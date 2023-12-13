@@ -1,0 +1,78 @@
+package com.jbp.admin.controller.platform;
+
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.RefundOrderRemarkRequest;
+import com.jbp.common.request.RefundOrderSearchRequest;
+import com.jbp.common.response.PlatformRefundOrderPageResponse;
+import com.jbp.common.response.RefundOrderAdminDetailResponse;
+import com.jbp.common.response.RefundOrderCountItemResponse;
+import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.RefundOrderService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 平台端退款订单控制器
+ * +----------------------------------------------------------------------
+ * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
+ * +----------------------------------------------------------------------
+ * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * +----------------------------------------------------------------------
+ * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
+ * +----------------------------------------------------------------------
+ * | Author: CRMEB Team <admin@crmeb.com>
+ * +----------------------------------------------------------------------
+ */
+@Slf4j
+@RestController
+@RequestMapping("api/admin/platform/refund/order")
+@Api(tags = "平台端退款订单控制器")
+public class PlatformRefundOrderController {
+
+    @Autowired
+    private RefundOrderService refundOrderService;
+
+    @PreAuthorize("hasAuthority('platform:refund:order:page:list')")
+    @ApiOperation(value = "平台端退款订单分页列表")
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public CommonResult<CommonPage<PlatformRefundOrderPageResponse>> getList(@Validated RefundOrderSearchRequest request, @Validated PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(refundOrderService.getPlatformAdminPage(request, pageParamRequest)));
+    }
+
+    @PreAuthorize("hasAuthority('platform:refund:order:status:num')")
+    @ApiOperation(value = "平台端获取退款订单各状态数量")
+    @RequestMapping(value = "/status/num", method = RequestMethod.GET)
+    public CommonResult<RefundOrderCountItemResponse> getOrderStatusNum(@RequestParam(value = "dateLimit", defaultValue = "") String dateLimit) {
+        return CommonResult.success(refundOrderService.getPlatformOrderStatusNum(dateLimit));
+    }
+
+    @PreAuthorize("hasAuthority('platform:refund:order:detail')")
+    @ApiOperation(value = "平台端退款订单详情")
+    @RequestMapping(value = "/detail/{refundOrderNo}", method = RequestMethod.GET)
+    public CommonResult<RefundOrderAdminDetailResponse> getDetail(@PathVariable(value = "refundOrderNo") String refundOrderNo) {
+        return CommonResult.success(refundOrderService.getPlatformDetail(refundOrderNo));
+    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台备注退款订单")
+    @PreAuthorize("hasAuthority('platform:refund:order:mark')")
+    @ApiOperation(value = "平台备注退款订单")
+    @RequestMapping(value = "/mark", method = RequestMethod.POST)
+    public CommonResult<String> mark(@RequestBody @Validated RefundOrderRemarkRequest request) {
+        if (refundOrderService.platformMark(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
+
+}
+
+
+

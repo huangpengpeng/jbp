@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.ProductDao">
+
+    <select id="getPlatformPageList" resultType="com.jbp.common.response.PlatformProductListResponse" parameterType="Map">
+        SELECT p.id,p.image,p.name as name,p.keyword,p.category_id as categoryId,p.price,p.sales,p.stock,p.ficti,
+        p.audit_status as auditStatus,p.reason,p.rank,m.name as merchantName,m.is_self as isSelf,p.rank
+        FROM eb_product AS p
+        right join eb_merchant AS m on p.mer_id = m.id
+        where p.is_del = 0 and p.is_recycle = 0
+        <choose>
+            <when test='type == "1"'>
+                and p.is_show = 1
+                and p.audit_status in (0,2)
+            </when>
+            <when test='type == "2"'>
+                and p.is_show = 0
+                and p.is_audit = 0
+                and p.audit_status in (0,1,2)
+            </when>
+            <when test='type == "6"'>
+                and p.audit_status = 1
+                and p.is_audit = 1
+            </when>
+            <when test='type == "7"'>
+                and p.audit_status = 3
+                and p.is_audit = 0
+            </when>
+        </choose>
+        <if test="merId != null and merId !='' ">
+            and p.mer_id = #{merId}
+        </if>
+        <if test="self != null">
+            and m.is_self = #{self}
+        </if>
+        <if test="categoryIds != null and categoryIds !='' ">
+            and find_in_set(p.category_id, #{categoryIds, jdbcType=VARCHAR})
+        </if>
+        <if test="keywords != null and keywords !='' ">
+            and (p.name like CONCAT('%', #{keywords, jdbcType=VARCHAR}, '%')
+            or p.keyword like CONCAT('%', #{keywords, jdbcType=VARCHAR}, '%'))
+        </if>
+        ORDER BY p.rank desc, p.id desc
+    </select>
+
+    <select id="findH5List" resultType="com.jbp.common.response.ProductFrontResponse" parameterType="Map">
+        SELECT p.id,p.image,p.name as name,p.price,p.ot_price as otPrice,p.price,p.sales,p.stock,p.ficti,
+        p.unit_name as unitName,p.reason,p.mer_id as merId,m.name as merName,m.category_id as merCategoryId,m.type_id as merTypeId
+        FROM eb_product AS p
+        right join eb_merchant AS m on p.mer_id = m.id
+        where p.is_del = 0 and p.is_recycle = 0 and p.is_show = 1
+        and p.audit_status in (0,2)
+        <if test="categoryId != null">
+            and p.category_id = #{categoryId}
+        </if>
+        <if test="brandId != null">
+            and p.brand_id = #{brandId}
+        </if>
+
+        <if test="minPrice != null">
+            and p.price &gt;= #{minPrice}
+        </if>
+        <if test="maxPrice != null">
+            and p.price &lt;= #{maxPrice}
+        </if>
+        <if test="keywords != null and keywords !='' ">
+            and (p.name like CONCAT('%', #{keywords, jdbcType=VARCHAR}, '%')
+            or p.keyword like CONCAT('%', #{keywords, jdbcType=VARCHAR}, '%'))
+        </if>
+        <if test="isSelf != null">
+            and m.is_self = #{isSelf}
+        </if>
+        ${lastStr}
+    </select>
+
+</mapper>

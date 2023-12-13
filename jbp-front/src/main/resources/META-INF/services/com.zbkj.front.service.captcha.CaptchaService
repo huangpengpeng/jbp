@@ -1,0 +1,3 @@
+com.jbp.front.service.captcha.impl.BlockPuzzleCaptchaServiceImpl
+com.jbp.front.service.captcha.impl.ClickWordCaptchaServiceImpl
+com.jbp.front.service.captcha.impl.DefaultCaptchaServiceImpl

@@ -1,0 +1,61 @@
+package com.jbp.service.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.closing.MerchantClosingRecord;
+import com.jbp.common.request.*;
+import com.jbp.common.response.MerchantClosingPlatformPageResponse;
+
+/**
+*  TransferRecordService 接口
+*  +----------------------------------------------------------------------
+*  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
+*  +----------------------------------------------------------------------
+*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  +----------------------------------------------------------------------
+*  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
+*  +----------------------------------------------------------------------
+*  | Author: CRMEB Team <admin@crmeb.com>
+*  +----------------------------------------------------------------------
+*/
+public interface MerchantClosingRecordService extends IService<MerchantClosingRecord> {
+
+    /**
+     * 商户结算分页列表(平台)
+     * @param request 搜索参数
+     * @param pageParamRequest 分页参数
+     * @return PageInfo
+     */
+    PageInfo<MerchantClosingPlatformPageResponse> getMerchantClosingPageListByPlatform(MerchantClosingSearchRequest request, PageParamRequest pageParamRequest);
+
+    /**
+     * 商户结算记录详情
+     * @param closingNo 结算单号
+     */
+    MerchantClosingRecord getByClosingNo(String closingNo);
+
+    /**
+     * 商户结算申请审核
+     * @param request 请求参数
+     * @return Boolean
+     */
+    Boolean userClosingAudit(ClosingAuditRequest request);
+
+    /**
+     * 商户结算到账凭证
+     */
+    Boolean proof(ClosingProofRequest request);
+
+    /**
+     * 商户结算备注
+     */
+    Boolean remark(ClosingRemarkRequest request);
+
+    /**
+     * 商户结算分页列表(商户)
+     * @param request 搜索参数
+     * @param pageParamRequest 分页参数
+     * @return PageInfo
+     */
+    PageInfo<MerchantClosingRecord> getMerchantClosingPageListByMerchant(MerchantClosingSearchRequest request, PageParamRequest pageParamRequest);
+}

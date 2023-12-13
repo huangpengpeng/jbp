@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.OrderDetailDao">
+
+    <select id="findReplyList" resultType="com.jbp.common.model.order.OrderDetail">
+        select od.* from eb_order_detail od
+        left join eb_order o on o.order_no = od.order_no and o.status in (5,6) and o.is_user_del = 0 and o.level = 1
+        where
+        od.is_receipt = 1
+        and od.is_reply = #{isReply}
+        and od.uid = #{userId}
+        order by od.id desc
+    </select>
+
+    <select id="findAfterSaleApplyList" resultType="com.jbp.common.model.order.OrderDetail">
+        select od.* from eb_order_detail od
+        left join eb_order o on o.order_no = od.order_no
+        where
+        od.uid = #{uid}
+        and o.status not in (0,6,9)
+        and o.is_user_del = 0 and o.level = 1
+        and o.refund_status &lt; 3
+        and (od.apply_refund_num + od.refund_num) &lt; od.pay_num
+        <if test="orderNo != '' and orderNo != null ">
+            and od.order_no = #{orderNo}
+        </if>
+        order by od.id desc
+    </select>
+
+    <select id="getSalesNumByDateAndProductId" resultType="java.lang.Integer">
+        select IFNULL(sum(pay_num), 0) as pay_num from eb_order_detail
+        where order_no in (SELECT order_no FROM `eb_order` where paid = 1 and is_del = 0 and date_format(pay_time, '%Y-%m-%d') = #{date})
+        and product_id = #{proId}
+    </select>
+
+    <select id="getSalesByDateAndProductId" resultType="java.math.BigDecimal">
+        select IFNULL(sum(price), 0) as price from eb_order_detail
+        where order_no in (SELECT order_no FROM `eb_order` where paid = 1 and is_del = 0 and date_format(pay_time, '%Y-%m-%d') = #{date})
+        and product_id = #{proId}
+    </select>
+
+    <select id="getAwaitReplyCount" resultType="java.lang.Integer">
+        select count(*) from eb_order_detail od
+        left join eb_order o on o.order_no = od.order_no and o.status in (5,6) and o.is_user_del = 0 and o.level = 1
+        where
+        od.is_receipt = 1
+        and od.is_reply = 0
+        and od.uid = #{userId}
+    </select>
+</mapper>

@@ -1,0 +1,178 @@
+package com.jbp.service.service.impl;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.jbp.service.dao.MerchantDailyStatementDao;
+import com.jbp.service.service.MerchantDailyStatementService;
+import com.jbp.service.service.OrderProfitSharingService;
+import com.jbp.service.service.OrderService;
+import com.jbp.service.service.RefundOrderService;
+import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.bill.MerchantDailyStatement;
+import com.jbp.common.model.order.OrderProfitSharing;
+import com.jbp.common.model.order.RefundOrder;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * MerchantDailyStatementServiceImpl 接口实现
+ * +----------------------------------------------------------------------
+ * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
+ * +----------------------------------------------------------------------
+ * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * +----------------------------------------------------------------------
+ * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
+ * +----------------------------------------------------------------------
+ * | Author: CRMEB Team <admin@crmeb.com>
+ * +----------------------------------------------------------------------
+ */
+@Service
+public class MerchantDailyStatementServiceImpl extends ServiceImpl<MerchantDailyStatementDao, MerchantDailyStatement> implements MerchantDailyStatementService {
+
+    @Resource
+    private MerchantDailyStatementDao dao;
+
+    @Autowired
+    private OrderProfitSharingService orderProfitSharingService;
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private RefundOrderService refundOrderService;
+
+    /**
+     * 查询某一天的所有商户日帐单
+     *
+     * @param date 日期:年-月-日
+     * @return List
+     */
+    @Override
+    public List<MerchantDailyStatement> findByDate(String date) {
+        LambdaQueryWrapper<MerchantDailyStatement> lqw = Wrappers.lambdaQuery();
+        lqw.eq(MerchantDailyStatement::getDataDate, date);
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 获取某个月的所有帐单
+     *
+     * @param month 月份：年-月
+     * @return List
+     */
+    @Override
+    public List<MerchantDailyStatement> findByMonth(String month) {
+        LambdaQueryWrapper<MerchantDailyStatement> lqw = Wrappers.lambdaQuery();
+        lqw.apply("date_format(data_date, '%Y-%m') = {0}", month);
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 分页列表
+     *
+     * @param dateLimit        时间参数
+     * @param pageParamRequest 分页参数
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<MerchantDailyStatement> getPageList(String dateLimit, PageParamRequest pageParamRequest) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Page<MerchantDailyStatement> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<MerchantDailyStatement> lqw = Wrappers.lambdaQuery();
+        lqw.eq(MerchantDailyStatement::getMerId, systemAdmin.getMerId());
+        if (StrUtil.isNotBlank(dateLimit)) {
+            DateLimitUtilVo dateLimitVo = CrmebDateUtil.getDateLimit(dateLimit);
+            String startDate = DateUtil.parse(dateLimitVo.getStartTime()).toDateStr();
+            String endDate = DateUtil.parse(dateLimitVo.getEndTime()).toDateStr();
+            lqw.between(MerchantDailyStatement::getDataDate, startDate, endDate);
+        }
+        lqw.orderByDesc(MerchantDailyStatement::getId);
+        List<MerchantDailyStatement> list = dao.selectList(lqw);
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        // 判断是否包含今天
+        String today = DateUtil.date().toDateStr();
+        for (MerchantDailyStatement dailyStatement : list) {
+            if (!dailyStatement.getDataDate().equals(today)) {
+                continue;
+            }
+            writeDailyStatement(dailyStatement);
+        }
+        return CommonPage.copyPageInfo(page, list);
+    }
+
+    /**
+     * 为帐单写入数据
+     *
+     * @param statement 帐单
+     */
+    private void writeDailyStatement(MerchantDailyStatement statement) {
+        List<OrderProfitSharing> sharingList = orderProfitSharingService.findByDate(statement.getMerId(), statement.getDataDate());
+        List<RefundOrder> refundOrderList = refundOrderService.findByDate(statement.getMerId(), statement.getDataDate());
+
+        // 订单支付总金额
+        BigDecimal orderPayAmount = new BigDecimal("0.00");
+        // 订单支付笔数
+        int orderNum = 0;
+        // 商户分账金额
+        BigDecimal orderIncomeAmount = new BigDecimal("0.00");
+        // 平台手续费
+        BigDecimal handlingFee = new BigDecimal("0.00");
+        // 一二级分佣金额
+        BigDecimal firstBrokerage = new BigDecimal("0.00");
+        BigDecimal secondBrokerage = new BigDecimal("0.00");
+        // 商户退款金额
+        BigDecimal refundAmount = new BigDecimal("0.00");
+        // 退款笔数
+        int refundNum = 0;
+
+        if (CollUtil.isNotEmpty(sharingList)) {
+            orderPayAmount =  sharingList.stream().map(OrderProfitSharing::getOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            orderNum = sharingList.size();
+            orderIncomeAmount = sharingList.stream().map(OrderProfitSharing::getProfitSharingMerPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            handlingFee = sharingList.stream().map(OrderProfitSharing::getProfitSharingPlatPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            firstBrokerage = sharingList.stream().map(OrderProfitSharing::getFirstBrokerageFee).reduce(BigDecimal.ZERO, BigDecimal::add);
+            secondBrokerage = sharingList.stream().map(OrderProfitSharing::getSecondBrokerageFee).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        if (CollUtil.isNotEmpty(refundOrderList)) {
+            refundAmount = refundOrderList.stream().map(RefundOrder::getMerchantRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundNum = refundOrderList.size();
+        }
+
+        // 支出总金额 = 商户退款金额
+        BigDecimal payoutAmount = refundAmount;
+        // 支出笔数 = 退款笔数
+        int payoutNum = refundNum;
+        // 商户日收支 = 订单收入金额 - 商户退款金额
+        BigDecimal incomeExpenditure = orderIncomeAmount.subtract(refundAmount);
+
+        statement.setOrderPayAmount(orderPayAmount);
+        statement.setOrderNum(orderNum);
+        statement.setOrderIncomeAmount(orderIncomeAmount);
+        statement.setHandlingFee(handlingFee);
+        statement.setFirstBrokerage(firstBrokerage);
+        statement.setSecondBrokerage(secondBrokerage);
+        statement.setPayoutAmount(payoutAmount);
+        statement.setPayoutNum(payoutNum);
+        statement.setRefundAmount(refundAmount);
+        statement.setRefundNum(refundNum);
+        statement.setIncomeExpenditure(incomeExpenditure);
+    }
+}
+

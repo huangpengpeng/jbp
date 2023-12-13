@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.CouponDao">
+
+    <select id="getH5ListBySearch" resultType="com.jbp.common.model.coupon.Coupon" parameterType="Map">
+        SELECT c.*
+        FROM eb_coupon AS c
+        where
+        c.is_del = 0 and c.status = 1 and receive_type = 1
+        and (last_total > 0 or is_limited = 0)
+        and (is_time_receive = 0 or (receive_start_time &lt;= #{date} and receive_end_time &gt;= #{date}))
+        and (is_fixed_time = 0 or use_end_time &gt;= #{date})
+        <if test="category != null">
+            and category = #{category}
+        </if>
+        <if test="merId != null">
+            and mer_id = #{merId}
+        </if>
+        <if test="productId != null">
+            and #{productId} in (select pid from eb_coupon_product where cid = c.id)
+        </if>
+        order by c.sort,c.id desc
+    </select>
+
+</mapper>

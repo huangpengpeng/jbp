@@ -1,0 +1,42 @@
+package com.jbp.admin.service;
+
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.request.IntegralPageSearchRequest;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.IntegralConfigResponse;
+import com.jbp.common.response.IntegralRecordPageResponse;
+
+/**
+ * 积分服务
+ * +----------------------------------------------------------------------
+ * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
+ * +----------------------------------------------------------------------
+ * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * +----------------------------------------------------------------------
+ * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
+ * +----------------------------------------------------------------------
+ * | Author: CRMEB Team <admin@crmeb.com>
+ * +----------------------------------------------------------------------
+ */
+public interface IntegralService {
+
+    /**
+     * 获取积分配置
+     * @return IntegralConfigResponse
+     */
+    IntegralConfigResponse getConfig();
+
+    /**
+     * 编辑积分配置
+     * @param request 积分配置请求对象
+     * @return Boolean
+     */
+    Boolean updateConfig(IntegralConfigResponse request);
+
+    /**
+     * 积分记录分页列表
+     * @param request 搜索参数
+     * @param pageRequest 分页参数
+     */
+    PageInfo<IntegralRecordPageResponse> findRecordPageList(IntegralPageSearchRequest request, PageParamRequest pageRequest);
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.CouponUserDao">
+
+    <select id="findListByPreOrder" resultType="com.jbp.common.response.CouponUserOrderResponse" parameterType="Map">
+        SELECT cu.id,cu.coupon_id as couponId,cu.mer_id as merId,cu.name,cu.category,cu.money,cu.min_price as minPrice,
+        cu.status,cu.start_time as startTime,cu.end_time as endTime,cu.use_time as useTime
+        FROM eb_coupon_user AS cu
+        where
+        cu.`status` = 0
+        <if test="merId != null">
+            and cu.mer_id = #{merId}
+        </if>
+        and (cu.min_price = 0
+        <if test="maxPrice != null">
+            or cu.min_price &lt;= #{maxPrice}
+        </if>
+        )
+        <if test="date != null">
+            and cu.start_time &lt; #{date}
+            and cu.end_time &gt; #{date}
+        </if>
+        <if test="uid != null">
+            and cu.uid = #{uid}
+        </if>
+        and (cu.category = 1 or (cu.category = 2 and ${pidPrimaryKeySql}))
+        order by cu.id desc
+    </select>
+
+</mapper>
