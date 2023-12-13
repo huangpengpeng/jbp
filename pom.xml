@@ -3,19 +3,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
-
     <modules>
-        <module>jbp-common</module>
-        <module>jbp-service</module>
-        <module>jbp-admin</module>
-        <module>jbp-front</module>
+        <module>crmeb-common</module>
+        <module>crmeb-service</module>
+        <module>crmeb-admin</module>
+        <module>crmeb-front</module>
     </modules>
 
-    <groupId>jbp</groupId>
-    <artifactId>com.jbp</artifactId>
+    <groupId>com.zbkj</groupId>
+    <artifactId>crmeb</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>jbp</name>
-    <description>jbp project for Spring Boot</description>
+    <name>crmeb</name>
+    <description>Crmeb project for Spring Boot</description>
 
     <properties>
         <springboot.version>2.2.6.RELEASE</springboot.version>
@@ -29,6 +28,7 @@
         <druid.version>1.1.20</druid.version>
         <mysql.version>5.1.24</mysql.version>
         <mysql.plus.version>3.3.1</mysql.plus.version>
+        <weixin-java.version>3.9.0</weixin-java.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -200,7 +200,6 @@
             <artifactId>poi-ooxml</artifactId>
             <version>3.17</version>
         </dependency>
-
         <!-- Apache Commons FileUpload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -251,26 +250,14 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.10</version>
+            <version>1.4.18</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-core</artifactId>
-            <version>3.8.2</version>
-        </dependency>
         <dependency>
             <groupId>com.vaadin.external.google</groupId>
             <artifactId>android-json</artifactId>
             <version>0.0.20131108.vaadin1</version>
             <scope>compile</scope>
-        </dependency>
-        <!--图片上传-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.5.2</version>
         </dependency>
 
         <!--谷歌二维码-->
@@ -285,12 +272,6 @@
             <version>3.3.3</version>
         </dependency>
 
-        <!--中文转拼音-->
-        <dependency>
-            <groupId>com.belerweb</groupId>
-            <artifactId>pinyin4j</artifactId>
-            <version>2.5.0</version>
-        </dependency>
 
         <!--解析JWT-->
         <dependency>
@@ -309,6 +290,32 @@
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
             <version>4.15.20.ALL</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-miniapp</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-pay</artifactId>
+            <version>${weixin-java.version}</version>
+        </dependency>
+
+        <!-- 京东云存储 -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.12.99</version>
+        </dependency>
+
+        <!--Ip解析地址-->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>2.7.0</version>
         </dependency>
 
     </dependencies>

@@ -1,39 +1,60 @@
-# jwebpay
+# 环境
+1. Java Jdk1.8
+2. Redis 5+
+3. Mysql 5.7+
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+# Java项目框架
+1. SpringBoot 2.2.6.RELEASE
+2. Maven 3.6.1
+3. Swagger 2.9.2
+4. Mybatis Plus 3.3.1
 
-#### 软件架构
-软件架构说明
-
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+# 文档链接
+admin 开发文档 http://api.admin.merchant.java.crmeb.net/doc.html
+front 开发文档 http://api.front.merchant.java.crmeb.net/doc.html
+安装部署文档 https://doc.crmeb.com/crmebjavalandmer/crmebjavamer/6919
+使用说明 https://doc.crmeb.com/crmebjavalandmer/crmebjavamer/6920
 
 
-#### 特技
+# 部署
+1. 拿到jar包，上传到web目录下，（宝塔配置的域名指向的web目录下即可）
+2. 在 jar包同级目录下运行 `start.sh (运行命令为 ./start.sh )` 脚本即可启动项目
+3. shell脚本会自动运行 `tail -f crmeb_out.file` 命令输出当前启动日志
+4. 看到 `Completed 200 OK` 表示启动成功
+5. 默认启动 `20000` 端口号
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+# 注意事项
+1. web端口号不可以设置为`20000`
+2. 反向代理地址: `http://127.0.0.1:20000` 【外网域名指向这个地址】
+
+
+# 二次开发帮助文档
+##注解参考：
+1. `@NotNull`    注解	作用类型	解释	任何类型	属性不能为 `null`
+2. `@NotEmpty`	集合	集合不能为 `null`，且 `size` 大于 `0`
+3. `@NotBlank`	只能作用在 `String` 上，不能为 `null`，而且调用 `trim()` 后，长度必须大于 `0`
+4. `@AssertTrue`	`Boolean、boolean`	布尔属性必须是 `true`
+5. `@Min`	数字类型（原子和包装）	限定数字的最小值（整型）
+6. `@Max`	同 `@Min`	限定数字的最大值（整型）
+7. `@DecimalMin`	同 `@Min`	限定数字的最小值（字符串，可以是小数）
+8. `@DecimalMax`	同 `@Min`	限定数字的最大值（字符串，可以是小数）
+9. `@Range`	数字类型（原子和包装）	限定数字范围（长整型）
+10. `@Length`	字符串	限定字符串长度
+11. `@Size`	集合	限定集合大小
+12. `@Past`	时间、日期	必须是一个过去的时间或日期
+13. `@Future`	时期、时间	必须是一个未来的时间或日期
+14. `@Email`	字符串	必须是一个邮箱格式
+15. `@Pattern`	字符串、字符	正则匹配字符串
+
+# 产品复制
+1. 设置 [99api](https://www.99api.com "99api") 对应的api到配置表eb_system_config 
+2. 配置baseUrl和key 实际的key可以根据自己的定义修改
+3. 目前支持天猫，京东，淘宝，苏宁，拼多多
+
+# 打印机
+1. [易联云文档](http://doc2.10ss.net/337744 "易联云文档")
+2. [易联云JAVA SDK](http://doc2.10ss.net/337744 "易联云JAVA SDK gitee文档")
+
+
+# 行为验证码 安吉加加
+https://captcha.anji-plus.com/
