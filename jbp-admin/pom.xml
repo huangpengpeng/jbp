@@ -76,23 +76,23 @@
 			<!--&lt;!&ndash;                    <exclude>application-prod.yml</exclude>&ndash;&gt;-->
 			<!--                </excludes>-->
 			<!--            </resource>-->
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
+<!--			<resource>-->
+<!--				<directory>src/main/resources</directory>-->
+<!--				<filtering>true</filtering>-->
+<!--			</resource>-->
 			<!--            <resource>-->
 			<!--
 			<directory>src/main/resources.${spring.profiles.active}</directory>-->
 			<!--                <filtering>false</filtering>-->
 			<!--            </resource>-->
 			<!--这个元素描述了项目相关的所有资源路径列表，例如和项目相关的属性文件，这些资源被包含在最终的打包文件里。-->
-			<resource>
-				<!--   描述存放资源的目录，该路径相对POM路径-->
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</resource>
+<!--			<resource>-->
+<!--				   描述存放资源的目录，该路径相对POM路径-->
+<!--				<directory>src/main/java</directory>-->
+<!--				<includes>-->
+<!--					<include>**/*.xml</include>-->
+<!--				</includes>-->
+<!--			</resource>-->
 		</resources>
 	</build>
 

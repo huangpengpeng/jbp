@@ -45,7 +45,7 @@ spring:
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
-    password: 111111
+    password: 
     timeout: 30000 # 连接超时时间（毫秒）
     database: 9  #默认数据库
     jedis:
@@ -60,11 +60,10 @@ debug: true
 logging:
   level:
     io.swagger.*: error
-    com.zbjk.crmeb: debug
     org.springframework.boot.autoconfigure: ERROR
   config: classpath:logback-spring.xml
   file:
-    path: ./crmeb_log
+    path: ./jbp_log
 
 # mybatis 配置
 mybatis-plus:
