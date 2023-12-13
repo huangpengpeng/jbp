@@ -12,9 +12,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.UserBrokerageRecordDao;
-import com.jbp.service.service.UserBrokerageRecordService;
-import com.jbp.service.service.UserService;
 import com.jbp.common.constants.BrokerageRecordConstants;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.DateConstants;
@@ -26,6 +23,9 @@ import com.jbp.common.request.RetailStoreSubUserSearchRequest;
 import com.jbp.common.utils.ArrayUtil;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.UserBrokerageRecordDao;
+import com.jbp.service.service.UserBrokerageRecordService;
+import com.jbp.service.service.UserService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -92,21 +92,6 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
         return dao.selectList(lqw);
     }
 
-//    /**
-//     * 获取记录(订单不可用此方法)
-//     * @param linkId 关联id
-//     * @param linkType 关联类型
-//     * @return 记录列表
-//     */
-//    @Override
-//    public UserBrokerageRecord getByLinkIdAndLinkType(String linkId, String linkType) {
-//        LambdaQueryWrapper<UserBrokerageRecord> lqw = new LambdaQueryWrapper<>();
-//        lqw.eq(UserBrokerageRecord::getLinkId, linkId);
-//        lqw.eq(UserBrokerageRecord::getLinkType, linkType);
-//        lqw.last(" limit 1");
-//        return dao.selectOne(lqw);
-//    }
-
     /**
      * 佣金解冻
      */
@@ -154,8 +139,6 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
         QueryWrapper<UserBrokerageRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uid", uid);
         queryWrapper.eq("status", BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//        queryWrapper.groupBy("left(update_time, 7)");
-//        queryWrapper.orderByDesc("left(update_time, 7)");
         queryWrapper.orderByDesc("id");
         List<UserBrokerageRecord> recordList = dao.selectList(queryWrapper);
         return CommonPage.copyPageInfo(recordPage, recordList);
@@ -291,51 +274,6 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
         return dao.selectList(lqw);
     }
 
-//    /**
-//     * 佣金总金额（单位时间）
-//     * @param dateLimit 时间参数
-//     * @return BigDecimal
-//     */
-//    @Override
-//    public BigDecimal getTotalSpreadPriceBydateLimit(String dateLimit) {
-//        LambdaQueryWrapper<UserBrokerageRecord> lqw = new LambdaQueryWrapper<>();
-//        lqw.select(UserBrokerageRecord::getPrice);
-//        lqw.eq(UserBrokerageRecord::getLinkType, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
-//        lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_ADD);
-//        lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//        if (StrUtil.isNotBlank(dateLimit)) {
-//            dateLimitUtilVo dateLimitVo = DateUtil.getDateLimit(dateLimit);
-//            lqw.between(UserBrokerageRecord::getUpdateTime, dateLimitVo.getStartTime(), dateLimitVo.getEndTime());
-//        }
-//        List<UserBrokerageRecord> list = dao.selectList(lqw);
-//        if (CollUtil.isEmpty(list)) {
-//            return BigDecimal.ZERO;
-//        }
-//        return list.stream().map(UserBrokerageRecord::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-//    }
-//
-//    /**
-//     * 单位时间消耗的佣金
-//     * @param dateLimit 时间参数
-//     * @return
-//     */
-//    @Override
-//    public BigDecimal getSubSpreadPriceByDateLimit(String dateLimit) {
-//        LambdaQueryWrapper<UserBrokerageRecord> lqw = new LambdaQueryWrapper<>();
-//        lqw.select(UserBrokerageRecord::getPrice);
-//        lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_SUB);
-//        lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//        if (StrUtil.isNotBlank(dateLimit)) {
-//            dateLimitUtilVo dateLimitVo = DateUtil.getDateLimit(dateLimit);
-//            lqw.between(UserBrokerageRecord::getUpdateTime, dateLimitVo.getStartTime(), dateLimitVo.getEndTime());
-//        }
-//        List<UserBrokerageRecord> list = dao.selectList(lqw);
-//        if (CollUtil.isEmpty(list)) {
-//            return BigDecimal.ZERO;
-//        }
-//        return list.stream().map(UserBrokerageRecord::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-//    }
-
     /**
      * 获取冻结期佣金
      *
@@ -385,103 +323,9 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
     @Override
     public UserBrokerageRecord getOneByLinkNo(String linkNo) {
         LambdaQueryWrapper<UserBrokerageRecord> lqw = new LambdaQueryWrapper<>();
-        lqw.select(UserBrokerageRecord::getPrice);
         lqw.eq(UserBrokerageRecord::getLinkNo, linkNo);
         return dao.selectOne(lqw);
     }
-
-//    /**
-//     * 佣金记录列表
-//     * @param request 筛选条件
-//     * @param pageParamRequest 分页参数
-//     * @return PageInfo
-//     */
-//    @Override
-//    public PageInfo<UserBrokerageRecord> getAdminList(BrokerageRecordRequest request, PageParamRequest pageParamRequest) {
-//        Page<UserBrokerageRecord> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-//        LambdaQueryWrapper<UserBrokerageRecord> lqw = new LambdaQueryWrapper<>();
-//        if (ObjectUtil.isNotNull(request.getType())) {
-//            switch (request.getType()) {
-//                case 1:// 订单返佣
-//                    lqw.eq(UserBrokerageRecord::getLinkType, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
-//                    lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//                    lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_ADD);
-//                    break;
-//                case 2:// 申请提现
-//                    lqw.eq(UserBrokerageRecord::getLinkType, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_WITHDRAW);
-//                    lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_WITHDRAW);
-//                    lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_SUB);
-//                    break;
-//                case 3:// 提现失败
-//                    lqw.eq(UserBrokerageRecord::getLinkType, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_WITHDRAW);
-//                    lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//                    lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_ADD);
-//                    break;
-//                case 4:// 提现成功
-//                    lqw.eq(UserBrokerageRecord::getLinkType, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_WITHDRAW);
-//                    lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//                    lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_SUB);
-//                    break;
-//                case 5:// 佣金转余额
-//                    lqw.eq(UserBrokerageRecord::getLinkType, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_YUE);
-//                    lqw.eq(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
-//                    lqw.eq(UserBrokerageRecord::getType, BrokerageRecordConstants.BROKERAGE_RECORD_TYPE_SUB);
-//                    break;
-//            }
-//        } else {
-//            lqw.in(UserBrokerageRecord::getStatus, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE, BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_WITHDRAW);
-//        }
-//        lqw.orderByDesc(UserBrokerageRecord::getUpdateTime, UserBrokerageRecord::getId);
-//        List<UserBrokerageRecord> list = dao.selectList(lqw);
-//        return CommonPage.copyPageInfo(page, list);
-//    }
-//
-//    /**
-//     * 根据日期获取支付佣金金额（确认到账佣金）
-//     * @param date 日期，yyyy-MM-dd格式
-//     * @return BigDecimal
-//     */
-//    @Override
-//    public BigDecimal getBrokerageAmountByDate(String date) {
-//        QueryWrapper<UserBrokerageRecord> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("IFNULL(sum(price), 0) as price");
-//        queryWrapper.eq("link_type", "order");
-//        queryWrapper.eq("type", 1);
-//        queryWrapper.eq("status", 3);
-//        queryWrapper.apply("date_format(create_time, '%Y-%m-%d') = {0}", date);
-//        return dao.selectOne(queryWrapper).getPrice();
-//    }
-//
-//    /**
-//     * 获取累计佣金转余额金额
-//     * @return BigDecimal
-//     */
-//    @Override
-//    public BigDecimal getTotalYuePrice() {
-//        QueryWrapper<UserBrokerageRecord> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("IFNULL(sum(price), 0) as price");
-//        queryWrapper.eq("link_type", "yue");
-//        queryWrapper.eq("type", 2);
-//        queryWrapper.eq("status", 3);
-//        return dao.selectOne(queryWrapper).getPrice();
-//    }
-//
-//    /**
-//     * 根据月份获取佣金明细
-//     * @param uid uid
-//     * @param month 月份
-//     * @return
-//     */
-//    private List<UserBrokerageRecord> getListByUidAndMonth(Integer uid, String month) {
-//        QueryWrapper<UserBrokerageRecord> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("id", "title", "price", "update_time", "type", "status");
-//        queryWrapper.eq("uid", uid);
-//        queryWrapper.in("status", BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE
-//                , BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_WITHDRAW);
-//        queryWrapper.eq("left(update_time, 7)", month);
-//        queryWrapper.orderByDesc("update_time");
-//        return dao.selectList(queryWrapper);
-//    }
 
     /**
      * 获取需要解冻的记录列表

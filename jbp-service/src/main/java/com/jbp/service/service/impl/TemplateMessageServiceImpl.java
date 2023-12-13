@@ -3,19 +3,24 @@ package com.jbp.service.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.TemplateMessageDao;
-import com.jbp.service.service.SystemNotificationService;
-import com.jbp.service.service.TemplateMessageService;
-import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.template.TemplateMessage;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.common.vo.ProgramTemplateMessageVo;
+import com.jbp.common.vo.SendProgramTemplateMessageItemVo;
+import com.jbp.common.vo.SendTemplateMessageItemVo;
+import com.jbp.common.vo.TemplateMessageVo;
+import com.jbp.service.dao.TemplateMessageDao;
+import com.jbp.service.service.SystemNotificationService;
+import com.jbp.service.service.TemplateMessageService;
+import com.jbp.service.service.WechatService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +30,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +38,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -50,8 +56,8 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
     @Autowired
     private RedisUtil redisUtil;
 
-//    @Autowired
-//    private WechatNewService wechatNewService;
+    @Autowired
+    private WechatService wechatService;
 
     @Autowired
     private SystemNotificationService systemNotificationService;
@@ -64,26 +70,24 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
         String redisKey = RedisConstants.WE_CHAT_MESSAGE_KEY_PUBLIC;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("TemplateMessageServiceImpl.consumePublic | size:" + size);
-        if(size < 1){
+        if (size < 1) {
             return;
         }
         for (int i = 0; i < size; i++) {
             //如果10秒钟拿不到一个数据，那么退出循环
             Object data = redisUtil.getRightPop(redisKey, 10L);
-            if(null == data){
+            if (null == data) {
                 continue;
             }
-            // TODO
-//            try{
-//                TemplateMessageVo templateMessage = JSONObject.toJavaObject(JSONObject.parseObject(data.toString()), TemplateMessageVo.class);
-//                boolean result = wechatNewService.sendPublicTemplateMessage(templateMessage);
-////                boolean result = weChatService.sendPublicTempMessage(templateMessage);
-//                if(!result){
-//                    redisUtil.lPush(redisKey, data);
-//                }
-//            }catch (Exception e){
-//                redisUtil.lPush(redisKey, data);
-//            }
+            try {
+                TemplateMessageVo templateMessage = JSONObject.toJavaObject(JSONObject.parseObject(data.toString()), TemplateMessageVo.class);
+                boolean result = wechatService.sendPublicTemplateMessage(templateMessage);
+                if (!result) {
+                    redisUtil.lPush(redisKey, data);
+                }
+            } catch (Exception e) {
+                redisUtil.lPush(redisKey, data);
+            }
         }
     }
 
@@ -95,13 +99,13 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
         String redisKey = RedisConstants.WE_CHAT_MESSAGE_KEY_PROGRAM;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("TemplateMessageServiceImpl.consumeProgram | size:" + size);
-        if(size < 1){
+        if (size < 1) {
             return;
         }
         for (int i = 0; i < size; i++) {
             //如果10秒钟拿不到一个数据，那么退出循环
             Object data = redisUtil.getRightPop(redisKey, 10L);
-            if(null == data){
+            if (null == data) {
                 continue;
             }
             // TODO
@@ -119,60 +123,61 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
     /**
      * 发送模板消息
+     *
      * @param templateId 模板消息编号
-     * @param temMap 内容Map
-     * @param openId 微信用户openid
+     * @param temMap     内容Map
+     * @param openId     微信用户openid
      */
     @Override
     public void pushTemplateMessage(Integer templateId, HashMap<String, String> temMap, String openId) {
-        // TODO
-//        TemplateMessageVo templateMessageVo = new TemplateMessageVo();
-//
-//        TemplateMessage templateMessage = getById(templateId);
-//        if(ObjectUtil.isNull(templateMessage) || StrUtil.isBlank(templateMessage.getContent())){
-//            return;
-//        }
-//        templateMessageVo.setTemplate_id(templateMessage.getTempId());
-//
-//        HashMap<String, SendTemplateMessageItemVo> hashMap = new HashMap<>();
-//        for (Map.Entry<String, String> entry : temMap.entrySet()){
-//            hashMap.put(entry.getKey(), new SendTemplateMessageItemVo(entry.getValue()));
-//        }
-//
-//        templateMessageVo.setData(hashMap);
-//        templateMessageVo.setTouser(openId);
-//        redisUtil.lPush(Constants.WE_CHAT_MESSAGE_KEY_PUBLIC, JSONObject.toJSONString(templateMessageVo));
+        TemplateMessageVo templateMessageVo = new TemplateMessageVo();
+
+        TemplateMessage templateMessage = getById(templateId);
+        if (ObjectUtil.isNull(templateMessage) || StrUtil.isBlank(templateMessage.getContent())) {
+            return;
+        }
+        templateMessageVo.setTemplate_id(templateMessage.getTempId());
+
+        HashMap<String, SendTemplateMessageItemVo> hashMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : temMap.entrySet()) {
+            hashMap.put(entry.getKey(), new SendTemplateMessageItemVo(entry.getValue()));
+        }
+
+        templateMessageVo.setData(hashMap);
+        templateMessageVo.setTouser(openId);
+        wechatService.sendPublicTemplateMessage(templateMessageVo);
     }
 
     /**
      * 发送小程序订阅消息
+     *
      * @param templateId 模板消息编号
-     * @param temMap 内容Map
-     * @param openId 微信用户openId
+     * @param temMap     内容Map
+     * @param openId     微信用户openId
      */
     @Override
     public void pushMiniTemplateMessage(Integer templateId, HashMap<String, String> temMap, String openId) {
-        // TODO
         TemplateMessage templateMessage = getById(templateId);
-        if(ObjectUtil.isNull(templateMessage) || StrUtil.isBlank(templateMessage.getContent())){
+        if (ObjectUtil.isNull(templateMessage) || StrUtil.isBlank(templateMessage.getContent())) {
             return;
         }
 
-//        ProgramTemplateMessageVo programTemplateMessageVo = new ProgramTemplateMessageVo();
-//        programTemplateMessageVo.setTemplate_id(templateMessage.getTempId());
-//
-//        //组装关键字数据
-//        HashMap<String, SendProgramTemplateMessageItemVo> hashMap = new HashMap<>();
-//        temMap.forEach((key, value) -> hashMap.put(key, new SendProgramTemplateMessageItemVo(value)));
-//
-//        programTemplateMessageVo.setData(hashMap);
-//        programTemplateMessageVo.setTouser(openId);
-//        redisUtil.lPush(Constants.WE_CHAT_MESSAGE_KEY_PROGRAM, JSONObject.toJSONString(programTemplateMessageVo));
+        ProgramTemplateMessageVo programTemplateMessageVo = new ProgramTemplateMessageVo();
+        programTemplateMessageVo.setTemplate_id(templateMessage.getTempId());
+
+        //组装关键字数据
+        HashMap<String, SendProgramTemplateMessageItemVo> hashMap = new HashMap<>();
+        temMap.forEach((key, value) -> hashMap.put(key, new SendProgramTemplateMessageItemVo(value)));
+
+        programTemplateMessageVo.setData(hashMap);
+        programTemplateMessageVo.setTouser(openId);
+        wechatService.sendMiniSubscribeMessage(programTemplateMessageVo);
     }
 
     /**
      * 修改模板状态
-     * @param id 模板id
+     *
+     * @param id     模板id
      * @param status 状态
      */
     @Override
@@ -187,6 +192,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
     /**
      * 公众号模板消息同步
+     *
      * @return Boolean
      */
     @Override
@@ -213,6 +219,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
     /**
      * 小程序订阅消息同步
+     *
      * @return Boolean
      */
     @Override
@@ -269,6 +276,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
     /**
      * 通过模板编号获取列表
+     *
      * @param idList 模板编号列表
      * @return List
      */
@@ -280,6 +288,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
     /**
      * 查询单条数据
+     *
      * @param id Integer id
      */
     @Override
@@ -293,6 +302,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
     /**
      * 获取模板列表
+     *
      * @param tidList id数组
      * @return List
      */

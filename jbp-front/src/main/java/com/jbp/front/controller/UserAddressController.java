@@ -5,6 +5,7 @@ import com.jbp.common.request.UserAddressRequest;
 import com.jbp.common.request.WechatAddressImportRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserAddressService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -44,11 +45,8 @@ public class UserAddressController {
 
     @ApiOperation(value = "用户地址添加")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public CommonResult<UserAddress> add(@RequestBody @Validated UserAddressRequest request) {
-        if (userAddressService.create(request)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
+    public CommonResult<Integer> add(@RequestBody @Validated UserAddressRequest request) {
+        return CommonResult.success(userAddressService.create(request));
     }
 
     @ApiOperation(value = "用户地址编辑")
@@ -83,20 +81,17 @@ public class UserAddressController {
 
     @ApiOperation(value = "设置默认地址")
     @RequestMapping(value = "/set/default/{id}", method = RequestMethod.POST)
-    public CommonResult<UserAddress> setDefault(@PathVariable(value = "id") Integer id) {
+    public CommonResult<Object> setDefault(@PathVariable(value = "id") Integer id) {
         if (userAddressService.setDefault(id)) {
             return CommonResult.success();
         }
         return CommonResult.failed();
     }
 
-    @ApiOperation(value = "微信地址导入")
-    @RequestMapping(value = "/wechant/import", method = RequestMethod.POST)
-    public CommonResult<UserAddress> wechatImport(@RequestBody @Validated WechatAddressImportRequest request) {
-        if (userAddressService.wechatImport(request)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
+    @ApiOperation(value = "获取微信地址信息")
+    @RequestMapping(value = "/wechat/info", method = RequestMethod.POST)
+    public CommonResult<UserAddress> wechatInfo(@RequestBody @Validated WechatAddressImportRequest request) {
+        return CommonResult.success(userAddressService.getWechatInfo(request));
     }
 }
 

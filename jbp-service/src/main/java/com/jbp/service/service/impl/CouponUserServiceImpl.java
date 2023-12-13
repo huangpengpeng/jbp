@@ -15,11 +15,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.CouponUserDao;
-import com.jbp.service.service.CouponService;
-import com.jbp.service.service.CouponUserService;
-import com.jbp.service.service.ProductService;
-import com.jbp.service.service.UserService;
 import com.jbp.common.constants.CouponConstants;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.constants.OrderConstants;
@@ -27,9 +22,11 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponUser;
+import com.jbp.common.model.product.Product;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.CouponUserSearchRequest;
+import com.jbp.common.request.MyCouponRequest;
 import com.jbp.common.request.OrderUseCouponRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.CouponUserOrderResponse;
@@ -42,6 +39,8 @@ import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.PreMerchantOrderVo;
 import com.jbp.common.vo.PreOrderInfoDetailVo;
 import com.jbp.common.vo.PreOrderInfoVo;
+import com.jbp.service.dao.CouponUserDao;
+import com.jbp.service.service.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,14 +55,12 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Calendar.SECOND;
-
 /**
  * CouponUserService 实现类
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -83,11 +80,13 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
     @Autowired
     private UserService userService;
     @Autowired
-    private ProductService productService;
-    @Autowired
     private TransactionTemplate transactionTemplate;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private ProductCategoryService productCategoryService;
 
     /**
      * 批量使用优惠券
@@ -99,6 +98,7 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
     public Boolean useBatch(List<Integer> couponIdList) {
         LambdaUpdateWrapper<CouponUser> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USED);
+        wrapper.set(CouponUser::getUseTime, DateUtil.date());
         wrapper.in(CouponUser::getId, couponIdList);
         wrapper.eq(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
         return update(wrapper);
@@ -193,7 +193,7 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
     }
 
     /**
-     * 根据购物车id获取可用优惠券
+     * 根据预下单号获取可用优惠券
      *
      * @param request 预下单参数
      * @return 优惠券集合
@@ -207,26 +207,52 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
             throw new CrmebException("预下单订单不存在");
         }
         String orderVoString = redisUtil.get(key).toString();
-        PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
-        //产品id集合
-        List<Integer> pidList = null;
-        BigDecimal maxPrice = BigDecimal.ZERO;
-        for (PreMerchantOrderVo merchantOrderVo : orderInfoVo.getMerchantOrderVoList()) {
-            if (merchantOrderVo.getMerId().equals(request.getMerId())) {
-                pidList = merchantOrderVo.getOrderInfoList().stream().map(PreOrderInfoDetailVo::getProductId).distinct().collect(Collectors.toList());
-                maxPrice = merchantOrderVo.getProTotalFee();
-            }
-        }
-        String pidPrimaryKeySql = getPidPrimaryKeySql(pidList);
+        PreOrderInfoVo preOrderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         Integer uid = userService.getUserIdException();
-        Date date = CrmebDateUtil.nowDateTime();
-        Map<String, Object> map = new HashMap<>();
-        map.put("merId", request.getMerId());
-        map.put("maxPrice", maxPrice);
-        map.put("date", date);
-        map.put("uid", uid);
-        map.put("pidPrimaryKeySql", pidPrimaryKeySql);
-        return dao.findListByPreOrder(map);
+        if (request.getMerId() > 0) {// 查询商户优惠券
+            //产品id集合
+            List<Integer> pidList = null;
+            BigDecimal maxPrice = BigDecimal.ZERO;
+            for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
+                if (merchantOrderVo.getMerId().equals(request.getMerId())) {
+                    pidList = merchantOrderVo.getOrderInfoList().stream().map(PreOrderInfoDetailVo::getProductId).distinct().collect(Collectors.toList());
+                    maxPrice = merchantOrderVo.getProTotalFee();
+                }
+            }
+            String pidPrimaryKeySql = getPidPrimaryKeySql(pidList);
+
+            Date date = CrmebDateUtil.nowDateTime();
+            Map<String, Object> map = new HashMap<>();
+            map.put("merId", request.getMerId());
+            map.put("maxPrice", maxPrice);
+            map.put("date", date);
+            map.put("uid", uid);
+            map.put("pidPrimaryKeySql", pidPrimaryKeySql);
+            return dao.findListByPreOrder(map);
+        }
+        List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
+        List<Integer> merIdList = new ArrayList<>();
+        for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
+            orderInfoList.addAll(merchantOrderVo.getOrderInfoList());
+            merIdList.add(merchantOrderVo.getMerId());
+        }
+        List<Integer> proIdsList = orderInfoList.stream().map(PreOrderInfoDetailVo::getProductId).distinct().collect(Collectors.toList());
+        BigDecimal price = preOrderInfoVo.getProTotalFee();
+//        BigDecimal price = preOrderInfoVo.getProTotalFee().subtract(preOrderInfoVo.getMerCouponFee());
+        List<Product> productList = productService.findByIds(proIdsList);
+        List<Integer> proCategoryIdList = productList.stream().map(Product::getCategoryId).collect(Collectors.toList());
+        List<Integer> secondParentIdList = productCategoryService.findParentIdByChildIds(proCategoryIdList);
+        List<Integer> firstParentIdList = productCategoryService.findParentIdByChildIds(secondParentIdList);
+        proCategoryIdList.addAll(secondParentIdList);
+        proCategoryIdList.addAll(firstParentIdList);
+        List<Integer> brandIdList = productList.stream().map(Product::getBrandId).collect(Collectors.toList());
+        // 查询适用的用户平台优惠券
+        List<CouponUser> platCouponUserList = findManyPlatByUidAndMerIdAndMoneyAndProList(uid, proIdsList, proCategoryIdList, merIdList, brandIdList, price);
+        return platCouponUserList.stream().map(e -> {
+            CouponUserOrderResponse response = new CouponUserOrderResponse();
+            BeanUtils.copyProperties(e, response);
+            return response;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -298,7 +324,7 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
             throw new CrmebException("优惠券余量不足！");
         }
         //看是否过期
-        if (ObjectUtil.isNotNull(coupon.getReceiveEndTime())) {
+        if (coupon.getIsTimeReceive()) {
             //非永久可领取
             String date = CrmebDateUtil.nowDateTimeStr();
             int result = CrmebDateUtil.compareDate(date, CrmebDateUtil.dateToStr(coupon.getReceiveEndTime(), DateConstants.DATE_FORMAT), DateConstants.DATE_FORMAT);
@@ -307,7 +333,7 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
                 throw new CrmebException("优惠券领取截止日期已过！");
             }
         }
-        if (isUserReceiveCoupon(coupon.getId(), userId)) {
+        if (!userIsCanReceiveCoupon(coupon, userId)) {
             //已经领取过了
             throw new CrmebException("当前用户已经领取过此优惠券了！");
         }
@@ -332,12 +358,36 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
         couponUser.setStartTime(coupon.getUseStartTime());
         couponUser.setEndTime(coupon.getUseEndTime());
         couponUser.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
-        Boolean execute = transactionTemplate.execute(e -> {
+        return transactionTemplate.execute(e -> {
             save(couponUser);
             couponService.deduction(coupon.getId(), 1, coupon.getIsLimited());
             return Boolean.TRUE;
         });
-        return execute;
+    }
+
+    /**
+     * 用户是否能够领取此优惠券
+     * @param coupon 优惠券
+     * @param userId 用户ID
+     */
+    @Override
+    public Boolean userIsCanReceiveCoupon(Coupon coupon, Integer userId) {
+        LambdaQueryWrapper<CouponUser> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(CouponUser::getCouponId, coupon.getId());
+        lqw.eq(CouponUser::getUid, userId);
+        lqw.orderByDesc(CouponUser::getId);
+        lqw.last(" limit 1");
+        CouponUser couponUser = dao.selectOne(lqw);
+        if (ObjectUtil.isNull(couponUser)) {
+            return true;
+        }
+        if (!coupon.getIsRepeated()) {
+            return false;
+        }
+        if (!couponUser.getStatus().equals(CouponConstants.STORE_COUPON_USER_STATUS_USABLE)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -433,32 +483,21 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
         couponUser.setMoney(coupon.getMoney());
         couponUser.setDiscount(coupon.getDiscount());
         couponUser.setMinPrice(coupon.getMinPrice());
-        couponUser.setStartTime(coupon.getUseStartTime());
-        couponUser.setEndTime(coupon.getUseEndTime());
         couponUser.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
+        //是否有固定的使用时间
+        if (!coupon.getIsFixedTime()) {
+            String endTime = CrmebDateUtil.addDay(CrmebDateUtil.nowDate(DateConstants.DATE_FORMAT), coupon.getDay(), DateConstants.DATE_FORMAT);
+            couponUser.setStartTime(CrmebDateUtil.nowDateTimeReturnDate(DateConstants.DATE_FORMAT));
+            couponUser.setEndTime(CrmebDateUtil.strToDate(endTime, DateConstants.DATE_FORMAT));
+        } else {
+            couponUser.setStartTime(coupon.getUseStartTime());
+            couponUser.setEndTime(coupon.getUseEndTime());
+        }
         record.set("status", "ok");
         record.set("couponUser", couponUser);
         record.set("isLimited", coupon.getIsLimited());
         return record;
     }
-//
-//    /**
-//     * 根据uid获取列表
-//     * @param uid uid
-//     * @param pageParamRequest 分页参数
-//     * @return 优惠券列表
-//     */
-//    @Override
-//    public List<CouponUser> findListByUid(Integer uid, PageParamRequest pageParamRequest) {
-//        PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-//
-//        //带 CouponUser 类的多条件查询
-//        LambdaQueryWrapper<CouponUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-//
-//        lambdaQueryWrapper.eq(CouponUser::getUid, uid);
-//        lambdaQueryWrapper.orderByDesc(CouponUser::getId);
-//        return dao.selectList(lambdaQueryWrapper);
-//    }
 
     /**
      * 获取可用优惠券数量
@@ -493,25 +532,27 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
     /**
      * 我的优惠券列表
      *
-     * @param type             类型，usable-可用，unusable-不可用
-     * @param pageParamRequest 分页参数
      * @return PageInfo<CouponUserResponse>
      */
     @Override
-    public PageInfo<UserCouponResponse> getMyCouponList(String type, PageParamRequest pageParamRequest) {
+    public PageInfo<UserCouponResponse> getMyCouponList(MyCouponRequest request) {
         Integer userId = userService.getUserIdException();
-//        List<CouponUser> couponUserList = getH5List(type, userId, pageParamRequest);
         LambdaQueryWrapper<CouponUser> lqw = Wrappers.lambdaQuery();
         lqw.eq(CouponUser::getUid, userId);
-        if (type.equals("usable")) {
-            lqw.eq(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
-            lqw.orderByDesc(CouponUser::getId);
+        switch (request.getType()) {
+            case "usable":
+                lqw.eq(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
+                lqw.orderByDesc(CouponUser::getId);
+                break;
+            case "unusable":
+                lqw.gt(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
+                lqw.last(StrUtil.format(" order by update_time desc, id desc, case `status` when {} then {} when {} then {} when {} then {} end, update_time desc, id desc", 0, 1, 1, 2, 2, 3));
+                break;
+            default:
+                lqw.orderByDesc(CouponUser::getId);
+                break;
         }
-        if (type.equals("unusable")) {
-            lqw.gt(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
-            lqw.last(StrUtil.format(" order by case `status` when {} then {} when {} then {} when {} then {} end", 0, 1, 1, 2, 2, 3));
-        }
-        Page<CouponUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        Page<CouponUser> page = PageHelper.startPage(request.getPage(), request.getLimit());
         List<CouponUser> couponUserList = dao.selectList(lqw);
         if (CollUtil.isEmpty(couponUserList)) {
             return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
@@ -553,26 +594,241 @@ public class CouponUserServiceImpl extends ServiceImpl<CouponUserDao, CouponUser
      */
     @Override
     public Boolean rollbackByIds(List<Integer> couponIdList) {
+        DateTime date = DateUtil.date();
+        List<CouponUser> couponUserList = findByIds(couponIdList);
+        couponUserList.forEach(cu -> {
+            if (date.compareTo(cu.getEndTime()) >= 0) {
+                cu.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_LAPSED);
+            } else {
+                cu.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
+            }
+        });
+        return updateBatchById(couponUserList);
+    }
+
+    private List<CouponUser> findByIds(List<Integer> couponIdList) {
+        LambdaQueryWrapper<CouponUser> lqw = Wrappers.lambdaQuery();
+        lqw.in(CouponUser::getCouponId, couponIdList);
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 优惠券失效处理（通过优惠券ID）
+     */
+    @Override
+    public Boolean loseEfficacyByCouponId(Integer couponId) {
         LambdaUpdateWrapper<CouponUser> wrapper = Wrappers.lambdaUpdate();
-        wrapper.set(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
-        wrapper.in(CouponUser::getId, couponIdList);
+        wrapper.set(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_LAPSED);
+        wrapper.eq(CouponUser::getCouponId, couponId);
         return update(wrapper);
     }
 
-//    private void getPrimaryKeySql(LambdaQueryWrapper<CouponUser> lambdaQueryWrapper, String productIdStr) {
-//        if (StrUtil.isBlank(productIdStr)) {
-//            return;
-//        }
-//
-//        List<Integer> categoryIdList = productService.getSecondaryCategoryByProductId(productIdStr);
-//        String categoryIdStr = categoryIdList.stream().map(Object::toString).collect(Collectors.joining(","));
-//        lambdaQueryWrapper.and(i -> i.and(
-//                //通用券  商品券  品类券
-//                t -> t.eq(CouponUser::getUseType, 1)
-//                        .or(p -> p.eq(CouponUser::getUseType , 2).apply(StrUtil.format(" primary_key in ({})", productIdStr)))
-//                        .or(c -> c.eq(CouponUser::getUseType , 3).apply(StrUtil.format(" primary_key in ({})", categoryIdStr)))
-//
-//        ));
-//    }
+    /**
+     * 获取优惠券已使用数量
+     * @param couponId 优惠券ID
+     * @return 优惠券已使用数量
+     */
+    @Override
+    public Integer getUsedNumByCouponId(Integer couponId) {
+        LambdaQueryWrapper<CouponUser> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(CouponUser::getCouponId, couponId);
+        lqw.eq(CouponUser::getStatus, CouponConstants.STORE_COUPON_USER_STATUS_USED);
+        return dao.selectCount(lqw);
+    }
+
+    /**
+     * 获取优惠券列表，通过优惠券ID和用户ID列表
+     * @param couponId 优惠券ID
+     * @param uidList 用户ID列表
+     */
+    @Override
+    public List<CouponUser> findByCouponIdAndUidList(Integer couponId, List<Integer> uidList) {
+        LambdaQueryWrapper<CouponUser> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(CouponUser::getCouponId, couponId);
+        lqw.in(CouponUser::getUid, uidList);
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 平台端优惠券领取列表
+     * @param request 请求参数
+     * @param pageParamRequest 分页参数
+     */
+    @Override
+    public PageInfo<CouponUserResponse> getPlatformList(CouponUserSearchRequest request, PageParamRequest pageParamRequest) {
+        Page<CouponUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<CouponUser> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(CouponUser::getPublisher, CouponConstants.COUPON_PUBLISHER_PLATFORM);
+        lqw.eq(CouponUser::getMerId, 0);
+        if (StrUtil.isNotBlank(request.getName())) {
+            String couponName = URLUtil.decode(request.getName());
+            lqw.like(CouponUser::getName, couponName);
+        }
+        if (ObjectUtil.isNotNull(request.getUid()) && request.getUid() > 0) {
+            lqw.eq(CouponUser::getUid, request.getUid());
+        }
+        if (ObjectUtil.isNotNull(request.getStatus())) {
+            lqw.eq(CouponUser::getStatus, request.getStatus());
+        }
+        if (StrUtil.isNotBlank(request.getNickname())) {
+            String decodeName = URLUtil.decode(request.getNickname());
+            lqw.apply(StrUtil.format("(uid in (select id from eb_user where nickname like '%{}%'))", decodeName));
+        }
+        lqw.orderByDesc(CouponUser::getId);
+        List<CouponUser> couponUserList = dao.selectList(lqw);
+        if (CollUtil.isEmpty(couponUserList)) {
+            return new PageInfo<>();
+        }
+        List<Integer> uidList = couponUserList.stream().map(CouponUser::getUid).distinct().collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(uidList);
+
+        ArrayList<CouponUserResponse> CouponUserResponseList = new ArrayList<>();
+        for (CouponUser CouponUser : couponUserList) {
+            CouponUserResponse CouponUserResponse = new CouponUserResponse();
+            BeanUtils.copyProperties(CouponUser, CouponUserResponse);
+            if (userMap.containsKey(CouponUser.getUid())) {
+                CouponUserResponse.setNickname(userMap.get(CouponUser.getUid()).getNickname());
+                CouponUserResponse.setAvatar(userMap.get(CouponUser.getUid()).getAvatar());
+            }
+            CouponUserResponseList.add(CouponUserResponse);
+        }
+        return CommonPage.copyPageInfo(page, CouponUserResponseList);
+    }
+
+    /**
+     * 获取用户领取的优惠券
+     * @param couponId 优惠券ID
+     * @param userId 用户ID
+     */
+    @Override
+    public CouponUser getLastByCouponIdAndUid(Integer couponId, Integer userId) {
+        LambdaQueryWrapper<CouponUser> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(CouponUser::getCouponId, couponId);
+        lqw.eq(CouponUser::getUid, userId);
+        lqw.orderByDesc(CouponUser::getId);
+        lqw.last(" limit 1");
+        return dao.selectOne(lqw);
+    }
+
+    /**
+     * 查询适用的优惠券列表
+     * @param userId 用户ID
+     * @param merId 商户ID
+     * @param proId 商品ID
+     * @param money 金额
+     */
+    @Override
+    public List<CouponUser> findByUidAndMerIdAndMoneyAndProList(Integer userId, Integer merId, Integer proId, BigDecimal money) {
+        String now = DateUtil.now();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("merId", merId);
+        map.put("proId", proId);
+        map.put("money", money);
+        map.put("nowDate", now);
+        return dao.findByUidAndMerIdAndMoneyAndProList(map);
+    }
+
+    /**
+     * 自动领取优惠券
+     */
+    @Override
+    public Integer autoReceiveCoupon(Coupon coupon, Integer uid) {
+        if (!coupon.getIsFixedTime()) {
+            String endTime = CrmebDateUtil.addDay(CrmebDateUtil.nowDate(DateConstants.DATE_FORMAT), coupon.getDay(), DateConstants.DATE_FORMAT);
+            coupon.setUseEndTime(CrmebDateUtil.strToDate(endTime, DateConstants.DATE_FORMAT));
+            coupon.setUseStartTime(CrmebDateUtil.nowDateTimeReturnDate(DateConstants.DATE_FORMAT));
+        }
+        CouponUser couponUser = new CouponUser();
+        couponUser.setCouponId(coupon.getId());
+        couponUser.setMerId(coupon.getMerId());
+        couponUser.setUid(uid);
+        couponUser.setName(coupon.getName());
+        couponUser.setPublisher(coupon.getPublisher());
+        couponUser.setCategory(coupon.getCategory());
+        couponUser.setReceiveType(coupon.getReceiveType());
+        couponUser.setCouponType(coupon.getCouponType());
+        couponUser.setMoney(coupon.getMoney());
+        couponUser.setDiscount(coupon.getDiscount());
+        couponUser.setMinPrice(coupon.getMinPrice());
+        couponUser.setStartTime(coupon.getUseStartTime());
+        couponUser.setEndTime(coupon.getUseEndTime());
+        couponUser.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
+        Boolean execute = transactionTemplate.execute(e -> {
+            save(couponUser);
+            couponService.deduction(coupon.getId(), 1, coupon.getIsLimited());
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            throw new CrmebException("自动领取优惠券失败");
+        }
+        return couponUser.getId();
+    }
+
+    /**
+     * 查询适用的平台优惠券列表
+     * @param userId 用户ID
+     * @param proId 商品ID
+     * @param proCategoryIdList 商品分类ID列表
+     * @param merId 商户ID
+     * @param brandId 品牌ID
+     * @param money 金额
+     */
+    @Override
+    public List<CouponUser> findPlatByUidAndMerIdAndMoneyAndProList(Integer userId, Integer proId, List<Integer> proCategoryIdList, Integer merId, Integer brandId, BigDecimal money) {
+        String now = DateUtil.now();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("proId", proId);
+        map.put("proCategoryIdList", proCategoryIdList);
+        map.put("merId", merId);
+        map.put("brandId", brandId);
+        map.put("money", money);
+        map.put("nowDate", now);
+        return dao.findPlatByUidAndMerIdAndMoneyAndProList(map);
+    }
+
+    /**
+     * 查询适用的优惠券列表
+     * @param userId 用户ID
+     * @param merId 商户ID
+     * @param proIdList 商品ID列表
+     * @param money 金额
+     */
+    @Override
+    public List<CouponUser> findManyByUidAndMerIdAndMoneyAndProList(Integer userId, Integer merId, List<Integer> proIdList, BigDecimal money) {
+        String now = DateUtil.now();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("merId", merId);
+        map.put("proIdList", proIdList);
+        map.put("money", money);
+        map.put("nowDate", now);
+        return dao.findManyByUidAndMerIdAndMoneyAndProList(map);
+    }
+
+    /**
+     * 查询适用的平台优惠券列表(多商品)
+     * @param userId 用户ID
+     * @param proIdList 商品ID列表
+     * @param proCategoryIdList 商品分类ID列表
+     * @param merIdList 商户ID列表
+     * @param brandIdList 品牌ID列表
+     * @param money 金额
+     */
+    @Override
+    public List<CouponUser> findManyPlatByUidAndMerIdAndMoneyAndProList(Integer userId, List<Integer> proIdList, List<Integer> proCategoryIdList, List<Integer> merIdList, List<Integer> brandIdList, BigDecimal money) {
+        String now = DateUtil.now();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("proIdList", proIdList);
+        map.put("proCategoryIdList", proCategoryIdList);
+        map.put("merIdList", merIdList);
+        map.put("brandIdList", brandIdList);
+        map.put("money", money);
+        map.put("nowDate", now);
+        return dao.findManyPlatByUidAndMerIdAndMoneyAndProList(map);
+    }
+
 }
 

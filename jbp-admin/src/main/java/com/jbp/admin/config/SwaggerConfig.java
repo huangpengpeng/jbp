@@ -2,6 +2,7 @@ package com.jbp.admin.config;
 
 import com.google.common.base.Predicate;
 import com.jbp.common.constants.Constants;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -9,10 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -28,7 +26,7 @@ import static com.google.common.collect.Lists.newArrayList;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -128,11 +126,13 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
+        Contact contact = new Contact("Crmeb","https://www.crmeb.com/index/java_merchant", "278437628@qq.com");
         return new ApiInfoBuilder()
-                .title("Crmeb Java Merchant")
-                .description("Crmeb")
-                .termsOfServiceUrl("http://host:port")
-                .version("1.0.0").build();
+                .title("Crmeb Java 多商户管理侧")
+                .description("Java多商户接口文档")
+                .contact(contact)
+                .termsOfServiceUrl("https://www.crmeb.com/index/java_merchant")
+                .version("1.4.0").build();
     }
 
 

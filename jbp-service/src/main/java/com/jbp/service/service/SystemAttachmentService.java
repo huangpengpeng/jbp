@@ -12,7 +12,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -77,4 +77,10 @@ public interface SystemAttachmentService extends IService<SystemAttachment> {
      * @return String
      */
     String getCdnUrl();
+
+    /**
+     * 删除附件
+     * @param idList 附件ID列表
+     */
+    Boolean deleteByIds(List<Integer> idList);
 }

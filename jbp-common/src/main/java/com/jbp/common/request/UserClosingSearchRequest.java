@@ -16,7 +16,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -34,8 +34,8 @@ public class UserClosingSearchRequest implements Serializable {
     @ApiModelProperty(value = "搜索关键字（微信号、支付宝账号、银行卡号、持卡人姓名）")
     private String keywords;
 
-    @ApiModelProperty(value = "结算类型：bank = 银行卡 alipay = 支付宝 weixin=微信")
-    @StringContains(limitValues = {"bank","alipay","weixin"}, message = "请选择正确的提现方式")
+    @ApiModelProperty(value = "结算类型：bank = 银行卡 alipay = 支付宝 wechat=微信")
+    @StringContains(limitValues = {"bank","alipay","wechat"}, message = "请选择正确的提现方式")
     private String closingType;
 
     @ApiModelProperty(value = "审核状态：0-待审核，1-通过审核，2-审核失败")

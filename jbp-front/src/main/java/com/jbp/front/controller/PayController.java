@@ -1,10 +1,12 @@
 package com.jbp.front.controller;
 
 import com.jbp.common.request.OrderPayRequest;
+import com.jbp.common.response.CashierInfoResponse;
 import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.PayConfigResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.PayService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -52,8 +54,14 @@ public class PayController {
     }
 
     @ApiOperation(value = "查询订单支付宝支付结果")
-    @RequestMapping(value = "/query/ali/pay/result/{orderNp}", method = RequestMethod.GET)
+    @RequestMapping(value = "/query/ali/pay/result/{orderNo}", method = RequestMethod.GET)
     public CommonResult<Boolean> queryAliPayResult(@PathVariable(value = "orderNo") String orderNo) {
         return CommonResult.success(payService.queryAliPayResult(orderNo));
+    }
+
+    @ApiOperation(value = "获取收银台信息")
+    @RequestMapping(value = "/get/cashier/{orderNo}", method = RequestMethod.GET)
+    public CommonResult<CashierInfoResponse> getCashierIno(@PathVariable(value = "orderNo") String orderNo) {
+        return CommonResult.success(payService.getCashierIno(orderNo));
     }
 }

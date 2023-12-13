@@ -14,7 +14,7 @@ import java.util.List;
 *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -40,6 +40,9 @@ public interface CategoryService extends IService<Category> {
 
     Boolean update(CategoryRequest request, Integer id);
 
+    /**
+     * 更改基础分类状态
+     */
     Boolean updateStatus(Integer id);
 
     /**
@@ -49,8 +52,15 @@ public interface CategoryService extends IService<Category> {
 
     /**
      * 获取分类详情
-     * @param id 分了ID
+     * @param id 分类ID
      * @return Category
      */
     Category getByIdException(Integer id);
+
+    /**
+     * 获取基础分类信息
+     * @param id 分类ID
+     * @return Category
+     */
+    Category getBaseCategoryInfo(Integer id);
 }

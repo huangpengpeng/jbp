@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.CityRegionDao;
-import com.jbp.service.service.CityRegionService;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.enums.RegionTypeEnum;
 import com.jbp.common.exception.CrmebException;
@@ -20,6 +18,8 @@ import com.jbp.common.response.CityResponse;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.CityTree;
 import com.jbp.common.vo.CityVo;
+import com.jbp.service.dao.CityRegionDao;
+import com.jbp.service.service.CityRegionService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -284,6 +284,52 @@ public class CityRegionServiceImpl extends ServiceImpl<CityRegionDao, CityRegion
         lqw.eq(CityRegion::getParentId, parentId);
         lqw.last(" limit 1");
         return dao.selectOne(lqw);
+    }
+
+    /**
+     * 获取省级城市数据
+     */
+    @Override
+    public List<CityRegion> findProvinceList() {
+        return findByRegionType(1, 0);
+    }
+
+    /**
+     * 获取市级城市数据
+     */
+    @Override
+    public List<CityRegion> findCityList(Integer provinceId) {
+        return findByRegionType(2, provinceId);
+    }
+
+    /**
+     * 获取区级城市数据
+     */
+    @Override
+    public List<CityRegion> findDistrictList(Integer cityId) {
+        return findByRegionType(3, cityId);
+    }
+
+    /**
+     * 获取区级城市数据
+     */
+    @Override
+    public List<CityRegion> findStreetList(Integer districtId) {
+        return findByRegionType(4, districtId);
+    }
+
+    /**
+     * 按区域类型获取城市数据
+     * @param regionType 区域类型，0-国家、1-省、2-市、3-区、4-街道
+     * @param parentId 父区域id
+     */
+    private List<CityRegion> findByRegionType(Integer regionType, Integer parentId) {
+        LambdaQueryWrapper<CityRegion> lqw = Wrappers.lambdaQuery();
+        lqw.eq(CityRegion::getRegionType, regionType);
+        if (parentId > 0) {
+            lqw.eq(CityRegion::getParentId, parentId);
+        }
+        return dao.selectList(lqw);
     }
 }
 

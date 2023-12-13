@@ -1,15 +1,19 @@
 package com.jbp.front.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
-import com.jbp.front.service.FrontOrderService;
+import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.cat.Cart;
+import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
 import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.express.ShippingTemplates;
@@ -19,7 +23,9 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.product.ProductCategory;
 import com.jbp.common.model.product.ProductReply;
+import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserAddress;
 import com.jbp.common.model.user.UserIntegralRecord;
@@ -32,7 +38,10 @@ import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.*;
+import com.jbp.front.service.FrontOrderService;
+import com.jbp.front.service.SeckillService;
 import com.jbp.service.service.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -50,7 +59,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -107,8 +116,6 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private RefundOrderInfoService refundOrderInfoService;
     @Autowired
-    private LogisticService logisticService;
-    @Autowired
     private PayComponentProductService payComponentProductService;
     @Autowired
     private PayComponentProductSkuService payComponentProductSkuService;
@@ -116,6 +123,18 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private UserIntegralRecordService userIntegralRecordService;
     @Autowired
     private SystemGroupDataService systemGroupDataService;
+    @Autowired
+    private SeckillService seckillService;
+    @Autowired
+    private SeckillProductService seckillProductService;
+    @Autowired
+    private CouponService couponService;
+    @Autowired
+    private ProductCategoryService productCategoryService;
+    @Autowired
+    private RefundOrderStatusService refundOrderStatusService;
+    @Autowired
+    private CrmebConfig crmebConfig;
 
     /**
      * 订单预下单
@@ -125,11 +144,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public OrderNoResponse preOrder(PreOrderRequest request) {
-        logger.info("preOrder:{}", JSON.toJSONString(request));
         User user = userService.getInfo();
         // 校验预下单商品信息
         PreOrderInfoVo preOrderInfoVo = validatePreOrderRequest(request, user);
-        logger.info("preOrder 预下单 检查后:{} ", JSON.toJSONString(preOrderInfoVo));
         List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
         for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
             orderInfoList.addAll(merchantOrderVo.getOrderInfoList());
@@ -169,8 +186,442 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
         OrderNoResponse response = new OrderNoResponse();
         response.setOrderNo(key);
+        response.setOrderType(preOrderInfoVo.getType());
         logger.info("preOrder response:{}", JSON.toJSONString(response));
         return response;
+    }
+
+    /**
+     * 订单预下单V1.3
+     *
+     * @param request 预下单请求参数
+     * @return PreOrderResponse
+     */
+    @Override
+    public OrderNoResponse preOrder_V1_3(PreOrderRequest request) {
+        User user = userService.getInfo();
+        // 校验预下单商品信息
+        PreOrderInfoVo preOrderInfoVo = validatePreOrderRequest(request, user);
+        List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
+        for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
+            orderInfoList.addAll(merchantOrderVo.getOrderInfoList());
+            BigDecimal merTotalPrice = merchantOrderVo.getOrderInfoList().stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+            merchantOrderVo.setProTotalFee(merTotalPrice);
+            merchantOrderVo.setProTotalNum(merchantOrderVo.getOrderInfoList().stream().mapToInt(PreOrderInfoDetailVo::getPayNum).sum());
+        }
+        // 商品总计金额
+        BigDecimal totalPrice = orderInfoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        preOrderInfoVo.setProTotalFee(totalPrice);
+        // 购买商品总数量
+        int orderProNum = orderInfoList.stream().mapToInt(PreOrderInfoDetailVo::getPayNum).sum();
+        preOrderInfoVo.setOrderProNum(orderProNum);
+        // 获取默认地址
+        UserAddress userAddress = userAddressService.getDefaultByUid(user.getId());
+        if (ObjectUtil.isNotNull(userAddress)) {
+            // 计算运费
+            getFreightFee(preOrderInfoVo, userAddress);
+            preOrderInfoVo.setAddressId(userAddress.getId());
+        } else {
+            preOrderInfoVo.setFreightFee(BigDecimal.ZERO);
+            preOrderInfoVo.setAddressId(0);
+        }
+        // 实际支付金额
+        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()));
+        preOrderInfoVo.setUserIntegral(user.getIntegral());
+        preOrderInfoVo.setUserBalance(user.getNowMoney());
+        preOrderInfoVo.setIntegralDeductionSwitch(false);
+        preOrderInfoVo.setIsUseIntegral(false);
+
+        if (request.getPreOrderType().equals("video") || request.getPreOrderType().equals("seckill")) {
+            // 活动商品不使用优惠券
+            // 缓存订单
+            String key = user.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
+            redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
+            OrderNoResponse response = new OrderNoResponse();
+            response.setOrderNo(key);
+            response.setOrderType(preOrderInfoVo.getType());
+            logger.info("preOrder response:{}", JSON.toJSONString(response));
+            return response;
+        }
+        preOrderSetCouponPrice(preOrderInfoVo, orderInfoList, user);
+        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()).subtract(preOrderInfoVo.getCouponFee()));
+        String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
+        String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
+        if ("true".equals(integralDeductionSwitch) && preOrderInfoVo.getProTotalFee().subtract(preOrderInfoVo.getCouponFee()).compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
+            preOrderInfoVo.setIntegralDeductionSwitch(true);
+        }
+        // 缓存订单
+        String key = user.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
+        redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
+        OrderNoResponse response = new OrderNoResponse();
+        response.setOrderNo(key);
+        response.setOrderType(preOrderInfoVo.getType());
+        logger.info("preOrder response:{}", JSON.toJSONString(response));
+        return response;
+    }
+
+    private void preOrderSetCouponPrice(PreOrderInfoVo preOrderInfoVo, List<PreOrderInfoDetailVo> orderInfoList, User user) {
+        // 自动领券计算
+        BigDecimal couponPrice = BigDecimal.ZERO;
+        List<Integer> proIdsList = orderInfoList.stream().map(PreOrderInfoDetailVo::getProductId).distinct().collect(Collectors.toList());
+        List<Integer> merIdList = new ArrayList<>();
+        for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
+            Integer merId = merchantOrderVo.getMerId();
+            merIdList.add(merId);
+            List<Integer> proIdList = merchantOrderVo.getOrderInfoList().stream().map(PreOrderInfoDetailVo::getProductId).collect(Collectors.toList());
+            BigDecimal merPrice = merchantOrderVo.getProTotalFee();
+            List<Coupon> merCouponList = couponService.findManyByMerIdAndMoney(merId, proIdList, merPrice);
+            for (int i = 0; i < merCouponList.size(); ) {
+                Coupon coupon = merCouponList.get(i);
+                if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                    i++;
+                    continue;
+                }
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList().stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proPrice = detailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    merCouponList.remove(i);
+                    continue;
+                }
+                if (proPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    merCouponList.remove(i);
+                    continue;
+                }
+                i++;
+            }
+            // 查询适用的用户优惠券
+            List<CouponUser> merCouponUserList = couponUserService.findManyByUidAndMerIdAndMoneyAndProList(user.getId(), merchantOrderVo.getMerId(), proIdList, merPrice);
+            for (int i = 0; i < merCouponUserList.size(); ) {
+                CouponUser couponUser = merCouponUserList.get(i);
+                if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                    i++;
+                    continue;
+                }
+                Coupon coupon = couponService.getById(couponUser.getCouponId());
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList().stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proPrice = detailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    merCouponUserList.remove(i);
+                    continue;
+                }
+                if (proPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    merCouponUserList.remove(i);
+                    continue;
+                }
+                i++;
+            }
+
+            List<Integer> cidList = merCouponUserList.stream().map(CouponUser::getCouponId).collect(Collectors.toList());
+            for (int i = 0; i < merCouponList.size(); ) {
+                if (cidList.contains(merCouponList.get(i).getId())) {
+                    merCouponList.remove(i);
+                    continue;
+                }
+                if (!couponUserService.userIsCanReceiveCoupon(merCouponList.get(i), user.getId())) {
+                    merCouponList.remove(i);
+                    continue;
+                }
+                i++;
+            }
+
+            if (CollUtil.isEmpty(merCouponList) && CollUtil.isEmpty(merCouponUserList)) {
+                continue;
+            }
+            if (CollUtil.isEmpty(merCouponList)) {
+                CouponUser couponUser = merCouponUserList.get(0);
+                merchantOrderVo.setUserCouponId(couponUser.getId());
+                merchantOrderVo.setCouponFee(new BigDecimal(couponUser.getMoney().toString()));
+                merchantOrderVo.setMerCouponFee(new BigDecimal(couponUser.getMoney().toString()));
+                setMerProCouponPrice(merchantOrderVo, null, couponUser);
+                couponPrice = couponPrice.add(merchantOrderVo.getMerCouponFee());
+                continue;
+            }
+            if (CollUtil.isEmpty(merCouponUserList)) {
+                Coupon coupon = merCouponList.get(0);
+                Integer couponUserId = couponUserService.autoReceiveCoupon(coupon, user.getId());
+                merchantOrderVo.setUserCouponId(couponUserId);
+                merchantOrderVo.setCouponFee(new BigDecimal(coupon.getMoney().toString()));
+                merchantOrderVo.setMerCouponFee(new BigDecimal(coupon.getMoney().toString()));
+                setMerProCouponPrice(merchantOrderVo, coupon, null);
+                couponPrice = couponPrice.add(merchantOrderVo.getMerCouponFee());
+                continue;
+            }
+
+            Coupon coupon = merCouponList.get(0);
+            CouponUser couponUser = merCouponUserList.get(0);
+            if (couponUser.getMoney() >= coupon.getMoney()) {
+                // 使用用户优惠券
+                merchantOrderVo.setUserCouponId(merCouponUserList.get(0).getId());
+                merchantOrderVo.setCouponFee(new BigDecimal(couponUser.getMoney().toString()));
+                merchantOrderVo.setMerCouponFee(new BigDecimal(couponUser.getMoney().toString()));
+                setMerProCouponPrice(merchantOrderVo, null, couponUser);
+            } else {
+                // 领取优惠券下单
+                Integer couponUserId = couponUserService.autoReceiveCoupon(merCouponList.get(0), user.getId());
+                merchantOrderVo.setUserCouponId(couponUserId);
+                merchantOrderVo.setCouponFee(new BigDecimal(coupon.getMoney().toString()));
+                merchantOrderVo.setMerCouponFee(new BigDecimal(coupon.getMoney().toString()));
+                setMerProCouponPrice(merchantOrderVo, coupon, null);
+            }
+            couponPrice = couponPrice.add(merchantOrderVo.getMerCouponFee());
+        }
+
+        preOrderInfoVo.setMerCouponFee(couponPrice);
+        // 自动领平台券计算
+        // 查所有适用的平台优惠券
+        BigDecimal remainPrice = preOrderInfoVo.getProTotalFee().subtract(preOrderInfoVo.getMerCouponFee());
+        List<Product> productList = productService.findByIds(proIdsList);
+        List<Integer> proCategoryIdList = productList.stream().map(Product::getCategoryId).collect(Collectors.toList());
+        List<Integer> secondParentIdList = productCategoryService.findParentIdByChildIds(proCategoryIdList);
+        List<Integer> firstParentIdList = productCategoryService.findParentIdByChildIds(secondParentIdList);
+        proCategoryIdList.addAll(secondParentIdList);
+        proCategoryIdList.addAll(firstParentIdList);
+        List<Integer> brandIdList = productList.stream().map(Product::getBrandId).collect(Collectors.toList());
+        List<Coupon> platCouponList = couponService.findManyPlatByMerIdAndMoney(proIdsList, proCategoryIdList, merIdList, brandIdList, preOrderInfoVo.getProTotalFee());
+        for (int i = 0; i < platCouponList.size(); ) {
+            Coupon coupon = platCouponList.get(i);
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                if (remainPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            i++;
+        }
+        // 查询适用的用户平台优惠券
+        List<CouponUser> platCouponUserList = couponUserService.findManyPlatByUidAndMerIdAndMoneyAndProList(user.getId(), proIdsList, proCategoryIdList, merIdList, brandIdList, preOrderInfoVo.getProTotalFee());
+        for (int i = 0; i < platCouponUserList.size(); ) {
+            CouponUser couponUser = platCouponUserList.get(i);
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                if (remainPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            Coupon coupon = couponService.getById(couponUser.getCouponId());
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            i++;
+        }
+
+        List<Integer> platCidList = platCouponUserList.stream().map(CouponUser::getCouponId).collect(Collectors.toList());
+        for (int i = 0; i < platCouponList.size(); ) {
+            if (platCidList.contains(platCouponList.get(i).getId())) {
+                platCouponList.remove(i);
+                continue;
+            }
+            if (!couponUserService.userIsCanReceiveCoupon(platCouponList.get(i), user.getId())) {
+                platCouponList.remove(i);
+                continue;
+            }
+            i++;
+        }
+
+        if (CollUtil.isNotEmpty(platCouponUserList) && CollUtil.isEmpty(platCouponList)) {
+            // 使用用户优惠券
+            preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponUserList.get(0).getMoney().toString()));
+            preOrderInfoVo.setPlatUserCouponId(platCouponUserList.get(0).getId());
+        }
+        if (CollUtil.isEmpty(platCouponUserList) && CollUtil.isNotEmpty(platCouponList)) {
+            // 领取优惠券下单
+            preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponList.get(0).getMoney().toString()));
+            Integer couponUserId = couponUserService.autoReceiveCoupon(platCouponList.get(0), user.getId());
+            preOrderInfoVo.setPlatUserCouponId(couponUserId);
+        }
+        if (CollUtil.isNotEmpty(platCouponUserList) && CollUtil.isNotEmpty(platCouponList)) {
+            Long platCouponMoney = platCouponList.get(0).getMoney();
+            Long platCouponUserMoney = platCouponUserList.get(0).getMoney();
+            if (platCouponUserMoney >= platCouponMoney) {
+                // 使用用户优惠券
+                preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponUserList.get(0).getMoney().toString()));
+                preOrderInfoVo.setPlatUserCouponId(platCouponUserList.get(0).getId());
+            } else {
+                // 领取优惠券下单
+                preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponList.get(0).getMoney().toString()));
+                Integer couponUserId = couponUserService.autoReceiveCoupon(platCouponList.get(0), user.getId());
+                preOrderInfoVo.setPlatUserCouponId(couponUserId);
+            }
+        }
+        preOrderInfoVo.setCouponFee(preOrderInfoVo.getMerCouponFee().add(preOrderInfoVo.getPlatCouponFee()));
+    }
+
+    /**
+     * 设置订单商品详情商户优惠价格
+     */
+    private void setMerProCouponPrice(PreMerchantOrderVo merchantOrderVo, Coupon coupon, CouponUser couponUser) {
+        if (ObjectUtil.isNull(coupon)) {
+            coupon = couponService.getById(couponUser.getCouponId());
+        }
+        List<PreOrderInfoDetailVo> proDtoList = new ArrayList<>();
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+            proDtoList = merchantOrderVo.getOrderInfoList();
+        }
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+            List<Integer> proIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+            proDtoList = merchantOrderVo.getOrderInfoList().stream().filter(d -> proIdList.contains(d.getProductId())).collect(Collectors.toList());
+        }
+        BigDecimal proTotalPrice = proDtoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal couponPrice = merchantOrderVo.getCouponFee();
+        for (int i = 0; i < proDtoList.size(); i++) {
+            PreOrderInfoDetailVo d = proDtoList.get(i);
+            if (proDtoList.size() == (i + 1)) {
+                d.setMerCouponPrice(couponPrice);
+                break;
+            }
+            BigDecimal proPrice = d.getPrice().multiply(new BigDecimal(d.getPayNum().toString()));
+            BigDecimal ratio = proPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal detailCouponFee = couponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+            couponPrice = couponPrice.subtract(detailCouponFee);
+            d.setMerCouponPrice(detailCouponFee);
+        }
     }
 
     /**
@@ -181,6 +632,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public PreOrderResponse loadPreOrder(String preOrderNo) {
+        UserInfoResponse userInfo = userService.getUserInfo();
         // 通过缓存获取预下单对象
         String key = OrderConstants.PRE_ORDER_CACHE_PREFIX + preOrderNo;
         boolean exists = redisUtil.exists(key);
@@ -190,7 +642,173 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderVoString = redisUtil.get(key);
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         PreOrderResponse preOrderResponse = new PreOrderResponse();
-        preOrderResponse.setOrderInfoVo(orderInfoVo);
+        BeanUtils.copyProperties(orderInfoVo, preOrderResponse);
+
+        List<PreOrderMerchantInfoResponse> infoResponseList = new ArrayList<>();
+        List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
+        if (orderInfoVo.getType() == 1 || orderInfoVo.getType() == 2) {
+            for (PreMerchantOrderVo merchantOrderVo : merchantOrderVoList) {
+                PreOrderMerchantInfoResponse infoResponse = new PreOrderMerchantInfoResponse();
+                BeanUtils.copyProperties(merchantOrderVo, infoResponse);
+                infoResponseList.add(infoResponse);
+            }
+            preOrderResponse.setMerchantInfoList(infoResponseList);
+            return preOrderResponse;
+        }
+        List<Integer> merIdList = new ArrayList<>();
+        List<Integer> proIdList = new ArrayList<>();
+        List<Product> productList = new ArrayList<>();
+        List<PreOrderInfoDetailVo> orderDetailInfoList = new ArrayList<>();
+        for (PreMerchantOrderVo merchantOrderVo : merchantOrderVoList) {
+            merIdList.add(merchantOrderVo.getMerId());
+            PreOrderMerchantInfoResponse infoResponse = new PreOrderMerchantInfoResponse();
+            BeanUtils.copyProperties(merchantOrderVo, infoResponse);
+            merchantOrderVo.getOrderInfoList().forEach(info -> {
+                if (!proIdList.contains(info.getProductId())) {
+                    Product product = productService.getById(info.getProductId());
+                    productList.add(product);
+                    proIdList.add(product.getId());
+                }
+            });
+            orderDetailInfoList.addAll(merchantOrderVo.getOrderInfoList());
+            // 查询适用的用户优惠券
+            List<Integer> merProIdList = merchantOrderVo.getOrderInfoList().stream().map(PreOrderInfoDetailVo::getProductId).distinct().collect(Collectors.toList());
+            BigDecimal merPrice = merchantOrderVo.getProTotalFee();
+            BigDecimal merRemainingAmount = merchantOrderVo.getProTotalFee().subtract(orderInfoVo.getPlatCouponFee());
+            List<CouponUser> merCouponUserList = couponUserService.findManyByUidAndMerIdAndMoneyAndProList(userInfo.getId(), merchantOrderVo.getMerId(), merProIdList, merPrice);
+            for (int i = 0; i < merCouponUserList.size(); ) {
+                CouponUser couponUser = merCouponUserList.get(i);
+                if (merchantOrderVo.getUserCouponId() > 0 && couponUser.getId().equals(merchantOrderVo.getUserCouponId())) {
+                    couponUser.setIsChecked(true);
+                    couponUser.setIsChoose(true);
+                    i++;
+                    continue;
+                }
+                if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                    if (merRemainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                        couponUser.setIsChoose(true);
+                    }
+                    i++;
+                    continue;
+                }
+                Coupon coupon = couponService.getById(couponUser.getCouponId());
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList().stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proPrice = detailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proRemainingAmount = detailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getPlatCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    merCouponUserList.remove(i);
+                    continue;
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    merCouponUserList.remove(i);
+                    continue;
+                }
+                if (proRemainingAmount.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0) {
+                    if (proRemainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                        couponUser.setIsChoose(true);
+                    }
+                }
+                i++;
+            }
+            infoResponse.setMerCouponUserList(merCouponUserList);
+            infoResponseList.add(infoResponse);
+        }
+        preOrderResponse.setMerchantInfoList(infoResponseList);
+
+        // 获取平台可用优惠券列表
+        BigDecimal proTotalFee = orderInfoVo.getProTotalFee();
+        List<Integer> proCategoryIdList = productList.stream().map(Product::getCategoryId).collect(Collectors.toList());
+        List<Integer> secondParentIdList = productCategoryService.findParentIdByChildIds(proCategoryIdList);
+        List<Integer> firstParentIdList = productCategoryService.findParentIdByChildIds(secondParentIdList);
+        proCategoryIdList.addAll(secondParentIdList);
+        proCategoryIdList.addAll(firstParentIdList);
+        List<Integer> brandIdList = productList.stream().map(Product::getBrandId).collect(Collectors.toList());
+        List<CouponUser> platCouponUserList = couponUserService.findManyPlatByUidAndMerIdAndMoneyAndProList(userInfo.getId(), proIdList, proCategoryIdList, merIdList, brandIdList, proTotalFee);
+
+        BigDecimal remainingAmount = orderInfoVo.getProTotalFee().subtract(orderInfoVo.getMerCouponFee());
+        for (CouponUser couponUser : platCouponUserList) {
+            if (orderInfoVo.getPlatUserCouponId() > 0 && couponUser.getId().equals(orderInfoVo.getPlatUserCouponId())) {
+                couponUser.setIsChecked(true);
+                couponUser.setIsChoose(true);
+            }
+            // 判断是否可用
+            if (remainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                if (orderInfoVo.getProTotalFee().compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && remainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            Coupon coupon = couponService.getById(couponUser.getCouponId());
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+        }
+
+        preOrderResponse.setPlatCouponUserList(platCouponUserList);
         return preOrderResponse;
     }
 
@@ -223,7 +841,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderVoString = redisUtil.get(key).toString();
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         User user = userService.getInfo();
-//        redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
+
         return computedPrice(request, orderInfoVo, user);
     }
 
@@ -241,6 +859,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         boolean exists = redisUtil.exists(key);
         if (!exists) {
             throw new CrmebException("预下单订单不存在");
+        }
+        String orderVoString = redisUtil.get(key).toString();
+        PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+            return seckillService.createOrder(orderRequest, orderInfoVo, user);
         }
         UserAddress userAddress = null;
         List<OrderMerchantRequest> orderMerchantRequestList = orderRequest.getOrderMerchantRequestList();
@@ -264,15 +887,26 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             });
         }
 
-        String orderVoString = redisUtil.get(key).toString();
-        PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
-
         // 校验商品库存
         List<MyRecord> skuRecordList = validateProductStock(orderInfoVo);
 
+        orderInfoVo.getMerchantOrderVoList().forEach(e -> {
+            orderMerchantRequestList.forEach(o -> {
+                if (o.getMerId().equals(e.getMerId())) {
+                    e.setShippingType(o.getShippingType());
+                    e.setUserCouponId(o.getUserCouponId());
+                    e.setCouponFee(BigDecimal.ZERO);
+                    e.setMerCouponFee(BigDecimal.ZERO);
+                }
+            });
+        });
         // 计算订单各种价格
         getFreightFee(orderInfoVo, userAddress);
-        getCouponFee(orderInfoVo, orderMerchantRequestList, user.getId());
+        orderInfoVo.setPlatUserCouponId(orderRequest.getPlatUserCouponId());
+        orderInfoVo.setPlatCouponFee(BigDecimal.ZERO);
+        orderInfoVo.setCouponFee(BigDecimal.ZERO);
+        orderInfoVo.setMerCouponFee(BigDecimal.ZERO);
+        getCouponFee_V1_3(orderInfoVo, user.getId());
         if (orderRequest.getIsUseIntegral() && user.getIntegral() > 0) {// 使用积分
             integralDeductionComputed(orderInfoVo, user.getIntegral());
         }
@@ -296,13 +930,16 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setPaid(false);
         order.setCancelStatus(OrderConstants.ORDER_CANCEL_STATUS_NORMAL);
         order.setLevel(OrderConstants.ORDER_LEVEL_PLATFORM);
-        order.setType(OrderConstants.ORDER_TYPE_NORMAL);// 默认普通订单
-        if (orderInfoVo.getIsVideo()) {
-            order.setType(OrderConstants.ORDER_TYPE_VIDEO);// 视频号订单
-        }
+        order.setType(orderInfoVo.getType());// 默认普通订单
+        order.setMerCouponPrice(orderInfoVo.getMerCouponFee());
+        order.setPlatCouponPrice(orderInfoVo.getPlatCouponFee());
+        order.setPlatCouponId(orderInfoVo.getPlatUserCouponId());
 
         // 商户订单
         List<Integer> couponIdList = CollUtil.newArrayList();
+        if (orderRequest.getPlatUserCouponId() > 0) {
+            couponIdList.add(orderRequest.getPlatUserCouponId());
+        }
         List<MerchantOrder> merchantOrderList = new ArrayList<>();
         List<OrderDetail> orderDetailList = new ArrayList<>();
         for (PreMerchantOrderVo merchantOrderVo : merchantOrderVoList) {
@@ -339,13 +976,18 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (merchantOrder.getCouponId() > 0) {
                 couponIdList.add(merchantOrder.getCouponId());
             }
-            merchantOrder.setCouponPrice(merchantOrderVo.getCouponFee());
+            List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList();
+            BigDecimal merCouponPrice = detailVoList.stream().map(PreOrderInfoDetailVo::getMerCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            merchantOrder.setMerCouponPrice(merCouponPrice);
+            BigDecimal platCouponPrice = detailVoList.stream().map(PreOrderInfoDetailVo::getPlatCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            merchantOrder.setPlatCouponPrice(platCouponPrice);
+            merchantOrder.setCouponPrice(merchantOrder.getMerCouponPrice().add(merchantOrder.getPlatCouponPrice()));
             merchantOrder.setPayPrice(merchantOrder.getTotalPrice().subtract(merchantOrder.getCouponPrice()).subtract(merchantOrder.getIntegralPrice()));
             merchantOrder.setGainIntegral(0);
-            merchantOrder.setType(OrderConstants.ORDER_TYPE_NORMAL);
+            merchantOrder.setType(order.getType());
+
             merchantOrderList.add(merchantOrder);
 
-            List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList();
             for (PreOrderInfoDetailVo detailVo : detailVoList) {
                 OrderDetail orderDetail = new OrderDetail();
                 orderDetail.setOrderNo(order.getOrderNo());
@@ -365,10 +1007,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 orderDetail.setBrokerage(detailVo.getBrokerage());
                 orderDetail.setBrokerageTwo(detailVo.getBrokerageTwo());
                 orderDetail.setFreightFee(detailVo.getFreightFee());
-                orderDetail.setCouponPrice(detailVo.getCouponPrice());
+
                 orderDetail.setUseIntegral(detailVo.getUseIntegral());
                 orderDetail.setIntegralPrice(detailVo.getIntegralPrice());
                 orderDetail.setPayPrice(BigDecimal.ZERO);
+
+                orderDetail.setMerCouponPrice(detailVo.getMerCouponPrice());
+                orderDetail.setPlatCouponPrice(detailVo.getPlatCouponPrice());
+                orderDetail.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
                 BigDecimal detailPayPrice = orderDetail.getPrice().multiply(new BigDecimal(orderDetail.getPayNum().toString())).add(orderDetail.getFreightFee()).subtract(orderDetail.getCouponPrice()).subtract(orderDetail.getIntegralPrice());
                 if (detailPayPrice.compareTo(BigDecimal.ZERO) >= 0) {
                     orderDetail.setPayPrice(detailPayPrice);
@@ -377,15 +1023,15 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
         }
 
-        logger.error("订单生成：商户订单列表： " + JSON.toJSONString(merchantOrderList));
+        logger.info("订单生成：商户订单列表： " + JSON.toJSONString(merchantOrderList));
         Boolean execute = transactionTemplate.execute(e -> {
             Boolean result = true;
             logger.info("开始扣件商品库存:order:{}", JSON.toJSONString(order));
-            if(order.getType().equals(0)){ // 普通商品
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_NORMAL)) { // 普通商品
                 logger.info("开始扣件商品库存 --> 普通商品:{}", JSON.toJSONString(skuRecordList));
                 // 扣减库存
                 for (MyRecord skuRecord : skuRecordList) {
-                     // 普通商品口库存
+                    // 普通商品口库存
                     result = productService.operationStock(skuRecord.getInt("productId"), skuRecord.getInt("num"), Constants.OPERATION_TYPE_SUBTRACT);
                     if (!result) {
                         e.setRollbackOnly();
@@ -400,7 +1046,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                         return result;
                     }
                 }
-            }else if(order.getType().equals(1)) {// 视频号订单
+            }
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {// 视频号订单
                 logger.info("开始扣件商品库存 --> 视频号商品:{}", JSON.toJSONString(skuRecordList));
                 MyRecord skuRecord = skuRecordList.get(0);
                 // 商品规格表扣库存
@@ -410,14 +1057,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 // 视频号商品扣库存
                 payComponentProductService.operationStock(skuRecord.getInt("productId"), skuRecord.getInt("num"), Constants.OPERATION_TYPE_SUBTRACT);
             }
-
-
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+                logger.info("开始扣件商品库存 --> 秒杀商品:{}", JSON.toJSONString(skuRecordList));
+                MyRecord skuRecord = skuRecordList.get(0);
+                seckillService.subStock(skuRecord);
+            }
             orderService.save(order);
             merchantOrderService.saveBatch(merchantOrderList);
             orderDetailService.saveBatch(orderDetailList);
             // 扣除用户积分
             if (order.getUseIntegral() > 0) {
-                result  = userService.updateIntegral(user.getId(), order.getUseIntegral(), Constants.OPERATION_TYPE_SUBTRACT);
+                result = userService.updateIntegral(user.getId(), order.getUseIntegral(), Constants.OPERATION_TYPE_SUBTRACT);
                 if (!result) {
                     e.setRollbackOnly();
                     logger.error("生成订单扣除用户积分失败,预下单号：{}", orderRequest.getPreOrderNo());
@@ -458,10 +1108,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     /**
      * 用户积分记录——订单抵扣
-     * @param uid 用户ID
+     *
+     * @param uid         用户ID
      * @param useIntegral 使用的积分
-     * @param integral 用户当前积分
-     * @param orderNo 订单号
+     * @param integral    用户当前积分
+     * @param orderNo     订单号
      * @return 用户积分记录
      */
     private UserIntegralRecord initOrderUseIntegral(Integer uid, Integer useIntegral, Integer integral, String orderNo) {
@@ -483,7 +1134,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      * @param orderInfoVo  订单vo
      * @param userIntegral 用户积分
      */
-    private void integralDeductionComputed(PreOrderInfoVo orderInfoVo, Integer userIntegral) {
+    @Override
+    public void integralDeductionComputed(PreOrderInfoVo orderInfoVo, Integer userIntegral) {
         BigDecimal payPrice = orderInfoVo.getProTotalFee().subtract(orderInfoVo.getCouponFee());
         String integralDeductionSwitch = systemConfigService.getValueByKeyException(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
         if (integralDeductionSwitch.equals("false")) {
@@ -514,9 +1166,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         Integer tempUseIntegral = useIntegral;
         BigDecimal tempIntegralDeductionPrice = integralDeductionPrice;
         List<PreMerchantOrderVo> voList = merchantOrderVoList.stream().sorted(Comparator.comparing(o -> (o.getProTotalFee().subtract(o.getCouponFee())))).collect(Collectors.toList());
+        BigDecimal paySubPrice = orderInfoVo.getProTotalFee().subtract(orderInfoVo.getMerCouponFee());
         for (int i = 0; i < voList.size(); i++) {
             PreMerchantOrderVo merchantOrderVo = voList.get(i);
-            BigDecimal merPayPrice = merchantOrderVo.getProTotalFee().subtract(merchantOrderVo.getCouponFee());
+            BigDecimal merPayPrice = merchantOrderVo.getProTotalFee().subtract(merchantOrderVo.getMerCouponFee());
             if (merchantOrderVoList.size() == (i + 1)) {
                 merchantOrderVo.setUseIntegral(tempUseIntegral);
                 merchantOrderVo.setIntegralPrice(tempIntegralDeductionPrice);
@@ -534,7 +1187,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             detailVo.setIntegralPrice(merIntegralDeductionPrice);
                             break;
                         }
-                        BigDecimal detailPayPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum())).subtract(detailVo.getCouponPrice());
+                        BigDecimal detailPayPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum())).subtract(detailVo.getMerCouponPrice());
                         BigDecimal ratio = detailPayPrice.divide(merPayPrice, 10, BigDecimal.ROUND_HALF_UP);
                         int detailUseIntegral = new BigDecimal(merUseIntegral.toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_DOWN).intValue();
                         BigDecimal detailIntegralPrice = new BigDecimal(detailUseIntegral).multiply(new BigDecimal(integralDeductionMoney));
@@ -546,7 +1199,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 }
                 break;
             }
-            BigDecimal payRatio = merPayPrice.divide(payPrice, 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal payRatio = merPayPrice.divide(paySubPrice, 10, BigDecimal.ROUND_HALF_UP);
             Integer merUseIntegral = new BigDecimal(tempUseIntegral.toString()).multiply(payRatio).setScale(0, BigDecimal.ROUND_DOWN).intValue();
             if (merUseIntegral.equals(0)) {
                 continue;
@@ -569,7 +1222,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                         detailVo.setIntegralPrice(merIntegralDeductionPrice);
                         break;
                     }
-                    BigDecimal detailPayPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum())).subtract(detailVo.getCouponPrice());
+                    BigDecimal detailPayPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum())).subtract(detailVo.getMerCouponPrice());
                     BigDecimal ratio = detailPayPrice.divide(merPayPrice, 10, BigDecimal.ROUND_HALF_UP);
                     int detailUseIntegral = new BigDecimal(merUseIntegral.toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_DOWN).intValue();
                     BigDecimal detailIntegralPrice = new BigDecimal(detailUseIntegral).multiply(new BigDecimal(integralDeductionMoney));
@@ -583,6 +1236,88 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             tempIntegralDeductionPrice = tempIntegralDeductionPrice.subtract(merchantOrderVo.getIntegralPrice());
         }
         orderInfoVo.setMerchantOrderVoList(voList);
+    }
+
+    /**
+     * 退款单退回商品
+     */
+    @Override
+    public Boolean returningGoods(OrderRefundReturningGoodsRequest request) {
+        RefundOrder refundOrder = refundOrderService.getByRefundOrderNo(request.getRefundOrderNo());
+        if (ObjectUtil.isNull(refundOrder)) {
+            throw new CrmebException("退款单不存在");
+        }
+        if (refundOrder.getRefundStatus() != 4) {
+            throw new CrmebException("退款单状态异常");
+        }
+        if (refundOrder.getReturnGoodsType() == 1) {
+            if (StrUtil.isNotBlank(request.getExpressName())) {
+                throw new CrmebException("请选择快递公司");
+            }
+            if (StrUtil.isNotBlank(request.getTrackingNumber())) {
+                throw new CrmebException("请填写运单号");
+            }
+            refundOrder.setExpressName(request.getExpressName());
+            refundOrder.setTrackingNumber(request.getTrackingNumber());
+        }
+        refundOrder.setTelephone(request.getTelephone());
+        return refundOrderService.updateById(refundOrder);
+    }
+
+    /**
+     * 撤销退款单
+     * @param refundOrderNo 退款单号
+     */
+    @Override
+    public Boolean revoke(String refundOrderNo) {
+        refundOrderService.revoke(refundOrderNo);
+        return null;
+    }
+
+    /**
+     * 订单列表(v1.4.0)
+     * @param request 搜索参数
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<OrderFrontDataResponse> list_v1_4(OrderFrontListRequest request) {
+        Integer userId = userService.getUserIdException();
+
+        PageInfo<Order> pageInfo = orderService.getUserOrderList_v1_4(userId, request);
+        List<Order> orderList = pageInfo.getList();
+        if (CollUtil.isEmpty(orderList)) {
+            return CommonPage.copyPageInfo(pageInfo, CollUtil.newArrayList());
+        }
+        List<Integer> merIdList = orderList.stream().map(Order::getMerId).filter(i -> i > 0).distinct().collect(Collectors.toList());
+        Map<Integer, Merchant> merchantMap = null;
+        if (CollUtil.isNotEmpty(merIdList)) {
+            merchantMap = merchantService.getMerIdMapByIdList(merIdList);
+        }
+        List<OrderFrontDataResponse> responseList = CollUtil.newArrayList();
+        DateTime cancelTime;
+        for (Order order : orderList) {
+            OrderFrontDataResponse infoResponse = new OrderFrontDataResponse();
+            BeanUtils.copyProperties(order, infoResponse);
+            // 订单详情对象列表
+            List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+            List<OrderInfoFrontDataResponse> infoResponseList = CollUtil.newArrayList();
+            orderDetailList.forEach(e -> {
+                OrderInfoFrontDataResponse orderInfoResponse = new OrderInfoFrontDataResponse();
+                BeanUtils.copyProperties(e, orderInfoResponse);
+                infoResponseList.add(orderInfoResponse);
+            });
+            infoResponse.setOrderInfoList(infoResponseList);
+            if (order.getMerId() > 0) {
+                infoResponse.setMerName(merchantMap.get(order.getMerId()).getName());
+            }
+            if (!order.getPaid()) {
+                cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
+                infoResponse.setCancelTime(cancelTime.getTime());
+            }
+
+            responseList.add(infoResponse);
+        }
+        return CommonPage.copyPageInfo(pageInfo, responseList);
     }
 
     /**
@@ -607,6 +1342,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             merchantMap = merchantService.getMerIdMapByIdList(merIdList);
         }
         List<OrderFrontDataResponse> responseList = CollUtil.newArrayList();
+        DateTime cancelTime;
         for (Order order : orderList) {
             OrderFrontDataResponse infoResponse = new OrderFrontDataResponse();
             BeanUtils.copyProperties(order, infoResponse);
@@ -622,6 +1358,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (order.getMerId() > 0) {
                 infoResponse.setMerName(merchantMap.get(order.getMerId()).getName());
             }
+            if (!order.getPaid()) {
+                cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
+                infoResponse.setCancelTime(cancelTime.getTime());
+            }
+
             responseList.add(infoResponse);
         }
         return CommonPage.copyPageInfo(pageInfo, responseList);
@@ -660,6 +1401,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merDetailResponse.setMerLatitude(merchant.getLatitude());
                 merDetailResponse.setMerLongitude(merchant.getLongitude());
             }
+            merDetailResponse.setIsSelf(merchant.getIsSelf());
             List<OrderDetail> detailList = orderDetailMap.get(merchantOrder.getMerId());
             List<OrderInfoFrontDataResponse> dataResponseList = detailList.stream().map(d -> {
                 OrderInfoFrontDataResponse dataResponse = new OrderInfoFrontDataResponse();
@@ -670,6 +1412,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             merDetailResponseList.add(merDetailResponse);
         }
         response.setMerchantOrderList(merDetailResponseList);
+        if (!order.getPaid()) {
+            DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
+            response.setCancelTime(cancelTime.getTime());
+        }
         return response;
     }
 
@@ -693,6 +1439,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             InfoReplyResponse replyResponse = new InfoReplyResponse();
             BeanUtils.copyProperties(info, replyResponse);
             replyResponse.setMerName(merchantMap.get(info.getMerId()).getName());
+            replyResponse.setMerIsSelf(merchantMap.get(info.getMerId()).getIsSelf());
             return replyResponse;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(pageInfo, responseList);
@@ -725,6 +1472,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         BeanUtils.copyProperties(request, productReply);
         productReply.setMerId(orderDetail.getMerId());
         productReply.setProductId(orderDetail.getProductId());
+        if (order.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+            SeckillProduct seckillProduct = seckillProductService.getById(orderDetail.getProductId());
+            productReply.setProductId(seckillProduct.getProductId());
+        }
         productReply.setAttrValueId(orderDetail.getAttrValueId());
         productReply.setSku(orderDetail.getSku());
         productReply.setUid(user.getId());
@@ -793,6 +1544,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         Boolean execute = transactionTemplate.execute(e -> {
             orderService.takeDelivery(orderNo);
             orderDetailService.takeDelivery(orderNo);
+            orderStatusService.createLog(order.getOrderNo(), OrderStatusConstants.ORDER_STATUS_USER_TAKE_DELIVERY, OrderStatusConstants.ORDER_LOG_USER_RECEIPT);
             return Boolean.TRUE;
         });
         if (execute) {
@@ -832,12 +1584,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     /**
      * 售后申请列表(可申请售后列表)
      *
-     * @param pageParamRequest 分页参数
+     * @param request 搜索参数
      */
     @Override
-    public PageInfo<OrderDetail> getAfterSaleApplyList(String orderNo, PageParamRequest pageParamRequest) {
+    public PageInfo<OrderDetail> getAfterSaleApplyList(CommonSearchRequest request) {
         Integer uid = userService.getUserIdException();
-        PageInfo<OrderDetail> pageInfo = orderDetailService.findAfterSaleApplyList(uid, orderNo, pageParamRequest);
+        PageInfo<OrderDetail> pageInfo = orderDetailService.findAfterSaleApplyList(uid, request);
         List<OrderDetail> orderDetailList = pageInfo.getList();
         if (CollUtil.isEmpty(orderDetailList)) {
             return pageInfo;
@@ -912,6 +1664,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrder.setRefundReasonWapImg(systemAttachmentService.clearPrefix(request.getReasonImage()));
         refundOrder.setRefundReasonWapExplain(request.getExplain());
         refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY);
+        refundOrder.setRefundPlatCouponPrice(merchantOrder.getPlatCouponPrice());
+        refundOrder.setAfterSalesType(request.getAfterSalesType());
+        refundOrder.setReturnGoodsType(request.getReturnGoodsType());
 
         RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
         refundOrderInfo.setRefundOrderNo(refundOrder.getRefundOrderNo());
@@ -932,6 +1687,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             refundOrderInfo.setRefundPrice(orderDetail.getPayPrice());
             refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral());
             refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral());
+            refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
         } else {
             refundOrderInfo.setRefundUseIntegral(0);
             refundOrderInfo.setRefundGainIntegral(0);
@@ -943,11 +1699,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (orderDetail.getGainIntegral() > 0) {
                 refundOrderInfo.setRefundGainIntegral(new BigDecimal(orderDetail.getGainIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             }
+            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
+                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+            }
+            refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
         }
 
         refundOrder.setRefundPrice(refundOrderInfo.getRefundPrice());
         refundOrder.setRefundUseIntegral(refundOrderInfo.getRefundUseIntegral());
         refundOrder.setRefundGainIntegral(refundOrderInfo.getRefundGainIntegral());
+        refundOrder.setRefundPlatCouponPrice(refundOrderInfo.getRefundPlatCouponPrice());
+        refundOrder.setRefundFreightFee(refundOrderInfo.getRefundFreightFee());
 
         order.setRefundStatus(OrderConstants.ORDER_REFUND_STATUS_APPLY);
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
@@ -956,6 +1718,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             orderDetailService.updateById(orderDetail);
             refundOrderService.save(refundOrder);
             refundOrderInfoService.save(refundOrderInfo);
+            refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_APPLY, "用户发起退款单申请");
             return Boolean.TRUE;
         });
         if (!execute) throw new CrmebException("申请退款失败");
@@ -965,28 +1728,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     /**
      * 退款订单列表
      *
-     * @param type        列表类型：0-处理中，9-申请记录
-     * @param pageRequest 分页参数
+     * @param request 搜索参数
      * @return PageInfo
      */
     @Override
-    public PageInfo<RefundOrderResponse> getRefundOrderList(Integer type, PageParamRequest pageRequest) {
-        PageInfo<RefundOrder> pageInfo = refundOrderService.getH5List(type, pageRequest);
-        List<RefundOrder> refundOrderList = pageInfo.getList();
-        if (CollUtil.isEmpty(refundOrderList)) {
-            return CommonPage.copyPageInfo(pageInfo, CollUtil.newArrayList());
-        }
-        List<RefundOrderResponse> responseList = refundOrderList.stream().map(refundOrder -> {
-            RefundOrderResponse response = new RefundOrderResponse();
-            BeanUtils.copyProperties(refundOrder, response);
-            RefundOrderInfo orderInfo = refundOrderInfoService.getByRefundOrderNo(refundOrder.getRefundOrderNo());
-            response.setProductName(orderInfo.getProductName());
-            response.setImage(orderInfo.getImage());
-            response.setSku(orderInfo.getSku());
-            response.setApplyRefundNum(orderInfo.getApplyRefundNum());
-            return response;
-        }).collect(Collectors.toList());
-        return CommonPage.copyPageInfo(pageInfo, responseList);
+    public PageInfo<RefundOrderResponse> getRefundOrderList(OrderAfterSalesSearchRequest request) {
+        return refundOrderService.getH5List(request);
     }
 
     /**
@@ -1010,6 +1757,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     /**
      * 获取发货单列表
+     *
      * @param orderNo 订单号
      * @return 发货单列表
      */
@@ -1056,13 +1804,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     private List<MyRecord> validateProductStock(PreOrderInfoVo orderInfoVo) {
         List<MyRecord> recordList = CollUtil.newArrayList();
-//        if (orderInfoVo.getSeckillId() > 0) {
-//        }
-//        if (orderInfoVo.getBargainId() > 0) {
-//        }
-//        if (orderInfoVo.getCombinationId() > 0) {
-//        }
-        if (orderInfoVo.getIsVideo()) {// 视频号订单
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {// 秒杀订单
+            recordList.add(seckillService.validateCreateOrderProductStock(orderInfoVo));
+            return recordList;
+        }
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {// 视频号订单
             // 查询商品信息 视频号都是单品下单
             List<PreOrderInfoDetailVo> detailVos = orderInfoVo.getMerchantOrderVoList().get(0).getOrderInfoList();
             PayComponentProduct product = payComponentProductService.getById(detailVos.get(0).getProductId());
@@ -1075,7 +1821,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (!product.getStatus().equals(5)) {
                 throw new CrmebException("商品已下架，请刷新后重新选择");
             }
-            if (product.getStock().equals(0) ||product.getStock() < detailVos.get(0).getPayNum()) {
+            if (product.getStock().equals(0) || product.getStock() < detailVos.get(0).getPayNum()) {
                 throw new CrmebException("商品库存不足，请刷新后重新选择");
             }
             // 查询商品规格属性值信息
@@ -1146,7 +1892,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     /**
      * 计算订单运费
      */
-    private void getFreightFee(PreOrderInfoVo orderInfoVo, UserAddress userAddress) {
+    @Override
+    public void getFreightFee(PreOrderInfoVo orderInfoVo, UserAddress userAddress) {
         BigDecimal freightFee = BigDecimal.ZERO;
 
         List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
@@ -1270,22 +2017,22 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             BigDecimal renewalPrice = shippingTemplatesRegion.getRenewalPrice().multiply(divide);
                             storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
                             postageFee = shippingTemplatesRegion.getFirstPrice().add(renewalPrice);
-                            List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList().stream().filter(e -> e.getProductId().equals(record.getInt("proId"))).collect(Collectors.toList());
-                            if (infoDetailVoList.size() == 1) {
-                                infoDetailVoList.get(0).setFreightFee(postageFee);
-                            } else {
-                                for (int i = 0; i < infoDetailVoList.size(); i++) {
-                                    PreOrderInfoDetailVo detail = infoDetailVoList.get(i);
-                                    if (infoDetailVoList.size() == (i + 1)) {
-                                        detail.setFreightFee(postageFee);
-                                        break;
-                                    }
-                                    BigDecimal wv = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT) ? detail.getWeight() : detail.getVolume();
-                                    BigDecimal ratio = wv.multiply(new BigDecimal(detail.getPayNum().toString())).divide(surplus, 10, BigDecimal.ROUND_HALF_UP);
-                                    BigDecimal multiply = postageFee.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
-                                    detail.setFreightFee(multiply);
-                                    postageFee = postageFee.subtract(multiply);
+                        }
+                        List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList().stream().filter(e -> e.getProductId().equals(record.getInt("proId"))).collect(Collectors.toList());
+                        if (infoDetailVoList.size() == 1) {
+                            infoDetailVoList.get(0).setFreightFee(postageFee);
+                        } else {
+                            for (int i = 0; i < infoDetailVoList.size(); i++) {
+                                PreOrderInfoDetailVo detail = infoDetailVoList.get(i);
+                                if (infoDetailVoList.size() == (i + 1)) {
+                                    detail.setFreightFee(postageFee);
+                                    break;
                                 }
+                                BigDecimal wv = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT) ? detail.getWeight() : detail.getVolume();
+                                BigDecimal ratio = wv.multiply(new BigDecimal(detail.getPayNum().toString())).divide(surplus, 10, BigDecimal.ROUND_HALF_UP);
+                                BigDecimal multiply = postageFee.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                                detail.setFreightFee(multiply);
+                                postageFee = postageFee.subtract(multiply);
                             }
                         }
                         break;
@@ -1304,27 +2051,30 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      * @return OrderInfoVo
      */
     private PreOrderInfoVo validatePreOrderRequest(PreOrderRequest request, User user) {
-        logger.info("预下单检查调用 -》validatePreOrderRequest->:request:{}|user:{}",JSON.toJSONString(request),JSON.toJSONString(user));
         PreOrderInfoVo preOrderInfoVo = new PreOrderInfoVo();
         List<PreMerchantOrderVo> merchantOrderVoList = CollUtil.newArrayList();
-        if (request.getPreOrderType().equals("shoppingCart")) {// 购物车购买
-            logger.info("预下单检查调用:购物车购买");
-            merchantOrderVoList = validatePreOrderShopping(request, user);
-            List<Integer> cartIdList = request.getOrderDetails().stream().map(PreOrderDetailRequest::getShoppingCartId).distinct().collect(Collectors.toList());
-            preOrderInfoVo.setCartIdList(cartIdList);
-        }
-        if (request.getPreOrderType().equals("buyNow")) {// 立即购买
-            logger.info("预下单检查调用:立即购买");
-            // 立即购买只会有一条详情
-            PreOrderDetailRequest detailRequest = request.getOrderDetails().get(0);
-            merchantOrderVoList.add(validatePreOrderNormal(detailRequest));
-        }
-        if (request.getPreOrderType().equals("video")) {
-            logger.info("预下单检查调用:视频号下单");
-            // 视频号暂时只能购买一个商品
-            PreOrderDetailRequest detailRequest = request.getOrderDetails().get(0);
-            merchantOrderVoList.add(validatePreOrderVideo(detailRequest));
-            preOrderInfoVo.setIsVideo(true);
+
+        switch (request.getPreOrderType()) {
+            case OrderConstants.PLACE_ORDER_TYPE_CART:
+                merchantOrderVoList = validatePreOrderShopping(request, user);
+                List<Integer> cartIdList = request.getOrderDetails().stream().map(PreOrderDetailRequest::getShoppingCartId).distinct().collect(Collectors.toList());
+                preOrderInfoVo.setCartIdList(cartIdList);
+                break;
+            case OrderConstants.PLACE_ORDER_TYPE_BUY_NOW:
+                // 立即购买只会有一条详情
+                merchantOrderVoList.add(validatePreOrderNormal(request.getOrderDetails().get(0)));
+                break;
+            case OrderConstants.PLACE_ORDER_TYPE_VIDEO:
+                // 视频号暂时只能购买一个商品
+                merchantOrderVoList.add(validatePreOrderVideo(request.getOrderDetails().get(0)));
+                preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_VIDEO);
+                break;
+            case OrderConstants.PLACE_ORDER_TYPE_SECKILL:
+                // 秒杀只支持单商品支付
+                merchantOrderVoList.add(seckillService.validatePreOrderSeckill(request.getOrderDetails().get(0)));
+                preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_SECKILL);
+                break;
+
         }
         preOrderInfoVo.setMerchantOrderVoList(merchantOrderVoList);
         logger.info("预下单检查调用:结果preOrderInfoVo:{}", JSON.toJSONString(preOrderInfoVo));
@@ -1378,6 +2128,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         merchantOrderVo.setCouponFee(BigDecimal.ZERO);
         merchantOrderVo.setUserCouponId(0);
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
+        merchantOrderVo.setIsSelf(merchant.getIsSelf());
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(product.getId());
         detailVo.setProductName(product.getName());
@@ -1441,7 +2192,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         return merchantOrderVoList;
     }
 
-    private ComputedOrderPriceResponse computedPrice(OrderComputedPriceRequest request, PreOrderInfoVo orderInfoVo, User user) {
+    private ComputedOrderPriceResponse computedPrice_V1_3(OrderComputedPriceRequest request, PreOrderInfoVo orderInfoVo, User user) {
         String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
         if (request.getIsUseIntegral()) {
             if (integralDeductionSwitch.equals("false")) {
@@ -1465,6 +2216,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         getFreightFee(orderInfoVo, userAddress);
         priceResponse.setFreightFee(orderInfoVo.getFreightFee());
         // 优惠券计算
+        orderInfoVo.setPlatUserCouponId(request.getPlatUserCouponId());
         getCouponFee(orderInfoVo, orderMerchantRequestList, user.getId());
         priceResponse.setCouponFee(orderInfoVo.getCouponFee());
         List<ComputedMerchantOrderResponse> merOrderResponseList = orderInfoVo.getMerchantOrderVoList().stream().map(vo -> {
@@ -1488,7 +2240,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             priceResponse.setIntegralDeductionSwitch(false);
             priceResponse.setIsUseIntegral(false);
             String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
-            if ("ture".equals(integralDeductionSwitch) && payPrice.compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
+            if ("true".equals(integralDeductionSwitch) && payPrice.compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
                 priceResponse.setIntegralDeductionSwitch(true);
             }
             return priceResponse;
@@ -1515,7 +2267,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             BigDecimal deductionPrice = new BigDecimal(user.getIntegral()).multiply(new BigDecimal(integralDeductionMoney));
             // 积分兑换金额小于实际支付可抵扣金额
             if (deductionPrice.compareTo(canDeductionPrice) <= 0) {
-                payPrice = payPrice.subtract(deductionPrice);
+//                payPrice = payPrice.subtract(deductionPrice);
                 priceResponse.setSurplusIntegral(0);
                 priceResponse.setUsedIntegral(user.getIntegral());
             } else {
@@ -1535,9 +2287,280 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         return priceResponse;
     }
 
+    private ComputedOrderPriceResponse computedPrice(OrderComputedPriceRequest request, PreOrderInfoVo orderInfoVo, User user) {
+        String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
+        if (request.getIsUseIntegral()) {
+            if (integralDeductionSwitch.equals("false")) {
+                throw new CrmebException("积分抵扣未开启，请重新下单");
+            }
+        }
+
+        // 计算各种价格
+        ComputedOrderPriceResponse priceResponse = new ComputedOrderPriceResponse();
+        List<OrderMerchantRequest> orderMerchantRequestList = request.getOrderMerchantRequestList();
+        // 计算运费
+        UserAddress userAddress = userAddressService.getById(request.getAddressId());
+        orderInfoVo.getMerchantOrderVoList().forEach(e -> {
+            orderMerchantRequestList.forEach(o -> {
+                if (o.getMerId().equals(e.getMerId())) {
+                    e.setShippingType(o.getShippingType());
+                    e.setUserCouponId(o.getUserCouponId());
+                    e.setCouponFee(BigDecimal.ZERO);
+                    e.setMerCouponFee(BigDecimal.ZERO);
+                }
+            });
+        });
+        getFreightFee(orderInfoVo, userAddress);
+        priceResponse.setFreightFee(orderInfoVo.getFreightFee());
+        // 优惠券计算
+        orderInfoVo.setCouponFee(BigDecimal.ZERO);
+        orderInfoVo.setPlatUserCouponId(request.getPlatUserCouponId());
+        orderInfoVo.setPlatCouponFee(BigDecimal.ZERO);
+        orderInfoVo.setMerCouponFee(BigDecimal.ZERO);
+        priceResponse.setCouponFee(BigDecimal.ZERO);
+        if (!orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) && !orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {
+            getCouponFee_V1_3(orderInfoVo, user.getId());
+            priceResponse.setCouponFee(orderInfoVo.getCouponFee());
+            priceResponse.setPlatCouponFee(orderInfoVo.getPlatCouponFee());
+            priceResponse.setMerCouponFee(orderInfoVo.getMerCouponFee());
+            priceResponse.setMerOrderResponseList(computedPriceGetMerOrderList(orderInfoVo));
+            priceResponse.setPlatCouponUserList(computedPriceGetPlatOrderList(orderInfoVo));
+        } else {
+            priceResponse.setMerOrderResponseList(computedPriceGetMerOrderList(orderInfoVo));
+        }
+        // 积分部分
+        BigDecimal payPrice = orderInfoVo.getProTotalFee().subtract(priceResponse.getCouponFee());
+        priceResponse.setIsUseIntegral(request.getIsUseIntegral());
+        priceResponse.setProTotalFee(orderInfoVo.getProTotalFee());
+        if (!request.getIsUseIntegral() || user.getIntegral() <= 0) {// 不使用积分
+            priceResponse.setDeductionPrice(BigDecimal.ZERO);
+            priceResponse.setSurplusIntegral(user.getIntegral());
+            priceResponse.setPayFee(payPrice.add(priceResponse.getFreightFee()));
+            priceResponse.setUsedIntegral(0);
+            priceResponse.setIntegralDeductionSwitch(false);
+            priceResponse.setIsUseIntegral(false);
+            String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
+            if ("true".equals(integralDeductionSwitch) && payPrice.compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
+                priceResponse.setIntegralDeductionSwitch(true);
+            }
+            return priceResponse;
+        }
+        // 使用积分
+        if (request.getIsUseIntegral() && user.getIntegral() > 0) {
+            String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
+            if (Integer.parseInt(integralDeductionStartMoney) <= 0 || payPrice.compareTo(new BigDecimal(integralDeductionStartMoney)) < 0) {
+                priceResponse.setDeductionPrice(BigDecimal.ZERO);
+                priceResponse.setSurplusIntegral(user.getIntegral());
+                priceResponse.setPayFee(payPrice.add(priceResponse.getFreightFee()));
+                priceResponse.setUsedIntegral(0);
+                priceResponse.setIntegralDeductionSwitch(false);
+                priceResponse.setIsUseIntegral(false);
+                return priceResponse;
+            }
+
+            // 查询积分使用比例
+            String integralRatio = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_RATIO);
+            // 可抵扣金额
+            BigDecimal canDeductionPrice = payPrice.multiply(new BigDecimal(integralRatio)).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+            // 积分转换金额
+            String integralDeductionMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_MONEY);
+            BigDecimal deductionPrice = new BigDecimal(user.getIntegral()).multiply(new BigDecimal(integralDeductionMoney));
+            // 积分兑换金额小于实际支付可抵扣金额
+            if (deductionPrice.compareTo(canDeductionPrice) <= 0) {
+//                payPrice = payPrice.subtract(deductionPrice);
+                priceResponse.setSurplusIntegral(0);
+                priceResponse.setUsedIntegral(user.getIntegral());
+            } else {
+                deductionPrice = canDeductionPrice;
+                if (canDeductionPrice.compareTo(BigDecimal.ZERO) > 0) {
+                    int usedIntegral = canDeductionPrice.divide(new BigDecimal(integralDeductionMoney), 0, BigDecimal.ROUND_UP).intValue();
+                    priceResponse.setSurplusIntegral(user.getIntegral() - usedIntegral);
+                    priceResponse.setUsedIntegral(usedIntegral);
+                }
+            }
+            payPrice = payPrice.subtract(deductionPrice);
+            priceResponse.setPayFee(payPrice.add(priceResponse.getFreightFee()));
+            priceResponse.setDeductionPrice(deductionPrice);
+            priceResponse.setIsUseIntegral(true);
+            priceResponse.setIntegralDeductionSwitch(true);
+        }
+        return priceResponse;
+    }
+
+    private List<CouponUser> computedPriceGetPlatOrderList(PreOrderInfoVo orderInfoVo) {
+        Integer userId = userService.getUserId();
+        // 获取平台可用优惠券列表
+        List<Integer> merIdList = new ArrayList<>();
+        List<Integer> proIdList = new ArrayList<>();
+        List<Product> productList = new ArrayList<>();
+        List<PreOrderInfoDetailVo> orderDetailInfoList = new ArrayList<>();
+        for (PreMerchantOrderVo merchantOrderVo : orderInfoVo.getMerchantOrderVoList()) {
+            merIdList.add(merchantOrderVo.getMerId());
+            merchantOrderVo.getOrderInfoList().forEach(info -> {
+                if (!proIdList.contains(info.getProductId())) {
+                    Product product = productService.getById(info.getProductId());
+                    productList.add(product);
+                    proIdList.add(product.getId());
+                }
+            });
+            orderDetailInfoList.addAll(merchantOrderVo.getOrderInfoList());
+        }
+        BigDecimal proTotalFee = orderInfoVo.getProTotalFee();
+        List<Integer> proCategoryIdList = productList.stream().map(Product::getCategoryId).collect(Collectors.toList());
+        List<Integer> secondParentIdList = productCategoryService.findParentIdByChildIds(proCategoryIdList);
+        List<Integer> firstParentIdList = productCategoryService.findParentIdByChildIds(secondParentIdList);
+        proCategoryIdList.addAll(secondParentIdList);
+        proCategoryIdList.addAll(firstParentIdList);
+        List<Integer> brandIdList = productList.stream().map(Product::getBrandId).collect(Collectors.toList());
+        List<CouponUser> platCouponUserList = couponUserService.findManyPlatByUidAndMerIdAndMoneyAndProList(userId, proIdList, proCategoryIdList, merIdList, brandIdList, proTotalFee);
+
+        BigDecimal remainingAmount = orderInfoVo.getProTotalFee().subtract(orderInfoVo.getMerCouponFee());
+        for (CouponUser couponUser : platCouponUserList) {
+            if (orderInfoVo.getPlatUserCouponId() > 0 && couponUser.getId().equals(orderInfoVo.getPlatUserCouponId())) {
+                couponUser.setIsChecked(true);
+                couponUser.setIsChoose(true);
+            }
+            // 判断是否可用
+            if (remainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                if (orderInfoVo.getProTotalFee().compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && remainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            Coupon coupon = couponService.getById(couponUser.getCouponId());
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = orderDetailInfoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0
+                        && proSubPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                    couponUser.setIsChoose(true);
+                }
+                continue;
+            }
+        }
+        return platCouponUserList;
+    }
+
+    private List<ComputedMerchantOrderResponse> computedPriceGetMerOrderList(PreOrderInfoVo orderInfoVo) {
+        Integer userId = userService.getUserId();
+        List<ComputedMerchantOrderResponse> merOrderResponseList = orderInfoVo.getMerchantOrderVoList().stream().map(vo -> {
+            ComputedMerchantOrderResponse merOrderResponse = new ComputedMerchantOrderResponse();
+            merOrderResponse.setMerId(vo.getMerId());
+            merOrderResponse.setFreightFee(vo.getFreightFee());
+            if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) && orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {
+                merOrderResponse.setUserCouponId(0);
+                merOrderResponse.setCouponFee(BigDecimal.ZERO);
+                return merOrderResponse;
+            }
+            merOrderResponse.setUserCouponId(vo.getUserCouponId());
+            merOrderResponse.setCouponFee(vo.getMerCouponFee());
+            // 查询适用的用户优惠券
+            List<Integer> merProIdList = vo.getOrderInfoList().stream().map(PreOrderInfoDetailVo::getProductId).distinct().collect(Collectors.toList());
+            BigDecimal merPrice = vo.getProTotalFee();
+            BigDecimal merRemainingAmount = vo.getProTotalFee().subtract(orderInfoVo.getPlatCouponFee());
+            List<CouponUser> merCouponUserList = couponUserService.findManyByUidAndMerIdAndMoneyAndProList(userId, vo.getMerId(), merProIdList, merPrice);
+            for (int i = 0; i < merCouponUserList.size(); ) {
+                CouponUser couponUser = merCouponUserList.get(i);
+                if (vo.getUserCouponId() > 0 && couponUser.getId().equals(vo.getUserCouponId())) {
+                    couponUser.setIsChecked(true);
+                    couponUser.setIsChoose(true);
+                    i++;
+                    continue;
+                }
+                if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                    if (merRemainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                        couponUser.setIsChoose(true);
+                    }
+                    i++;
+                    continue;
+                }
+                Coupon coupon = couponService.getById(couponUser.getCouponId());
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<PreOrderInfoDetailVo> detailVoList = vo.getOrderInfoList().stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proPrice = detailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proRemainingAmount = detailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getPlatCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    merCouponUserList.remove(i);
+                    continue;
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    merCouponUserList.remove(i);
+                    continue;
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) >= 0) {
+                    if (proRemainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) > 0) {
+                        couponUser.setIsChoose(true);
+                    }
+                }
+                i++;
+            }
+            merOrderResponse.setMerCouponUserList(merCouponUserList);
+            return merOrderResponse;
+        }).collect(Collectors.toList());
+        return merOrderResponseList;
+    }
+
     /**
      * 视频号下单校验
      * 暂时只支持都买一种商品
+     *
      * @param detailRequest 请求参数
      * @return 预下单结果
      */
@@ -1587,6 +2610,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         merchantOrderVo.setCouponFee(BigDecimal.ZERO);
         merchantOrderVo.setUserCouponId(0);
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
+        merchantOrderVo.setIsSelf(merchant.getIsSelf());
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(product.getId());
         detailVo.setProductName(product.getTitle());
@@ -1625,16 +2649,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     /**
      * 获取优惠金额
      */
-    private void getCouponFee(PreOrderInfoVo orderInfoVo, List<OrderMerchantRequest> orderMerchantRequestList, Integer uid) {
+    @Override
+    public void getCouponFee(PreOrderInfoVo orderInfoVo, List<OrderMerchantRequest> orderMerchantRequestList, Integer uid) {
         long count = orderMerchantRequestList.stream().filter(e -> e.getUserCouponId() > 0).count();
         if (count <= 0) {
             orderInfoVo.setCouponFee(BigDecimal.ZERO);
             return;
         }
-//        if (orderInfoVo.getSeckillId() > 0 || orderInfoVo.getBargainId() > 0 || orderInfoVo.getCombinationId() > 0) {
-//            throw new CrmebException("营销活动商品无法使用优惠券");
-//        }
-        if (orderInfoVo.getIsVideo()) {
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+            throw new CrmebException("营销活动商品无法使用优惠券");
+        }
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {
             throw new CrmebException("视频号商品无法使用优惠券");
         }
         List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
@@ -1758,5 +2783,334 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             merchantOrderVo.setCouponFee(merchantCouponFee);
         }
         orderInfoVo.setCouponFee(couponFee);
+    }
+
+    /**
+     * 获取优惠金额
+     */
+    private void getCouponFee_V1_3(PreOrderInfoVo orderInfoVo, Integer uid) {
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+            throw new CrmebException("营销活动商品无法使用优惠券");
+        }
+        if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {
+            throw new CrmebException("视频号商品无法使用优惠券");
+        }
+        orderInfoVo.getMerchantOrderVoList().forEach(merchantOrder -> {
+            merchantOrder.setCouponFee(BigDecimal.ZERO);
+            merchantOrder.setMerCouponFee(BigDecimal.ZERO);
+            merchantOrder.getOrderInfoList().forEach(info -> {
+                info.setMerCouponPrice(BigDecimal.ZERO);
+                info.setPlatCouponPrice(BigDecimal.ZERO);
+            });
+        });
+        List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
+        long count = merchantOrderVoList.stream().filter(e -> e.getUserCouponId() > 0).count();
+        if (count <= 0 && orderInfoVo.getPlatUserCouponId() <= 0) {
+            orderInfoVo.setCouponFee(BigDecimal.ZERO);
+            return;
+        }
+        BigDecimal couponFee = BigDecimal.ZERO;
+        Date date = CrmebDateUtil.nowDateTime();
+        List<Integer> proIdList = new ArrayList<>();
+        for (PreMerchantOrderVo merchantOrderVo : merchantOrderVoList) {
+            List<Integer> productIdList = merchantOrderVo.getOrderInfoList().stream().map(PreOrderInfoDetailVo::getProductId).collect(Collectors.toList());
+            proIdList.addAll(productIdList);
+            if (merchantOrderVo.getUserCouponId() <= 0) {
+                merchantOrderVo.setCouponFee(BigDecimal.ZERO);
+                merchantOrderVo.setMerCouponFee(BigDecimal.ZERO);
+                continue;
+            }
+            BigDecimal merchantCouponFee = BigDecimal.ZERO;
+            // 判断优惠券是否可以使用
+            CouponUser couponUser = couponUserService.getById(merchantOrderVo.getUserCouponId());
+            if (ObjectUtil.isNull(couponUser) || !couponUser.getUid().equals(uid)) {
+                throw new CrmebException("优惠券领取记录不存在！");
+            }
+            if (!couponUser.getMerId().equals(merchantOrderVo.getMerId())) {
+                throw new CrmebException("商家无此优惠券");
+            }
+            if (CouponConstants.STORE_COUPON_USER_STATUS_USED.equals(couponUser.getStatus())) {
+                throw new CrmebException("此优惠券已使用！");
+            }
+            if (CouponConstants.STORE_COUPON_USER_STATUS_LAPSED.equals(couponUser.getStatus())) {
+                throw new CrmebException("此优惠券已失效！");
+            }
+            //判断是否在使用时间内
+            if (couponUser.getStartTime().compareTo(date) > 0) {
+                throw new CrmebException("此优惠券还未到达使用时间范围之内！");
+            }
+            if (date.compareTo(couponUser.getEndTime()) > 0) {
+                throw new CrmebException("此优惠券已经失效了");
+            }
+            if (new BigDecimal(couponUser.getMinPrice().toString()).compareTo(merchantOrderVo.getProTotalFee()) > 0) {
+//                throw new CrmebException("总金额小于优惠券最小使用金额");
+                throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+            }
+
+            //检测优惠券信息
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                // 商品券
+                //设置优惠券所提供的集合
+                List<CouponProduct> couponProductList = couponProductService.findByCid(couponUser.getCouponId());
+                List<Integer> primaryKeyIdList = couponProductList.stream().map(CouponProduct::getPid).collect(Collectors.toList());
+                //取两个集合的交集，如果是false则证明没有相同的值
+                //oldList.retainAll(newList)返回值代表oldList是否保持原样，如果old和new完全相同，那old保持原样并返回false。
+                //交集：listA.retainAll(listB) ——listA内容变为listA和listB都存在的对象；listB不变
+                primaryKeyIdList.retainAll(productIdList);
+                if (CollUtil.isEmpty(primaryKeyIdList)) {
+                    throw new CrmebException("此券为商品券，请在购买相关产品后使用！");
+                }
+                List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList().stream().filter(info -> primaryKeyIdList.contains(info.getProductId())).collect(Collectors.toList());
+                if (CollUtil.isEmpty(infoDetailVoList)) {
+                    throw new CrmebException("此券为商品券，请在购买相关产品后使用！");
+                }
+                BigDecimal proTotalPrice = infoDetailVoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (new BigDecimal(couponUser.getMinPrice().toString()).compareTo(proTotalPrice) > 0) {
+//                    throw new CrmebException("总金额小于优惠券最低使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                merchantCouponFee = merchantCouponFee.add(new BigDecimal(couponUser.getMoney().toString()));
+                BigDecimal couponPrice = merchantCouponFee;
+                if (infoDetailVoList.size() == 1) {
+                    infoDetailVoList.get(0).setMerCouponPrice(couponPrice);
+                } else {
+                    for (int i = 0; i < infoDetailVoList.size(); i++) {
+                        PreOrderInfoDetailVo detailVo = infoDetailVoList.get(i);
+                        if (infoDetailVoList.size() == (i + 1)) {
+                            detailVo.setMerCouponPrice(couponPrice);
+                            break;
+                        }
+                        BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                        BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal detailCouponFee = couponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                        couponPrice = couponPrice.subtract(detailCouponFee);
+                        detailVo.setMerCouponPrice(detailCouponFee);
+                    }
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                // 商家券
+                List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList();
+                BigDecimal proTotalPrice = infoDetailVoList.stream().map(i -> i.getPrice().multiply(new BigDecimal(i.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (new BigDecimal(couponUser.getMinPrice().toString()).compareTo(proTotalPrice) > 0) {
+//                    throw new CrmebException("总金额小于优惠券最低使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                merchantCouponFee = merchantCouponFee.add(new BigDecimal(couponUser.getMoney().toString()));
+                BigDecimal couponPrice = merchantCouponFee;
+                if (infoDetailVoList.size() == 1) {
+                    infoDetailVoList.get(0).setMerCouponPrice(couponPrice);
+                } else {
+                    for (int i = 0; i < infoDetailVoList.size(); i++) {
+                        PreOrderInfoDetailVo detailVo = infoDetailVoList.get(i);
+                        if (infoDetailVoList.size() == (i + 1)) {
+                            detailVo.setMerCouponPrice(couponPrice);
+                            break;
+                        }
+                        BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                        BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal detailCouponFee = couponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                        couponPrice = couponPrice.subtract(detailCouponFee);
+                        detailVo.setMerCouponPrice(detailCouponFee);
+                    }
+                }
+            }
+            couponFee = couponFee.add(merchantCouponFee);
+            merchantOrderVo.setCouponFee(merchantCouponFee);
+            merchantOrderVo.setMerCouponFee(merchantCouponFee);
+        }
+        orderInfoVo.setMerCouponFee(couponFee);
+        // 计算平台优惠券
+        if (orderInfoVo.getPlatUserCouponId() > 0) {
+
+            CouponUser couponUser = couponUserService.getById(orderInfoVo.getPlatUserCouponId());
+            if (ObjectUtil.isNull(couponUser) || !couponUser.getUid().equals(uid)) {
+                throw new CrmebException("优惠券领取记录不存在！");
+            }
+            if (!couponUser.getMerId().equals(0)) {
+                throw new CrmebException("平台无此优惠券");
+            }
+            if (CouponConstants.STORE_COUPON_USER_STATUS_USED.equals(couponUser.getStatus())) {
+                throw new CrmebException("此优惠券已使用！");
+            }
+            if (CouponConstants.STORE_COUPON_USER_STATUS_LAPSED.equals(couponUser.getStatus())) {
+                throw new CrmebException("此优惠券已失效！");
+            }
+            //判断是否在使用时间内
+            if (couponUser.getStartTime().compareTo(date) > 0) {
+                throw new CrmebException("此优惠券还未到达使用时间范围之内！");
+            }
+            if (date.compareTo(couponUser.getEndTime()) > 0) {
+                throw new CrmebException("此优惠券已经失效了");
+            }
+
+            Coupon coupon = couponService.getById(couponUser.getCouponId());
+            List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
+            merchantOrderVoList.forEach(m -> {
+                orderInfoList.addAll(m.getOrderInfoList());
+            });
+            BigDecimal platCouponPrice = new BigDecimal(couponUser.getMoney().toString());
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                BigDecimal remainingAmount = orderInfoVo.getProTotalFee().subtract(orderInfoVo.getMerCouponFee());
+                if (orderInfoVo.getProTotalFee().compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+//                    throw new CrmebException("总金额小于优惠券最小使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (remainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                BigDecimal proTotalPrice = orderInfoList.stream().map(i -> i.getPrice().multiply(new BigDecimal(i.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                for (int i = 0; i < orderInfoList.size(); i++) {
+                    PreOrderInfoDetailVo detailVo = orderInfoList.get(i);
+                    if (orderInfoList.size() == (i + 1)) {
+                        detailVo.setPlatCouponPrice(platCouponPrice);
+                        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                        break;
+                    }
+                    BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                    BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal detailCouponFee = new BigDecimal(couponUser.getMoney().toString()).multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    platCouponPrice = platCouponPrice.subtract(detailCouponFee);
+                    detailVo.setPlatCouponPrice(detailCouponFee);
+                    detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                // 平台优惠券计算金额 = （商品金额 - 商户优惠金额） * 购买数量
+                List<PreOrderInfoDetailVo> infoDetailList = orderInfoList.stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proTotalPrice = infoDetailList.stream().map(i -> i.getPrice().multiply(new BigDecimal(i.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proPrice = infoDetailList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+//                    throw new CrmebException("总金额小于优惠券最小使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                for (int i = 0; i < infoDetailList.size(); i++) {
+                    PreOrderInfoDetailVo detailVo = infoDetailList.get(i);
+                    if (orderInfoList.size() == (i + 1)) {
+                        detailVo.setPlatCouponPrice(platCouponPrice);
+                        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                        break;
+                    }
+                    BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                    BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal detailCouponFee = new BigDecimal(couponUser.getMoney().toString()).multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    platCouponPrice = platCouponPrice.subtract(detailCouponFee);
+                    detailVo.setPlatCouponPrice(detailCouponFee);
+                    detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                }
+            }
+            proIdList = proIdList.stream().distinct().collect(Collectors.toList());
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Product> productList = productService.findByIds(proIdList);
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                List<PreOrderInfoDetailVo> infoDetailList = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proTotalPrice = infoDetailList.stream().map(i -> i.getPrice().multiply(new BigDecimal(i.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proPrice = infoDetailList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+//                    throw new CrmebException("总金额小于优惠券最小使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                for (int i = 0; i < infoDetailList.size(); i++) {
+                    PreOrderInfoDetailVo detailVo = infoDetailList.get(i);
+                    if (orderInfoList.size() == (i + 1)) {
+                        detailVo.setPlatCouponPrice(platCouponPrice);
+                        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                        break;
+                    }
+                    BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                    BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal detailCouponFee = new BigDecimal(couponUser.getMoney().toString()).multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    platCouponPrice = platCouponPrice.subtract(detailCouponFee);
+                    detailVo.setPlatCouponPrice(detailCouponFee);
+                    detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Product> productList = productService.findByIds(proIdList);
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                List<PreOrderInfoDetailVo> infoDetailList = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proTotalPrice = infoDetailList.stream().map(i -> i.getPrice().multiply(new BigDecimal(i.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proPrice = infoDetailList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+//                    throw new CrmebException("总金额小于优惠券最小使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                for (int i = 0; i < infoDetailList.size(); i++) {
+                    PreOrderInfoDetailVo detailVo = infoDetailList.get(i);
+                    if (orderInfoList.size() == (i + 1)) {
+                        detailVo.setPlatCouponPrice(platCouponPrice);
+                        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                        break;
+                    }
+                    BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                    BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal detailCouponFee = new BigDecimal(couponUser.getMoney().toString()).multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    platCouponPrice = platCouponPrice.subtract(detailCouponFee);
+                    detailVo.setPlatCouponPrice(detailCouponFee);
+                    detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Product> productList = productService.findByIds(proIdList);
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                List<PreOrderInfoDetailVo> infoDetailList = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+                BigDecimal proTotalPrice = infoDetailList.stream().map(i -> i.getPrice().multiply(new BigDecimal(i.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proPrice = infoDetailList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+//                    throw new CrmebException("总金额小于优惠券最小使用金额");
+                    throw new CrmebException("请合理搭配优惠组合，当前优惠券不满足使用条件");
+                }
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    throw new CrmebException(StrUtil.format("{}优惠券不适用，请重新选择优惠券", couponUser.getName()));
+                }
+                for (int i = 0; i < infoDetailList.size(); i++) {
+                    PreOrderInfoDetailVo detailVo = infoDetailList.get(i);
+                    if (orderInfoList.size() == (i + 1)) {
+                        detailVo.setPlatCouponPrice(platCouponPrice);
+                        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                        break;
+                    }
+                    BigDecimal detailPrice = detailVo.getPrice().multiply(new BigDecimal(detailVo.getPayNum()));
+                    BigDecimal ratio = detailPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal detailCouponFee = new BigDecimal(couponUser.getMoney().toString()).multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    platCouponPrice = platCouponPrice.subtract(detailCouponFee);
+                    detailVo.setPlatCouponPrice(detailCouponFee);
+                    detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+                }
+            }
+            BigDecimal platCouponFee = new BigDecimal(couponUser.getMoney().toString());
+            orderInfoVo.setPlatCouponFee(platCouponFee);
+        }
+        orderInfoVo.setCouponFee(orderInfoVo.getPlatCouponFee().add(orderInfoVo.getMerCouponFee()));
     }
 }

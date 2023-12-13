@@ -1,7 +1,7 @@
 package com.jbp.admin.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.admin.service.WeChatMessageService;
+import com.jbp.admin.service.WechatMessageService;
 import com.jbp.admin.vo.*;
 import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.model.article.Article;
@@ -13,6 +13,7 @@ import com.jbp.service.service.ArticleService;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.UserTokenService;
 import com.jbp.service.service.WechatReplyService;
+
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -38,7 +39,7 @@ import java.util.Map;
  */
 @Data
 @Service
-public class WeChatMessageServiceImpl implements WeChatMessageService {
+public class WeChatMessageServiceImpl implements WechatMessageService {
     private static final Logger logger = LoggerFactory.getLogger(WeChatMessageServiceImpl.class);
 
     @Autowired

@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.service.*;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
@@ -20,7 +19,9 @@ import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.RetailStoreConfigVo;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ import static java.math.BigDecimal.ZERO;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -146,16 +147,30 @@ public class RetailStoreServiceImpl implements RetailStoreService {
      */
     @Override
     public RetailStoreConfigVo getRetailStoreConfig() {
+        ArrayList<String> keyList = new ArrayList<>();
+        keyList.add(SysConfigConstants.RETAIL_STORE_SWITCH);
+        keyList.add(SysConfigConstants.RETAIL_STORE_LINE);
+        keyList.add(SysConfigConstants.RETAIL_STORE_BINDING_TYPE);
+        keyList.add(SysConfigConstants.RETAIL_STORE_BUBBLE_SWITCH);
+        keyList.add(SysConfigConstants.RETAIL_STORE_BROKERAGE_FIRST_RATIO);
+        keyList.add(SysConfigConstants.RETAIL_STORE_BROKERAGE_SECOND_RATIO);
+        keyList.add(SysConfigConstants.RETAIL_STORE_BROKERAGE_FREEZING_TIME);
+        keyList.add(SysConfigConstants.RETAIL_STORE_EXTRACT_MIN_PRICE);
+        keyList.add(SysConfigConstants.RETAIL_STORE_EXTRACT_BANK);
+        keyList.add(SysConfigConstants.RETAIL_STORE_BROKERAGE_SHARE_NODE);
+        MyRecord record = systemConfigService.getValuesByKeyList(keyList);
+
         RetailStoreConfigVo vo = new RetailStoreConfigVo();
-        vo.setRetailStoreSwitch(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_SWITCH)));
-        vo.setRetailStoreLine(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_LINE)));
-        vo.setRetailStoreBindingType(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_BINDING_TYPE)));
-        vo.setRetailStoreBubbleSwitch(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_BUBBLE_SWITCH)));
-        vo.setRetailStoreBrokerageFirstRatio(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_BROKERAGE_FIRST_RATIO)));
-        vo.setRetailStoreBrokerageSecondRatio(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_BROKERAGE_SECOND_RATIO)));
-        vo.setRetailStoreBrokerageFreezingTime(Integer.parseInt(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_BROKERAGE_FREEZING_TIME)));
-        vo.setRetailStoreExtractMinPrice(new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_EXTRACT_MIN_PRICE)));
-        vo.setRetailStoreExtractBank(systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_EXTRACT_BANK).replace("\\n", "\n"));
+        vo.setRetailStoreSwitch(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_SWITCH)));
+        vo.setRetailStoreLine(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_LINE)));
+        vo.setRetailStoreBindingType(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_BINDING_TYPE)));
+        vo.setRetailStoreBubbleSwitch(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_BUBBLE_SWITCH)));
+        vo.setRetailStoreBrokerageFirstRatio(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_BROKERAGE_FIRST_RATIO)));
+        vo.setRetailStoreBrokerageSecondRatio(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_BROKERAGE_SECOND_RATIO)));
+        vo.setRetailStoreBrokerageFreezingTime(Integer.parseInt(record.getStr(SysConfigConstants.RETAIL_STORE_BROKERAGE_FREEZING_TIME)));
+        vo.setRetailStoreExtractMinPrice(new BigDecimal(record.getStr(SysConfigConstants.RETAIL_STORE_EXTRACT_MIN_PRICE)));
+        vo.setRetailStoreExtractBank(record.getStr(SysConfigConstants.RETAIL_STORE_EXTRACT_BANK).replace("\\n", "\n"));
+        vo.setRetailStoreBrokerageShareNode(record.getStr(SysConfigConstants.RETAIL_STORE_BROKERAGE_SHARE_NODE));
         return vo;
     }
 
@@ -182,6 +197,7 @@ public class RetailStoreServiceImpl implements RetailStoreService {
         systemConfigService.updateOrSaveValueByName(SysConfigConstants.RETAIL_STORE_BROKERAGE_FREEZING_TIME, retailStoreConfigVo.getRetailStoreBrokerageFreezingTime().toString());
         systemConfigService.updateOrSaveValueByName(SysConfigConstants.RETAIL_STORE_EXTRACT_MIN_PRICE, retailStoreConfigVo.getRetailStoreExtractMinPrice().toString());
         systemConfigService.updateOrSaveValueByName(SysConfigConstants.RETAIL_STORE_EXTRACT_BANK, retailStoreConfigVo.getRetailStoreExtractBank());
+        systemConfigService.updateOrSaveValueByName(SysConfigConstants.RETAIL_STORE_BROKERAGE_SHARE_NODE, retailStoreConfigVo.getRetailStoreBrokerageShareNode());
         return true;
     }
 
@@ -515,6 +531,7 @@ public class RetailStoreServiceImpl implements RetailStoreService {
 
     /**
      * 用户结算记录
+     *
      * @param pageParamRequest 分页参数
      * @return List
      */
@@ -552,6 +569,7 @@ public class RetailStoreServiceImpl implements RetailStoreService {
 
     /**
      * 佣金转入余额
+     *
      * @param request 请求参数
      * @return Boolean
      */
@@ -679,8 +697,9 @@ public class RetailStoreServiceImpl implements RetailStoreService {
 
     /**
      * 分销员列表
-     * @param keywords 搜索参数
-     * @param dateLimit 时间参数
+     *
+     * @param keywords    搜索参数
+     * @param dateLimit   时间参数
      * @param pageRequest 分页参数
      * @return CommonPage
      */
@@ -743,7 +762,8 @@ public class RetailStoreServiceImpl implements RetailStoreService {
 
     /**
      * 根据条件获取下级推广用户列表
-     * @param request 查询参数
+     *
+     * @param request     查询参数
      * @param pageRequest 分页参数
      * @return 下级推广用户列表
      */
@@ -754,7 +774,8 @@ public class RetailStoreServiceImpl implements RetailStoreService {
 
     /**
      * 根据条件获取推广订单列表
-     * @param request 查询参数
+     *
+     * @param request     查询参数
      * @param pageRequest 分页参数
      * @return 推广订单列表
      */
@@ -803,7 +824,7 @@ public class RetailStoreServiceImpl implements RetailStoreService {
                 throw new CrmebException("请填写支付宝账号");
             }
         }
-        if (request.getType().equals(ClosingConstant.CLOSING_TYPE_WEIXIN)) {
+        if (request.getType().equals(ClosingConstant.CLOSING_TYPE_WECHAT)) {
             if (StrUtil.isBlank(request.getWechatNo())) {
                 throw new CrmebException("请填写微信号");
             }

@@ -1,6 +1,9 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -9,38 +12,36 @@ import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
-import com.alipay.api.domain.AlipayTradeWapPayModel;
-import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
-import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.jbp.service.service.*;
+import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.alipay.AliPayInfo;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
 import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.order.MerchantOrder;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.order.OrderProfitSharing;
+import com.jbp.common.model.merchant.MerchantBalanceRecord;
+import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.ProductCoupon;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.*;
 import com.jbp.common.model.wechat.WechatPayInfo;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.request.OrderPayRequest;
+import com.jbp.common.response.CashierInfoResponse;
 import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.PayConfigResponse;
-import com.jbp.common.utils.*;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.RequestUtil;
+import com.jbp.common.utils.WxPayUtil;
 import com.jbp.common.vo.*;
 import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
+import com.jbp.service.service.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,7 +61,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -81,8 +82,6 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private TransactionTemplate transactionTemplate;
     @Autowired
-    private RedisUtil redisUtil;
-    @Autowired
     private UserTokenService userTokenService;
     @Autowired
     private WechatService wechatService;
@@ -97,10 +96,6 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private UserIntegralRecordService userIntegralRecordService;
     @Autowired
-    private UserExperienceRecordService userExperienceRecordService;
-    @Autowired
-    private UserLevelService userLevelService;
-    @Autowired
     private SystemNotificationService systemNotificationService;
     @Autowired
     private SmsService smsService;
@@ -108,8 +103,6 @@ public class PayServiceImpl implements PayService {
     private TemplateMessageService templateMessageService;
     @Autowired
     private OrderDetailService orderDetailService;
-    @Autowired
-    private CouponProductService couponProductService;
     @Autowired
     private ProductCouponService productCouponService;
     @Autowired
@@ -136,6 +129,16 @@ public class PayServiceImpl implements PayService {
     private PayComponentOrderService payComponentOrderService;
     @Autowired
     private PayComponentProductService payComponentProductService;
+    @Autowired
+    private AliPayInfoService aliPayInfoService;
+    @Autowired
+    private RechargeOrderService rechargeOrderService;
+    @Autowired
+    private MerchantBalanceRecordService merchantBalanceRecordService;
+    @Autowired
+    private MerchantPrintService merchantPrintService;
+    @Autowired
+    private CrmebConfig crmebConfig;
 
     /**
      * 获取支付配置
@@ -180,6 +183,13 @@ public class PayServiceImpl implements PayService {
         // 根据支付类型进行校验,更换支付类型
         order.setPayType(orderPayRequest.getPayType());
         order.setPayChannel(orderPayRequest.getPayChannel());
+        // 获取过期时间
+        DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
+        long between = DateUtil.between(cancelTime, DateUtil.date(), DateUnit.SECOND, false);
+        if (between > 0) {
+            throw new CrmebException("订单已过期");
+        }
+
         // 余额支付
         if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
             if (user.getNowMoney().compareTo(order.getPayPrice()) < 0) {
@@ -192,12 +202,9 @@ public class PayServiceImpl implements PayService {
         response.setPayType(order.getPayType());
         response.setPayChannel(order.getPayChannel());
         // TODO 0元付 再思考
-//        if (order.getPayPrice().compareTo(BigDecimal.ZERO) <= 0) {
-//            Boolean aBoolean = yuePay(order);
-//            response.setPayType(PayConstants.PAY_TYPE_YUE);
-//            response.setStatus(aBoolean);
-//            return response;
-//        }
+        if (order.getPayPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new CrmebException("支付金额不能低于等于0元");
+        }
         // 余额支付
         if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
             Boolean yueBoolean = yuePay(order, user);
@@ -205,18 +212,9 @@ public class PayServiceImpl implements PayService {
             logger.info("余额支付 response : {}", JSON.toJSONString(response));
             return response;
         }
-        // 微信支付，调用微信预下单，返回拉起微信支付需要的信息
-        if (order.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
-            logger.info("订单支付 微信下单");
-            WxPayJsResultVo vo = wechatPayment(order);
-            orderService.updateById(order);
-            response.setStatus(true);
-            response.setJsConfig(vo);
-            logger.info("订单支付 微信下单 response :{}", JSON.toJSONString(response));
-        }
 
         // 微信视频号下单 需要额外调用支付参数
-        if(order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_MINI_VIDEO)){
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_MINI_VIDEO)) {
             WxPayJsResultVo vo = new WxPayJsResultVo();
             UserToken tokenByUser = userTokenService.getTokenByUserId(user.getId(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
             List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
@@ -268,11 +266,11 @@ public class PayServiceImpl implements PayService {
             shopOrderAddVo.setMerId(order.getMerId());
 
             // 订单路由地址
-            shopOrderAddVo.setPath("/pages/users/order_details/index?orderNo="+orderPayRequest.getOrderNo());
+            shopOrderAddVo.setPath("/pages/users/order_details/index?orderNo=" + orderPayRequest.getOrderNo());
 
             // 组装订单信息 视频号都是单品 最多是多量
             List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderPayRequest.getOrderNo());
-            if(ObjectUtil.isNull(merchantOrderList) || merchantOrderList.size() == 0) {
+            if (ObjectUtil.isNull(merchantOrderList) || merchantOrderList.size() == 0) {
                 throw new CrmebException("未找到视频号商品订单");
             }
             MerchantOrder CurrentMerchantOrder = merchantOrderList.get(0);
@@ -297,7 +295,7 @@ public class PayServiceImpl implements PayService {
             ShopOrderGetPaymentParamsRersponseVo shopOrderGetPaymentParamsRersponseVo = wechatVideoOrderService.shopOrderGetPaymentParams(videoPaymentRequestVo);
             logger.info("视频号下单时 获取的支付参数 {}", JSON.toJSONString(shopOrderGetPaymentParamsRersponseVo));
             response.setStatus(true);
-            vo.setTimeStamp(WxPayUtil.getCurrentTimestamp()+"");
+            vo.setTimeStamp(WxPayUtil.getCurrentTimestamp() + "");
             vo.setNonceStr(shopOrderGetPaymentParamsRersponseVo.getNonceStr());
             vo.setPackages(shopOrderGetPaymentParamsRersponseVo.get_package());
             vo.setPaySign(shopOrderGetPaymentParamsRersponseVo.getPaySign());
@@ -319,6 +317,8 @@ public class PayServiceImpl implements PayService {
         if (order.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY)) {
             logger.info("订单支付 支付宝");
             String result = aliPayment(order);
+            order.setOutTradeNo(order.getOrderNo());
+            orderService.updateById(order);
             response.setStatus(true);
             response.setAlipayRequest(result);
             logger.info("订单支付 支付宝 response :{}", JSON.toJSONString(response));
@@ -384,6 +384,41 @@ public class PayServiceImpl implements PayService {
      */
     @Override
     public Boolean queryAliPayResult(String orderNo) {
+        AliPayInfo aliPayInfo = aliPayInfoService.getByOutTradeNo(orderNo);
+        if (ObjectUtil.isNull(aliPayInfo)) {
+            throw new CrmebException("支付宝订单信息不存在");
+        }
+        String passbackParams = aliPayInfo.getPassbackParams();
+        if (StrUtil.isBlank(passbackParams)) {
+            throw new CrmebException("未知的支付宝订单类型");
+        }
+        String decode;
+        try {
+            decode = URLDecoder.decode(passbackParams, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new CrmebException("ali pay query error : 订单支付类型解码失败==》" + orderNo);
+        }
+
+        String[] split = decode.split("=");
+        String orderType = split[1];
+        if (PayConstants.PAY_SERVICE_TYPE_RECHARGE.equals(orderType)) {// 充值订单
+            RechargeOrder rechargeOrder = rechargeOrderService.getByOutTradeNo(orderNo);
+            if (ObjectUtil.isNull(rechargeOrder)) {
+                throw new CrmebException(StrUtil.format("ali pay query error : 充值订单后置处理，没有找到对应订单，支付服务方订单号：{}", orderNo));
+            }
+            if (rechargeOrder.getPaid()) {
+                return Boolean.TRUE;
+            }
+            aliPayQuery(orderNo);
+            // 支付成功处理
+            Boolean rechargePayAfter = rechargeOrderService.paySuccessAfter(rechargeOrder);
+            if (!rechargePayAfter) {
+                throw new CrmebException(StrUtil.format("ali pay recharge pay after error : 数据保存失败==》" + orderNo));
+            }
+            return Boolean.TRUE;
+        }
+
         Order order = orderService.getByOrderNo(orderNo);
         if (ObjectUtil.isNull(order)) {
             throw new CrmebException("订单不存在");
@@ -397,12 +432,31 @@ public class PayServiceImpl implements PayService {
         if (order.getPaid()) {
             return Boolean.TRUE;
         }
+        aliPayQuery(orderNo);
+        Boolean execute = transactionTemplate.execute(e -> {
+            Boolean updatePaid = orderService.updatePaid(orderNo);
+            if (!updatePaid) {
+                logger.warn("商品订单更新支付状态失败，orderNo = {}", orderNo);
+                e.setRollbackOnly();
+            }
+            return Boolean.TRUE;
+        });
 
+        if (!execute) {
+            throw new CrmebException("支付成功更新订单失败");
+        }
+        asyncService.orderPaySuccessSplit(order.getOrderNo());
+//        // 添加支付成功task
+//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, orderNo);
+        return Boolean.TRUE;
+    }
+
+    private AlipayTradeQueryResponse aliPayQuery(String orderNo) {
         //支付宝交易号
         // SDK 公共请求类，包含公共请求参数，以及封装了签名与验签，开发者无需关注签名与验签
         String aliPayAppid = systemConfigService.getValueByKey(AlipayConfig.APPID);
         String aliPayPrivateKey = systemConfigService.getValueByKey(AlipayConfig.RSA_PRIVATE_KEY);
-        String aliPayPublicKey = systemConfigService.getValueByKey(AlipayConfig.ALIPAY_PUBLIC_KEY_2);
+        String aliPayPublicKey = systemConfigService.getValueByKey(AlipayConfig.ALIPAY_PUBLIC_KEY);
         AlipayClient client = new DefaultAlipayClient(AlipayConfig.URL, aliPayAppid, aliPayPrivateKey, AlipayConfig.FORMAT, AlipayConfig.CHARSET, aliPayPublicKey, AlipayConfig.SIGNTYPE);
         AlipayTradeQueryRequest alipay_request = new AlipayTradeQueryRequest();
 
@@ -420,29 +474,22 @@ public class PayServiceImpl implements PayService {
             logger.error("支付宝支付查询异常，" + e.getMessage());
             throw new CrmebException("支付宝支付查询异常");
         }
-        logger.info("alipay_response = ");
-        if (!alipay_response.getTradeStatus().equals("TRADE_SUCCESS")) {
+        if (ObjectUtil.isNull(alipay_response)) {
+            logger.error("支付宝支付结果异常,查询结果为空");
+            throw new CrmebException("支付宝支付结果异常,查询结果为空");
+        }
+        logger.info("alipay_response = " + JSONObject.toJSONString(alipay_response));
+        if (ObjectUtil.isNull(alipay_response.getTradeStatus()) || !alipay_response.getTradeStatus().equals("TRADE_SUCCESS")) {
             logger.error("支付宝支付结果异常，tradeStatus = " + alipay_response.getTradeStatus());
             throw new CrmebException("支付宝支付结果异常");
         }
-
-        Boolean execute = transactionTemplate.execute(e -> {
-            orderService.updatePaid(orderNo);
-            return Boolean.TRUE;
-        });
-
-        if (!execute) {
-            throw new CrmebException("支付成功更新订单失败");
-        }
-        asyncService.orderPaySuccessSplit(order.getOrderNo());
-//        // 添加支付成功task
-//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, orderNo);
-        return Boolean.TRUE;
+        return alipay_response;
     }
 
     /**
      * 支付成功后置处理
      * 经验逻辑确定后，可在处理中加入经验处理
+     *
      * @param orderNo 订单编号
      */
     @Override
@@ -496,6 +543,7 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 支付成功后置处理(临时)
+     *
      * @param orderNo 订单编号
      */
     @Override
@@ -518,11 +566,17 @@ public class PayServiceImpl implements PayService {
         List<MerchantBill> merchantBillList = CollUtil.newArrayList();
         List<Bill> billList = CollUtil.newArrayList();
         List<MerchantOrder> merchantOrderList = CollUtil.newArrayList();
+        List<MerchantOrder> merchantOrderListForPrint = CollUtil.newArrayList();
+
         List<OrderDetail> orderDetailList = CollUtil.newArrayList();
 
         for (Order order : orderList) {
             // 拆单后，一个主订单只会对应一个商户订单
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+            // 排除核销订单，核销订单在具体核销步骤再打印小票
+            if(merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS)){
+                merchantOrderListForPrint.add(merchantOrder);
+            }
             if (order.getGainIntegral() > 0) {
                 // 生成赠送积分记录
                 UserIntegralRecord integralRecord = integralRecordGainInit(user.getId(), order.getOrderNo(), order.getGainIntegral());
@@ -544,6 +598,21 @@ public class PayServiceImpl implements PayService {
             merchantBillList.add(merchantBill);
             billList.addAll(platBillList);
         }
+
+        // 商户余额记录
+        List<MerchantBalanceRecord> merchantBalanceRecordList = profitSharingList.stream().map(sharing -> {
+            MerchantBalanceRecord merchantBalanceRecord = new MerchantBalanceRecord();
+            merchantBalanceRecord.setMerId(sharing.getMerId());
+            merchantBalanceRecord.setLinkNo(sharing.getOrderNo());
+            merchantBalanceRecord.setLinkType("order");
+            merchantBalanceRecord.setType(1);
+            merchantBalanceRecord.setTitle(StrUtil.format("订单支付，商户预计分账金额{}元", sharing.getProfitSharingMerPrice()));
+            merchantBalanceRecord.setAmount(sharing.getProfitSharingMerPrice());
+            merchantBalanceRecord.setBalance(BigDecimal.ZERO);
+            merchantBalanceRecord.setStatus(1);
+            return merchantBalanceRecord;
+        }).collect(Collectors.toList());
+
         // 分销员逻辑
         if (!user.getIsPromoter()) {
             String funcStatus = systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_SWITCH);
@@ -574,9 +643,10 @@ public class PayServiceImpl implements PayService {
             billService.saveBatch(billList);
             merchantBillService.saveBatch(merchantBillList);
             orderProfitSharingService.saveBatch(profitSharingList);
-            profitSharingList.forEach(p -> {
-                merchantService.operationBalance(p.getMerId(), p.getProfitSharingMerPrice(), Constants.OPERATION_TYPE_ADD);
-            });
+//            profitSharingList.forEach(p -> {
+//                merchantService.operationBalance(p.getMerId(), p.getProfitSharingMerPrice(), Constants.OPERATION_TYPE_ADD);
+//            });
+            merchantBalanceRecordService.saveBatch(merchantBalanceRecordList);
             return Boolean.TRUE;
         });
         if (execute) {
@@ -586,32 +656,66 @@ public class PayServiceImpl implements PayService {
                 try {
                     smsService.sendPaySuccess(user.getPhone(), platOrder.getOrderNo(), platOrder.getPayPrice());
                 } catch (Exception e) {
-                    logger.error("支付成功短信发送异常，{}", e.getMessage());
+                    logger.error("支付成功短信发送异常", e);
                 }
             }
-//            if (payNotification.getIsWechat().equals(1) || payNotification.getIsRoutine().equals(1)) {
-//                //下发模板通知 TODO
-//                pushMessageOrder(order, user, payNotification);
-//            }
+            if (payNotification.getIsWechat().equals(1) || payNotification.getIsRoutine().equals(1)) {
+                //下发模板通知
+                try {
+                    pushMessageOrder(platOrder, user, payNotification);
+                } catch (Exception e) {
+                    logger.error("支付成功发送微信通知失败", e);
+                }
+            }
 
             // 购买成功后根据配置送优惠券
             autoSendCoupons(platOrder);
+            List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
+            asyncService.orderPayAfterFreezingOperation(orderNoList);
 
-            // TODO 根据配置 打印小票
-//            try {
-//                ylyPrintService.YlyPrint(storeOrder.getOrderId?(),true);
-//            } catch (Exception e) {
-//                logger.error("打印小票异常,{}", e.getMessage());
-//            }
         }
+        // 打印小票 op=1 为方法调用这里也就是支付后自动打印小票的场景
+
+        logger.info("小票打印开始调用");
+        merchantPrintService.printReceipt(merchantOrderListForPrint, 3);
         return execute;
     }
 
     /**
+     * 获取收银台信息
+     *
+     * @param orderNo 订单号
+     */
+    @Override
+    public CashierInfoResponse getCashierIno(String orderNo) {
+        Order order = orderService.getByOrderNo(orderNo);
+        if (order.getCancelStatus() > OrderConstants.ORDER_CANCEL_STATUS_NORMAL) {
+            throw new CrmebException("订单已取消");
+        }
+        if (order.getPaid()) {
+            throw new CrmebException("订单已支付");
+        }
+        if (order.getStatus() > OrderConstants.ORDER_STATUS_WAIT_PAY) {
+            throw new CrmebException("订单状态异常");
+        }
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderNo);
+        CashierInfoResponse response = new CashierInfoResponse();
+        response.setPayPrice(order.getPayPrice());
+        response.setTotalNum(order.getTotalNum());
+        response.setConsigneeName(merchantOrder.getRealName());
+        response.setConsigneePhone(merchantOrder.getUserPhone());
+        response.setConsigneeAddress(merchantOrder.getUserAddress());
+        DateTime cancelDate = DateUtil.offsetMinute(order.getCreateTime(), crmebConfig.getOrderCancelTime());
+        response.setCancelDateTime(cancelDate.getTime());
+        return response;
+    }
+
+    /**
      * 单商户订单处理
-     * @param order 主订单
+     *
+     * @param order         主订单
      * @param merchantOrder 商户订单
-     * @param user 用户
+     * @param user          用户
      */
     private Boolean oneMerchantOrderProcessing(Order order, MerchantOrder merchantOrder, User user) {
         List<UserIntegralRecord> integralList = CollUtil.newArrayList();
@@ -699,9 +803,10 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 多商户订单处理
-     * @param order 主订单
+     *
+     * @param order             主订单
      * @param merchantOrderList 商户订单列表
-     * @param user 用户
+     * @param user              用户
      */
     private Boolean manyMerchantOrderProcessing(Order order, List<MerchantOrder> merchantOrderList, User user) {
         List<UserIntegralRecord> integralList = CollUtil.newArrayList();
@@ -823,6 +928,7 @@ public class PayServiceImpl implements PayService {
      * 小程序订阅消息
      */
     private void pushMessageOrder(Order order, User user, SystemNotification payNotification) {
+        logger.info("发送微信模板消息，订单编号：" + order.getOrderNo());
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_H5)) {// H5
             return;
         }
@@ -832,11 +938,11 @@ public class PayServiceImpl implements PayService {
             return;
         }
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
-        // 公众号
-        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_PUBLIC) && payNotification.getIsWechat().equals(1)) {
+        // 公众号模板消息
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_PUBLIC) && payNotification.getIsWechat().equals(1) && user.getIsWechatPublic()) {
             userToken = userTokenService.getTokenByUserId(user.getId(), UserConstants.USER_TOKEN_TYPE_WECHAT);
             if (ObjectUtil.isNull(userToken)) {
-                return ;
+                return;
             }
             // 发送微信模板消息
             /**
@@ -848,11 +954,11 @@ public class PayServiceImpl implements PayService {
              * 订单支付时间：{{keyword5.DATA}}
              * {{remark.DATA}}
              */
-            temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "您的订单已支付成功！");
+            temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "订单支付成功通知！");
             temMap.put("keyword1", order.getOrderNo());
             temMap.put("keyword2", orderDetailList.stream().map(OrderDetail::getProductName).collect(Collectors.joining(",")));
             temMap.put("keyword3", order.getPayPrice().toString());
-            temMap.put("keyword4", user.getAccount());
+            temMap.put("keyword4", user.getNickname());
             temMap.put("keyword5", order.getPayTime().toString());
             temMap.put(Constants.WE_CHAT_TEMP_KEY_END, "欢迎下次再来！");
             templateMessageService.pushTemplateMessage(payNotification.getWechatId(), temMap, userToken.getToken());
@@ -862,7 +968,7 @@ public class PayServiceImpl implements PayService {
             // 小程序发送订阅消息
             userToken = userTokenService.getTokenByUserId(user.getId(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
             if (ObjectUtil.isNull(userToken)) {
-                return ;
+                return;
             }
             // 组装数据
 //            temMap.put("character_string1", storeOrder.getOrderId());
@@ -878,28 +984,29 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 佣金处理
-     * @param merchantOrder 商户订单部分
+     *
+     * @param merchantOrder   商户订单部分
      * @param orderDetailList 订单详情列表
      * @return 佣金记录列表
      */
     private List<UserBrokerageRecord> assignCommission(MerchantOrder merchantOrder, List<OrderDetail> orderDetailList) {
+        // 秒杀订单不参与分佣
+        if (merchantOrder.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+            return CollUtil.newArrayList();
+        }
         // 检测商城是否开启分销功能
         String isOpen = systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_SWITCH);
-        if(StrUtil.isBlank(isOpen) || isOpen.equals("0")){
+        if (StrUtil.isBlank(isOpen) || isOpen.equals("0")) {
             return CollUtil.newArrayList();
         }
         long count = orderDetailList.stream().filter(e -> e.getSubBrokerageType() > 0).count();
-        if (count <= 0L) {
+        if (count == 0L) {
             return CollUtil.newArrayList();
         }
-        // 营销产品不参与
-//        if(storeOrder.getCombinationId() > 0 || storeOrder.getSeckillId() > 0 || storeOrder.getBargainId() > 0){
-//            return CollUtil.newArrayList();
-//        }
         // 查找订单所属人信息
         User user = userService.getById(merchantOrder.getUid());
         // 当前用户不存在 没有上级 或者 当用用户上级时自己  直接返回
-        if(ObjectUtil.isNull(user.getSpreadUid()) || user.getSpreadUid() < 1 || user.getSpreadUid().equals(merchantOrder.getUid())){
+        if (ObjectUtil.isNull(user.getSpreadUid()) || user.getSpreadUid() < 1 || user.getSpreadUid().equals(merchantOrder.getUid())) {
             return CollUtil.newArrayList();
         }
         // 获取参与分佣的人（两级）
@@ -917,7 +1024,11 @@ public class PayServiceImpl implements PayService {
                 if (orderDetail.getSubBrokerageType().equals(0)) {
                     continue;
                 }
-                BigDecimal brokerage = orderDetail.getPayPrice().multiply(new BigDecimal(orderDetail.getBrokerage().toString())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+//                BigDecimal brokerage = orderDetail.getPayPrice().multiply(new BigDecimal(orderDetail.getBrokerage().toString())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+                BigDecimal brokerage = orderDetail.getPrice().multiply(new BigDecimal(orderDetail.getPayNum().toString()))
+                        .subtract(orderDetail.getMerCouponPrice())
+                        .multiply(new BigDecimal(orderDetail.getBrokerage().toString()))
+                        .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
                 orderDetail.setFirstBrokerageFee(brokerage);
                 firstBrokerage = firstBrokerage.add(brokerage);
             }
@@ -944,8 +1055,18 @@ public class PayServiceImpl implements PayService {
             if (orderDetail.getSubBrokerageType().equals(0)) {
                 continue;
             }
-            BigDecimal brokerage = orderDetail.getPayPrice().multiply(new BigDecimal(orderDetail.getBrokerage().toString())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
-            BigDecimal brokerageTwo = orderDetail.getPayPrice().multiply(new BigDecimal(orderDetail.getBrokerageTwo().toString())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+//            BigDecimal brokerage = orderDetail.getPayPrice().multiply(new BigDecimal(orderDetail.getBrokerage().toString())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+//            BigDecimal brokerageTwo = orderDetail.getPayPrice().multiply(new BigDecimal(orderDetail.getBrokerageTwo().toString())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+
+            BigDecimal brokerage = orderDetail.getPrice().multiply(new BigDecimal(orderDetail.getPayNum().toString()))
+                    .subtract(orderDetail.getMerCouponPrice())
+                    .multiply(new BigDecimal(orderDetail.getBrokerage().toString()))
+                    .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+            BigDecimal brokerageTwo = orderDetail.getPrice().multiply(new BigDecimal(orderDetail.getPayNum().toString()))
+                    .subtract(orderDetail.getMerCouponPrice())
+                    .multiply(new BigDecimal(orderDetail.getBrokerageTwo().toString()))
+                    .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_DOWN);
+
             orderDetail.setFirstBrokerageFee(brokerage);
             orderDetail.setSecondBrokerageFee(brokerageTwo);
             firstBrokerage = firstBrokerage.add(brokerage);
@@ -976,15 +1097,16 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 佣金处理
-     * @param order 订单
+     *
+     * @param order             订单
      * @param merchantOrderList 商户订单部分
-     * @param orderDetailList 订单详情列表
+     * @param orderDetailList   订单详情列表
      * @return 佣金记录列表
      */
     private List<UserBrokerageRecord> assignCommission(Order order, List<MerchantOrder> merchantOrderList, List<OrderDetail> orderDetailList) {
         // 检测商城是否开启分销功能
         String isOpen = systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_SWITCH);
-        if(StrUtil.isBlank(isOpen) || isOpen.equals("0")){
+        if (StrUtil.isBlank(isOpen) || isOpen.equals("0")) {
             return CollUtil.newArrayList();
         }
         // 营销产品不参与
@@ -998,7 +1120,7 @@ public class PayServiceImpl implements PayService {
         // 查找订单所属人信息
         User user = userService.getById(order.getUid());
         // 当前用户不存在 没有上级 或者 当用用户上级时自己  直接返回
-        if(ObjectUtil.isNull(user.getSpreadUid()) || user.getSpreadUid() < 1 || user.getSpreadUid().equals(order.getUid())){
+        if (ObjectUtil.isNull(user.getSpreadUid()) || user.getSpreadUid() < 1 || user.getSpreadUid().equals(order.getUid())) {
             return CollUtil.newArrayList();
         }
         // 获取参与分佣的人（两级）
@@ -1079,6 +1201,7 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 获取参与分佣人员（两级）
+     *
      * @param spreadUid 一级分佣人Uid
      * @return List<MyRecord>
      */
@@ -1114,7 +1237,8 @@ public class PayServiceImpl implements PayService {
     private void presentIntegral(MerchantOrder merchantOrder, List<OrderDetail> orderDetailList, List<UserIntegralRecord> integralList, User user, Order order) {
         //比例
         String integralRatioStr = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_RATE_ORDER_GIVE);
-        if (StrUtil.isNotBlank(integralRatioStr) && order.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
+        // 当下单支付金额按比例赠送积分 <= 0 时，不进行计算
+        if (StrUtil.isNotBlank(integralRatioStr) && order.getPayPrice().compareTo(BigDecimal.ZERO) > 0 && new BigDecimal(integralRatioStr).compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal integralBig = new BigDecimal(integralRatioStr);
             int giveIntegral = merchantOrder.getPayPrice().divide(integralBig, 0, BigDecimal.ROUND_DOWN).intValue();
             merchantOrder.setGainIntegral(giveIntegral);
@@ -1177,6 +1301,7 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 初始化订单分帐表
+     *
      * @param merchantOrder 商户部分订单
      * @return 分账记录
      */
@@ -1184,9 +1309,12 @@ public class PayServiceImpl implements PayService {
         // 获取商户信息
         Merchant merchant = merchantService.getByIdException(merchantOrder.getMerId());
         // 分账计算
-        BigDecimal payPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice());
-        BigDecimal platFee = payPrice.multiply(new BigDecimal(merchant.getHandlingFee())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_UP);
-        BigDecimal merchantFee = payPrice.subtract(platFee).subtract(merchantOrder.getFirstBrokerage()).subtract(merchantOrder.getSecondBrokerage());
+        // 商户收入 = 订单应付 - 商户优惠 -平台手续费 - 佣金
+        BigDecimal orderPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice()).add(merchantOrder.getPlatCouponPrice()).subtract(merchantOrder.getPayPostage());
+        // 平台手续费
+        BigDecimal platFee = orderPrice.multiply(new BigDecimal(merchant.getHandlingFee())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_UP);
+        // 商户收入金额
+        BigDecimal merchantFee = orderPrice.subtract(platFee).subtract(merchantOrder.getFirstBrokerage()).subtract(merchantOrder.getSecondBrokerage());
         OrderProfitSharing orderProfitSharing = new OrderProfitSharing();
         orderProfitSharing.setOrderNo(merchantOrder.getOrderNo());
         orderProfitSharing.setMerId(merchantOrder.getMerId());
@@ -1197,13 +1325,16 @@ public class PayServiceImpl implements PayService {
         orderProfitSharing.setProfitSharingMerPrice(merchantFee);
         orderProfitSharing.setFirstBrokerageFee(merchantOrder.getFirstBrokerage());
         orderProfitSharing.setSecondBrokerageFee(merchantOrder.getSecondBrokerage());
+        orderProfitSharing.setPlatCouponPrice(merchantOrder.getPlatCouponPrice());
+        orderProfitSharing.setFreightFee(merchantOrder.getPayPostage());
         return orderProfitSharing;
     }
 
     /**
      * 初始化订单支付商户账单表
+     *
      * @param merchantOrder 商户订单部分
-     * @param merchantFee 商户分账金额
+     * @param merchantFee   商户分账金额
      */
     private MerchantBill initPayMerchantBill(MerchantOrder merchantOrder, BigDecimal merchantFee) {
         MerchantBill merchantBill = new MerchantBill();
@@ -1219,8 +1350,9 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 初始化订单支付平台账单表
-     * @param order 订单
-     * @param merchantOrder 商户订单部分
+     *
+     * @param order              订单
+     * @param merchantOrder      商户订单部分
      * @param orderProfitSharing 分账数据
      * @return List
      */
@@ -1337,6 +1469,7 @@ public class PayServiceImpl implements PayService {
         switch (payChannel) {
             case PayConstants.PAY_CHANNEL_WECHAT_PUBLIC:
             case PayConstants.PAY_CHANNEL_H5:// H5使用公众号的信息
+            case PayConstants.PAY_CHANNEL_WECHAT_NATIVE:// H5使用公众号的信息
                 appId = systemConfigService.getValueByKeyException(WeChatConstants.WECHAT_PUBLIC_APPID);
                 mchId = systemConfigService.getValueByKeyException(WeChatConstants.WECHAT_PAY_PUBLIC_MCHID);
                 signKey = systemConfigService.getValueByKeyException(WeChatConstants.WECHAT_PAY_PUBLIC_KEY);
@@ -1372,103 +1505,7 @@ public class PayServiceImpl implements PayService {
      * @return result
      */
     private String aliPayment(Order order) {
-        //商户订单号，商户网站订单系统中唯一订单号，必填
-        String out_trade_no = order.getOrderNo();
-        //付款金额，必填
-        String total_amount = order.getPayPrice().toString();
-        //订单名称，必填
-        String subject = systemConfigService.getValueByKeyException(SysConfigConstants.CONFIG_KEY_SITE_NAME);
-        //商品描述，可空
-//            String body = "用户订购商品个数：1";
-
-        // 该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
-        String timeout_express = "30m";
-
-        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_ALI_APP_PAY)) {// APP 支付
-
-            //获得初始化的AlipayClient
-            String aliPayAppid = systemConfigService.getValueByKey(AlipayConfig.APPID);
-            String aliPayPrivateKey = systemConfigService.getValueByKey(AlipayConfig.RSA_PRIVATE_KEY);
-            String aliPayPublicKey = systemConfigService.getValueByKey(AlipayConfig.ALIPAY_PUBLIC_KEY);
-            AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, aliPayAppid, aliPayPrivateKey, AlipayConfig.FORMAT, AlipayConfig.CHARSET, aliPayPublicKey, AlipayConfig.SIGNTYPE);
-            //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
-            AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-            //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
-            AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-//                model.setBody("我是测试数据");
-            model.setSubject(subject);
-            model.setOutTradeNo(out_trade_no);
-            model.setTimeoutExpress(timeout_express);
-            model.setTotalAmount(total_amount);
-            model.setProductCode("QUICK_MSECURITY_PAY");
-
-            String encode = "type=" + PayConstants.PAY_SERVICE_TYPE_ORDER;
-            try {
-                encode = URLEncoder.encode(encode, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                throw new CrmebException("支付宝参数UrlEncode异常");
-            }
-            model.setPassbackParams(encode);
-
-            request.setBizModel(model);
-            request.setNotifyUrl(systemConfigService.getValueByKey(AlipayConfig.notify_url));
-
-            //请求
-            String result;
-            try {
-                //这里和普通的接口调用不同，使用的是sdkExecute
-                AlipayTradeAppPayResponse aaa = alipayClient.sdkExecute(request);
-                result = aaa.getBody();
-            } catch (AlipayApiException e) {
-                logger.error("生成支付宝app支付请求异常," + e.getErrMsg());
-                throw new CrmebException(e.getErrMsg());
-            }
-            logger.info("支付宝app result = " + result);
-            return result;
-        }
-
-        //获得初始化的AlipayClient
-        String aliPayAppid = systemConfigService.getValueByKey(AlipayConfig.APPID);
-        String aliPayPrivateKey = systemConfigService.getValueByKey(AlipayConfig.RSA_PRIVATE_KEY);
-        String aliPayPublicKey = systemConfigService.getValueByKey(AlipayConfig.ALIPAY_PUBLIC_KEY);
-        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, aliPayAppid, aliPayPrivateKey, AlipayConfig.FORMAT, AlipayConfig.CHARSET, aliPayPublicKey, AlipayConfig.SIGNTYPE);
-        //设置请求参数
-        AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
-        alipayRequest.setReturnUrl(systemConfigService.getValueByKey(AlipayConfig.return_url));
-        String apiDomain = systemConfigService.getValueByKeyException(SysConfigConstants.CONFIG_KEY_API_URL);
-        alipayRequest.setNotifyUrl(apiDomain + PayConstants.ALI_PAY_NOTIFY_API_URI);
-
-        AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
-        model.setOutTradeNo(out_trade_no);
-        model.setSubject(subject);
-        model.setTotalAmount(total_amount);
-//            model.setBody(body);
-        model.setTimeoutExpress(timeout_express);
-        model.setProductCode("QUICK_WAP_PAY");
-        model.setQuitUrl(systemConfigService.getValueByKey(AlipayConfig.quit_url));
-
-        String encode = "type=" + PayConstants.PAY_SERVICE_TYPE_ORDER;
-        try {
-            encode = URLEncoder.encode(encode, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new CrmebException("支付宝参数UrlEncode异常");
-        }
-        model.setPassbackParams(encode);
-
-        alipayRequest.setBizModel(model);
-        logger.info("alipayRequest = " + alipayRequest);
-        //请求
-        String result;
-        try {
-            result = alipayClient.pageExecute(alipayRequest).getBody();
-        } catch (AlipayApiException e) {
-            logger.error("支付宝订单生成失败," + e.getErrMsg());
-            throw new CrmebException(e.getErrMsg());
-        }
-        logger.info("result = " + result);
-        return result;
+        return aliPayService.pay(order.getOrderNo(), order.getPayPrice(), "order", order.getPayChannel());
     }
 
     /**
@@ -1493,6 +1530,9 @@ public class PayServiceImpl implements PayService {
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_APP_IOS) ||
                 order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_APP_ANDROID)) {// App
             vo.setPartnerid(unifiedorder.get("partnerid"));
+        }
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_NATIVE)) {
+            vo.setMwebUrl(unifiedorder.get("code_url"));
         }
         // 更新商户订单号
         order.setOutTradeNo(unifiedorder.get("outTradeNo"));
@@ -1537,8 +1577,6 @@ public class PayServiceImpl implements PayService {
         });
         if (!execute) throw new CrmebException("余额支付订单失败");
         asyncService.orderPaySuccessSplit(order.getOrderNo());
-//        // 添加支付成功redis队列
-//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
         return true;
     }
 
@@ -1568,6 +1606,7 @@ public class PayServiceImpl implements PayService {
         switch (order.getPayChannel()) {
             case PayConstants.PAY_CHANNEL_WECHAT_PUBLIC:
             case PayConstants.PAY_CHANNEL_H5:// H5使用公众号的信息
+            case PayConstants.PAY_CHANNEL_WECHAT_NATIVE:// H5使用公众号的信息
                 appId = systemConfigService.getValueByKeyException(WeChatConstants.WECHAT_PUBLIC_APPID);
                 mchId = systemConfigService.getValueByKeyException(WeChatConstants.WECHAT_PAY_PUBLIC_MCHID);
                 signKey = systemConfigService.getValueByKeyException(WeChatConstants.WECHAT_PAY_PUBLIC_KEY);
@@ -1621,6 +1660,9 @@ public class PayServiceImpl implements PayService {
             logger.info("================================================app支付签名，sign = " + sign);
             map.put("paySign", sign);
         }
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_NATIVE)) {
+            map.put("code_url", responseVo.getCodeUrl());
+        }
         return map;
     }
 
@@ -1660,6 +1702,11 @@ public class PayServiceImpl implements PayService {
                 vo.setTrade_type(PayConstants.WX_PAY_TRADE_TYPE_APP);
                 vo.setOpenid(null);
                 break;
+            case PayConstants.PAY_CHANNEL_WECHAT_NATIVE:
+                vo.setTrade_type(PayConstants.WX_PAY_TRADE_TYPE_NATIVE);
+                vo.setProduct_id(order.getOrderNo());
+                vo.setOpenid(null);
+                break;
             default:
                 vo.setTrade_type(PayConstants.WX_PAY_TRADE_TYPE_JS);
                 vo.setOpenid(openid);
@@ -1689,7 +1736,7 @@ public class PayServiceImpl implements PayService {
         List<Integer> proIdList = orderDetailList.stream().map(OrderDetail::getProductId).distinct().collect(Collectors.toList());
         for (Integer proId : proIdList) {
             List<ProductCoupon> couponsForGiveUser = productCouponService.getListByProductId(proId);
-            for (int i = 0; i < couponsForGiveUser.size();) {
+            for (int i = 0; i < couponsForGiveUser.size(); ) {
                 ProductCoupon productCoupon = couponsForGiveUser.get(i);
                 MyRecord record = couponUserService.paySuccessGiveAway(productCoupon.getCouponId(), order.getUid());
                 if (record.getStr("status").equals("fail")) {

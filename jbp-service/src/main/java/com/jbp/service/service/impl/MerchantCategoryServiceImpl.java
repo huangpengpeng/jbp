@@ -1,5 +1,6 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -7,14 +8,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.MerchantCategoryDao;
-import com.jbp.service.service.MerchantCategoryService;
-import com.jbp.service.service.MerchantService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.merchant.MerchantCategory;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.MerchantCategoryRequest;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.merchant.MerchantCategoryRequest;
+import com.jbp.service.dao.MerchantCategoryDao;
+import com.jbp.service.service.MerchantCategoryService;
+import com.jbp.service.service.MerchantService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,14 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * StoreCategoryServiceImpl 接口实现
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -125,6 +127,20 @@ public class MerchantCategoryServiceImpl extends ServiceImpl<MerchantCategoryDao
     }
 
     /**
+     * 全部商户分类Map
+     * @return Map
+     */
+    @Override
+    public Map<Integer, MerchantCategory> allMap() {
+        List<MerchantCategory> categoryList = allList();
+        Map<Integer, MerchantCategory> map = CollUtil.newHashMap();
+        categoryList.forEach(c -> {
+            map.put(c.getId(), c);
+        });
+        return map;
+    }
+
+    /**
      * 校验名称是否唯一
      * @param name 分类名称
      */
@@ -143,10 +159,11 @@ public class MerchantCategoryServiceImpl extends ServiceImpl<MerchantCategoryDao
      * @param id 分类ID
      * @return MerchantCategory
      */
-    private MerchantCategory getByIdException(Integer id) {
+    @Override
+    public MerchantCategory getByIdException(Integer id) {
         MerchantCategory category = getById(id);
         if (ObjectUtil.isNull(category) || category.getIsDel()) {
-            throw new CrmebException("分类不存在");
+            throw new CrmebException("商户分类不存在");
         }
         return category;
     }

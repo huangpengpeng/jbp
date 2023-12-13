@@ -1,6 +1,5 @@
 package com.jbp.common.response;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.Date;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -25,7 +24,6 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_merchant_apply")
 @ApiModel(value="MerchantSettledResponse对象", description="商户入驻响应对象")
 public class MerchantSettledResponse implements Serializable {
 
@@ -48,9 +46,6 @@ public class MerchantSettledResponse implements Serializable {
 
     @ApiModelProperty(value = "商户手机号")
     private String phone;
-
-    @ApiModelProperty(value = "手续费(%)")
-    private Integer handlingFee;
 
     @ApiModelProperty(value = "商户关键字")
     private String keywords;

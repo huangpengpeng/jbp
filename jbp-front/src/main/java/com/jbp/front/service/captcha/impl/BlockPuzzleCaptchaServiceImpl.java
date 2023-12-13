@@ -1,8 +1,6 @@
 package com.jbp.front.service.captcha.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.jbp.front.service.captcha.AbstractCaptchaService;
-import com.jbp.front.service.captcha.CaptchaServiceFactory;
 import com.jbp.common.captcha.model.common.CaptchaTypeEnum;
 import com.jbp.common.captcha.model.common.RepCodeEnum;
 import com.jbp.common.captcha.model.common.ResponseModel;
@@ -12,6 +10,8 @@ import com.jbp.common.captcha.util.AESUtil;
 import com.jbp.common.captcha.util.ImageUtils;
 import com.jbp.common.captcha.util.JsonUtil;
 import com.jbp.common.captcha.util.RandomUtils;
+import com.jbp.front.service.captcha.AbstractCaptchaService;
+import com.jbp.front.service.captcha.CaptchaServiceFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

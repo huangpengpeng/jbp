@@ -21,4 +21,25 @@ public interface CouponUserDao extends BaseMapper<CouponUser> {
      * 获取预下单可用优惠券
      */
     List<CouponUserOrderResponse> findListByPreOrder(Map<String, Object> map);
+
+    /**
+     * 查询适用的优惠券列表
+     */
+    List<CouponUser> findByUidAndMerIdAndMoneyAndProList(Map<String, Object> map);
+
+    /**
+     * 查询适用的平台优惠券列表
+     */
+    List<CouponUser> findPlatByUidAndMerIdAndMoneyAndProList(Map<String, Object> map);
+
+    /**
+     * 查询适用的优惠券列表(多商品)
+     */
+    List<CouponUser> findManyByUidAndMerIdAndMoneyAndProList(Map<String, Object> map);
+
+    /**
+     * 查询适用的平台优惠券列表(多商品)
+     */
+    List<CouponUser> findManyPlatByUidAndMerIdAndMoneyAndProList(Map<String, Object> map);
+
 }

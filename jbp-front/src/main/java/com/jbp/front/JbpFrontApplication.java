@@ -1,5 +1,6 @@
 package com.jbp.front;
 
+import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -26,12 +27,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Configuration
 @EnableTransactionManagement
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class) //去掉数据源
+//@SpringBootApplication(exclude = DataSourceAutoConfiguration.class) //去掉数据源
+@SpringBootApplication(exclude = {WxMaAutoConfiguration.class}) //去掉数据源
 @ComponentScan(basePackages = {"com.jbp", "com.jbp.front"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
 public class JbpFrontApplication {
     public static void main(String[] args) {
         SpringApplication.run(JbpFrontApplication.class, args);
-        System.out.println("CRMEB Front Started Success --》 Swagger Doc: http://localhost:8081/doc.html");
     }
 }

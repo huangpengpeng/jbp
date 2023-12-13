@@ -4,12 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.PayComponentBrandDao;
-import com.jbp.service.service.PayComponentBrandService;
-import com.jbp.service.service.WechatVideoSpuService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.wechat.video.PayComponentBrand;
 import com.jbp.common.vo.wxvedioshop.cat_brand.ShopBrandVo;
+import com.jbp.service.dao.PayComponentBrandDao;
+import com.jbp.service.service.PayComponentBrandService;
+import com.jbp.service.service.WechatVideoSpuService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------

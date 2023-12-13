@@ -6,19 +6,22 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.SystemConfigDao;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.SystemFormTempService;
+import com.github.pagehelper.PageHelper;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.system.SystemConfig;
+import com.jbp.common.model.system.SystemFormTemp;
 import com.jbp.common.request.SystemConfigAdminRequest;
 import com.jbp.common.request.SystemFormCheckRequest;
 import com.jbp.common.request.SystemFormItemCheckRequest;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.ExpressSheetVo;
+import com.jbp.common.vo.MyRecord;
+import com.jbp.service.dao.SystemConfigDao;
+import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.SystemFormTempService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -64,6 +67,64 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    /**
+     * 在系统启动初始化时
+     * 根据配置文件加载config_list缓存
+     */
+    @PostConstruct
+    public void loadingConfigCache() {
+        if (!crmebConfig.getAsyncConfig()) {
+            return;
+        }
+        if (redisUtil.exists(SysConfigConstants.CONFIG_LIST)) {
+            Long hashSize = redisUtil.getHashSize(SysConfigConstants.CONFIG_LIST);
+            if (hashSize > 0) {
+                return;
+            }
+        }
+        LambdaQueryWrapper<SystemConfig> lqw = Wrappers.lambdaQuery();
+        lqw.select(SystemConfig::getName, SystemConfig::getValue);
+        lqw.eq(SystemConfig::getStatus, false);
+        List<SystemConfig> systemConfigList = dao.selectList(lqw);
+        systemConfigList.forEach(config -> redisUtil.hset(SysConfigConstants.CONFIG_LIST, config.getName(), config.getValue()));
+    }
+
+    /**
+     * 通过key数组获取Record对象
+     * @param keyList key列表
+     * @return MyRecord
+     */
+    @Override
+    public MyRecord getValuesByKeyList(List<String> keyList) {
+        if (CollUtil.isEmpty(keyList)) {
+            return null;
+        }
+        MyRecord record = new MyRecord();
+        if (!crmebConfig.getAsyncConfig()) {
+            LambdaQueryWrapper<SystemConfig> lqw = Wrappers.lambdaQuery();
+            lqw.select(SystemConfig::getName, SystemConfig::getValue);
+            lqw.in(SystemConfig::getName, keyList);
+            lqw.eq(SystemConfig::getStatus, false);
+            lqw.groupBy(SystemConfig::getName);
+            lqw.orderByDesc(SystemConfig::getId);
+            List<SystemConfig> systemConfigList = dao.selectList(lqw);
+            keyList.forEach(k -> {
+                SystemConfig systemConfig = systemConfigList.stream().filter(config -> config.getName().equals(k)).findFirst().orElse(null);
+                if (ObjectUtil.isNotNull(systemConfig)) {
+                    record.set(systemConfig.getName(), systemConfig.getValue());
+                } else {
+                    record.set(k, "");
+                }
+            });
+            return record;
+        }
+        keyList.forEach(k -> {
+            String value = get(k);
+            record.set(k, value);
+        });
+        return record;
+    }
 
     /**
      * 根据menu name 获取 value
@@ -103,6 +164,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         systemFormTempService.checkForm(systemFormCheckRequest);
 
         List<SystemConfig> systemConfigList = new ArrayList<>();
+        SystemFormTemp systemFormTemp = systemFormTempService.getById(systemFormCheckRequest.getId());
         //批量添加
         for (SystemFormItemCheckRequest systemFormItemCheckRequest : systemFormCheckRequest.getFields()) {
             SystemConfig systemConfig = new SystemConfig();
@@ -115,6 +177,9 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
             systemConfig.setValue(value);
             systemConfig.setFormId(systemFormCheckRequest.getId());
             systemConfig.setTitle(systemFormItemCheckRequest.getTitle());
+            if (systemFormCheckRequest.getId() > 0) {
+                systemConfig.setFormName(systemFormTemp.getName());
+            }
             systemConfigList.add(systemConfig);
         }
 
@@ -132,7 +197,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
             return Boolean.TRUE;
         });
         if (execute) {
-            if (crmebConfig.isAsyncConfig()) {
+            if (crmebConfig.getAsyncConfig()) {
                 if (CollUtil.isNotEmpty(systemConfigOldList)) {
                     asyncDelete(systemConfigOldList);
                 }
@@ -169,20 +234,19 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
             SystemConfig systemConfig = systemConfigs.get(0);
             systemConfig.setValue(value);
             boolean update = updateById(systemConfig);
-            if (update && crmebConfig.isAsyncConfig()) {
+            if (update && crmebConfig.getAsyncConfig()) {
                 async(systemConfig);
             }
             return update;
         } else {
             SystemConfig systemConfig = new SystemConfig().setName(name).setValue(value);
             boolean save = save(systemConfig);
-            if (save && crmebConfig.isAsyncConfig()) {
+            if (save && crmebConfig.getAsyncConfig()) {
                 async(systemConfig);
             }
             return save;
         }
     }
-
 
     /**
      * 根据formId查询数据
@@ -220,6 +284,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     /**
      * 根据key获取配置
+     *
      * @param key key
      * @return List
      */
@@ -262,7 +327,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
             return systemConfig;
         }).collect(Collectors.toList());
         boolean batch = updateBatchById(configList);
-        if (batch && crmebConfig.isAsyncConfig()) {
+        if (batch && crmebConfig.getAsyncConfig()) {
             async(configList);
         }
         return batch;
@@ -283,11 +348,11 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     }
 
     private void asyncBlank(String key) {
-        redisUtil.hmSet(SysConfigConstants.CONFIG_LIST, key, "");
+        redisUtil.hset(SysConfigConstants.CONFIG_LIST, key, "");
     }
 
     private void async(SystemConfig systemConfig) {
-        redisUtil.hmSet(SysConfigConstants.CONFIG_LIST, systemConfig.getName(), systemConfig.getValue());
+        redisUtil.hset(SysConfigConstants.CONFIG_LIST, systemConfig.getName(), systemConfig.getValue());
     }
 
     /**
@@ -297,7 +362,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
      */
     private void async(List<SystemConfig> systemConfigList) {
         for (SystemConfig systemConfig : systemConfigList) {
-            redisUtil.hmSet(SysConfigConstants.CONFIG_LIST, systemConfig.getName(), systemConfig.getValue());
+            redisUtil.hset(SysConfigConstants.CONFIG_LIST, systemConfig.getName(), systemConfig.getValue());
         }
     }
 
@@ -308,7 +373,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
      * @return String
      */
     private String get(String name) {
-        if (!crmebConfig.isAsyncConfig()) {
+        if (!crmebConfig.getAsyncConfig()) {
             SystemConfig systemConfig = getByName(name);
             if (ObjectUtil.isNull(systemConfig) || StrUtil.isBlank(systemConfig.getValue())) {
                 return "";
@@ -325,7 +390,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
             async(systemConfig);
             return systemConfig.getValue();
         }
-        Object data = redisUtil.hmGet(SysConfigConstants.CONFIG_LIST, name);
+        Object data = redisUtil.hget(SysConfigConstants.CONFIG_LIST, name);
         if (ObjectUtil.isNull(data)) {
             asyncBlank(name);
             return "";
@@ -334,44 +399,23 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     }
 
     private SystemConfig getByName(String name) {
+        PageHelper.clearPage();
         LambdaQueryWrapper<SystemConfig> lqw = Wrappers.lambdaQuery();
         lqw.select(SystemConfig::getId, SystemConfig::getName, SystemConfig::getValue);
         lqw.eq(SystemConfig::getStatus, false);
         lqw.eq(SystemConfig::getName, name);
         lqw.last(" limit 1");
-        return dao.selectOne(lqw);
-    }
-
-    /**
-     * 初始化时加载config_list缓存
-     */
-    @PostConstruct
-    public void loadingConfigCache() {
-        if (!crmebConfig.isAsyncConfig()) {
-            return;
-        }
-        Long hashSize = redisUtil.getHashSize(SysConfigConstants.CONFIG_LIST);
-        if (hashSize > 0) {
-//            redisUtil.delete(SysConfigConstants.CONFIG_LIST);
-            return;
-        }
-        LambdaQueryWrapper<SystemConfig> lqw = Wrappers.lambdaQuery();
-        lqw.select(SystemConfig::getName, SystemConfig::getValue);
-        lqw.eq(SystemConfig::getStatus, false);
-        List<SystemConfig> systemConfigList = dao.selectList(lqw);
-        systemConfigList.forEach(config -> {
-            redisUtil.hmSet(SysConfigConstants.CONFIG_LIST, config.getName(), config.getValue());
-        });
-
+        return getOne(lqw);
     }
 
     /**
      * 获取各种文字协议
+     *
      * @return String
      */
     @Override
     public String getAgreementByKey(String agreementName) {
-        if(ObjectUtil.isEmpty(agreementName)){
+        if (ObjectUtil.isEmpty(agreementName)) {
             return "Key Not Empty";
         }
         LambdaQueryWrapper<SystemConfig> lqw = Wrappers.lambdaQuery();
@@ -384,5 +428,23 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         return systemConfig.getValue();
     }
 
+    /**
+     * 获取移动端域名
+     * @return 移动端域名
+     */
+    @Override
+    public String getFrontDomain() {
+        return getValueByKey(SysConfigConstants.CONFIG_KEY_SITE_URL);
+    }
+
+    /**
+     * 获取素材域名
+     *
+     * @return 素材域名
+     */
+    @Override
+    public String getMediaDomain() {
+        return systemAttachmentService.getCdnUrl();
+    }
 }
 

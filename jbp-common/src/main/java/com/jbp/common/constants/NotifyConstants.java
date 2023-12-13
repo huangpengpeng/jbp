@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -48,5 +48,7 @@ public class NotifyConstants {
     public static final String AUDIT_FAIL_MARK = "auditFail";
     /** 改价通知 */
     public static final String MODIFY_ORDER_PRICE = "modifyOrderPrice";
+    /** 生日礼标记 */
+    public static final String BIRTHDAY_PRESENT_MARK = "birthdayPresent";
 
 }

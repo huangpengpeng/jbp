@@ -6,8 +6,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.service.service.*;
-import com.jbp.service.util.OnePassUtil;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.sms.SmsTemplate;
@@ -17,6 +15,8 @@ import com.jbp.common.request.SmsApplyTempRequest;
 import com.jbp.common.request.SmsModifySignRequest;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
+import com.jbp.service.service.*;
+import com.jbp.service.util.OnePassUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -302,6 +302,27 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
         map.put("date", date);
         map.put("mer", merName);
         map.put("site", siteName);
+        return push(phone, tempId, map);
+    }
+
+    /**
+     * 发送生日礼短信
+     * @param phone 手机号
+     * @param name 祝福内容
+     * @return Boolean
+     */
+    @Override
+    public Boolean sendBirthdayPresent(String phone, String name) {
+        Integer tempId;
+        try {
+            beforeSendMessage();
+            tempId = getSmsTempId(NotifyConstants.BIRTHDAY_PRESENT_MARK);
+        } catch (Exception e) {
+            logger.error("发送短信失败，{}", e.getMessage());
+            return false;
+        }
+        HashMap<String, Object> map = CollUtil.newHashMap();
+        map.put("name", name);
         return push(phone, tempId, map);
     }
 

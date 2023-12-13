@@ -1,5 +1,7 @@
 package com.jbp.admin.service;
 
+import java.util.List;
+
 import com.jbp.common.request.LoginAdminUpdateRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
 import com.jbp.common.response.AdminLoginPicResponse;
@@ -8,14 +10,12 @@ import com.jbp.common.response.MenusResponse;
 import com.jbp.common.response.SystemLoginResponse;
 import com.jbp.common.vo.MyRecord;
 
-import java.util.List;
-
 /**
  * 管理端登录服务
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

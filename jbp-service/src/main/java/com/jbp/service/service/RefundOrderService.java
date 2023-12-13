@@ -3,12 +3,8 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.order.RefundOrder;
-import com.jbp.common.request.OrderRefundAuditRequest;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.RefundOrderRemarkRequest;
-import com.jbp.common.request.RefundOrderSearchRequest;
+import com.jbp.common.request.*;
 import com.jbp.common.response.*;
-import com.jbp.common.vo.MyRecord;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +14,7 @@ import java.util.List;
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -30,10 +26,9 @@ public interface RefundOrderService extends IService<RefundOrder> {
     /**
      * 商户端退款订单分页列表
      * @param request 查询参数
-     * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<MerchantRefundOrderPageResponse> getMerchantAdminPage(RefundOrderSearchRequest request, PageParamRequest pageParamRequest);
+    PageInfo<MerchantRefundOrderPageResponse> getMerchantAdminPage(RefundOrderSearchRequest request);
 
     /**
      * 获取商户端退款订单各状态数量
@@ -67,10 +62,10 @@ public interface RefundOrderService extends IService<RefundOrder> {
 
     /**
      * 移动端退款订单列表
-     * @param pageRequest 分页参数
+     * @param request 搜索参数
      * @return List
      */
-    PageInfo<RefundOrder> getH5List(Integer type, PageParamRequest pageRequest);
+    PageInfo<RefundOrderResponse> getH5List(OrderAfterSalesSearchRequest request);
 
     /**
      * 退款订单详情（移动端）
@@ -89,10 +84,9 @@ public interface RefundOrderService extends IService<RefundOrder> {
     /**
      * 平台端退款订单分页列表
      * @param request 查询参数
-     * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<PlatformRefundOrderPageResponse> getPlatformAdminPage(RefundOrderSearchRequest request, PageParamRequest pageParamRequest);
+    PageInfo<PlatformRefundOrderPageResponse> getPlatformAdminPage(RefundOrderSearchRequest request);
 
     /**
      * 获取平台端退款订单各状态数量
@@ -161,4 +155,35 @@ public interface RefundOrderService extends IService<RefundOrder> {
      * @return Integer
      */
     Integer getAwaitAuditNum(Integer merId);
+
+    /**
+     * 撤销退款单
+     * @param refundOrderNo 退款单号
+     */
+    Boolean revoke(String refundOrderNo);
+
+    /**
+     * 退款单审核
+     * @param request 审核参数
+     * @return 审核结果
+     */
+    Boolean audit(OrderRefundAuditRequest request);
+
+    /**
+     * 退款单收到退货
+     * @param refundOrderNo 退款单号
+     */
+    Boolean receiving(String refundOrderNo);
+
+    /**
+     * 平台强制退款
+     * @param refundOrderNo 退款单号
+     */
+    Boolean compulsoryRefund(String refundOrderNo);
+
+    /**
+     * 退款单-商家拒绝收货退款
+     * @param request 拒绝收货请求对象
+     */
+    Boolean receivingReject(RejectReceivingRequest request);
 }

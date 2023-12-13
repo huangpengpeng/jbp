@@ -3,8 +3,8 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.merchant.MerchantType;
-import com.jbp.common.request.MerchantTypeRequest;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.merchant.MerchantTypeRequest;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

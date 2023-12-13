@@ -1,11 +1,11 @@
 package com.jbp.common.result;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.jbp.common.exception.ExceptionCodeEnum;
-import com.jbp.common.exception.ExceptionHandler;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.vo.MyRecord;
 
 /**
@@ -13,48 +13,73 @@ import com.jbp.common.vo.MyRecord;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
  * | Author: CRMEB Team <admin@crmeb.com>
  * +----------------------------------------------------------------------
  */
-public class CommonResult<T> {
-    private long code;
+public class CommonResult<T> implements Serializable {
+
+    private static final long serialVersionUID = -6630747483482976634L;
+
+    /**
+     * 响应码
+     */
+    private Integer code;
+    /**
+     * 响应消息
+     */
     private String message;
+    /**
+     * 响应体
+     */
     private T data;
 
-    protected CommonResult() {
+    // ===========构造器开始，构造器私有，外部不可直接创建=========================================
+
+    private CommonResult() {
+        this.code = 200;
     }
 
-    protected CommonResult(long code, String message, T data) {
+    private CommonResult(T data) {
+        this.code = 200;
+        this.data = data;
+    }
+
+    private CommonResult(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    private CommonResult(Integer code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
     }
 
+    private CommonResult(IResultEnum iResultEnum) {
+        this.code = iResultEnum.getCode();
+        this.message = iResultEnum.getMessage();
+    }
+
+    // ===========构造器结束，构造器私有，外部不可直接创建=========================================
+
     /**
-     * 成功返回结果
+     * 成功返回,没有结果
      */
     public static <T> CommonResult<T> success() {
-        return new CommonResult<T>(ExceptionCodeEnum.SUCCESS.getCode(), ExceptionCodeEnum.SUCCESS.getMessage(), null);
+        return new CommonResult<>();
     }
 
     /**
-     * 成功返回结果
-     */
-    public static <T> CommonResult<T> success(String message) {
-        return new CommonResult<T>(ExceptionCodeEnum.SUCCESS.getCode(), message, null);
-    }
-
-    /**
-     * 成功返回结果
+     * 成功返回,有返回结果
      *
      * @param data 获取的数据
      */
     public static <T> CommonResult<T> success(T data) {
-        return new CommonResult<T>(ExceptionCodeEnum.SUCCESS.getCode(), ExceptionCodeEnum.SUCCESS.getMessage(), data);
+        return new CommonResult<>(data);
     }
 
     /**
@@ -63,7 +88,7 @@ public class CommonResult<T> {
      * @param record 获取的数据
      */
     public static CommonResult<Map<String, Object>> success(MyRecord record) {
-        return new CommonResult<>(ExceptionCodeEnum.SUCCESS.getCode(), ExceptionCodeEnum.SUCCESS.getMessage(), record.getColumns());
+        return new CommonResult<>(record.getColumns());
     }
 
     /**
@@ -74,103 +99,59 @@ public class CommonResult<T> {
     public static CommonResult<List<Map<String, Object>>> success(List<MyRecord> recordList) {
         List<Map<String, Object>> list = new ArrayList<>();
         recordList.forEach(i -> {
-             list.add(i.getColumns());
+            list.add(i.getColumns());
         });
-        return new CommonResult<>(ExceptionCodeEnum.SUCCESS.getCode(), ExceptionCodeEnum.SUCCESS.getMessage(), list);
+        return new CommonResult<>(list);
     }
 
     /**
-     * 成功返回结果
+     * 通用返回失败
      *
-     * @param data 获取的数据
-     * @param  message 提示信息
+     * @param iResultEnum 结果枚举
+     * @return T
      */
-    public static <T> CommonResult<T> success(T data, String message) {
-        return new CommonResult<T>(ExceptionCodeEnum.SUCCESS.getCode(), message, data);
+    public static <T> CommonResult<T> failed(IResultEnum iResultEnum) {
+        return new CommonResult<>(iResultEnum);
     }
 
     /**
      * 失败返回结果
-     * @param errorCode 错误码
+     *
+     * @param resultCode 结果枚举
+     * @param message    错误信息
      */
-    public static <T> CommonResult<T> failed(ExceptionHandler errorCode) {
-        System.out.println("errorCode1:" + errorCode);
-        return new CommonResult<T>(errorCode.getCode(), errorCode.getMessage(), null);
+    public static <T> CommonResult<T> failed(CommonResultCode resultCode, String message) {
+        return new CommonResult<>(resultCode.getCode(), message);
     }
 
     /**
      * 失败返回结果
-     * @param errorCode 错误码
-     * @param message 错误信息
      */
-    public static <T> CommonResult<T> failed(ExceptionHandler errorCode, String message) {
-        System.out.println("errorCode2:" + errorCode);
-        return new CommonResult<T>(errorCode.getCode(), message, null);
-    }
-
-    /**
-     * 失败返回结果
-     * @param message 提示信息
-     */
-    public static <T> CommonResult<T> failed(String message) {
-        return new CommonResult<T>(ExceptionCodeEnum.FAILED.getCode(), message, null);
+    public static <T> CommonResult<T> failed(CrmebException e) {
+        return new CommonResult<>(e.getCode(), e.getMessage());
     }
 
     /**
      * 失败返回结果
      */
     public static <T> CommonResult<T> failed() {
-        return failed(ExceptionCodeEnum.FAILED);
+        return failed(CommonResultCode.ERROR);
     }
 
     /**
-     * 参数验证失败返回结果
+     * 失败返回结果
+     *
+     * @param message    错误信息
      */
-    public static <T> CommonResult<T> validateFailed() {
-        return failed(ExceptionCodeEnum.VALIDATE_FAILED);
-    }
-
-    /**
-     * 参数验证失败返回结果
-     * @param message 提示信息
-     */
-    public static <T> CommonResult<T> validateFailed(String message) {
-        return new CommonResult<T>(ExceptionCodeEnum.VALIDATE_FAILED.getCode(), message, null);
-    }
-
-    /**
-     * 未登录返回结果
-     */
-    public static <T> CommonResult<T> unauthorized(T data) {
-        return new CommonResult<T>(ExceptionCodeEnum.UNAUTHORIZED.getCode(), ExceptionCodeEnum.UNAUTHORIZED.getMessage(), data);
-    }
-
-    /**
-     * 未登录返回结果
-     */
-    public static <T> CommonResult<T> unauthorized() {
-        return new CommonResult<T>(ExceptionCodeEnum.UNAUTHORIZED.getCode(), ExceptionCodeEnum.UNAUTHORIZED.getMessage(), null);
-    }
-
-    /**
-     * 没有权限查看
-     */
-    public static <T> CommonResult<T> forbidden() {
-        return new CommonResult<T>(ExceptionCodeEnum.FORBIDDEN.getCode(), ExceptionCodeEnum.FORBIDDEN.getMessage(), null);
-    }
-
-    /**
-     * 未授权返回结果
-     */
-    public static <T> CommonResult<T> forbidden(T data) {
-        return new CommonResult<T>(ExceptionCodeEnum.FORBIDDEN.getCode(), ExceptionCodeEnum.FORBIDDEN.getMessage(), data);
+    public static <T> CommonResult<T> failed(String message) {
+        return new CommonResult<>(CommonResultCode.ERROR.getCode(), message);
     }
 
     public long getCode() {
         return code;
     }
 
-    public void setCode(long code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 
@@ -178,8 +159,9 @@ public class CommonResult<T> {
         return message;
     }
 
-    public void setMessage(String message) {
+    public CommonResult<T> setMessage(String message) {
         this.message = message;
+        return this;
     }
 
     public T getData() {

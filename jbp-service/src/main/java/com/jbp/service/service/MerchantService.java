@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.*;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.MerchantConfigInfoVo;
 import com.jbp.common.vo.MerchantSettlementInfoVo;
@@ -17,7 +18,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -131,6 +132,13 @@ public interface MerchantService extends IService<Merchant> {
      * @return Boolean
      */
     Boolean operationBalance(Integer merId, BigDecimal price, String type);
+
+    /**
+     * 根据商户id集合获取商户信息
+     * @param merIdList 商户id集合
+     * @return 查询到的商户信息
+     */
+    List<Merchant> getListByIdList(List<Integer> merIdList);
 
     /**
      * 获取商户Id组成的Map
@@ -284,8 +292,9 @@ public interface MerchantService extends IService<Merchant> {
 
     /**
      * 首页商户列表
+     * @param recomdProdsNum 店铺街推荐商品数量
      */
-    List<IndexMerchantResponse> findIndexList();
+    List<IndexMerchantResponse> findIndexList(Integer recomdProdsNum);
 
     /**
      * 通过商户id列表获取商户名map
@@ -318,4 +327,16 @@ public interface MerchantService extends IService<Merchant> {
      * 获取所有的商户
      */
     List<Merchant> all();
+
+    /**
+     * 可用分类商户列表
+     */
+    List<CategoryMerchantResponse> getUseCategoryList();
+
+    /**
+     * 获取PC商城商户首页信息
+     *
+     * @param merId 商户ID
+     */
+    MerchantPcIndexResponse getPcIndexByMerId(Integer merId);
 }

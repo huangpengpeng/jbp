@@ -1,18 +1,19 @@
 package com.jbp.front.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
-
-import javax.servlet.http.HttpServletRequest;
+import com.jbp.common.vo.MyRecord;
 
 /**
  * 移动端登录服务类
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -83,4 +84,10 @@ public interface LoginService {
      * ios登录
      */
     LoginResponse ioslogin(IosLoginRequest loginRequest);
+
+    /**
+     * 校验token是否有效
+     * @return true 有效， false 无效
+     */
+    Boolean tokenIsExist();
 }

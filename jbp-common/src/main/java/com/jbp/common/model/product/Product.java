@@ -94,6 +94,7 @@ public class Product implements Serializable {
 
     @ApiModelProperty(value = "浏览量")
     private Integer browse;
+
     @ApiModelProperty(value = "商品二维码地址(用户小程序海报)")
     private String codePath;
 
@@ -145,4 +146,8 @@ public class Product implements Serializable {
     @ApiModelProperty(value = "商品详情")
     @TableField(exist = false)
     private String content;
+
+    @ApiModelProperty(value = "活动边框 列表中是边框 详情中是背景图")
+    @TableField(exist = false)
+    private String activityStyle;
 }

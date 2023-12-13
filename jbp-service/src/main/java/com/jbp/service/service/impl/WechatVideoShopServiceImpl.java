@@ -3,8 +3,6 @@ package com.jbp.service.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.service.service.WechatService;
-import com.jbp.service.service.WechatVideoShopService;
 import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.request.wxvedio.forregister.ShopRegisterApplySceneRequest;
 import com.jbp.common.request.wxvedio.forregister.ShopRegisterFinishAccessInfoRequest;
@@ -12,6 +10,8 @@ import com.jbp.common.utils.RestTemplateUtil;
 import com.jbp.common.utils.WxUtil;
 import com.jbp.common.vo.wxvedioshop.BaseResultResponseVo;
 import com.jbp.common.vo.wxvedioshop.register.RegisterCheckResponseVo;
+import com.jbp.service.service.WechatService;
+import com.jbp.service.service.WechatVideoShopService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.Map;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------

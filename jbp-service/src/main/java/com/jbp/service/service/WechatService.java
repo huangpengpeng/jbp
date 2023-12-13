@@ -5,6 +5,7 @@ import com.jbp.common.response.WeChatJsSdkConfigResponse;
 import com.jbp.common.response.WechatOpenUploadResponse;
 import com.jbp.common.response.WechatPublicShareResponse;
 import com.jbp.common.vo.*;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -74,11 +75,10 @@ public interface WechatService {
     /**
      * 生成小程序码
      *
-     * @param page  必须是已经发布的小程序存在的页面
-     * @param scene 最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，其它字符请自行编码为合法字符
+     * @param jsonObject
      * @return 小程序码
      */
-    String createQrCode(String page, String scene);
+    String createQrCode(JSONObject jsonObject);
 
     /**
      * 微信预下单接口(统一下单)
@@ -109,7 +109,7 @@ public interface WechatService {
      * @param templateMessage 消息对象
      * @return 是否发送成功
      */
-    Boolean sendMiniSubscribeMessage(TemplateMessageVo templateMessage);
+    Boolean sendMiniSubscribeMessage(ProgramTemplateMessageVo templateMessage);
 
     /**
      * 获取微信公众号自定义菜单配置

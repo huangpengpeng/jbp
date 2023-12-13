@@ -8,8 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.ProductRuleDao;
-import com.jbp.service.service.ProductRuleService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.product.ProductRule;
@@ -18,6 +16,8 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.ProductRuleRequest;
 import com.jbp.common.request.ProductRuleSearchRequest;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.service.dao.ProductRuleDao;
+import com.jbp.service.service.ProductRuleService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -66,19 +66,19 @@ public class ProductRuleServiceImpl extends ServiceImpl<ProductRuleDao, ProductR
 
     /**
      * 新增商品规格
-     * @param ProductRuleRequest 规格参数
+     * @param productRuleRequest 规格参数
      * @return 新增结果
      */
     @Override
-    public boolean save(ProductRuleRequest ProductRuleRequest) {
+    public boolean save(ProductRuleRequest productRuleRequest) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        if (existRuleName(ProductRuleRequest.getRuleName(), systemAdmin.getMerId())) {
+        if (existRuleName(productRuleRequest.getRuleName(), systemAdmin.getMerId())) {
             throw new CrmebException("此规格值已经存在");
         }
-        ProductRule ProductRule = new ProductRule();
-        BeanUtils.copyProperties(ProductRuleRequest, ProductRule);
-        ProductRule.setMerId(systemAdmin.getMerId());
-        return save(ProductRule);
+        ProductRule productRule = new ProductRule();
+        BeanUtils.copyProperties(productRuleRequest, productRule);
+        productRule.setMerId(systemAdmin.getMerId());
+        return save(productRule);
     }
 
     /**
@@ -97,17 +97,42 @@ public class ProductRuleServiceImpl extends ServiceImpl<ProductRuleDao, ProductR
 
     /**
      * 修改规格
-     * @param ProductRuleRequest 规格参数
+     * @param productRuleRequest 规格参数
      * @return Boolean
      */
     @Override
-    public Boolean updateRule(ProductRuleRequest ProductRuleRequest) {
-        if (ObjectUtil.isNull(ProductRuleRequest.getId())) {
+    public Boolean updateRule(ProductRuleRequest productRuleRequest) {
+        if (ObjectUtil.isNull(productRuleRequest.getId())) {
             throw new CrmebException("请先选择规格");
         }
-        ProductRule ProductRule = new ProductRule();
-        BeanUtils.copyProperties(ProductRuleRequest, ProductRule);
-        return updateById(ProductRule);
+        getRuleInfo(productRuleRequest.getId());
+        ProductRule newProductRule = new ProductRule();
+        BeanUtils.copyProperties(productRuleRequest, newProductRule);
+        return updateById(newProductRule);
+    }
+
+    /**
+     * 删除商品规格
+     * @param id 规格ID
+     */
+    @Override
+    public Boolean deleteById(Integer id) {
+        getRuleInfo(id);
+        return removeById(id);
+    }
+
+    /**
+     * 商品规格详情
+     * @param id 规格ID
+     */
+    @Override
+    public ProductRule getRuleInfo(Integer id) {
+        ProductRule productRule = getById(id);
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (ObjectUtil.isNull(productRule) || !admin.getMerId().equals(productRule.getMerId())) {
+            throw new CrmebException("规格不存在");
+        }
+        return productRule;
     }
 
 }

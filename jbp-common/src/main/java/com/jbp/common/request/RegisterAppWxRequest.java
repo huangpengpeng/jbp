@@ -6,16 +6,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
 
 import com.jbp.common.annotation.StringContains;
+
+import java.io.Serializable;
 
 /**
  * App微信注册/登录请求对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -31,6 +33,7 @@ public class RegisterAppWxRequest implements Serializable {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "用户openId", required = true)
+    @NotBlank(message = "openId不能为空")
     private String openId;
 
     @ApiModelProperty(value = "用户unionId")

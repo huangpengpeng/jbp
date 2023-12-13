@@ -2,9 +2,11 @@ package com.jbp.front.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.user.UserAddress;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.LogisticsResultVo;
+import com.jbp.common.vo.PreOrderInfoVo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -29,6 +31,13 @@ public interface FrontOrderService {
      * @return PreOrderResponse
      */
     OrderNoResponse preOrder(PreOrderRequest request);
+
+    /**
+     * 订单预下单V1.3
+     * @param request 预下单请求参数
+     * @return PreOrderResponse
+     */
+    OrderNoResponse preOrder_V1_3(PreOrderRequest request);
 
     /**
      * 加载预下单信息
@@ -101,9 +110,9 @@ public interface FrontOrderService {
 
     /**
      * 售后申请列表(可申请售后列表)
-     * @param pageParamRequest 分页参数
+     * @param request 搜索参数
      */
-    PageInfo<OrderDetail> getAfterSaleApplyList(String orderNo, PageParamRequest pageParamRequest);
+    PageInfo<OrderDetail> getAfterSaleApplyList(CommonSearchRequest request);
 
     /**
      * 查询退款理由
@@ -120,11 +129,10 @@ public interface FrontOrderService {
 
     /**
      * 退款订单列表
-     * @param type 列表类型：0-处理中，9-申请记录
-     * @param pageRequest 分页参数
+     * @param request 搜索参数
      * @return PageInfo
      */
-    PageInfo<RefundOrderResponse> getRefundOrderList(Integer type, PageParamRequest pageRequest);
+    PageInfo<RefundOrderResponse> getRefundOrderList(OrderAfterSalesSearchRequest request);
 
     /**
      * 退款订单详情
@@ -154,4 +162,41 @@ public interface FrontOrderService {
      * 获取订单状态图
      */
     List<HashMap<String, Object>> getOrderStatusImage();
+
+    /**
+     * 计算订单运费
+     */
+    void getFreightFee(PreOrderInfoVo orderInfoVo, UserAddress userAddress);
+
+    /**
+     * 获取优惠金额
+     */
+    void getCouponFee(PreOrderInfoVo orderInfoVo, List<OrderMerchantRequest> orderMerchantRequestList, Integer uid);
+
+    /**
+     * 积分抵扣计算
+     *
+     * @param orderInfoVo  订单vo
+     * @param userIntegral 用户积分
+     */
+    void integralDeductionComputed(PreOrderInfoVo orderInfoVo, Integer userIntegral);
+
+    /**
+     * 退款单退回商品
+     */
+    Boolean returningGoods(OrderRefundReturningGoodsRequest request);
+
+    /**
+     * 撤销退款单
+     * @param refundOrderNo 退款单号
+     */
+    Boolean revoke(String refundOrderNo);
+
+    /**
+     * 订单列表(v1.4.0)
+     * @param request 搜索参数
+     * @return PageInfo
+     */
+    PageInfo<OrderFrontDataResponse> list_v1_4(OrderFrontListRequest request);
+
 }

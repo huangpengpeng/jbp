@@ -18,7 +18,7 @@ import java.util.Date;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -39,10 +39,12 @@ public class CouponRequest implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-平台券", required = true)
+    @NotNull(message = "请选择优惠券类别")
     @Range(min = 1, max = 3, message = "未知的优惠券类别")
     private Integer category;
 
     @ApiModelProperty(value = "领取类型 1-手动领取,2-商品买赠送券", required = true)
+    @NotNull(message = "请选择优惠券领取类型")
     @Range(min = 1, max = 2, message = "未知的优惠券领取方式")
     private Integer receiveType;
 

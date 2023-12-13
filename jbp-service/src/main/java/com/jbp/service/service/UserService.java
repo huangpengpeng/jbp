@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantUserSearchRequest;
 import com.jbp.common.response.*;
 
 import java.math.BigDecimal;
@@ -15,7 +16,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -324,4 +325,17 @@ public interface UserService extends IService<User> {
      * @param id 用户ID
      */
     UserAdminDetailResponse getAdminDetail(Integer id);
+
+    /**
+     * 更新用户等级
+     * @param userId 用户ID
+     * @param level 用户等级
+     */
+    Boolean updateUserLevel(Integer userId, Integer level);
+
+    /**
+     * 通过生日获取用户列表
+     * @param birthday 生日日期
+     */
+    List<User> findByBirthday(String birthday);
 }

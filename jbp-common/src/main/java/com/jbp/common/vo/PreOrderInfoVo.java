@@ -14,7 +14,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -34,13 +34,22 @@ public class PreOrderInfoVo {
     private Integer orderProNum;
 
     @ApiModelProperty(value = "运费金额")
-    private BigDecimal freightFee;
+    private BigDecimal freightFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "优惠金额")
-    private BigDecimal couponFee;
+    private BigDecimal couponFee = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "商户优惠金额")
+    private BigDecimal merCouponFee = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "平台优惠金额")
+    private BigDecimal platCouponFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payFee;
+
+    @ApiModelProperty(value = "平台优惠券编号（选择优惠券时有值,不选时为0")
+    private Integer platUserCouponId = 0;
 
     @ApiModelProperty(value = "地址id")
     private Integer addressId;
@@ -54,30 +63,15 @@ public class PreOrderInfoVo {
     @ApiModelProperty(value = "商户订单数组")
     private List<PreMerchantOrderVo> merchantOrderVoList;
 
-//    @ApiModelProperty(value = "秒杀商品Id")
-//    private Integer seckillId = 0;
-//
-//    @ApiModelProperty(value = "砍价商品Id")
-//    private Integer bargainId = 0;
-//
-//    @ApiModelProperty(value = "用户砍价活动id")
-//    private Integer bargainUserId;
-//
-//    @ApiModelProperty(value = "拼团商品Id")
-//    private Integer combinationId = 0;
-//
-//    @ApiModelProperty(value = "拼团团长Id")
-//    private Integer pinkId = 0;
-
     @ApiModelProperty(value = "购物车编号列表")
     private List<Integer> cartIdList;
-
-    @ApiModelProperty(value = "是否视频号订单")
-    private Boolean isVideo = false;
 
     @ApiModelProperty(value = "积分抵扣开关")
     private Boolean integralDeductionSwitch;
 
     @ApiModelProperty(value = "用户是否使用积分抵扣")
     private Boolean isUseIntegral;
+
+    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单")
+    private Integer type = 0;
 }

@@ -9,6 +9,7 @@ import com.jbp.common.request.wxvedio.product.PayComponentDraftProductPlatformOp
 import com.jbp.common.request.wxvedio.product.PayComponentProductAddRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.PayComponentDraftProductService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

@@ -2,9 +2,12 @@ package com.jbp.admin.controller.platform;
 
 import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.request.SystemUserLevelRequest;
+import com.jbp.common.request.SystemUserLevelRuleRequest;
 import com.jbp.common.request.SystemUserLevelUpdateShowRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.SystemUserLevelConfigVo;
 import com.jbp.service.service.SystemUserLevelService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -40,8 +43,8 @@ public class SystemUserLevelController {
     @PreAuthorize("hasAuthority('platform:system:user:level:list')")
     @ApiOperation(value = "系统用户等级分页列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResult<List<SystemUserLevel>> getList() {
-        return CommonResult.success(systemUserLevelService.getList());
+    public List<SystemUserLevel> getList() {
+        return systemUserLevelService.getList();
     }
 
     @PreAuthorize("hasAuthority('platform:system:user:level:save')")
@@ -74,11 +77,46 @@ public class SystemUserLevelController {
         return CommonResult.failed();
     }
 
+    @Deprecated
     @PreAuthorize("hasAuthority('platform:system:user:level:use')")
     @ApiOperation(value = "使用/禁用系统用户等级")
     @RequestMapping(value = "/use", method = RequestMethod.POST)
     public CommonResult<Object> use(@RequestBody @Validated SystemUserLevelUpdateShowRequest request) {
         if (systemUserLevelService.updateShow(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
+
+    @PreAuthorize("hasAuthority('platform:system:user:level:rule')")
+    @ApiOperation(value = "获取用户等级规则")
+    @RequestMapping(value = "/get/rule", method = RequestMethod.GET)
+    public String getRule() {
+        return systemUserLevelService.getRule();
+    }
+
+    @PreAuthorize("hasAuthority('platform:system:user:level:rule:update')")
+    @ApiOperation(value = "编辑用户等级规则")
+    @RequestMapping(value = "/update/rule", method = RequestMethod.POST)
+    public CommonResult<Object> updateRule(@RequestBody SystemUserLevelRuleRequest request) {
+        if (systemUserLevelService.updateRule(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
+
+    @PreAuthorize("hasAuthority('platform:system:user:level:config')")
+    @ApiOperation(value = "获取用户等级配置")
+    @RequestMapping(value = "/get/config", method = RequestMethod.GET)
+    public SystemUserLevelConfigVo getConfig() {
+        return systemUserLevelService.getConfig();
+    }
+
+    @PreAuthorize("hasAuthority('platform:system:user:level:config:update')")
+    @ApiOperation(value = "编辑用户等级配置")
+    @RequestMapping(value = "/update/config", method = RequestMethod.POST)
+    public CommonResult<Object> updateConfig(@RequestBody @Validated SystemUserLevelConfigVo request) {
+        if (systemUserLevelService.updateConfig(request)) {
             return CommonResult.success();
         }
         return CommonResult.failed();

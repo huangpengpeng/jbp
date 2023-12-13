@@ -3,9 +3,14 @@ package com.jbp.service.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.record.BrowseRecord;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.BrowseRecordDao;
 import com.jbp.service.service.BrowseRecordService;
-import com.jbp.common.model.record.BrowseRecord;
 
 import org.springframework.stereotype.Service;
 
@@ -17,7 +22,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -76,6 +81,21 @@ public class BrowseRecordServiceImpl extends ServiceImpl<BrowseRecordDao, Browse
     @Override
     public Boolean myUpdate(BrowseRecord browseRecord) {
         return dao.myUpdate(browseRecord) > 0;
+    }
+
+    /**
+     * 用户足迹分月列表
+     * @param userId 用户Id
+     * @param pageParamRequest 分页参数
+     */
+    @Override
+    public PageInfo<BrowseRecord> findPageByUserId(Integer userId, PageParamRequest pageParamRequest) {
+        Page<BrowseRecord> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<BrowseRecord> lqw = Wrappers.lambdaQuery();
+        lqw.eq(BrowseRecord::getUid, userId);
+        lqw.orderByDesc(BrowseRecord::getCreateTime);
+        List<BrowseRecord> list = dao.selectList(lqw);
+        return CommonPage.copyPageInfo(page, list);
     }
 }
 

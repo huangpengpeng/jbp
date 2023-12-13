@@ -90,5 +90,9 @@ public class ProductAttrValue implements Serializable {
     @ApiModelProperty(value = "并发版本控制")
     private Integer version;
 
+    @ApiModelProperty(value = "主商品attrValueID")
+    private Integer masterId;
 
+    @ApiModelProperty(value = "是否回滚库存：0-未回滚，1-已回滚")
+    private Boolean isCallback;
 }

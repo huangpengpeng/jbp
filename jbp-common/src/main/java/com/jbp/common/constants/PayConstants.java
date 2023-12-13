@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -29,6 +29,8 @@ public class PayConstants {
     public static final String PAY_CHANNEL_WECHAT_MINI_VIDEO = "video";
     /** 支付渠道-网页支付 */
     public static final String PAY_CHANNEL_H5 = "h5";
+    /** 支付渠道-微信native支付 */
+    public static final String PAY_CHANNEL_WECHAT_NATIVE = "native";
     /** 支付渠道-余额支付 */
     public static final String PAY_CHANNEL_YUE = "yue";
     /** 支付渠道-微信Ios */
@@ -39,6 +41,8 @@ public class PayConstants {
     public static final String PAY_CHANNEL_ALI_PAY = "alipay";
     /** 支付渠道-支付宝App */
     public static final String PAY_CHANNEL_ALI_APP_PAY = "alipayApp";
+    /** 支付渠道-支付宝App */
+    public static final String PAY_CHANNEL_ALI_PC_PAY = "alipayPc";
 
     /** 支付服务类型-订单 */
     public static final String PAY_SERVICE_TYPE_ORDER = "order";
@@ -66,7 +70,7 @@ public class PayConstants {
     public static final String WX_PAY_REFUND_NOTIFY_API_URI = "/api/publicly/payment/callback/wechat/refund";
 
     // 支付宝支付回调地址
-    public static final String ALI_PAY_NOTIFY_API_URI = "/api/publicly/payment/callback/wechat/alipay";
+    public static final String ALI_PAY_NOTIFY_API_URI = "/api/publicly/payment/callback/alipay";
 
     public static final String WX_PAY_SIGN_TYPE_MD5 = "MD5";
     public static final String WX_PAY_SIGN_TYPE_SHA256 = "HMAC-SHA256";

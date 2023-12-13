@@ -4,27 +4,30 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.MerchantProductCategoryDao;
-import com.jbp.service.service.MerchantProductCategoryService;
-import com.jbp.service.service.ProductService;
-import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.merchant.MerchantProductCategory;
-import com.jbp.common.request.MerchantProductCategoryRequest;
+import com.jbp.common.request.merchant.MerchantProductCategoryRequest;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.ProCategoryCacheTree;
 import com.jbp.common.vo.ProCategoryCacheVo;
+import com.jbp.service.dao.MerchantProductCategoryDao;
+import com.jbp.service.service.MerchantProductCategoryService;
+import com.jbp.service.service.ProductService;
+import com.jbp.service.service.SystemAttachmentService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +36,7 @@ import java.util.stream.Collectors;
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -52,6 +55,8 @@ public class MerchantProductCategoryServiceImpl extends ServiceImpl<MerchantProd
     private SystemAttachmentService systemAttachmentService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
 
     /**
@@ -76,7 +81,8 @@ public class MerchantProductCategoryServiceImpl extends ServiceImpl<MerchantProd
      */
     @Override
     public Boolean add(MerchantProductCategoryRequest request) {
-        if (checkName(request.getName())) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (checkName(request.getName(), admin.getMerId())) {
             throw new CrmebException("分类名称已存在");
         }
         if (!request.getPid().equals(0)) {
@@ -85,7 +91,7 @@ public class MerchantProductCategoryServiceImpl extends ServiceImpl<MerchantProd
                 throw new CrmebException("商户商品分类只支持二级分类");
             }
         }
-        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+
         MerchantProductCategory productCategory = new MerchantProductCategory();
         BeanUtils.copyProperties(request, productCategory);
         productCategory.setId(null);
@@ -145,7 +151,7 @@ public class MerchantProductCategoryServiceImpl extends ServiceImpl<MerchantProd
             throw new CrmebException("不能操作非自己商户的数据");
         }
         if (!oldCategory.getName().equals(request.getName())) {
-            if (checkName(request.getName())) {
+            if (checkName(request.getName(), admin.getMerId())) {
                 throw new CrmebException("分类名称已存在");
             }
         }
@@ -175,12 +181,44 @@ public class MerchantProductCategoryServiceImpl extends ServiceImpl<MerchantProd
     public Boolean updateShowStatus(Integer id) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         MerchantProductCategory category = getByIdException(id);
+        if (!admin.getMerId().equals(category.getMerId())) {
+            throw new CrmebException("不能操作非自己商户的数据");
+        }
+        List<MerchantProductCategory> categoryList = new ArrayList<>();
+        boolean showStatus = !category.getIsShow();
+        if (!category.getPid().equals(0) && showStatus) {
+            MerchantProductCategory parentCategory = getByIdException(category.getPid());
+            if (!parentCategory.getIsShow()) {
+                parentCategory.setIsShow(showStatus);
+                categoryList.add(parentCategory);
+            }
+        }
         category.setIsShow(!category.getIsShow());
-        boolean update = updateById(category);
-        if (update) {
+        categoryList.add(category);
+        Boolean execute = transactionTemplate.execute(e -> {
+            updateBatchById(categoryList);
+            if (category.getPid().equals(0)) {
+                updateChildShowStatus(category.getId(), showStatus);
+            }
+            return Boolean.TRUE;
+        });
+        if (execute) {
             redisUtil.delete(StrUtil.format(RedisConstants.STORE_PRODUCT_CATEGORY_CACHE_LIST_KEY, admin.getMerId()));
         }
-        return update;
+        return execute;
+    }
+
+    /**
+     * 更新子级显示状态
+     *
+     * @param pid 父级ID
+     */
+    private void updateChildShowStatus(Integer pid, boolean showStatus) {
+        LambdaUpdateWrapper<MerchantProductCategory> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(MerchantProductCategory::getIsShow, showStatus);
+        wrapper.eq(MerchantProductCategory::getPid, pid);
+        wrapper.eq(MerchantProductCategory::getIsDel, false);
+        update(wrapper);
     }
 
     /**
@@ -252,10 +290,11 @@ public class MerchantProductCategoryServiceImpl extends ServiceImpl<MerchantProd
      * @param name 分类名称
      * @return Boolean
      */
-    private Boolean checkName(String name) {
+    private Boolean checkName(String name, Integer merId) {
         LambdaQueryWrapper<MerchantProductCategory> lqw = Wrappers.lambdaQuery();
         lqw.select(MerchantProductCategory::getId);
         lqw.eq(MerchantProductCategory::getName, name);
+        lqw.eq(MerchantProductCategory::getMerId, merId);
         lqw.eq(MerchantProductCategory::getIsDel, false);
         lqw.last(" limit 1");
         MerchantProductCategory productCategory = dao.selectOne(lqw);

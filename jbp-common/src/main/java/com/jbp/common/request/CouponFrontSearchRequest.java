@@ -15,7 +15,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -30,9 +30,9 @@ public class CouponFrontSearchRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "类别 0-所有 1-商家券, 2-商品券", required = true)
+    @ApiModelProperty(value = "类别 0-所有 1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券", required = true)
     @NotNull(message = "优惠券类别不能为空")
-    @Range(min = 0, max = 2, message = "未知的优惠券类别")
+    @Range(min = 0, max = 6, message = "未知的优惠券类别")
     private Integer category;
 
     @ApiModelProperty(value = "产品id,与merId二选一")

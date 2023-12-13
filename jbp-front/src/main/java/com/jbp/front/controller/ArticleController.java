@@ -9,6 +9,7 @@ import com.jbp.common.response.ArticleResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ArticleCategoryService;
 import com.jbp.service.service.ArticleService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -53,21 +54,21 @@ public class ArticleController {
 
     @ApiOperation(value = "文章分页列表")
     @RequestMapping(value = "/list/{cid}", method = RequestMethod.GET)
-    public CommonResult<CommonPage<ArticleResponse>> getList(@PathVariable(name = "cid") String cid,
+    public CommonResult<CommonPage<ArticleResponse>> getList(@PathVariable(name = "cid") Integer cid,
                                                              @Validated PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(articleService.getList(cid, pageParamRequest)));
     }
 
     @ApiOperation(value = "热门列表")
     @RequestMapping(value = "/hot/list", method = RequestMethod.GET)
-    public CommonResult<CommonPage<ArticleResponse>> getHotList() {
-        return CommonResult.success(CommonPage.restPage(articleService.getHotList()));
+    public CommonResult<List<ArticleResponse>> getHotList() {
+        return CommonResult.success(articleService.getHotList());
     }
 
     @ApiOperation(value = "轮播列表")
     @RequestMapping(value = "/banner/list", method = RequestMethod.GET)
-    public CommonResult<CommonPage<Article>> getList() {
-        return CommonResult.success(CommonPage.restPage(articleService.getBannerList()));
+    public CommonResult<List<Article>> getList() {
+        return CommonResult.success(articleService.getBannerList());
     }
 
     @ApiOperation(value = "详情")

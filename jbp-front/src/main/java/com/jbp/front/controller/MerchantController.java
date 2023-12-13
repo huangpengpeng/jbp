@@ -1,12 +1,12 @@
 package com.jbp.front.controller;
 
-import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.merchant.MerchantCategory;
 import com.jbp.common.model.merchant.MerchantType;
-import com.jbp.common.request.MerchantMoveSearchRequest;
-import com.jbp.common.request.MerchantSettledApplyRequest;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.SendCodeRequest;
+import com.jbp.common.request.merchant.MerchantMoveSearchRequest;
+import com.jbp.common.request.merchant.MerchantSettledApplyRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.ProCategoryCacheVo;
@@ -14,6 +14,7 @@ import com.jbp.service.service.MerchantCategoryService;
 import com.jbp.service.service.MerchantProductCategoryService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.MerchantTypeService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -70,20 +71,20 @@ public class MerchantController {
 
     @ApiOperation(value = "商户入驻记录")
     @RequestMapping(value = "/settled/record", method = RequestMethod.GET)
-    public CommonResult<PageInfo<MerchantSettledResponse>> settledRecord(@ModelAttribute PageParamRequest pageParamRequest) {
-        return CommonResult.success(merchantService.findSettledRecord(pageParamRequest));
+    public CommonResult<CommonPage<MerchantSettledResponse>> settledRecord(@ModelAttribute PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(merchantService.findSettledRecord(pageParamRequest)));
     }
 
     @ApiOperation(value = "商户搜索列表")
     @RequestMapping(value = "/search/list", method = RequestMethod.GET)
-    public CommonResult<PageInfo<MerchantSearchResponse>> searchList(MerchantMoveSearchRequest request, @ModelAttribute PageParamRequest pageParamRequest) {
-        return CommonResult.success(merchantService.findSearchList(request, pageParamRequest));
+    public CommonResult<CommonPage<MerchantSearchResponse>> searchList(MerchantMoveSearchRequest request, @ModelAttribute PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(merchantService.findSearchList(request, pageParamRequest)));
     }
 
     @ApiOperation(value = "店铺街")
     @RequestMapping(value = "/street", method = RequestMethod.GET)
-    public CommonResult<PageInfo<MerchantSearchResponse>> getStreet(@ModelAttribute PageParamRequest pageParamRequest) {
-        return CommonResult.success(merchantService.getStreet(pageParamRequest));
+    public CommonResult<CommonPage<MerchantSearchResponse>> getStreet(@ModelAttribute PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(merchantService.getStreet(pageParamRequest)));
     }
 
     @ApiOperation(value = "店铺首页信息")

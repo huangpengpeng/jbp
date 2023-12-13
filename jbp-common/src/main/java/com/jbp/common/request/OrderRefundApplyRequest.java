@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import javax.validation.constraints.NotNull;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -37,6 +38,16 @@ public class OrderRefundApplyRequest {
     @ApiModelProperty(value = "订单详情id", required = true)
     @NotNull(message = "订单详情id不能为空")
     private Integer orderDetailId;
+
+    @ApiModelProperty(value = "售后类型：1-仅退款，2-退货退款", required = true)
+    @NotNull(message = "请选择售后类型")
+    @Range(min = 1, max = 2, message = "未知的售后类型")
+    private Integer afterSalesType;
+
+    @ApiModelProperty(value = "退货类型：0-不退货 1-快递退回，2-到店退货", required = true)
+    @NotNull(message = "请选择退货类型")
+    @Range(min = 0, max = 2, message = "未知的退货类型")
+    private Integer returnGoodsType;
 
     @ApiModelProperty(value = "退款数量", required = true)
     @NotNull(message = "退款数量不能为空")

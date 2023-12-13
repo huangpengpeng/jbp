@@ -7,7 +7,7 @@ import io.swagger.models.auth.In;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -21,8 +21,7 @@ public class ClosingConstant {
     /** 结算提现类型：支付宝 */
     public static final String CLOSING_TYPE_ALIPAY = "alipay";
     /** 结算提现类型：微信 */
-    public static final String CLOSING_TYPE_WEIXIN = "weixin";
-    public static final String CLOSING_MERCHANT_TYPE_WEIXIN = "wechat";
+    public static final String CLOSING_TYPE_WECHAT = "wechat";
 
     /** 审核状态——待审核 */
     public static final Integer CLOSING_AUDIT_STATUS_AUDIT = 0;

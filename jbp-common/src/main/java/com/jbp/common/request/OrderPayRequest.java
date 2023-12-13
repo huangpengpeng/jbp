@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import com.jbp.common.annotation.StringContains;
 
@@ -16,7 +15,7 @@ import com.jbp.common.annotation.StringContains;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -38,9 +37,9 @@ public class OrderPayRequest {
     @StringContains(limitValues = {"weixin","alipay","yue"}, message = "未知的支付方式")
     private String payType;
 
-    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, video=视频号", required = true)
+    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, video=视频号, native=微信native支付， alipayPc=支付宝PC支付", required = true)
     @NotBlank(message = "支付渠道不能为空")
-    @StringContains(limitValues = {"public","mini","h5","yue","wechatIos","wechatAndroid","alipay","alipayApp","video"}, message = "未知的支付渠道")
+    @StringContains(limitValues = {"public","mini","h5","yue","wechatIos","wechatAndroid","alipay","alipayApp","video","native","alipayPc"}, message = "未知的支付渠道")
     private String payChannel;
 
     @ApiModelProperty(value = "支付平台")

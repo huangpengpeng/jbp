@@ -12,9 +12,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.UserIntegralRecordDao;
-import com.jbp.service.service.UserIntegralRecordService;
-import com.jbp.service.service.UserService;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.constants.IntegralRecordConstants;
@@ -27,6 +24,9 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.IntegralRecordPageResponse;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.UserIntegralRecordDao;
+import com.jbp.service.service.UserIntegralRecordService;
+import com.jbp.service.service.UserService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -129,90 +129,6 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
         }
     }
 
-//    /**
-//     * PC后台列表
-//     * @param request 搜索条件
-//     * @param pageParamRequest 分页参数
-//     * @return 记录列表
-//     */
-//    @Override
-//    public PageInfo<UserIntegralRecordResponse> findAdminList(AdminIntegralSearchRequest request, PageParamRequest pageParamRequest) {
-//        Page<UserIntegralRecordResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-//        LambdaQueryWrapper<UserIntegralRecord> lqw = Wrappers.lambdaQuery();
-//        lqw.select(UserIntegralRecord::getId, UserIntegralRecord::getTitle, UserIntegralRecord::getBalance, UserIntegralRecord::getIntegral,
-//                UserIntegralRecord::getMark, UserIntegralRecord::getUid, UserIntegralRecord::getUpdateTime);
-//        lqw.eq(UserIntegralRecord::getStatus, IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
-//        if (ObjectUtil.isNotNull(request.getUid())) {
-//            lqw.eq(UserIntegralRecord::getUid, request.getUid());
-//        }
-//        if (StrUtil.isNotBlank(request.getKeywords())) {
-//            List<Integer> idList = userService.findIdListLikeName(request.getKeywords());
-//            if (CollUtil.isNotEmpty(idList)) {
-//                lqw.in(UserIntegralRecord::getUid, idList);
-//            } else {
-//                return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
-//            }
-//        }
-//        //时间范围
-//        if (StrUtil.isNotBlank(request.getDateLimit())) {
-//            dateLimitUtilVo dateLimit = DateUtil.getDateLimit(request.getDateLimit());
-//            //判断时间
-//            int compareDateResult = DateUtil.compareDate(dateLimit.getEndTime(), dateLimit.getStartTime(), DateConstants.DATE_FORMAT);
-//            if (compareDateResult == -1) {
-//                throw new CrmebException("开始时间不能大于结束时间！");
-//            }
-//
-//            lqw.between(UserIntegralRecord::getUpdateTime, dateLimit.getStartTime(), dateLimit.getEndTime());
-//        }
-//        lqw.orderByDesc(UserIntegralRecord::getUpdateTime);
-//        List<UserIntegralRecord> list = dao.selectList(lqw);
-//        if (CollUtil.isEmpty(list)) {
-//            return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
-//        }
-//        List<UserIntegralRecordResponse> responseList = list.stream().map(i -> {
-//            UserIntegralRecordResponse response = new UserIntegralRecordResponse();
-//            BeanUtils.copyProperties(i, response);
-//            // 获取用户昵称
-//            User user = userService.getById(i.getUid());
-//            if (ObjectUtil.isNotNull(user)) {
-//                response.setNickName(user.getNickname());
-//            } else {
-//                response.setNickName("");
-//            }
-//            return response;
-//        }).collect(Collectors.toList());
-//        return CommonPage.copyPageInfo(page, responseList);
-//    }
-//
-//    /**
-//     * 根据类型条件计算积分总数
-//     * @param uid 用户uid
-//     * @param type 类型：1-增加，2-扣减
-//     * @param date 日期
-//     * @param linkType 关联类型
-//     * @return 积分总数
-//     */
-//    @Override
-//    public Integer getSumIntegral(Integer uid, Integer type, String date, String linkType) {
-//        QueryWrapper<UserIntegralRecord> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("sum(integral) as integral");
-//        queryWrapper.eq("uid", uid);
-//        queryWrapper.eq("type", type);
-//        if (StrUtil.isNotBlank(linkType)) {
-//            queryWrapper.eq("link_type", linkType);
-//        }
-//        queryWrapper.eq("status", IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
-//        if (StrUtil.isNotBlank(date)) {
-//            dateLimitUtilVo dateLimit = DateUtil.getDateLimit(date);
-//            queryWrapper.between("update_time", dateLimit.getStartTime(), dateLimit.getEndTime());
-//        }
-//        UserIntegralRecord integralRecord = dao.selectOne(queryWrapper);
-//        if (ObjectUtil.isNull(integralRecord) || ObjectUtil.isNull(integralRecord.getIntegral())) {
-//            return 0;
-//        }
-//        return integralRecord.getIntegral();
-//    }
-
     /**
      * H5用户积分列表
      * @param uid 用户uid
@@ -231,26 +147,6 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
         return CommonPage.copyPageInfo(page, integralRecordList);
     }
 
-//    /**
-//     * 获取用户冻结的积分
-//     * @param uid 用户uid
-//     * @return 积分数量
-//     */
-//    @Override
-//    public Integer getFrozenIntegralByUid(Integer uid) {
-//        QueryWrapper<UserIntegralRecord> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("sum(integral) as integral");
-//        queryWrapper.eq("uid", uid);
-//        queryWrapper.eq("type", IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
-//        queryWrapper.eq("link_type", IntegralRecordConstants.INTEGRAL_RECORD_LINK_TYPE_ORDER);
-//        queryWrapper.eq("status", IntegralRecordConstants.INTEGRAL_RECORD_STATUS_FROZEN);
-//        UserIntegralRecord integralRecord = dao.selectOne(queryWrapper);
-//        if (ObjectUtil.isNull(integralRecord) || ObjectUtil.isNull(integralRecord.getIntegral())) {
-//            return 0;
-//        }
-//        return integralRecord.getIntegral();
-//    }
-//
     /**
      * 获取需要解冻的记录列表
      * @return 记录列表

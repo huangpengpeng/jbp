@@ -3,7 +3,12 @@ package com.jbp.service.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.response.RefundOrderInfoResponse;
+import com.jbp.common.response.RefundOrderResponse;
+
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -21,4 +26,6 @@ public interface RefundOrderDao extends BaseMapper<RefundOrder> {
      * @return RefundOrderInfoResponse
      */
     RefundOrderInfoResponse getRefundOrderDetailByRefundOrderNo(@Param("refundOrderNo") String refundOrderNo);
+
+    List<RefundOrderResponse> findSearchList(Map<String, Object> map);
 }

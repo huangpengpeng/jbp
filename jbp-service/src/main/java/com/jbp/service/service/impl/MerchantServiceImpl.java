@@ -13,8 +13,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.MerchantDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.*;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
@@ -23,9 +21,11 @@ import com.jbp.common.model.bill.MerchantDailyStatement;
 import com.jbp.common.model.bill.MerchantMonthStatement;
 import com.jbp.common.model.express.ShippingTemplates;
 import com.jbp.common.model.merchant.*;
+import com.jbp.common.model.system.GroupConfig;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.*;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.merchant.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
@@ -35,6 +35,8 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MerchantConfigInfoVo;
 import com.jbp.common.vo.MerchantSettlementInfoVo;
+import com.jbp.service.dao.MerchantDao;
+import com.jbp.service.service.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +57,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -105,7 +107,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
-    private AsyncService asyncService;
+    private GroupConfigService groupConfigService;
 
     /**
      * 商户分页列表
@@ -527,11 +529,11 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
     }
 
     /**
-     * 获取商户列表（商户id）
-     *
-     * @param merIdList 商户ID列表
+     * 根据商户id集合获取商户信息
+     * @param merIdList 商户id集合
+     * @return 查询到的商户信息
      */
-    private List<Merchant> getListByIdList(List<Integer> merIdList) {
+    public List<Merchant> getListByIdList(List<Integer> merIdList) {
         LambdaQueryWrapper<Merchant> lqw = Wrappers.lambdaQuery();
         lqw.in(Merchant::getId, merIdList);
         return dao.selectList(lqw);
@@ -568,6 +570,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         BeanUtils.copyProperties(merchant, baseInfo);
         baseInfo.setMerCategory(merchantCategory.getName());
         baseInfo.setMerType(merchantType.getName());
+        baseInfo.setReceiptPrintingSwitch(merchant.getReceiptPrintingSwitch());
         return baseInfo;
     }
 
@@ -633,7 +636,9 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (StrUtil.isNotBlank(merchant.getPcBackImage())) {
             merchant.setPcBackImage(systemAttachmentService.clearPrefix(merchant.getPcBackImage(), cdnUrl));
         }
+        merchant.setReceiptPrintingSwitch(request.getReceiptPrintingSwitch());
         merchantInfo.setId(tempMerchantInfo.getId());
+        merchant.setReceiptPrintingSwitch(request.getReceiptPrintingSwitch());
         return transactionTemplate.execute(e -> {
             updateById(merchant);
             merchantInfoService.updateById(merchantInfo);
@@ -775,6 +780,9 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         }
         //检测验证码
         checkValidateCode(request.getPhone(), request.getCaptcha());
+
+        MerchantCategory merchantCategory = merchantCategoryService.getByIdException(request.getCategoryId());
+        request.setHandlingFee(merchantCategory.getHandlingFee());
         return merchantApplyService.settledApply(request);
     }
 
@@ -823,11 +831,13 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
     public PageInfo<MerchantSearchResponse> findSearchList(MerchantMoveSearchRequest request, PageParamRequest pageParamRequest) {
         Page<Merchant> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<Merchant> lqw = Wrappers.lambdaQuery();
-        if (ObjectUtil.isNotNull(request.getCategoryId())) {
-            lqw.eq(Merchant::getCategoryId, request.getCategoryId());
+        if (StrUtil.isNotBlank(request.getCategoryIds())) {
+            List<Integer> categoryIdList = CrmebUtil.stringToArray(request.getCategoryIds());
+            lqw.in(Merchant::getCategoryId, categoryIdList);
         }
-        if (ObjectUtil.isNotNull(request.getTypeId())) {
-            lqw.eq(Merchant::getTypeId, request.getTypeId());
+        if (StrUtil.isNotBlank(request.getTypeIds())) {
+            List<Integer> typeIdList = CrmebUtil.stringToArray(request.getTypeIds());
+            lqw.in(Merchant::getTypeId, typeIdList);
         }
         if (ObjectUtil.isNotNull(request.getIsSelf())) {
             lqw.eq(Merchant::getIsSelf, request.getIsSelf());
@@ -844,6 +854,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (CollUtil.isEmpty(merchantList)) {
             return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
         }
+        Integer userId = userService.getUserId();
         List<MerchantSearchResponse> responseList = merchantList.stream().map(merchant -> {
             MerchantSearchResponse response = new MerchantSearchResponse();
             BeanUtils.copyProperties(merchant, response);
@@ -853,6 +864,9 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
             // 店铺关注人数
             Integer followerNum = userMerchantCollectService.getCountByMerId(merchant.getId());
             response.setFollowerNum(followerNum);
+            if (userId > 0) {
+                response.setIsCollect(userMerchantCollectService.isCollect(userId, merchant.getId()));
+            }
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
@@ -884,6 +898,8 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
             // 店铺关注人数
             Integer followerNum = userMerchantCollectService.getCountByMerId(merchant.getId());
             response.setFollowerNum(followerNum);
+            response.setPcLogo(merchant.getPcLogo());
+            response.setPcGoodStoreCoverImage(merchant.getPcGoodStoreCoverImage());
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
@@ -909,7 +925,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         response.setIsCollect(false);
         if (userId > 0) {
             response.setIsCollect(userMerchantCollectService.isCollect(userId, merchant.getId()));
-            // 商品浏览量统计(每日/个体)
+            // 商户访客量统计
             String dateStr = DateUtil.date().toString(DateConstants.DATE_FORMAT_DATE);
             redisUtil.incrAndCreate(StrUtil.format(RedisConstants.MERCHANT_VISITORS_KEY, dateStr, merchant.getId()));
         }
@@ -1050,16 +1066,23 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
      * 首页商户列表
      */
     @Override
-    public List<IndexMerchantResponse> findIndexList() {
+    public List<IndexMerchantResponse> findIndexList(Integer recomdProdsNum) {
         LambdaQueryWrapper<Merchant> lqw = Wrappers.lambdaQuery();
         lqw.eq(Merchant::getIsSwitch, true);
         lqw.eq(Merchant::getIsDel, false);
         lqw.orderByDesc(Merchant::getIsRecommend, Merchant::getSort, Merchant::getId);
-        lqw.last(" limit 6");
+        lqw.last(" limit " + recomdProdsNum);
         List<Merchant> merchantList = dao.selectList(lqw);
         return merchantList.stream().map(mer -> {
             IndexMerchantResponse response = new IndexMerchantResponse();
             BeanUtils.copyProperties(mer, response);
+            // 根据商户再获取三条商户对应的3条推荐商品 适用于DIY样式
+            response.setProList(productService.getRecommendedProductsByMerId(mer.getId(), 3));
+            // 店铺关注人数
+            response.setFollowerNum(userMerchantCollectService.getCountByMerId(mer.getId()));
+
+            response.setPcLogo(mer.getPcLogo());
+            response.setPcGoodStoreCoverImage(mer.getPcGoodStoreCoverImage());
             return response;
         }).collect(Collectors.toList());
     }
@@ -1073,7 +1096,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
     @Override
     public Map<Integer, Merchant> getMapByIdList(List<Integer> merIdList) {
         LambdaQueryWrapper<Merchant> lqw = Wrappers.lambdaQuery();
-        lqw.select(Merchant::getId, Merchant::getName, Merchant::getIsSelf, Merchant::getTypeId, Merchant::getCategoryId);
+        lqw.select(Merchant::getId, Merchant::getName, Merchant::getIsSelf, Merchant::getTypeId, Merchant::getCategoryId, Merchant::getAvatar);
         lqw.in(Merchant::getId, merIdList);
         List<Merchant> merchantList = dao.selectList(lqw);
         Map<Integer, Merchant> merchantMap = CollUtil.newHashMap();
@@ -1133,6 +1156,75 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         lqw.select(Merchant::getId, Merchant::getName);
         lqw.eq(Merchant::getIsDel, 0);
         return dao.selectList(lqw);
+    }
+
+    /**
+     * 可用分类商户列表
+     */
+    @Override
+    public List<CategoryMerchantResponse> getUseCategoryList() {
+        LambdaQueryWrapper<Merchant> lqw = Wrappers.lambdaQuery();
+        lqw.select(Merchant::getId, Merchant::getName, Merchant::getCategoryId);
+        lqw.eq(Merchant::getIsSwitch, 1);
+        lqw.eq(Merchant::getIsDel, 0);
+        List<Merchant> merchantList = dao.selectList(lqw);
+        List<CategoryMerchantResponse> responseList = CollUtil.newArrayList();
+        if (CollUtil.isEmpty(merchantList)) {
+            return responseList;
+        }
+        Map<Integer, MerchantCategory> categoryMap = merchantCategoryService.allMap();
+        merchantList.forEach(m -> {
+            if (responseList.stream().anyMatch(e -> e.getId().equals(m.getCategoryId()))) {
+                responseList.forEach(response -> {
+                    if (response.getId().equals(m.getCategoryId())) {
+                        response.getMerchantList().add(m);
+                    }
+                });
+            } else {
+                CategoryMerchantResponse response = new CategoryMerchantResponse();
+                MerchantCategory merchantCategory = categoryMap.get(m.getCategoryId());
+                response.setId(merchantCategory.getId());
+                response.setName(merchantCategory.getName());
+                response.getMerchantList().add(m);
+                responseList.add(response);
+            }
+        });
+        return responseList;
+    }
+
+    /**
+     * 获取PC商城商户首页信息
+     *
+     * @param merId 商户ID
+     */
+    @Override
+    public MerchantPcIndexResponse getPcIndexByMerId(Integer merId) {
+        Merchant merchant = getByIdException(merId);
+        if (!merchant.getIsSwitch()) {
+            throw new CrmebException("商户未营业");
+        }
+        MerchantPcIndexResponse response = new MerchantPcIndexResponse();
+        BeanUtils.copyProperties(merchant, response);
+        MerchantInfo merchantInfo = merchantInfoService.getByMerId(merchant.getId());
+        response.setServiceType(merchantInfo.getServiceType());
+        response.setServiceLink(merchantInfo.getServiceLink());
+        response.setServicePhone(merchantInfo.getServicePhone());
+
+        List<GroupConfig> bannerConfigList = groupConfigService.findByTag(GroupConfigConstants.TAG_MERCHANT_PC_BANNER, merchant.getId(), Constants.SORT_ASC, null);
+        if (CollUtil.isNotEmpty(bannerConfigList)) {
+            List<GroupConfig> bannerList = bannerConfigList.stream().filter(e -> e.getStatus().equals(true)).collect(Collectors.toList());
+            response.setBannerList(bannerList);
+        }
+
+        response.setIsCollect(false);
+        Integer userId = userService.getUserId();
+        if (userId > 0) {
+            response.setIsCollect(userMerchantCollectService.isCollect(userId, merchant.getId()));
+            // 商户访客量统计
+            String dateStr = DateUtil.date().toString(DateConstants.DATE_FORMAT_DATE);
+            redisUtil.incrAndCreate(StrUtil.format(RedisConstants.MERCHANT_VISITORS_KEY, dateStr, merchant.getId()));
+        }
+        return response;
     }
 
     /**

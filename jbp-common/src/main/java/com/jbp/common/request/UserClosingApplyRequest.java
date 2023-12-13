@@ -21,7 +21,7 @@ import java.math.BigDecimal;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -36,9 +36,9 @@ public class UserClosingApplyRequest implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(value = "结算方式| alipay=支付宝,bank=银行卡,weixin=微信", allowableValues = "range[alipay,weixin,bank]")
+    @ApiModelProperty(value = "结算方式| alipay=支付宝,bank=银行卡,wechat=微信", allowableValues = "range[alipay,weixin,bank]")
     @NotBlank(message = "请选择结算方式， 支付宝|微信|银行卡")
-    @StringContains(limitValues = {"alipay","weixin","bank"}, message = "未知的结算方式")
+    @StringContains(limitValues = {"alipay","wechat","bank"}, message = "未知的结算方式")
     private String type;
 
     @ApiModelProperty(value = "支付宝账号")

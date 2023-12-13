@@ -14,7 +14,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -29,12 +29,12 @@ public class AdminLoginPicResponse implements Serializable {
 
     private static final long serialVersionUID = 3285713110515203543L;
 
-    @ApiModelProperty(value = "背景图")
+    @ApiModelProperty(value = "登录页背景图")
     private String backgroundImage;
 
-    @ApiModelProperty(value = "logo")
+    @ApiModelProperty(value = "登录页LOGO")
     private String loginLogo;
 
-    @ApiModelProperty(value = "左侧logo")
+    @ApiModelProperty(value = "登录页左侧logo")
     private String leftLogo;
 }

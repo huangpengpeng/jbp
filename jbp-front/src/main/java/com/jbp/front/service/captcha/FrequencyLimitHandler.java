@@ -1,10 +1,11 @@
 package com.jbp.front.service.captcha;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.jbp.common.captcha.model.common.Const;
 import com.jbp.common.captcha.model.common.RepCodeEnum;
 import com.jbp.common.captcha.model.common.ResponseModel;
 import com.jbp.common.captcha.model.vo.CaptchaVO;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 import java.util.Properties;

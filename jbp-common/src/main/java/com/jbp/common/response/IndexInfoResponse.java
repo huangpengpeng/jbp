@@ -17,7 +17,7 @@ import com.jbp.common.model.article.Article;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -52,6 +52,10 @@ public class IndexInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "客服类型:h5,hotline,message,email")
     private String consumerType;
+
     @ApiModelProperty(value = "店铺街开关")
     private String shopStreetSwitch;
+
+    @ApiModelProperty(value = "是否开启微信公众号 网页授权 true开启 false不开启")
+    private String wechatBrowserVisit;
 }

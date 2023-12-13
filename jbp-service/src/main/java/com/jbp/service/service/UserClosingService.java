@@ -5,12 +5,14 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.user.UserClosing;
 import com.jbp.common.request.*;
 
+import java.util.List;
+
 /**
  * UserExtractService 接口
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -65,6 +67,13 @@ public interface UserClosingService extends IService<UserClosing> {
      * @return 提现数据
      */
     UserClosing getUserExtractByUserId(Integer userId);
+
+    /**
+     * 获取某一天的所有数据
+     * @param date 日期：年-月-日
+     * @return List
+     */
+    List<UserClosing> findByDate(String date);
 
 //    List<UserExtract> getList(UserExtractSearchRequest request, PageParamRequest pageParamRequest);
 //

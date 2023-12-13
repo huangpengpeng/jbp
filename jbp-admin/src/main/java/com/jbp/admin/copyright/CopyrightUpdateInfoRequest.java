@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -31,6 +31,6 @@ public class CopyrightUpdateInfoRequest {
     private String companyName;
 
     @ApiModelProperty(value = "公司图片")
-    @NotBlank(message = "公司版权图片不能为空")
+//    @NotBlank(message = "公司版权图片不能为空")
     private String companyImage;
 }

@@ -1,8 +1,8 @@
 package com.jbp.front.config;
 
+import com.jbp.common.interceptor.SwaggerInterceptor;
 import com.jbp.front.filter.ResponseFilter;
 import com.jbp.front.interceptor.FrontTokenInterceptor;
-import com.jbp.common.interceptor.SwaggerInterceptor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,7 +20,7 @@ import org.springframework.web.servlet.handler.MappedInterceptor;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -85,32 +85,32 @@ public class WebConfig implements WebMvcConfigurer {
                 excludePathPatterns("/api/front/merchant/product/category/cache/tree/*").
                 excludePathPatterns("/api/front/coupon/page/list").
                 excludePathPatterns("/api/front/article/**").
-
+                excludePathPatterns("/api/front/Seckill/**").
+                excludePathPatterns("/api/front/login/token/is/exist").
                 excludePathPatterns("/api/front/wechat/**").
-                excludePathPatterns("/api/front/share").
-                excludePathPatterns("/api/front/article/**").
-                excludePathPatterns("/api/front/product/hot").
-                excludePathPatterns("/api/front/product/good").
-                excludePathPatterns("/api/front/reply/**").
-                excludePathPatterns("/api/front/user/service/**").
-                excludePathPatterns("/api/front/logistics").
-                excludePathPatterns("/api/front/groom/list/**").
-                excludePathPatterns("/api/front/config").
-                excludePathPatterns("/api/front/category").
-                excludePathPatterns("/api/front/seckill/*").
-                excludePathPatterns("/api/front/seckill/list/*").
-                excludePathPatterns("/api/front/seckill/detail/*").
-                excludePathPatterns("/api/front/ios/*").
                 excludePathPatterns("/api/front/ios/register/binding/phone").
-                excludePathPatterns("api/front/combination/index").
-                excludePathPatterns("api/front/seckill/index").
-                excludePathPatterns("api/front/bargain/index").
-                excludePathPatterns("api/front/combination/index").
-                excludePathPatterns("api/front/index/product/*").
-                excludePathPatterns("api/front/index/color/config").
-                excludePathPatterns("api/front/index/copyright/company/image").
-                excludePathPatterns("api/front/image/domain").
-                excludePathPatterns("api/front/product/leaderboard").
+                excludePathPatterns("/api/front/community/category/list").
+                excludePathPatterns("/api/front/community/user/home/page/*").
+                excludePathPatterns("/api/front/community/topic/count/*").
+                excludePathPatterns("/api/front/community/topic/recommend/list").
+                excludePathPatterns("/api/front/community/topic/list").
+                excludePathPatterns("/api/front/community/note/discover/list").
+                excludePathPatterns("/api/front/community/note/author/list/*").
+                excludePathPatterns("/api/front/community/note/user/detail/*").
+                excludePathPatterns("/api/front/community/note/reply/list/*").
+                excludePathPatterns("/api/front/community/note/topic/list").
+                excludePathPatterns("/api/front/community/note/discover/list/recommend/*").
+                excludePathPatterns("/api/front/community/note/discover/list/recommend/*").
+                excludePathPatterns("/api/front/coupon/voucher/collection/center").
+                excludePathPatterns("/api/front/product/system/coupon/pro/list").
+
+                excludePathPatterns("/api/front/coupon/voucher/collection/center").
+
+                excludePathPatterns("/api/front/pc/home/**").
+                excludePathPatterns("/api/front/merchant/pc/**").
+
+
+                excludePathPatterns("/api/front/pagediy/**").
                 excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
     }
 

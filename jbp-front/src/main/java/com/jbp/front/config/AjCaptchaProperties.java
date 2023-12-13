@@ -1,7 +1,8 @@
 package com.jbp.front.config;
 
-import com.jbp.common.captcha.model.common.CaptchaTypeEnum;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import com.jbp.common.captcha.model.common.CaptchaTypeEnum;
 
 import java.awt.*;
 

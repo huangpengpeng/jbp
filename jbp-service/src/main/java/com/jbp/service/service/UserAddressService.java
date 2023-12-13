@@ -1,9 +1,7 @@
 package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.user.UserAddress;
-import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.UserAddressRequest;
 import com.jbp.common.request.WechatAddressImportRequest;
 
@@ -14,7 +12,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -27,9 +25,9 @@ public interface UserAddressService extends IService<UserAddress> {
      * 添加用户地址
      *
      * @param request 地址请求参数
-     * @return UserAddress
+     * @return 地址ID
      */
-    Boolean create(UserAddressRequest request);
+    Integer create(UserAddressRequest request);
 
     /**
      * 用户地址编辑
@@ -82,10 +80,16 @@ public interface UserAddressService extends IService<UserAddress> {
      */
     Boolean setDefault(Integer id);
 
+//    /**
+//     * 微信地址导入
+//     * @param request 地址参数
+//     * @return 是否成功
+//     */
+//    Boolean wechatImport(WechatAddressImportRequest request);
+
     /**
-     * 微信地址导入
-     * @param request 地址参数
-     * @return 是否成功
+     * 获取微信地址信息
+     * @param request 微信地址参数
      */
-    Boolean wechatImport(WechatAddressImportRequest request);
+    UserAddress getWechatInfo(WechatAddressImportRequest request);
 }

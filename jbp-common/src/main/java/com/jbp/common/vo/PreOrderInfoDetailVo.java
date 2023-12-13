@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -82,4 +82,10 @@ public class PreOrderInfoDetailVo {
 
     @ApiModelProperty(value = "积分抵扣金额")
     private BigDecimal integralPrice = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "平台优惠券优惠金额")
+    private BigDecimal platCouponPrice = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "商户优惠券优惠金额")
+    private BigDecimal merCouponPrice = BigDecimal.ZERO;
 }

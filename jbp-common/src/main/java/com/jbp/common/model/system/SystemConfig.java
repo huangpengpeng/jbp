@@ -54,5 +54,6 @@ public class SystemConfig implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
-
+    @ApiModelProperty(value = "表单名称")
+    private String formName;
 }

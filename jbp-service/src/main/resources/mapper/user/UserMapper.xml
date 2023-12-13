@@ -28,25 +28,22 @@
                     and u.pay_count >= #{payCount}
                 </if>
             </if>
-            <if test="isWechatPublic != null">
-                and u.`is_wechat_public` = #{isWechatPublic}
+            <if test="isPromoter != null">
+                and u.`is_promoter` = #{isPromoter}
             </if>
-            <if test="isWechatRoutine != null">
-                and u.`is_wechat_routine` = #{isWechatRoutine}
-            </if>
-            <if test="status != null">
-                and u.`status` = #{status}
+            <if test="isLogoff != null">
+                and u.`is_logoff` = #{isLogoff}
             </if>
             <if test="startTime != null and startTime != ''">
                 <choose>
-                    <when test="accessType = 1">
+                    <when test="accessType == 1">
                         and u.create_time between #{startTime} and #{endTime}
                         and u.create_time = u.last_login_time
                     </when>
-                    <when test="accessType = 2">
+                    <when test="accessType == 2">
                         and u.last_login_time between #{startTime} and #{endTime}
                     </when>
-                    <when test="accessType = 3">
+                    <when test="accessType == 3">
                         and u.last_login_time not between #{startTime} and #{endTime}
                     </when>
                     <otherwise>
@@ -93,7 +90,7 @@
             #{userIdList}
         </foreach>
         <if test="keywords != '' and keywords != null ">
-            and ( u.real_name like #{keywords, jdbcType=VARCHAR} or u.nickname like #{keywords, jdbcType=VARCHAR})
+            and ( u.real_name like CONCAT('%',#{keywords},'%') or u.nickname like CONCAT('%',#{keywords},'%')
         </if>
         ORDER BY ${sortKey} ${sortValue}
     </select>

@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -29,4 +29,6 @@ public class TaskConstants {
     public static final String ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER = "alterOrderRefundByUser";
     /** 订单自动取消 Key */
     public static final String ORDER_TASK_REDIS_KEY_AUTO_CANCEL_KEY = "order_auto_cancel_key";
+    /** 秒杀商品回滚库存key **/
+    public static final String TASK_SECKILL_PRODUCT_CALLBACK_KEY = "seckill_product_callback_list";
 }

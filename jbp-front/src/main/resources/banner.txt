@@ -6,7 +6,6 @@ d8'           88      ,8P 88`8b       d8'88 88          88      ,8P
 Y8,           88    `8b   88   `8b d8'   88 88          88      `8b
  Y8a.    .a8P 88     `8b  88    `888'    88 88          88      a8P
   `"Y8888Y"'  88      `8b 88     `8'     88 88888888888 88888888P"
-文档地址:               https://doc.crmeb.com/crmebjavalandmer/crmebjavamer
-演示站WEBPC商户端：      https://adminmer.merchant.java.crmeb.net
-演示站WEBPC平台端：      https://adminmer.merchant.java.crmeb.net
-演示站H5:               https://h5.merchant.java.crmeb.net
+文档地址:        https://help.crmeb.net/crmeb_java/1748037
+演示站WEBPC：    https://admin.java.crmeb.net
+演示站H5:        https://java.crmeb.net

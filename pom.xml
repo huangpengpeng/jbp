@@ -4,17 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-        <module>crmeb-common</module>
-        <module>crmeb-service</module>
-        <module>crmeb-admin</module>
-        <module>crmeb-front</module>
+        <module>jbp-common</module>
+        <module>jbp-service</module>
+        <module>jbp-admin</module>
+        <module>jbp-front</module>
     </modules>
 
-    <groupId>com.zbkj</groupId>
-    <artifactId>crmeb</artifactId>
+    <groupId>jbp</groupId>
+    <artifactId>com.jbp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>crmeb</name>
-    <description>Crmeb project for Spring Boot</description>
+    <name>jbp</name>
+    <description>jbp project for Spring Boot</description>
 
     <properties>
         <springboot.version>2.2.6.RELEASE</springboot.version>
@@ -26,7 +26,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fastjson.version>1.2.56</fastjson.version>
         <druid.version>1.1.20</druid.version>
-        <mysql.version>5.1.24</mysql.version>
+        <mysql.version>8.0.21</mysql.version>
         <mysql.plus.version>3.3.1</mysql.plus.version>
         <weixin-java.version>3.9.0</weixin-java.version>
     </properties>

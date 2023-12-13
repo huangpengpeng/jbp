@@ -8,13 +8,14 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 商户订单详情评论响应对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -58,4 +59,13 @@ public class InfoReplyResponse implements Serializable {
 
     @ApiModelProperty(value = "商户名称")
     private String merName;
+
+    @ApiModelProperty(value = "商户是否自营：0-自营，1-非自营")
+    private Boolean merIsSelf;
+
+    @ApiModelProperty(value = "商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号")
+    private Integer productType;
+
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime;
 }

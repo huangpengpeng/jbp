@@ -4,27 +4,29 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.ProductCategoryDao;
-import com.jbp.service.service.ProductBrandCategoryService;
-import com.jbp.service.service.ProductCategoryService;
-import com.jbp.service.service.ProductService;
-import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.product.ProductCategory;
 import com.jbp.common.request.ProductCategoryRequest;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.ProCategoryCacheTree;
 import com.jbp.common.vo.ProCategoryCacheVo;
+import com.jbp.service.dao.ProductCategoryDao;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -53,6 +55,10 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
     private ProductService productService;
     @Autowired
     private ProductBrandCategoryService productBrandCategoryService;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+    @Autowired
+    private CouponService couponService;
 
     /**
      * 获取分类列表
@@ -67,7 +73,7 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
     }
 
     /**
-     * 添加商品分类
+     *
      *
      * @param request 添加参数
      * @return Boolean
@@ -84,6 +90,10 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
         if (!request.getLevel().equals(1)) {
             if (request.getPid().equals(0)) {
                 throw new CrmebException("子级菜单，父级ID不能为0");
+            }
+            ProductCategory category = getByIdException(request.getPid());
+            if (category.getLevel() >= request.getLevel()) {
+                throw new CrmebException("新增的商品分类层级异常");
             }
             productCategory.setPid(request.getPid());
         }
@@ -126,7 +136,12 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
             throw new CrmebException("有品牌关联该分类，无法删除");
         }
         category.setIsDel(true);
-        boolean update = updateById(category);
+        Boolean update = transactionTemplate.execute(e -> {
+            updateById(category);
+            // 删除商品分类相关优惠券
+            couponService.deleteByProCategoryId(category.getId());
+            return Boolean.TRUE;
+        });
         if (update) {
             redisUtil.delete(RedisConstants.PRODUCT_CATEGORY_CACHE_LIST_KEY);
             redisUtil.delete(RedisConstants.PRODUCT_CATEGORY_CACHE_MERCHANT_LIST_KEY);
@@ -186,14 +201,56 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
     @Override
     public Boolean updateShowStatus(Integer id) {
         ProductCategory category = getByIdException(id);
-        category.setIsShow(!category.getIsShow());
-        boolean update = updateById(category);
+        List<ProductCategory> categoryList = new ArrayList<>();
+        boolean showStatus = !category.getIsShow();
+        if (!category.getLevel().equals(1) && showStatus) {
+            ProductCategory parentCategory = getByIdException(category.getPid());
+            if (parentCategory.getIsShow().equals(false)) {
+                parentCategory.setIsShow(showStatus);
+                categoryList.add(parentCategory);
+            }
+            if (parentCategory.getLevel().equals(2)) {
+                ProductCategory firstCategory = getByIdException(parentCategory.getPid());
+                if (firstCategory.getIsShow().equals(false)) {
+                    firstCategory.setIsShow(showStatus);
+                    categoryList.add(firstCategory);
+                }
+            }
+        }
+
+        category.setIsShow(showStatus);
+        categoryList.add(category);
+        Boolean update = transactionTemplate.execute(e -> {
+            updateBatchById(categoryList);
+            if (category.getLevel().equals(2)) {
+                updateChildShowStatus(category.getId(), showStatus);
+            }
+            if (category.getLevel().equals(1)) {
+                List<ProductCategory> productCategoryList = findAllChildListByPid(category.getId(), category.getLevel());
+                productCategoryList.forEach(c -> c.setIsShow(showStatus));
+                updateBatchById(productCategoryList, 100);
+            }
+            return Boolean.TRUE;
+        });
+
         if (update) {
             // 平台端缓存列表不受显示状态影响
-//            redisUtil.delete(RedisConstants.PRODUCT_CATEGORY_CACHE_LIST_KEY);
+            redisUtil.delete(RedisConstants.PRODUCT_CATEGORY_CACHE_LIST_KEY);
             redisUtil.delete(RedisConstants.PRODUCT_CATEGORY_CACHE_MERCHANT_LIST_KEY);
         }
         return update;
+    }
+
+    /**
+     * 更新子级显示状态
+     *
+     * @param pid 父级ID
+     */
+    private void updateChildShowStatus(Integer pid, Boolean showStatus) {
+        LambdaUpdateWrapper<ProductCategory> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(ProductCategory::getIsShow, showStatus);
+        wrapper.eq(ProductCategory::getPid, pid);
+        update(wrapper);
     }
 
     /**
@@ -293,6 +350,7 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
 
     /**
      * 获取首页第三级分类数据
+     *
      * @param firstId 第一级分类id
      */
     @Override
@@ -302,12 +360,66 @@ public class ProductCategoryServiceImpl extends ServiceImpl<ProductCategoryDao, 
 
     /**
      * 获取第三级分类数据
+     *
      * @param firstId 第一级分类id
-     * @param limit 查询数量，0全部
+     * @param limit   查询数量，0全部
      */
     @Override
     public List<ProductCategory> getThirdCategoryByFirstId(Integer firstId, Integer limit) {
         return dao.getThirdCategoryByFirstId(firstId, limit);
+    }
+
+    /**
+     * 通过分类id列表获取分类map
+     *
+     * @param cateIdList 分类id列表
+     * @return Map
+     */
+    @Override
+    public Map<Integer, ProductCategory> getMapByIdList(List<Integer> cateIdList) {
+        LambdaQueryWrapper<ProductCategory> lqw = Wrappers.lambdaQuery();
+        lqw.select(ProductCategory::getId, ProductCategory::getName);
+        lqw.in(ProductCategory::getId, cateIdList);
+        List<ProductCategory> categoryList = dao.selectList(lqw);
+        Map<Integer, ProductCategory> categoryMap = CollUtil.newHashMap();
+        categoryList.forEach(c -> {
+            categoryMap.put(c.getId(), c);
+        });
+        return categoryMap;
+    }
+
+    /**
+     * 获取分类名称通过Ids
+     *
+     * @param proCategoryIds 分类ID字符，逗号分隔
+     * @return 分类名称字符，逗号分隔
+     */
+    @Override
+    public String getNameStrByIds(String proCategoryIds) {
+        LambdaQueryWrapper<ProductCategory> lqw = Wrappers.lambdaQuery();
+        lqw.select(ProductCategory::getName);
+        lqw.in(ProductCategory::getId, CrmebUtil.stringToArray(proCategoryIds));
+        List<ProductCategory> categoryList = dao.selectList(lqw);
+        return categoryList.stream().map(ProductCategory::getName).collect(Collectors.joining(","));
+    }
+
+    /**
+     * 通过子ID获取所有父ID
+     * @param childIdList 子分类ID
+     */
+    @Override
+    public List<Integer> findParentIdByChildIds(List<Integer> childIdList) {
+        LambdaQueryWrapper<ProductCategory> lqw = Wrappers.lambdaQuery();
+        lqw.in(ProductCategory::getId, childIdList);
+        List<ProductCategory> list = dao.selectList(lqw);
+        return list.stream().map(ProductCategory::getPid).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductCategory> findByIdList(List<Integer> idList) {
+        LambdaQueryWrapper<ProductCategory> lqw = Wrappers.lambdaQuery();
+        lqw.in(ProductCategory::getId, idList);
+        return dao.selectList(lqw);
     }
 
     private ProductCategory getByIdException(Integer id) {

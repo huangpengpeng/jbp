@@ -2,7 +2,6 @@ package com.jbp.common.page;
 
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.Constants;
-import com.jbp.common.response.UserCouponResponse;
 
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -16,7 +15,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

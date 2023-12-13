@@ -1,16 +1,15 @@
 package com.jbp.front.controller;
 
 
-import com.github.pagehelper.PageInfo;
-import com.jbp.front.service.FrontProductService;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantProductSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.front.service.FrontProductService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -38,6 +37,12 @@ public class ProductController {
     @Autowired
     private FrontProductService productService;
 
+    @ApiOperation(value = "商品分页列表前置信息")
+    @RequestMapping(value = "/list/before", method = RequestMethod.GET)
+    public CommonResult<ProductSearchBeforeResponse> getListBefore(@Validated ProductFrontSearchRequest request) {
+        return CommonResult.success(productService.getListBefore(request.getKeyword()));
+    }
+
     @ApiOperation(value = "商品分页列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<ProductFrontResponse>> getList(@ModelAttribute @Validated ProductFrontSearchRequest request,
@@ -47,9 +52,10 @@ public class ProductController {
 
     @ApiOperation(value = "商品详情")
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @ApiImplicitParam(name = "type", value = "商品类型:normal=普通商品,video=视频号商品,seckill=秒杀商品", defaultValue = "normal")
     public CommonResult<ProductDetailResponse> getDetail(@Validated @PathVariable Integer id,
                                                          @RequestParam(value = "type", required = false) String type) {
-        return CommonResult.success(productService.getDetail(id,type));
+        return CommonResult.success(productService.getDetail(id, type));
     }
 
     @ApiOperation(value = "商品评论列表")
@@ -72,24 +78,6 @@ public class ProductController {
         return CommonResult.success(productService.getProductReply(id));
     }
 
-//    /**
-//     * 商品规格详情
-//     */
-//    @ApiOperation(value = "商品规格详情")
-//    @RequestMapping(value = "/sku/detail/{id}", method = RequestMethod.GET)
-//    public CommonResult<ProductDetailResponse> getSkuDetail(@PathVariable Integer id) {
-//        return CommonResult.success(productService.getSkuDetail(id));
-//    }
-//
-//    /**
-//     * 商品排行榜
-//     */
-//    @ApiOperation(value = "商品排行榜")
-//    @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
-//    public CommonResult<List<StoreProduct>> getLeaderboard() {
-//        return CommonResult.success(productService.getLeaderboard());
-//    }
-
     @ApiOperation(value = "商户商品列表")
     @RequestMapping(value = "/merchant/pro/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<ProductCommonResponse>> getMerchantProList(@ModelAttribute @Validated MerchantProductSearchRequest request,
@@ -97,16 +85,34 @@ public class ProductController {
         return CommonResult.success(CommonPage.restPage(productService.getMerchantProList(request, pageParamRequest)));
     }
 
-    @ApiOperation(value = "优惠券商品列表")
+    @ApiOperation(value = "我的优惠券商品列表")
     @RequestMapping(value = "/coupon/pro/list", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "keyword", value = "商品名称"),
-            @ApiImplicitParam(name = "page", value = "页码", required = true),
-            @ApiImplicitParam(name = "limit", value = "每页数量", required = true)
-    })
-    public CommonResult<PageInfo<ProductFrontResponse>> getCouponProList(@ModelAttribute @Validated CouponProductSearchRequest request,
-                                                                         @ModelAttribute @Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(productService.getCouponProList(request, pageParamRequest));
+    public CommonResult<CommonPage<ProductFrontResponse>> getCouponProList(@ModelAttribute @Validated CouponProductSearchRequest request) {
+        return CommonResult.success(CommonPage.restPage(productService.getCouponProList(request)));
+    }
+
+    @ApiOperation(value = "已购商品列表")
+    @RequestMapping(value = "/purchased/list", method = RequestMethod.GET)
+    public CommonPage<ProductSimpleResponse> getPurchasedList(@ModelAttribute @Validated PageParamRequest pageParamRequest) {
+        return CommonPage.restPage(productService.findPurchasedList(pageParamRequest));
+    }
+
+    @ApiOperation(value = "足迹商品列表")
+    @RequestMapping(value = "/browse/list", method = RequestMethod.GET)
+    public CommonPage<ProductSimpleResponse> getBrowseList(@ModelAttribute @Validated PageParamRequest pageParamRequest) {
+        return CommonPage.restPage(productService.findBrowseList(pageParamRequest));
+    }
+
+    @ApiOperation(value = "系统优惠券商品列表")
+    @RequestMapping(value = "/system/coupon/pro/list", method = RequestMethod.GET)
+    public CommonResult<CommonPage<ProductFrontResponse>> findCouponProductList(@Validated SystemCouponProductSearchRequest request) {
+        return CommonResult.success(CommonPage.restPage(productService.findCouponProductList(request)));
+    }
+
+    @ApiOperation(value = "推荐商品分页列表")
+    @RequestMapping(value = "/recommend/list", method = RequestMethod.GET)
+    public CommonResult<CommonPage<RecommendProductResponse>> findRecommendPage(@ModelAttribute @Validated PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(productService.findRecommendPage(pageParamRequest)));
     }
 }
 

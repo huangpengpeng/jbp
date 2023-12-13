@@ -11,8 +11,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.ProductReplyDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -34,6 +32,8 @@ import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.ProductReplyDao;
+import com.jbp.service.service.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -201,6 +201,10 @@ public class ProductReplyServiceImpl extends ServiceImpl<ProductReplyDao, Produc
     public Boolean virtualCreate(ProductReplyVirtualRequest request) {
         Product product = productService.getById(request.getProductId());
         if (ObjectUtil.isNull(product) || product.getIsDel()) {
+            throw new CrmebException("商品不存在");
+        }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         ProductAttrValue attrValue = attrValueService.getById(request.getAttrValueId());
@@ -385,16 +389,28 @@ public class ProductReplyServiceImpl extends ServiceImpl<ProductReplyDao, Produc
      */
     @Override
     public Boolean delete(Integer id) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         LambdaUpdateWrapper<ProductReply> wrapper = new LambdaUpdateWrapper<>();
         wrapper.set(ProductReply::getIsDel, 1);
         wrapper.eq(ProductReply::getId, id);
+        if (admin.getMerId() > 0) {
+            wrapper.eq(ProductReply::getMerId, admin.getMerId());
+        }
         return update(wrapper);
     }
 
+    /**
+     * 商品评论回复
+     * @param request 回复参数
+     */
     @Override
     public Boolean comment(ProductReplyCommentRequest request) {
         ProductReply reply = getById(request.getId());
         if (ObjectUtil.isNull(reply) || reply.getIsDel()) {
+            throw new CrmebException("评论不存在");
+        }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(reply.getMerId())) {
             throw new CrmebException("评论不存在");
         }
         if (reply.getIsReply()) {

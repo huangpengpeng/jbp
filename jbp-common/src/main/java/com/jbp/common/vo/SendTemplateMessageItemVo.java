@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -23,6 +23,12 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @ApiModel(value="SendTemplateMessageItemVo对象", description="微信模板发送数据类")
 public class SendTemplateMessageItemVo {
+
+    public SendTemplateMessageItemVo() {}
+
+    public SendTemplateMessageItemVo(String value) {
+        this.value = value;
+    }
 
     @ApiModelProperty(value = "显示的文字内容", required = true)
     private String value;

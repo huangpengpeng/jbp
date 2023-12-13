@@ -8,16 +8,16 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.SystemGroupDataDao;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemFormTempService;
-import com.jbp.service.service.SystemGroupDataService;
 import com.jbp.common.model.system.SystemGroupData;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.SystemFormItemCheckRequest;
 import com.jbp.common.request.SystemGroupDataRequest;
 import com.jbp.common.request.SystemGroupDataSearchRequest;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.dao.SystemGroupDataDao;
+import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.SystemFormTempService;
+import com.jbp.service.service.SystemGroupDataService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -162,7 +162,7 @@ public class SystemGroupDataServiceImpl extends ServiceImpl<SystemGroupDataDao, 
         LambdaQueryWrapper<SystemGroupData> lqw = Wrappers.lambdaQuery();
         lqw.eq(SystemGroupData::getGid, gid);
         lqw.eq(SystemGroupData::getStatus, true);
-        lqw.orderByDesc(SystemGroupData::getSort).orderByAsc(SystemGroupData::getId);
+        lqw.orderByAsc(SystemGroupData::getSort).orderByAsc(SystemGroupData::getId);
         List<SystemGroupData> list = dao.selectList(lqw);
 
         List<HashMap<String, Object>> arrayList = new ArrayList<>();
@@ -223,7 +223,7 @@ public class SystemGroupDataServiceImpl extends ServiceImpl<SystemGroupDataDao, 
     public List<SystemGroupData> findListByGid(Integer gid) {
         LambdaQueryWrapper<SystemGroupData> lqw = Wrappers.lambdaQuery();
         lqw.eq(SystemGroupData::getGid, gid);
-        lqw.orderByDesc(SystemGroupData::getSort).orderByAsc(SystemGroupData::getId);
+        lqw.orderByAsc(SystemGroupData::getSort).orderByAsc(SystemGroupData::getId);
         return dao.selectList(lqw);
     }
 

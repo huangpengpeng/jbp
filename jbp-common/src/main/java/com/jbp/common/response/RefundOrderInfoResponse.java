@@ -11,12 +11,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.jbp.common.model.order.RefundOrderStatus;
+
 /**
  * 退款订单详情响应对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -37,8 +39,11 @@ public class RefundOrderInfoResponse implements Serializable {
     @ApiModelProperty(value = "订单号")
     private String orderNo;
 
-    @ApiModelProperty(value = "商户ID")
-    private Integer merId;
+    @ApiModelProperty(value = "售后类型：1-仅退款，2-退货退款")
+    private Integer afterSalesType;
+
+//    @ApiModelProperty(value = "商户ID")
+//    private Integer merId;
 
     @ApiModelProperty(value = "退款原因")
     private String refundReasonWap;
@@ -49,7 +54,7 @@ public class RefundOrderInfoResponse implements Serializable {
     @ApiModelProperty(value = "退款用户说明")
     private String refundReasonWapExplain;
 
-    @ApiModelProperty(value = "退款状态：0:待审核 1:审核未通过 2：退款中 3:已退款")
+    @ApiModelProperty(value = "售后状态：0:待审核 1:商家拒绝 2：退款中 3:已退款 4:用户退货 5:商家待收货 6:已撤销")
     private Integer refundStatus;
 
     @ApiModelProperty(value = "拒绝退款说明")
@@ -82,10 +87,33 @@ public class RefundOrderInfoResponse implements Serializable {
     @ApiModelProperty(value = "商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号")
     private Integer productType;
 
-    @ApiModelProperty(value = "退还使用积分")
-    private Integer refundUseIntegral;
+//    @ApiModelProperty(value = "退还使用积分")
+//    private Integer refundUseIntegral;
+//
+//    @ApiModelProperty(value = "扣除赠送积分")
+//    private Integer refundGainIntegral;
 
-    @ApiModelProperty(value = "扣除赠送积分")
-    private Integer refundGainIntegral;
+    @ApiModelProperty(value = "收货人姓名")
+    private String receiver;
 
+    @ApiModelProperty(value = "收货人电话")
+    private String receiverPhone;
+
+    @ApiModelProperty(value = "收货人详细地址")
+    private String receiverAddressDetail;
+
+    @ApiModelProperty(value = "退货类型：0-不退货 1-快递退回，2-到店退货")
+    private Integer returnGoodsType;
+
+    @ApiModelProperty(value = "物流公司名称")
+    private String expressName;
+
+    @ApiModelProperty(value = "运单号")
+    private String trackingNumber;
+
+    @ApiModelProperty(value = "用户联系电话")
+    private String telephone;
+
+    @ApiModelProperty(value = "退款单日志列表")
+    private List<RefundOrderStatus> statusList;
 }

@@ -76,4 +76,24 @@ public class OrderProfitSharing implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "平台优惠券金额")
+    private BigDecimal platCouponPrice;
+
+    @ApiModelProperty(value = "退还平台优惠券补贴金额")
+    private BigDecimal refundPlatCouponPrice;
+
+    @ApiModelProperty(value = "退还平台分账金额")
+    private BigDecimal refundProfitSharingPlatPrice;
+
+    @ApiModelProperty(value = "退还商户分账金额")
+    private BigDecimal refundProfitSharingMerPrice;
+
+    @ApiModelProperty(value = "退还一级返佣金额")
+    private BigDecimal refundFirstBrokerageFee;
+
+    @ApiModelProperty(value = "退还二级返佣金额")
+    private BigDecimal refundSecondBrokerageFee;
+
+    @ApiModelProperty(value = "运费金额")
+    private BigDecimal freightFee;
 }

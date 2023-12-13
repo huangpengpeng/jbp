@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -32,10 +32,10 @@ public class BalanceRecordConstants {
     public static final String BALANCE_RECORD_REMARK_ORDER = "用户订单付款成功,扣余额{}元";
     /** 余额记录备注—用户订单退款成功 */
     public static final String BALANCE_RECORD_REMARK_ORDER_REFUND = "用户订单退款成功,返还余额{}元";
-    /** 余额记录备注—后台积分操作添加 */
-    public static final String BALANCE_RECORD_REMARK_SYSTEM_ADD = "后台积分操作,添加余额{}元";
-    /** 余额记录备注—后台积分操作减少 */
-    public static final String BALANCE_RECORD_REMARK_SYSTEM_SUB = "后台积分操作,减少余额{}元";
+    /** 余额记录备注—后台操作添加 */
+    public static final String BALANCE_RECORD_REMARK_SYSTEM_ADD = "后台操作,添加余额{}元";
+    /** 余额记录备注—后台操作减少 */
+    public static final String BALANCE_RECORD_REMARK_SYSTEM_SUB = "后台操作,减少余额{}元";
     /** 余额记录备注—充值 */
     public static final String BALANCE_RECORD_REMARK_RECHARGE = "充值成功，余额增加{}元";
     /** 余额记录备注—佣金转余额 */

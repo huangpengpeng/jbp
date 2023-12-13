@@ -7,13 +7,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 简单商品Vo对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -35,5 +36,11 @@ public class SimpleProductVo implements Serializable {
     private String image;
 
     @ApiModelProperty(value = "商品名称")
-    private String storeName;
+    private String name;
+
+    @ApiModelProperty(value = "商品价格")
+    private BigDecimal price;
+
+    @ApiModelProperty(value = "库存")
+    private Integer stock;
 }

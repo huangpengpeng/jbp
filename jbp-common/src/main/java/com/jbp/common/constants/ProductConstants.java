@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -74,4 +74,9 @@ public class ProductConstants {
     public static final Integer AUDIT_STATUS_SUCCESS = 2;
     /** 商品审核状态-审核拒绝 */
     public static final Integer AUDIT_STATUS_FAIL = 3;
+
+    /** 活动边框 */
+    public static final String PRODUCT_ACTIVITY_STYLE_BORDER = "activity_style_border";
+    /** 活动背景 */
+    public static final String PRODUCT_ACTIVITY_STYLE_BACKGROUND = "activity_style_background";
 }

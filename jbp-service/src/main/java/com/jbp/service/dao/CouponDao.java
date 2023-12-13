@@ -21,4 +21,35 @@ public interface CouponDao extends BaseMapper<Coupon> {
      * @param map 查询参数
      */
     List<Coupon> getH5ListBySearch(Map<String, Object> map);
+
+    /**
+     * 获取所有适用金额的商户优惠券
+     * @param map 查询参数
+     */
+    List<Coupon> findByMerIdAndMoney(Map<String, Object> map);
+
+    /**
+     * 获取所有适用金额的平台优惠券
+     * @param map 查询参数
+     */
+    List<Coupon> findPlatByMerIdAndMoney(Map<String, Object> map);
+
+    /**
+     * 获取可用优惠券 为DIY首页
+     * @param limit 配合前端样式获取对应条数
+     * @return 可用优惠券列表
+     */
+    List<Coupon> getCouponListForDiyHomePage(Integer limit);
+
+    /**
+     * 获取所有适用金额的商户优惠券（多商品）
+     * @param map 查询参数
+     */
+    List<Coupon> findManyByMerIdAndMoney(Map<String, Object> map);
+
+    /**
+     * 获取所有适用金额的平台优惠券（多商品）
+     * @param map 查询参数
+     */
+    List<Coupon> findManyPlatByMerIdAndMoney(Map<String, Object> map);
 }

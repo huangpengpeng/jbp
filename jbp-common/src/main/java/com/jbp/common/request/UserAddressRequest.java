@@ -19,7 +19,7 @@ import java.io.Serializable;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -51,6 +51,10 @@ public class UserAddressRequest implements Serializable {
     @NotBlank(message = "收货人所在省不能为空")
     private String province;
 
+    @ApiModelProperty(value = "省份ID")
+    @NotNull(message = "省份ID不能为空")
+    private Integer provinceId;
+
     @ApiModelProperty(value = "收货人所在市")
     @NotBlank(message = "收货人所在市不能为空")
     private String city;
@@ -68,7 +72,7 @@ public class UserAddressRequest implements Serializable {
     private Integer districtId;
 
     @ApiModelProperty(value = "收货人所在街道")
-    @NotBlank(message = "收货人所在街道不能为空")
+//    @NotBlank(message = "收货人所在街道不能为空")
     private String street;
 
     @ApiModelProperty(value = "收货人详细地址", required = true)

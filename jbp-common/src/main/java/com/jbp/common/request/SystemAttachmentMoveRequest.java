@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -26,7 +26,7 @@ public class SystemAttachmentMoveRequest {
     @NotNull(message = "父级id不能为空")
     private Integer pid;
 
-    @ApiModelProperty(value = "附件id")
+    @ApiModelProperty(value = "附件id,英文逗号拼接")
     @NotBlank(message = "请选择附件")
     private String attrId;
 }

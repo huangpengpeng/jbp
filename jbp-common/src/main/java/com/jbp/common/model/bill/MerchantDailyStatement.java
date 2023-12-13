@@ -60,7 +60,7 @@ public class MerchantDailyStatement implements Serializable {
     @ApiModelProperty(value = "支出笔数")
     private Integer payoutNum;
 
-    @ApiModelProperty(value = "商户退款金额")
+    @ApiModelProperty(value = "订单退款金额")
     private BigDecimal refundAmount;
 
     @ApiModelProperty(value = "退款笔数")
@@ -72,5 +72,36 @@ public class MerchantDailyStatement implements Serializable {
     @ApiModelProperty(value = "日期：年-月-日")
     private String dataDate;
 
+    @ApiModelProperty(value = "平台优惠券补贴金额")
+    private BigDecimal platCouponPrice;
 
+    @ApiModelProperty(value = "订单积分抵扣金额")
+    private BigDecimal integralPrice;
+
+    @ApiModelProperty(value = "订单实际退款金额")
+    private BigDecimal orderRefundPrice;
+
+    @ApiModelProperty(value = "退还平台优惠券补贴金额")
+    private BigDecimal refundPlatCouponPrice;
+
+    @ApiModelProperty(value = "退还积分抵扣金额")
+    private BigDecimal refundIntegralPrice;
+
+    @ApiModelProperty(value = "退还手续费金额")
+    private BigDecimal refundHandlingFee;
+
+    @ApiModelProperty(value = "分佣")
+    private BigDecimal brokeragePrice;
+
+    @ApiModelProperty(value = "退还佣金")
+    private BigDecimal refundBrokeragePrice;
+
+    @ApiModelProperty(value = "退还商户分账金额")
+    private BigDecimal refundMerchantTransferAmount;
+
+    @ApiModelProperty(value = "运费金额")
+    private BigDecimal freightFee;
+
+    @ApiModelProperty(value = "退运费金额")
+    private BigDecimal refundFreightFee;
 }

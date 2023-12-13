@@ -45,6 +45,9 @@ public class UserAddress implements Serializable {
     @ApiModelProperty(value = "收货人所在省")
     private String province;
 
+    @ApiModelProperty(value = "省份ID")
+    private Integer provinceId;
+
     @ApiModelProperty(value = "收货人所在市")
     private String city;
 

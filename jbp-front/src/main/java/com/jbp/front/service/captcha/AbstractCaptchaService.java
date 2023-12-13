@@ -1,5 +1,9 @@
 package com.jbp.front.service.captcha;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jbp.common.captcha.model.common.Const;
 import com.jbp.common.captcha.model.common.RepCodeEnum;
 import com.jbp.common.captcha.model.common.ResponseModel;
@@ -8,9 +12,6 @@ import com.jbp.common.captcha.util.AESUtil;
 import com.jbp.common.captcha.util.CacheUtil;
 import com.jbp.common.captcha.util.ImageUtils;
 import com.jbp.common.captcha.util.MD5Util;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;

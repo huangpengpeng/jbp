@@ -1,20 +1,20 @@
 package com.jbp.service.service;
 
 
+import java.util.List;
+
 import com.jbp.common.vo.wxvedioshop.*;
 import com.jbp.common.vo.wxvedioshop.cat_brand.ShopAccountUpdateVo;
 import com.jbp.common.vo.wxvedioshop.cat_brand.ShopBrandVo;
 import com.jbp.common.vo.wxvedioshop.cat_brand.ShopCatDetailVo;
 import com.jbp.common.vo.wxvedioshop.cat_brand.ShopCatListResponse;
 
-import java.util.List;
-
 /**
  * 视频号交易组件服务——商品部分
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------

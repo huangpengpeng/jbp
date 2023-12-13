@@ -1,18 +1,18 @@
 package com.jbp.front.controller;
 
+import com.jbp.common.request.BaseUploadRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.service.UploadService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -60,6 +60,11 @@ public class UserUploadController {
         return CommonResult.success(uploadService.fileUpload(multipart, model, pid, null));
     }
 
+    @ApiOperation(value = "base64图片上传")
+    @RequestMapping(value = "/base64", method = RequestMethod.POST)
+    public CommonResult<FileResultVo> base64Upload(@RequestBody @Validated BaseUploadRequest request) {
+        return CommonResult.success(uploadService.base64Upload(request.getBase64Url(), request.getModel(), request.getPid()));
+    }
 }
 
 

@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -80,4 +80,8 @@ public class CreateOrderResponseVo {
     private String extra;
 
     private Object transJsConfig;
+
+    @ApiModelProperty(value = "trade_type=NATIVE时有返回，此url用于生成支付二维码，然后提供给用户进行扫码支付。时效性为2小时")
+    @JsonProperty(value = "code_url")
+    private String codeUrl;
 }

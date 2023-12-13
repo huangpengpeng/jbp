@@ -3,13 +3,13 @@ package com.jbp.service.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
-import com.jbp.service.service.SystemAdminService;
-import com.jbp.service.service.SystemMenuService;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.admin.SystemMenu;
 import com.jbp.common.model.admin.SystemPermissions;
 import com.jbp.common.vo.LoginUserVo;
+import com.jbp.service.service.SystemAdminService;
+import com.jbp.service.service.SystemMenuService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         } else {
             menuList = systemMenuService.findPermissionByUserId(user.getId());
         }
-        menuList = menuList.stream().filter(e -> StrUtil.isNotBlank(e.getPerms())).collect(Collectors.toList());
+        menuList = menuList.stream().filter(e -> StrUtil.isNotBlank(e.getPerms())).filter(SystemMenu::getIsShow).collect(Collectors.toList());
         List<SystemPermissions> permissionsList = menuList.stream().map(e -> {
             SystemPermissions permissions = new SystemPermissions();
             permissions.setId(e.getId());

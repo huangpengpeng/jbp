@@ -1,14 +1,15 @@
 package com.jbp.front.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.front.service.LoginService;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserToken;
 import com.jbp.common.request.*;
@@ -16,10 +17,13 @@ import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.token.FrontTokenComponent;
 import com.jbp.common.utils.*;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.WeChatAuthorizeLoginUserInfoVo;
 import com.jbp.common.vo.WeChatMiniAuthorizeVo;
 import com.jbp.common.vo.WeChatOauthToken;
+import com.jbp.front.service.LoginService;
 import com.jbp.service.service.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -58,8 +64,6 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private FrontTokenComponent tokenComponent;
     @Autowired
-    private RestTemplateUtil restTemplateUtil;
-    @Autowired
     private SmsService smsService;
     @Autowired
     private SystemConfigService systemConfigService;
@@ -69,6 +73,8 @@ public class LoginServiceImpl implements LoginService {
     private WechatService wechatService;
     @Autowired
     private UserTokenService userTokenService;
+    @Autowired
+    private CouponService couponService;
 
     /**
      * 发送短信验证码
@@ -124,7 +130,7 @@ public class LoginServiceImpl implements LoginService {
         User user = userService.getByPhone(loginRequest.getPhone());
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
-            return getLoginResponse(user);
+            return getLoginResponse_V1_3(user, true);
         }
         return commonLogin(user, spreadPid);
 
@@ -275,6 +281,7 @@ public class LoginServiceImpl implements LoginService {
             user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
             user.setSex(0);
             user.setAddress("");
+            user.setLevel(1);
         }
         switch (request.getType()) {
             case UserConstants.REGISTER_TYPE_WECHAT:
@@ -317,7 +324,7 @@ public class LoginServiceImpl implements LoginService {
             logger.error(StrUtil.format("微信用户注册生成失败，openid = {}, key = {}", registerThirdUserRequest.getOpenId(), request.getKey()));
             throw new CrmebException(StrUtil.format("微信用户注册生成失败，openid = {}, key = {}", registerThirdUserRequest.getOpenId(), request.getKey()));
         }
-        return getLoginResponse(finalUser);
+        return getLoginResponse_V1_3(finalUser, isNew);
     }
 
     /**
@@ -353,12 +360,21 @@ public class LoginServiceImpl implements LoginService {
             }
             checkValidateCode(request.getPhone(), request.getCaptcha());
         } else {
-            // 参数校验
+            // 小程序自填手机号校验
+            if (StrUtil.isNotBlank(request.getCaptcha())) {
+                if (StrUtil.isBlank(request.getPhone())) {
+                    throw new CrmebException("手机号不能为空");
+                }
+                checkValidateCode(request.getPhone(), request.getCaptcha());
+                return;
+            }
+            //  获取微信小程序手机号 参数校验
             if (StrUtil.isBlank(request.getCode())) {
                 throw new CrmebException("小程序获取手机号code不能为空");
             }
             if (StrUtil.isBlank(request.getEncryptedData())) {
-                throw new CrmebException("小程序获取手机号加密数据不能为空");
+//                throw new CrmebException("小程序获取手机号加密数据不能为空");
+                throw new CrmebException("请认证微信账号：获取手机号码失败");
             }
             if (StrUtil.isBlank(request.getIv())) {
                 throw new CrmebException("小程序获取手机号加密算法的初始向量不能为空");
@@ -413,8 +429,19 @@ public class LoginServiceImpl implements LoginService {
      */
     @Override
     public FrontLoginConfigResponse getLoginConfig() {
+        List<String> keyList = new ArrayList<>();
+        keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
+        keyList.add(SysConfigConstants.WECHAT_PUBLIC_LOGIN_TYPE);
+        keyList.add(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION);
+        keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
+        keyList.add(SysConfigConstants.CONFIG_KEY_SITE_NAME);
+        MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
-        response.setLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
+        response.setLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
+        response.setWechatBrowserVisit(record.getStr(SysConfigConstants.WECHAT_PUBLIC_LOGIN_TYPE));
+        response.setRoutinePhoneVerification(record.getStr(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION));
+        response.setMobileLoginLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
+        response.setSiteName(record.getStr(SysConfigConstants.CONFIG_KEY_SITE_NAME));
         return response;
     }
 
@@ -506,6 +533,7 @@ public class LoginServiceImpl implements LoginService {
         user.setAddress("");
         user.setIsBindingIos(true);
         user.setLastLoginTime(CrmebDateUtil.nowDateTime());
+        user.setLevel(1);
         Boolean execute = transactionTemplate.execute(e -> {
             userService.save(user);
             userTokenService.bind(loginRequest.getOpenId(), UserConstants.USER_TOKEN_TYPE_IOS, user.getId());
@@ -514,7 +542,17 @@ public class LoginServiceImpl implements LoginService {
         if (!execute) {
             throw new CrmebException("App用户注册生成失败，nickName = " + user.getNickname());
         }
-        return getLoginResponse(user);
+        return getLoginResponse_V1_3(user, true);
+    }
+
+    /**
+     * 校验token是否有效
+     * @return true 有效， false 无效
+     */
+    @Override
+    public Boolean tokenIsExist() {
+        Integer userId = userService.getUserId();
+        return userId > 0;
     }
 
     private LoginResponse commonLogin(User user, Integer spreadPid) {
@@ -540,6 +578,28 @@ public class LoginServiceImpl implements LoginService {
         loginResponse.setNikeName(user.getNickname());
         loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
         loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
+        loginResponse.setAvatar(user.getAvatar());
+        return loginResponse;
+    }
+
+
+    private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
+        //生成token
+        LoginResponse loginResponse = new LoginResponse();
+        String token = tokenComponent.createToken(user);
+        loginResponse.setToken(token);
+        loginResponse.setId(user.getId());
+        loginResponse.setNikeName(user.getNickname());
+        loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
+        loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
+        loginResponse.setAvatar(user.getAvatar());
+        if (isNew) {
+            loginResponse.setIsNew(true);
+            List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
+            if (CollUtil.isNotEmpty(couponList)) {
+                loginResponse.setNewPeopleCouponList(couponList);
+            }
+        }
         return loginResponse;
     }
 }

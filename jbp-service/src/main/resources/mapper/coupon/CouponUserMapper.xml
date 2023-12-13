@@ -3,17 +3,16 @@
 <mapper namespace="com.jbp.service.dao.CouponUserDao">
 
     <select id="findListByPreOrder" resultType="com.jbp.common.response.CouponUserOrderResponse" parameterType="Map">
-        SELECT cu.id,cu.coupon_id as couponId,cu.mer_id as merId,cu.name,cu.category,cu.money,cu.min_price as minPrice,
-        cu.status,cu.start_time as startTime,cu.end_time as endTime,cu.use_time as useTime
+        SELECT cu.*
         FROM eb_coupon_user AS cu
         where
         cu.`status` = 0
+        and cu.mer_id = #{merId}
         <if test="merId != null">
-            and cu.mer_id = #{merId}
         </if>
         and (cu.min_price = 0
+        or cu.min_price &lt;= #{maxPrice}
         <if test="maxPrice != null">
-            or cu.min_price &lt;= #{maxPrice}
         </if>
         )
         <if test="date != null">
@@ -27,4 +26,103 @@
         order by cu.id desc
     </select>
 
+    <select id="findByUidAndMerIdAndMoneyAndProList" resultType="com.jbp.common.model.coupon.CouponUser" parameterType="Map">
+        SELECT cu.*
+        FROM eb_coupon_user AS cu
+        left join eb_coupon AS c on cu.coupon_id  = c.id
+        where
+        cu.uid = #{userId}
+        and cu.mer_id = #{merId}
+        and cu.`status` = 0
+        and (cu.min_price = 0 or cu.min_price &lt;= #{money})
+        and cu.money &lt; #{money}
+        and cu.start_time &lt;= #{nowDate}
+        and cu.end_time &gt;= #{nowDate}
+        and (cu.category = 1 or (cu.category = 2 and find_in_set(#{proId}, c.linked_data)))
+        order by cu.money desc, cu.id desc
+    </select>
+
+    <select id="findPlatByUidAndMerIdAndMoneyAndProList" resultType="com.jbp.common.model.coupon.CouponUser" parameterType="Map">
+        SELECT cu.*
+        FROM eb_coupon_user AS cu
+        left join eb_coupon AS c on cu.coupon_id  = c.id
+        where
+        cu.uid = #{userId}
+        and cu.mer_id = 0
+        and cu.`status` = 0
+        and (cu.min_price = 0 or cu.min_price &lt;= #{money})
+        and cu.money &lt; #{money}
+        and cu.start_time &lt;= #{nowDate}
+        and cu.end_time &gt;= #{nowDate}
+        and (
+        cu.category = 3 or
+        (cu.category = 2 and find_in_set(#{proId}, c.linked_data)) or
+        (cu.category = 4 and
+        <foreach collection="proCategoryIdList" separator="or" index="index" close=")" open="(" item="proCategoryId">
+            find_in_set(#{proCategoryId}, c.linked_data)
+        </foreach>
+        ) or
+        (cu.category = 5 and find_in_set(#{brandId}, c.linked_data)) or
+        (cu.category = 6 and find_in_set(#{merId}, c.linked_data))
+        )
+        order by cu.money desc, cu.id desc
+    </select>
+
+    <select id="findManyByUidAndMerIdAndMoneyAndProList" resultType="com.jbp.common.model.coupon.CouponUser" parameterType="Map">
+        SELECT cu.*
+        FROM eb_coupon_user AS cu
+        left join eb_coupon AS c on cu.coupon_id  = c.id
+        where
+        cu.uid = #{userId}
+        and cu.mer_id = #{merId}
+        and cu.`status` = 0
+        and (cu.min_price = 0 or cu.min_price &lt;= #{money})
+        and cu.money &lt; #{money}
+        and cu.start_time &lt;= #{nowDate}
+        and cu.end_time &gt;= #{nowDate}
+        and (cu.category = 1 or (cu.category = 2 and
+        <foreach collection="proIdList" item="proId" open="(" close=")" index="index" separator="or">
+            find_in_set(#{proId}, c.linked_data)
+        </foreach>
+        ))
+        order by cu.money desc, cu.id desc
+    </select>
+
+    <select id="findManyPlatByUidAndMerIdAndMoneyAndProList" resultType="com.jbp.common.model.coupon.CouponUser" parameterType="Map">
+        SELECT cu.*
+        FROM eb_coupon_user AS cu
+        left join eb_coupon AS c on cu.coupon_id  = c.id
+        where
+        cu.uid = #{userId}
+        and cu.mer_id = 0
+        and cu.`status` = 0
+        and (cu.min_price = 0 or cu.min_price &lt;= #{money})
+        and cu.money &lt; #{money}
+        and cu.start_time &lt;= #{nowDate}
+        and cu.end_time &gt;= #{nowDate}
+        and (
+        cu.category = 3 or
+        (cu.category = 2 and
+        <foreach collection="proIdList" separator="or" index="index" close=")" open="(" item="proId">
+            find_in_set(#{proId}, c.linked_data)
+        </foreach>
+        ) or
+        (cu.category = 4 and
+        <foreach collection="proCategoryIdList" separator="or" index="index" close=")" open="(" item="proCategoryId">
+            find_in_set(#{proCategoryId}, c.linked_data)
+        </foreach>
+        ) or
+        (cu.category = 5 and
+        <foreach collection="brandIdList" separator="or" index="index" close=")" open="(" item="brandId">
+            find_in_set(#{brandId}, c.linked_data)
+        </foreach>
+        ) or
+        (cu.category = 6 and
+        <foreach collection="merIdList" separator="or" index="index" close=")" open="(" item="merId">
+            find_in_set(#{merId}, c.linked_data)
+        </foreach>
+        )
+        )
+        order by cu.money desc, cu.id desc
+    </select>
 </mapper>

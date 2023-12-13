@@ -9,8 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
+import com.jbp.common.annotation.StringContains;
+
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,7 +24,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -64,4 +67,9 @@ public class IntegralConfigResponse implements Serializable {
     @NotNull(message = "积分冻结时间不能为空")
     @Min(value = 0, message = "积分冻结时间最小为0")
     private Integer freezeIntegralDay;
+
+    @ApiModelProperty(value = "积分冻结节点:pay:订单支付后，receipt:订单收货后，complete:订单完成后", required = true)
+    @NotBlank(message = "积分冻结节点不能为空")
+    @StringContains(limitValues = {"pay", "receipt", "complete"}, message = "未知的积分冻结节点")
+    private String integralFreezeNode;
 }

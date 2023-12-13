@@ -9,16 +9,17 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.user.UserMerchantCollect;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.CancelCollectRequest;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.MerchantCollectResponse;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.dao.UserMerchantCollectDao;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.UserMerchantCollectService;
 import com.jbp.service.service.UserService;
-import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.user.UserMerchantCollect;
-import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.MerchantCollectResponse;
-import com.jbp.common.utils.RedisUtil;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -148,6 +149,8 @@ public class UserMerchantCollectServiceImpl extends ServiceImpl<UserMerchantColl
             response.setMerAvatar(merchant.getAvatar());
             response.setIsSelf(merchant.getIsSelf());
             response.setCollectNum(getCountByMerId(merchant.getId()));
+            response.setPcGoodStoreCoverImage(merchant.getPcGoodStoreCoverImage());
+            response.setPcLogo(merchant.getPcLogo());
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
@@ -161,6 +164,18 @@ public class UserMerchantCollectServiceImpl extends ServiceImpl<UserMerchantColl
     public Boolean deleteByUid(Integer uid) {
         LambdaUpdateWrapper<UserMerchantCollect> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(UserMerchantCollect::getUid, uid);
+        return remove(wrapper);
+    }
+
+    /**
+     * 批量取消收藏店铺
+     */
+    @Override
+    public Boolean userBatchCancelCollect(CancelCollectRequest request) {
+        Integer userId = userService.getUserIdException();
+        LambdaUpdateWrapper<UserMerchantCollect> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(UserMerchantCollect::getUid, userId);
+        wrapper.eq(UserMerchantCollect::getMerId, CrmebUtil.stringToArray(request.getIds()));
         return remove(wrapper);
     }
 }

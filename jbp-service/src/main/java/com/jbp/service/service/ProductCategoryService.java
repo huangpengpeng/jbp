@@ -6,13 +6,14 @@ import com.jbp.common.request.ProductCategoryRequest;
 import com.jbp.common.vo.ProCategoryCacheVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 *  ProductCategoryService 接口
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -91,4 +92,26 @@ public interface ProductCategoryService extends IService<ProductCategory> {
      * @param limit 查询数量，0全部
      */
     List<ProductCategory> getThirdCategoryByFirstId(Integer firstId, Integer limit);
+
+    /**
+     * 通过分类id列表获取分类map
+     * @param cateIdList 分类id列表
+     * @return Map
+     */
+    Map<Integer, ProductCategory> getMapByIdList(List<Integer> cateIdList);
+
+    /**
+     * 获取分类名称通过Ids
+     * @param proCategoryIds 分类ID字符，逗号分隔
+     * @return 分类名称字符，逗号分隔
+     */
+    String getNameStrByIds(String proCategoryIds);
+
+    /**
+     * 通过子ID获取所有父ID
+     * @param childIdList 子分类ID
+     */
+    List<Integer> findParentIdByChildIds(List<Integer> childIdList);
+
+    List<ProductCategory> findByIdList(List<Integer> idList);
 }

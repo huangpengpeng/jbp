@@ -14,7 +14,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -49,4 +49,17 @@ public interface SystemFormTempService extends IService<SystemFormTemp> {
      * @param systemFormTempRequest 修改参数
      */
     Boolean edit(Integer id, SystemFormTempRequest systemFormTempRequest);
+
+    /**
+     * 通过名称查询详情
+     * @param name 表单名称
+     * @return SystemFormTemp
+     */
+    SystemFormTemp getOneByName(String name);
+
+    /**
+     * 获取表单组件详情
+     * @param id ID
+     */
+    SystemFormTemp getByIdException(Integer id);
 }

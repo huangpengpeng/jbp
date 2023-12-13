@@ -6,11 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.ProductAttrValueDao;
-import com.jbp.service.service.ProductAttrValueService;
 import com.jbp.common.constants.Constants;
+import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.service.dao.ProductAttrValueDao;
+import com.jbp.service.service.ProductAttrValueService;
 
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -120,6 +121,11 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
                 updateWrapper.last(StrUtil.format("and (quota - {} >= 0)", num));
             }
         }
+        if (operationType.equals(Constants.OPERATION_TYPE_ACTIVITY_CREATE)) {
+            updateWrapper.setSql(StrUtil.format("stock = stock - {}", num));
+            // 扣减时加乐观锁保证库存不为负
+            updateWrapper.last(StrUtil.format("and (stock - {} >= 0)", num));
+        }
         updateWrapper.setSql("version = version + 1");
         updateWrapper.eq("id", id);
         updateWrapper.eq("type", type);
@@ -171,6 +177,27 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         lqw.in(ProductAttrValue::getId, attrIdList);
         lqw.eq(ProductAttrValue::getIsDel, false);
         return dao.selectList(lqw);
+    }
+
+    /**
+     * 秒杀回滚库存
+     * @param id skuID
+     * @param num 数量
+     * @param sales 销量
+     */
+    @Override
+    public Boolean seckillRollBack(Integer id, Integer num, Integer sales) {
+        UpdateWrapper<ProductAttrValue> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.setSql(StrUtil.format("stock = stock + {}", num));
+        updateWrapper.setSql(StrUtil.format("sales = sales + {}", sales));
+        updateWrapper.setSql("version = version + 1");
+        updateWrapper.eq("id", id);
+        updateWrapper.eq("type", ProductConstants.PRODUCT_TYPE_NORMAL);
+        boolean update = update(updateWrapper);
+        if (!update) {
+            throw new CrmebException("更新商品attrValue失败，attrValueId = " + id);
+        }
+        return update;
     }
 }
 

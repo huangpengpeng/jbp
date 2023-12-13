@@ -9,23 +9,30 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.CartDao;
-import com.jbp.service.service.*;
+import com.jbp.common.constants.CouponConstants;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.constants.RedisConstants;
+import com.jbp.common.dto.ProductPriceCalculateDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.cat.Cart;
+import com.jbp.common.model.coupon.Coupon;
+import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.product.ProductCategory;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.CartNumRequest;
 import com.jbp.common.request.CartRequest;
 import com.jbp.common.request.CartResetRequest;
 import com.jbp.common.response.CartInfoResponse;
 import com.jbp.common.response.CartMerchantResponse;
+import com.jbp.common.response.CartPriceResponse;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.service.dao.CartDao;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +52,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -71,6 +79,12 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
     private TransactionTemplate transactionTemplate;
     @Autowired
     private ProductRelationService productRelationService;
+    @Autowired
+    private CouponService couponService;
+    @Autowired
+    private CouponUserService couponUserService;
+    @Autowired
+    private ProductCategoryService productCategoryService;
 
     /**
      * 列表
@@ -98,6 +112,7 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
             CartMerchantResponse merchantResponse = new CartMerchantResponse();
             merchantResponse.setMerId(merId);
             merchantResponse.setMerName(merchantMap.get(merId).getName());
+            merchantResponse.setMerIsSelf(merchantMap.get(merId).getIsSelf());
             List<Cart> merCartList = cartList.stream().filter(e -> e.getMerId().equals(merId)).collect(Collectors.toList());
             List<CartInfoResponse> infoResponseList = merCartList.stream().map(storeCart -> {
                 CartInfoResponse cartInfoResponse = new CartInfoResponse();
@@ -258,7 +273,7 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
      * 加购商品统计
      *
      * @param productId 商品id
-     * @param num 加购数量
+     * @param num       加购数量
      */
     private void purchaseStatistics(Integer productId, Integer num) {
         String todayStr = DateUtil.date().toString(DateConstants.DATE_FORMAT_DATE);
@@ -414,6 +429,7 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
 
     /**
      * 购物车移入收藏
+     *
      * @param ids 购物车id列表
      * @return Boolean
      */
@@ -438,6 +454,7 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
 
     /**
      * 通过用户id删除
+     *
      * @param uid 用户ID
      */
     @Override
@@ -445,6 +462,428 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
         LambdaUpdateWrapper<Cart> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(Cart::getUid, uid);
         return remove(wrapper);
+    }
+
+    /**
+     * 购物车价格计算
+     *
+     * @param ids 购物车ID列表
+     * @return CartPriceResponse
+     */
+    @Override
+    public CartPriceResponse calculatePrice(List<Integer> ids) {
+        Integer userId = userService.getUserIdException();
+        List<Cart> cartList = findListByIds(ids);
+        List<Integer> proIdList = new ArrayList<>();
+        Map<Integer, ProductAttrValue> attrValueMap = new HashMap<>();
+        BigDecimal proTotalPrice = BigDecimal.ZERO;
+        List<Product> productList = new ArrayList<>();
+        List<ProductPriceCalculateDto> dtoList = new ArrayList<>();
+        for (Cart cart : cartList) {
+            if (!cart.getStatus()) {
+                throw new CrmebException("购物扯商品状态异常，请重新选择商品");
+            }
+            // 查询商品信息
+            Product product = productService.getById(cart.getProductId());
+            if (ObjectUtil.isNull(product) || product.getIsDel()) {
+                throw new CrmebException("购买的商品信息不存在");
+            }
+            if (!product.getIsShow()) {
+                throw new CrmebException("购买的商品已下架");
+            }
+            if (product.getStock().equals(0) || cart.getCartNum() > product.getStock()) {
+                throw new CrmebException("购买的商品库存不足");
+            }
+            // 查询商品规格属性值信息
+            ProductAttrValue attrValue = productAttrValueService.getByIdAndProductIdAndType(cart.getProductAttrUnique(), cart.getProductId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+            if (ObjectUtil.isNull(attrValue)) {
+                throw new CrmebException("购买的商品规格信息不存在");
+            }
+            if (attrValue.getStock() < cart.getCartNum()) {
+                throw new CrmebException("购买的商品库存不足");
+            }
+            if (!proIdList.contains(product.getId())) {
+                productList.add(product);
+                proIdList.add(product.getId());
+            }
+            attrValueMap.put(attrValue.getId(), attrValue);
+            proTotalPrice = proTotalPrice.add(attrValue.getPrice().multiply(new BigDecimal(cart.getCartNum().toString())));
+
+            ProductPriceCalculateDto dto = new ProductPriceCalculateDto();
+            dto.setProductId(product.getId());
+            dto.setAttrValueId(attrValue.getId());
+            dto.setMerchantId(product.getMerId());
+            dto.setNum(cart.getCartNum());
+            dto.setPrice(attrValue.getPrice());
+            dtoList.add(dto);
+        }
+        // 自动选择最合适的优惠券
+        Map<Integer, List<Cart>> merCartMap = cartList.stream().collect(Collectors.groupingBy(Cart::getMerId));
+        List<Integer> merIdList = new ArrayList<>(merCartMap.keySet());
+        BigDecimal merCouponPrice = BigDecimal.ZERO;
+        for (Map.Entry<Integer, List<Cart>> entry : merCartMap.entrySet()) {
+            Integer merId = entry.getKey();
+            List<Cart> carts = entry.getValue();
+            BigDecimal merProTotalPrice = BigDecimal.ZERO;
+            for (Cart cart : carts) {
+                ProductAttrValue attrValue = attrValueMap.get(cart.getProductAttrUnique());
+                BigDecimal multiply = attrValue.getPrice().multiply(new BigDecimal(cart.getCartNum().toString()));
+                merProTotalPrice = merProTotalPrice.add(multiply);
+            }
+            List<Integer> merProIdList = carts.stream().map(Cart::getProductId).distinct().collect(Collectors.toList());
+            List<Coupon> merCouponList = couponService.findManyByMerIdAndMoney(merId, merProIdList, merProTotalPrice);
+            if (CollUtil.isNotEmpty(merCouponList)) {
+                for (int i = 0; i < merCouponList.size(); ) {
+                    Coupon coupon = merCouponList.get(i);
+                    if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                        i++;
+                        continue;
+                    }
+                    List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                    List<Cart> merCartList = carts.stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                    BigDecimal proPrice = merCartList.stream()
+                            .map(e -> attrValueMap.get(e.getProductAttrUnique()).getPrice().multiply(new BigDecimal(e.getCartNum().toString())))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                        merCouponList.remove(i);
+                        continue;
+                    }
+                    if (proPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                        merCouponList.remove(i);
+                        continue;
+                    }
+                    i++;
+                }
+            }
+
+            // 查询适用的用户优惠券
+            List<CouponUser> merCouponUserList = couponUserService.findManyByUidAndMerIdAndMoneyAndProList(userId, merId, merProIdList, merProTotalPrice);
+            if (CollUtil.isNotEmpty(merCouponUserList)) {
+                for (int i = 0; i < merCouponUserList.size(); ) {
+                    CouponUser couponUser = merCouponUserList.get(i);
+                    if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+                        i++;
+                        continue;
+                    }
+                    Coupon coupon = couponService.getById(couponUser.getCouponId());
+                    List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                    List<Cart> merCartList = carts.stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+                    BigDecimal proPrice = merCartList.stream()
+                            .map(e -> attrValueMap.get(e.getProductAttrUnique()).getPrice().multiply(new BigDecimal(e.getCartNum().toString())))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                        merCouponUserList.remove(i);
+                        continue;
+                    }
+                    if (proPrice.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                        merCouponUserList.remove(i);
+                        continue;
+                    }
+                    i++;
+                }
+            }
+
+            List<Integer> cidList = merCouponUserList.stream().map(CouponUser::getCouponId).collect(Collectors.toList());
+            for (int i = 0; i < merCouponList.size(); ) {
+                if (cidList.contains(merCouponList.get(i).getId())) {
+                    merCouponList.remove(i);
+                    continue;
+                }
+                if (!couponUserService.userIsCanReceiveCoupon(merCouponList.get(i), userId)) {
+                    merCouponList.remove(i);
+                    continue;
+                }
+                i++;
+            }
+            if (CollUtil.isEmpty(merCouponList) && CollUtil.isEmpty(merCouponUserList)) {
+                continue;
+            }
+            if (CollUtil.isEmpty(merCouponList)) {
+                CouponUser couponUser = merCouponUserList.get(0);
+                merCouponPrice = new BigDecimal(couponUser.getMoney().toString());
+                setMerProCouponPrice(dtoList, merId, merCouponPrice, null, couponUser);
+                continue;
+            }
+            if (CollUtil.isEmpty(merCouponUserList)) {
+                Coupon coupon = merCouponList.get(0);
+                merCouponPrice = new BigDecimal(coupon.getMoney().toString());
+                setMerProCouponPrice(dtoList, merId, merCouponPrice, coupon, null);
+                continue;
+            }
+            Coupon coupon = merCouponList.get(0);
+            CouponUser couponUser = merCouponUserList.get(0);
+            if (couponUser.getMoney() >= coupon.getMoney()) {
+                // 使用用户优惠券
+                merCouponPrice = new BigDecimal(couponUser.getMoney().toString());
+                setMerProCouponPrice(dtoList, merId, merCouponPrice, null, couponUser);
+            } else {
+                // 领取优惠券下单
+                merCouponPrice = new BigDecimal(coupon.getMoney().toString());
+                setMerProCouponPrice(dtoList, merId, merCouponPrice, coupon, null);
+            }
+        }
+
+        merCouponPrice = dtoList.stream().map(ProductPriceCalculateDto::getMerCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 自动领平台券计算
+        // 查所有适用的平台优惠券
+        BigDecimal remainingAmount = proTotalPrice.subtract(merCouponPrice);
+        List<Integer> proCategoryIdList = productList.stream().map(Product::getCategoryId).collect(Collectors.toList());
+        List<Integer> secondParentIdList = productCategoryService.findParentIdByChildIds(proCategoryIdList);
+        List<Integer> firstParentIdList = productCategoryService.findParentIdByChildIds(secondParentIdList);
+        proCategoryIdList.addAll(secondParentIdList);
+        proCategoryIdList.addAll(firstParentIdList);
+        List<Integer> brandIdList = productList.stream().map(Product::getBrandId).collect(Collectors.toList());
+        List<Coupon> platCouponList = couponService.findManyPlatByMerIdAndMoney(proIdList, proCategoryIdList, merIdList, brandIdList, proTotalPrice);
+        for (int i = 0; i < platCouponList.size(); ) {
+            Coupon coupon = platCouponList.get(i);
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                if (proTotalPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (remainingAmount.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                BigDecimal proPrice = dtoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(coupon.getMinPrice().toString())) < 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponList.remove(i);
+                    continue;
+                }
+            }
+            i++;
+        }
+
+        // 查询适用的用户平台优惠券
+        List<CouponUser> platCouponUserList = couponUserService.findManyPlatByUidAndMerIdAndMoneyAndProList(userId, proIdList, proCategoryIdList, merIdList, brandIdList, proTotalPrice);
+        for (int i = 0; i < platCouponUserList.size(); ) {
+            CouponUser couponUser = platCouponUserList.get(i);
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_UNIVERSAL)) {
+                if (proTotalPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (remainingAmount.compareTo(new BigDecimal(couponUser.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            Coupon coupon = couponService.getById(couponUser.getCouponId());
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+                List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                BigDecimal proPrice = dtoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> cpIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+                List<Integer> cidList = new ArrayList<>();
+                Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+                ProductCategory category = productCategoryService.getById(categoryId);
+                if (category.getLevel().equals(3)) {
+                    cidList.add(categoryId);
+                } else {
+                    List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                    if (category.getLevel().equals(1)) {
+                        productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                    }
+                    cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+                }
+                List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+                Integer brandId = Integer.valueOf(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+                List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+                List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+                BigDecimal proPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal proSubPrice = dtoList.stream().filter(f -> pIdList.contains(f.getProductId()))
+                        .map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString())).subtract(e.getMerCouponPrice())).reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (proPrice.compareTo(new BigDecimal(couponUser.getMinPrice().toString())) < 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+                if (proSubPrice.compareTo(new BigDecimal(coupon.getMoney().toString())) <= 0) {
+                    platCouponUserList.remove(i);
+                    continue;
+                }
+            }
+            i++;
+        }
+
+        BigDecimal platCouponPrice = BigDecimal.ZERO;
+        List<Integer> platCidList = platCouponUserList.stream().map(CouponUser::getCouponId).collect(Collectors.toList());
+        for (int i = 0; i < platCouponList.size(); ) {
+            if (platCidList.contains(platCouponList.get(i).getId())) {
+                platCouponList.remove(i);
+                continue;
+            }
+            if (!couponUserService.userIsCanReceiveCoupon(platCouponList.get(i), userId)) {
+                platCouponList.remove(i);
+                continue;
+            }
+            i++;
+        }
+        if (CollUtil.isEmpty(platCouponList) && CollUtil.isNotEmpty(platCouponUserList)) {
+            platCouponPrice = new BigDecimal(platCouponUserList.get(0).getMoney().toString());
+        }
+        if (CollUtil.isNotEmpty(platCouponList) && CollUtil.isEmpty(platCouponUserList)) {
+            platCouponPrice = new BigDecimal(platCouponList.get(0).getMoney().toString());
+        }
+        if (CollUtil.isNotEmpty(platCouponList) && CollUtil.isNotEmpty(platCouponUserList)) {
+            Long platCouponMoney = platCouponList.get(0).getMoney();
+            Long platCouponUserMoney = platCouponUserList.get(0).getMoney();
+            if (platCouponUserMoney >= platCouponMoney) {
+                // 使用用户优惠券
+                platCouponPrice = new BigDecimal(platCouponUserMoney.toString());
+            } else {
+                // 领取优惠券下单
+                platCouponPrice = new BigDecimal(platCouponMoney.toString());
+            }
+        }
+
+        CartPriceResponse cartPriceResponse = new CartPriceResponse();
+        cartPriceResponse.setMerCouponPrice(merCouponPrice);
+        cartPriceResponse.setPlatCouponPrice(platCouponPrice);
+        cartPriceResponse.setProTotalPrice(proTotalPrice);
+        cartPriceResponse.setTotalCouponPrice(platCouponPrice.add(merCouponPrice));
+        cartPriceResponse.setTotalPrice(proTotalPrice.subtract(cartPriceResponse.getTotalCouponPrice()));
+        return cartPriceResponse;
+    }
+
+    /**
+     * 设置dto优惠价格
+     */
+    private void setMerProCouponPrice(List<ProductPriceCalculateDto> dtoList, Integer merId, BigDecimal merCouponPrice, Coupon coupon, CouponUser couponUser) {
+        if (ObjectUtil.isNull(coupon)) {
+            coupon = couponService.getById(couponUser.getCouponId());
+        }
+        List<ProductPriceCalculateDto> proDtoList = new ArrayList<>();
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
+            proDtoList = dtoList.stream().filter(d -> d.getMerchantId().equals(merId)).collect(Collectors.toList());
+        }
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+            List<Integer> proIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+            proDtoList = dtoList.stream().filter(d -> proIdList.contains(d.getProductId())).collect(Collectors.toList());
+        }
+        BigDecimal proTotalPrice = proDtoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal couponPrice = merCouponPrice;
+        for (int i = 0; i < proDtoList.size(); i++) {
+            ProductPriceCalculateDto d = proDtoList.get(i);
+            if (proDtoList.size() == (i + 1)) {
+                d.setMerCouponPrice(couponPrice);
+                break;
+            }
+            BigDecimal proPrice = d.getPrice().multiply(new BigDecimal(d.getNum().toString()));
+            BigDecimal ratio = proPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal detailCouponFee = couponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+            couponPrice = couponPrice.subtract(detailCouponFee);
+            d.setMerCouponPrice(detailCouponFee);
+        }
     }
 
     private List<Cart> findListByIds(List<Integer> ids) {

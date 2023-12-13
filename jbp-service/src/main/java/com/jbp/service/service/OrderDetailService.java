@@ -3,17 +3,19 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.request.CommonSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
 *  OrderDetailService 接口
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -46,10 +48,10 @@ public interface OrderDetailService extends IService<OrderDetail> {
 
     /**
      * 售后申请列表(可申请售后列表)
-     * @param pageParamRequest 分页参数
+     * @param request 分页参数
      * @return PageInfo
      */
-    PageInfo<OrderDetail> findAfterSaleApplyList(Integer uid, String orderNo, PageParamRequest pageParamRequest);
+    PageInfo<OrderDetail> findAfterSaleApplyList(Integer uid, CommonSearchRequest request);
 
     /**
      * 根据时间、商品id获取销售件数
@@ -79,4 +81,22 @@ public interface OrderDetailService extends IService<OrderDetail> {
      * @return 待评价数量
      */
     Integer getAwaitReplyCount(Integer userId);
+
+    /**
+     * 是否已购买（已收货后才算已购）
+     */
+    Boolean isPurchased(Integer proId, Integer userId);
+
+    /**
+     * 获取已购商品列表
+     * @param pageParamRequest 分页参数
+     * @return PageInfo
+     */
+    PageInfo<OrderDetail> findPurchasedList(Integer userId, PageParamRequest pageParamRequest);
+
+    /**
+     * 通过订单号获取订单商品详情Map
+     * @param orderNoList 订单号列表
+     */
+    Map<String, List<OrderDetail>> getMapByOrderNoList(List<String> orderNoList);
 }

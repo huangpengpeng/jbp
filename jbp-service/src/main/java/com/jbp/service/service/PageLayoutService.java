@@ -1,15 +1,15 @@
 package com.jbp.service.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
-import com.jbp.common.vo.MyRecord;
 
 /**
  * 页面布局接口
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -59,5 +59,14 @@ public interface PageLayoutService {
      */
     Boolean userMenuSave(JSONObject jsonObject);
 
+    /**
+     * 获取页面底部导航信息
+     */
+    PageLayoutBottomNavigationResponse getBottomNavigation();
 
+    /**
+     * 页面底部导航信息保存
+     * @return 保存结果
+     */
+    Boolean bottomNavigationSave(JSONObject jsonObject);
 }

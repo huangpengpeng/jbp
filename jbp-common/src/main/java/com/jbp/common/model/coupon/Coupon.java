@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -25,10 +24,10 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_coupon")
-@ApiModel(value="Coupon对象", description="优惠券表")
+@ApiModel(value = "Coupon对象", description = "优惠券表")
 public class Coupon implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "优惠券表ID")
     @TableId(value = "id", type = IdType.AUTO)
@@ -43,10 +42,10 @@ public class Coupon implements Serializable {
     @ApiModelProperty(value = "发行方，1-平台，2-商户")
     private Integer publisher;
 
-    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-平台券")
+    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券")
     private Integer category;
 
-    @ApiModelProperty(value = "领取类型 1-手动领取,2-商品赠送券")
+    @ApiModelProperty(value = "领取类型 1-手动领取,2-商品赠送券,3-平台活动发放")
     private Integer receiveType;
 
     @ApiModelProperty(value = "优惠券类型 1-满减券,2-折扣券")
@@ -99,6 +98,12 @@ public class Coupon implements Serializable {
 
     @ApiModelProperty(value = "是否删除 状态（0：否，1：是）")
     private Boolean isDel;
+
+    @ApiModelProperty(value = "关联数据")
+    private String linkedData;
+
+    @ApiModelProperty(value = "是否可重复领取")
+    private Boolean isRepeated;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

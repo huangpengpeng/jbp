@@ -4,7 +4,7 @@ package com.jbp.common.constants;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -31,6 +31,12 @@ public class WeChatConstants {
     public static final String WECHAT_MINI_APPSECRET = "routine_appsecret";
     /** 小程序 名称 */
     public static final String WECHAT_MINI_NAME = "routine_name";
+    /** 微信小程序消息服务器配置的token */
+    public static final String WECHAT_MINI_TOKEN = "routine_token";
+    /** 微信小程序消息服务器配置的EncodingAESKey */
+    public static final String WECHAT_MINI_AES_KEY = "routine_aes_key";
+    /** 微信小程序消息格式 */
+    public static final String WECHAT_MINI_MSG_DATA_FORMAT = "JSON";
 
     /** 公众号 支付商户号 */
     public static final String WECHAT_PAY_PUBLIC_MCHID = "pay_weixin_mchid";
@@ -97,12 +103,6 @@ public class WeChatConstants {
     public static final String PUBLIC_API_PUBLIC_TEMPLATE_MESSAGE_SEND = "cgi-bin/message/template/send";
     //获取设置的行业信息
     public static final String PUBLIC_API_TEMPLATE_MESSAGE_INDUSTRY = "cgi-bin/template/get_industry";
-    //新增其他类型永久素材
-    public static final String PUBLIC_API_MEDIA_UPLOAD = "cgi-bin/material/add_material";
-    //获取永久素材
-    public static final String PUBLIC_API_MEDIA_GET = "cgi-bin/material/get_material";
-    //获取微信素材总数
-    public static final String PUBLIC_API_MEDIA_COUNT = "cgi-bin/material/get_materialcount";
     //发送客服消息
     public static final String PUBLIC_API_KF_MESSAGE_SEND = "cgi-bin/message/custom/send";
 
@@ -315,150 +315,150 @@ public class WeChatConstants {
      */
 
     /*------------------------------------------ 申请接入接口 START ---------------------------------------*/
-    public static final String WECHAT_SHOP_BASE_DOME = "https://api.weixin.qq.com";
+    public static final String WECHAT_API_BASE_DOME = "https://api.weixin.qq.com";
 
     /* 申请接入申请 */
-    public static final String WECHAT_SHOP_REGISTER_APPLY = WECHAT_SHOP_BASE_DOME.concat("/shop/register/apply?access_token={}");
+    public static final String WECHAT_SHOP_REGISTER_APPLY = WECHAT_API_BASE_DOME.concat("/shop/register/apply?access_token={}");
     /* 获取接入状态 */
-    public static final String WECHAT_SHOP_REGISTER_CHECK = WECHAT_SHOP_BASE_DOME.concat("/shop/register/check?access_token={}");
+    public static final String WECHAT_SHOP_REGISTER_CHECK = WECHAT_API_BASE_DOME.concat("/shop/register/check?access_token={}");
     /* 完成接入任务 */
-    public static final String WECHAT_SHOP_REGISTER_FINISH_ACCESS = WECHAT_SHOP_BASE_DOME.concat("/shop/register/finish_access_info?access_token={}");
+    public static final String WECHAT_SHOP_REGISTER_FINISH_ACCESS = WECHAT_API_BASE_DOME.concat("/shop/register/finish_access_info?access_token={}");
     /* 场景接入申请 在小程序上线之后 并且所有的api调用都通过了 才可以使用 调用申请成功之后就可以在视频号直播时选择线上商品了 */
-    public static final String WECHAT_SHOP_REGISTER_APPLY_SCENE = WECHAT_SHOP_BASE_DOME.concat("/shop/register/apply_scene?access_token={}");
+    public static final String WECHAT_SHOP_REGISTER_APPLY_SCENE = WECHAT_API_BASE_DOME.concat("/shop/register/apply_scene?access_token={}");
 
     /*------------------------------------------ 申请接入接口 END ---------------------------------------*/
 
 
     /*------------------------------------------ 接入商品前必须接口 START ---------------------------------------*/
     /** 获取商品类目 */
-    public static final String WECHAT_SHOP_CAT_GET_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/cat/get?access_token={}");
+    public static final String WECHAT_SHOP_CAT_GET_URL = WECHAT_API_BASE_DOME.concat("/shop/cat/get?access_token={}");
     /** 上传图片 **/
-    public static final String WECHAT_SHOP_IMG_UPLOAD = WECHAT_SHOP_BASE_DOME.concat("/shop/img/upload?&access_token={}");
+    public static final String WECHAT_SHOP_IMG_UPLOAD = WECHAT_API_BASE_DOME.concat("/shop/img/upload?&access_token={}");
     /** 上传品牌信息 */
-    public static final String WECHAT_SHOP_AUDIT_AUDIT_BRAND = WECHAT_SHOP_BASE_DOME.concat("/shop/audit/audit_brand?&access_token={}");
+    public static final String WECHAT_SHOP_AUDIT_AUDIT_BRAND = WECHAT_API_BASE_DOME.concat("/shop/audit/audit_brand?&access_token={}");
     /** 上传类目资质 */
-    public static final String WECHAT_SHOP_AUDIT_AUDIT_CATEGORY = WECHAT_SHOP_BASE_DOME.concat("/shop/audit/audit_category?&access_token={}");
+    public static final String WECHAT_SHOP_AUDIT_AUDIT_CATEGORY = WECHAT_API_BASE_DOME.concat("/shop/audit/audit_category?&access_token={}");
     /** 查询类目审核结果 */
-    public static final String WECHAT_SHOP_AUDIT_RESULT= WECHAT_SHOP_BASE_DOME.concat("/shop/audit/result?access_token={}");
+    public static final String WECHAT_SHOP_AUDIT_RESULT= WECHAT_API_BASE_DOME.concat("/shop/audit/result?access_token={}");
     /** 获取小程序提交过的入驻资质信息 */
-    public static final String WECHAT_SHOP_AUDIT_GET_MINIAPP_CERTIFICATE= WECHAT_SHOP_BASE_DOME.concat("/shop/audit/get_miniapp_certificate?access_token={}");
+    public static final String WECHAT_SHOP_AUDIT_GET_MINIAPP_CERTIFICATE= WECHAT_API_BASE_DOME.concat("/shop/audit/get_miniapp_certificate?access_token={}");
     /*------------------------------------------ 接入商品前必须接口 END ---------------------------------------*/
 
 
     /*------------------------------------------ 商家入驻接口 START ---------------------------------------*/
     /** 获取类目列表 */
-    public static final String WECHAT_SHOP_ACCOUNT_GET_CATEGORY_LIST = WECHAT_SHOP_BASE_DOME.concat("/shop/account/get_category_list?access_token={}");
+    public static final String WECHAT_SHOP_ACCOUNT_GET_CATEGORY_LIST = WECHAT_API_BASE_DOME.concat("/shop/account/get_category_list?access_token={}");
     /** 获取品牌列表 */
-    public static final String WECHAT_SHOP_ACCOUNT_GET_BRAND_LIST = WECHAT_SHOP_BASE_DOME.concat("/shop/account/get_brand_list?access_token={}");
+    public static final String WECHAT_SHOP_ACCOUNT_GET_BRAND_LIST = WECHAT_API_BASE_DOME.concat("/shop/account/get_brand_list?access_token={}");
     /** 更新商家信息 */
-    public static final String WECHAT_SHOP_ACCOUNT_UPDATE_INFO = WECHAT_SHOP_BASE_DOME.concat("/shop/account/update_info?access_token={}");
+    public static final String WECHAT_SHOP_ACCOUNT_UPDATE_INFO = WECHAT_API_BASE_DOME.concat("/shop/account/update_info?access_token={}");
     /** 获取商家信息 */
-    public static final String WECHAT_SHOP_ACCOUNT_GET_INFO = WECHAT_SHOP_BASE_DOME.concat("/shop/account/get_info?access_token={}");
+    public static final String WECHAT_SHOP_ACCOUNT_GET_INFO = WECHAT_API_BASE_DOME.concat("/shop/account/get_info?access_token={}");
     /*------------------------------------------ 商家入驻接口 END ---------------------------------------*/
 
     /*------------------------------------------ SPU 接口 START ---------------------------------------*/
     /** 添加商品 */
-    public static final String WECHAT_SHOP_SPU_ADD_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/add?access_token={}");
+    public static final String WECHAT_SHOP_SPU_ADD_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/add?access_token={}");
     /** 删除商品 */
-    public static final String WECHAT_SHOP_SPU_DEL_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/del?access_token={}");
+    public static final String WECHAT_SHOP_SPU_DEL_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/del?access_token={}");
     /** 撤回商品审核 */
-    public static final String WECHAT_SHOP_SPU_DEL_AUDIT_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/del_audit?access_token={}");
+    public static final String WECHAT_SHOP_SPU_DEL_AUDIT_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/del_audit?access_token={}");
     /** 获取商品 */
-    public static final String WECHAT_SHOP_SPU_GET_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/get?access_token={}");
+    public static final String WECHAT_SHOP_SPU_GET_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/get?access_token={}");
     /** 获取商品列表 */
-    public static final String WECHAT_SHOP_SPU_GET_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/get_list?access_token={}");
+    public static final String WECHAT_SHOP_SPU_GET_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/get_list?access_token={}");
     /** 更新商品 */
-    public static final String WECHAT_SHOP_SPU_UPDATE_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/update?access_token={}");
+    public static final String WECHAT_SHOP_SPU_UPDATE_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/update?access_token={}");
     /** 上架商品 */
-    public static final String WECHAT_SHOP_SPU_LISTING_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/listing?access_token={}");
+    public static final String WECHAT_SHOP_SPU_LISTING_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/listing?access_token={}");
     /** 下架商品 */
-    public static final String WECHAT_SHOP_SPU_DELISTING_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/spu/delisting?access_token={}");
+    public static final String WECHAT_SHOP_SPU_DELISTING_URL = WECHAT_API_BASE_DOME.concat("/shop/spu/delisting?access_token={}");
 
     /*------------------------------------------ SPU 接口 END ---------------------------------------*/
 
     /*------------------------------------------ 订单 接口 START ---------------------------------------*/
     /** 检查场景值是否在支付校验范围内 */
-    public static final String WECHAT_SHOP_SCENE_CHECK_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/scene/check?access_token={}");
+    public static final String WECHAT_SHOP_SCENE_CHECK_URL = WECHAT_API_BASE_DOME.concat("/shop/scene/check?access_token={}");
     /** 生成订单并获取ticket */
-    public static final String WECHAT_SHOP_ORDER_ADD_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/add?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_ADD_URL = WECHAT_API_BASE_DOME.concat("/shop/order/add?access_token={}");
     /** 视频号忽略此接口 同步订单支付结果  */
-    public static final String WECHAT_SHOP_ORDER_PAY_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/pay?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_PAY_URL = WECHAT_API_BASE_DOME.concat("/shop/order/pay?access_token={}");
     /** 生成支付参数   */
-    public static final String WECHAT_SHOP_ORDER_PAYMENT_PARAMS_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/getpaymentparams?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_PAYMENT_PARAMS_URL = WECHAT_API_BASE_DOME.concat("/shop/order/getpaymentparams?access_token={}");
     /** 获取订单 */
-    public static final String WECHAT_SHOP_ORDER_GET_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/get?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_GET_URL = WECHAT_API_BASE_DOME.concat("/shop/order/get?access_token={}");
     /** 按推广员获取订单 */
-    public static final String WECHAT_SHOP_ORDER_GETBYFINDER_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/get_list_by_finder?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_GETBYFINDER_URL = WECHAT_API_BASE_DOME.concat("/shop/order/get_list_by_finder?access_token={}");
     /** 按分享员获取订单 */
-    public static final String WECHAT_SHOP_ORDER_GETBYSHARER_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/get_list_by_sharer?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_GETBYSHARER_URL = WECHAT_API_BASE_DOME.concat("/shop/order/get_list_by_sharer?access_token={}");
     /** 获取订单列表 */
-    public static final String WECHAT_SHOP_ORDER_GET_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/order/get_list?access_token={}");
+    public static final String WECHAT_SHOP_ORDER_GET_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/order/get_list?access_token={}");
     /*------------------------------------------ 订单 接口 END ---------------------------------------*/
 
     /*------------------------------------------ 物流 接口 START ---------------------------------------*/
     /** 获取快递公司列表 */
-    public static final String WECHAT_SHOP_DELIVERY_GET_COMPANY_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/delivery/get_company_list?access_token={}");
+    public static final String WECHAT_SHOP_DELIVERY_GET_COMPANY_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/delivery/get_company_list?access_token={}");
     /** 订单发货 */
-    public static final String WECHAT_SHOP_DELIVERY_SEND_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/delivery/send?access_token={}");
+    public static final String WECHAT_SHOP_DELIVERY_SEND_URL = WECHAT_API_BASE_DOME.concat("/shop/delivery/send?access_token={}");
     /** 订单确认收货 */
-    public static final String WECHAT_SHOP_DELIVERY_RECIEVE_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/delivery/recieve?access_token={}");
+    public static final String WECHAT_SHOP_DELIVERY_RECIEVE_URL = WECHAT_API_BASE_DOME.concat("/shop/delivery/recieve?access_token={}");
     /*------------------------------------------ 物流 接口 END ---------------------------------------*/
 
     /*------------------------------------------ 售后 接口 START ---------------------------------------*/
     /** 创建售后 */
-    public static final String WECHAT_SHOP_AFTERSALE_ADD_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/aftersale/add?access_token={}");
+    public static final String WECHAT_SHOP_AFTERSALE_ADD_URL = WECHAT_API_BASE_DOME.concat("/shop/aftersale/add?access_token={}");
     /** 获取售后 */
-    public static final String WECHAT_SHOP_AFTERSALE_GET_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/aftersale/get?access_token={}");
+    public static final String WECHAT_SHOP_AFTERSALE_GET_URL = WECHAT_API_BASE_DOME.concat("/shop/aftersale/get?access_token={}");
     /** 更新售后 */
-    public static final String WECHAT_SHOP_AFTERSALE_UPDATE_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/aftersale/update?access_token={}");
+    public static final String WECHAT_SHOP_AFTERSALE_UPDATE_URL = WECHAT_API_BASE_DOME.concat("/shop/aftersale/update?access_token={}");
     /*------------------------------------------ 售后 接口 END ---------------------------------------*/
 
     /*------------------------------------------ 优惠券 接口 START 二期 ---------------------------------------*/
     /** 商家确认回调领券事件 */
-    public static final String WECHAT_SHOP_COUPON_CONFIRM_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/confirm?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_CONFIRM_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/confirm?access_token={}");
     /** 添加优惠券 */
-    public static final String WECHAT_SHOP_COUPON_ADD_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/add?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_ADD_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/add?access_token={}");
     /** 获取优惠券信息 */
-    public static final String WECHAT_SHOP_COUPON_GET_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/get?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_GET_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/get?access_token={}");
     /** 获取优惠券列表 */
-    public static final String WECHAT_SHOP_COUPON_GET_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/get_list?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_GET_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/get_list?access_token={}");
     /** 更新优惠券信息 */
-    public static final String WECHAT_SHOP_COUPON_UPDATE_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/update?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_UPDATE_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/update?access_token={}");
     /** 更新优惠券状态 */
-    public static final String WECHAT_SHOP_COUPON_UPDATE_STATUS_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/update_status?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_UPDATE_STATUS_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/update_status?access_token={}");
     /** 更新优惠券库存 */
-    public static final String WECHAT_SHOP_COUPON_UPDATE_STOCK_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/update_coupon_stock?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_UPDATE_STOCK_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/update_coupon_stock?access_token={}");
     /** 添加用户优惠券 */
-    public static final String WECHAT_SHOP_COUPON_ADD_USER_COUPON_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/add_user_coupon?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_ADD_USER_COUPON_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/add_user_coupon?access_token={}");
     /** 获取用户优惠券列表 */
-    public static final String WECHAT_SHOP_COUPON_GET_USERCOUPON_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/get_usercoupon_list?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_GET_USERCOUPON_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/get_usercoupon_list?access_token={}");
     /** 更新用户优惠券 */
-    public static final String WECHAT_SHOP_COUPON_UPDATE_USER_COUPON_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/update_user_coupon?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_UPDATE_USER_COUPON_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/update_user_coupon?access_token={}");
     /** 更新用户优惠券状态 */
-    public static final String WECHAT_SHOP_COUPON_UPDATE_USERCOUPON_STATUS_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/coupon/update_usercoupon_status?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_UPDATE_USERCOUPON_STATUS_URL = WECHAT_API_BASE_DOME.concat("/shop/coupon/update_usercoupon_status?access_token={}");
 
     /*------------------------------------------ 优惠券 接口 END 二期 ---------------------------------------*/
 
     /*------------------------------------------ 推广员 接口 START 二期 ---------------------------------------*/
     /** 获取推广员列表 */
-    public static final String WECHAT_SHOP_COUPON_PROMOTER_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/promoter/list?access_token={}");
+    public static final String WECHAT_SHOP_COUPON_PROMOTER_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/promoter/list?access_token={}");
     /*------------------------------------------ 推广员 接口 END 二期 ---------------------------------------*/
 
     /*------------------------------------------ 分销员 接口 START 二期 ---------------------------------------*/
     /** 绑定分享员 */
-    public static final String WECHAT_SHOP_SHARER_BIND_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/bind?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_BIND_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/bind?access_token={}");
     /** 解绑分享员 */
-    public static final String WECHAT_SHOP_SHARER_UNBIND_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/unbind?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_UNBIND_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/unbind?access_token={}");
     /** 获取已经绑定的分享员列表*/
-    public static final String WECHAT_SHOP_SHARER_GET_SHARER_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/get_sharer_list?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_GET_SHARER_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/get_sharer_list?access_token={}");
     /** 获取分分享员 */
-    public static final String WECHAT_SHOP_SHARER_SEARCH_SHARER_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/search_sharer?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_SEARCH_SHARER_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/search_sharer?access_token={}");
     /** 获取分享员的中带货数据 */
-    public static final String WECHAT_SHOP_SHARER_GET_SHARER_DATA_SUMMARY_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/get_sharer_data_summary?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_GET_SHARER_DATA_SUMMARY_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/get_sharer_data_summary?access_token={}");
     /** 获取分享员的直播间订单汇总 */
-    public static final String WECHAT_SHOP_SHARER_GET_SHARER_LIVE_ORDER_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/get_sharer_live_order_list?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_GET_SHARER_LIVE_ORDER_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/get_sharer_live_order_list?access_token={}");
     /** 获取分享员的直播间带货数据汇总 */
-    public static final String WECHAT_SHOP_SHARER_GET_SHARER_LIVE_SUMMARY_LIST_URL = WECHAT_SHOP_BASE_DOME.concat("/shop/sharer/get_sharer_live_summary_list?access_token={}");
+    public static final String WECHAT_SHOP_SHARER_GET_SHARER_LIVE_SUMMARY_LIST_URL = WECHAT_API_BASE_DOME.concat("/shop/sharer/get_sharer_live_summary_list?access_token={}");
 
     /*------------------------------------------ 分销员 接口 END 二期 ---------------------------------------*/
 
@@ -497,4 +497,13 @@ public class WeChatConstants {
     public static final Long OPEN_MEDIA_UPLOAD_VOICE_MAX_SIZE = 1024 * 1024 * 2L;
     /** 素材上传语音后缀类型 */
     public static final String OPEN_MEDIA_UPLOAD_VOICE_SUFFIX_NAME = "mp3,wma,wav,amr";
+
+
+    /*-------------------------------------------------------- 微信素材 -----------------------------------------------*/
+    /** 新增微信素材 返回URL */
+    public static final String WECHAT_MEDIA_UPLOADIMG = WECHAT_API_BASE_DOME.concat("/cgi-bin/media/uploadimg?access_token={}");
+    /** 新增微信永久素材 返回MediaId */
+    public static final String WECHAT_MEDIA_UPLOADIMG_HASMEDIAID = WECHAT_API_BASE_DOME.concat("/cgi-bin/material/add_material?access_token={}");
+    /** 永久素材获取 */
+    public static final String WECHAT_MEDIA_GET = WECHAT_API_BASE_DOME.concat("/cgi-bin/material/get_material?access_token={}");
 }

@@ -1,8 +1,10 @@
 package com.jbp.front.controller;
 
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.constants.UserLevelConstants;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.SystemConfigService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -35,48 +37,60 @@ public class AgreementController {
     @ApiOperation(value = "关于我们协议 详情")
     @RequestMapping(value = "/aboutusinfo", method = RequestMethod.GET)
     public CommonResult<String> aboutusAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.ABOUTUS_AGREEMENT), "获取关于我们协议 成功过");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.ABOUTUS_AGREEMENT));
     }
 
     @ApiOperation(value = "平台资质证明 详情")
     @RequestMapping(value = "/intelligentinfo", method = RequestMethod.GET)
     public CommonResult<String> intelligentAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.PLATFROM_INTELLIGENT_AGREEMENT), "获取平台资质证明 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.PLATFROM_INTELLIGENT_AGREEMENT));
     }
 
     @ApiOperation(value = "平台规则 详情")
     @RequestMapping(value = "/platfromruleinfo", method = RequestMethod.GET)
     public CommonResult<String> platfromRuleAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.PLATFROM_RULE_AGREEMENT), "获取平台平台规则 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.PLATFROM_RULE_AGREEMENT));
     }
 
     @ApiOperation(value = "用户注册协议 详情")
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET)
     public CommonResult<String> userAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_REGISTER_AGREEMENT), "获取 用户注册协议 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_REGISTER_AGREEMENT));
     }
 
     @ApiOperation(value = "用户隐私协议 详情")
     @RequestMapping(value = "/userprivacyinfo", method = RequestMethod.GET)
     public CommonResult<String> userPrivacyAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_PRIVACY_AGREEMENT), "获取用户隐私协议 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_PRIVACY_AGREEMENT));
     }
 
     @ApiOperation(value = "用户注销协议 详情")
     @RequestMapping(value = "/useraccountcancelinfo", method = RequestMethod.GET)
     public CommonResult<String> userAccountCancelAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_CANCEL_AGREEMENT), "获取用户注销协议 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_CANCEL_AGREEMENT));
     }
 
     @ApiOperation(value = "商户入驻协议 详情")
     @RequestMapping(value = "/merincomminginfo", method = RequestMethod.GET)
     public CommonResult<String> merincommingAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.MERCHANT_SETTLEMENT_AGREEMENT), "获取商户入驻协议 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.MERCHANT_SETTLEMENT_AGREEMENT));
     }
 
     @ApiOperation(value = "用户注销声明 详情")
     @RequestMapping(value = "/useraccountcancelnoticeinfo", method = RequestMethod.GET)
     public CommonResult<String> userAccountCancelNoticeAgreementInfo() {
-        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_CANCEL_NOTICE_AGREEMENT), "获取用户注销声明 成功");
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.USER_CANCEL_NOTICE_AGREEMENT));
+    }
+
+    @ApiOperation(value = "用户等级规则说明")
+    @RequestMapping(value = "/user/level/rule", method = RequestMethod.GET)
+    public String userLevelRule() {
+        return systemConfigService.getValueByKey(UserLevelConstants.SYSTEM_USER_LEVEL_RULE);
+    }
+
+    @ApiOperation(value = "优惠券规则 详情")
+    @RequestMapping(value = "/coupon/agreement/info", method = RequestMethod.GET)
+    public CommonResult<String> couponAgreementInfo() {
+        return CommonResult.success(systemConfigService.getAgreementByKey(SysConfigConstants.COUPON_AGREEMENT));
     }
 }

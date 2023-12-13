@@ -106,7 +106,7 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "支付重定向地址")
     private String redirect;
 
-    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单")
+    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单")
     private Integer type;
 
     @ApiModelProperty(value = "订单等级:0-平台订单，1-商户订单")
@@ -127,4 +127,12 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "商户优惠券金额")
+    private BigDecimal merCouponPrice;
+
+    @ApiModelProperty(value = "平台优惠券金额")
+    private BigDecimal platCouponPrice;
+
+    @ApiModelProperty(value = "平台优惠券id")
+    private Integer platCouponId;
 }

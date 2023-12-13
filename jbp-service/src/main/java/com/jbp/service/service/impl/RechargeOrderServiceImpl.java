@@ -5,22 +5,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.domain.AlipayTradeWapPayModel;
-import com.alipay.api.request.AlipayTradeAppPayRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
-import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.RechargeOrderDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.bill.Bill;
@@ -40,6 +31,8 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RequestUtil;
 import com.jbp.common.utils.WxPayUtil;
 import com.jbp.common.vo.*;
+import com.jbp.service.dao.RechargeOrderDao;
+import com.jbp.service.service.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +53,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -93,6 +84,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     private UserBalanceRecordService userBalanceRecordService;
     @Autowired
     private BillService billService;
+    @Autowired
+    private AsyncService asyncService;
+    @Autowired
+    private AliPayService aliPayService;
 
     /**
      * 列表
@@ -203,7 +198,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             rechargeOrder.setOutTradeNo(outTradeNo);
         }
         if (request.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY)) {
-            String result = aliPayment(rechargePrice, request.getPayChannel(), rechargeNo);
+            String result = aliPayService.pay(rechargeNo, rechargePrice, "recharge", request.getPayChannel());
             response.setAlipayRequest(result);
             rechargeOrder.setOutTradeNo(rechargeNo);
         }
@@ -218,112 +213,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             throw new CrmebException("生成充值订单失败!");
         }
         return response;
-    }
-
-    /**
-     * 支付宝支付
-     *
-     * @param rechargePrice 充值金额
-     * @param payChannel    支付渠道
-     * @param rechargeNo    充值单号
-     * @return String
-     */
-    private String aliPayment(BigDecimal rechargePrice, String payChannel, String rechargeNo) {
-        //商户订单号，商户网站订单系统中唯一订单号，必填
-        String out_trade_no = rechargeNo;
-        //付款金额，必填
-        String total_amount = rechargePrice.toString();
-        //订单名称，必填
-        String subject = systemConfigService.getValueByKeyException(SysConfigConstants.CONFIG_KEY_SITE_NAME);
-        // 商品描述，可空
-        // String body = "用户订购商品个数：1";
-        // 该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
-        String timeout_express = "30m";
-
-        if (payChannel.equals(PayConstants.PAY_CHANNEL_ALI_APP_PAY)) {// APP 支付
-            //获得初始化的AlipayClient
-            String aliPayAppid = systemConfigService.getValueByKey(AlipayConfig.APPID);
-            String aliPayPrivateKey = systemConfigService.getValueByKey(AlipayConfig.RSA_PRIVATE_KEY);
-            String aliPayPublicKey = systemConfigService.getValueByKey(AlipayConfig.ALIPAY_PUBLIC_KEY);
-            AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, aliPayAppid, aliPayPrivateKey, AlipayConfig.FORMAT, AlipayConfig.CHARSET, aliPayPublicKey, AlipayConfig.SIGNTYPE);
-            //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
-            AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-            //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
-            AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-//                model.setBody("我是测试数据");
-            model.setSubject(subject);
-            model.setOutTradeNo(out_trade_no);
-            model.setTimeoutExpress(timeout_express);
-            model.setTotalAmount(total_amount);
-            model.setProductCode("QUICK_MSECURITY_PAY");
-
-            String encode = "type=" + PayConstants.PAY_SERVICE_TYPE_ORDER;
-            try {
-                encode = URLEncoder.encode(encode, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                throw new CrmebException("支付宝参数UrlEncode异常");
-            }
-            model.setPassbackParams(encode);
-
-            request.setBizModel(model);
-            request.setNotifyUrl(systemConfigService.getValueByKey(AlipayConfig.notify_url));
-
-            //请求
-            String result;
-            try {
-                //这里和普通的接口调用不同，使用的是sdkExecute
-                AlipayTradeAppPayResponse aaa = alipayClient.sdkExecute(request);
-                result = aaa.getBody();
-            } catch (AlipayApiException e) {
-                logger.error("生成支付宝app支付请求异常," + e.getErrMsg());
-                throw new CrmebException(e.getErrMsg());
-            }
-            logger.info("支付宝app result = " + result);
-            return result;
-        }
-
-        //获得初始化的AlipayClient
-        String aliPayAppid = systemConfigService.getValueByKey(AlipayConfig.APPID);
-        String aliPayPrivateKey = systemConfigService.getValueByKey(AlipayConfig.RSA_PRIVATE_KEY);
-        String aliPayPublicKey = systemConfigService.getValueByKey(AlipayConfig.ALIPAY_PUBLIC_KEY);
-        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, aliPayAppid, aliPayPrivateKey, AlipayConfig.FORMAT, AlipayConfig.CHARSET, aliPayPublicKey, AlipayConfig.SIGNTYPE);
-        //设置请求参数
-        AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
-        alipayRequest.setReturnUrl(systemConfigService.getValueByKey(AlipayConfig.return_url));
-        String apiDomain = systemConfigService.getValueByKeyException(SysConfigConstants.CONFIG_KEY_API_URL);
-        alipayRequest.setNotifyUrl(apiDomain + PayConstants.ALI_PAY_NOTIFY_API_URI);
-
-        AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
-        model.setOutTradeNo(out_trade_no);
-        model.setSubject(subject);
-        model.setTotalAmount(total_amount);
-//            model.setBody(body);
-        model.setTimeoutExpress(timeout_express);
-        model.setProductCode("QUICK_WAP_PAY");
-        model.setQuitUrl(systemConfigService.getValueByKey(AlipayConfig.quit_url));
-
-        String encode = "type=" + PayConstants.PAY_SERVICE_TYPE_ORDER;
-        try {
-            encode = URLEncoder.encode(encode, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new CrmebException("支付宝参数UrlEncode异常");
-        }
-        model.setPassbackParams(encode);
-
-        alipayRequest.setBizModel(model);
-        logger.info("alipayRequest = " + alipayRequest);
-        //请求
-        String result;
-        try {
-            result = alipayClient.pageExecute(alipayRequest).getBody();
-        } catch (AlipayApiException e) {
-            logger.error("支付宝订单生成失败," + e.getErrMsg());
-            throw new CrmebException(e.getErrMsg());
-        }
-        logger.info("result = " + result);
-        return result;
     }
 
     /**
@@ -508,9 +397,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
      */
     @Override
     public Boolean paySuccessAfter(RechargeOrder rechargeOrder) {
-        rechargeOrder.setPaid(true);
-        rechargeOrder.setPayTime(CrmebDateUtil.nowDateTime());
-
         User user = userService.getById(rechargeOrder.getUid());
 
         BigDecimal addPrice = rechargeOrder.getPrice().add(rechargeOrder.getGivePrice());
@@ -528,13 +414,17 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         Bill bill = new Bill();
         bill.setOrderNo(rechargeOrder.getOrderNo());
         bill.setUid(rechargeOrder.getUid());
-        bill.setPm(BillConstants.BILL_PM_SUB);
+        bill.setPm(BillConstants.BILL_PM_ADD);
         bill.setAmount(rechargeOrder.getPrice());
         bill.setType(BillConstants.BILL_TYPE_RECHARGE_USER);
         bill.setMark(StrUtil.format("充值订单，用户充值金额{}元", rechargeOrder.getPrice()));
-        return transactionTemplate.execute(e -> {
+        Boolean execute = transactionTemplate.execute(e -> {
             // 订单变动
-            updateById(rechargeOrder);
+            boolean updatePaid = updatePaid(rechargeOrder.getId(), rechargeOrder.getOrderNo());
+            if (!updatePaid) {
+                logger.warn("充值订单更新支付状态失败，orderNo = {}", rechargeOrder.getOrderNo());
+                e.setRollbackOnly();
+            }
             // 余额变动
             userService.updateNowMoney(user.getId(), addPrice, Constants.OPERATION_TYPE_ADD);
             // 创建记录
@@ -542,6 +432,24 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             billService.save(bill);
             return Boolean.TRUE;
         });
+        if (execute) {
+            // 发送充值成功通知
+            asyncService.sendRechargeSuccessNotification(rechargeOrder, user);
+        }
+        return execute;
+    }
+
+    /**
+     * 支付完成变动
+     */
+    private boolean updatePaid(Integer id, String orderNo) {
+        LambdaUpdateWrapper<RechargeOrder> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(RechargeOrder::getPaid, true);
+        wrapper.set(RechargeOrder::getPayTime, CrmebDateUtil.nowDateTime());
+        wrapper.eq(RechargeOrder::getId, id);
+        wrapper.eq(RechargeOrder::getOrderNo, orderNo);
+        wrapper.eq(RechargeOrder::getPaid, false);
+        return update(wrapper);
     }
 
     /**

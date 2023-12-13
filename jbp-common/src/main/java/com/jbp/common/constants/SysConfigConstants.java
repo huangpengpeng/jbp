@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -14,12 +14,12 @@ package com.jbp.common.constants;
  */
 public class SysConfigConstants {
 
-    //后台首页登录图片
-    /** 平台端-登录页LOGO */
+    /** 平台端-左上角菜单logo(登陆后) */
     public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP = "site_logo_lefttop";
+    /** 平台端-左上角缩回菜单logo(登陆后) */
+    public static final String CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE = "site_logo_square";
+    /** 平台端-登录页LOGO */
     public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN = "site_logo_login";
-    /** 平台端-左上角缩回菜单logo */
-    public static final String CONFIG_APP_LAYOUT_SITE_LOGO_SQUARE = "site_logo_square";
     /** 平台端-登录页背景图 */
     public static final String CONFIG_KEY_ADMIN_LOGIN_BACKGROUND_IMAGE = "admin_login_bg_pic";
     /** 平台端-登录页左侧logo */
@@ -33,6 +33,10 @@ public class SysConfigConstants {
     public static final String CONFIG_KEY_MERCHANT_LOGIN_LEFT_LOGO = "mer_admin_login_left_logo";
     /** 商户端-站点地址 */
     public static final String CONFIG_KEY_MERCHANT_SITE_URL = "mer_site_url";
+    /** 商户端-左上角菜单logo(登陆后) */
+    public static final String CONFIG_KEY_MERCHANT_LOGIN_LOGO_LEFT_TOP = "site_logo_lefttop";
+    /** 商户端-左上角缩回菜单logo(登陆后) */
+    public static final String CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE = "site_logo_square";
 
     /** 微信分享图片（公众号） */
     public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_IMAGE = "wechat_share_img";
@@ -56,26 +60,18 @@ public class SysConfigConstants {
     public static final String RETAIL_STORE_BROKERAGE_SECOND_RATIO = "retail_store_brokerage_second_ratio";
     /** 分销佣金冻结时间(天) */
     public static final String RETAIL_STORE_BROKERAGE_FREEZING_TIME = "retail_store_brokerage_freezing_time";
+    /** 分销佣金分账节点:pay:订单支付后，receipt:订单收货后，complete:订单完成后 */
+    public static final String RETAIL_STORE_BROKERAGE_SHARE_NODE = "retail_store_brokerage_share_node";
     /** 分销提现最低金额 */
     public static final String RETAIL_STORE_EXTRACT_MIN_PRICE = "retail_store_extract_min_price";
     /** 分销提现银行 */
     public static final String RETAIL_STORE_EXTRACT_BANK = "retail_store_extract_bank";
 
 
-    /** 是否开启会员功能 */
-    public static final String CONFIG_KEY_VIP_OPEN = "vip_open";
     /** 是否开启充值功能 */
     public static final String CONFIG_KEY_RECHARGE_SWITCH = "recharge_switch";
-    /** 是否开启门店自提 */
-    public static final String CONFIG_KEY_STORE_SELF_MENTION = "store_self_mention";
-    /** 腾讯地图key */
+    /** 腾讯地图key todo 需要前端判断是否删除 */
     public static final String CONFIG_SITE_TENG_XUN_MAP_KEY = "tengxun_map_key";
-
-
-    /** 全场满额包邮开关 */
-    public static final String STORE_FEE_POSTAGE_SWITCH = "store_free_postage_switch";
-    /** 全场满额包邮金额 */
-    public static final String STORE_FEE_POSTAGE = "store_free_postage";
 
     /** 微信支付开关 */
     public static final String CONFIG_PAY_WECHAT_OPEN = "pay_weixin_open";
@@ -87,26 +83,10 @@ public class SysConfigConstants {
     /** 网站名称 */
     public static final String CONFIG_KEY_SITE_NAME = "site_name";
 
-    /** 商品警戒库存 */
-    public static final String CONFIG_KEY_STORE_STOCK = "store_stock";
-
-    /** CRMEB chat 统计 */
-    public static final String JS_CONFIG_CRMEB_CHAT_TONGJI = "crmeb_tongji_js";
-
     /** 用户默认头像 */
     public static final String USER_DEFAULT_AVATAR_CONFIG_KEY = "h5_avatar";
     /** 系统颜色配置 */
     public static final String CONFIG_CHANGE_COLOR_CONFIG = "change_color_config";
-
-    /** 验证码过期时间 */
-    public static final String CONFIG_KEY_SMS_CODE_EXPIRE = "sms_code_expire";
-
-    /** 阿里云短信签名 */
-    public static final String CONFIG_KEY_ALIYUN_SMS_SIGN_NAME = "aliyun_sms_sign_name";
-    /** 阿里云短信access key id */
-    public static final String CONFIG_KEY_ALIYUN_SMS_KEY_ID = "aliyun_sms_key_id";
-    /** 阿里云短信access key secret */
-    public static final String CONFIG_KEY_ALIYUN_SMS_KEY_SECRET = "aliyun_sms_key_secret";
 
     /** 积分抵扣开关 */
     public static final String CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH = "integral_deduction_switch";
@@ -120,19 +100,15 @@ public class SysConfigConstants {
     public static final String CONFIG_KEY_INTEGRAL_RATE_ORDER_GIVE = "order_give_integral";
     /** 积分冻结时间 */
     public static final String CONFIG_KEY_STORE_INTEGRAL_EXTRACT_TIME = "freeze_integral_day";
+    /** 积分冻结时间 */
+    public static final String CONFIG_KEY_STORE_INTEGRAL_FREEZE_NODE = "integral_freeze_node";
 
-    /** 移动端顶部logo */
-    public static final String CONFIG_KEY_MOBILE_TOP_LOGO = "mobile_top_logo";
     /** 移动端登录 logo */
     public static final String CONFIG_KEY_MOBILE_LOGIN_LOGO = "mobile_login_logo";
-    /** 商品分类页配置 */
-    public static final String CONFIG_CATEGORY_CONFIG = "category_page_config";
-    /** 是否隐藏一级分类 */
-    public static final String CONFIG_IS_SHOW_CATEGORY = "is_show_category";
-    /** 首页商品列表模板配置 */
-    public static final String CONFIG_IS_PRODUCT_LIST_STYLE = "homePageSaleListStyle";
+    /** 是否 开启微信公众号授权等你 */
+    public static final String CONFIG_WECHAT_BROWSER_VISIT = "wechat_browser_visit";
 
-    /** 图片上传类型 1本地 2七牛云 3OSS 4COS, 默认本地 */
+    /** 图片上传类型 1本地 2七牛云 3OSS 4COS 5京东, 默认本地 */
     public static final String CONFIG_UPLOAD_TYPE = "uploadType";
     /** 文件上传是否保存本地 */
     public static final String CONFIG_FILE_IS_SAVE = "file_is_save";
@@ -180,6 +156,19 @@ public class SysConfigConstants {
     /** 腾讯云存储区域 */
     public static final String CONFIG_TX_STORAGE_REGION = "txStorageRegion";
 
+    /** 京东云上传URL */
+    public static final String CONFIG_JD_UPLOAD_URL = "jdUploadUrl";
+    /** 京东云Access Key */
+    public static final String CONFIG_JD_ACCESS_KEY = "jdAccessKey";
+    /** 京东云Secret Key */
+    public static final String CONFIG_JD_SECRET_KEY = "jdSecretKey";
+    /** 京东云存储桶名称 */
+    public static final String CONFIG_JD_BUCKET_NAME = "jdBucketName";
+    /** 京东云存储区域 */
+    public static final String CONFIG_JD_CLOUD_SIGNING_REGION = "jdSigningRegion";
+    /** 京东云存储端点 */
+    public static final String CONFIG_JD_CLOUD_ENDPOINT = "jdEndpoint";
+
 
     /** 客服H5链接 */
     public static final String CONFIG_CONSUMER_H5_URL = "consumer_h5_url";
@@ -187,10 +176,6 @@ public class SysConfigConstants {
     public static final String CONFIG_CONSUMER_HOTLINE = "consumer_hotline";
     /** 店铺街开关 */
     public static final String CONFIG_KEY_SHOP_STREET_SWITCH = "shop_street_switch";
-    /** 客服电话 */
-    public static final String CONFIG_CONSUMER_MESSAGE = "consumer_message";
-    /** 客服邮箱 */
-    public static final String CONFIG_CONSUMER_EMAIL = "consumer_email";
     /** 客服类型 */
     public static final String CONFIG_CONSUMER_TYPE = "consumer_type";
     /** 客户类型-H5 */
@@ -218,18 +203,10 @@ public class SysConfigConstants {
     public static final String LOGISTICS_QUERY_ALIYUN_CODE = "system_express_app_code";
     /** 阿里云查询快递URL  https://market.aliyun.com/products/56928004/cmapi021863.html#sku=yuncode15863000015 */
     public static final String LOGISTICS_QUERY_ALIYUN_URL = "https://wuliu.market.alicloudapi.com/kdi?no={}";
-    /** 阿里云全国物流App key */
-    public static final String CONFIG_ALIYUN_LOGISTICS_APP_KEY = "logistics_app_key";
-    /** 阿里云全国物流App secret */
-    public static final String CONFIG_ALIYUN_LOGISTICS_APP_SECRET = "logistics_app_secret";
 
     /** 移动端文章顶部的banner图最大数量 配置数据最小3最大10 */
     public static final String ARTICLE_BANNER_LIMIT = "news_slides_limit";
 
-    /** 普通商品未支付取消订单时间(单位:分钟) */
-    public static final String CONFIG_ORDER_CANCEL_TIME = "order_cancel_time";
-    /** 活动商品未支付取消订单时间(单位:分钟) */
-    public static final String CONFIG_ORDER_ACTIVITY_CANCEL_TIME = "order_activity_time";
     /** 订单订单自动收货天数 */
     public static final String CONFIG_ORDER_AUTO_TAKE_DELIVERY_DAY = "auto_take_delivery_day";
     /** 订单收货后自动完成天数 */
@@ -237,19 +214,6 @@ public class SysConfigConstants {
     /** 退款理由 */
     public static final String CONFIG_KEY_STOR_REASON = "stor_reason";
 
-    /** PayPal客户端id */
-    public static final String CONFIG_PAYPAL_CLIENT_ID = "paypal_client_id";
-    /** PayPal客户端secret */
-    public static final String CONFIG_PAYPAL_CLIENT_SECRET = "paypal_client_secret";
-    /** PayPal支付模式:sandbox-沙盒,live-正式 */
-    public static final String CONFIG_PAYPAL_MODE = "paypal_mode";
-    /** PayPal支付开关:false,true */
-    public static final String CONFIG_PAYPAL_SWITCH = "paypal_switch";
-
-    /** Stripe ApiKey */
-    public static final String CONFIG_STRIPE_API_KEY = "stripe_api_key";
-    /** Stripe支付开关:false,true */
-    public static final String CONFIG_STRIPE_SWITCH = "stripe_switch";
 
     /** 商户保证金额 */
     public static final String MERCHANT_GUARANTEED_AMOUNT = "guaranteed_amount";
@@ -257,8 +221,12 @@ public class SysConfigConstants {
     public static final String MERCHANT_TRANSFER_MIN_AMOUNT = "transfer_min_amount";
     /** 商户每笔最高转账额度 */
     public static final String MERCHANT_TRANSFER_MAX_AMOUNT = "transfer_max_amount";
-    /** 商户余额冻结期 */
-    public static final String MERCHANT_BALANCE_FREEZE_DAY = "balance_freeze_day";
+    /** 商户分账节点:pay:订单支付后，receipt:订单收货后，complete:订单完成后 */
+    public static final String MERCHANT_SHARE_NODE = "merchant_share_node";
+    /** 商户分账冻结时间（天） */
+    public static final String MERCHANT_SHARE_FREEZE_TIME = "merchant_share_freeze_time";
+
+
 
     /** 系统配置列表 */
     public static final String CONFIG_LIST = "config_list";
@@ -289,22 +257,10 @@ public class SysConfigConstants {
     public static final String PLATFROM_INTELLIGENT_AGREEMENT = "platfromIntelligentAgreement";
     /** 平台规则 */
     public static final String PLATFROM_RULE_AGREEMENT = "platfromRuleAgreement";
+    /** 优惠券规则 */
+    public static final String COUPON_AGREEMENT = "couponAgreement";
 
     /********************************************************************************************* 协议END ****************/
-
-    /** 首页banner类型 */
-    public static final String FORNT_INDEX_BANNER_TYPE = "index_banner_type";
-
-//    /** PC首页店铺街背景图 */
-//    public static final String PC_HOME_SHOP_STREET_BACK_IMAGE = "pc_home_shop_street_back";
-    /** PC首页推荐商品竖图 */
-    public static final String PC_HOME_RECOMMEND_IMAGE = "pc_home_recommend_image";
-    /** PC店铺街头图 */
-    public static final String PC_SHOP_STREET_HEADER_IMAGE = "pc_shop_street_header_image";
-    /** PC顶部logo */
-    public static final String PC_TOP_LOGO = "pc_top_logo";
-    /** PC登录页左侧展示图 */
-    public static final String PC_LOGIN_LEFT_IMAGE = "pc_login_left_image";
 
 
     /** 一号通账号 */
@@ -343,5 +299,40 @@ public class SysConfigConstants {
 
     /** 版权-授权标签 */
     public static final String CONFIG_INSTALL_STATISTICS = "is_install";
+
+    /** 底部导航—是否自定义 */
+    public static final String CONFIG_BOTTOM_NAVIGATION_IS_CUSTOM = "bottom_navigation_is_custom";
+
+    /** 新人礼—开关 */
+    public static final String NEW_PEOPLE_PRESENT_SWITCH = "new_people_present_switch";
+    /** 新人礼—优惠券 */
+    public static final String NEW_PEOPLE_PRESENT_COUPON = "new_people_present_coupon";
+    /** 生日有礼—开关 */
+    public static final String BIRTHDAY_PRESENT_SWITCH = "birthday_present_switch";
+    /** 生日有礼—优惠券 */
+    public static final String BIRTHDAY_PRESENT_COUPON = "birthday_present_coupon";
+
+    /** 公众号-浏览访问方式 */
+    public static final String WECHAT_PUBLIC_LOGIN_TYPE = "wechat_browser_visit";
+    /** 小程序—手机号授权验证类型 */
+    public static final String WECHAT_ROUTINE_PHONE_VERIFICATION = "routine_phone_verification";
+
+    /** PC商城—左上角logo */
+    public static final String PC_SHOPPING_LEFT_TOP_LOGO = "pc_shopping_left_top_logo";
+    /** PC商城—品牌好店广告图 */
+    public static final String PC_SHOPPING_GOOD_STORE_IMAGE = "pc_shopping_good_store_image";
+    /** PC商城—手机体验购买二维码类型 1:小程序 2:公众号/H5 */
+    public static final String PC_SHOPPING_GO_PHONE_QR_CODE_TYPE = "pc_shopping_go_phone_qr_code_type";
+    /** PC商城授权信息—联系电话 */
+    public static final String PC_SHOPPING_AUTHORIZE_PHONE = "pc_shopping_authorize_phone";
+    /** PC商城授权信息—地址 */
+    public static final String PC_SHOPPING_AUTHORIZE_ADDRESS = "pc_shopping_authorize_address";
+    /** PC商城授权信息—授权信息 */
+    public static final String PC_SHOPPING_AUTHORIZE_INFO = "pc_shopping_authorize_info";
+    /** PC商城授权信息—备案号 */
+    public static final String PC_SHOPPING_AUTHORIZE_FILING_NUM = "pc_shopping_authorize_filing_num";
+
+    /** 系统商品复制类型 */
+    public static final String CONFIG_PRODUCT_COPY_TYPE = "system_product_copy_type";
 
 }

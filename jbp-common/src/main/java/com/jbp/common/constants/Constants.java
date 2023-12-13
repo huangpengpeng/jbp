@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -15,8 +15,6 @@ package com.jbp.common.constants;
 public class Constants {
 
     public static final long TOKEN_EXPRESS_MINUTES = (60 * 24); //3小时
-
-    public static final int HTTPSTATUS_CODE_SUCCESS = 200;
 
     public static final int NUM_ZERO = 0;
     public static final int NUM_ONE = 1;
@@ -70,10 +68,18 @@ public class Constants {
     public static final String OPERATION_TYPE_QUICK_ADD = "quick";
     /** 操作类型-扣减 */
     public static final String OPERATION_TYPE_SUBTRACT = "sub";
+    /** 操作类型-活动创建 */
+    public static final String OPERATION_TYPE_ACTIVITY_CREATE = "create";
+    /** 操作类型-活动回归 */
+    public static final String OPERATION_TYPE_ACTIVITY_ROLL_BACK = "back";
 
     /** 自定义表单开关：关闭 */
     public static final String CONFIG_FORM_SWITCH_CLOSE = "'0'";
     /** 自定义表单开关：开启 */
     public static final String CONFIG_FORM_SWITCH_OPEN = "'1'";
 
+    /** 公共IS字段值：0（未删除、未开启） */
+    public static final Integer COMMON_IS_FILED_ZERO = 0;
+    /** 公共IS字段值：1（已删除、已开启） */
+    public static final Integer COMMON_IS_FILED_ONE = 1;
 }

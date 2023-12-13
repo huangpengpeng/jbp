@@ -14,7 +14,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -25,7 +25,8 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "RefundOrderSearchRequest对象", description = "退款订单列表请求对象")
-public class RefundOrderSearchRequest implements Serializable {
+public class RefundOrderSearchRequest extends PageParamRequest implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "商户ID, 平台端调用时有效")
@@ -40,7 +41,7 @@ public class RefundOrderSearchRequest implements Serializable {
     @ApiModelProperty(value = "创建时间区间")
     private String dateLimit;
 
-    @ApiModelProperty(value = "退款状态：0:待审核 1:审核未通过 2：退款中 3:已退款 9:全部")
+    @ApiModelProperty(value = "售后状态：0:待审核 1:商家拒绝 2：退款中 3:已退款 4:用户退货 5:商家待收货 6:已撤销 9:全部")
     @NotNull(message = "退款状态不能为空")
-    private Integer refundStatus;
+    private Integer refundStatus = 9;
 }

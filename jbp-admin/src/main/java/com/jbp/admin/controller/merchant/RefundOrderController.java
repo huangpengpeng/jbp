@@ -3,15 +3,13 @@ package com.jbp.admin.controller.merchant;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.OrderRefundAuditRequest;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.RefundOrderRemarkRequest;
-import com.jbp.common.request.RefundOrderSearchRequest;
+import com.jbp.common.request.*;
 import com.jbp.common.response.MerchantRefundOrderPageResponse;
 import com.jbp.common.response.RefundOrderAdminDetailResponse;
 import com.jbp.common.response.RefundOrderCountItemResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.RefundOrderService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -45,7 +43,7 @@ public class RefundOrderController {
     @ApiOperation(value = "商户端退款订单分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<MerchantRefundOrderPageResponse>> getList(@Validated RefundOrderSearchRequest request, @Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(refundOrderService.getMerchantAdminPage(request, pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(refundOrderService.getMerchantAdminPage(request)));
     }
 
     @PreAuthorize("hasAuthority('merchant:refund:order:detail')")
@@ -73,28 +71,60 @@ public class RefundOrderController {
         return CommonResult.failed();
     }
 
-    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单退款")
-    @PreAuthorize("hasAuthority('merchant:refund:order:refund')")
-    @ApiOperation(value = "订单退款")
-    @RequestMapping(value = "/refund", method = RequestMethod.GET)
-    public CommonResult<String> refund(@ModelAttribute @Validated OrderRefundAuditRequest request) {
-        if (refundOrderService.refund(request)) {
+//    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单退款")
+//    @PreAuthorize("hasAuthority('merchant:refund:order:refund')")
+//    @ApiOperation(value = "订单退款")
+//    @RequestMapping(value = "/refund", method = RequestMethod.GET)
+//    public CommonResult<String> refund(@ModelAttribute @Validated OrderRefundAuditRequest request) {
+//        if (refundOrderService.refund(request)) {
+//            return CommonResult.success();
+//        }
+//        return CommonResult.failed();
+//    }
+//
+//    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单拒绝退款")
+//    @PreAuthorize("hasAuthority('merchant:refund:order:refund:refuse')")
+//    @ApiOperation(value = "拒绝退款")
+//    @RequestMapping(value = "/refund/refuse", method = RequestMethod.GET)
+//    public CommonResult<String> refundRefuse(@ModelAttribute @Validated OrderRefundAuditRequest request) {
+//        if (refundOrderService.refundRefuse(request)) {
+//            return CommonResult.success();
+//        }
+//        return CommonResult.failed();
+//    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "退款单审核")
+    @PreAuthorize("hasAuthority('merchant:refund:order:audit')")
+    @ApiOperation(value = "退款单审核")
+    @RequestMapping(value = "/audit", method = RequestMethod.POST)
+    public CommonResult<String> audit(@RequestBody @Validated OrderRefundAuditRequest request) {
+        if (refundOrderService.audit(request)) {
             return CommonResult.success();
         }
         return CommonResult.failed();
     }
 
-    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单拒绝退款")
-    @PreAuthorize("hasAuthority('merchant:refund:order:refund:refuse')")
-    @ApiOperation(value = "拒绝退款")
-    @RequestMapping(value = "/refund/refuse", method = RequestMethod.GET)
-    public CommonResult<String> refundRefuse(@ModelAttribute @Validated OrderRefundAuditRequest request) {
-        if (refundOrderService.refundRefuse(request)) {
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "退款单收到退货")
+    @PreAuthorize("hasAuthority('merchant:refund:order:receiving')")
+    @ApiOperation(value = "退款单收到退货")
+    @RequestMapping(value = "/receiving/{refundOrderNo}", method = RequestMethod.POST)
+    public CommonResult<String> receiving(@PathVariable(value = "refundOrderNo") String refundOrderNo) {
+        if (refundOrderService.receiving(refundOrderNo)) {
             return CommonResult.success();
         }
         return CommonResult.failed();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "退款单拒绝收货")
+    @PreAuthorize("hasAuthority('merchant:refund:order:receiving:reject')")
+    @ApiOperation(value = "退款单拒绝收货")
+    @RequestMapping(value = "/receiving/reject", method = RequestMethod.POST)
+    public CommonResult<String> receivingReject(@RequestBody @Validated RejectReceivingRequest request) {
+        if (refundOrderService.receivingReject(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
 }
 
 

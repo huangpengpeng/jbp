@@ -1,11 +1,12 @@
 package com.jbp.front.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.coupon.Coupon;
+import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.system.SystemConfig;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.IndexInfoResponse;
-import com.jbp.common.response.IndexMerchantResponse;
-import com.jbp.common.response.ProductCommonResponse;
+import com.jbp.common.response.*;
+import com.jbp.common.vo.MyRecord;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -58,11 +59,56 @@ public interface IndexService{
 
     /**
      * 首页商户列表
+     * @param recomdProdsNum 推荐商品数量
      */
-    List<IndexMerchantResponse> findIndexMerchantList();
+    List<IndexMerchantResponse> findIndexMerchantListByRecomdNum(Integer recomdProdsNum);
+
+    /**
+     * 根据商户id集合查询对应商户信息
+     * @param ids id集合
+     * @return 商户id集合
+     */
+    List<IndexMerchantResponse> findIndexMerchantListByIds(String ids);
 
     /**
      * 获取公司版权图片
      */
     String getCopyrightCompanyImage();
+
+    /**
+     * 获取首页秒杀信息
+     */
+    List<SeckillProduct> getIndexSeckillInfo();
+
+    /**
+     * 获取首页优惠券信息
+     * @param limit 优惠券数量
+     */
+    List<Coupon> getIndexCouponInfo(Integer limit);
+
+    /**
+     * 获取底部导航信息
+     */
+    PageLayoutBottomNavigationResponse getBottomNavigationInfo();
+
+    /**
+     * 获取版本信息
+     * @return AppVersionResponse
+     */
+    AppVersionResponse getVersion();
+
+    /**
+     * 获取公司版权图片
+     */
+    CopyrightConfigInfoResponse getCopyrightInfo();
+
+    /**
+     * 获取移动端域名
+     */
+    String getFrontDomain();
+
+    /**
+     * 获取平台客服
+     */
+    CustomerServiceResponse getPlatCustomerService();
 }

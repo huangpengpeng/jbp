@@ -11,12 +11,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.MerchantClosingRecordDao;
-import com.jbp.service.service.MerchantClosingRecordService;
-import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.common.constants.BrokerageRecordConstants;
 import com.jbp.common.constants.ClosingConstant;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
@@ -24,16 +18,18 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.closing.MerchantClosingRecord;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.user.User;
-import com.jbp.common.model.user.UserBrokerageRecord;
-import com.jbp.common.model.user.UserClosing;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantClosingSearchRequest;
 import com.jbp.common.response.MerchantClosingPlatformPageResponse;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.SecurityUtil;
-import com.jbp.common.utils.UrlUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.MerchantClosingRecordDao;
+import com.jbp.service.service.MerchantClosingRecordService;
+import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.SystemConfigService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +45,7 @@ import java.util.Map;
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -215,6 +211,24 @@ public class MerchantClosingRecordServiceImpl extends ServiceImpl<MerchantClosin
         }
         lqw.orderByDesc(MerchantClosingRecord::getId);
         return CommonPage.copyPageInfo(page, dao.selectList(lqw));
+    }
+
+    /**
+     * 获取某一天的所有数据
+     * @param merId 商户id，0为所有商户
+     * @param date 日期：年-月-日
+     * @return List
+     */
+    @Override
+    public List<MerchantClosingRecord> findByDate(Integer merId, String date) {
+        LambdaQueryWrapper<MerchantClosingRecord> lqw = Wrappers.lambdaQuery();
+        if (merId > 0) {
+            lqw.eq(MerchantClosingRecord::getMerId, merId);
+        }
+        lqw.eq(MerchantClosingRecord::getAuditStatus, ClosingConstant.CLOSING_AUDIT_STATUS_SUCCESS);
+        lqw.eq(MerchantClosingRecord::getAccountStatus, ClosingConstant.CLOSING_ACCOUNT_STATUS_SUCCESS);
+        lqw.apply("date_format(update_time, '%Y-%m-%d') = {0}", date);
+        return dao.selectList(lqw);
     }
 }
 

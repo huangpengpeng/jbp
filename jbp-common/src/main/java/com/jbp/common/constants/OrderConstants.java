@@ -1,13 +1,11 @@
 package com.jbp.common.constants;
 
-import io.swagger.annotations.ApiModelProperty;
-
 /**
  * 订单常量类
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -71,6 +69,8 @@ public class OrderConstants {
     public static final Integer ORDER_TYPE_NORMAL = 0;
     /** 订单类型-视频号订单 */
     public static final Integer ORDER_TYPE_VIDEO = 1;
+    /** 订单类型-秒杀订单 */
+    public static final Integer ORDER_TYPE_SECKILL = 2;
 
     /** 订单配送方式-快递 */
     public static final Integer ORDER_SHIPPING_TYPE_EXPRESS = 1;
@@ -94,6 +94,16 @@ public class OrderConstants {
     public static final Integer ORDER_REFUND_STATUS_REFUNDING = 2;
     /** 订单退款状态-已退款 */
     public static final Integer ORDER_REFUND_STATUS_REFUND = 3;
+
+    /** 订单下单类型-购物车 */
+    public static final String PLACE_ORDER_TYPE_CART = "shoppingCart";
+    /** 订单下单类型-购物车 */
+    public static final String PLACE_ORDER_TYPE_BUY_NOW = "buyNow";
+    /** 订单下单类型-购物车 */
+    public static final String PLACE_ORDER_TYPE_VIDEO = "video";
+    /** 订单下单类型-购物车 */
+    public static final String PLACE_ORDER_TYPE_SECKILL = "seckill";
+
 
     /** 商户端订单查询状态-所有 */
     public static final String MERCHANT_ORDER_STATUS_ALL = "all";
@@ -127,10 +137,16 @@ public class OrderConstants {
 
     /** 商户退款订单状态-待审核 */
     public static final Integer MERCHANT_REFUND_ORDER_STATUS_APPLY = 0;
-    /** 商户退款订单状态-审核未通过 */
+    /** 商户退款订单状态-商家拒绝 */
     public static final Integer MERCHANT_REFUND_ORDER_STATUS_REJECT = 1;
     /** 商户退款订单状态-退款中 */
     public static final Integer MERCHANT_REFUND_ORDER_STATUS_REFUNDING = 2;
     /** 商户退款订单状态-已退款 */
     public static final Integer MERCHANT_REFUND_ORDER_STATUS_REFUND = 3;
+    /** 商户退款订单状态-用户退货 */
+    public static final Integer MERCHANT_REFUND_ORDER_STATUS_RETURN_GOODS = 4;
+    /** 商户退款订单状态-商家待收货 */
+    public static final Integer MERCHANT_REFUND_ORDER_STATUS_AWAIT_RECEIVING = 5;
+    /** 商户退款订单状态-撤销 */
+    public static final Integer MERCHANT_REFUND_ORDER_STATUS_REVOKE = 6;
 }

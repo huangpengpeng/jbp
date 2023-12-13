@@ -1,6 +1,7 @@
 package com.jbp.common.model.coupon;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -49,10 +50,10 @@ public class CouponUser implements Serializable {
     @ApiModelProperty(value = "发行方，1-平台，2-商户")
     private Integer publisher;
 
-    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-平台券")
+    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券")
     private Integer category;
 
-    @ApiModelProperty(value = "领取类型 1-手动领取,2-商品赠送券")
+    @ApiModelProperty(value = "领取类型 1-手动领取,2-商品赠送券,3-平台活动发放")
     private Integer receiveType;
 
     @ApiModelProperty(value = "优惠券类型 1-满减券,2-折扣券")
@@ -85,5 +86,11 @@ public class CouponUser implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @TableField(exist = false)
+    @ApiModelProperty(value = "是否可选")
+    private Boolean isChoose = false;
 
+    @TableField(exist = false)
+    @ApiModelProperty(value = "是否选中")
+    private Boolean isChecked = false;
 }

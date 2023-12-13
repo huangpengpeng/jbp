@@ -7,11 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.SystemRoleDao;
-import com.jbp.service.service.SystemAdminService;
-import com.jbp.service.service.SystemMenuService;
-import com.jbp.service.service.SystemRoleMenuService;
-import com.jbp.service.service.SystemRoleService;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -26,6 +21,11 @@ import com.jbp.common.response.RoleInfoResponse;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.MenuCheckTree;
 import com.jbp.common.vo.MenuCheckVo;
+import com.jbp.service.dao.SystemRoleDao;
+import com.jbp.service.service.SystemAdminService;
+import com.jbp.service.service.SystemMenuService;
+import com.jbp.service.service.SystemRoleMenuService;
+import com.jbp.service.service.SystemRoleService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ import java.util.stream.Stream;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -108,6 +108,10 @@ public class SystemRoleServiceImpl extends ServiceImpl<SystemRoleDao, SystemRole
         if (role.getType().equals(RoleEnum.SUPER_ADMIN.getValue())
                 || role.getType().equals(RoleEnum.SUPER_MERCHANT.getValue())) {
             throw new CrmebException("系统内置权限，不允许编辑");
+        }
+        SystemAdmin currentAdmin = SecurityUtil.getLoginUserVo().getUser();
+        if (!currentAdmin.getMerId().equals(role.getMerId())) {
+            throw new CrmebException("非自己管理的角色不能修改");
         }
         if (role.getStatus().equals(request.getStatus())) {
             return true;
@@ -258,6 +262,10 @@ public class SystemRoleServiceImpl extends ServiceImpl<SystemRoleDao, SystemRole
         if (ObjectUtil.isNull(systemRole)) {
             throw new CrmebException("角色不存在");
         }
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        if (!systemAdmin.getMerId().equals(systemRole.getMerId())) {
+            throw new CrmebException("角色不存在");
+        }
         // 查询角色对应的菜单(权限)
         List<Integer> menuIdList = systemRoleMenuService.getMenuListByRid(id);
         List<SystemMenu> menuList;
@@ -324,10 +332,6 @@ public class SystemRoleServiceImpl extends ServiceImpl<SystemRoleDao, SystemRole
         if (currentAdmin.getType().equals(RoleEnum.SUPER_MERCHANT.getValue()) ||
                 currentAdmin.getType().equals(RoleEnum.MERCHANT_ADMIN.getValue())) {
             return currentAdmin.getMerId();
-        }
-        if (currentAdmin.getType().equals(RoleEnum.SUPER_ADMIN.getValue()) ||
-                currentAdmin.getType().equals(RoleEnum.PLATFORM_ADMIN.getValue())) {
-            return -1;
         }
         return -1;
     }

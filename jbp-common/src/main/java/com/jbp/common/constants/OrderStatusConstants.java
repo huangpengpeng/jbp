@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -52,5 +52,7 @@ public class OrderStatusConstants {
     /** 订单操作日志类型说明-用户删除订单 */
     public static final String ORDER_LOG_USER_DELETE = "用户删除订单";
     /** 订单操作日志类型说明-用户收货 */
-    public static final String ORDER_LOG_MESSAGE_TAKE = "用户已收货";
+    public static final String ORDER_LOG_USER_RECEIPT = "用户已收货";
+    /** 订单操作日志类型说明-系统自动收货 */
+    public static final String ORDER_LOG_SYSTEM_AUTO_RECEIPT = "系统自动收货";
 }

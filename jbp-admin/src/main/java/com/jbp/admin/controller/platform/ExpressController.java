@@ -9,6 +9,7 @@ import com.jbp.common.request.ExpressUpdateShowRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ExpressService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ import java.util.List;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -76,9 +77,11 @@ public class ExpressController {
     @RequestMapping(value = "/sync/express", method = RequestMethod.POST)
     public CommonResult<String> syncExpress() {
         if (expressService.syncExpress()) {
-            return CommonResult.success();
+            CommonResult<String> success = CommonResult.success();
+            success.setMessage("同步物流公司成功");
+            return success;
         }
-        return CommonResult.failed();
+        return CommonResult.failed("同步物流公司失败");
     }
 
 

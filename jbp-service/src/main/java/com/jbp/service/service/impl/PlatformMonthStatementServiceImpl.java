@@ -9,8 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.PlatformMonthStatementDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.model.bill.PlatformMonthStatement;
 import com.jbp.common.model.order.OrderProfitSharing;
@@ -20,6 +18,8 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.PlatformMonthStatementDao;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ import java.util.List;
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -108,7 +108,7 @@ public class PlatformMonthStatementServiceImpl extends ServiceImpl<PlatformMonth
     private void writeMonthStatement(PlatformMonthStatement monthStatement) {
         List<OrderProfitSharing> sharingList = orderProfitSharingService.findByMonth(0, monthStatement.getDataDate());
         List<RefundOrder> refundOrderList = refundOrderService.findByMonth(0, monthStatement.getDataDate());
-        List<RechargeOrder> rechargeOrderList = rechargeOrderService.findByMonth(monthStatement.getDataDate());
+//        List<RechargeOrder> rechargeOrderList = rechargeOrderService.findByMonth(monthStatement.getDataDate());
         // 订单支付总金额
         BigDecimal orderPayAmount = new BigDecimal("0.00");
         // 总订单支付笔数
@@ -131,12 +131,22 @@ public class PlatformMonthStatementServiceImpl extends ServiceImpl<PlatformMonth
         BigDecimal firstBrokerage = new BigDecimal("0.00");
         // 二级佣金额
         BigDecimal secondBrokerage = new BigDecimal("0.00");
-        // 充值金额
-        BigDecimal rechargeAmount = new BigDecimal("0.00");
-        // 充值笔数
-        int rechargeNum = 0;
+//        // 充值金额
+//        BigDecimal rechargeAmount = new BigDecimal("0.00");
+//        // 充值笔数
+//        int rechargeNum = 0;
         // 订单积分抵扣金额
-        BigDecimal integralPrice = BigDecimal.ZERO;
+        BigDecimal integralPrice = new BigDecimal("0.00");
+        BigDecimal platCouponPrice = new BigDecimal("0.00");
+        BigDecimal brokeragePrice = new BigDecimal("0.00");
+        // 退款部分
+        BigDecimal refundPlatCouponPrice = new BigDecimal("0.00");
+        BigDecimal refundHandlingFee = new BigDecimal("0.00");
+        BigDecimal refundBrokeragePrice = new BigDecimal("0.00");
+        BigDecimal refundMerchantTransferAmount = new BigDecimal("0.00");
+
+        BigDecimal freightFee = new BigDecimal("0.00");
+        BigDecimal refundFreightFee = new BigDecimal("0.00");
 
         if (CollUtil.isNotEmpty(sharingList)) {
             orderPayAmount =  sharingList.stream().map(OrderProfitSharing::getOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -147,25 +157,61 @@ public class PlatformMonthStatementServiceImpl extends ServiceImpl<PlatformMonth
             secondBrokerage = sharingList.stream().map(OrderProfitSharing::getSecondBrokerageFee).reduce(BigDecimal.ZERO, BigDecimal::add);
             merchantTransferNum = sharingList.size();
             integralPrice = sharingList.stream().map(OrderProfitSharing::getIntegralPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            platCouponPrice = sharingList.stream().map(OrderProfitSharing::getPlatCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            brokeragePrice = firstBrokerage.add(secondBrokerage);
+            freightFee = sharingList.stream().map(OrderProfitSharing::getFreightFee).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
         if (CollUtil.isNotEmpty(refundOrderList)) {
             refundAmount = refundOrderList.stream().map(RefundOrder::getRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             refundReplaceBrokerage = refundOrderList.stream().filter(RefundOrder::getIsReplace).map(e -> e.getRefundFirstBrokerageFee().add(e.getRefundSecondBrokerageFee())).reduce(BigDecimal.ZERO, BigDecimal::add);
             refundReplaceIntegralPrice = refundOrderList.stream().map(RefundOrder::getRefundIntegralPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             refundOrderNum = refundOrderList.size();
-        }
-        if (CollUtil.isNotEmpty(rechargeOrderList)) {
-            rechargeNum = rechargeOrderList.size();
-            rechargeAmount = rechargeOrderList.stream().map(RechargeOrder::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
+            refundPlatCouponPrice = refundOrderList.stream().map(RefundOrder::getRefundPlatCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundHandlingFee = refundOrderList.stream().map(RefundOrder::getPlatformRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundMerchantTransferAmount = refundOrderList.stream().map(RefundOrder::getMerchantRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundBrokeragePrice = refundOrderList.stream().map(e -> e.getRefundFirstBrokerageFee().add(e.getRefundSecondBrokerageFee())).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundFreightFee = refundOrderList.stream().map(RefundOrder::getRefundFreightFee).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 支出总金额 = 商户分账金额 + 一级分佣金额 + 二级分佣金额 + 退款金额  + 平台代扣佣金金额
-        BigDecimal payoutAmount = merchantTransferAmount.add(firstBrokerage).add(secondBrokerage).add(refundAmount).add(refundReplaceBrokerage);
-        // 支出笔数 = 分账笔数 + 退款笔数
-        int payoutNum = merchantTransferNum + refundOrderNum;
+        }
+//        if (CollUtil.isNotEmpty(rechargeOrderList)) {
+//            rechargeNum = rechargeOrderList.size();
+//            rechargeAmount = rechargeOrderList.stream().map(RechargeOrder::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+//        }
 
-        // 平台日收支 = 日手续费收入 + 退款平台积分抵扣金额 - 退款金额
-        BigDecimal incomeExpenditure = handlingFee.add(refundReplaceIntegralPrice).subtract(refundAmount);
+//        // 支出总金额 = 商户分账金额 + 一级分佣金额 + 二级分佣金额 + 退款金额  + 平台代扣佣金金额
+//        BigDecimal payoutAmount = merchantTransferAmount.add(firstBrokerage).add(secondBrokerage).add(refundAmount).add(refundReplaceBrokerage);
+//        // 支出笔数 = 分账笔数 + 退款笔数
+//        int payoutNum = merchantTransferNum + refundOrderNum;
+//
+//        // 平台日收支 = 日手续费收入 + 退款平台积分抵扣金额 - 退款金额
+//        BigDecimal incomeExpenditure = handlingFee.add(refundReplaceIntegralPrice).subtract(refundAmount);
+
+        // 订单实收 = 订单实际支付金额
+        BigDecimal orderIncome = orderPayAmount;
+
+        // 订单应收
+        BigDecimal orderReceivable = orderIncome.add(platCouponPrice).add(integralPrice);
+
+        // 订单应退 = 商户退款 + 平台退款 + 佣金退款
+        BigDecimal orderRefundable = refundMerchantTransferAmount.add(refundHandlingFee).add(refundBrokeragePrice);
+
+        // 订单实退 = -订单应退 + 退还平台优惠券补贴 + 退还平台积分补贴
+        BigDecimal orderRefund = refundPlatCouponPrice.add(refundReplaceIntegralPrice).subtract(orderRefundable);
+
+        // 商家分账 = 支付分账 - 退款分账
+        BigDecimal merchantProfitSharing = merchantTransferAmount.subtract(refundMerchantTransferAmount);
+
+        // 佣金 = 支付佣金 - 退还佣金 + 退款佣金代扣
+        BigDecimal brokerage = brokeragePrice.subtract(refundBrokeragePrice).add(refundReplaceBrokerage);
+
+        // 实际收入
+        BigDecimal income = orderIncome.add(orderRefund);
+
+        // 实际支出 = 商家分账 + 佣金
+        BigDecimal payout = merchantProfitSharing.add(brokerage);
+
+        // 当日结余 = 实际收入 - 实际支出
+        BigDecimal incomeExpenditure = income.subtract(payout);
 
         monthStatement.setOrderPayAmount(orderPayAmount);
         monthStatement.setTotalOrderNum(orderPayNum);
@@ -175,15 +221,26 @@ public class PlatformMonthStatementServiceImpl extends ServiceImpl<PlatformMonth
         monthStatement.setFirstBrokerage(firstBrokerage);
         monthStatement.setSecondBrokerage(secondBrokerage);
         monthStatement.setIntegralPrice(integralPrice);
-        monthStatement.setPayoutAmount(payoutAmount);
-        monthStatement.setPayoutNum(payoutNum);
+//        monthStatement.setPayoutAmount(payoutAmount);
+//        monthStatement.setPayoutNum(payoutNum);
         monthStatement.setRefundAmount(refundAmount);
         monthStatement.setRefundReplaceBrokerage(refundReplaceBrokerage);
         monthStatement.setRefundReplaceIntegralPrice(refundReplaceIntegralPrice);
         monthStatement.setRefundNum(refundOrderNum);
-        monthStatement.setRechargeAmount(rechargeAmount);
-        monthStatement.setRechargeNum(rechargeNum);
-        monthStatement.setIncomeExpenditure(incomeExpenditure);
+//        monthStatement.setRechargeAmount(rechargeAmount);
+//        monthStatement.setRechargeNum(rechargeNum);
+        monthStatement.setIncomeExpenditure(incomeExpenditure.abs());
+
+        monthStatement.setPlatCouponPrice(platCouponPrice);
+        monthStatement.setBrokeragePrice(brokeragePrice);
+        monthStatement.setOrderRefundPrice(orderRefund.abs());
+        monthStatement.setRefundPlatCouponPrice(refundPlatCouponPrice);
+        monthStatement.setRefundHandlingFee(refundHandlingFee);
+        monthStatement.setRefundBrokeragePrice(refundBrokeragePrice);
+        monthStatement.setRefundMerchantTransferAmount(refundMerchantTransferAmount);
+
+        monthStatement.setFreightFee(freightFee);
+        monthStatement.setRefundFreightFee(refundFreightFee);
     }
 }
 

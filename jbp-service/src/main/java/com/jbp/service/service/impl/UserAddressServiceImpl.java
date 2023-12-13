@@ -6,15 +6,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.UserAddressDao;
-import com.jbp.service.service.CityRegionService;
-import com.jbp.service.service.UserAddressService;
-import com.jbp.service.service.UserService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.city.CityRegion;
 import com.jbp.common.model.user.UserAddress;
 import com.jbp.common.request.UserAddressRequest;
 import com.jbp.common.request.WechatAddressImportRequest;
+import com.jbp.service.dao.UserAddressDao;
+import com.jbp.service.service.CityRegionService;
+import com.jbp.service.service.UserAddressService;
+import com.jbp.service.service.UserService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -50,10 +50,10 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
      * 创建地址
      *
      * @param request UserAddressRequest 参数
-     * @return Boolean
+     * @return 地址ID
      */
     @Override
-    public Boolean create(UserAddressRequest request) {
+    public Integer create(UserAddressRequest request) {
         UserAddress userAddress = new UserAddress();
         BeanUtils.copyProperties(request, userAddress);
         userAddress.setUid(userService.getUserIdException());
@@ -62,7 +62,11 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
             //把当前用户其他默认地址取消
             cancelDefault(userAddress.getUid());
         }
-        return save(userAddress);
+        boolean save = save(userAddress);
+        if (!save) {
+            throw new CrmebException("创建地址失败");
+        }
+        return userAddress.getId();
     }
 
     /**
@@ -83,6 +87,12 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
         }
         UserAddress address = new UserAddress();
         BeanUtils.copyProperties(request, address);
+        if (StrUtil.isBlank(request.getStreet())) {
+            address.setStreet("");
+        }
+        if (address.getIsDefault()) {
+            cancelDefault(userId);
+        }
         return updateById(address);
     }
 
@@ -133,7 +143,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
     public UserAddress getDetail(Integer id) {
         Integer UserId = userService.getUserIdException();
         LambdaQueryWrapper<UserAddress> lqw = Wrappers.lambdaQuery();
-        lqw.select(UserAddress::getId, UserAddress::getRealName, UserAddress::getPhone, UserAddress::getProvince,
+        lqw.select(UserAddress::getId, UserAddress::getRealName, UserAddress::getPhone, UserAddress::getProvince, UserAddress::getProvinceId,
                 UserAddress::getCity, UserAddress::getDistrict, UserAddress::getStreet, UserAddress::getDetail,
                 UserAddress::getPostCode, UserAddress::getIsDefault, UserAddress::getCityId, UserAddress::getDistrictId);
         lqw.eq(UserAddress::getId, id);
@@ -166,9 +176,9 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
     public List<UserAddress> getAllList() {
         Integer UserId = userService.getUserIdException();
         LambdaQueryWrapper<UserAddress> lqw = Wrappers.lambdaQuery();
-        lqw.select(UserAddress::getId, UserAddress::getRealName, UserAddress::getPhone, UserAddress::getProvince,
+        lqw.select(UserAddress::getId, UserAddress::getRealName, UserAddress::getPhone, UserAddress::getProvince, UserAddress::getProvinceId,
                 UserAddress::getCity, UserAddress::getDistrict, UserAddress::getDetail, UserAddress::getPostCode,
-                UserAddress::getIsDefault, UserAddress::getCityId, UserAddress::getDistrictId);
+                UserAddress::getIsDefault, UserAddress::getCityId, UserAddress::getDistrictId, UserAddress::getStreet);
         lqw.eq(UserAddress::getUid, UserId);
         lqw.eq(UserAddress::getIsDel, false);
         lqw.orderByDesc(UserAddress::getIsDefault);
@@ -196,18 +206,16 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
     }
 
     /**
-     * 微信地址导入
-     * @param request 地址参数
-     * @return 是否成功
+     * 获取微信地址信息
+     * @param request 微信地址参数
      */
     @Override
-    public Boolean wechatImport(WechatAddressImportRequest request) {
-        Integer userId = userService.getUserIdException();
+    public UserAddress getWechatInfo(WechatAddressImportRequest request) {
 
         CityRegion countyRegion = cityRegionService.getByRegionId(Integer.parseInt(request.getNationalCode()));
         CityRegion provinceRegion;
         CityRegion cityRegion;
-        if (ObjectUtil.isNotNull(countyRegion)) {
+        if (ObjectUtil.isNotNull(countyRegion) && countyRegion.getRegionType().equals(3)) {
             cityRegion = cityRegionService.getByRegionId(countyRegion.getParentId());
             provinceRegion = cityRegionService.getByRegionId(cityRegion.getParentId());
         } else {
@@ -226,17 +234,15 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
             }
         }
         UserAddress userAddress = new UserAddress();
-        userAddress.setUid(userId);
-        userAddress.setRealName(request.getUserName());
-        userAddress.setPhone(request.getTelNumber());
         userAddress.setProvince(provinceRegion.getRegionName());
+        userAddress.setProvinceId(provinceRegion.getRegionId());
         userAddress.setCity(cityRegion.getRegionName());
         userAddress.setCityId(cityRegion.getRegionId());
         userAddress.setDistrict(countyRegion.getRegionName());
         userAddress.setDistrictId(countyRegion.getRegionId());
         userAddress.setStreet(StrUtil.isNotBlank(request.getStreetName()) ? request.getStreetName() : "");
         userAddress.setDetail(request.getDetail());
-        return save(userAddress);
+        return userAddress;
     }
 
     /**

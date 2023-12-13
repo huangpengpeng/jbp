@@ -11,10 +11,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.ArticleDao;
-import com.jbp.service.service.ArticleService;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemConfigService;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.article.Article;
@@ -24,6 +20,10 @@ import com.jbp.common.request.ArticleSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleInfoResponse;
 import com.jbp.common.response.ArticleResponse;
+import com.jbp.service.dao.ArticleDao;
+import com.jbp.service.service.ArticleService;
+import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.SystemConfigService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -70,11 +70,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
      * @return PageInfo<Article>
      */
     @Override
-    public PageInfo<ArticleResponse> getList(String cid, PageParamRequest pageParamRequest) {
+    public PageInfo<ArticleResponse> getList(Integer cid, PageParamRequest pageParamRequest) {
         Page<Article> articlePage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
 
         LambdaQueryWrapper<Article> lqw = Wrappers.lambdaQuery();
-        lqw.eq(Article::getCid, cid);
+        if (ObjectUtil.isNotNull(cid) && cid > 0) {
+            lqw.eq(Article::getCid, cid);
+        }
         lqw.eq(Article::getStatus, true);
         lqw.eq(Article::getIsDel, false);
         lqw.orderByDesc(Article::getSort, Article::getId).orderByDesc(Article::getVisit).orderByDesc(Article::getCreateTime);
@@ -199,7 +201,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
         lqw.eq(Article::getStatus, true);
         lqw.eq(Article::getIsDel, false);
         lqw.orderByDesc(Article::getSort, Article::getId);
-        lqw.last(" limit 20");
+        lqw.last(" limit 10");
         List<Article> articleList = dao.selectList(lqw);
         if (CollUtil.isEmpty(articleList)) {
             return CollUtil.newArrayList();

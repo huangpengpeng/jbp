@@ -3,7 +3,9 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.request.SystemUserLevelRequest;
+import com.jbp.common.request.SystemUserLevelRuleRequest;
 import com.jbp.common.request.SystemUserLevelUpdateShowRequest;
+import com.jbp.common.vo.SystemUserLevelConfigVo;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -58,6 +60,47 @@ public interface SystemUserLevelService extends IService<SystemUserLevel> {
      * 使用/禁用
      * @param request request
      */
+    @Deprecated
     Boolean updateShow(SystemUserLevelUpdateShowRequest request);
 
+    /**
+     * 获取用户等级规则
+     * @return 用户等级规则
+     */
+    String getRule();
+
+    /**
+     * 获取用户等级配置
+     * @return 用户等级配置
+     */
+    SystemUserLevelConfigVo getConfig();
+
+    /**
+     * 编辑用户规则
+     * @param request 用户规则参数
+     */
+    Boolean updateRule(SystemUserLevelRuleRequest request);
+
+    /**
+     * 编辑用户等级配置
+     */
+    Boolean updateConfig(SystemUserLevelConfigVo request);
+
+    /**
+     * 获取下一个等级
+     * @param level 当前等级
+     */
+    SystemUserLevel getNextLevel(Integer level);
+
+    /**
+     * 获取经验所属的等级
+     * @param exp 经验
+     */
+    SystemUserLevel getByExp(Integer exp);
+
+    /**
+     * 获取上一个系统用户等级
+     * @param grade 用户等级级别
+     */
+    SystemUserLevel getPreviousGrade(Integer grade);
 }

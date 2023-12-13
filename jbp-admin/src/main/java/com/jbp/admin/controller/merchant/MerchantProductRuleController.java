@@ -9,6 +9,7 @@ import com.jbp.common.request.ProductRuleRequest;
 import com.jbp.common.request.ProductRuleSearchRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ProductRuleService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -64,7 +65,7 @@ public class MerchantProductRuleController {
     @ApiOperation(value = "删除商品规格")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public CommonResult<String> delete(@PathVariable Integer id) {
-        if (productRuleService.removeById(id)) {
+        if (productRuleService.deleteById(id)) {
             return CommonResult.success();
         } else {
             return CommonResult.failed();
@@ -87,8 +88,7 @@ public class MerchantProductRuleController {
     @ApiOperation(value = "商品规格详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     public CommonResult<ProductRule> info(@PathVariable Integer id) {
-        ProductRule ProductRule = productRuleService.getById(id);
-        return CommonResult.success(ProductRule);
+        return CommonResult.success(productRuleService.getRuleInfo(id));
    }
 }
 

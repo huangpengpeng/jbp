@@ -10,7 +10,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -78,4 +78,12 @@ public interface ProductAttrValueService extends IService<ProductAttrValue> {
      * @return 商品属性集合
      */
     List<ProductAttrValue> getByProductIdAndAttrIdList(Integer productId, List<Integer> attrIdList, Integer type);
+
+    /**
+     * 秒杀回滚库存
+     * @param id skuID
+     * @param num 数量
+     * @param sales 销量
+     */
+    Boolean seckillRollBack(Integer id, Integer num, Integer sales);
 }

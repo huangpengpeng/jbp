@@ -16,7 +16,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -61,4 +61,10 @@ public class LoginAdminResponse implements Serializable {
 
     @ApiModelProperty(value = "权限标识数组")
     private List<String> permissionsList;
+
+    @ApiModelProperty(value = "商户星级")
+    private Integer merStarLevel = 0;
+
+    @ApiModelProperty(value = "商户小票打印开关：0关闭，1=手动打印，2=自动打印，3=自动和手动")
+    private Integer merReceiptPrintingSwitch;
 }

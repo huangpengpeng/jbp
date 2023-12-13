@@ -1,7 +1,7 @@
 package com.jbp.front.service.captcha.impl;
 
-import com.jbp.front.service.captcha.CaptchaCacheService;
 import com.jbp.common.captcha.util.CacheUtil;
+import com.jbp.front.service.captcha.CaptchaCacheService;
 
 public class CaptchaCacheServiceMemImpl implements CaptchaCacheService {
     @Override

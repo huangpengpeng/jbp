@@ -7,12 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.SystemNotificationDao;
-import com.jbp.service.service.SmsTemplateService;
-import com.jbp.service.service.SystemNotificationService;
-import com.jbp.service.service.TemplateMessageService;
 import com.jbp.common.constants.NotifyConstants;
-import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.sms.SmsTemplate;
 import com.jbp.common.model.system.SystemNotification;
@@ -21,6 +16,10 @@ import com.jbp.common.request.NotificationInfoRequest;
 import com.jbp.common.request.NotificationSearchRequest;
 import com.jbp.common.request.NotificationUpdateRequest;
 import com.jbp.common.response.NotificationInfoResponse;
+import com.jbp.service.dao.SystemNotificationDao;
+import com.jbp.service.service.SmsTemplateService;
+import com.jbp.service.service.SystemNotificationService;
+import com.jbp.service.service.TemplateMessageService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -276,20 +275,14 @@ public class SystemNotificationServiceImpl extends ServiceImpl<SystemNotificatio
                 lqw.eq(SystemNotification::getMark, NotifyConstants.PAY_SUCCESS_MARK);
                 break;
             case "afterPay":// 支付成功
-                lqw.in(SystemNotification::getMark, NotifyConstants.DELIVER_GOODS_MARK, NotifyConstants.FULFILLMENT_ORDER_MARK, NotifyConstants.RECEIPT_GOODS_MARK);
-                break;
-            case "refundApply":// 申请退款
-                lqw.eq(SystemNotification::getMark, "-1");
+                lqw.in(SystemNotification::getMark, NotifyConstants.DELIVER_GOODS_MARK, NotifyConstants.RECEIPT_GOODS_MARK);
                 break;
             case "beforeRecharge":// 充值之前
-                lqw.eq(SystemNotification::getMark, "-1");
+                lqw.eq(SystemNotification::getMark, NotifyConstants.RECHARGE_SUCCESS_MARK);
                 break;
+            case "refundApply":// 申请退款
             case "createBargain":// 创建砍价
-                lqw.in(SystemNotification::getMark, NotifyConstants.BARGAINING_SUCCESS_MARK);
-                break;
             case "pink":// 参与拼团
-                lqw.in(SystemNotification::getMark, NotifyConstants.GROUP_SUCCESS_MARK);
-                break;
             case "cancelPink":// cancelPink
                 lqw.eq(SystemNotification::getMark, "-1");
                 break;

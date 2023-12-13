@@ -1,15 +1,15 @@
 package com.jbp.admin.controller.merchant;
 
 import cn.hutool.json.JSONException;
+
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
-import com.jbp.common.response.AdminProductListResponse;
-import com.jbp.common.response.ProductInfoResponse;
-import com.jbp.common.response.ProductTabsHeaderResponse;
+import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ProductService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,7 +31,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -177,10 +177,10 @@ public class MerchantProductController {
             @ApiImplicitParam(name = "form", value = "导入平台1=淘宝，2=京东，3=苏宁，4=拼多多, 5=天猫", dataType = "int",  required = true),
             @ApiImplicitParam(name = "url", value = "URL", dataType = "String", required = true),
     })
-    public CommonResult<ProductRequest> importProduct(
+    public CommonResult<ProductResponseForCopyProduct> importProduct(
             @RequestParam @Valid int form,
             @RequestParam @Valid String url) throws IOException, JSONException {
-        ProductRequest productRequest = productService.importProductFromUrl(url, form);
+        ProductResponseForCopyProduct productRequest = productService.importProductFrom99Api(url, form);
         return CommonResult.success(productRequest);
     }
 
@@ -200,6 +200,14 @@ public class MerchantProductController {
     @RequestMapping(value = "/copy/product", method = RequestMethod.POST)
     public CommonResult<Map<String, Object>> copyProduct(@RequestBody @Valid CopyProductRequest request) {
         return CommonResult.success(productService.copyProduct(request.getUrl()));
+    }
+
+    @PreAuthorize("hasAuthority('merchant:product:activity:search:page')")
+    @ApiOperation(value = "商品搜索分页列表（活动）")
+    @RequestMapping(value = "/activity/search/page", method = RequestMethod.GET)
+    public CommonResult<CommonPage<ProductActivityResponse>> getActivitySearchPage(
+            @Validated ProductActivitySearchRequest request, @Validated PageParamRequest pageRequest) {
+        return CommonResult.success(CommonPage.restPage(productService.getActivitySearchPageByMerchant(request, pageRequest)));
     }
 }
 

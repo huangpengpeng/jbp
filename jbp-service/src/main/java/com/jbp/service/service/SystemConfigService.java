@@ -5,6 +5,7 @@ import com.jbp.common.model.system.SystemConfig;
 import com.jbp.common.request.SystemConfigAdminRequest;
 import com.jbp.common.request.SystemFormCheckRequest;
 import com.jbp.common.vo.ExpressSheetVo;
+import com.jbp.common.vo.MyRecord;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -22,6 +23,13 @@ import java.util.List;
  * +----------------------------------------------------------------------
  */
 public interface SystemConfigService extends IService<SystemConfig> {
+
+    /**
+     * 通过key数组获取Record对象
+     * @param keyList key列表
+     * @return MyRecord
+     */
+    MyRecord getValuesByKeyList(List<String> keyList);
 
     /**
      * 根据menu name 获取 value
@@ -97,4 +105,16 @@ public interface SystemConfigService extends IService<SystemConfig> {
      * @return String
      */
     String getAgreementByKey(String agreementName);
+
+    /**
+     * 获取移动端域名
+     * @return 移动端域名
+     */
+    String getFrontDomain();
+
+    /**
+     * 获取素材域名
+     * @return 素材域名
+     */
+    String getMediaDomain();
 }

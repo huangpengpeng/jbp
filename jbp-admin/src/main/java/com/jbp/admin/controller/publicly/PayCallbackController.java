@@ -1,7 +1,10 @@
 package com.jbp.admin.controller.publicly;
 
+import com.alibaba.fastjson.JSON;
+import com.jbp.common.annotation.CustomResponseAnnotation;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.PayCallbackService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -30,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("api/publicly/payment/callback")
 @Api(tags = "支付回调控制器")
+@CustomResponseAnnotation
 public class PayCallbackController {
 
     @Autowired
@@ -48,7 +52,7 @@ public class PayCallbackController {
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
     public String aliPay(HttpServletRequest request){
         //支付宝支付回调
-        System.out.println("支付宝支付回调 request ===> " + request.getParameterMap());
+        System.out.println("支付宝支付回调 request ===> " + JSON.toJSONString(request.getParameterMap()));
         return callbackService.aliPayCallback(request);
     }
 

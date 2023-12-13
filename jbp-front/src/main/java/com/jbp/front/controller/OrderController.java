@@ -1,12 +1,11 @@
 package com.jbp.front.controller;
 
-import com.jbp.front.service.FrontOrderService;
-import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.LogisticsResultVo;
+import com.jbp.front.service.FrontOrderService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -25,7 +24,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -44,7 +43,7 @@ public class OrderController {
     @ApiOperation(value = "预下单")
     @RequestMapping(value = "/pre/order", method = RequestMethod.POST)
     public CommonResult<OrderNoResponse> preOrder(@RequestBody @Validated PreOrderRequest request) {
-        return CommonResult.success(orderService.preOrder(request));
+        return CommonResult.success(orderService.preOrder_V1_3(request));
     }
 
     @ApiOperation(value = "加载预下单")
@@ -67,12 +66,8 @@ public class OrderController {
 
     @ApiOperation(value = "订单列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "status", value = "订单状态（-1：全部，0：待支付，1：待发货,2：部分发货， 3：待核销，4：待收货,5：已收货,6：已完成，9：已取消）", required = true)
-    })
-    public CommonResult<CommonPage<OrderFrontDataResponse>> orderList(@RequestParam(name = "status") Integer status,
-                                                                      @ModelAttribute PageParamRequest pageRequest) {
-        return CommonResult.success(CommonPage.restPage(orderService.list(status, pageRequest)));
+    public CommonResult<CommonPage<OrderFrontDataResponse>> orderList(@ModelAttribute @Validated OrderFrontListRequest request) {
+        return CommonResult.success(CommonPage.restPage(orderService.list_v1_4(request)));
     }
 
     @ApiOperation(value = "订单详情")
@@ -116,48 +111,11 @@ public class OrderController {
 
     @ApiOperation(value = "订单收货")
     @RequestMapping(value = "/take/delivery/{orderNo}", method = RequestMethod.POST)
-    public CommonResult<Boolean> take(@PathVariable(value = "orderNo") String orderNo) {
+    public CommonResult<String> take(@PathVariable(value = "orderNo") String orderNo) {
         if (orderService.takeDelivery(orderNo)) {
             return CommonResult.success("订单收货成功");
         }
         return CommonResult.failed("订单收货失败");
-    }
-
-    @ApiOperation(value = "售后申请列表(可申请售后列表)")
-    @RequestMapping(value = "/after/sale/apply/list", method = RequestMethod.GET)
-    @ApiImplicitParam(name="orderNo", value="订单号")
-    public CommonResult<CommonPage<OrderDetail>> afterSaleApplyList(@RequestParam(value = "orderNo", defaultValue = "", required = false) String orderNo,
-                                                                    @ModelAttribute PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(orderService.getAfterSaleApplyList(orderNo, pageParamRequest)));
-    }
-
-    @ApiOperation(value = "订单退款申请")
-    @RequestMapping(value = "/refund", method = RequestMethod.POST)
-    public CommonResult<Boolean> refundApply(@RequestBody @Validated OrderRefundApplyRequest request) {
-        if(orderService.refundApply(request)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
-    }
-
-    @ApiOperation(value = "订单退款理由（平台提供）")
-    @RequestMapping(value = "/refund/reason", method = RequestMethod.GET)
-    public CommonResult<List<String>> refundReason() {
-        return CommonResult.success(orderService.getRefundReason());
-    }
-
-    @ApiOperation(value = "退款订单详情")
-    @RequestMapping(value = "/refund/detail/{refundOrderNo}", method = RequestMethod.GET)
-    public CommonResult<RefundOrderInfoResponse> refundOrderDetail(@PathVariable String refundOrderNo) {
-        return CommonResult.success(orderService.refundOrderDetail(refundOrderNo));
-    }
-
-    @ApiOperation(value = "退款订单列表")
-    @RequestMapping(value = "/refund/list", method = RequestMethod.GET)
-    @ApiImplicitParam(name = "type", value = "列表类型：0-处理中，9-申请记录", required = true)
-    public CommonResult<CommonPage<RefundOrderResponse>> refundOrderList(@RequestParam(value = "type") Integer type,
-                                                                         @ModelAttribute PageParamRequest pageRequest) {
-        return CommonResult.success(CommonPage.restPage(orderService.getRefundOrderList(type, pageRequest)));
     }
 
     @ApiOperation(value = "获取订单发货单列表")

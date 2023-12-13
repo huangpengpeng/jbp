@@ -11,9 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.CategoryDao;
-import com.jbp.service.service.CategoryService;
-import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.common.constants.CategoryConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.category.Category;
@@ -21,7 +18,12 @@ import com.jbp.common.request.CategoryRequest;
 import com.jbp.common.request.CategorySearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.CategoryTreeVo;
+import com.jbp.service.dao.CategoryDao;
+import com.jbp.service.service.CategoryService;
+import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.SystemRoleService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -57,6 +59,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
     private SystemAttachmentService systemAttachmentService;
     @Autowired
     private TransactionTemplate transactionTemplate;
+    @Autowired
+    private SystemRoleService systemRoleService;
 
 
     /**
@@ -82,7 +86,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
             String decode = URLUtil.decode(request.getName());
             lqw.like(Category::getName, decode);
         }
-        lqw.eq(Category::getOwner, CrmebUtil.getOwnerByAdmin());
+        lqw.eq(Category::getOwner, systemRoleService.getOwnerByCurrentAdmin());
         lqw.orderByDesc(Category::getSort).orderByDesc(Category::getId);
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return dao.selectList(lqw);
@@ -98,6 +102,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
     public List<Category> getByIds(List<Integer> idList) {
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.in(Category::getId, idList);
+        lambdaQueryWrapper.in(Category::getOwner, systemRoleService.getOwnerByCurrentAdmin());
         return dao.selectList(lambdaQueryWrapper);
     }
 
@@ -120,7 +125,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         if (oldCategory.getId().equals(request.getPid())) {
             throw new CrmebException("分类的父级不能为自己");
         }
-        Integer ownerId = CrmebUtil.getOwnerByAdmin();
+        Integer ownerId = systemRoleService.getOwnerByCurrentAdmin();
+        if (!oldCategory.getOwner().equals(ownerId)) {
+            throw new CrmebException("不能操作非自己商户的资源");
+        }
         if (!oldCategory.getName().equals(request.getName())) {
             if (checkName(request.getName(), request.getType(), ownerId, oldCategory.getId())) {
                 throw new CrmebException("分类名称重复");
@@ -232,7 +240,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         if (StrUtil.isNotBlank(name)) { // 根据名称模糊搜索
             lqw.like(Category::getName, name);
         }
-        lqw.eq(Category::getOwner, CrmebUtil.getOwnerByAdmin());
+        lqw.eq(Category::getOwner, systemRoleService.getOwnerByCurrentAdmin());
         lqw.orderByDesc(Category::getSort);
         lqw.orderByAsc(Category::getId);
         List<Category> allTree = dao.selectList(lqw);
@@ -292,6 +300,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         if (getChildCountByPid(id) > 0) {
             throw new CrmebException("当前分类下有子类，请先删除子类！");
         }
+        Category category = getByIdException(id);
+        Integer owner = systemRoleService.getOwnerByCurrentAdmin();
+        if (!owner.equals(category.getOwner())) {
+            throw new CrmebException("不能操作非自己商户的资源");
+        }
         return dao.deleteById(id);
     }
 
@@ -315,11 +328,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.selectCount(lambdaQueryWrapper) > 0;
     }
 
+    /**
+     * 更改基础分类状态
+     */
     @Override
     public Boolean updateStatus(Integer id) {
         Category category = getById(id);
+        Integer owner = systemRoleService.getOwnerByCurrentAdmin();
+        if (!owner.equals(category.getOwner())) {
+            throw new CrmebException("不能操作非自己商户的资源");
+        }
         category.setStatus(!category.getStatus());
-        category.setOwner(CrmebUtil.getOwnerByAdmin());
         return updateById(category);
     }
 
@@ -328,7 +347,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
      */
     @Override
     public Boolean create(CategoryRequest categoryRequest) {
-        Integer ownerId = CrmebUtil.getOwnerByAdmin();
+        Integer ownerId = systemRoleService.getOwnerByCurrentAdmin();
         //检测标题是否存在
         if (checkName(categoryRequest.getName(), categoryRequest.getType(), ownerId, 0)) {
             throw new CrmebException("此分类已存在");
@@ -344,14 +363,29 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
     /**
      * 获取分类详情
      *
-     * @param id 分了ID
+     * @param id 分类ID
      * @return Category
      */
     @Override
     public Category getByIdException(Integer id) {
         Category category = getById(id);
         if (ObjectUtil.isNull(category)) {
-            throw new CrmebException("分了不存在");
+            throw new CrmebException("分类不存在");
+        }
+        return category;
+    }
+
+    /**
+     * 获取基础分类信息
+     * @param id 分类ID
+     * @return Category
+     */
+    @Override
+    public Category getBaseCategoryInfo(Integer id) {
+        Category category = getByIdException(id);
+        Integer owner = systemRoleService.getOwnerByCurrentAdmin();
+        if (!owner.equals(category.getOwner())) {
+            throw new CrmebException("不能获取非自己商户的资源");
         }
         return category;
     }

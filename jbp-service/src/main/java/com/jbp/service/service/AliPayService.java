@@ -1,16 +1,16 @@
 package com.jbp.service.service;
 
 
-import com.jbp.common.model.order.Order;
-
 import java.math.BigDecimal;
+
+import com.jbp.common.model.order.Order;
 
 /**
  * 支付宝支付 Service
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -41,4 +41,15 @@ public interface AliPayService {
 //     * @param orderNo 订单编号
 //     */
 //    Boolean queryRefund(String orderNo);
+
+    /**
+     * 支付宝支付
+     * @param orderNo 订单号
+     * @param price 支付金额
+     * @param orderType 订单类型：order - 商品订单，recharge - 充值订单
+     * @param payChannel 支付渠道：alipayApp - 支付宝app支付, alipay - 支付宝支付
+     * @return 支付宝调用结果
+     */
+    String pay(String orderNo, BigDecimal price, String orderType, String payChannel);
+
 }

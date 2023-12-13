@@ -1,9 +1,9 @@
 package com.jbp.front.config;
 
-import com.jbp.front.service.captcha.CaptchaService;
-import com.jbp.front.service.captcha.CaptchaServiceFactory;
 import com.jbp.common.captcha.model.common.Const;
 import com.jbp.common.captcha.util.ImageUtils;
+import com.jbp.front.service.captcha.CaptchaService;
+import com.jbp.front.service.captcha.CaptchaServiceFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

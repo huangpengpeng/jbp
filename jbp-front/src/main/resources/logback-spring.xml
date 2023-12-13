@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
     <!-- 根据需要自行配置 -->
-    <property name="APP_NAME" value="Jbp"/>
-    <property name="log.path" value="./Jbp_log"></property>
+    <property name="APP_NAME" value="Crmeb"/>
+    <property name="log.path" value="./crmeb_log"></property>
 
     <!--"@timestamp": "2019-06-27T09:59:41.897+08:00",-->
     <!--"@version": "1",-->

@@ -2,7 +2,6 @@ package com.jbp.common.token;
 
 import cn.hutool.core.util.StrUtil;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
 
 import com.jbp.common.constants.Constants;
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -131,38 +130,13 @@ public class FrontTokenComponent {
         return redisUtil.get(getTokenKey(token));
     }
 
-    //路由在此处，则返回true，无论用户是否登录都可以访问
-    public boolean checkRouter(String uri) {
-        String[] routerList = {
-                "api/front/product/detail",
-                "api/front/coupons",
-                "api/front/index",
-                "api/front/bargain/list",
-                "api/front/combination/list",
-                "api/front/index/product",
-                "api/front/combination/index",
-                "api/front/bargain/index",
-                "api/front/index/color/config",
-                "api/front/product/list",
-                "api/front/product/sku/detail",
-                "api/front/index/get/version",
-                "api/front/image/domain",
-                "api/front/product/leaderboard"
-        };
-
-        return ArrayUtils.contains(routerList, uri);
-    }
-
-    public Boolean check(String token, HttpServletRequest request) {
+    public Boolean check(String token) {
 
         try {
             boolean exists = redisUtil.exists(getTokenKey(token));
             if (exists) {
                 Integer uid = redisUtil.get(getTokenKey(token));
                 redisUtil.set(getTokenKey(token), uid, Constants.TOKEN_EXPRESS_MINUTES, TimeUnit.MINUTES);
-            } else {
-                //判断路由，部分路由不管用户是否登录/token过期都可以访问
-                exists = checkRouter(RequestUtil.getUri(request));
             }
             return exists;
         } catch (Exception e) {

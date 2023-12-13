@@ -5,7 +5,7 @@ package com.jbp.service.service;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -30,4 +30,10 @@ public interface StatisticsTaskService {
      * 每月第一天2点执行
      */
     void monthStatement();
+
+    /**
+     * 每日财务流水定时任务
+     * 每天1点执行
+     */
+    void dailySummaryFinancialStatement();
 }

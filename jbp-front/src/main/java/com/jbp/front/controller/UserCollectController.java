@@ -1,6 +1,6 @@
 package com.jbp.front.controller;
 
-import com.github.pagehelper.PageInfo;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.CancelCollectRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.UserCollectRequest;
@@ -10,6 +10,7 @@ import com.jbp.common.response.UserProductRelationResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ProductRelationService;
 import com.jbp.service.service.UserMerchantCollectService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -43,8 +44,8 @@ public class UserCollectController {
 
     @ApiOperation(value = "我的商品收藏列表")
     @RequestMapping(value = "/product/list", method = RequestMethod.GET)
-    public CommonResult<PageInfo<UserProductRelationResponse>> getList(@Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(productRelationService.getUserList(pageParamRequest));
+    public CommonResult<CommonPage<UserProductRelationResponse>> getList(@Validated PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(productRelationService.getUserList(pageParamRequest)));
     }
 
     @ApiOperation(value = "添加收藏产品")
@@ -85,8 +86,17 @@ public class UserCollectController {
 
     @ApiOperation(value = "商户收藏列表")
     @RequestMapping(value = "/merchant/list", method = RequestMethod.GET)
-    public CommonResult<PageInfo<MerchantCollectResponse>> getMerchantList(@Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(userMerchantCollectService.findList(pageParamRequest));
+    public CommonResult<CommonPage<MerchantCollectResponse>> getMerchantList(@Validated PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(userMerchantCollectService.findList(pageParamRequest)));
+    }
+
+    @ApiOperation(value = "批量取消收藏店铺")
+    @RequestMapping(value = "/cancel/merchant/batch", method = RequestMethod.POST)
+    public CommonResult<MerchantDetailResponse> userBatchCancelCollect(@RequestBody CancelCollectRequest request) {
+        if (userMerchantCollectService.userBatchCancelCollect(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
     }
 }
 

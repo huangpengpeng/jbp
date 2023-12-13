@@ -9,11 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.ProductBrandDao;
-import com.jbp.service.service.ProductBrandCategoryService;
-import com.jbp.service.service.ProductBrandService;
-import com.jbp.service.service.ProductService;
-import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.product.ProductBrand;
@@ -25,6 +20,8 @@ import com.jbp.common.request.ProductBrandRequest;
 import com.jbp.common.response.ProductBrandListResponse;
 import com.jbp.common.response.ProductBrandResponse;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.service.dao.ProductBrandDao;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,17 +35,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
-*  ProductBrandServiceImpl 接口实现
-*  +----------------------------------------------------------------------
-*  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
-*  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
-*  +----------------------------------------------------------------------
-*  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
-*  +----------------------------------------------------------------------
-*  | Author: CRMEB Team <admin@crmeb.com>
-*  +----------------------------------------------------------------------
-*/
+ * ProductBrandServiceImpl 接口实现
+ * +----------------------------------------------------------------------
+ * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
+ * +----------------------------------------------------------------------
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
+ * +----------------------------------------------------------------------
+ * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
+ * +----------------------------------------------------------------------
+ * | Author: CRMEB Team <admin@crmeb.com>
+ * +----------------------------------------------------------------------
+ */
 @Service
 public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, ProductBrand> implements ProductBrandService {
 
@@ -65,9 +62,12 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
     private RedisUtil redisUtil;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CouponService couponService;
 
     /**
      * 品牌分页列表
+     *
      * @param pageParamRequest 分页参数
      * @return PageInfo
      */
@@ -98,6 +98,7 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 添加品牌
+     *
      * @param request 添加参数
      * @return Boolean
      */
@@ -126,6 +127,7 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 删除品牌
+     *
      * @param id 品牌ID
      * @return Boolean
      */
@@ -134,12 +136,14 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
         ProductBrand brand = getByIdException(id);
         // 判断商品是否使用品牌
         if (productService.isUseBrand(brand.getId())) {
-            throw new CrmebException("该商品使用该品牌，无法删除");
+            throw new CrmebException("有商品使用该品牌，无法删除");
         }
         brand.setIsDel(true);
         Boolean execute = transactionTemplate.execute(e -> {
             updateById(brand);
             brandCategoryService.deleteByBid(brand.getId());
+            // 删除品牌关联的优惠券
+            couponService.deleteByBrandId(brand.getId());
             return Boolean.TRUE;
         });
         if (execute) {
@@ -150,6 +154,7 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 编辑品牌
+     *
      * @param request 修改参数
      * @return Boolean
      */
@@ -184,6 +189,7 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 修改品牌显示状态
+     *
      * @param id 品牌ID
      * @return Boolean
      */
@@ -191,11 +197,16 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
     public Boolean updateShowStatus(Integer id) {
         ProductBrand brand = getByIdException(id);
         brand.setIsShow(!brand.getIsShow());
-        return updateById(brand);
+        boolean update = updateById(brand);
+        if (update) {
+            redisUtil.delete(RedisConstants.PRODUCT_ALL_BRAND_LIST_KEY);
+        }
+        return update;
     }
 
     /**
      * 品牌缓存列表(全部)
+     *
      * @return List
      */
     @Override
@@ -221,7 +232,8 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 通过分类查询品牌分页列表
-     * @param request 查询参数
+     *
+     * @param request          查询参数
      * @param pageParamRequest 分页参数
      * @return PageInfo
      */
@@ -245,6 +257,19 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
         return CommonPage.copyPageInfo(page, responseList);
     }
 
+    /**
+     * 根据ID列表获取品牌列表
+     *
+     * @param brandIdList 品牌ID列表
+     */
+    @Override
+    public List<ProductBrand> findByIdList(List<Integer> brandIdList) {
+        LambdaQueryWrapper<ProductBrand> lqw = Wrappers.lambdaQuery();
+        lqw.eq(ProductBrand::getIsDel, false);
+        lqw.in(ProductBrand::getId, brandIdList);
+        return dao.selectList(lqw);
+    }
+
     private ProductBrand getByIdException(Integer id) {
         ProductBrand brand = getById(id);
         if (ObjectUtil.isNull(brand) || brand.getIsDel()) {
@@ -255,6 +280,7 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 初始化品牌分类关联
+     *
      * @param categoryIds 分类ids
      * @return List<ProductBrandCategory>
      */
@@ -270,6 +296,7 @@ public class ProductBrandServiceImpl extends ServiceImpl<ProductBrandDao, Produc
 
     /**
      * 校验品牌名是否重复
+     *
      * @param name 品牌名
      */
     private void validateName(String name) {

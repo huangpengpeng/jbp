@@ -12,7 +12,7 @@ import com.jbp.common.request.ProductRuleSearchRequest;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -31,15 +31,27 @@ public interface ProductRuleService extends IService<ProductRule> {
 
     /**
      * 新增商品规格
-     * @param ProductRuleRequest 规格参数
+     * @param productRuleRequest 规格参数
      * @return 新增结果
      */
-    boolean save(ProductRuleRequest ProductRuleRequest);
+    boolean save(ProductRuleRequest productRuleRequest);
 
     /**
      * 修改规格
-     * @param ProductRuleRequest 规格参数
+     * @param productRuleRequest 规格参数
      * @return Boolean
      */
-    Boolean updateRule(ProductRuleRequest ProductRuleRequest);
+    Boolean updateRule(ProductRuleRequest productRuleRequest);
+
+    /**
+     * 删除商品规格
+     * @param id 规格ID
+     */
+    Boolean deleteById(Integer id);
+
+    /**
+     * 商品规格详情
+     * @param id 规格ID
+     */
+    ProductRule getRuleInfo(Integer id);
 }

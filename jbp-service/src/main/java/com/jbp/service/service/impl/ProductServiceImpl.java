@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,29 +15,35 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.ProductDao;
-import com.jbp.service.service.*;
-import com.jbp.service.util.ProductUtils;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.CouponConstants;
 import com.jbp.common.constants.ProductConstants;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
 import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantInfo;
 import com.jbp.common.model.product.*;
+import com.jbp.common.model.seckill.SeckillActivity;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantProductSearchRequest;
 import com.jbp.common.response.*;
+import com.jbp.common.response.productTag.ProductTagsForSearchResponse;
 import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.OnePassUserInfoVo;
 import com.jbp.common.vo.SimpleProductVo;
+import com.jbp.service.dao.ProductDao;
+import com.jbp.service.service.*;
+import com.jbp.service.util.ProductUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +61,7 @@ import java.util.stream.Stream;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -110,6 +117,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private CartService cartService;
     @Autowired
     private ProductReplyService productReplyService;
+    @Autowired
+    private SeckillActivityService seckillActivityService;
+    @Autowired
+    private ActivityStyleService activityStyleService;
+    @Autowired
+    private ProductTagService productTagService;
 
     /**
      * 获取产品列表Admin
@@ -162,7 +175,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Override
     public List<SimpleProductVo> getSimpleListInIds(List<Integer> productIds) {
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
-        lqw.select(Product::getId, Product::getName, Product::getImage);
+        lqw.select(Product::getId, Product::getName, Product::getImage, Product::getPrice, Product::getStock);
         lqw.in(Product::getId, productIds);
         lqw.eq(Product::getIsDel, false);
         List<Product> selectList = dao.selectList(lqw);
@@ -195,15 +208,22 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
                 }
             });
         }
+        ProductCategory productCategory = productCategoryService.getById(request.getCategoryId());
+        if (ObjectUtil.isNull(productCategory) || productCategory.getIsDel()) {
+            throw new CrmebException("商品平台分类不存在或以删除");
+        }
+        if (productCategory.getLevel() < 3) {
+            throw new CrmebException("必须选择商品平台第三级分类");
+        }
 
-        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
 
-        Merchant merchant = merchantService.getByIdException(loginUserVo.getUser().getMerId());
+        Merchant merchant = merchantService.getByIdException(admin.getMerId());
 
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
         product.setId(null);
-        product.setMerId(loginUserVo.getUser().getMerId());
+        product.setMerId(admin.getMerId());
 
         String cdnUrl = systemAttachmentService.getCdnUrl();
         //主图
@@ -305,31 +325,31 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     /**
      * 更新商品信息
      *
-     * @param ProductRequest 商品参数
+     * @param productRequest 商品参数
      * @return 更新结果
      */
     @Override
-    public Boolean update(ProductAddRequest ProductRequest) {
-        if (ObjectUtil.isNull(ProductRequest.getId())) {
+    public Boolean update(ProductAddRequest productRequest) {
+        if (ObjectUtil.isNull(productRequest.getId())) {
             throw new CrmebException("商品ID不能为空");
         }
 
-        if (!ProductRequest.getSpecType()) {
-            if (ProductRequest.getAttrValue().size() > 1) {
+        if (!productRequest.getSpecType()) {
+            if (productRequest.getAttrValue().size() > 1) {
                 throw new CrmebException("单规格商品属性值不能大于1");
             }
         }
-        if (ProductRequest.getIsSub()) {
-            ProductRequest.getAttrValue().forEach(av -> {
+        if (productRequest.getIsSub()) {
+            productRequest.getAttrValue().forEach(av -> {
                 int brokerageRatio = av.getBrokerage() + av.getBrokerageTwo();
                 if (brokerageRatio > crmebConfig.getRetailStoreBrokerageRatio()) {
                     throw new CrmebException(StrUtil.format("一二级返佣比例之和范围为 0~{}", crmebConfig.getRetailStoreBrokerageRatio()));
                 }
             });
         }
-
-        Product tempProduct = getById(ProductRequest.getId());
-        if (ObjectUtil.isNull(tempProduct)) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Product tempProduct = getById(productRequest.getId());
+        if (ObjectUtil.isNull(tempProduct) || !admin.getMerId().equals(tempProduct.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         if (tempProduct.getIsRecycle() || tempProduct.getIsDel()) {
@@ -341,9 +361,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (tempProduct.getIsAudit()) {
             throw new CrmebException("审核中的商品无法修改");
         }
+        ProductCategory productCategory = productCategoryService.getById(productRequest.getCategoryId());
+        if (ObjectUtil.isNull(productCategory) || productCategory.getIsDel()) {
+            throw new CrmebException("商品平台分类不存在或以删除");
+        }
+        if (productCategory.getLevel() < 3) {
+            throw new CrmebException("必须选择商品平台第三级分类");
+        }
 
         Product product = new Product();
-        BeanUtils.copyProperties(ProductRequest, product);
+        BeanUtils.copyProperties(productRequest, product);
         product.setAuditStatus(tempProduct.getAuditStatus());
         Merchant merchant = merchantService.getByIdException(tempProduct.getMerId());
 
@@ -353,7 +380,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         //轮播图
         product.setSliderImage(systemAttachmentService.clearPrefix(product.getSliderImage(), cdnUrl));
 
-        List<ProductAttrValueAddRequest> attrValueAddRequestList = ProductRequest.getAttrValue();
+        List<ProductAttrValueAddRequest> attrValueAddRequestList = productRequest.getAttrValue();
         //计算价格
         ProductAttrValueAddRequest minAttrValue = attrValueAddRequestList.stream().min(Comparator.comparing(ProductAttrValueAddRequest::getPrice)).get();
         product.setPrice(minAttrValue.getPrice());
@@ -362,7 +389,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         product.setStock(attrValueAddRequestList.stream().mapToInt(ProductAttrValueAddRequest::getStock).sum());
 
         // attr部分
-        List<ProductAttrAddRequest> addRequestList = ProductRequest.getAttr();
+        List<ProductAttrAddRequest> addRequestList = productRequest.getAttr();
         List<ProductAttr> attrAddList = CollUtil.newArrayList();
         List<ProductAttr> attrUpdateList = CollUtil.newArrayList();
         addRequestList.forEach(e -> {
@@ -403,7 +430,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
         // 处理富文本
         ProductDescription spd = new ProductDescription();
-        spd.setDescription(ProductRequest.getContent().length() > 0 ? systemAttachmentService.clearPrefix(ProductRequest.getContent(), cdnUrl) : "");
+        spd.setDescription(productRequest.getContent().length() > 0 ? systemAttachmentService.clearPrefix(productRequest.getContent(), cdnUrl) : "");
         spd.setType(ProductConstants.PRODUCT_TYPE_NORMAL);
         spd.setProductId(product.getId());
 
@@ -438,10 +465,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             productDescriptionService.deleteByProductId(product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
             productDescriptionService.save(spd);
 
-            if (CollUtil.isNotEmpty(ProductRequest.getCouponIds())) {
+            if (CollUtil.isNotEmpty(productRequest.getCouponIds())) {
                 productCouponService.deleteByProductId(product.getId());
                 List<ProductCoupon> couponList = new ArrayList<>();
-                for (Integer couponId : ProductRequest.getCouponIds()) {
+                for (Integer couponId : productRequest.getCouponIds()) {
                     ProductCoupon spc = new ProductCoupon();
                     spc.setProductId(product.getId());
                     spc.setCouponId(couponId);
@@ -466,42 +493,46 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      */
     @Override
     public ProductInfoResponse getInfo(Integer id) {
-        Product Product = dao.selectById(id);
-        if (ObjectUtil.isNull(Product)) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Product product = dao.selectById(id);
+        if (ObjectUtil.isNull(product)) {
+            throw new CrmebException("未找到对应商品信息");
+        }
+        if (admin.getMerId() > 0 && !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("未找到对应商品信息");
         }
 
-        ProductInfoResponse ProductResponse = new ProductInfoResponse();
-        BeanUtils.copyProperties(Product, ProductResponse);
+        ProductInfoResponse productInfoResponse = new ProductInfoResponse();
+        BeanUtils.copyProperties(product, productInfoResponse);
 
-        List<ProductAttr> attrList = attrService.getListByProductIdAndType(Product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
-        ProductResponse.setAttr(attrList);
+        List<ProductAttr> attrList = attrService.getListByProductIdAndType(product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+        productInfoResponse.setAttr(attrList);
 
-        List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(Product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+        List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
         List<AttrValueResponse> valueResponseList = attrValueList.stream().map(e -> {
             AttrValueResponse valueResponse = new AttrValueResponse();
             BeanUtils.copyProperties(e, valueResponse);
             return valueResponse;
         }).collect(Collectors.toList());
-        ProductResponse.setAttrValue(valueResponseList);
+        productInfoResponse.setAttrValue(valueResponseList);
 
-        ProductDescription sd = productDescriptionService.getByProductIdAndType(Product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+        ProductDescription sd = productDescriptionService.getByProductIdAndType(product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
         if (ObjectUtil.isNotNull(sd)) {
-            ProductResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
+            productInfoResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
 
         // 获取已关联的优惠券
-        List<ProductCoupon> productCouponList = productCouponService.getListByProductId(Product.getId());
+        List<ProductCoupon> productCouponList = productCouponService.getListByProductId(product.getId());
         if (CollUtil.isNotEmpty(productCouponList)) {
             List<Integer> ids = productCouponList.stream().map(ProductCoupon::getCouponId).collect(Collectors.toList());
             SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
             if (systemAdmin.getMerId() > 0) {
-                ProductResponse.setCouponIds(ids);
+                productInfoResponse.setCouponIds(ids);
             } else {
-                ProductResponse.setCouponList(couponService.findSimpleListByIdList(ids));
+                productInfoResponse.setCouponList(couponService.findSimpleListByIdList(ids));
             }
         }
-        return ProductResponse;
+        return productInfoResponse;
     }
 
     /**
@@ -621,19 +652,19 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         try {
             switch (tag) {
                 case 1:
-                    productRequest = productUtils.getTaobaoProductInfo(url,tag);
+                    productRequest = productUtils.getTaobaoProductInfo(url, tag);
                     break;
                 case 2:
-                    productRequest = productUtils.getJDProductInfo(url,tag);
+                    productRequest = productUtils.getJDProductInfo(url, tag);
                     break;
                 case 3:
-                    productRequest = productUtils.getSuningProductInfo(url,tag);
+                    productRequest = productUtils.getSuningProductInfo(url, tag);
                     break;
                 case 4:
-                    productRequest = productUtils.getPddProductInfo(url,tag);
+                    productRequest = productUtils.getPddProductInfo(url, tag);
                     break;
                 case 5:
-                    productRequest = productUtils.getTmallProductInfo(url,tag);
+                    productRequest = productUtils.getTmallProductInfo(url, tag);
                     break;
             }
         } catch (Exception e) {
@@ -647,6 +678,51 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     }
 
     /**
+     * 根据其他平台url导入产品信息
+     *
+     * @param url 待导入平台url
+     * @param tag 1=淘宝，2=京东，3=苏宁，4=拼多多， 5=天猫
+     * @return ProductRequest
+     */
+    @Override
+    public ProductResponseForCopyProduct importProductFrom99Api(String url, int tag) throws JSONException {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Merchant merchant = merchantService.getByIdException(admin.getMerId());
+        if (merchant.getCopyProductNum() <= 0) {
+            throw new CrmebException("商户复制商品数量不足");
+        }
+
+        ProductResponseForCopyProduct copyProduct = null;
+        try {
+            switch (tag) {
+                case 1:
+                    copyProduct = productUtils.getTaobaoProductInfo99Api(url, tag);
+                    break;
+                case 2:
+                    copyProduct = productUtils.getJDProductInfo99Api(url, tag);
+                    break;
+                case 3:
+                    copyProduct = productUtils.getSuningProductInfo99Api(url, tag);
+                    break;
+                case 4:
+                    copyProduct = productUtils.getPddProductInfo99Api(url, tag);
+                    break;
+                case 5:
+                    copyProduct = productUtils.getTmallProductInfo99Api(url, tag);
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CrmebException("确认URL和平台是否正确，以及平台费用是否足额" + e.getMessage());
+        }
+        Boolean sub = merchantService.subCopyProductNum(merchant.getId());
+        if (!sub) {
+            LOGGER.error("扣除商户复制条数异常：商户ID = {}", merchant.getId());
+        }
+        return copyProduct;
+    }
+
+    /**
      * 商品回收/删除
      *
      * @param request 删除参数
@@ -654,8 +730,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      */
     @Override
     public Boolean deleteProduct(ProductDeleteRequest request) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getById(request.getId());
-        if (ObjectUtil.isNull(product)) {
+        if (ObjectUtil.isNull(product) || !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         if (ProductConstants.PRODUCT_DELETE_TYPE_RECYCLE.equals(request.getType()) && product.getIsRecycle()) {
@@ -688,10 +765,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      */
     @Override
     public Boolean restoreProduct(Integer productId) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         LambdaUpdateWrapper<Product> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(Product::getId, productId);
         wrapper.set(Product::getIsRecycle, false);
         wrapper.set(Product::getIsShow, false);
+        wrapper.set(Product::getMerId, admin.getMerId());
         return update(wrapper);
     }
 
@@ -733,8 +812,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      */
     @Override
     public Boolean offShelf(Integer id) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getById(id);
-        if (ObjectUtil.isNull(product)) {
+        if (ObjectUtil.isNull(product) || !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         if (!product.getIsShow()) {
@@ -761,7 +841,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Override
     public Boolean putOnShelf(Integer id) {
         Product product = getById(id);
-        if (ObjectUtil.isNull(product)) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (ObjectUtil.isNull(product) || !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         if (product.getIsShow()) {
@@ -795,14 +876,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      * 首页商品列表
      *
      * @param pageParamRequest 分页参数
-     * @param cid 一级商品分类id，全部传0
+     * @param cid              一级商品分类id，全部传0
      * @return CommonPage
      */
     @Override
     public PageInfo<Product> getIndexProduct(Integer cid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
         lqw.select(Product::getId, Product::getMerId, Product::getImage, Product::getName, Product::getUnitName,
-                Product::getPrice, Product::getOtPrice, Product::getSales, Product::getFicti);
+                Product::getPrice, Product::getOtPrice, Product::getSales, Product::getFicti, Product::getCategoryId, Product::getBrandId);
         getForSaleWhere(lqw);
         lqw.gt(Product::getStock, 0);
         if (cid > 0) {
@@ -817,8 +898,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         lqw.orderByDesc(Product::getId);
         Page<Product> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<Product> productList = dao.selectList(lqw);
+        // 查询活动边框配置信息, 并赋值给商品response 重复添加的商品数据会根据数据添加持续覆盖后的为准
+        productList = activityStyleService.makeActivityBorderStyle(productList);
         return CommonPage.copyPageInfo(page, productList);
     }
+
 
     /**
      * 获取出售中商品的Where条件
@@ -840,8 +924,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Override
     public PageInfo<ProductFrontResponse> findH5List(ProductFrontSearchRequest request, PageParamRequest pageRequest) {
         Map<String, Object> map = new HashMap<>();
-        if (ObjectUtil.isNotNull(request.getCid()) && request.getCid() > 0) {
-            map.put("categoryId", request.getCid());
+        StringJoiner brandIds = new StringJoiner(",");
+        StringJoiner merIds = new StringJoiner(",");
+        StringJoiner categoryIds = new StringJoiner(",");
+        if (ObjectUtil.isNotNull(request.getCid()) && !request.getCid().isEmpty()) {
+            categoryIds.add(request.getCid());
         }
         if (StrUtil.isNotBlank(request.getKeyword())) {
             String keyword = URLUtil.decode(request.getKeyword());
@@ -853,12 +940,38 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (ObjectUtil.isNotNull(request.getMinPrice())) {
             map.put("minPrice", request.getMinPrice());
         }
-        if (ObjectUtil.isNotNull(request.getBrandId())) {
-            map.put("brandId", request.getBrandId());
+        if (ObjectUtil.isNotNull(request.getBrandId()) && !request.getBrandId().isEmpty()) {
+            brandIds.add(request.getBrandId());
         }
-        if (ObjectUtil.isNotNull(request.getIsSelf())) {
-            map.put("isSelf", request.getIsSelf() ? 1 : 0);
+        if (ObjectUtil.isNotNull(request.getMerId()) && !request.getMerId().isEmpty()) {
+            merIds.add(request.getMerId());
         }
+        if (ObjectUtil.isNotNull(request.getTagId())) {
+            ProductTagsForSearchResponse tagSearchConfig = productTagService.getProductIdListByProductTagId(request.getTagId());
+            if(CollUtil.isNotEmpty(tagSearchConfig.getProductIds())){
+                map.put("id", tagSearchConfig.getProductIds().stream().map(Objects::toString).collect(Collectors.joining(",")));
+            }
+            if(ObjectUtil.isNotNull(tagSearchConfig.getBrandId())){
+                brandIds.add(tagSearchConfig.getBrandId().stream().map(Objects::toString).collect(Collectors.joining(",")));
+            }
+            if(ObjectUtil.isNotNull(tagSearchConfig.getMerId())){
+                merIds.add(tagSearchConfig.getMerId().stream().map(Objects::toString).collect(Collectors.joining(",")));
+            }
+            if(ObjectUtil.isNotNull(tagSearchConfig.getCategoryId())){
+                categoryIds.add(tagSearchConfig.getCategoryId().stream().map(Objects::toString).collect(Collectors.joining(",")));
+            }
+        }
+
+        if(StrUtil.isNotEmpty(brandIds.toString())){
+            map.put("brandId", brandIds.toString());
+        }
+        if(StrUtil.isNotEmpty(merIds.toString())){
+            map.put("merId", merIds.toString());
+        }
+        if(StrUtil.isNotEmpty(categoryIds.toString())){
+            map.put("categoryId", categoryIds.toString());
+        }
+
         // 排序部分
         if (StrUtil.isNotBlank(request.getSalesOrder())) {
             if (request.getSalesOrder().equals(Constants.SORT_DESC)) {
@@ -866,7 +979,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             } else {
                 map.put("lastStr", " order by (p.sales + p.ficti) asc, p.rank desc, p.sort desc, p.id desc");
             }
-        } else if (StrUtil.isNotBlank(request.getPriceOrder())){
+        } else if (StrUtil.isNotBlank(request.getPriceOrder())) {
             if (request.getPriceOrder().equals(Constants.SORT_DESC)) {
                 map.put("lastStr", " order by p.price desc, p.rank desc, p.sort desc, p.id desc");
             } else {
@@ -877,17 +990,43 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         Page<Product> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getLimit());
         List<ProductFrontResponse> responseList = dao.findH5List(map);
+        if (CollUtil.isEmpty(responseList)) {
+            return CommonPage.copyPageInfo(page, responseList);
+        }
         responseList.forEach(e -> {
             // 评论总数
             Integer sumCount = productReplyService.getCountByScore(e.getId(), ProductConstants.PRODUCT_REPLY_TYPE_ALL);
             // 好评总数
             Integer goodCount = productReplyService.getCountByScore(e.getId(), ProductConstants.PRODUCT_REPLY_TYPE_GOOD);
+            // 设置商品标签
+            ProductTagsFrontResponse productTagsFrontResponse = productTagService.setProductTagByProductTagsRules(e.getId(), e.getBrandId(), e.getMerId(), e.getCategoryId(), e.getProductTags());
+            e.setProductTags(productTagsFrontResponse);
+
             String replyChance = "0";
             if (sumCount > 0 && goodCount > 0) {
                 replyChance = String.format("%.2f", ((goodCount.doubleValue() / sumCount.doubleValue())));
             }
             e.setReplyNum(sumCount);
             e.setPositiveRatio(replyChance);
+            e.setSales(e.getSales() + e.getFicti());
+        });
+
+        // 查询活动边框配置信息, 并赋值给商品response 重复添加的商品数据会根据数据添加持续覆盖后的为准
+        List<Product> products = new ArrayList<>();
+        responseList.forEach(response -> {
+            Product product = new Product();
+            BeanUtils.copyProperties(response, product);
+            products.add(product);
+        });
+        List<Product> makeProductList = activityStyleService.makeActivityBorderStyle(products);
+
+        makeProductList.forEach(p -> {
+            responseList.stream().map(resProduct -> {
+                if(p.getId().equals(resProduct.getId())){
+                    resProduct.setActivityStyle(p.getActivityStyle());
+                }
+                return resProduct;
+            }).collect(Collectors.toList());
         });
         return CommonPage.copyPageInfo(page, responseList);
     }
@@ -903,7 +1042,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
         lqw.select(Product::getId, Product::getMerId, Product::getImage, Product::getName, Product::getSliderImage,
                 Product::getOtPrice, Product::getStock, Product::getSales, Product::getPrice, Product::getIntro,
-                Product::getFicti, Product::getBrowse, Product::getUnitName, Product::getGuaranteeIds);
+                Product::getFicti, Product::getBrowse, Product::getUnitName, Product::getGuaranteeIds, Product::getBrandId,
+                Product::getCategoryId);
         lqw.eq(Product::getId, id);
         getForSaleWhere(lqw);
         Product product = dao.selectOne(lqw);
@@ -1063,6 +1203,38 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         return CommonPage.copyPageInfo(page, proList);
     }
 
+
+    /**
+     * 根据id集合查询对应商品列表
+     *
+     * @param ids 商品id集合 逗号分割
+     * @return 商品列表
+     */
+    @Override
+    public List<PlatformProductListResponse> getPlatformListForIds(List<String> ids) {
+        LambdaQueryWrapper<Product> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.eq(Product::getIsDel, Boolean.FALSE);
+//        lambdaQueryWrapper.eq(Product::getIsShow, Boolean.TRUE);
+        lambdaQueryWrapper.in(Product::getId, ids);
+        List<Product> products = dao.selectList(lambdaQueryWrapper);
+        List<PlatformProductListResponse> platformProductListResponses = productListToPlatFromProductListResponse(products);
+        return platformProductListResponses;
+    }
+
+    /**
+     * 根据id集合以及活动上限加载商品数据
+     *
+     * @param ids id集合
+     * @return 平台商品列表
+     */
+    @Override
+    public List<PlatformProductListResponse> getPlatformListForIdsByLimit(List<String> ids) {
+        if (crmebConfig.getActivityStyleProductLimit() < ids.size()) {
+            throw new CrmebException("活动边框 指定商品上限：" + crmebConfig.getActivityStyleProductLimit());
+        }
+        return getPlatformListForIds(ids);
+    }
+
     /**
      * 商品审核
      *
@@ -1195,7 +1367,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
         // id、名称、图片、价格、销量
         lqw.select(Product::getId, Product::getName, Product::getImage, Product::getPrice, Product::getOtPrice,
-                Product::getSales, Product::getFicti, Product::getUnitName, Product::getStock);
+                Product::getSales, Product::getFicti, Product::getUnitName, Product::getStock, Product::getMerId,
+                Product::getCategoryId, Product::getBrandId);
 
         getForSaleWhere(lqw);
         lqw.eq(Product::getMerId, request.getMerId());
@@ -1336,11 +1509,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 优惠券商品列表
-     * @param request 搜索参数
-     * @param pageParamRequest 分页参数
+     *
+     * @param request          搜索参数
      */
     @Override
-    public PageInfo<Product> getCouponProList(CouponProductSearchRequest request, PageParamRequest pageParamRequest) {
+    public PageInfo<Product> getCouponProList(CouponProductSearchRequest request) {
         Integer userId = userService.getUserIdException();
         CouponUser couponUser = couponUserService.getById(request.getUserCouponId());
         if (ObjectUtil.isNull(couponUser) || !couponUser.getUid().equals(userId)
@@ -1355,14 +1528,19 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             }
             pidList = cpList.stream().map(CouponProduct::getPid).collect(Collectors.toList());
         }
+        Coupon coupon = couponService.getById(couponUser.getCouponId());
+        if (ObjectUtil.isNull(coupon)) {
+            throw new CrmebException("优惠券实体不存在");
+        }
         LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
         // id、名称、图片、价格、销量
         lqw.select(Product::getId, Product::getName, Product::getImage, Product::getPrice, Product::getOtPrice,
                 Product::getSales, Product::getFicti, Product::getUnitName, Product::getStock, Product::getMerId);
         getForSaleWhere(lqw);
         if (StrUtil.isNotBlank(request.getKeyword())) {
-            lqw.and(i -> i.like(Product::getName, request.getKeyword())
-                    .or().like(Product::getKeyword, request.getKeyword()));
+            String decode = URLUtil.decode(request.getKeyword());
+            lqw.and(i -> i.like(Product::getName, decode)
+                    .or().like(Product::getKeyword, decode));
         }
         if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_MERCHANT)) {
             lqw.eq(Product::getMerId, couponUser.getMerId());
@@ -1372,9 +1550,33 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
                 lqw.in(Product::getId, pidList);
             }
         }
+        if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+            ProductCategory productCategory = productCategoryService.getById(Integer.valueOf(coupon.getLinkedData()));
+            List<Integer> pcIdList = new ArrayList<>();
+            if (productCategory.getLevel().equals(3)) {
+                pcIdList.add(productCategory.getId());
+            } else {
+                List<ProductCategory> productCategoryList = new ArrayList<>();
+                if (productCategory.getLevel().equals(2)) {
+                    productCategoryList = productCategoryService.findAllChildListByPid(productCategory.getId(), productCategory.getLevel());
+                }
+                if (productCategory.getLevel().equals(1)) {
+                    productCategoryList = productCategoryService.getThirdCategoryByFirstId(productCategory.getId(), 0);
+                }
+                List<Integer> collect = productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList());
+                pcIdList.addAll(collect);
+            }
+            lqw.in(Product::getCategoryId, pcIdList);
+        }
+        if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+            lqw.eq(Product::getBrandId, Integer.valueOf(coupon.getLinkedData()));
+        }
+        if (couponUser.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+            lqw.in(Product::getMerId, coupon.getLinkedData());
+        }
         lqw.orderByDesc(Product::getSort);
         lqw.orderByDesc(Product::getId);
-        Page<Product> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        Page<Product> page = PageHelper.startPage(request.getPage(), request.getLimit());
         List<Product> productList = dao.selectList(lqw);
         return CommonPage.copyPageInfo(page, productList);
     }
@@ -1446,7 +1648,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      */
     @Override
     public Boolean submitAudit(Integer id) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getByIdException(id);
+        if (!admin.getMerId().equals(product.getMerId())) {
+            throw new CrmebException("商品不存在");
+        }
         if (product.getIsAudit()) {
             throw new CrmebException("商品已经在审核中");
         }
@@ -1472,6 +1678,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Override
     public Boolean quickAddStock(ProductAddStockRequest request) {
         Product product = getByIdException(request.getId());
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(product.getMerId())) {
+            throw new CrmebException("商品不存在");
+        }
         if (product.getIsAudit()) {
             throw new CrmebException("审核中商品无法编辑");
         }
@@ -1512,6 +1722,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Override
     public Boolean reviewFreeEdit(ProductReviewFreeEditRequest request) {
         Product product = getByIdException(request.getId());
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(product.getMerId())) {
+            throw new CrmebException("商品不存在");
+        }
         if (product.getIsShow()) {
             throw new CrmebException("上架商品无法编辑");
         }
@@ -1561,19 +1775,26 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 获取复制商品配置
+     *
      * @return copyType 复制类型：1：一号通
-     *         copyNum 复制条数(一号通类型下有值)
+     * copyNum 复制条数(一号通类型下有值)
      */
     @Override
     public MyRecord copyConfig() {
-        String copyType = systemConfigService.getValueByKey("system_product_copy_type");
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        String copyType = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PRODUCT_COPY_TYPE);
         if (StrUtil.isBlank(copyType)) {
             throw new CrmebException("请先进行采集商品配置");
         }
         int copyNum = 0;
         if (copyType.equals("1")) {// 一号通
-            OnePassUserInfoVo info = onePassService.info();
-            copyNum = Optional.ofNullable(info.getCopy().getNum()).orElse(0);
+            if (admin.getMerId() > 0) {
+                Merchant merchant = merchantService.getById(admin.getMerId());
+                copyNum = merchant.getCopyProductNum();
+            } else {
+                OnePassUserInfoVo info = onePassService.info();
+                copyNum = Optional.ofNullable(info.getCopy().getNum()).orElse(0);
+            }
         }
         MyRecord record = new MyRecord();
         record.set("copyType", copyType);
@@ -1583,6 +1804,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 复制平台商品
+     *
      * @param url 商品链接
      * @return MyRecord
      */
@@ -1591,24 +1813,34 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         // 校验当前商户的copy余量
         SystemAdmin currentMerchantAdmin = SecurityUtil.getLoginUserVo().getUser();
         Merchant currentMerchant = merchantService.getByIdException(currentMerchantAdmin.getMerId());
-        if(currentMerchant.getCopyProductNum() <= 0){
+        if (currentMerchant.getCopyProductNum() <= 0) {
             throw new CrmebException("当前商户采集商品数量不足");
         }
-        JSONObject jsonObject = onePassService.copyGoods(url);
-        ProductResponseForCopyProduct productResponseForCopyProduct = ProductUtils.onePassCopyTransition(jsonObject);
+        ProductResponseForCopyProduct productResponseForCopyProduct;
+        try {
+            JSONObject jsonObject = onePassService.copyGoods(url);
+            productResponseForCopyProduct = ProductUtils.onePassCopyTransition(jsonObject);
+        } catch (Exception e) {
+            throw new CrmebException("一号通采集商品异常：" + e.getMessage());
+        }
+        Boolean sub = merchantService.subCopyProductNum(currentMerchant.getId());
+        if (!sub) {
+            LOGGER.error("扣除商户复制条数异常：商户ID = {}", currentMerchant.getId());
+        }
         MyRecord record = new MyRecord();
         return record.set("info", productResponseForCopyProduct);
     }
 
     /**
      * 获取商品Map
+     *
      * @param proIdList 商品id列表
      * @return Map
      */
     @Override
     public Map<Integer, Product> getMapByIdList(List<Integer> proIdList) {
         LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
-        lqw.select(Product::getId, Product::getName, Product::getPrice, Product::getImage, Product::getIsShow, Product::getIsDel);
+        lqw.select(Product::getId, Product::getName, Product::getPrice, Product::getImage, Product::getIsShow, Product::getIsRecycle, Product::getIsDel);
         lqw.in(Product::getId, proIdList);
         List<Product> productList = dao.selectList(lqw);
         Map<Integer, Product> productMap = CollUtil.newHashMap();
@@ -1616,6 +1848,164 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             productMap.put(e.getId(), e);
         });
         return productMap;
+    }
+
+    /**
+     * 商品搜索分页列表（活动）
+     *
+     * @param request     搜索参数
+     * @param pageRequest 分页参数
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<ProductActivityResponse> getActivitySearchPage(ProductActivitySearchRequest request, PageParamRequest pageRequest) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Page<Product> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getLimit());
+        Map<String, Object> map = new HashMap<>();
+        if (StrUtil.isNotBlank(request.getName())) {
+            map.put("name", URLUtil.decode(request.getName()));
+        }
+        if (ObjectUtil.isNotNull(request.getCategoryId())) {
+            map.put("categoryId", request.getCategoryId());
+        }
+        if (ObjectUtil.isNotNull(request.getIsShow())) {
+            map.put("isShow", request.getIsShow() ? 1 : 0);
+        }
+        if (ObjectUtil.isNotNull(request.getMerStars()) && request.getMerStars() > 0) {
+            map.put("merStars", request.getMerStars());
+        }
+        if (admin.getMerId() > 0) {
+            request.setMerIds(admin.getMerId().toString());
+        }
+        if (StrUtil.isNotBlank(request.getMerIds())) {
+            map.put("merIds", request.getMerIds());
+        }
+        if (ObjectUtil.isNotNull(request.getBrandId())) {
+            map.put("brandId", request.getBrandId());
+        }
+        // 排序部分
+        if (StrUtil.isNotBlank(request.getSalesOrder())) {
+            if (request.getSalesOrder().equals(Constants.SORT_DESC)) {
+                map.put("lastStr", " order by (p.sales + p.ficti) desc, p.rank desc, p.sort desc, p.id desc");
+            } else {
+                map.put("lastStr", " order by (p.sales + p.ficti) asc, p.rank desc, p.sort desc, p.id desc");
+            }
+        } else if (StrUtil.isNotBlank(request.getPriceOrder())){
+            if (request.getPriceOrder().equals(Constants.SORT_DESC)) {
+                map.put("lastStr", " order by p.price desc, p.rank desc, p.sort desc, p.id desc");
+            } else {
+                map.put("lastStr", " order by p.price asc, p.rank desc, p.sort desc, p.id desc");
+            }
+        } else {
+            map.put("lastStr", " order by p.rank desc, p.sort desc, p.id desc");
+        }
+        List<ProductActivityResponse> responseList = dao.getActivitySearchPage(map);
+        responseList.forEach(response -> {
+            List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(response.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+            response.setAttrValue(attrValueList);
+        });
+        return CommonPage.copyPageInfo(page, responseList);
+    }
+
+    /**
+     * 商品搜索分页列表（活动）商户端
+     *
+     * @param request     搜索参数
+     * @param pageRequest 分页参数
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<ProductActivityResponse> getActivitySearchPageByMerchant(ProductActivitySearchRequest request, PageParamRequest pageRequest) {
+        if (ObjectUtil.isNull(request.getActivityId())) {
+            throw new CrmebException("请选择秒杀活动");
+        }
+        SeckillActivity activity = seckillActivityService.getById(request.getActivityId());
+        if (ObjectUtil.isNull(activity) || activity.getIsDel()) {
+            throw new CrmebException("秒杀活动不存在，请刷新后再试");
+        }
+        if (activity.getStatus().equals(2)) {
+            throw new CrmebException("秒杀活动已结束");
+        }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Merchant merchant = merchantService.getByIdException(admin.getMerId());
+        if (activity.getMerStars() > merchant.getStarLevel()) {
+            throw new CrmebException("商户等级不足以参加该活动");
+        }
+        Page<Product> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getLimit());
+        Map<String, Object> map = new HashMap<>();
+        if (StrUtil.isNotBlank(request.getName())) {
+            map.put("name", URLUtil.decode(request.getName()));
+        }
+        if (ObjectUtil.isNotNull(request.getCategoryId())) {
+            map.put("categoryId", request.getCategoryId());
+        }
+        if (ObjectUtil.isNotNull(request.getCateId())) {
+            map.put("cateId", request.getCateId());
+        }
+        if (ObjectUtil.isNotNull(request.getIsShow())) {
+            map.put("isShow", request.getIsShow() ? 1 : 0);
+        }
+        map.put("merId", admin.getMerId());
+        if (!activity.getProCategory().equals("0")) {
+            map.put("proCateIds", activity.getProCategory());
+        }
+        if (ObjectUtil.isNotNull(request.getProductId())) {
+            map.put("productId", request.getProductId());
+        }
+        List<ProductActivityResponse> responseList = dao.getActivitySearchPageByMerchant(map);
+        responseList.forEach(response -> {
+            List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(response.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+            response.setAttrValue(attrValueList);
+        });
+        return CommonPage.copyPageInfo(page, responseList);
+    }
+
+    /**
+     * 秒杀回滚库存
+     *
+     * @param id    商品ID
+     * @param num   数量
+     * @param sales 销量
+     */
+    @Override
+    public Boolean seckillRollBack(Integer id, Integer num, Integer sales) {
+        UpdateWrapper<Product> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.setSql(StrUtil.format("stock = stock + {}", num));
+        updateWrapper.setSql(StrUtil.format("sales = sales + {}", sales));
+        updateWrapper.eq("id", id);
+        boolean update = update(updateWrapper);
+        if (!update) {
+            throw new CrmebException("秒杀回滚库存败，Id = " + id);
+        }
+        return update;
+    }
+
+    /**
+     * 活动操作库存
+     *
+     * @param id    商品ID
+     * @param num   数量
+     * @param sales 销量
+     * @param type  类型
+     */
+    @Override
+    public Boolean activityOperationStock(Integer id, Integer num, Integer sales, String type) {
+        UpdateWrapper<Product> updateWrapper = new UpdateWrapper<>();
+        if (type.equals(Constants.OPERATION_TYPE_ACTIVITY_CREATE)) {
+            updateWrapper.setSql(StrUtil.format("stock = stock - {}", num));
+            // 扣减时加乐观锁保证库存不为负
+            updateWrapper.last(StrUtil.format(" and (stock - {} >= 0)", num));
+        }
+        if (type.equals(Constants.OPERATION_TYPE_ACTIVITY_ROLL_BACK)) {
+            updateWrapper.setSql(StrUtil.format("stock = stock + {}", num));
+            updateWrapper.setSql(StrUtil.format("sales = sales + {}", sales));
+        }
+        updateWrapper.eq("id", id);
+        boolean update = update(updateWrapper);
+        if (!update) {
+            throw new CrmebException("更新普通商品库存失败,商品id = " + id);
+        }
+        return update;
     }
 
     private Product getByIdException(Integer id) {
@@ -1626,5 +2016,249 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         return Product;
     }
 
+    /**
+     * 把商品列表转换为 平台商品商品列表格式
+     *
+     * @param productList 商品列表
+     * @return 平台商品列表格式
+     */
+    @Override
+    public List<PlatformProductListResponse> productListToPlatFromProductListResponse(List<Product> productList) {
+        List<PlatformProductListResponse> platformProductListResponses = new ArrayList<>();
+        for (Product product : productList) {
+            PlatformProductListResponse r = new PlatformProductListResponse();
+            BeanUtils.copyProperties(product, r);
+            platformProductListResponses.add(r);
+        }
+        return platformProductListResponses;
+    }
+
+    /**
+     * 领券中心优惠券商品列表
+     *
+     * @param couponCategory 优惠券类型：1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券
+     * @param pidList        商品ID列表
+     * @param linkedData     优惠券关联参数
+     * @param pcIdList       商品分类ID列表（3级）
+     */
+    @Override
+    public List<SimpleProductVo> findCouponListLimit3(Integer couponCategory, List<Integer> pidList, String linkedData, List<Integer> pcIdList) {
+        LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
+        lqw.select(Product::getId, Product::getName, Product::getImage, Product::getPrice, Product::getStock);
+        switch (couponCategory) {
+            case 2:
+                lqw.in(Product::getId, pidList);
+                break;
+            case 4:
+                lqw.in(Product::getCategoryId, pcIdList);
+                break;
+            case 5:
+                lqw.eq(Product::getBrandId, Integer.valueOf(linkedData));
+                break;
+            case 6:
+                lqw.in(Product::getMerId, CrmebUtil.stringToArray(linkedData));
+                break;
+        }
+        getForSaleWhere(lqw);
+        lqw.orderByDesc(Product::getSort, Product::getId);
+        lqw.last(" limit 3");
+        List<Product> productList = dao.selectList(lqw);
+        if (CollUtil.isEmpty(productList)) {
+            return new ArrayList<>();
+        }
+        return productList.stream().map(e -> {
+            SimpleProductVo vo = new SimpleProductVo();
+            BeanUtils.copyProperties(e, vo);
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 系统优惠券商品列表
+     *
+     * @param couponId         优惠券ID
+     * @param couponCategory   优惠券分类
+     * @param couponLinkedDate 优惠券关联参数
+     * @param pageParamRequest 分页参数
+     */
+    @Override
+    public PageInfo<Product> findCouponProductList(Integer couponId, Integer couponCategory, String couponLinkedDate, SystemCouponProductSearchRequest pageParamRequest) {
+        LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
+        switch (couponCategory) {
+            case 2:
+                List<CouponProduct> couponProductList = couponProductService.findByCid(couponId);
+                List<Integer> pidList = couponProductList.stream().map(CouponProduct::getPid).collect(Collectors.toList());
+                lqw.in(Product::getId, pidList);
+                break;
+            case 4:
+                ProductCategory productCategory = productCategoryService.getById(Integer.valueOf(couponLinkedDate));
+                List<Integer> pcIdList = new ArrayList<>();
+                if (productCategory.getLevel().equals(3)) {
+                    pcIdList.add(productCategory.getId());
+                } else {
+                    List<ProductCategory> productCategoryList = new ArrayList<>();
+                    if (productCategory.getLevel().equals(2)) {
+                        productCategoryList = productCategoryService.findAllChildListByPid(productCategory.getId(), productCategory.getLevel());
+                    }
+                    if (productCategory.getLevel().equals(1)) {
+                        productCategoryList = productCategoryService.getThirdCategoryByFirstId(productCategory.getId(), 0);
+                    }
+                    List<Integer> collect = productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList());
+                    pcIdList.addAll(collect);
+                }
+                lqw.in(Product::getCategoryId, pcIdList);
+                break;
+            case 5:
+                lqw.eq(Product::getBrandId, Integer.valueOf(couponLinkedDate));
+                break;
+            case 6:
+                lqw.in(Product::getMerId, CrmebUtil.stringToArray(couponLinkedDate));
+                break;
+        }
+        getForSaleWhere(lqw);
+        if (StrUtil.isNotBlank(pageParamRequest.getKeyword())) {
+            String decode = URLUtil.decode(pageParamRequest.getKeyword());
+            lqw.like(Product::getName, decode);
+        }
+        lqw.orderByDesc(Product::getSort, Product::getId);
+        Page<Product> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<Product> productList = dao.selectList(lqw);
+        return CommonPage.copyPageInfo(page, productList);
+    }
+
+    /**
+     * 通过ID获取商品列表
+     * @param proIdsList 商品ID列表
+     */
+    @Override
+    public List<Product> findByIds(List<Integer> proIdsList) {
+        return findByIdsAndLabel(proIdsList, "admin");
+    }
+
+    /**
+     * 通过ID获取商品列表
+     * @param proIdsList 商品ID列表
+     * @param label admin-管理端，front-移动端
+     */
+    @Override
+    public List<Product> findByIds(List<Integer> proIdsList, String label) {
+        return findByIdsAndLabel(proIdsList, label);
+    }
+
+    /**
+     * 通过ID获取商品列表
+     * @param proIdsList 商品ID列表
+     * @param label admin-管理端，front-移动端
+     */
+    private List<Product> findByIdsAndLabel(List<Integer> proIdsList, String label) {
+        LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
+        lqw.in(Product::getId, proIdsList);
+        if (label.equals("front")) {
+            getForSaleWhere(lqw);
+        }
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 获取首页推荐商品
+     *
+     * @param message 商品关联标识
+     * @param value   分类ID、商户ID、品牌ID
+     * @param expand  商品ID字符串
+     * @param isHome  是否首页
+     */
+    @Override
+    public List<Product> findHomeRecommended(String message, String value, String expand, boolean isHome) {
+        LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
+        lqw.select(Product::getId, Product::getImage, Product::getName, Product::getSales, Product::getPrice, Product::getFicti, Product::getBrandId, Product::getMerId, Product::getCategoryId);
+        getForSaleWhere(lqw);
+        switch (message) {
+            case "product":
+                List<Integer> proIdList = CrmebUtil.stringToArray(expand);
+                lqw.in(Product::getId, proIdList);
+                break;
+            case "category":
+                lqw.eq(Product::getCategoryId, value);
+                break;
+            case "brand":
+                lqw.eq(Product::getBrandId, value);
+                break;
+            case "merchant":
+                lqw.eq(Product::getMerId, value);
+                break;
+        }
+        if (isHome) {
+            lqw.last(" order by sales + ficti desc limit 8");
+        } else {
+            lqw.last(" order by sales + ficti desc");
+        }
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 推荐商品分页列表
+     *
+     * @param pageRequest 分页参数
+     */
+    @Override
+    public PageInfo<RecommendProductResponse> findRecommendPage(PageParamRequest pageRequest) {
+        LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
+        lqw.select(Product::getId, Product::getMerId, Product::getImage, Product::getName, Product::getUnitName,
+                Product::getPrice, Product::getSales, Product::getFicti, Product::getCategoryId, Product::getBrandId);
+        getForSaleWhere(lqw);
+        lqw.orderByDesc(Product::getRank, Product::getSales, Product::getFicti, Product::getId);
+        Page<Product> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getLimit());
+        List<Product> productList = dao.selectList(lqw);
+        if (CollUtil.isEmpty(productList)) {
+            return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
+        }
+        productList = activityStyleService.makeActivityBorderStyle(productList);
+        List<RecommendProductResponse> responseList = productList.stream().map(p -> {
+            RecommendProductResponse response = new RecommendProductResponse();
+            BeanUtils.copyProperties(p, response);
+            response.setSales(p.getSales() + p.getFicti());
+            // 设置商品标签
+            ProductTagsFrontResponse productTagsFrontResponse = productTagService.setProductTagByProductTagsRules(p.getId(), p.getBrandId(), p.getMerId(), p.getCategoryId(), response.getProductTags());
+            response.setProductTags(productTagsFrontResponse);
+            return response;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(page, responseList);
+    }
+
+    /**
+     * 校验商品是否可用（移动端可用）
+     * @param proId 商品ID
+     */
+    @Override
+    public Boolean validatedCanUseById(Integer proId) {
+        Product product = getById(proId);
+        if (ObjectUtil.isNull(product)) return false;
+        if (product.getIsDel()) return false;
+        if (product.getIsRecycle()) return false;
+        if (!product.getIsShow()) return false;
+        if (!product.getAuditStatus().equals(ProductConstants.AUDIT_STATUS_SUCCESS)
+                && !product.getAuditStatus().equals(ProductConstants.AUDIT_STATUS_EXEMPTION)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 根据关键字获取商品所有的品牌ID
+     * @param keyword 关键字
+     */
+    @Override
+    public List<Integer> findProductBrandIdByKeyword(String keyword) {
+        return dao.findProductBrandIdByKeyword(URLUtil.decode(keyword));
+    }
+
+    /**
+     * 根据关键字获取商品所有的分类ID
+     * @param keyword 关键字
+     */
+    @Override
+    public List<Integer> findProductCategoryIdByKeyword(String keyword) {
+        return dao.findProductCategoryIdByKeyword(URLUtil.decode(keyword));
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -7,9 +8,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.alipay.AliPayCallback;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.model.order.RefundOrder;
@@ -22,6 +23,7 @@ import com.jbp.common.utils.WxPayUtil;
 import com.jbp.common.vo.AttachVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.WechatPayCallbackVo;
+import com.jbp.service.service.*;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -46,7 +48,7 @@ import java.util.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -76,6 +78,8 @@ public class PayCallbackServiceImpl implements PayCallbackService {
     private AsyncService asyncService;
     @Autowired
     private RefundOrderService refundOrderService;
+    @Autowired
+    private AliPayCallbackService aliPayCallbackService;
 
     /**
      * 微信支付回调
@@ -213,7 +217,9 @@ public class PayCallbackServiceImpl implements PayCallbackService {
     public String aliPayCallback(HttpServletRequest request) {
         Map<String, String> params = convertRequestParamsToMap(request); // 将异步通知中收到的待验证所有参数都存放到map中
         String paramsJson = JSON.toJSONString(params);
-        logger.info("支付宝回调，{}", paramsJson);
+        logger.info("支付宝回调 = " + paramsJson);
+        // 保存支付宝回调信息
+        saveAliPayCallbackInfo(params);
         try {
             //商户订单号
             String outTradeNo = params.get("out_trade_no");
@@ -334,6 +340,33 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             logger.error("支付宝回调签名认证失败,paramsJson:{},errorMsg:{}", paramsJson, e.getMessage());
             return "fail";
         }
+    }
+
+    /**
+     * 保存支付宝回调信息
+     * @param params
+     */
+    private void saveAliPayCallbackInfo(Map<String, String> params) {
+        AliPayCallback aliPayCallback = new AliPayCallback();
+        aliPayCallback.setNotifyType(params.get("notify_type"));
+        aliPayCallback.setNotifyId(params.get("notify_id"));
+        aliPayCallback.setAppId(params.get("app_id"));
+        aliPayCallback.setCharset(params.get("charset"));
+        aliPayCallback.setVersion(params.get("version"));
+        aliPayCallback.setSignType(params.get("sign_type"));
+        aliPayCallback.setSign(params.get("sign"));
+        aliPayCallback.setTradeNo(params.get("trade_no"));
+        aliPayCallback.setOutTradeNo(params.get("out_trade_no"));
+        aliPayCallback.setTradeStatus(params.get("trade_status"));
+        aliPayCallback.setTotalAmount(new BigDecimal(params.get("total_amount")));
+        aliPayCallback.setReceiptAmount(new BigDecimal(params.get("receipt_amount")));
+        aliPayCallback.setRefundFee(ObjectUtil.isNotNull(params.get("refund_fee")) ? new BigDecimal(params.get("refund_fee")) : null);
+        aliPayCallback.setSubject(params.get("subject"));
+        aliPayCallback.setBody(Optional.ofNullable(params.get("body")).orElse(""));
+        aliPayCallback.setPassbackParams(params.get("passback_params"));
+        aliPayCallback.setNotifyTime(DateUtil.parse(params.get("notify_time")));
+        aliPayCallback.setAddTime(DateUtil.date());
+        aliPayCallbackService.save(aliPayCallback);
     }
 
     /**

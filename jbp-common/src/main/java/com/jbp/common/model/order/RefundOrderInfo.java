@@ -103,5 +103,9 @@ public class RefundOrderInfo implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "退还平台优惠券补贴金额")
+    private BigDecimal refundPlatCouponPrice;
 
+    @ApiModelProperty(value = "退运费金额")
+    private BigDecimal refundFreightFee;
 }

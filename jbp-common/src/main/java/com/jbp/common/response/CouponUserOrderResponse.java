@@ -16,7 +16,7 @@ import java.util.Date;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -43,14 +43,14 @@ public class CouponUserOrderResponse implements Serializable {
     @ApiModelProperty(value = "优惠券名称")
     private String name;
 
-    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-平台券")
+    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券")
     private Integer category;
 
     @ApiModelProperty(value = "优惠券的面值")
-    private BigDecimal money;
+    private Long money;
 
     @ApiModelProperty(value = "最低消费多少金额可用优惠券")
-    private BigDecimal minPrice;
+    private Long minPrice;
 
     @ApiModelProperty(value = "状态（0：未使用，1：已使用, 2:已失效）")
     private Integer status;

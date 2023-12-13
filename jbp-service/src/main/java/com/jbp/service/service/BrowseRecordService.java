@@ -1,7 +1,9 @@
 package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.record.BrowseRecord;
+import com.jbp.common.request.PageParamRequest;
 
 import java.util.List;
 
@@ -10,7 +12,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -44,4 +46,11 @@ public interface BrowseRecordService extends IService<BrowseRecord> {
      * 更新足迹数据
      */
     Boolean myUpdate(BrowseRecord browseRecord);
+
+    /**
+     * 用户足迹分月列表
+     * @param userId 用户Id
+     * @param pageParamRequest 分页参数
+     */
+    PageInfo<BrowseRecord> findPageByUserId(Integer userId, PageParamRequest pageParamRequest);
 }

@@ -18,7 +18,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -33,14 +33,14 @@ public class WechatAddressImportRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "收货人姓名", required = true)
-    @NotBlank(message = "收货人姓名不能为空")
-    private String userName;
+//    @ApiModelProperty(value = "收货人姓名", required = false)
+//    @NotBlank(message = "收货人姓名不能为空")
+//    private String userName;
 
-    @ApiModelProperty(value = "收货人电话", required = true)
-    @NotBlank(message = "收货人电话不能为空")
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
-    private String telNumber;
+//    @ApiModelProperty(value = "收货人电话", required = false)
+//    @NotBlank(message = "收货人电话不能为空")
+//    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
+//    private String telNumber;
 
     @ApiModelProperty(value = "收货人所在省", required = true)
     @NotBlank(message = "收货人所在省不能为空")

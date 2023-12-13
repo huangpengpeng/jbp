@@ -14,8 +14,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.OrderDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -34,7 +32,11 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
+import com.jbp.service.dao.OrderDao;
+import com.jbp.service.service.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -59,7 +61,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements OrderService {
-
+    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Resource
     private OrderDao dao;
 
@@ -97,6 +99,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private TemplateMessageService templateMessageService;
     @Autowired
     private SystemNotificationServiceImpl systemNotificationService;
+    @Autowired
+    private MerchantPrintService merchantPrintService;
 
     /**
      * 根据订单编号获取订单
@@ -166,10 +170,47 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         lqw.lt(Order::getRefundStatus, OrderConstants.ORDER_REFUND_STATUS_REFUND);
         lqw.eq(Order::getIsUserDel, false);
         lqw.eq(Order::getIsMerchantDel, false);
-        lqw.eq(Order::getType, OrderConstants.ORDER_TYPE_NORMAL);
+        lqw.in(Order::getType, OrderConstants.ORDER_TYPE_NORMAL, OrderConstants.ORDER_TYPE_SECKILL);
         lqw.eq(Order::getIsDel, false);
         lqw.orderByDesc(Order::getId);
         List<Order> orderList = dao.selectList(lqw);
+        return CommonPage.copyPageInfo(page, orderList);
+    }
+
+    /**
+     * 获取用户订单列表V1.4
+     * @param userId 用户id
+     * @param request 搜索参数
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<Order> getUserOrderList_v1_4(Integer userId, OrderFrontListRequest request) {
+        Page<Order> page = PageHelper.startPage(request.getPage(), request.getLimit());
+        if (StrUtil.isBlank(request.getKeywords())) {
+            LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+            lqw.eq(Order::getUid, userId);
+            if (request.getStatus() >= 0) {
+                if (request.getStatus() == 1) {
+                    lqw.in(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING, OrderConstants.ORDER_STATUS_PART_SHIPPING);
+                } else {
+                    lqw.eq(Order::getStatus, request.getStatus());
+                }
+            }
+            lqw.lt(Order::getRefundStatus, OrderConstants.ORDER_REFUND_STATUS_REFUND);
+            lqw.eq(Order::getIsUserDel, false);
+            lqw.eq(Order::getIsMerchantDel, false);
+            lqw.in(Order::getType, OrderConstants.ORDER_TYPE_NORMAL, OrderConstants.ORDER_TYPE_SECKILL);
+            lqw.eq(Order::getIsDel, false);
+            lqw.orderByDesc(Order::getId);
+            List<Order> orderList = dao.selectList(lqw);
+            return CommonPage.copyPageInfo(page, orderList);
+        }
+        Map<String, Object> searchMap = new HashMap<>();
+        String keywords = URLUtil.decode(request.getKeywords());
+        searchMap.put("keywords", keywords);
+        searchMap.put("status", request.getStatus());
+        searchMap.put("userId", userId);
+        List<Order> orderList = dao.findFrontList(searchMap);
         return CommonPage.copyPageInfo(page, orderList);
     }
 
@@ -209,6 +250,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         lqw.eq(Order::getMerId, systemAdmin.getMerId());
         if (StrUtil.isNotBlank(request.getOrderNo())) {
             lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
+        }
+        if (ObjectUtil.isNotNull(request.getType())) {
+            lqw.eq(Order::getType, request.getType());
         }
         if (StrUtil.isNotBlank(request.getDateLimit())) {
             getRequestTimeWhere(lqw, request.getDateLimit());
@@ -333,6 +377,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (!(order.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING) || order.getStatus().equals(OrderConstants.ORDER_STATUS_PART_SHIPPING))) {
             throw new CrmebException("订单不处于待发货状态");
         }
+        if (order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_ALL)) {
+            throw new CrmebException("订单已退款无法发货");
+        }
         MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(request.getOrderNo());
         if (!merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS)) {
             throw new CrmebException("订单非发货类型订单");
@@ -365,10 +412,31 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             if (orderDetail.getPayNum() - orderDetail.getDeliveryNum() - detailRequest.getNum() < 0) {
                 throw new CrmebException("超出可发货数量,请重新选择数量");
             }
+//            if (orderDetail.getPayNum() - orderDetail.getRefundNum() - detailRequest.getNum() < 0) {
+//                throw new CrmebException("超出可发货数量,请重新选择数量");
+//            }
         });
 
         // 拆单发货
         return splitSendExpress(request, order, merchantOrder, orderDetailList);
+    }
+
+    /**
+     * 小票打印
+     *
+     * @param orderNo 订单编号
+     * @return 打印结果
+     */
+    @Override
+    public void printReceipt(String orderNo) {
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderNo);
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(merchantOrder.getMerId())) {
+            throw new CrmebException("订单不存在");
+        }
+        List<MerchantOrder> orders = new ArrayList<>();
+        orders.add(merchantOrder);
+        merchantPrintService.printReceipt(orders, 1);;
     }
 
     /**
@@ -436,6 +504,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
             lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
+        }
+        if (ObjectUtil.isNotNull(request.getType())) {
+            lqw.eq(Order::getType, request.getType());
         }
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(lqw, request.getDateLimit());
@@ -533,6 +604,26 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     /**
+     * 获取订单快递信息(商户端)
+     *
+     * @param invoiceId 发货单ID
+     * @return LogisticsResultVo
+     */
+    @Override
+    public LogisticsResultVo getLogisticsInfoByMerchant(Integer invoiceId) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        OrderInvoice orderInvoice = orderInvoiceService.getById(invoiceId);
+        if (ObjectUtil.isNull(orderInvoice)) {
+            throw new CrmebException("发货单不存在");
+        }
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderInvoice.getOrderNo());
+        if (ObjectUtil.isNull(merchantOrder) || !admin.getMerId().equals(merchantOrder.getMerId())) {
+            throw new CrmebException("订单不存在");
+        }
+        return logisticService.info(orderInvoice.getTrackingNumber(), null, Optional.ofNullable(orderInvoice.getExpressCode()).orElse(""), merchantOrder.getUserPhone());
+    }
+
+    /**
      * 获取订单快递信息
      *
      * @param invoiceId 发货单ID
@@ -545,15 +636,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             throw new CrmebException("发货单不存在");
         }
         MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderInvoice.getOrderNo());
-
-//        if (order.getType().equals(1)) {// 视频号订单 TODO
-//            Express express = expressService.getByName(merchantOrder.getDeliveryName());
-//            if (ObjectUtil.isNotNull(express)) {
-//                info.setDeliveryCode(express.getCode());
-//            } else {
-//                info.setDeliveryCode("");
-//            }
-//        }
         return logisticService.info(orderInvoice.getTrackingNumber(), null, Optional.ofNullable(orderInvoice.getExpressCode()).orElse(""), merchantOrder.getUserPhone());
     }
 
@@ -567,6 +649,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     public Boolean verificationOrderByCode(String verifyCode) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         MerchantOrder merchantOrder = merchantOrderService.getOneByVerifyCode(verifyCode);
+        List<MerchantOrder> merchantOrderListForPrint = CollUtil.newArrayList();
         if (ObjectUtil.isNull(merchantOrder)) {
             throw new CrmebException("请选择正确的核销码");
         }
@@ -580,10 +663,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         order.setStatus(OrderConstants.ORDER_STATUS_TAKE_DELIVERY);
         order.setReceivingTime(DateUtil.date());
         merchantOrder.setClerkId(admin.getId());
+        merchantOrderListForPrint.add(merchantOrder);
         Boolean execute = transactionTemplate.execute(e -> {
             updateById(order);
             orderDetailService.takeDelivery(order.getOrderNo());
             merchantOrderService.updateById(merchantOrder);
+            // 打印小票 op=1 为方法调用这里也就是支付后自动打印小票的场景
+            logger.info("小票打印开始调用");
+            merchantPrintService.printReceipt(merchantOrderListForPrint, 3);
             return Boolean.TRUE;
         });
         if (execute) {
@@ -674,8 +761,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      */
     @Override
     public List<OrderDetail> getDetailList(String orderNo) {
-        getByOrderNo(orderNo);
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        getByOrderNoAndMerId(orderNo, admin.getMerId());
         return orderDetailService.getShipmentByOrderNo(orderNo);
+    }
+
+    /**
+     * 获取订单发货单列表(商户端)
+     * @param orderNo 订单号
+     * @return 发货单列表
+     */
+    @Override
+    public List<OrderInvoiceResponse> getInvoiceListByMerchant(String orderNo) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        getByOrderNoAndMerId(orderNo, admin.getMerId());
+        return getInvoiceList(orderNo);
     }
 
     /**
@@ -849,6 +949,60 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     /**
+     * 获取用户购买的商品数量
+     * @param uid 用户ID
+     * @param proId 商品ID
+     * @param productType 商品类型
+     */
+    @Override
+    public Integer getProductNumCount(Integer uid, Integer proId, Integer productType) {
+        return dao.getProductNumCount(uid, proId, productType);
+    }
+
+    /**
+     * 获取某一天的所有数据
+     * @param merId 商户id，0为所有商户
+     * @param date 日期：年-月-日
+     * @return List
+     */
+    @Override
+    public List<Order> findPayByDate(Integer merId, String date) {
+        LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+        if (merId > 0) {
+            lqw.eq(Order::getMerId, merId);
+        }
+        lqw.eq(Order::getPaid, 1);
+        lqw.ne(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_PAY);
+        lqw.eq(Order::getIsDel, 0);
+        lqw.apply("date_format(pay_time, '%Y-%m-%d') = {0}", date);
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 获取导出订单列表
+     * @param request 请求参数
+     */
+    @Override
+    public List<Order> findExportList(OrderSearchRequest request) {
+        LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+        if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
+            lqw.eq(Order::getMerId, request.getMerId());
+        }
+        if (StrUtil.isNotBlank(request.getOrderNo())) {
+            lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
+        }
+        if (ObjectUtil.isNotNull(request.getType())) {
+            lqw.eq(Order::getType, request.getType());
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            getRequestTimeWhere(lqw, request.getDateLimit());
+        }
+        getMerchantStatusWhere(lqw, request.getStatus());
+        lqw.orderByDesc(Order::getId);
+        return dao.selectList(lqw);
+    }
+
+    /**
      * 根据订单编号获取订单
      *
      * @param orderNo 订单编号
@@ -930,7 +1084,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         });
         if (!execute) throw new CrmebException("快递拆单发货失败！");
         List<OrderDetail> detailList = orderDetailService.getByOrderNo(order.getOrderNo());
-        long count = detailList.stream().filter(e -> e.getPayNum() - e.getDeliveryNum() > 0).count();
+//        long count = detailList.stream().filter(e -> e.getPayNum() - e.getDeliveryNum() > 0).count();
+        long count = detailList.stream().filter(e -> e.getPayNum() > (e.getDeliveryNum() + e.getRefundNum())).count();
         if (count <= 0) {
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_RECEIPT);
             updateById(order);
@@ -1010,6 +1165,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         });
 
         if (!execute) throw new CrmebException("快递发货失败！");
+        // 发送消息通知
+        SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.DELIVER_GOODS_MARK);
+        pushMessageOrder(order, payNotification, invoice);
         return execute;
     }
 
@@ -1202,32 +1360,37 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * 小程序订阅消息
      */
     private void pushMessageOrder(Order order, SystemNotification notification, OrderInvoice invoice) {
-        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_H5)) {
+        if (!order.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
             return;
         }
-        if (!order.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_H5)) {
             return;
         }
         UserToken userToken;
         HashMap<String, String> temMap = new HashMap<>();
-
         // 公众号
-
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_PUBLIC) && notification.getIsWechat().equals(1)) {
             userToken = userTokenService.getTokenByUserId(order.getUid(), UserConstants.USER_TOKEN_TYPE_WECHAT);
             if (ObjectUtil.isNull(userToken)) {
                 return ;
             }
+            /**
+             * {{first.DATA}}
+             * 订单编号：{{keyword1.DATA}}
+             * 物流公司：{{keyword2.DATA}}
+             * 物流单号：{{keyword3.DATA}}
+             * {{remark.DATA}}
+             */
             // 发送微信模板消息
             temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "订单发货提醒");
             temMap.put("keyword1", order.getOrderNo());
-            temMap.put("keyword2", CrmebDateUtil.nowDate());
-            temMap.put("keyword3", invoice.getExpressName());
-            temMap.put("keyword4", invoice.getExpressCode());
+            temMap.put("keyword2", invoice.getExpressName());
+            temMap.put("keyword3", invoice.getExpressCode());
             temMap.put(Constants.WE_CHAT_TEMP_KEY_END, "欢迎再次购买！");
             templateMessageService.pushTemplateMessage(notification.getWechatId(), temMap, userToken.getToken());
             return;
-        } else if (notification.getIsRoutine().equals(1)) {
+        }
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_MINI) && notification.getIsRoutine().equals(1)) {
             // 小程序发送订阅消息
             userToken = userTokenService.getTokenByUserId(order.getUid(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
             if (ObjectUtil.isNull(userToken)) {
@@ -1239,10 +1402,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 //        temMap.put("name3", storeOrder.getDeliveryName());
 //        temMap.put("character_string4", storeOrder.getDeliveryId());
 //        temMap.put("thing7", "您的订单已发货");
-            // 放开部分为一码秦川小程序
-            temMap.put("character_string1", order.getOrderNo());
-            temMap.put("name6", invoice.getExpressName());
-            temMap.put("character_string7", invoice.getExpressCode());
+            // 放开部分为二码秦川小程序
+            temMap.put("character_string7", order.getOrderNo());
+            temMap.put("thing1", invoice.getExpressName());
+            temMap.put("character_string2", invoice.getExpressCode());
             temMap.put("thing11", "您的订单已发货");
             templateMessageService.pushMiniTemplateMessage(notification.getRoutineId(), temMap, userToken.getToken());
         }

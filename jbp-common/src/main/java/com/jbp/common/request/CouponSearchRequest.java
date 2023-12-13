@@ -13,7 +13,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -24,20 +24,22 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="CouponSearchRequest对象", description="优惠卷搜索请求对象")
-public class CouponSearchRequest implements Serializable {
+public class CouponSearchRequest extends PageParamRequest implements Serializable {
 
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "优惠券名称")
     private String name;
 
-    @ApiModelProperty(value = "领取类型 1-手动领取,2-商品赠送券")
+    @ApiModelProperty(value = "领取类型 1-手动领取,2-商品赠送券,3-平台活动发放")
     private Integer receiveType;
 
-    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-平台券")
+    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券")
     private Integer category;
 
     @ApiModelProperty(value = "状态（0：关闭，1：开启）")
     private Boolean status;
 
+    @ApiModelProperty(value = "领取状态：1-可领取，0-不可领取")
+    private Integer receiveStatus;
 }

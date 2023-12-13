@@ -5,9 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.ProductGuaranteeGroupDao;
-import com.jbp.service.service.MerchantProductGuaranteeGroupService;
-import com.jbp.service.service.ProductGuaranteeGroupService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.product.MerchantProductGuaranteeGroup;
@@ -16,6 +13,9 @@ import com.jbp.common.request.ProductGuaranteeGroupAddRequest;
 import com.jbp.common.response.ProductGuaranteeGroupListResponse;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.service.dao.ProductGuaranteeGroupDao;
+import com.jbp.service.service.MerchantProductGuaranteeGroupService;
+import com.jbp.service.service.ProductGuaranteeGroupService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -86,6 +86,10 @@ public class ProductGuaranteeGroupServiceImpl extends ServiceImpl<ProductGuarant
     @Override
     public Boolean delete(Integer id) {
         ProductGuaranteeGroup group = getByIdException(id);
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(group.getMerId())) {
+            throw new CrmebException("保障服务组合不存在");
+        }
         group.setIsDel(true);
         return transactionTemplate.execute(e -> {
             updateById(group);
@@ -103,7 +107,11 @@ public class ProductGuaranteeGroupServiceImpl extends ServiceImpl<ProductGuarant
         if (ObjectUtil.isNull(request.getId())) {
             throw new CrmebException("组合ID不能为空");
         }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         ProductGuaranteeGroup guaranteeGroup = getByIdException(request.getId());
+        if (!admin.getMerId().equals(guaranteeGroup.getMerId())) {
+            throw new CrmebException("保障服务组合不存在");
+        }
         List<Integer> gidList = CrmebUtil.stringToArray(request.getGids());
         List<MerchantProductGuaranteeGroup> mpGroupList = gidList.stream().map(gid -> {
             MerchantProductGuaranteeGroup group = new MerchantProductGuaranteeGroup();

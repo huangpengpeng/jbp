@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantProductSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.SimpleProductVo;
@@ -18,7 +19,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -62,10 +63,10 @@ public interface ProductService extends IService<Product> {
 
     /**
      * 更新商品信息
-     * @param ProductRequest 商品参数
+     * @param productRequest 商品参数
      * @return 更新结果
      */
-    Boolean update(ProductAddRequest ProductRequest);
+    Boolean update(ProductAddRequest productRequest);
 
     /**
      * 获取tabsHeader对应数量
@@ -132,6 +133,20 @@ public interface ProductService extends IService<Product> {
      * @return PageInfo
      */
     PageInfo<PlatformProductListResponse> getPlatformPageList(ProductSearchRequest request, PageParamRequest pageParamRequest);
+
+    /**
+     * 根据id集合查询对应商品列表
+     * @param ids 商品id集合 Integer 对象集合
+     * @return 商品列表
+     */
+    List<PlatformProductListResponse> getPlatformListForIds(List<String> ids);
+
+    /**
+     * 根据id集合以及活动上限加载商品数据
+     * @param ids id集合
+     * @return 平台商品列表
+     */
+    List<PlatformProductListResponse> getPlatformListForIdsByLimit(List<String> ids);
 
     /**
      * 商品审核
@@ -226,6 +241,14 @@ public interface ProductService extends IService<Product> {
      * @return 待导入的商品信息
      */
     ProductRequest importProductFromUrl(String url, int tag) throws IOException, JSONException;
+
+    /**
+     * 根据其他平台url导入产品信息
+     * @param url 待倒入平台的url
+     * @param tag 待导入平台标识
+     * @return 待导入的商品信息
+     */
+    ProductResponseForCopyProduct importProductFrom99Api(String url, int tag) throws IOException, JSONException;
 
     /**
      * 首页商品列表
@@ -329,9 +352,8 @@ public interface ProductService extends IService<Product> {
     /**
      * 优惠券商品列表
      * @param request 搜索参数
-     * @param pageParamRequest 分页参数
      */
-    PageInfo<Product> getCouponProList(CouponProductSearchRequest request, PageParamRequest pageParamRequest);
+    PageInfo<Product> getCouponProList(CouponProductSearchRequest request);
 
     /**
      * 获取复制商品配置
@@ -353,4 +375,110 @@ public interface ProductService extends IService<Product> {
      * @return Map
      */
     Map<Integer, Product> getMapByIdList(List<Integer> proIdList);
+
+    /**
+     * 商品搜索分页列表（活动）
+     * @param request 搜索参数
+     * @param pageRequest 分页参数
+     * @return PageInfo
+     */
+    PageInfo<ProductActivityResponse> getActivitySearchPage(ProductActivitySearchRequest request, PageParamRequest pageRequest);
+
+    /**
+     * 商品搜索分页列表（活动）商户端
+     * @param request 搜索参数
+     * @param pageRequest 分页参数
+     * @return PageInfo
+     */
+    PageInfo<ProductActivityResponse> getActivitySearchPageByMerchant(ProductActivitySearchRequest request, PageParamRequest pageRequest);
+
+    /**
+     * 秒杀回滚库存
+     * @param id 商品ID
+     * @param num 数量
+     * @param sales 销量
+     */
+    Boolean seckillRollBack(Integer id, Integer num, Integer sales);
+
+    /**
+     * 活动操作库存
+     * @param id 商品ID
+     * @param num 数量
+     * @param sales 销量
+     * @param type 类型
+     */
+    Boolean activityOperationStock(Integer id, Integer num, Integer sales, String type);
+
+    /**
+     * 把商品列表转换为 平台商品商品列表格式
+     * @param productList 商品列表
+     * @return 平台商品列表格式
+     */
+    List<PlatformProductListResponse> productListToPlatFromProductListResponse(List<Product> productList);
+
+    /**
+     * 领券中心优惠券商品列表
+     * @param couponCategory 优惠券类型：1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券
+     * @param pidList 商品ID列表
+     * @param linkedData 优惠券关联参数
+     * @param pcIdList 商品分类ID列表（3级）
+     */
+    List<SimpleProductVo> findCouponListLimit3(Integer couponCategory, List<Integer> pidList, String linkedData, List<Integer> pcIdList);
+
+    /**
+     * 系统优惠券商品列表
+     * @param couponId 优惠券ID
+     * @param couponCategory 优惠券分类
+     * @param couponLinkedDate 优惠券关联参数
+     * @param pageParamRequest 分页参数
+     */
+    PageInfo<Product> findCouponProductList(Integer couponId, Integer couponCategory, String couponLinkedDate, SystemCouponProductSearchRequest pageParamRequest);
+
+    /**
+     * 通过ID获取商品列表
+     * @param proIdsList 商品ID列表
+     */
+    List<Product> findByIds(List<Integer> proIdsList);
+
+    /**
+     * 通过ID获取商品列表
+     * @param proIdsList 商品ID列表
+     * @param label admin-管理端，front-移动端
+     */
+    List<Product> findByIds(List<Integer> proIdsList, String label);
+
+    /**
+     * 获取首页推荐商品
+     *
+     * @param message 商品关联标识
+     * @param value   分类ID、商户ID、品牌ID
+     * @param expand  商品ID字符串
+     * @param isHome  是否首页
+     */
+    List<Product> findHomeRecommended(String message, String value, String expand, boolean isHome);
+
+    /**
+     * 推荐商品分页列表
+     *
+     * @param pageRequest 分页参数
+     */
+    PageInfo<RecommendProductResponse> findRecommendPage(PageParamRequest pageRequest);
+
+    /**
+     * 校验商品是否可用（移动端可用）
+     * @param proId 商品ID
+     */
+    Boolean validatedCanUseById(Integer proId);
+
+    /**
+     * 根据关键字获取商品所有的品牌ID
+     * @param keyword 关键字
+     */
+    List<Integer> findProductBrandIdByKeyword(String keyword);
+
+    /**
+     * 根据关键字获取商品所有的分类ID
+     * @param keyword 关键字
+     */
+    List<Integer> findProductCategoryIdByKeyword(String keyword);
 }

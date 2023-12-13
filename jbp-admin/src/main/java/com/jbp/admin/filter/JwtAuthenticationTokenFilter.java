@@ -1,11 +1,13 @@
 package com.jbp.admin.filter;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.jbp.common.vo.LoginUserVo;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.jbp.common.vo.LoginUserVo;
 
 import javax.annotation.Resource;
 import javax.servlet.FilterChain;

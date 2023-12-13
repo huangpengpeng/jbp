@@ -4,14 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.GroupDataConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.constants.UploadConstants;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.system.SystemGroupData;
 import com.jbp.common.request.SystemFormItemCheckRequest;
+import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -71,8 +73,8 @@ public class PageLayoutServiceImpl implements PageLayoutService {
         response.setUserBanner(convertData(userBannerList));
         // 用户默认头像
         response.setUserDefaultAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
-        // 首页logo
-        response.setIndexLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MOBILE_TOP_LOGO));
+        // 首页logo 1.3 版本DIY已经替代
+//        response.setIndexLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MOBILE_TOP_LOGO));
         return response;
     }
 
@@ -182,6 +184,48 @@ public class PageLayoutServiceImpl implements PageLayoutService {
             systemGroupDataService.deleteByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_MENU);
             // 保存新数据
             systemGroupDataService.saveBatch(dataList, 100);
+            return Boolean.TRUE;
+        });
+    }
+
+    /**
+     * 获取页面底部导航信息
+     */
+    @Override
+    public PageLayoutBottomNavigationResponse getBottomNavigation() {
+        PageLayoutBottomNavigationResponse response = new PageLayoutBottomNavigationResponse();
+        // 个人中心页服务
+        List<SystemGroupData> dataList = systemGroupDataService.findListByGid(GroupDataConstants.GROUP_DATA_ID_BOTTOM_NAVIGATION);
+        response.setBottomNavigationList(convertData(dataList));
+
+        // 是否自定义
+        String isCustom = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_BOTTOM_NAVIGATION_IS_CUSTOM);
+        response.setIsCustom(isCustom);
+        return response;
+    }
+
+    /**
+     * 页面底部导航信息保存
+     * @return 保存结果
+     */
+    @Override
+    public Boolean bottomNavigationSave(JSONObject jsonObject) {
+        String isCustom = jsonObject.getString("isCustom");
+        if (StrUtil.isBlank(isCustom)) {
+            throw new CrmebException("请选择是否自定义");
+        }
+        List<JSONObject> bottomNavigationList = CrmebUtil.jsonArrayToJsonObjectList(jsonObject.getJSONArray("bottomNavigationList"));
+        if (CollUtil.isEmpty(bottomNavigationList)) {
+            throw new CrmebException("请传入底部导航数据");
+        }
+        List<SystemGroupData> dataList = convertGroupData(bottomNavigationList, GroupDataConstants.GROUP_DATA_ID_BOTTOM_NAVIGATION);
+        return transactionTemplate.execute(e -> {
+            // 先删除历史数据
+            systemGroupDataService.deleteByGid(GroupDataConstants.GROUP_DATA_ID_BOTTOM_NAVIGATION);
+            // 保存新数据
+            systemGroupDataService.saveBatch(dataList, 100);
+
+            systemConfigService.updateOrSaveValueByName(SysConfigConstants.CONFIG_BOTTOM_NAVIGATION_IS_CUSTOM, isCustom);
             return Boolean.TRUE;
         });
     }

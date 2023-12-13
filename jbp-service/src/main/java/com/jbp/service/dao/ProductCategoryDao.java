@@ -2,6 +2,7 @@ package com.jbp.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.product.ProductCategory;
+
 import org.apache.ibatis.annotations.Param;
 
 import javax.validation.constraints.Pattern;

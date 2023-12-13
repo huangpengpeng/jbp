@@ -4,15 +4,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.PayComponentDeliveryCompanyDao;
-import com.jbp.service.service.ExpressService;
-import com.jbp.service.service.PayComponentDeliveryCompanyService;
-import com.jbp.service.service.WechatVideoDeliveryService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.wechat.video.PayComponentDeliveryCompany;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.wxvedioshop.delivery.DeliveryCompanyVo;
+import com.jbp.service.dao.PayComponentDeliveryCompanyDao;
+import com.jbp.service.service.ExpressService;
+import com.jbp.service.service.PayComponentDeliveryCompanyService;
+import com.jbp.service.service.WechatVideoDeliveryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------

@@ -5,15 +5,19 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import net.bytebuddy.implementation.bind.annotation.Empty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+
+import com.jbp.common.annotation.StringContains;
 
 /**
  * 订单退款审核请求对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -29,9 +33,17 @@ public class OrderRefundAuditRequest {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "退款订单号", required = true)
-    @NotEmpty(message = "退款订单号不能为空")
+    @NotBlank(message = "退款订单号不能为空")
     private String refundOrderNo;
+
+    @ApiModelProperty(value = "审核结果：success-审核通过，refuse-审核拒绝", required = true)
+    @NotBlank(message = "请选择审核结果")
+    @StringContains(limitValues = {"success", "refuse"}, message = "未知的审核结果")
+    private String auditType;
 
     @ApiModelProperty(value = "拒绝退款原因，拒绝退款时必传")
     private String reason;
+
+    @ApiModelProperty(value = "商户地址ID")
+    private Integer merAddressId;
 }

@@ -6,10 +6,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.WechatExceptionsService;
-import com.jbp.service.service.WechatPayInfoService;
-import com.jbp.service.service.WechatService;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.PayConstants;
 import com.jbp.common.constants.SysConfigConstants;
@@ -22,6 +18,10 @@ import com.jbp.common.response.WechatOpenUploadResponse;
 import com.jbp.common.response.WechatPublicShareResponse;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.WechatExceptionsService;
+import com.jbp.service.service.WechatPayInfoService;
+import com.jbp.service.service.WechatService;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -239,26 +239,20 @@ public class WechatServiceImpl implements WechatService {
         response.setTimestamp(timestamp);
         response.setSignature(signature);
         response.setJsApiList(CrmebUtil.stringToArrayStr(WeChatConstants.PUBLIC_API_JS_API_SDK_LIST));
-        response.setDebug(crmebConfig.isWechatJsApiDebug());
         return response;
     }
 
     /**
      * 生成小程序码
      *
-     * @param page  必须是已经发布的小程序存在的页面
-     * @param scene 最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，其它字符请自行编码为合法字符
+     * @param jsonObject  微信端参数
      * @return 小程序码
      */
     @Override
-    public String createQrCode(String page, String scene) {
+    public String createQrCode(JSONObject jsonObject) {
         String miniAccessToken = getMiniAccessToken();
         String url = StrUtil.format(WeChatConstants.WECHAT_MINI_QRCODE_UNLIMITED_URL, miniAccessToken);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("scene", scene);
-        map.put("page", page);
-        map.put("width", 200);
-        byte[] bytes = restTemplateUtil.postJsonDataAndReturnBuffer(url, new JSONObject(map));
+        byte[] bytes = restTemplateUtil.postJsonDataAndReturnBuffer(url, jsonObject);
         String response = new String(bytes);
         if (StringUtils.contains(response, "errcode")) {
             logger.error("微信生成小程序码异常" + response);
@@ -269,7 +263,7 @@ public class WechatServiceImpl implements WechatService {
                 redisUtil.delete(WeChatConstants.REDIS_WECAHT_MINI_ACCESS_TOKEN_KEY);
                 miniAccessToken = getMiniAccessToken();
                 url = StrUtil.format(WeChatConstants.WECHAT_MINI_QRCODE_UNLIMITED_URL, miniAccessToken);
-                bytes = restTemplateUtil.postJsonDataAndReturnBuffer(url, new JSONObject(map));
+                bytes = restTemplateUtil.postJsonDataAndReturnBuffer(url, jsonObject);
                 response = new String(bytes);
                 if (StringUtils.contains(response, "errcode")) {
                     logger.error("微信生成小程序码重试异常" + response);
@@ -441,7 +435,7 @@ public class WechatServiceImpl implements WechatService {
      * @return 是否发送成功
      */
     @Override
-    public Boolean sendMiniSubscribeMessage(TemplateMessageVo templateMessage) {
+    public Boolean sendMiniSubscribeMessage(ProgramTemplateMessageVo templateMessage) {
         String accessToken = getMiniAccessToken();
         String url = StrUtil.format(WeChatConstants.WECHAT_MINI_SEND_SUBSCRIBE_URL, accessToken);
         JSONObject messAge = JSONObject.parseObject(JSONObject.toJSONString(templateMessage));

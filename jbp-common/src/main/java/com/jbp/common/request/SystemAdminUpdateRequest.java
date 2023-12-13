@@ -17,7 +17,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -37,17 +37,17 @@ public class SystemAdminUpdateRequest implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "后台管理员账号", required = true)
-    @NotNull(message = "后台管理员账号不能为空")
+    @NotBlank(message = "后台管理员账号不能为空")
     @Length(max = 32, message = "账号长度不能超过32个字符")
     private String account;
 
     @ApiModelProperty(value = "后台管理员密码", required = true)
-    @NotNull(message = "管理员密码不能为空")
+    @NotBlank(message = "管理员密码不能为空")
     @Length(min = 6, max = 30 ,message = "密码长度在6-30个字符")
     private String pwd;
 
     @ApiModelProperty(value = "后台管理员姓名", required = true)
-    @NotNull(message = "管理姓名不能为空")
+    @NotBlank(message = "管理姓名不能为空")
     @Length(max = 16, message = "姓名长度不能超过16个字符")
     private String realName;
 

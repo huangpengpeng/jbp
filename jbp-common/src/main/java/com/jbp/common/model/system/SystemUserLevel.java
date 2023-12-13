@@ -24,7 +24,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_system_user_level")
-@ApiModel(value="SystemUserLevel对象", description="普通会员等级")
+@ApiModel(value="SystemUserLevel对象", description="系统用户等级")
 public class SystemUserLevel implements Serializable {
 
     private static final long serialVersionUID=1L;
@@ -59,5 +59,9 @@ public class SystemUserLevel implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "用户等级背景图")
+    private String backImage;
 
+    @ApiModelProperty(value = "用户等级文字背景色")
+    private String backColor;
 }

@@ -6,23 +6,28 @@ import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 
-import com.jbp.admin.service.WeChatMiniCodeDownloadService;
+import com.jbp.admin.service.WechatMiniCodeDownloadService;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.service.service.SystemConfigService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 小程序源码下载 服务实现类
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -30,7 +35,7 @@ import org.springframework.stereotype.Service;
  * +----------------------------------------------------------------------
  */
 @Service
-public class WeChatMiniCodeDownloadServiceImpl implements WeChatMiniCodeDownloadService {
+public class WeChatMiniCodeDownloadServiceImpl implements WechatMiniCodeDownloadService {
 
     @Autowired
     private CrmebConfig crmebConfig;
@@ -45,24 +50,31 @@ public class WeChatMiniCodeDownloadServiceImpl implements WeChatMiniCodeDownload
      */
     @Override
     public String WeChatMiniCodeDownload() {
+        List<String> list = new ArrayList<>();
+        list.add(WeChatConstants.WECHAT_MINI_APPID);
+        list.add(WeChatConstants.WECHAT_MINI_NAME);
+        list.add(SysConfigConstants.CONFIG_KEY_FRONT_API_URL);
+        list.add(SysConfigConstants.CONFIG_KEY_API_URL);
+        list.add(SysConfigConstants.CONFIG_KEY_SITE_URL);
+        MyRecord myRecord = systemConfigService.getValuesByKeyList(list);
         // 获取 需要运行微信小程序的必备配置
-        String crmebWeixinAppid = systemConfigService.getValueByKey(WeChatConstants.WECHAT_MINI_APPID);
+        String crmebWeixinAppid = myRecord.getStr(WeChatConstants.WECHAT_MINI_APPID);
         if (StrUtil.isBlank(crmebWeixinAppid)) {
             throw new CrmebException("应用设置中 微信小程序数据配置 或者 支付回调地址以及网站地址 配置不全");
         }
-        String crmebName = systemConfigService.getValueByKey(WeChatConstants.WECHAT_MINI_NAME);
+        String crmebName = myRecord.getStr(WeChatConstants.WECHAT_MINI_NAME);
         if (StrUtil.isBlank(crmebName)) {
             throw new CrmebException("应用设置中 微信小程序数据配置 或者 支付回调地址以及网站地址 配置不全");
         }
-        String apiPath = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_FRONT_API_URL);
+        String apiPath = myRecord.getStr(SysConfigConstants.CONFIG_KEY_FRONT_API_URL);
         if (StrUtil.isBlank(apiPath)) {
             throw new CrmebException("应用设置中 微信小程序数据配置 或者 支付回调地址以及网站地址 配置不全");
         }
-        String adminApiPath = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_API_URL);
+        String adminApiPath = myRecord.getStr(SysConfigConstants.CONFIG_KEY_API_URL);
         if (StrUtil.isBlank(adminApiPath)) {
             throw new CrmebException("应用设置中 微信小程序数据配置 或者 支付回调地址以及网站地址 配置不全");
         }
-        String appPath = systemConfigService.getValueByKeyException(SysConfigConstants.CONFIG_KEY_SITE_URL);
+        String appPath = myRecord.getStr(SysConfigConstants.CONFIG_KEY_SITE_URL);
         if (StrUtil.isBlank(appPath)) {
             throw new CrmebException("应用设置中 微信小程序数据配置 或者 支付回调地址以及网站地址 配置不全");
         }

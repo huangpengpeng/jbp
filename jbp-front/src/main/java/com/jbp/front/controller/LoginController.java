@@ -1,11 +1,11 @@
 package com.jbp.front.controller;
 
 
-import com.jbp.front.service.LoginService;
 import com.jbp.common.request.*;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.front.service.LoginService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -103,6 +103,13 @@ public class LoginController {
     public CommonResult<LoginResponse> ioslogin(@RequestBody @Validated IosLoginRequest loginRequest) {
         return CommonResult.success(loginService.ioslogin(loginRequest));
     }
+
+    @ApiOperation(value = "校验token是否有效")
+    @RequestMapping(value = "/token/is/exist", method = RequestMethod.POST)
+    public CommonResult<Boolean> tokenIsExist() {
+        return CommonResult.success(loginService.tokenIsExist());
+    }
+
 }
 
 

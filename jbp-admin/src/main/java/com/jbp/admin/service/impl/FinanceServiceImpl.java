@@ -17,18 +17,22 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserClosing;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantClosingApplyRequest;
+import com.jbp.common.request.merchant.MerchantClosingSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.MerchantClosingConfigVo;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.service.service.*;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
-import java.sql.Struct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +43,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -77,6 +81,8 @@ public class FinanceServiceImpl implements FinanceService {
     private UserClosingService userClosingService;
     @Autowired
     private MerchantClosingRecordService merchantClosingService;
+    @Autowired
+    private SummaryFinancialStatementsService summaryFinancialStatementsService;
 
     /**
      * 用户结算分页列表
@@ -125,13 +131,25 @@ public class FinanceServiceImpl implements FinanceService {
      */
     @Override
     public MerchantClosingConfigVo getMerchantClosingConfig() {
-        String guaranteedAmount = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_GUARANTEED_AMOUNT);
-        String transferMinAmount = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_TRANSFER_MIN_AMOUNT);
-        String transferMaxAmount = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_TRANSFER_MAX_AMOUNT);
+        ArrayList<String> keyList = new ArrayList<>();
+        keyList.add(SysConfigConstants.MERCHANT_GUARANTEED_AMOUNT);
+        keyList.add(SysConfigConstants.MERCHANT_TRANSFER_MIN_AMOUNT);
+        keyList.add(SysConfigConstants.MERCHANT_TRANSFER_MAX_AMOUNT);
+        keyList.add(SysConfigConstants.MERCHANT_SHARE_NODE);
+        keyList.add(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME);
+        MyRecord myRecord = systemConfigService.getValuesByKeyList(keyList);
+
+        BigDecimal guaranteedAmount = StrUtil.isNotBlank(myRecord.getStr(SysConfigConstants.MERCHANT_GUARANTEED_AMOUNT)) ? new BigDecimal(myRecord.getStr(SysConfigConstants.MERCHANT_GUARANTEED_AMOUNT)) : BigDecimal.ZERO;
+        BigDecimal transferMinAmount = StrUtil.isNotBlank(myRecord.getStr(SysConfigConstants.MERCHANT_TRANSFER_MIN_AMOUNT)) ? new BigDecimal(myRecord.getStr(SysConfigConstants.MERCHANT_TRANSFER_MIN_AMOUNT)) : BigDecimal.ZERO;
+        BigDecimal transferMaxAmount = StrUtil.isNotBlank(myRecord.getStr(SysConfigConstants.MERCHANT_TRANSFER_MAX_AMOUNT)) ? new BigDecimal(myRecord.getStr(SysConfigConstants.MERCHANT_TRANSFER_MAX_AMOUNT)) : BigDecimal.ZERO;
+        String merchantShareNode = myRecord.getStr(SysConfigConstants.MERCHANT_SHARE_NODE);
+        String merchantShareFreezeTime = myRecord.getStr(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME);
         MerchantClosingConfigVo configVo = new MerchantClosingConfigVo();
-        configVo.setGuaranteedAmount(new BigDecimal(guaranteedAmount));
-        configVo.setTransferMinAmount(new BigDecimal(transferMinAmount));
-        configVo.setTransferMaxAmount(new BigDecimal(transferMaxAmount));
+        configVo.setGuaranteedAmount(guaranteedAmount);
+        configVo.setTransferMinAmount(transferMinAmount);
+        configVo.setTransferMaxAmount(transferMaxAmount);
+        configVo.setMerchantShareNode(StrUtil.isBlank(merchantShareNode) ? "complete" : merchantShareNode);
+        configVo.setMerchantShareFreezeTime(StrUtil.isBlank(merchantShareFreezeTime) ? 0 : Integer.parseInt(merchantShareFreezeTime));
         return configVo;
     }
 
@@ -144,6 +162,8 @@ public class FinanceServiceImpl implements FinanceService {
             systemConfigService.updateOrSaveValueByName(SysConfigConstants.MERCHANT_GUARANTEED_AMOUNT, request.getGuaranteedAmount().toString());
             systemConfigService.updateOrSaveValueByName(SysConfigConstants.MERCHANT_TRANSFER_MIN_AMOUNT, request.getTransferMinAmount().toString());
             systemConfigService.updateOrSaveValueByName(SysConfigConstants.MERCHANT_TRANSFER_MAX_AMOUNT, request.getTransferMaxAmount().toString());
+            systemConfigService.updateOrSaveValueByName(SysConfigConstants.MERCHANT_SHARE_NODE, request.getMerchantShareNode());
+            systemConfigService.updateOrSaveValueByName(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME, request.getMerchantShareFreezeTime().toString());
             return Boolean.TRUE;
         });
     }
@@ -229,7 +249,7 @@ public class FinanceServiceImpl implements FinanceService {
                     throw new CrmebException("请先在配置中进行商户转账信息配置");
                 }
                 break;
-            case ClosingConstant.CLOSING_TYPE_WEIXIN:
+            case ClosingConstant.CLOSING_TYPE_WECHAT:
                 if (StrUtil.isBlank(merchantInfo.getWechatCode())) {
                     throw new CrmebException("请先在配置中进行商户转账信息配置");
                 }
@@ -293,7 +313,7 @@ public class FinanceServiceImpl implements FinanceService {
                     throw new CrmebException("请先在配置中进行商户转账信息配置");
                 }
                 break;
-            case ClosingConstant.CLOSING_MERCHANT_TYPE_WEIXIN:
+            case ClosingConstant.CLOSING_TYPE_WECHAT:
                 if (StrUtil.isBlank(merchantInfo.getWechatCode())) {
                     throw new CrmebException("请先在配置中进行商户转账信息配置");
                 }
@@ -312,8 +332,9 @@ public class FinanceServiceImpl implements FinanceService {
             case ClosingConstant.CLOSING_TYPE_ALIPAY:
                 record.setAlipayAccount(merchantInfo.getAlipayCode());
                 record.setPaymentCode(merchantInfo.getAlipayQrcodeUrl());
+                record.setClosingName(merchantInfo.getRealName());
                 break;
-            case ClosingConstant.CLOSING_MERCHANT_TYPE_WEIXIN:
+            case ClosingConstant.CLOSING_TYPE_WECHAT:
                 record.setWechatNo(merchantInfo.getWechatCode());
                 record.setPaymentCode(merchantInfo.getWechatQrcodeUrl());
                 record.setClosingName(merchantInfo.getRealName());
@@ -362,6 +383,10 @@ public class FinanceServiceImpl implements FinanceService {
     @Override
     public MerchantClosingDetailResponse getMerchantClosingDetailByMerchant(String closingNo) {
         MerchantClosingRecord merchantClosing = merchantClosingService.getByClosingNo(closingNo);
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(merchantClosing.getMerId())) {
+            throw new CrmebException("不能获取非自己商户的数据");
+        }
         MerchantClosingDetailResponse response = new MerchantClosingDetailResponse();
         BeanUtils.copyProperties(merchantClosing, response);
         response.setRealName(response.getClosingName());
@@ -442,8 +467,52 @@ public class FinanceServiceImpl implements FinanceService {
      * @return PageInfo
      */
     @Override
-    public PageInfo<PlatformDailyStatement> getPlatformDailyStatementList(String dateLimit, PageParamRequest pageParamRequest) {
-        return platformDailyStatementService.getPageList(dateLimit, pageParamRequest);
+    public PageInfo<PlatformStatementResponse> getPlatformDailyStatementList(String dateLimit, PageParamRequest pageParamRequest) {
+        PageInfo<PlatformDailyStatement> pageInfo = platformDailyStatementService.getPageList(dateLimit, pageParamRequest);
+        List<PlatformDailyStatement> list = pageInfo.getList();
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(pageInfo, new ArrayList<>());
+        }
+        List<PlatformStatementResponse> responseList = list.stream().map(statement -> {
+            PlatformStatementResponse response = new PlatformStatementResponse();
+            response.setId(statement.getId());
+            response.setOrderRealIncome(statement.getOrderPayAmount());
+            response.setOrderReceivable(statement.getOrderPayAmount().add(statement.getPlatCouponPrice().add(statement.getIntegralPrice())));
+            response.setPlatCouponPrice(statement.getPlatCouponPrice());
+            response.setIntegralPrice(statement.getIntegralPrice());
+
+            response.setOrderRealRefund(statement.getOrderRefundPrice());
+//            response.setOrderRefundable(statement.getRefundMerchantTransferAmount().add(statement.getRefundHandlingFee()).add(statement.getRefundBrokeragePrice()));
+            response.setOrderRefundable(statement.getOrderRefundPrice().add(statement.getRefundPlatCouponPrice()).add(statement.getRefundReplaceIntegralPrice()));
+            response.setRefundPlatCouponPrice(statement.getRefundPlatCouponPrice());
+            response.setRefundIntegralPrice(statement.getRefundReplaceIntegralPrice());
+
+            response.setRealIncome(response.getOrderRealIncome().subtract(response.getOrderRealRefund()));
+
+            response.setPayTransfer(statement.getMerchantTransferAmount());
+            response.setRefundTransfer(statement.getRefundMerchantTransferAmount());
+            response.setMerchantTransferAmount(response.getPayTransfer().subtract(response.getRefundTransfer()));
+
+            response.setBrokeragePrice(statement.getBrokeragePrice());
+            response.setRefundBrokeragePrice(statement.getRefundBrokeragePrice());
+            response.setRefundReplaceBrokerage(statement.getRefundReplaceBrokerage());
+            response.setBrokerage(response.getBrokeragePrice().subtract(response.getRefundBrokeragePrice()).add(response.getRefundReplaceBrokerage()));
+
+            response.setFreightFee(statement.getFreightFee());
+            response.setRefundFreightFee(statement.getRefundFreightFee());
+            response.setFreight(response.getFreightFee().subtract(response.getRefundFreightFee()));
+
+            response.setActualExpenditure(response.getMerchantTransferAmount().add(response.getBrokerage()).add(response.getFreight()));
+
+            response.setCurrentDayBalance(response.getRealIncome().subtract(response.getActualExpenditure()));
+            response.setDataDate(statement.getDataDate());
+            response.setPayNum(statement.getTotalOrderNum());
+            response.setRefundNum(statement.getRefundNum());
+            response.setMerchantTransferNum(statement.getMerchantTransferNum());
+
+            return response;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(pageInfo, responseList);
     }
 
     /**
@@ -454,8 +523,52 @@ public class FinanceServiceImpl implements FinanceService {
      * @return PageInfo
      */
     @Override
-    public PageInfo<PlatformMonthStatement> getPlatformMonthStatementList(String dateLimit, PageParamRequest pageParamRequest) {
-        return platformMonthStatementService.getPageList(dateLimit, pageParamRequest);
+    public PageInfo<PlatformStatementResponse> getPlatformMonthStatementList(String dateLimit, PageParamRequest pageParamRequest) {
+        PageInfo<PlatformMonthStatement> pageInfo = platformMonthStatementService.getPageList(dateLimit, pageParamRequest);
+        List<PlatformMonthStatement> list = pageInfo.getList();
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(pageInfo, new ArrayList<>());
+        }
+        List<PlatformStatementResponse> responseList = list.stream().map(statement -> {
+            PlatformStatementResponse response = new PlatformStatementResponse();
+            response.setId(statement.getId());
+            response.setOrderRealIncome(statement.getOrderPayAmount());
+            response.setOrderReceivable(statement.getOrderPayAmount().add(statement.getPlatCouponPrice().add(statement.getIntegralPrice())));
+            response.setPlatCouponPrice(statement.getPlatCouponPrice());
+            response.setIntegralPrice(statement.getIntegralPrice());
+
+            response.setOrderRealRefund(statement.getOrderRefundPrice());
+//            response.setOrderRefundable(statement.getRefundMerchantTransferAmount().add(statement.getRefundHandlingFee()).add(statement.getRefundBrokeragePrice()));
+            response.setOrderRefundable(statement.getOrderRefundPrice().add(statement.getRefundPlatCouponPrice()).add(statement.getRefundReplaceIntegralPrice()));
+            response.setRefundPlatCouponPrice(statement.getRefundPlatCouponPrice());
+            response.setRefundIntegralPrice(statement.getRefundReplaceIntegralPrice());
+
+            response.setRealIncome(response.getOrderRealIncome().subtract(response.getOrderRealRefund()));
+
+            response.setPayTransfer(statement.getMerchantTransferAmount());
+            response.setRefundTransfer(statement.getRefundMerchantTransferAmount());
+            response.setMerchantTransferAmount(response.getPayTransfer().subtract(response.getRefundTransfer()));
+
+            response.setBrokeragePrice(statement.getBrokeragePrice());
+            response.setRefundBrokeragePrice(statement.getRefundBrokeragePrice());
+            response.setRefundReplaceBrokerage(statement.getRefundReplaceBrokerage());
+            response.setBrokerage(response.getBrokeragePrice().subtract(response.getRefundBrokeragePrice()).add(response.getRefundReplaceBrokerage()));
+
+            response.setFreightFee(statement.getFreightFee());
+            response.setRefundFreightFee(statement.getRefundFreightFee());
+            response.setFreight(response.getFreightFee().subtract(response.getRefundFreightFee()));
+
+            response.setActualExpenditure(response.getMerchantTransferAmount().add(response.getBrokerage()).add(response.getFreight()));
+
+            response.setCurrentDayBalance(response.getRealIncome().subtract(response.getActualExpenditure()));
+            response.setDataDate(statement.getDataDate());
+            response.setPayNum(statement.getTotalOrderNum());
+            response.setRefundNum(statement.getRefundNum());
+            response.setMerchantTransferNum(statement.getMerchantTransferNum());
+
+            return response;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(pageInfo, responseList);
     }
 
     /**
@@ -466,8 +579,45 @@ public class FinanceServiceImpl implements FinanceService {
      * @return PageInfo
      */
     @Override
-    public PageInfo<MerchantDailyStatement> getMerchantDailyStatementList(String dateLimit, PageParamRequest pageParamRequest) {
-        return merchantDailyStatementService.getPageList(dateLimit, pageParamRequest);
+    public PageInfo<MerchantStatementResponse> getMerchantDailyStatementList(String dateLimit, PageParamRequest pageParamRequest) {
+        PageInfo<MerchantDailyStatement> pageInfo = merchantDailyStatementService.getPageList(dateLimit, pageParamRequest);
+        List<MerchantDailyStatement> list = pageInfo.getList();
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(pageInfo, new ArrayList<>());
+        }
+        List<MerchantStatementResponse> responseList = list.stream().map(statement -> {
+            MerchantStatementResponse response = new MerchantStatementResponse();
+            response.setId(statement.getId());
+            response.setOrderReceivable(statement.getOrderPayAmount().add(statement.getPlatCouponPrice().add(statement.getIntegralPrice())));
+            response.setOrderRealIncome(statement.getOrderPayAmount());
+            response.setPlatCouponPrice(statement.getPlatCouponPrice());
+            response.setIntegralPrice(statement.getIntegralPrice());
+
+//            response.setOrderRefundable(statement.getRefundMerchantTransferAmount().add(statement.getRefundHandlingFee()).add(statement.getRefundBrokeragePrice()));
+            response.setOrderRefundable(statement.getRefundAmount().add(statement.getRefundPlatCouponPrice()).add(statement.getRefundIntegralPrice()));
+            response.setOrderRealRefund(statement.getRefundAmount());
+            response.setRefundPlatCouponPrice(statement.getRefundPlatCouponPrice());
+            response.setRefundIntegralPrice(statement.getRefundIntegralPrice());
+
+            response.setRealIncome(response.getOrderReceivable().subtract(response.getOrderRefundable()));
+
+            response.setPayHandlingFee(statement.getHandlingFee());
+            response.setRefundHandlingFee(statement.getRefundHandlingFee());
+            response.setHandlingFee(response.getPayHandlingFee().subtract(response.getRefundHandlingFee()));
+
+            response.setBrokeragePrice(statement.getBrokeragePrice());
+            response.setRefundBrokeragePrice(statement.getRefundBrokeragePrice());
+            response.setBrokerage(response.getBrokeragePrice().subtract(response.getRefundBrokeragePrice()));
+
+            response.setActualExpenditure(response.getHandlingFee().add(response.getBrokerage()));
+
+            response.setCurrentDayBalance(response.getRealIncome().subtract(response.getActualExpenditure()));
+            response.setDataDate(statement.getDataDate());
+            response.setPayNum(statement.getOrderNum());
+            response.setRefundNum(statement.getRefundNum());
+            return response;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(pageInfo, responseList);
     }
 
     /**
@@ -478,7 +628,56 @@ public class FinanceServiceImpl implements FinanceService {
      * @return PageInfo
      */
     @Override
-    public PageInfo<MerchantMonthStatement> getMerchantMonthStatementList(String dateLimit, PageParamRequest pageParamRequest) {
-        return merchantMonthStatementService.getPageList(dateLimit, pageParamRequest);
+    public PageInfo<MerchantStatementResponse> getMerchantMonthStatementList(String dateLimit, PageParamRequest pageParamRequest) {
+        PageInfo<MerchantMonthStatement> pageInfo = merchantMonthStatementService.getPageList(dateLimit, pageParamRequest);
+        List<MerchantMonthStatement> list = pageInfo.getList();
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(pageInfo, new ArrayList<>());
+        }
+        List<MerchantStatementResponse> responseList = list.stream().map(statement -> {
+            MerchantStatementResponse response = new MerchantStatementResponse();
+            response.setId(statement.getId());
+            response.setOrderReceivable(statement.getOrderPayAmount().add(statement.getPlatCouponPrice().add(statement.getIntegralPrice())));
+            response.setOrderRealIncome(statement.getOrderPayAmount());
+            response.setPlatCouponPrice(statement.getPlatCouponPrice());
+            response.setIntegralPrice(statement.getIntegralPrice());
+
+//            response.setOrderRefundable(statement.getRefundMerchantTransferAmount().add(statement.getRefundHandlingFee()).add(statement.getRefundBrokeragePrice()));
+            response.setOrderRefundable(statement.getRefundAmount().add(statement.getRefundPlatCouponPrice()).add(statement.getRefundIntegralPrice()));
+//            response.setOrderRealRefund(response.getOrderReceivable().subtract(statement.getRefundPlatCouponPrice()).subtract(statement.getRefundIntegralPrice()));
+            response.setOrderRealRefund(statement.getRefundAmount());
+            response.setRefundPlatCouponPrice(statement.getRefundPlatCouponPrice());
+            response.setRefundIntegralPrice(statement.getRefundIntegralPrice());
+
+            response.setRealIncome(response.getOrderReceivable().subtract(response.getOrderRefundable()));
+
+            response.setPayHandlingFee(statement.getHandlingFee());
+            response.setRefundHandlingFee(statement.getRefundHandlingFee());
+            response.setHandlingFee(response.getPayHandlingFee().subtract(response.getRefundHandlingFee()));
+
+            response.setBrokeragePrice(statement.getBrokeragePrice());
+            response.setRefundBrokeragePrice(statement.getRefundBrokeragePrice());
+            response.setBrokerage(response.getBrokeragePrice().subtract(response.getRefundBrokeragePrice()));
+
+            response.setActualExpenditure(response.getHandlingFee().add(response.getBrokerage()));
+
+            response.setCurrentDayBalance(response.getRealIncome().subtract(response.getActualExpenditure()));
+            response.setDataDate(statement.getDataDate());
+            response.setPayNum(statement.getOrderNum());
+            response.setRefundNum(statement.getRefundNum());
+            return response;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(pageInfo, responseList);
+    }
+
+    /**
+     * 财务流水汇总列表
+     * @param dateLimit 时间参数
+     * @param pageParamRequest 分页参数
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<SummaryFinancialStatements> summaryFinancialStatements(String dateLimit, PageParamRequest pageParamRequest) {
+        return summaryFinancialStatementsService.getPageList(dateLimit, pageParamRequest);
     }
 }

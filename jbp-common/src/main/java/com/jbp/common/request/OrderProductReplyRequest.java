@@ -18,7 +18,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -47,7 +47,7 @@ public class OrderProductReplyRequest implements Serializable {
     private Integer star;
 
     @ApiModelProperty(value = "评论内容", required = true)
-    @NotBlank(message = "评论内容不能为空")
+//    @NotBlank(message = "评论内容不能为空") 公司统一去掉售后提交时文字的必填限制
     @Length(max = 512, message = "评论内容不能超过512个字符")
     private String comment;
 

@@ -152,4 +152,16 @@ public class OrderDetail implements Serializable {
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;
+
+    @ApiModelProperty(value = "商户优惠券金额")
+    private BigDecimal merCouponPrice;
+
+    @ApiModelProperty(value = "平台优惠券金额")
+    private BigDecimal platCouponPrice;
+
+    @ApiModelProperty(value = "退还平台优惠券金额")
+    private BigDecimal refundPlatCouponPrice;
+
+    @ApiModelProperty(value = "退运费金额")
+    private BigDecimal refundFreightFee;
 }

@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -49,6 +49,8 @@ public class DateConstants {
     public static final String DATE_FORMAT_END_PEREND = "23:59:59";
     /** 日期格式:年-月-日 时:分 */
     public static final String DATE_FORMAT_HHMM = "yyyy-MM-dd HH:mm";
+    /** 日期格式:时分 */
+    public static final String DATE_FORMAT_TIME_HHMM = "HHmm";
 
     /** 搜索日期-今天 */
     public static final String SEARCH_DATE_DAY = "today";

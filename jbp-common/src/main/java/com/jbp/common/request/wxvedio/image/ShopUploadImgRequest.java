@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -30,6 +30,6 @@ public class ShopUploadImgRequest {
     private Integer uploadType;
 
     @ApiModelProperty(value = "upload_type=1时必传")
-    @NotEmpty(message = "imgUrl 待转换图片地址不能唯恐")
+    @NotEmpty(message = "imgUrl 待转换图片地址不能为空")
     private String imgUrl;
 }

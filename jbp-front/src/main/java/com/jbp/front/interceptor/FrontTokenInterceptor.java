@@ -1,9 +1,11 @@
 package com.jbp.front.interceptor;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.result.CommonResultCode;
 import com.jbp.common.token.FrontTokenComponent;
-import com.jbp.common.utils.RequestUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,16 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *  移动端管理端 token验证拦截器 使用前注意需要一个@Bean手动注解，否则注入无效
- *  +----------------------------------------------------------------------
- *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
- *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
- *  +----------------------------------------------------------------------
- *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
- *  +----------------------------------------------------------------------
- *  | Author: CRMEB Team <admin@crmeb.com>
- *  +----------------------------------------------------------------------
+ * 移动端管理端 token验证拦截器 使用前注意需要一个@Bean手动注解，否则注入无效
+ * +----------------------------------------------------------------------
+ * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
+ * +----------------------------------------------------------------------
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
+ * +----------------------------------------------------------------------
+ * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
+ * +----------------------------------------------------------------------
+ * | Author: CRMEB Team <admin@crmeb.com>
+ * +----------------------------------------------------------------------
  */
 public class FrontTokenInterceptor implements HandlerInterceptor {
 
@@ -32,19 +34,14 @@ public class FrontTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         response.setCharacterEncoding("UTF-8");
         String token = frontTokenComponent.getToken(request);
-        if(token == null || token.isEmpty()){
-            //判断路由，部分路由不管用户是否登录都可以访问
-            boolean result = frontTokenComponent.checkRouter(RequestUtil.getUri(request));
-            if(result){
-                return true;
-            }
-            response.getWriter().write(JSONObject.toJSONString(CommonResult.unauthorized()));
+        if (StrUtil.isBlank(token)) {
+            response.getWriter().write(JSONObject.toJSONString(CommonResult.failed(CommonResultCode.UNAUTHORIZED)));
             return false;
         }
 
-        Boolean result = frontTokenComponent.check(token, request);
-        if(!result){
-            response.getWriter().write(JSONObject.toJSONString(CommonResult.unauthorized()));
+        Boolean result = frontTokenComponent.check(token);
+        if (!result) {
+            response.getWriter().write(JSONObject.toJSONString(CommonResult.failed(CommonResultCode.PERMISSION_EXPIRATION)));
             return false;
         }
         return true;

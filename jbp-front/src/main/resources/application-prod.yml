@@ -1,14 +1,15 @@
 # CRMEB 相关配置
 crmeb:
-  version: CRMEB-JAVA-MER-v1.0.1 # 当前代码版本
+  version: CRMEB-JAVACORE-MER-DFYHZ-v1.4_beta # 当前代码版本为企业版本 授权给巅峰云（杭州）网络科技有限公司
   domain: #配合swagger使用 # 待部署域名
   wechat-api-url:  #请求微信接口中专服务器
-  wechat-js-api-debug: false #微信js api系列是否开启调试模式
-  wechat-js-api-beta: true #微信js api是否是beta版本
   asyncConfig: false #是否同步config表数据到redis
   asyncWeChatProgramTempList: false #是否同步小程序公共模板库
-  imagePath: /java代码包根目录的crmebimage上一级目录/ # 服务器图片路径配置 斜杠结尾
+  imagePath: /www/wwwroot/api.admin.hdq.xbdzz.cn/ # 服务器图片路径配置 斜杠结尾
   retailStoreBrokerageRatio: 30 #佣金返佣比例和上限
+  activityStyleCachedTime: 10 #活动边框缓存周期 秒为单位，生产环境适当5-10分钟即可
+  activityStyleProductLimit: 100 # 活动边框指定商品上线
+  productTagCacheMinutes: 10 # 商品标签缓存分钟数
 
 server:
   port: 20710
@@ -21,8 +22,8 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/crmeb?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
-    username: crmeb
+    url: jdbc:mysql://127.0.0.1:3306/java_mer_demo?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    username: java_mer_demo
     password: 111111
   redis:
     host: 127.0.0.1 #地址
@@ -59,5 +60,5 @@ swagger:
   basic:
     enable: true #是否开启界面
     check: false #是否打开验证
-    username:  #访问swagger的账号
-    password:  #访问swagger的密码
+    username: crmeb #访问swagger的账号
+    password: crmeb.com #访问swagger的密码

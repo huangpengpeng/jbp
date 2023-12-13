@@ -13,7 +13,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -42,5 +42,14 @@ public class RefundOrderCountItemResponse implements Serializable {
 
     @ApiModelProperty(value = "已退款")
     private Integer refunded;
+
+    @ApiModelProperty(value = "待退货")
+    private Integer awaitReturning;
+
+    @ApiModelProperty(value = "待收货")
+    private Integer awaitReceiving;
+
+    @ApiModelProperty(value = "已撤销")
+    private Integer revoke;
 
 }

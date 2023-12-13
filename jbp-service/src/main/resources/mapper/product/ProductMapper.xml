@@ -45,16 +45,20 @@
 
     <select id="findH5List" resultType="com.jbp.common.response.ProductFrontResponse" parameterType="Map">
         SELECT p.id,p.image,p.name as name,p.price,p.ot_price as otPrice,p.price,p.sales,p.stock,p.ficti,
-        p.unit_name as unitName,p.reason,p.mer_id as merId,m.name as merName,m.category_id as merCategoryId,m.type_id as merTypeId
+        p.unit_name as unitName,p.reason,p.mer_id as merId,m.name as merName,m.category_id as merCategoryId,m.type_id as merTypeId, p.category_id,
+        p.brand_id
         FROM eb_product AS p
         right join eb_merchant AS m on p.mer_id = m.id
         where p.is_del = 0 and p.is_recycle = 0 and p.is_show = 1
         and p.audit_status in (0,2)
+        <if test="id != null">
+            and find_in_set(p.id, #{id})
+        </if>
         <if test="categoryId != null">
-            and p.category_id = #{categoryId}
+            and find_in_set(p.category_id, #{categoryId})
         </if>
         <if test="brandId != null">
-            and p.brand_id = #{brandId}
+            and find_in_set(p.brand_id, #{brandId})
         </if>
 
         <if test="minPrice != null">
@@ -70,7 +74,94 @@
         <if test="isSelf != null">
             and m.is_self = #{isSelf}
         </if>
+        <if test="merId != null">
+            and find_in_set(p.mer_id, #{merId})
+        </if>
         ${lastStr}
     </select>
 
+    <select id="getActivitySearchPage" resultType="com.jbp.common.response.ProductActivityResponse" parameterType="Map">
+        SELECT p.id,p.image,p.name,p.price,p.stock,p.is_show as isShow,p.spec_type as specType,
+        m.name as merName,m.star_level as merStarLevel,p.brand_id as brandId,
+        pc.name as categoryName, p.category_id as categoryId,
+        p.sales,p.ficti,p.unit_name as unitName
+        FROM eb_product AS p
+        left join eb_merchant AS m on p.mer_id = m.id
+        left join eb_product_category AS pc on p.category_id = pc.id
+        where p.is_del = 0 and p.is_recycle = 0
+        and p.audit_status in (0,2)
+        <if test="categoryId != null and categoryId !='' ">
+            and find_in_set(p.category_id, #{categoryId})
+        </if>
+        <if test="isShow != null">
+            and p.is_show = #{isShow}
+        </if>
+        <if test="name != null and name !='' ">
+            and p.name like CONCAT('%', #{name, jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="merIds != null and merIds !='' ">
+            and find_in_set(p.mer_id, #{merIds})
+        </if>
+        <if test="merStars != null">
+            and m.star_level &gt;= #{merStars}
+        </if>
+        <if test="brandId != null and brandId !='' ">
+            and find_in_set(p.brand_id, #{brandId})
+        </if>
+        ${lastStr}
+    </select>
+
+    <select id="getActivitySearchPageByMerchant" resultType="com.jbp.common.response.ProductActivityResponse" parameterType="Map">
+        SELECT p.id,p.image,p.name,p.price,p.stock,p.is_show as isShow,p.spec_type as specType,
+        m.name as merName,m.star_level as merStarLevel,
+        pc.name as categoryName
+        FROM eb_product AS p
+        left join eb_merchant AS m on p.mer_id = m.id
+        left join eb_product_category AS pc on p.category_id = pc.id
+        where p.is_del = 0 and p.is_recycle = 0
+        and p.audit_status in (0,2)
+        <if test="categoryId != null">
+            and p.category_id = #{categoryId}
+        </if>
+        <if test="cateId != null">
+            and find_in_set(#{cateId}, p.cate_id)
+        </if>
+        <if test="isShow != null">
+            and p.is_show = #{isShow}
+        </if>
+        <if test="name != null and name !='' ">
+            and p.name like CONCAT('%', #{name, jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="merId != null">
+            and p.mer_id = #{merId}
+        </if>
+        <if test="productId != null">
+            and p.id = #{productId}
+        </if>
+        <if test="proCateIds != null and proCateIds !='' ">
+            and p.category_id in (SELECT id FROM `eb_product_category` where `level` = 3 and is_del = 0 and pid in (SELECT id FROM `eb_product_category` WHERE `level` = 2 and is_del = 0 and FIND_IN_SET(pid, #{proCateIds})))
+        </if>
+    </select>
+
+    <select id="findProductBrandIdByKeyword" resultType="java.lang.Integer">
+        select brand_id
+        FROM eb_product
+        where is_del = 0
+          and is_recycle = 0
+          and is_show = 1
+          and audit_status in (0, 2)
+          and (name like CONCAT('%', #{keyword, jdbcType=VARCHAR}, '%')
+            or keyword like CONCAT('%', #{keyword, jdbcType=VARCHAR}, '%'))
+    </select>
+
+    <select id="findProductCategoryIdByKeyword" resultType="java.lang.Integer">
+        select category_id
+        FROM eb_product
+        where is_del = 0
+          and is_recycle = 0
+          and is_show = 1
+          and audit_status in (0, 2)
+          and (name like CONCAT('%', #{keyword, jdbcType=VARCHAR}, '%')
+            or keyword like CONCAT('%', #{keyword, jdbcType=VARCHAR}, '%'))
+    </select>
 </mapper>

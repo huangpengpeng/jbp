@@ -159,4 +159,7 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "注销时间")
     private Date logoffTime;
+
+    @ApiModelProperty(value = "用户签名")
+    private String signature;
 }

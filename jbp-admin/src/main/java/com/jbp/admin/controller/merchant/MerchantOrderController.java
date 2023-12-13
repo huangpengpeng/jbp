@@ -12,6 +12,7 @@ import com.jbp.common.response.OrderInvoiceResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.service.service.OrderService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -104,18 +105,28 @@ public class MerchantOrderController {
         return CommonResult.failed();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "小票打印")
+    @PreAuthorize("hasAuthority('merchant:order:print')")
+    @ApiOperation(value = "小票打印")
+    @RequestMapping(value = "/printreceipt/{orderno}", method = RequestMethod.GET)
+    public CommonResult<Boolean> printReceipt(@PathVariable(value = "orderno") String orderno) {
+       orderService.printReceipt(orderno);
+        return CommonResult.success();
+
+    }
+
     @PreAuthorize("hasAuthority('merchant:order:invoice:list')")
     @ApiOperation(value = "获取订单发货单列表")
     @RequestMapping(value = "/{orderNo}/invoice/list", method = RequestMethod.GET)
     public CommonResult<List<OrderInvoiceResponse>> getInvoiceList(@PathVariable(value = "orderNo") String orderNo) {
-        return CommonResult.success(orderService.getInvoiceList(orderNo));
+        return CommonResult.success(orderService.getInvoiceListByMerchant(orderNo));
     }
 
     @PreAuthorize("hasAuthority('merchant:order:logistics:info')")
     @ApiOperation(value = "订单物流详情")
     @RequestMapping(value = "/get/{invoiceId}/logistics/info", method = RequestMethod.GET)
     public CommonResult<LogisticsResultVo> getLogisticsInfo(@PathVariable(value = "invoiceId") Integer invoiceId) {
-        return CommonResult.success(orderService.getLogisticsInfo(invoiceId));
+        return CommonResult.success(orderService.getLogisticsInfoByMerchant(invoiceId));
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "核销码核销订单")

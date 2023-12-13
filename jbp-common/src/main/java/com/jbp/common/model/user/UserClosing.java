@@ -40,7 +40,7 @@ public class UserClosing implements Serializable {
     @ApiModelProperty(value = "用户id")
     private Integer uid;
 
-    @ApiModelProperty(value = "结算类型：bank = 银行卡 alipay = 支付宝 weixin=微信")
+    @ApiModelProperty(value = "结算类型：bank = 银行卡 alipay = 支付宝 wechat=微信")
     private String closingType;
 
     @ApiModelProperty(value = "银行卡持卡人姓名")

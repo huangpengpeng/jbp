@@ -17,7 +17,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -45,15 +45,6 @@ public class UserSearchRequest implements Serializable {
     @StringContains(limitValues = {"wechat", "routine", "h5", "iosWx", "androidWx", "ios"}, message = "请选择正确的用户注册类型")
     private String registerType;
 
-    @ApiModelProperty(value = "是否关联公众号")
-    private Boolean isWechatPublic;
-
-    @ApiModelProperty(value = "是否关联小程序")
-    private Boolean isWechatRoutine;
-
-    @ApiModelProperty(value = "状态是否正常， 0 = 禁止， 1 = 正常")
-    private Boolean status;
-
     @ApiModelProperty(value = "消费情况")
     private String payCount;
 
@@ -67,4 +58,10 @@ public class UserSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "访问时间")
     private String dateLimit;
+
+    @ApiModelProperty(value = "身份：推广员 = 1， 普通用户 = 2")
+    private Integer isPromoter;
+
+    @ApiModelProperty(value = "是否注销,已注销=1，未注销=0")
+    private Integer isLogoff;
 }

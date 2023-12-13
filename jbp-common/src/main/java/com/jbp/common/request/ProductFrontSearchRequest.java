@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -33,7 +33,7 @@ public class ProductFrontSearchRequest implements Serializable {
     private String keyword;
 
     @ApiModelProperty(value = "分类id")
-    private Integer cid;
+    private String cid;
 
     @ApiModelProperty(value = "价格排序", allowableValues = "range[asc,desc]")
     private String priceOrder;
@@ -48,8 +48,11 @@ public class ProductFrontSearchRequest implements Serializable {
     private BigDecimal maxPrice;
 
     @ApiModelProperty(value = "品牌id")
-    private Integer brandId;
+    private String brandId;
 
-    @ApiModelProperty(value = "是否自营店铺:0-自营，1-非自营")
-    private Boolean isSelf;
+    @ApiModelProperty(value = "商户id")
+    private String merId;
+
+    @ApiModelProperty(value = "商品标签id")
+    private Integer tagId;
 }

@@ -5,7 +5,6 @@ import cn.hutool.core.util.RandomUtil;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.exception.CrmebException;
 
@@ -17,7 +16,7 @@ import java.io.IOException;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -27,20 +26,13 @@ import java.io.IOException;
 public class UploadUtil {
 
     //服务器存储地址
-//    private static String rootPath  = "/www/wwwroot/upload";
-    private static String rootPath  = "";
-
+    private static String rootPath = "";
     //类型
     private static String type = "/" + UploadConstants.UPLOAD_FILE_KEYWORD;
-
-
     //模块
-//    private static String modelPath = "/store";
     private static String modelPath = "/public";
-
     //扩展名
     private static String extStr = "png,jpg";
-
     //文件大小上限
     private static int size = 2;
 
@@ -86,8 +78,8 @@ public class UploadUtil {
 
     /**
      * 根据文件的绝对路径创建一个文件对象.
+     *
      * @return 返回创建的这个文件对象
-
      * @since 2020-05-08
      */
     public static File createFile(String filePath) throws IOException {
@@ -113,8 +105,8 @@ public class UploadUtil {
 
     /**
      * 生成文件文件名
+     *
      * @param fileName 文件名
-
      * @since 2020-05-08
      */
     public static String getDestPath(String fileName) {
@@ -122,27 +114,48 @@ public class UploadUtil {
         return getServerPath() + fileName;
     }
 
-    public static String fileName(String extName){
+    public static String fileName(String extName) {
         return CrmebUtil.getUuid() + RandomUtil.randomString(10) + "." + extName;
     }
 
     /**
      * 生成文件在的实际的路径
-
+     *
      * @since 2020-05-08
      */
     public static String getServerPath() {
         // 文件分隔符转化为当前系统的格式
-        return FilenameUtils.separatorsToSystem( getRootPath() + getWebPath());
+        return FilenameUtils.separatorsToSystem(getRootPath() + getWebPath());
     }
 
     /**
      * web目录可访问的路径
-
+     *
      * @since 2020-05-08
      */
     public static String getWebPath() {
         // 文件分隔符转化为当前系统的格式
         return getModelPath() + DateUtil.format(DateUtil.date(), "yyyy/MM/dd") + "/";
+    }
+
+    /** 服务器路径 */
+    public static String hzwServerPath = "";
+    /** 文件路径路径 */
+    public static String hzwFilePath = "";
+
+    public static String getHzwServerPath() {
+        return hzwServerPath;
+    }
+
+    public static void setHzwServerPath(String hzwServerPath) {
+        UploadUtil.hzwServerPath = hzwServerPath;
+    }
+
+    public static String getHzwFilePath() {
+        return hzwFilePath;
+    }
+
+    public static void setHzwFilePath(String hzwFilePath) {
+        UploadUtil.hzwFilePath = hzwFilePath;
     }
 }

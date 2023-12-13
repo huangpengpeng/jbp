@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
+import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttr;
 import com.jbp.common.model.product.ProductGuarantee;
@@ -19,7 +20,7 @@ import com.jbp.common.model.product.ProductGuarantee;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -51,4 +52,19 @@ public class ProductDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "保障服务")
     private List<ProductGuarantee> guaranteeList;
+
+    @ApiModelProperty(value = "主商品ID，普通商品值为0")
+    private Integer masterProductId = 0;
+
+    @ApiModelProperty(value = "活动单次限购")
+    private Integer oneQuota;
+
+    @ApiModelProperty(value = "秒杀开始时间(时间戳)")
+    private Long startTimeStamp = 0L;
+
+    @ApiModelProperty(value = "秒杀结束时间(时间戳)")
+    private Long endTimeStamp = 0L;
+
+    @ApiModelProperty(value = "优惠券信息(商户)")
+    private List<Coupon> couponList;
 }

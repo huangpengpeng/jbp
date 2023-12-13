@@ -3,7 +3,6 @@ package com.jbp.admin.controller.platform;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.RefundOrderRemarkRequest;
 import com.jbp.common.request.RefundOrderSearchRequest;
 import com.jbp.common.response.PlatformRefundOrderPageResponse;
@@ -11,6 +10,7 @@ import com.jbp.common.response.RefundOrderAdminDetailResponse;
 import com.jbp.common.response.RefundOrderCountItemResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.RefundOrderService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -43,8 +43,8 @@ public class PlatformRefundOrderController {
     @PreAuthorize("hasAuthority('platform:refund:order:page:list')")
     @ApiOperation(value = "平台端退款订单分页列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResult<CommonPage<PlatformRefundOrderPageResponse>> getList(@Validated RefundOrderSearchRequest request, @Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(refundOrderService.getPlatformAdminPage(request, pageParamRequest)));
+    public CommonResult<CommonPage<PlatformRefundOrderPageResponse>> getList(@Validated RefundOrderSearchRequest request) {
+        return CommonResult.success(CommonPage.restPage(refundOrderService.getPlatformAdminPage(request)));
     }
 
     @PreAuthorize("hasAuthority('platform:refund:order:status:num')")
@@ -72,6 +72,16 @@ public class PlatformRefundOrderController {
         return CommonResult.failed();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台强制退款")
+    @PreAuthorize("hasAuthority('platform:refund:order:compulsory:refund')")
+    @ApiOperation(value = "平台强制退款")
+    @RequestMapping(value = "/compulsory/refund/{refundOrderNo}", method = RequestMethod.POST)
+    public CommonResult<String> compulsoryRefund(@PathVariable(value = "refundOrderNo") String refundOrderNo) {
+        if (refundOrderService.compulsoryRefund(refundOrderNo)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
 }
 
 

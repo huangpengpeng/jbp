@@ -1,9 +1,9 @@
 package com.jbp.front.service.captcha;
 
+import java.util.Properties;
+
 import com.jbp.common.captcha.model.common.ResponseModel;
 import com.jbp.common.captcha.model.vo.CaptchaVO;
-
-import java.util.Properties;
 
 /**
  * 验证码服务接口

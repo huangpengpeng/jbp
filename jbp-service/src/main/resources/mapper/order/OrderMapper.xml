@@ -2,4 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.OrderDao">
 
+    <select id="getProductNumCount" resultType="java.lang.Integer">
+        select IFNULL(sum(od.pay_num),0)
+        from eb_order o
+        left join eb_order_detail od on o.order_no = od.order_no
+        where o.is_del = 0
+        and o.refund_status &lt; 3
+        and o.cancel_status = 0
+        and o.status &lt; 9
+        and o.uid = #{uid}
+        and od.product_id = #{proId}
+        and od.product_type = #{productType}
+    </select>
+
+    <select id="findFrontList" resultType="com.jbp.common.model.order.Order" parameterType="Map">
+        select * from eb_order
+        where
+        uid = #{userId}
+        <if test="status != null and status &gt;= 0">
+            <choose>
+                <when test="status == 1">
+                    and `status` in (1,2)
+                </when>
+                <otherwise>
+                    and `status` = #{status}
+                </otherwise>
+            </choose>
+        </if>
+        and refund_status &lt; 3
+        and is_user_del  = 0
+        and is_merchant_del  = 0
+        and type in (0,2)
+        and is_del = 0
+        <if test="keywords != null and keywords !='' ">
+            and (order_no like CONCAT('%',#{keywords},'%')
+                or
+                order_no in (select order_no from eb_order_detail where product_name like CONCAT('%',#{keywords},'%')))
+        </if>
+        order by id desc
+    </select>
+
 </mapper>

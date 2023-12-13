@@ -4,11 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.service.service.ExpressService;
-import com.jbp.service.service.OnePassService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.util.OnePassUtil;
 import com.jbp.common.constants.OnePassConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
@@ -20,6 +17,10 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.ValidateFormUtil;
 import com.jbp.common.vo.*;
+import com.jbp.service.service.ExpressService;
+import com.jbp.service.service.OnePassService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.util.OnePassUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -369,6 +371,8 @@ public class OnePassServiceImpl implements OnePassService {
 
     /**
      * 电子面单
+     * 兼容老设备 siid参数不存在的时候必须填写，print_type=IMAGE 返回面单图
+     * 并且Header中再新增一个version=v1.1的参数
      * @param record 电子面单参数
      * @return
      */
@@ -378,7 +382,16 @@ public class OnePassServiceImpl implements OnePassService {
         HashMap<String, String> header = onePassUtil.getCommonHeader(onePassUtil.getToken(loginVo));
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         Map<String, Object> columns = record.getColumns();
+        logger.info("电子面单原本的参数:{}", JSON.toJSONString(columns));
+        Object siid = columns.get("siid");
+        logger.info("原始数据的siid数据:{}", siid);
+        if(ObjectUtil.isEmpty(siid)){
+            columns.put("print_type", "IMAGE");
+            header.put("version", "v1.1");
+        }
         columns.forEach(params::add);
+        logger.info("请求前参数params:{}", JSON.toJSONString(params));
+        logger.info("请求前参数header:{}", JSON.toJSONString(header));
         JSONObject post = onePassUtil.postFrom(OnePassConstants.ONE_PASS_API_URL + OnePassConstants.ONE_PASS_API_EXPRESS_DUMP_URI, params, header);
         MyRecord myRecord = new MyRecord();
         JSONObject jsonObject = post.getJSONObject("data");
@@ -566,11 +579,16 @@ public class OnePassServiceImpl implements OnePassService {
      */
     @Override
     public OnePassLoginVo getLoginVo() {
-        String account = systemConfigService.getValueByKey(SysConfigConstants.ONE_PASS_SMS_ACCOUNT);// 获取配置账号
+        List<String> list = new ArrayList<>();
+        list.add(SysConfigConstants.ONE_PASS_SMS_ACCOUNT);// 获取配置账号
+        list.add(SysConfigConstants.ONE_PASS_SMS_TOKEN);//获取配置密码
+        MyRecord myRecord = systemConfigService.getValuesByKeyList(list);
+
+        String account = myRecord.getStr(SysConfigConstants.ONE_PASS_SMS_ACCOUNT);
         if (StrUtil.isBlank(account)) {
             throw new CrmebException("请配置一号通账号！");
         }
-        String token = systemConfigService.getValueByKey(SysConfigConstants.ONE_PASS_SMS_TOKEN); //获取配置密码
+        String token = myRecord.getStr(SysConfigConstants.ONE_PASS_SMS_TOKEN);
         if (StrUtil.isBlank(token)) {
             throw new CrmebException("请配置一号通密码！");
         }

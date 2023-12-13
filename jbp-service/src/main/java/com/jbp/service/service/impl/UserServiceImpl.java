@@ -15,23 +15,25 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.UserDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.*;
+import com.jbp.common.dto.IpLocation;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.UserBill;
+import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantUserSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.token.FrontTokenComponent;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
-import com.jbp.common.vo.MyRecord;
+import com.jbp.service.dao.UserDao;
+import com.jbp.service.service.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -98,6 +100,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private ProductRelationService productRelationService;
     @Autowired
     private UserMerchantCollectService userMerchantCollectService;
+    @Autowired
+    private CommunityNotesService communityNotesService;
+    @Autowired
+    private CommunityNotesRelationService communityNotesRelationService;
+    @Autowired
+    private SystemUserLevelService systemUserLevelService;
 
     /**
      * 手机号注册用户
@@ -118,6 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         Date nowDate = CrmebDateUtil.nowDateTime();
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
+        user.setLevel(1);
 
         // 推广人
         user.setSpreadUid(0);
@@ -128,16 +137,27 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 user.setSpreadTime(nowDate);
             }
         }
-        // 注意：当前版本暂无新人注册赠送优惠券
-        HttpServletRequest request = RequestUtil.getRequest();
-        String clientIP = ServletUtil.getClientIP(request, null);
-        if (StrUtil.isBlank(clientIP)) {
-            logger.error("获取用户ip失败，用户phone = " + user.getPhone());
-        } else {
-            MyRecord myRecord = IPUtil.getAddressByIp(clientIP);
-            user.setCountry(myRecord.getStr("country").equals("中国") ? "CN" : "OTHER");
-            user.setProvince(myRecord.getStr("region"));
-            user.setCity(myRecord.getStr("city"));
+
+        try {
+            HttpServletRequest request = RequestUtil.getRequest();
+            String clientIP = ServletUtil.getClientIP(request, null);
+            if (StrUtil.isBlank(clientIP)) {
+                logger.error("获取用户ip失败，用户phone = " + user.getPhone());
+            } else {
+    //            MyRecord myRecord = IPUtil.getAddressByIp(clientIP);
+    //            user.setCountry(myRecord.getStr("country").equals("中国") ? "CN" : "OTHER");
+    //            user.setProvince(myRecord.getStr("region"));
+    //            user.setCity(myRecord.getStr("city"));
+                IpLocation ipLocation = IPUtil.getLocation(clientIP);
+                if (ObjectUtil.isNotNull(ipLocation.getCountry())) {
+                    user.setCountry(ipLocation.getCountry().equals("中国") ? "CN" : "OTHER");
+                    user.setProvince(ipLocation.getProvince());
+                    user.setCity(ipLocation.getCity());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("通过ip获取用户位置失败，用户phone = {}", user.getPhone());
+            logger.error("通过ip获取用户位置失败,e = {}", e);
         }
 
         Boolean execute = transactionTemplate.execute(e -> {
@@ -408,17 +428,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (StrUtil.isNotBlank(request.getRegisterType())) {
             map.put("registerType", request.getRegisterType());
         }
-        if (ObjectUtil.isNotNull(request.getIsWechatPublic())) {
-            map.put("isWechatPublic", request.getIsWechatPublic() ? 1 : 0);
-        }
-        if (ObjectUtil.isNotNull(request.getIsWechatRoutine())) {
-            map.put("isWechatRoutine", request.getIsWechatRoutine() ? 1 : 0);
-        }
         if (StrUtil.isNotBlank(request.getPayCount())) {
             map.put("payCount", Integer.valueOf(request.getPayCount()));
         }
-        if (ObjectUtil.isNotNull(request.getStatus())) {
-            map.put("status", request.getStatus() ? 1 : 0);
+        if (ObjectUtil.isNotNull(request.getIsPromoter())) {
+            map.put("isPromoter", request.getIsPromoter().equals(1) ? 1 : 0);
+        }
+        if (ObjectUtil.isNotNull(request.getIsLogoff())) {
+            map.put("isLogoff", request.getIsLogoff());
         }
         DateLimitUtilVo dateLimit = CrmebDateUtil.getDateLimit(request.getDateLimit());
         if (StrUtil.isNotBlank(dateLimit.getStartTime())) {
@@ -510,6 +527,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         LambdaUpdateWrapper<User> wrapper = Wrappers.lambdaUpdate();
         if (StrUtil.isNotBlank(userRequest.getTagId())) {
             wrapper.set(User::getTagId, userRequest.getTagId());
+        } else {
+            wrapper.set(User::getTagId, "");
         }
         if (StrUtil.isNotBlank(userRequest.getBirthday())) {
             wrapper.set(User::getBirthday, userRequest.getBirthday());
@@ -528,6 +547,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         if (ObjectUtil.isNotNull(userRequest.getIsPromoter())) {
             wrapper.set(User::getIsPromoter, userRequest.getIsPromoter());
+            if (userRequest.getIsPromoter() && !tempUser.getIsPromoter()) {
+                wrapper.set(User::getPromoterTime, DateUtil.date());
+            }
         }
         wrapper.eq(User::getId, tempUser.getId());
         return update(wrapper);
@@ -602,7 +624,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Boolean removeLevelByLevelId(Integer levelId) {
         LambdaUpdateWrapper<User> luw = Wrappers.lambdaUpdate();
-        luw.set(User::getLevel, 0);
+        luw.set(User::getLevel, 1);
         luw.eq(User::getLevel, levelId);
         return update(luw);
     }
@@ -616,7 +638,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Map<Integer, User> getUidMapList(List<Integer> uidList) {
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.select(User::getId, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff);
+        lqw.select(User::getId, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel);
         lqw.in(User::getId, uidList);
         List<User> userList = dao.selectList(lqw);
         Map<Integer, User> userMap = new HashMap<>();
@@ -842,7 +864,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
                 balanceRecord.setType(BalanceRecordConstants.BALANCE_RECORD_TYPE_ADD);
                 balanceRecord.setBalance(user.getNowMoney().add(request.getMoney()));
-                balanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_SYSTEM_ADD, request.getMoney()));
+                balanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_SYSTEM_ADD, request.getMoney().setScale(2).toString()));
 
                 updateNowMoney(user.getId(), request.getMoney(), Constants.OPERATION_TYPE_ADD);
             } else {
@@ -856,7 +878,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
                 balanceRecord.setType(BalanceRecordConstants.BALANCE_RECORD_TYPE_SUB);
                 balanceRecord.setBalance(user.getNowMoney().subtract(request.getMoney()));
-                balanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_SYSTEM_SUB, request.getMoney()));
+                balanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_SYSTEM_SUB, request.getMoney().setScale(2).toString()));
 
                 updateNowMoney(user.getId(), request.getMoney(), Constants.OPERATION_TYPE_SUBTRACT);
             }
@@ -1151,6 +1173,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * 6.清空用户登录状态
      * 7.清除用户标签
      * 8.关闭推广人按钮
+     * 9.删除用户社区笔记
+     * 10.删除用户社区笔记关系
      */
     @Override
     public Boolean logoff() {
@@ -1173,6 +1197,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 batchRemoveSpreadUid(user.getId());
                 user.setSpreadCount(0);
             }
+            communityNotesService.deleteByUid(user.getId());
+            communityNotesRelationService.deleteByAuthorId(user.getId());
             boolean update = updateById(user);
             if (!update) {
                 logger.error("更新用户注销状态失败，用户id： {}", user.getId());
@@ -1198,6 +1224,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (ObjectUtil.isNull(user)) {
             throw new CrmebException("用户不存在");
         }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (admin.getMerId() > 0) {
+            if (!userMerchantCollectService.isCollect(user.getId(), admin.getMerId())) {
+                throw new CrmebException("用户未收藏商户，无权查看用户信息");
+            }
+        }
         UserAdminDetailResponse response = new UserAdminDetailResponse();
         BeanUtils.copyProperties(user, response);
         if (user.getSpreadUid() > 0) {
@@ -1207,7 +1239,37 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (StrUtil.isNotBlank(user.getPhone())) {
             response.setPhone(CrmebUtil.maskMobile(user.getPhone()));
         }
+        SystemUserLevel systemUserLevel = systemUserLevelService.getByLevelId(user.getLevel());
+        response.setGrade(ObjectUtil.isNotNull(systemUserLevel) ? systemUserLevel.getGrade() : 0);
         return response;
+    }
+
+    /**
+     * 更新用户等级
+     * @param userId 用户ID
+     * @param level 用户等级
+     */
+    @Override
+    public Boolean updateUserLevel(Integer userId, Integer level) {
+        LambdaUpdateWrapper<User> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(User::getLevel, level);
+        wrapper.eq(User::getId, userId);
+        return update(wrapper);
+    }
+
+    /**
+     * 通过生日获取用户列表
+     * @param birthday 生日日期
+     */
+    @Override
+    public List<User> findByBirthday(String birthday) {
+        LambdaQueryWrapper<User> lqw = Wrappers.lambdaQuery();
+        lqw.select(User::getId, User::getPhone);
+        lqw.eq(User::getIsLogoff, 0);
+        lqw.eq(User::getStatus, 1);
+//        lqw.eq(User::getBirthday, birthday);
+        lqw.apply("date_format(birthday, '%m-%d') = {0}", birthday);
+        return dao.selectList(lqw);
     }
 
     /**
@@ -1240,6 +1302,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             queryWrapper.and(e -> e.like(User::getNickname, decode).or().eq(User::getId, decode)
                     .or().eq(User::getPhone, decode));
         }
+        if (StrUtil.isNotBlank(request.getDateLimit())) {
+            DateLimitUtilVo dateLimit = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            queryWrapper.between(User::getCreateTime, dateLimit.getStartTime(), dateLimit.getEndTime());
+        }
         List<User> userList = dao.selectList(queryWrapper);
         return CommonPage.copyPageInfo(userPage, userList);
     }
@@ -1262,6 +1328,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             String decode = URLUtil.decode(request.getKeywords());
             queryWrapper.and(e -> e.like(User::getNickname, decode).or().eq(User::getId, decode)
                     .or().eq(User::getPhone, decode));
+        }
+        if (StrUtil.isNotBlank(request.getDateLimit())) {
+            DateLimitUtilVo dateLimit = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            queryWrapper.between(User::getCreateTime, dateLimit.getStartTime(), dateLimit.getEndTime());
         }
         List<User> userList = dao.selectList(queryWrapper);
         return CommonPage.copyPageInfo(userPage, userList);
@@ -1316,6 +1386,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             String decode = URLUtil.decode(request.getKeywords());
             lqw.and(e -> e.like(User::getNickname, decode).or().eq(User::getId, decode)
                     .or().eq(User::getPhone, decode));
+        }
+        if (StrUtil.isNotBlank(request.getDateLimit())) {
+            DateLimitUtilVo dateLimit = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            lqw.between(User::getCreateTime, dateLimit.getStartTime(), dateLimit.getEndTime());
         }
         List<User> userList = dao.selectList(lqw);
         return CommonPage.copyPageInfo(userPage, userList);

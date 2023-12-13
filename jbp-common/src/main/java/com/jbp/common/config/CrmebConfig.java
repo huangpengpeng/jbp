@@ -3,12 +3,14 @@ package com.jbp.common.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * Crmeb 基础配置
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -24,18 +26,24 @@ public class CrmebConfig{
     private String domain;
     // #请求微信接口中专服务器
     private String wechatApiUrl;
-    // #微信js api系列是否开启调试模式
-    private Boolean wechatJsApiDebug;
-    // #微信js api是否是beta版本
-    private Boolean wechatJsApiBeta;
     // #是否同步config表数据到redis
     private Boolean asyncConfig;
-    // #是否同步小程序公共模板库
-    private Boolean asyncWeChatProgramTempList;
     // 本地图片路径配置
     private String imagePath;
     // 佣金返佣比例和上限
     private Integer retailStoreBrokerageRatio;
+    // 活动边框缓存周期
+    private Integer activityStyleCachedTime;
+    // 活动边框参加 指定商品参加上限
+    private Integer activityStyleProductLimit;
+
+    // 商品标签缓存分钟数
+    private Long productTagCacheMinutes;
+    // 不过滤任何数据的url配置
+    private List<String> ignored;
+
+    // 订单支付取消时间，单位分钟
+    private Integer orderCancelTime;
 
     public Integer getRetailStoreBrokerageRatio() {
         return retailStoreBrokerageRatio;
@@ -69,36 +77,12 @@ public class CrmebConfig{
         this.wechatApiUrl = wechatApiUrl;
     }
 
-    public Boolean isWechatJsApiDebug() {
-        return wechatJsApiDebug;
-    }
-
-    public void setWechatJsApiDebug(Boolean wechatJsApiDebug) {
-        this.wechatJsApiDebug = wechatJsApiDebug;
-    }
-
-    public Boolean isWechatJsApiBeta() {
-        return wechatJsApiBeta;
-    }
-
-    public void setWechatJsApiBeta(Boolean wechatJsApiBeta) {
-        this.wechatJsApiBeta = wechatJsApiBeta;
-    }
-
-    public Boolean isAsyncConfig() {
+    public Boolean getAsyncConfig() {
         return asyncConfig;
     }
 
     public void setAsyncConfig(Boolean asyncConfig) {
         this.asyncConfig = asyncConfig;
-    }
-
-    public Boolean isAsyncWeChatProgramTempList() {
-        return asyncWeChatProgramTempList;
-    }
-
-    public void setAsyncWeChatProgramTempList(Boolean asyncWeChatProgramTempList) {
-        this.asyncWeChatProgramTempList = asyncWeChatProgramTempList;
     }
 
     public String getImagePath() {
@@ -107,5 +91,62 @@ public class CrmebConfig{
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public Integer getActivityStyleProductLimit() {
+        return activityStyleProductLimit;
+    }
+
+    public void setActivityStyleProductLimit(Integer activityStyleProductLimit) {
+        this.activityStyleProductLimit = activityStyleProductLimit;
+    }
+
+    public Integer getActivityStyleCachedTime() {
+        return activityStyleCachedTime;
+    }
+
+    public void setActivityStyleCachedTime(Integer activityStyleCachedTime) {
+        this.activityStyleCachedTime = activityStyleCachedTime;
+    }
+
+    public List<String> getIgnored() {
+        return ignored;
+    }
+
+    public void setIgnored(List<String> ignored) {
+        this.ignored = ignored;
+    }
+
+    public Long getProductTagCacheMinutes() {
+        return productTagCacheMinutes;
+    }
+
+    public void setProductTagCacheMinutes(Long productTagCacheMinutes) {
+        this.productTagCacheMinutes = productTagCacheMinutes;
+    }
+
+    public Integer getOrderCancelTime() {
+        return orderCancelTime;
+    }
+
+    public void setOrderCancelTime(Integer orderCancelTime) {
+        this.orderCancelTime = orderCancelTime;
+    }
+
+    @Override
+    public String toString() {
+        return "CrmebConfig{" +
+                "version='" + version + '\'' +
+                ", domain='" + domain + '\'' +
+                ", wechatApiUrl='" + wechatApiUrl + '\'' +
+                ", asyncConfig=" + asyncConfig +
+                ", imagePath='" + imagePath + '\'' +
+                ", retailStoreBrokerageRatio=" + retailStoreBrokerageRatio +
+                ", activityStyleCachedTime=" + activityStyleCachedTime +
+                ", activityStyleProductLimit=" + activityStyleProductLimit +
+                ", productTagCacheMinutes=" + productTagCacheMinutes +
+                ", ignored=" + ignored +
+                ", orderCancelTime=" + orderCancelTime +
+                '}';
     }
 }

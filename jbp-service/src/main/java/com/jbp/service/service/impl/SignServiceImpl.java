@@ -6,7 +6,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.sgin.SignConfig;
@@ -22,6 +21,7 @@ import com.jbp.common.response.SignPageInfoResponse;
 import com.jbp.common.response.UserSignRecordResponse;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -62,6 +62,8 @@ public class SignServiceImpl implements SignService {
     private UserIntegralRecordService userIntegralRecordService;
     @Autowired
     private UserExperienceRecordService userExperienceRecordService;
+    @Autowired
+    private AsyncService asyncService;
 
     /**
      * 获取签到配置
@@ -243,6 +245,10 @@ public class SignServiceImpl implements SignService {
         userSignRecord.setUid(user.getId());
         userSignRecord.setDate(todayStr);
         userSignRecord.setDay(user.getSignNum() + 1);
+        userSignRecord.setIntegral(0);
+        userSignRecord.setExperience(0);
+        userSignRecord.setAwardIntegral(0);
+        userSignRecord.setAwardExperience(0);
 
         if (baseSignConfig.getIsIntegral()) {
             userSignRecord.setIntegral(baseSignConfig.getIntegral());
@@ -301,6 +307,7 @@ public class SignServiceImpl implements SignService {
                 experienceRecord.setType(ExperienceRecordConstants.EXPERIENCE_RECORD_TYPE_ADD);
                 experienceRecord.setTitle(ExperienceRecordConstants.EXPERIENCE_RECORD_TITLE_SIGN);
                 experienceRecord.setMark(StrUtil.format("签到奖励{}经验", finalExperience));
+                experienceRecord.setExperience(finalExperience);
                 experienceRecord.setBalance(finalExperience + user.getExperience());
                 experienceRecord.setStatus(ExperienceRecordConstants.EXPERIENCE_RECORD_STATUS_CREATE);
                 userExperienceRecordService.save(experienceRecord);
@@ -309,6 +316,9 @@ public class SignServiceImpl implements SignService {
         });
         if (!execute) {
             throw new CrmebException("签到失败");
+        }
+        if (finalExperience > 0) {
+            asyncService.userLevelUp(user.getId(), user.getLevel(), user.getExperience() + finalExperience);
         }
         return userSignRecord;
     }

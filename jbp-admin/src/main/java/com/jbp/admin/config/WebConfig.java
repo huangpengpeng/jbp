@@ -4,7 +4,9 @@ import com.jbp.admin.filter.ResponseFilter;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.UploadConstants;
+import com.jbp.common.interceptor.ResultInterceptor;
 import com.jbp.common.interceptor.SwaggerInterceptor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,7 +23,7 @@ import org.springframework.web.servlet.handler.MappedInterceptor;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -49,13 +51,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${swagger.basic.check}")
     private Boolean check;
 
-
+    /**
+     * 添加自定义拦截器
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //添加token拦截器
         //addPathPatterns添加需要拦截的命名空间；
         //excludePathPatterns添加排除拦截命名空间
-
+        registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
     }
 
     @Override

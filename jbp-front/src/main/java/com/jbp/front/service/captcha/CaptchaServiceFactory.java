@@ -1,8 +1,9 @@
 package com.jbp.front.service.captcha;
 
-import com.jbp.common.captcha.model.common.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jbp.common.captcha.model.common.Const;
 
 import java.util.HashMap;
 import java.util.Map;

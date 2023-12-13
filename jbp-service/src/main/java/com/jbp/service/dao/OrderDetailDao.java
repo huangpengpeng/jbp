@@ -2,6 +2,7 @@ package com.jbp.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.order.OrderDetail;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -29,7 +30,7 @@ public interface OrderDetailDao extends BaseMapper<OrderDetail> {
      * @param uid 用户id
      * @param orderNo 订单号
      */
-    List<OrderDetail> findAfterSaleApplyList(@Param("uid") Integer uid, @Param("orderNo") String orderNo);
+    List<OrderDetail> findAfterSaleApplyList(@Param("uid") Integer uid, @Param("keywords") String keywords);
 
     /**
      * 根据时间、商品id获取销售件数

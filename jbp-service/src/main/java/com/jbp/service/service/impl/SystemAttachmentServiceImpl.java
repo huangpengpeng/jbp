@@ -4,12 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.SystemAttachmentDao;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.SystemRoleService;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.constants.UploadConstants;
@@ -17,6 +14,10 @@ import com.jbp.common.model.system.SystemAttachment;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.SystemAttachmentMoveRequest;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.dao.SystemAttachmentDao;
+import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.SystemRoleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -100,9 +101,9 @@ public class SystemAttachmentServiceImpl extends ServiceImpl<SystemAttachmentDao
             String cdnUrl = systemConfigService.getValueByKey("local" + "UploadUrl");
             return path.replace("crmebimage/", cdnUrl + "/crmebimage/");
         }
-        if (path.contains("file/excel")) {
+        if (path.contains("downloadf/excel")) {
             String cdnUrl = systemConfigService.getValueByKey("local" + "UploadUrl");
-            return path.replace("crmebimage/file/", cdnUrl + "/crmebimage/file/");
+            return path.replace("crmebimage/downloadf/", cdnUrl + "/crmebimage/downloadf/");
         }
         return path.replace("crmebimage/file/", getCdnUrl() + "/crmebimage/file/");
     }
@@ -154,9 +155,9 @@ public class SystemAttachmentServiceImpl extends ServiceImpl<SystemAttachmentDao
     @Override
     public Boolean updateAttrId(SystemAttachmentMoveRequest move) {
         LambdaUpdateWrapper<SystemAttachment> lup = new LambdaUpdateWrapper<>();
-        lup.in(SystemAttachment::getAttId, CrmebUtil.stringToArray(move.getAttrId()));
         lup.set(SystemAttachment::getPid, move.getPid());
-        lup.set(SystemAttachment::getOwner, systemRoleService.getOwnerByCurrentAdmin());
+        lup.in(SystemAttachment::getAttId, CrmebUtil.stringToArray(move.getAttrId()));
+        lup.eq(SystemAttachment::getOwner, systemRoleService.getOwnerByCurrentAdmin());
         return update(lup);
     }
 
@@ -181,10 +182,26 @@ public class SystemAttachmentServiceImpl extends ServiceImpl<SystemAttachmentDao
             case 4:
                 uploadUrl = SysConfigConstants.CONFIG_TX_UPLOAD_URL;
                 break;
+            case 5:
+                uploadUrl = SysConfigConstants.CONFIG_JD_UPLOAD_URL;
+                break;
             default:
                 break;
         }
         return systemConfigService.getValueByKey(uploadUrl);
+    }
+
+    /**
+     * 删除附件
+     * @param idList 附件ID列表
+     */
+    @Override
+    public Boolean deleteByIds(List<Integer> idList) {
+        Integer owner = systemRoleService.getOwnerByCurrentAdmin();
+        LambdaUpdateWrapper<SystemAttachment> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(SystemAttachment::getOwner, owner);
+        wrapper.in(SystemAttachment::getAttId, idList);
+        return remove(wrapper);
     }
 }
 

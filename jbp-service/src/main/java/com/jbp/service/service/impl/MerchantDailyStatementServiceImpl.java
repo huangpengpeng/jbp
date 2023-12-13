@@ -9,11 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.MerchantDailyStatementDao;
-import com.jbp.service.service.MerchantDailyStatementService;
-import com.jbp.service.service.OrderProfitSharingService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.RefundOrderService;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.bill.MerchantDailyStatement;
 import com.jbp.common.model.order.OrderProfitSharing;
@@ -23,6 +18,11 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.MerchantDailyStatementDao;
+import com.jbp.service.service.MerchantDailyStatementService;
+import com.jbp.service.service.OrderProfitSharingService;
+import com.jbp.service.service.OrderService;
+import com.jbp.service.service.RefundOrderService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -142,6 +142,21 @@ public class MerchantDailyStatementServiceImpl extends ServiceImpl<MerchantDaily
         // 退款笔数
         int refundNum = 0;
 
+        BigDecimal platCouponPrice = new BigDecimal("0.00");
+        BigDecimal integralPrice = new BigDecimal("0.00");
+        BigDecimal brokeragePrice = new BigDecimal("0.00");
+
+        // 退款
+        BigDecimal orderRefundPrice = new BigDecimal("0.00");
+        BigDecimal refundPlatCouponPrice = new BigDecimal("0.00");
+        BigDecimal refundIntegralPrice = new BigDecimal("0.00");
+        BigDecimal refundHandlingFee = new BigDecimal("0.00");
+        BigDecimal refundBrokeragePrice = new BigDecimal("0.00");
+        BigDecimal refundMerchantTransferAmount = new BigDecimal("0.00");
+
+        BigDecimal freightFee = new BigDecimal("0.00");
+        BigDecimal refundFreightFee = new BigDecimal("0.00");
+
         if (CollUtil.isNotEmpty(sharingList)) {
             orderPayAmount =  sharingList.stream().map(OrderProfitSharing::getOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             orderNum = sharingList.size();
@@ -149,18 +164,53 @@ public class MerchantDailyStatementServiceImpl extends ServiceImpl<MerchantDaily
             handlingFee = sharingList.stream().map(OrderProfitSharing::getProfitSharingPlatPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             firstBrokerage = sharingList.stream().map(OrderProfitSharing::getFirstBrokerageFee).reduce(BigDecimal.ZERO, BigDecimal::add);
             secondBrokerage = sharingList.stream().map(OrderProfitSharing::getSecondBrokerageFee).reduce(BigDecimal.ZERO, BigDecimal::add);
+            platCouponPrice = sharingList.stream().map(OrderProfitSharing::getPlatCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            integralPrice = sharingList.stream().map(OrderProfitSharing::getIntegralPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            brokeragePrice = firstBrokerage.add(secondBrokerage);
+            freightFee = sharingList.stream().map(OrderProfitSharing::getFreightFee).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
         if (CollUtil.isNotEmpty(refundOrderList)) {
-            refundAmount = refundOrderList.stream().map(RefundOrder::getMerchantRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundAmount = refundOrderList.stream().map(RefundOrder::getRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             refundNum = refundOrderList.size();
+            refundMerchantTransferAmount = refundOrderList.stream().map(RefundOrder::getMerchantRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundHandlingFee = refundOrderList.stream().map(RefundOrder::getPlatformRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundPlatCouponPrice = refundOrderList.stream().map(RefundOrder::getRefundPlatCouponPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundBrokeragePrice = refundOrderList.stream().map(e -> e.getRefundFirstBrokerageFee().add(e.getRefundSecondBrokerageFee())).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundIntegralPrice = refundOrderList.stream().map(RefundOrder::getRefundIntegralPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            orderRefundPrice = refundOrderList.stream().map(RefundOrder::getRefundPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundFreightFee = refundOrderList.stream().map(RefundOrder::getRefundFreightFee).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
-        // 支出总金额 = 商户退款金额
-        BigDecimal payoutAmount = refundAmount;
-        // 支出笔数 = 退款笔数
-        int payoutNum = refundNum;
-        // 商户日收支 = 订单收入金额 - 商户退款金额
-        BigDecimal incomeExpenditure = orderIncomeAmount.subtract(refundAmount);
+//        // 支出总金额 = 商户退款金额
+//        BigDecimal payoutAmount = refundAmount;
+//        // 支出笔数 = 退款笔数
+//        int payoutNum = refundNum;
+//        // 商户日收支 = 订单收入金额 - 商户退款金额
+//        BigDecimal incomeExpenditure = orderIncomeAmount.subtract(refundAmount);
+
+        // 订单应收 = 订单实付 + 平优 + 平积
+        BigDecimal orderReceivable = orderPayAmount.add(platCouponPrice).add(integralPrice);
+
+        // 订单应退 = 商户退款 + 平台退款 + 佣金退款
+        BigDecimal orderRefundable = BigDecimal.ZERO.subtract(refundMerchantTransferAmount).subtract(refundHandlingFee).subtract(refundBrokeragePrice);
+
+        // 订单实退 = 订单应退 - 退平台优惠券 - 退平台积分
+        BigDecimal orderRefund = orderRefundable.subtract(refundPlatCouponPrice).subtract(refundIntegralPrice);
+
+        // 平台手续费
+        BigDecimal platformHandling = handlingFee.subtract(refundHandlingFee);
+
+        // 佣金
+        BigDecimal brokerage = brokeragePrice.subtract(refundBrokeragePrice);
+
+        // 实际收入 = 订单应收 - 订单应退
+        BigDecimal income = orderReceivable.add(orderRefundable);
+
+        // 实际支出 = 平台手续费 + 佣金
+        BigDecimal payout = platformHandling.add(brokerage);
+
+        // 当日结余
+        BigDecimal incomeExpenditure = income.subtract(payout);
 
         statement.setOrderPayAmount(orderPayAmount);
         statement.setOrderNum(orderNum);
@@ -168,11 +218,24 @@ public class MerchantDailyStatementServiceImpl extends ServiceImpl<MerchantDaily
         statement.setHandlingFee(handlingFee);
         statement.setFirstBrokerage(firstBrokerage);
         statement.setSecondBrokerage(secondBrokerage);
-        statement.setPayoutAmount(payoutAmount);
-        statement.setPayoutNum(payoutNum);
+//        statement.setPayoutAmount(payoutAmount);
+//        statement.setPayoutNum(payoutNum);
         statement.setRefundAmount(refundAmount);
         statement.setRefundNum(refundNum);
-        statement.setIncomeExpenditure(incomeExpenditure);
+        statement.setIncomeExpenditure(incomeExpenditure.abs());
+
+        statement.setPlatCouponPrice(platCouponPrice);
+        statement.setIntegralPrice(integralPrice);
+        statement.setBrokeragePrice(brokeragePrice);
+        statement.setOrderRefundPrice(orderRefundPrice);
+        statement.setRefundPlatCouponPrice(refundPlatCouponPrice);
+        statement.setRefundIntegralPrice(refundIntegralPrice);
+        statement.setRefundHandlingFee(refundHandlingFee);
+        statement.setRefundBrokeragePrice(refundBrokeragePrice);
+        statement.setRefundMerchantTransferAmount(refundMerchantTransferAmount);
+
+        statement.setFreightFee(freightFee);
+        statement.setRefundFreightFee(refundFreightFee);
     }
 }
 

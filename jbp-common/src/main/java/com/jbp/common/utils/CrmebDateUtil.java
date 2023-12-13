@@ -23,7 +23,7 @@ import java.util.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -68,6 +68,18 @@ public final class CrmebDateUtil {
     public static String lastYear() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -1);
+        return cal.get(Calendar.YEAR) + "";
+    }
+
+    /**
+     * 获取下一年,指定格式
+     * 描述:<描述函数实现的功能>.
+     *
+     * @return
+     */
+    public static String nextYear() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, +1);
         return cal.get(Calendar.YEAR) + "";
     }
 
@@ -265,10 +277,10 @@ public final class CrmebDateUtil {
     /**
      * compare two date String with a pattern
      *
-     * @param date1
-     * @param date2
-     * @param pattern
-     * @return
+     * @param date1 开始时间
+     * @param date2 结束时间
+     * @param pattern 时间格式
+     * @return 1=D1大 ，-1=D2大，0=相等
      */
     public static int compareDate(String date1, String date2, String pattern) {
         SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(pattern);

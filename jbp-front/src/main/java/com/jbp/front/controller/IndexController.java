@@ -1,24 +1,24 @@
 package com.jbp.front.controller;
 
 
-import com.github.pagehelper.PageInfo;
-import com.jbp.front.service.IndexService;
+import cn.hutool.core.util.ObjectUtil;
+
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.coupon.Coupon;
+import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.system.SystemConfig;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.IndexInfoResponse;
-import com.jbp.common.response.IndexMerchantResponse;
-import com.jbp.common.response.ProductCommonResponse;
+import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.front.service.IndexService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -53,15 +53,21 @@ public class IndexController {
     @ApiOperation(value = "首页商品列表")
     @RequestMapping(value = "/product/list", method = RequestMethod.GET)
     @ApiImplicitParam(name="cid", value="一级商品分类id，全部传0", required = true)
-    public CommonResult<PageInfo<ProductCommonResponse>> getProductList(@RequestParam(value = "cid") Integer cid,
-                                                                        PageParamRequest pageParamRequest) {
-        return CommonResult.success(indexService.findIndexProductList(cid, pageParamRequest));
+    public CommonResult<CommonPage<ProductCommonResponse>> getProductList(@RequestParam(value = "cid") Integer cid,
+                                                                          PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(indexService.findIndexProductList(cid, pageParamRequest)));
     }
 
-    @ApiOperation(value = "首页店铺列表")
-    @RequestMapping(value = "/merchant/list", method = RequestMethod.GET)
-    public CommonResult<List<IndexMerchantResponse>> getMerchantList() {
-        return CommonResult.success(indexService.findIndexMerchantList());
+    @ApiOperation(value = "首页店铺列表-根据数量加载")
+    @RequestMapping(value = "/merchant/list/{recomdnum}", method = RequestMethod.GET)
+    public CommonResult<CommonPage<IndexMerchantResponse>> getMerchantListByRecomdNum(@PathVariable(name = "recomdnum", required = false) Integer recomdnum) {
+        return CommonResult.success(CommonPage.restPage(indexService.findIndexMerchantListByRecomdNum(recomdnum)));
+    }
+
+    @ApiOperation(value = "首页店铺列表-根据id集合加载")
+    @RequestMapping(value = "/merchant/listbyids/{ids}", method = RequestMethod.GET)
+    public CommonResult<List<IndexMerchantResponse>> getMerchantListByIds(@PathVariable(name = "ids", required = false) String ids) {
+        return CommonResult.success(indexService.findIndexMerchantListByIds(ids));
     }
 
     @ApiOperation(value = "热门搜索")
@@ -79,13 +85,63 @@ public class IndexController {
     @ApiOperation(value = "全局本地图片域名")
     @RequestMapping(value = "/image/domain", method = RequestMethod.GET)
     public CommonResult<String> getImageDomain() {
-        return CommonResult.success(indexService.getImageDomain(), "成功");
+        return CommonResult.success(indexService.getImageDomain());
     }
 
     @ApiOperation(value = "版权图片")
     @RequestMapping(value = "/copyright/company/image", method = RequestMethod.GET)
     public CommonResult<Object> getCopyrightCompanyImage() {
-        return CommonResult.success(indexService.getCopyrightCompanyImage(), "");
+        return CommonResult.success(indexService.getCopyrightCompanyImage());
+    }
+
+    @ApiOperation(value = "首页秒杀信息")
+    @RequestMapping(value = "/seckill/info", method = RequestMethod.GET)
+    public CommonResult<List<SeckillProduct>> getIndexSeckillInfo() {
+        return CommonResult.success(indexService.getIndexSeckillInfo());
+    }
+
+    @ApiOperation(value = "首页优惠券")
+    @RequestMapping(value = "/coupon/info/{limit}", method = RequestMethod.GET)
+    public CommonResult<List<Coupon>> getIndexCouponInfo(@PathVariable(value = "limit") Integer limit) {
+        if(ObjectUtil.isNull(limit) || limit <=0) throw new CrmebException("limit参数不合法");
+        if(limit >= 8) throw new CrmebException("首页 组件 优惠券上限不得超过 8 条");
+        return CommonResult.success(indexService.getIndexCouponInfo(limit));
+    }
+
+    @ApiOperation(value = "获取系统时间")
+    @RequestMapping(value = "/get/system/time", method = RequestMethod.GET)
+    public CommonResult<Long> getSystemTime() {
+        return CommonResult.success(System.currentTimeMillis());
+    }
+
+    @ApiOperation(value = "获取底部导航信息")
+    @RequestMapping(value = "/get/bottom/navigation", method = RequestMethod.GET)
+    public CommonResult<PageLayoutBottomNavigationResponse> getBottomNavigation() {
+        return CommonResult.success(indexService.getBottomNavigationInfo());
+    }
+
+    @ApiOperation(value = "获取版本信息")
+    @RequestMapping(value = "/index/get/version", method = RequestMethod.GET)
+    public CommonResult<AppVersionResponse> getVersion() {
+        return CommonResult.success(indexService.getVersion());
+    }
+
+    @ApiOperation(value = "获取版权信息")
+    @RequestMapping(value = "/copyright/info", method = RequestMethod.GET)
+    public CommonResult<CopyrightConfigInfoResponse> getCopyrightInfo() {
+        return CommonResult.success(indexService.getCopyrightInfo());
+    }
+
+    @ApiOperation(value = "获取移动端域名")
+    @RequestMapping(value = "/get/domain", method = RequestMethod.GET)
+    public CommonResult<String> getFrontDomain() {
+        return CommonResult.success(indexService.getFrontDomain());
+    }
+
+    @ApiOperation(value = "获取平台客服")
+    @RequestMapping(value = "/get/customer/service", method = RequestMethod.GET)
+    public CommonResult<CustomerServiceResponse> getPlatCustomerService() {
+        return CommonResult.success(indexService.getPlatCustomerService());
     }
 }
 

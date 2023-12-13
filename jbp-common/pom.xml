@@ -2,16 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-   
- 	<parent>
-		<groupId>jbp</groupId>
-		<artifactId>com.jbp</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
+  <parent>
+        <groupId>jbp</groupId>
+    <artifactId>com.jbp</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jbp-common</artifactId>
     <name>jbp-common</name>
+
+    <properties>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -75,7 +77,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -120,10 +121,6 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-models</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
@@ -192,6 +189,12 @@
             <artifactId>httpclient</artifactId>
         </dependency>
 
+        <!--图片上传-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+        </dependency>
+
         <!--SpringBoot 拦截 response 记录日志-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -229,7 +232,6 @@
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
         </dependency>
-
         <!--阿里云oss上传-->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
@@ -257,25 +259,12 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
+            <version>1.4.18</version>
         </dependency>
 
-        <!--        开发阶段热部署-->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-        </dependency>-->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-core</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.vaadin.external.google</groupId>
             <artifactId>android-json</artifactId>
-        </dependency>
-        <!--图片上传-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
         </dependency>
 
         <!--谷歌二维码-->
@@ -286,12 +275,6 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-        </dependency>
-
-        <!--中文转拼音-->
-        <dependency>
-            <groupId>com.belerweb</groupId>
-            <artifactId>pinyin4j</artifactId>
         </dependency>
 
         <!--解析JWT-->
@@ -316,6 +299,22 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- 京东云存储 -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-common</artifactId>
+            <version>4.4.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+        </dependency>
     </dependencies>
 
 

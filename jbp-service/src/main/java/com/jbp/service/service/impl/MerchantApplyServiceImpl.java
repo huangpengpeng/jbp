@@ -11,23 +11,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.MerchantApplyDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.MerchantConstants;
 import com.jbp.common.constants.NotifyConstants;
 import com.jbp.common.constants.SysConfigConstants;
-import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.merchant.MerchantApply;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.*;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.merchant.*;
 import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.LoginUserVo;
+import com.jbp.service.dao.MerchantApplyDao;
+import com.jbp.service.service.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +42,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

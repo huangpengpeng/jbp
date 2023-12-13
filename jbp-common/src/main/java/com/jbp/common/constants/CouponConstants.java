@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -29,13 +29,21 @@ public class CouponConstants {
     public static final Integer COUPON_CATEGORY_MERCHANT = 1;
     /** 优惠券类别-商品券 */
     public static final Integer COUPON_CATEGORY_PRODUCT = 2;
-    /** 优惠券类别-平台券 */
-    public static final Integer COUPON_CATEGORY_PLATFORM = 3;
+    /** 优惠券类别-通用券 */
+    public static final Integer COUPON_CATEGORY_UNIVERSAL = 3;
+    /** 优惠券类别-品类券 */
+    public static final Integer COUPON_CATEGORY_PRODUCT_CATEGORY = 4;
+    /** 优惠券类别-品牌券 */
+    public static final Integer COUPON_CATEGORY_BRAND = 5;
+    /** 优惠券类别-跨店券 */
+    public static final Integer COUPON_CATEGORY_JOINT_MERCHANT = 6;
 
     /** 优惠券领取类型—手动领取 */
     public static final Integer COUPON_RECEIVE_TYPE_MANUAL = 1;
     /** 优惠券领取类型—商品买赠送券 */
     public static final Integer COUPON_RECEIVE_TYPE_PAY_PRODUCT = 2;
+    /** 优惠券领取类型—平台活动发放 */
+    public static final Integer COUPON_RECEIVE_TYPE_PLAT_SEND = 3;
 
     /** 优惠券类型—满减券 */
     public static final Integer COUPON_TYPE_SATISFY = 1;

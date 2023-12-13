@@ -13,7 +13,7 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -23,10 +23,10 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="MerchantIndexInfoResponse对象", description="商户首页信息响应对象")
+@ApiModel(value = "MerchantIndexInfoResponse对象", description = "商户首页信息响应对象")
 public class MerchantIndexInfoResponse implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "商户ID")
     private Integer id;
@@ -63,10 +63,4 @@ public class MerchantIndexInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "客服电话")
     private String servicePhone;
-
-//    @ApiModelProperty(value = "pcBanner")
-//    private String pcBanner;
-//
-//    @ApiModelProperty(value = "pc背景图")
-//    private String pcBackImage;
 }

@@ -16,7 +16,7 @@ import java.util.List;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -79,6 +79,12 @@ public class OrderFrontDataResponse implements Serializable {
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
-    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单")
+    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单, 2-秒杀订单")
     private Integer type;
+
+    @ApiModelProperty(value = "过期时间")
+    private Long cancelTime;
+
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime;
 }

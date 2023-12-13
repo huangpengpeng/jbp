@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -42,6 +42,7 @@ public class ProductAttrValueAddRequest implements Serializable {
     @ApiModelProperty(value = "规格属性金额", required = true)
     @NotNull(message = "规格属性金额不能为空")
     @DecimalMin(value = "0", message = "金额不能小于0")
+    @DecimalMax(value = "999999.99", message = "商品金额最大为999999.99")
     private BigDecimal price;
 
     @ApiModelProperty(value = "图片", required = true)

@@ -2,6 +2,7 @@ package com.jbp.admin.task.statistics;
 
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.service.service.StatisticsTaskService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -33,7 +34,7 @@ public class StatementTask {
      * 每天1点执行
      */
     public void dailyStatement() {
-        // cron : 0 0 0 */1 * ?
+        // cron : 0 0 1 * * ?
         logger.info("---DailyStatementTask dailyStatement------produce Data with fixed rate task: Start Time - {}", CrmebDateUtil.nowDateTime());
         try {
             statisticsTaskService.dailyStatement();

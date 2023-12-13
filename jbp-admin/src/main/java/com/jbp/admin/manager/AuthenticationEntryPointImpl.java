@@ -2,6 +2,8 @@ package com.jbp.admin.manager;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.result.CommonResultCode;
+
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -26,7 +28,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, S
         httpServletResponse.setContentType("application/json");
         httpServletResponse.setCharacterEncoding("utf-8");
         try {
-            httpServletResponse.getWriter().print(JSONObject.toJSONString(CommonResult.unauthorized()));
+            httpServletResponse.getWriter().print(JSONObject.toJSONString(CommonResult.failed(CommonResultCode.UNAUTHORIZED)));
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

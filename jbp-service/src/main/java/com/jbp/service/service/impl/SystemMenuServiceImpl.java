@@ -7,9 +7,6 @@ import cn.hutool.core.util.URLUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.SystemMenuDao;
-import com.jbp.service.service.SystemMenuService;
-import com.jbp.service.service.SystemRoleMenuService;
 import com.jbp.common.constants.MenuConstants;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.enums.RoleEnum;
@@ -21,6 +18,9 @@ import com.jbp.common.request.SystemMenuSearchRequest;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.MenuCheckTree;
 import com.jbp.common.vo.MenuCheckVo;
+import com.jbp.service.dao.SystemMenuDao;
+import com.jbp.service.service.SystemMenuService;
+import com.jbp.service.service.SystemRoleMenuService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

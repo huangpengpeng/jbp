@@ -1,10 +1,12 @@
 package com.jbp.admin.manager;
 
 import cn.hutool.core.util.ObjectUtil;
+
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.service.service.impl.UserDetailServiceImpl;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

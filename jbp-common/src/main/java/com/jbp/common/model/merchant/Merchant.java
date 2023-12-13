@@ -142,6 +142,9 @@ public class Merchant implements Serializable {
     @ApiModelProperty(value = "关联管理账号ID")
     private Integer adminId;
 
+    @ApiModelProperty(value = "小票打印开关：0关闭，1=手动打印，2=自动打印，3=自动和手动")
+    private Integer receiptPrintingSwitch;
+
     @ApiModelProperty(value = "是否删除")
     private Boolean isDel;
 
@@ -151,5 +154,9 @@ public class Merchant implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "商户PCLogo")
+    private String pcLogo;
 
+    @ApiModelProperty(value = "商户PC品牌好店封面图片")
+    private String pcGoodStoreCoverImage;
 }

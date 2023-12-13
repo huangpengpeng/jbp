@@ -9,14 +9,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.service.dao.WechatCallbackDao;
-import com.jbp.service.service.*;
-import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.enums.*;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.order.Order;
 import com.jbp.common.model.product.ProductAttr;
 import com.jbp.common.model.product.ProductAttrValue;
 import com.jbp.common.model.wechat.WechatCallback;
@@ -26,8 +22,9 @@ import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.wxvedioshop.ShopSpuAuditVo;
 import com.jbp.common.vo.wxvedioshop.ShopSpuCommonVo;
 import com.jbp.common.vo.wxvedioshop.ShopSpuVo;
+import com.jbp.service.dao.WechatCallbackDao;
+import com.jbp.service.service.*;
 
-import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +41,7 @@ import java.util.*;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

@@ -136,7 +136,7 @@ public class MerchantOrder implements Serializable {
     @ApiModelProperty(value = "核销员id")
     private Integer clerkId;
 
-    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单")
+    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单")
     private Integer type;
 
     @ApiModelProperty(value = "创建时间")
@@ -145,5 +145,9 @@ public class MerchantOrder implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "商户优惠券金额")
+    private BigDecimal merCouponPrice;
 
+    @ApiModelProperty(value = "平台优惠券金额")
+    private BigDecimal platCouponPrice;
 }

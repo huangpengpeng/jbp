@@ -2,17 +2,20 @@ package com.jbp.front.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.request.CouponProductSearchRequest;
-import com.jbp.common.request.MerchantProductSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.ProductFrontSearchRequest;
+import com.jbp.common.request.SystemCouponProductSearchRequest;
+import com.jbp.common.request.merchant.MerchantProductSearchRequest;
 import com.jbp.common.response.*;
+
+import java.util.List;
 
 /**
  * ProductService 接口
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -34,7 +37,7 @@ public interface FrontProductService {
      * 获取商品详情
      *
      * @param  id 视频号商品id
-     * @param type 空 = 正常 video = 视频号商品
+     * @param type 空 = 正常 video = 视频号商品 seckill = 秒杀商品
      * @return 商品详情信息
      */
     ProductDetailResponse getDetail(Integer id, String type);
@@ -73,8 +76,44 @@ public interface FrontProductService {
     /**
      * 优惠券商品列表
      * @param request 搜索参数
-     * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<ProductFrontResponse> getCouponProList(CouponProductSearchRequest request, PageParamRequest pageParamRequest);
+    PageInfo<ProductFrontResponse> getCouponProList(CouponProductSearchRequest request);
+
+    /**
+     * 获取已购商品列表
+     * @param pageParamRequest 分页参数
+     */
+    PageInfo<ProductSimpleResponse> findPurchasedList(PageParamRequest pageParamRequest);
+
+    /**
+     * 足迹商品列表
+     * @param pageParamRequest 分页参数
+     */
+    PageInfo<ProductSimpleResponse> findBrowseList(PageParamRequest pageParamRequest);
+
+    /**
+     * 系统优惠券商品列表
+     * @param request 搜索参数
+     */
+    PageInfo<ProductFrontResponse> findCouponProductList(SystemCouponProductSearchRequest request);
+
+    /**
+     * 推荐商品分页列表
+     *
+     * @param pageRequest 分页参数
+     */
+    PageInfo<RecommendProductResponse> findRecommendPage(PageParamRequest pageRequest);
+
+    /**
+     * 商品列表搜索前置接口
+     */
+    ProductSearchBeforeResponse getListBefore(String keyword);
+
+    /**
+     * PC店铺推荐商品
+     *
+     * @param merId 商户ID
+     */
+    List<PcMerchantRecommendProductResponse> getRecommendProductByMerId(Integer merId);
 }

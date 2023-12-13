@@ -2,8 +2,10 @@ package com.jbp.front.controller;
 
 import com.jbp.common.request.*;
 import com.jbp.common.response.CartMerchantResponse;
+import com.jbp.common.response.CartPriceResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.CartService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -22,7 +24,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -105,6 +107,12 @@ public class CartController {
             return CommonResult.success();
         }
         return CommonResult.failed();
+    }
+
+    @ApiOperation(value = "购物车商品价格计算")
+    @RequestMapping(value = "/calculate/price", method = RequestMethod.POST)
+    public CommonResult<CartPriceResponse> calculatePrice(@RequestBody @Validated CartDeleteRequest request) {
+        return CommonResult.success(cartService.calculatePrice(request.getIds()));
     }
 }
 

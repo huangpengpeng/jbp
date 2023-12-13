@@ -8,9 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.SystemAdminDao;
-import com.jbp.service.service.SystemAdminService;
-import com.jbp.service.service.SystemRoleService;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -22,6 +19,9 @@ import com.jbp.common.request.SystemAdminUpdateRequest;
 import com.jbp.common.response.SystemAdminResponse;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.service.dao.SystemAdminDao;
+import com.jbp.service.service.SystemAdminService;
+import com.jbp.service.service.SystemRoleService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -38,7 +38,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -203,6 +203,9 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
                 || adminDetail.getType().equals(RoleEnum.SUPER_MERCHANT.getValue())) {
             throw new CrmebException("系统内置权限，不允许编辑");
         }
+        if (!currentUser.getMerId().equals(adminDetail.getMerId())) {
+            throw new CrmebException("不能操作非自己商户的数据");
+        }
         verifyAccount(systemAdminRequest.getId(), systemAdminRequest.getAccount());
         SystemAdmin systemAdmin = new SystemAdmin();
         BeanUtils.copyProperties(systemAdminRequest, systemAdmin);
@@ -227,6 +230,10 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
                 || perDelAdmin.getType().equals(RoleEnum.SUPER_MERCHANT.getValue())) {
             throw new CrmebException("系统内置权限，不允许删除");
         }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(perDelAdmin.getMerId())) {
+            throw new CrmebException("不能操作非自己商户的数据");
+        }
         return removeById(id);
     }
 
@@ -246,7 +253,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
             throw new CrmebException("系统内置权限，不允许编辑");
         }
         if (!currentUser.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("不同平台的用户，不允许编辑");
+            throw new CrmebException("不能操作非自己商户的数据");
         }
         if (systemAdmin.getStatus().equals(status)) {
             return true;
@@ -265,6 +272,12 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
         SystemAdmin systemAdmin = getById(id);
         if (ObjectUtil.isNull(systemAdmin) || systemAdmin.getIsDel()) {
             throw new CrmebException("管理员不存在");
+        }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (admin.getMerId() > 0) {
+            if (!admin.getMerId().equals(systemAdmin.getMerId())) {
+                throw new CrmebException("不能操作非自己商户的数据");
+            }
         }
         return systemAdmin;
     }

@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -76,4 +76,13 @@ public class RedisConstants {
 
     /** 微信小程序订阅通知列表 Key */
     public static final String WE_CHAT_MESSAGE_KEY_PROGRAM = "we_chat_program_message_list";
+
+    /** 秒杀商品库存缓存key **/
+    public static final String SECKILL_PRODUCT_INFO_KEY = "seckill_product_info:{}";
+
+    /** 秒杀商品库存缓存key **/
+    public static final String SECKILL_PRODUCT_QUOTA_KEY = "seckill_product_quota:{}";
+
+    /** 秒杀商品规格SKU库存缓存key **/
+    public static final String SECKILL_PRODUCT_SKU_QUOTA_KEY = "seckill_product_sku_quota:{}";
 }

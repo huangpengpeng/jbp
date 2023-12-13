@@ -6,9 +6,7 @@ import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.constants.Constants;
-import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.admin.SystemAdmin;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,7 +29,7 @@ import java.util.regex.Pattern;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -143,7 +141,7 @@ public class CrmebUtil {
      */
     public static void main(String[] args) throws Exception {
 //        System.out.println(encryptPassword("123456", "admin"));
-        System.out.println(decryptPassowrd("", ""));
+        System.out.println(decryptPassowrd("9n8S0bwrG6iXHK3vXWqppA==", "admin"));
     }
 
     /**
@@ -740,7 +738,7 @@ public class CrmebUtil {
      * unicode编码转换为汉字
      *
      * @param unicodeStr 待转化的编码
-     * @return 返回转化后的汉子
+     * @return 返回转化后的汉字
      */
     public static String UnicodeToCN(String unicodeStr) {
         Pattern pattern = Pattern.compile("(\\\\u(\\p{XDigit}{4}))");
@@ -902,18 +900,6 @@ public class CrmebUtil {
     }
 
     /**
-     * 获取资源方
-     * @return Integer -1:平台,>0:商户id
-     */
-    public static Integer getOwnerByAdmin() {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        if (systemAdmin.getType().equals(RoleEnum.SUPER_MERCHANT.getValue()) || systemAdmin.getType().equals(RoleEnum.MERCHANT_ADMIN.getValue())) {
-            return systemAdmin.getMerId();
-        }
-        return -1;
-    }
-
-    /**
      * 商户初始密码
      * @param account 商户账号
      * @return 商户初始密码
@@ -924,4 +910,18 @@ public class CrmebUtil {
         }
         return encryptPassword("000000", account);
     }
+
+    /**
+     * 日期字符串转数字
+     */
+    public static Integer dateStrToInteger(String dateStr) {
+        if (StrUtil.isBlank(dateStr)) {
+            return null;
+        }
+        String[] split = dateStr.split("-");
+        StringBuilder stringBuilder = new StringBuilder();
+        Arrays.stream(split).forEach(stringBuilder::append);
+        return Integer.valueOf(stringBuilder.toString());
+    }
+
 }

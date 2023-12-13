@@ -15,7 +15,7 @@ import java.util.Map;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -38,14 +38,6 @@ public interface UserBrokerageRecordService extends IService<UserBrokerageRecord
      * @return 记录列表
      */
     List<UserBrokerageRecord> findListByLinkNoAndLinkType(String linkNo, String linkType);
-
-//    /**
-//     * 获取记录(订单不可用此方法)
-//     * @param linkId 关联id
-//     * @param linkType 关联类型
-//     * @return 记录列表
-//     */
-//    UserBrokerageRecord getByLinkIdAndLinkType(String linkId, String linkType);
 
     /**
      * 佣金解冻
@@ -105,20 +97,6 @@ public interface UserBrokerageRecordService extends IService<UserBrokerageRecord
      */
     List<UserBrokerageRecord> getSpreadListByUid(Integer uid);
 
-//    /**
-//     * 佣金总金额（单位时间）
-//     * @param dateLimit 时间参数
-//     * @return BigDecimal
-//     */
-//    BigDecimal getTotalSpreadPriceBydateLimit(String dateLimit);
-//
-//    /**
-//     * 单位时间消耗的佣金
-//     * @param dateLimit 时间参数
-//     * @return BigDecimal
-//     */
-//    BigDecimal getSubSpreadPriceByDateLimit(String dateLimit);
-
     /**
      * 获取冻结期佣金
      * @param uid uid
@@ -140,24 +118,4 @@ public interface UserBrokerageRecordService extends IService<UserBrokerageRecord
      */
     UserBrokerageRecord getOneByLinkNo(String linkNo);
 
-//    /**
-//     * 佣金记录列表
-//     * @param request 筛选条件
-//     * @param pageParamRequest 分页参数
-//     * @return PageInfo
-//     */
-//    PageInfo<UserBrokerageRecord> getAdminList(BrokerageRecordRequest request, PageParamRequest pageParamRequest);
-//
-//    /**
-//     * 根据日期获取支付佣金金额（确认到账佣金）
-//     * @param date 日期，yyyy-MM-dd格式
-//     * @return BigDecimal
-//     */
-//    BigDecimal getBrokerageAmountByDate(String date);
-//
-//    /**
-//     * 获取累计佣金转余额金额
-//     * @return BigDecimal
-//     */
-//    BigDecimal getTotalYuePrice();
 }

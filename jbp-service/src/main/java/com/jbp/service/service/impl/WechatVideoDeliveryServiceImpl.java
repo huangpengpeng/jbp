@@ -5,8 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.service.service.WechatService;
-import com.jbp.service.service.WechatVideoDeliveryService;
 import com.jbp.common.constants.WeChatConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.utils.RestTemplateUtil;
@@ -15,6 +13,8 @@ import com.jbp.common.vo.wxvedioshop.ShopOrderCommonVo;
 import com.jbp.common.vo.wxvedioshop.delivery.DeliveryCompanyVo;
 import com.jbp.common.vo.wxvedioshop.delivery.DeliveryInfoVo;
 import com.jbp.common.vo.wxvedioshop.delivery.DeliverySendVo;
+import com.jbp.service.service.WechatService;
+import com.jbp.service.service.WechatVideoDeliveryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------

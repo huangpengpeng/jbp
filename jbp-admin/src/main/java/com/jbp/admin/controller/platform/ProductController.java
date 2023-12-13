@@ -1,14 +1,16 @@
 package com.jbp.admin.controller.platform;
 
+import cn.hutool.core.util.StrUtil;
+
 import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
-import com.jbp.common.response.PlatformProductListResponse;
-import com.jbp.common.response.ProductInfoResponse;
-import com.jbp.common.response.ProductTabsHeaderResponse;
+import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ProductService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 
@@ -25,7 +28,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -47,6 +50,13 @@ public class ProductController {
     public CommonResult<CommonPage<PlatformProductListResponse>> getList(@Validated ProductSearchRequest request,
                                                                          @Validated PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(productService.getPlatformPageList(request, pageParamRequest)));
+    }
+
+    @PreAuthorize("hasAuthority('platform:product:list:ids')")
+    @ApiOperation(value = "根据商品id集合查询商品列表") //配合swagger使用
+    @RequestMapping(value = "/listbyids/{ids}", method = RequestMethod.GET)
+    public CommonResult<List<PlatformProductListResponse>> getListByIds(@PathVariable(value = "ids") List<String> ids) {
+        return CommonResult.success(productService.getPlatformListForIdsByLimit(ids));
     }
 
     @PreAuthorize("hasAuthority('platform:product:tabs:headers')")
@@ -96,6 +106,13 @@ public class ProductController {
         return CommonResult.success(productService.getInfo(id));
     }
 
+    @PreAuthorize("hasAuthority('platform:product:activity:search:page')")
+    @ApiOperation(value = "商品搜索分页列表（活动）")
+    @RequestMapping(value = "/activity/search/page", method = RequestMethod.GET)
+    public CommonResult<CommonPage<ProductActivityResponse>> getActivitySearchPage(
+            @Validated ProductActivitySearchRequest request, @Validated PageParamRequest pageRequest) {
+        return CommonResult.success(CommonPage.restPage(productService.getActivitySearchPage(request, pageRequest)));
+    }
 }
 
 

@@ -5,11 +5,14 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
+import cn.hutool.poi.excel.StyleSet;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 
 import com.jbp.common.constants.Constants;
+import com.jbp.common.constants.DateConstants;
 import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.exception.CrmebException;
 
@@ -22,7 +25,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -40,7 +43,7 @@ public class ExportUtil {
      * @param aliasMap 别名Map（别名需要与数据列表的数据对应）
      * @return 返回给前端的文件名（路径+文件名）
      */
-    public static String exportExecl(String fileName, String title, List<?> voList, LinkedHashMap<String, String> aliasMap) {
+    public static String exportExcel(String fileName, String title, List<?> voList, LinkedHashMap<String, String> aliasMap) {
         if (StrUtil.isBlank(fileName)) {
             throw new CrmebException("文件名不能为空");
         }
@@ -55,15 +58,17 @@ public class ExportUtil {
         }
 
         // 文件名部分
-        String newFileName = UploadUtil.getWebPath() + fileName;
-        String filePath = UploadUtil.getServerPath();
+        String hzwServerPath = UploadUtil.getHzwServerPath();
+        String filePath = StrUtil.format("{}/{}/{}/{}/", UploadConstants.UPLOAD_FILE_KEYWORD, UploadConstants.DOWNLOAD_FILE_KEYWORD, UploadConstants.UPLOAD_MODEL_PATH_EXCEL, CrmebDateUtil.nowDate(DateConstants.DATE_FORMAT_DATE).replace("-", "/"));
+        String path = FilenameUtils.separatorsToSystem(hzwServerPath + filePath);
+        String newFileName = filePath + fileName;
 
         // 判断是否存在当前目录，不存在则创建
-        File file = new File(filePath);
+        File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
         }
-        fileName = filePath.concat(fileName);
+        fileName = path.concat(fileName);
 
         // 通过工具类创建writer
         ExcelWriter writer = ExcelUtil.getWriter(fileName);
@@ -72,6 +77,9 @@ public class ExportUtil {
         Font font = writer.createFont();
         font.setBold(true);
         headCellStyle.setFont(font);
+        // 解决操作excel时换行符（\n）只有鼠标双击才会生效
+        CellStyle styleSet = writer.getCellStyle();
+        styleSet.setWrapText(true);
 
         //自定义标题别名
         aliasMap.forEach((key, value) -> writer.addHeaderAlias(key, value));

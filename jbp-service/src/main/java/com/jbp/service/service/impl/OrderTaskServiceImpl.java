@@ -9,14 +9,17 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.jbp.service.service.*;
+import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.merchant.MerchantBalanceRecord;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBrokerageRecord;
@@ -24,6 +27,8 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.user.UserToken;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.common.vo.MyRecord;
+import com.jbp.service.service.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +49,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -96,11 +102,19 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     @Autowired
     private CouponUserService couponUserService;
     @Autowired
-    SystemNotificationService systemNotificationService;
+    private SystemNotificationService systemNotificationService;
     @Autowired
-    UserTokenService userTokenService;
+    private UserTokenService userTokenService;
     @Autowired
-    TemplateMessageService templateMessageService;
+    private TemplateMessageService templateMessageService;
+    @Autowired
+    private SeckillProductService seckillProductService;
+    @Autowired
+    private MerchantBalanceRecordService merchantBalanceRecordService;
+    @Autowired
+    private AsyncService asyncService;
+    @Autowired
+    private CrmebConfig crmebConfig;
 
 
     /**
@@ -159,6 +173,9 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         User user = userService.getById(order.getUid());
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(order.getOrderNo());
         List<Integer> couponIdList = merchantOrderList.stream().filter(e -> e.getCouponId() > 0).map(MerchantOrder::getCouponId).collect(Collectors.toList());
+        if (order.getPlatCouponId() > 0) {
+            couponIdList.add(order.getPlatCouponId());
+        }
         return transactionTemplate.execute(e -> {
             //写订单日志
             orderStatusService.createLog(orderNo, "cancel_order", "用户取消订单");
@@ -269,47 +286,109 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         }
         // 分佣返还
         List<UserBrokerageRecord> brokerageRecordList = CollUtil.newArrayList();
-        if (refundOrder.getRefundFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-            // 获取对应分佣记录
-            List<UserBrokerageRecord> userBrokerageRecordList = userBrokerageRecordService.getByOrderNo(orderNo);
-            if (CollUtil.isNotEmpty(userBrokerageRecordList) && userBrokerageRecordList.get(0).getStatus() < BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE) {
-                userBrokerageRecordList.forEach(r -> {
-                    if (r.getBrokerageLevel().equals(1)) {
-                        if (r.getPrice().compareTo(refundOrderInfo.getRefundFirstBrokerageFee()) == 0) {
-                            r.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_INVALIDATION);
-                        } else {
-                            r.setPrice(r.getPrice().subtract(refundOrderInfo.getRefundFirstBrokerageFee()));
-                        }
+        // 获取对应分佣记录
+        List<UserBrokerageRecord> userBrokerageRecordList = userBrokerageRecordService.getByOrderNo(orderNo);
+        if (CollUtil.isNotEmpty(userBrokerageRecordList) && userBrokerageRecordList.get(0).getStatus() < BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE) {
+            userBrokerageRecordList.forEach(r -> {
+                if (r.getBrokerageLevel().equals(1)) {
+                    if (r.getPrice().compareTo(refundOrderInfo.getRefundFirstBrokerageFee()) == 0) {
+                        r.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_INVALIDATION);
+                    } else {
+                        r.setPrice(r.getPrice().subtract(refundOrderInfo.getRefundFirstBrokerageFee()));
                     }
-                    if (r.getBrokerageLevel().equals(2)) {
-                        if (r.getPrice().compareTo(refundOrderInfo.getRefundSecondBrokerageFee()) == 0) {
-                            r.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_INVALIDATION);
-                        } else {
-                            r.setPrice(r.getPrice().subtract(refundOrderInfo.getRefundSecondBrokerageFee()));
-                        }
+                }
+                if (r.getBrokerageLevel().equals(2)) {
+                    if (r.getPrice().compareTo(refundOrderInfo.getRefundSecondBrokerageFee()) == 0) {
+                        r.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_INVALIDATION);
+                    } else {
+                        r.setPrice(r.getPrice().subtract(refundOrderInfo.getRefundSecondBrokerageFee()));
                     }
-                    brokerageRecordList.add(r);
-                });
-            }
+                }
+                brokerageRecordList.add(r);
+            });
         }
         OrderProfitSharing orderProfitSharing = orderProfitSharingService.getByOrderNo(orderNo);
-        orderProfitSharing.setProfitSharingRefund(orderProfitSharing.getProfitSharingRefund().add(refundOrder.getRefundPrice()));
+        BigDecimal merRefundPayPrice; // 商户退款金额
+        BigDecimal platRefundPayPrice; // 平台退款金额
+
+        if (orderProfitSharing.getOrderPrice().compareTo(refundOrder.getRefundPrice()) == 0) {
+            merRefundPayPrice = orderProfitSharing.getProfitSharingMerPrice();
+            platRefundPayPrice = orderProfitSharing.getProfitSharingPlatPrice();
+        } else if ((orderProfitSharing.getOrderPrice().subtract(orderProfitSharing.getProfitSharingRefund())).compareTo(refundOrder.getRefundPrice()) == 0) {
+            merRefundPayPrice = orderProfitSharing.getProfitSharingMerPrice().subtract(orderProfitSharing.getRefundProfitSharingMerPrice());
+            platRefundPayPrice = orderProfitSharing.getProfitSharingPlatPrice().subtract(orderProfitSharing.getRefundProfitSharingPlatPrice());
+        } else {
+            BigDecimal payReRatio = refundOrder.getRefundPrice().divide(orderProfitSharing.getOrderPrice(), 2, BigDecimal.ROUND_HALF_UP);
+            merRefundPayPrice = orderProfitSharing.getProfitSharingMerPrice().multiply(payReRatio).setScale(2, BigDecimal.ROUND_HALF_UP);
+            if ((merRefundPayPrice.add(orderProfitSharing.getRefundProfitSharingMerPrice())).compareTo(orderProfitSharing.getProfitSharingMerPrice()) > 0) {
+                merRefundPayPrice = orderProfitSharing.getProfitSharingMerPrice().subtract(orderProfitSharing.getRefundProfitSharingMerPrice());
+            }
+            platRefundPayPrice = orderProfitSharing.getProfitSharingPlatPrice().multiply(payReRatio).setScale(2, BigDecimal.ROUND_HALF_UP);
+            if ((platRefundPayPrice.add(orderProfitSharing.getRefundProfitSharingPlatPrice())).compareTo(orderProfitSharing.getProfitSharingPlatPrice()) > 0) {
+                platRefundPayPrice = orderProfitSharing.getProfitSharingPlatPrice().subtract(orderProfitSharing.getRefundProfitSharingPlatPrice());
+            }
+        }
+        orderProfitSharing.setRefundProfitSharingMerPrice(orderProfitSharing.getRefundProfitSharingMerPrice().add(merRefundPayPrice));
+        orderProfitSharing.setRefundProfitSharingPlatPrice(orderProfitSharing.getRefundProfitSharingPlatPrice().add(platRefundPayPrice));
+        if (refundOrder.getRefundPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
+            orderProfitSharing.setRefundPlatCouponPrice(orderProfitSharing.getRefundPlatCouponPrice().add(refundOrder.getRefundPlatCouponPrice()));
+        }
+        if (refundOrder.getRefundFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+            orderProfitSharing.setRefundFirstBrokerageFee(orderProfitSharing.getRefundFirstBrokerageFee().add(refundOrder.getRefundFirstBrokerageFee()));
+        }
+        if (refundOrder.getRefundSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+            orderProfitSharing.setRefundSecondBrokerageFee(orderProfitSharing.getRefundSecondBrokerageFee().add(refundOrder.getRefundSecondBrokerageFee()));
+        }
+
+        // 退使用积分金额
         if (refundOrderInfo.getRefundUseIntegral() > 0) {
             orderProfitSharing.setRefundUseIntegral(orderProfitSharing.getRefundUseIntegral() + refundOrderInfo.getRefundUseIntegral());
             orderProfitSharing.setRefundIntegralPrice(orderProfitSharing.getRefundIntegralPrice().add(refundOrderInfo.getRefundIntegralPrice()));
         }
 
-        BigDecimal platReplacePrice = refundOrderInfo.getRefundFirstBrokerageFee().add(refundOrderInfo.getRefundSecondBrokerageFee());
-        refundOrder.setMerchantRefundPrice(refundOrder.getRefundPrice().subtract(platReplacePrice));
+        refundOrder.setMerchantRefundPrice(merRefundPayPrice);
+        refundOrder.setPlatformRefundPrice(platRefundPayPrice);
         if (CollUtil.isEmpty(brokerageRecordList)) {
             refundOrder.setIsReplace(true);
         }
-
         MerchantBill merchantBill = initMerchantBillRefund(refundOrder);
+
+        // 平台分账返还
+        Bill platBill = new Bill();
+        platBill.setOrderNo(refundOrder.getRefundOrderNo());
+        platBill.setMerId(refundOrder.getMerId());
+        platBill.setPm(BillConstants.BILL_PM_SUB);
+        platBill.setAmount(platRefundPayPrice);
+        platBill.setType(BillConstants.BILL_TYPE_REFUND_ORDER);
+        platBill.setMark(StrUtil.format("订单退款，平台返还分账金额{}元", platRefundPayPrice));
+
+        orderProfitSharing.setProfitSharingRefund(orderProfitSharing.getProfitSharingRefund().add(refundOrder.getRefundPrice()));
+
+        // 退优惠券
+        // 订单详情是否有退款金额
+        // 订单详情是否全部退款
+        // 查询商户订单所有订单详情，判断是否退款
+        // 查询平台订单所有订单详情，判断是否退款
+        Integer platCouponId = 0;
+        Integer merCouponId = 0;
+        OrderDetail orderDetail = orderDetailService.getById(refundOrderInfo.getOrderDetailId());
+        if (orderDetail.getMerCouponPrice().compareTo(BigDecimal.ZERO) > 0 && orderDetail.getPayNum().equals(orderDetail.getRefundNum())) {
+            merCouponId = getRefundMerCouponId(refundOrder.getOrderNo());
+        }
+        if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0 && orderDetail.getPayNum().equals(orderDetail.getRefundNum())) {
+            platCouponId = getRefundPlatCouponId(order.getPlatOrderNo());
+        }
+        List<Integer> couponIdList = new ArrayList<>();
+        if (merCouponId > 0) {
+            couponIdList.add(merCouponId);
+        }
+        if (platCouponId > 0) {
+            couponIdList.add(platCouponId);
+        }
 
         return transactionTemplate.execute(e -> {
             // 回滚库存
-            refundRollbackStock(refundOrderInfo);
+            refundRollbackStock(refundOrderInfo, order.getType());
             // 扣商户资金
             merchantService.operationBalance(refundOrder.getMerId(), refundOrder.getMerchantRefundPrice(), Constants.OPERATION_TYPE_SUBTRACT);
             merchantBillService.save(merchantBill);
@@ -326,6 +405,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 userBrokerageRecordService.updateBatchById(brokerageRecordList);
             } else {
                 // 平台代扣记录
+                BigDecimal platReplacePrice = refundOrderInfo.getRefundFirstBrokerageFee().add(refundOrderInfo.getRefundSecondBrokerageFee());
                 Bill bill = new Bill();
                 bill.setOrderNo(refundOrder.getRefundOrderNo());
                 bill.setMerId(refundOrder.getMerId());
@@ -346,8 +426,63 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 bill.setMark(StrUtil.format("订单退款，平台代扣积分抵扣金额返还{}元", refundOrderInfo.getRefundIntegralPrice()));
                 billService.save(bill);
             }
+            billService.save(platBill);
+
+            orderProfitSharingService.updateById(orderProfitSharing);
+
+            if (CollUtil.isNotEmpty(couponIdList)) {
+                couponUserService.rollbackByIds(couponIdList);
+            }
             return Boolean.TRUE;
         });
+    }
+
+    /**
+     * 获取退款平台优惠券ID
+     * @param platOrderNo 主订单号/平台订单号
+     * @return 0-平台优惠券不满足退款，>0 - 平台优惠券ID
+     */
+    private Integer getRefundPlatCouponId(String platOrderNo) {
+        List<Order> orderList = orderService.getByPlatOrderNo(platOrderNo);
+        List<OrderDetail> orderDetailList = new ArrayList<>();
+        orderList.forEach(o -> {
+            orderDetailList.addAll(orderDetailService.getByOrderNo(o.getOrderNo()));
+        });
+        boolean isRefundCoupon = true;
+        for (OrderDetail od : orderDetailList) {
+            if (od.getPlatCouponPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            if (!od.getPayNum().equals(od.getRefundNum())) {
+                isRefundCoupon = false;
+                break;
+            }
+        }
+        return isRefundCoupon ? orderList.get(0).getPlatCouponId() : 0;
+    }
+
+    /**
+     * 获取退款商户优惠券ID
+     * @param orderNo 订单号
+     * @return 0-商户优惠券不满足退款，>0 - 商户优惠券ID
+     */
+    private Integer getRefundMerCouponId(String orderNo) {
+        List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orderNo);
+        boolean isRefund = true;
+        for (OrderDetail orderDetail : orderDetailList) {
+            if (orderDetail.getMerCouponPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            if (orderDetail.getPayNum() > orderDetail.getRefundNum()) {
+                isRefund = false;
+                break;
+            }
+        }
+        if (!isRefund) {
+            return 0;
+        }
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderNo);
+        return merchantOrder.getCouponId();
     }
 
     /**
@@ -371,9 +506,18 @@ public class OrderTaskServiceImpl implements OrderTaskService {
      * 退款回滚库存
      *
      * @param refundOrderInfo 退款单详情
+     * @param orderType 订单类型
      */
-    private void refundRollbackStock(RefundOrderInfo refundOrderInfo) {
-        productService.operationStock(refundOrderInfo.getProductId(), refundOrderInfo.getApplyRefundNum(), Constants.OPERATION_TYPE_ADD);
+    private void refundRollbackStock(RefundOrderInfo refundOrderInfo, Integer orderType) {
+        if (orderType.equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+            seckillProductService.operationStock(refundOrderInfo.getProductId(), refundOrderInfo.getApplyRefundNum(), Constants.OPERATION_TYPE_ADD);
+            String seckillProductQuotaKey = StrUtil.format(RedisConstants.SECKILL_PRODUCT_QUOTA_KEY, refundOrderInfo.getProductId());
+            String seckillProductSkuQuotaKey = StrUtil.format(RedisConstants.SECKILL_PRODUCT_SKU_QUOTA_KEY, refundOrderInfo.getAttrValueId());
+            redisUtil.incrAndCreate(seckillProductQuotaKey, refundOrderInfo.getApplyRefundNum());
+            redisUtil.incrAndCreate(seckillProductSkuQuotaKey, refundOrderInfo.getApplyRefundNum());
+        } else {
+            productService.operationStock(refundOrderInfo.getProductId(), refundOrderInfo.getApplyRefundNum(), Constants.OPERATION_TYPE_ADD);
+        }
         ProductAttrValue attrValue = productAttrValueService.getById(refundOrderInfo.getAttrValueId());
         productAttrValueService.operationStock(attrValue.getId(), refundOrderInfo.getApplyRefundNum(), Constants.OPERATION_TYPE_ADD, attrValue.getType(), attrValue.getVersion());
     }
@@ -397,37 +541,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         return record;
     }
 
-//    /**
-//     * 完成订单
-//
-//     * @since 2020-07-09
-//     */
-//    @Override
-//    public void complete() {
-//        String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER;
-//        Long size = redisUtil.getListSize(redisKey);
-//        logger.info("OrderTaskServiceImpl.complete | size:" + size);
-//        if (size < 1) {
-//            return;
-//        }
-//        for (int i = 0; i < size; i++) {
-//            //如果10秒钟拿不到一个数据，那么退出循环
-//            Object data = redisUtil.getRightPop(redisKey, 10L);
-//            if (null == data) {
-//                continue;
-//            }
-//            try {
-//                StoreOrder storeOrder = getJavaBeanStoreOrder(data);
-//                boolean result = storeOrderTaskService.complete(storeOrder);
-//                if (!result) {
-//                    redisUtil.lPush(redisKey, data);
-//                }
-//            } catch (Exception e) {
-//                redisUtil.lPush(redisKey, data);
-//            }
-//        }
-//    }
-
     /**
      * 订单支付成功后置处理
      */
@@ -447,8 +560,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             }
             try {
                 Boolean result = payService.payAfterProcessingTemp(String.valueOf(data));
-//                Boolean result = payService.payAfterProcessing(String.valueOf(data));
                 if (!result) {
+                    logger.error("订单支付成功后置处理失败，订单号：{}", String.valueOf(data));
                     redisUtil.lPush(redisKey, data);
                 }
             } catch (Exception e) {
@@ -508,12 +621,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             return Boolean.TRUE;
         }
         // 获取过期时间
-        String cancelStr = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ORDER_CANCEL_TIME);
-        DateTime cancelTime;
-        if (StrUtil.isBlank(cancelStr)) {
-            cancelStr = "5";
-        }
-        cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, Integer.parseInt(cancelStr));
+        DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
         long between = DateUtil.between(cancelTime, DateUtil.date(), DateUnit.SECOND, false);
         if (between < 0) {// 未到过期时间继续循环
             return Boolean.FALSE;
@@ -522,6 +630,9 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         User user = userService.getById(order.getUid());
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(order.getOrderNo());
         List<Integer> couponIdList = merchantOrderList.stream().filter(e -> e.getCouponId() > 0).map(MerchantOrder::getCouponId).collect(Collectors.toList());
+        if (order.getPlatCouponId() > 0) {
+            couponIdList.add(order.getPlatCouponId());
+        }
         return transactionTemplate.execute(e -> {
             orderService.cancel(order.getOrderNo(), false);
             //写订单日志
@@ -560,11 +671,24 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             logger.error("订单回滚库存未找到商品详情,订单号:{}", order.getOrderNo());
             return false;
         }
+
         return transactionTemplate.execute(e -> {
             for (OrderDetail orderDetail : orderDetailList) {
-                Product product = productService.getById(orderDetail.getProductId());
-                if (ObjectUtil.isNotNull(product)) {
-                    productService.operationStock(product.getId(), orderDetail.getPayNum(), Constants.OPERATION_TYPE_ADD);
+                if (order.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
+                    // 秒杀订单处理
+                    SeckillProduct seckillProduct = seckillProductService.getById(orderDetail.getProductId());
+                    if (ObjectUtil.isNotNull(seckillProduct)) {
+                        seckillProductService.operationStock(seckillProduct.getId(), orderDetail.getPayNum(), Constants.OPERATION_TYPE_ADD);
+                    }
+                    String seckillProductQuotaKey = StrUtil.format(RedisConstants.SECKILL_PRODUCT_QUOTA_KEY, orderDetail.getProductId());
+                    String seckillProductSkuQuotaKey = StrUtil.format(RedisConstants.SECKILL_PRODUCT_SKU_QUOTA_KEY, orderDetail.getAttrValueId());
+                    redisUtil.incrAndCreate(seckillProductQuotaKey, orderDetail.getPayNum());
+                    redisUtil.incrAndCreate(seckillProductSkuQuotaKey, orderDetail.getPayNum());
+                } else {
+                    Product product = productService.getById(orderDetail.getProductId());
+                    if (ObjectUtil.isNotNull(product)) {
+                        productService.operationStock(product.getId(), orderDetail.getPayNum(), Constants.OPERATION_TYPE_ADD);
+                    }
                 }
                 ProductAttrValue productAttrValue = productAttrValueService.getById(orderDetail.getAttrValueId());
                 if (ObjectUtil.isNotNull(productAttrValue)) {
@@ -615,53 +739,34 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             return Boolean.FALSE;
         }
         User user = userService.getById(order.getUid());
-        // 获取佣金记录
-        List<UserBrokerageRecord> recordList = userBrokerageRecordService.findListByLinkNoAndLinkType(orderNo, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
-        logger.info("收货处理佣金条数：" + recordList.size());
-        for (UserBrokerageRecord record : recordList) {
-            if (!record.getStatus().equals(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_CREATE)) {
-                throw new CrmebException(StrUtil.format("订单收货task处理，订单佣金记录不是创建状态，orderNo={}", orderNo));
-            }
-            // 佣金进入冻结期
-            record.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_FROZEN);
-            // 计算解冻时间
-            long thawTime = DateUtil.current(false);
-            if (record.getFrozenTime() > 0) {
-                DateTime dateTime = DateUtil.offsetDay(new Date(), record.getFrozenTime());
-                thawTime = dateTime.getTime();
-            }
-            record.setThawTime(thawTime);
-        }
 
-        // 获取积分记录
-        List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderNoAndUid(orderNo, order.getUid());
-        logger.info("收货处理积分条数：" + integralRecordList.size());
-        List<UserIntegralRecord> userIntegralRecordList = integralRecordList.stream().filter(e -> e.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD)).collect(Collectors.toList());
-        for (UserIntegralRecord record : userIntegralRecordList) {
-            if (!record.getStatus().equals(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_CREATE)) {
-                throw new CrmebException(StrUtil.format("订单收货task处理，订单积分记录不是创建状态，orderNo={}", orderNo));
-            }
-            // 佣金进入冻结期
-            record.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_FROZEN);
-            // 计算解冻时间
-            long thawTime = DateUtil.current(false);
-            if (record.getFrozenTime() > 0) {
-                DateTime dateTime = DateUtil.offsetDay(new Date(), record.getFrozenTime());
-                thawTime = dateTime.getTime();
-            }
-            record.setThawTime(thawTime);
-        }
+        List<String> nodeKeyList = new ArrayList<>();
+        nodeKeyList.add(SysConfigConstants.MERCHANT_SHARE_NODE);
+        nodeKeyList.add(SysConfigConstants.RETAIL_STORE_BROKERAGE_SHARE_NODE);
+        nodeKeyList.add(SysConfigConstants.CONFIG_KEY_STORE_INTEGRAL_FREEZE_NODE);
+        MyRecord nodeRecord = systemConfigService.getValuesByKeyList(nodeKeyList);
 
         Boolean execute = transactionTemplate.execute(e -> {
-            // 日志
-            orderStatusService.createLog(order.getOrderNo(), OrderStatusConstants.ORDER_STATUS_USER_TAKE_DELIVERY, OrderStatusConstants.ORDER_LOG_MESSAGE_TAKE);
-            // 分佣-佣金进入冻结期
-            if (CollUtil.isNotEmpty(recordList)) {
-                userBrokerageRecordService.updateBatchById(recordList);
+            String merchantShareNode = nodeRecord.getStr(SysConfigConstants.MERCHANT_SHARE_NODE);
+            if (StrUtil.isNotBlank(merchantShareNode) && "pay".equals(merchantShareNode)) {
+                String merchantShareNodeFreezeDayStr = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME);
+                if (StrUtil.isNotBlank(merchantShareNodeFreezeDayStr)) {
+                    orderMerchantShareFreezingOperation(orderNo, Integer.parseInt(merchantShareNodeFreezeDayStr));
+                }
             }
-            // 积分进入冻结期
-            if (CollUtil.isNotEmpty(userIntegralRecordList)) {
-                userIntegralRecordService.updateBatchById(userIntegralRecordList);
+            String retailStoreBrokerageShareNode = nodeRecord.getStr(SysConfigConstants.RETAIL_STORE_BROKERAGE_SHARE_NODE);
+            if (StrUtil.isNotBlank(retailStoreBrokerageShareNode) && "pay".equals(retailStoreBrokerageShareNode)) {
+                String retailStoreBrokerageShareFreezeDayStr = systemConfigService.getValueByKey(SysConfigConstants.RETAIL_STORE_BROKERAGE_FREEZING_TIME);
+                if (StrUtil.isNotBlank(retailStoreBrokerageShareFreezeDayStr)) {
+                    orderBrokerageShareFreezingOperation(orderNo, Integer.parseInt(retailStoreBrokerageShareFreezeDayStr));
+                }
+            }
+            String integralFreezeNode = nodeRecord.getStr(SysConfigConstants.CONFIG_KEY_STORE_INTEGRAL_FREEZE_NODE);
+            if (StrUtil.isNotBlank(integralFreezeNode) && "pay".equals(integralFreezeNode)) {
+                String integralDayStr = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_INTEGRAL_EXTRACT_TIME);
+                if (StrUtil.isNotBlank(integralDayStr)) {
+                    orderIntegralFreezingOperation(orderNo, Integer.parseInt(integralDayStr));
+                }
             }
             return Boolean.TRUE;
         });
@@ -695,6 +800,172 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         if (execute) {
             logger.error("订单自动完成：更新数据库失败，orderNoList = {}", JSON.toJSONString(orderNoList));
         }
+        asyncService.orderCompleteAfterFreezingOperation(orderNoList);
+    }
+
+    /**
+     * 订单积分冻结处理
+     * @param orderNo 订单编号
+     * @param freezeDay 积分冻结天数
+     */
+    private void orderIntegralFreezingOperation(String orderNo, Integer freezeDay) {
+        Order order = orderService.getByOrderNo(orderNo);
+        if (freezeDay > 0) {
+            UserIntegralRecord record = userIntegralRecordService.getByOrderNoAndType(orderNo, IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
+            if (!record.getStatus().equals(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_CREATE)) {
+                return;
+            }
+            // 佣金进入冻结期
+            record.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_FROZEN);
+            // 计算解冻时间
+            record.setFrozenTime(freezeDay);
+            DateTime dateTime = DateUtil.offsetDay(new Date(), freezeDay);
+            long thawTime = dateTime.getTime();
+            record.setThawTime(thawTime);
+            record.setUpdateTime(DateUtil.date());
+            boolean batch = userIntegralRecordService.updateById(record);
+            if (!batch) {
+                logger.error("订单积分冻结处理失败，订单号={}", order.getOrderNo());
+            }
+            return;
+        }
+        User user = userService.getById(order.getUid());
+        if (ObjectUtil.isNull(user)) {
+            logger.error("订单积分冻结处理失败，未找到对应的用户信息，订单编号={}", order.getOrderNo());
+            return;
+        }
+        Integer balance = user.getIntegral();
+
+        UserIntegralRecord record = userIntegralRecordService.getByOrderNoAndType(orderNo, IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
+        if (record.getStatus().equals(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE)) {
+            return;
+        }
+        // 佣金完结期
+        record.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
+        // 计算解冻时间
+        long thawTime = DateUtil.current(false);
+        record.setFrozenTime(freezeDay);
+        record.setThawTime(thawTime);
+        // 计算积分余额
+        balance = balance + record.getIntegral();
+        record.setBalance(balance);
+        record.setUpdateTime(DateUtil.date());
+        Boolean execute = transactionTemplate.execute(e -> {
+            userIntegralRecordService.updateById(record);
+            userService.updateIntegral(user.getId(), record.getIntegral(), Constants.OPERATION_TYPE_ADD);
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            logger.error("订单积分冻结处理：直接解冻失败，订单编号={}", order.getOrderNo());
+        }
+    }
+
+    /**
+     * 订单佣金分账冻结处理
+     * @param orderNo 订单编号
+     * @param freezeDay 积分冻结天数
+     */
+    private void orderBrokerageShareFreezingOperation(String orderNo, Integer freezeDay) {
+        Order order = orderService.getByOrderNo(orderNo);
+        List<UserBrokerageRecord> recordList = new ArrayList<>();
+        if (freezeDay > 0) {
+            List<UserBrokerageRecord> brokerageRecordList = userBrokerageRecordService.findListByLinkNoAndLinkType(orderNo, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
+            if (CollUtil.isEmpty(brokerageRecordList)) {
+                return;
+            }
+            for (UserBrokerageRecord record : brokerageRecordList) {
+                if (!record.getStatus().equals(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_CREATE)) {
+                    continue;
+                }
+                // 佣金进入冻结期
+                record.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_FROZEN);
+                // 计算解冻时间
+                record.setFrozenTime(freezeDay);
+                DateTime dateTime = DateUtil.offsetDay(new Date(), record.getFrozenTime());
+                long thawTime = dateTime.getTime();
+                record.setThawTime(thawTime);
+                record.setUpdateTime(DateUtil.date());
+                recordList.add(record);
+            }
+            if (CollUtil.isEmpty(recordList)) {
+                return;
+            }
+            userBrokerageRecordService.updateBatchById(recordList);
+            return;
+        }
+
+        List<UserBrokerageRecord> brokerageRecordList = userBrokerageRecordService.findListByLinkNoAndLinkType(orderNo, BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
+        if (CollUtil.isEmpty(brokerageRecordList)) {
+            return;
+        }
+        for (UserBrokerageRecord record : brokerageRecordList) {
+            if (!record.getStatus().equals(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_CREATE)) {
+                continue;
+            }
+            User user = userService.getById(record.getUid());
+            if (ObjectUtil.isNull(user)) {
+                continue;
+            }
+            record.setStatus(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_COMPLETE);
+            // 计算佣金余额
+            BigDecimal balance = user.getBrokeragePrice().add(record.getPrice());
+            record.setBalance(balance);
+            record.setUpdateTime(DateUtil.date());
+
+            recordList.add(record);
+        }
+        if (CollUtil.isEmpty(recordList)) {
+            return;
+        }
+        Boolean execute = transactionTemplate.execute(e -> {
+            userBrokerageRecordService.updateBatchById(recordList);
+            recordList.forEach(record -> {
+                userService.updateBrokerage(record.getUid(), record.getPrice(), Constants.OPERATION_TYPE_ADD);
+            });
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            logger.error(StrUtil.format("佣金解冻处理—数据库出错，订单编号 = {}", order.getOrderNo()));
+        }
+
+    }
+
+    /**
+     * 订单商户分账冻结处理
+     * @param orderNo 订单编号
+     * @param freezeDay 积分冻结天数
+     */
+    private void orderMerchantShareFreezingOperation(String orderNo, Integer freezeDay) {
+        Order order = orderService.getByOrderNo(orderNo);
+        MerchantBalanceRecord record = merchantBalanceRecordService.getByLinkNo(orderNo);
+        if (ObjectUtil.isNull(record)) {
+            return;
+        }
+        if (!record.getStatus().equals(1)) {
+            return;
+        }
+        if (freezeDay > 0) {
+            record.setStatus(2);
+            record.setFrozenTime(freezeDay);
+            DateTime dateTime = DateUtil.offsetDay(new Date(), record.getFrozenTime());
+            long thawTime = dateTime.getTime();
+            record.setThawTime(thawTime);
+            record.setUpdateTime(DateUtil.date());
+            merchantBalanceRecordService.updateById(record);
+            return;
+        }
+
+        record.setStatus(3);
+        Merchant merchant = merchantService.getById(record.getMerId());
+        record.setBalance(merchant.getBalance().add(record.getAmount()));
+        Boolean execute = transactionTemplate.execute(e -> {
+            merchantBalanceRecordService.updateById(record);
+            merchantService.operationBalance(record.getMerId(), record.getAmount(), Constants.OPERATION_TYPE_ADD);
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            logger.error(StrUtil.format("商户余额解冻处理—数据库出错，订单编号 = {}", order.getOrderNo()));
+        }
     }
 
     /**
@@ -721,6 +992,14 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             if (ObjectUtil.isNull(userToken)) {
                 return ;
             }
+            /**
+             * {{first.DATA}}
+             * 订单编号：{{keyword1.DATA}}
+             * 订单状态：{{keyword2.DATA}}
+             * 收货时间：{{keyword3.DATA}}
+             * 商品详情：{{keyword4.DATA}}
+             * {{remark.DATA}}
+             */
             // 发送微信模板消息
             temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "您购买的商品已确认收货！");
             temMap.put("keyword1", order.getOrderNo());
@@ -775,16 +1054,16 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         if (CollUtil.isEmpty(orderList)) {
             return;
         }
-        orderList.forEach(order -> {
-            if (order.getType().equals(1)) {// 视频号订单
-                // TODO 视频号订单自动收货
-            }
-        });
+        orderList = orderList.stream().filter(order -> !order.getType().equals(1)).collect(Collectors.toList());
+        if (CollUtil.isEmpty(orderList)) {
+            return;
+        }
         List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
         Boolean execute = transactionTemplate.execute(e -> {
             orderNoList.forEach(orderNo -> {
                 orderService.takeDelivery(orderNo);
                 orderDetailService.takeDelivery(orderNo);
+                orderStatusService.createLog(orderNo, OrderStatusConstants.ORDER_STATUS_USER_TAKE_DELIVERY, OrderStatusConstants.ORDER_LOG_SYSTEM_AUTO_RECEIPT);
             });
             return Boolean.TRUE;
         });

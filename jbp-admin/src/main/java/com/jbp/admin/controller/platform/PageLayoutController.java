@@ -1,9 +1,11 @@
 package com.jbp.admin.controller.platform;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.PageLayoutService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -40,6 +42,13 @@ public class PageLayoutController {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public CommonResult<PageLayoutIndexResponse> index() {
         return CommonResult.success(pageLayoutService.index());
+    }
+
+    @PreAuthorize("hasAuthority('platform:page:layout:bottom:navigation')")
+    @ApiOperation(value = "页面底部导航")
+    @RequestMapping(value = "/bottom/navigation/get", method = RequestMethod.GET)
+    public CommonResult<PageLayoutBottomNavigationResponse> getBottomNavigation() {
+        return CommonResult.success(pageLayoutService.getBottomNavigation());
     }
 
 //    @PreAuthorize("hasAuthority('platform:page:layout:save')")
@@ -102,30 +111,14 @@ public class PageLayoutController {
         return CommonResult.failed();
     }
 
-//    @PreAuthorize("hasAuthority('platform:page:layout:index:table:save')")
-//    @ApiOperation(value = "页面用户中心商品table保存")
-//    @RequestMapping(value = "/index/table/save", method = RequestMethod.POST)
-//    public CommonResult<Object> indexTableSave(@RequestBody JSONObject jsonObject) {
-//        if (pageLayoutService.indexTableSave(jsonObject)) {
-//            return CommonResult.success();
-//        }
-//        return CommonResult.failed();
-//    }
+    @PreAuthorize("hasAuthority('platform:page:layout:bottom:navigation:save')")
+    @ApiOperation(value = "底部导航保存")
+    @RequestMapping(value = "/bottom/navigation/save", method = RequestMethod.POST)
+    public CommonResult<Object> bottomNavigationSave(@RequestBody JSONObject jsonObject) {
+        if (pageLayoutService.bottomNavigationSave(jsonObject)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
 
-//    @PreAuthorize("hasAuthority('platform:page:layout:category:config')")
-//    @ApiOperation(value = "获取分类页配置")
-//    @RequestMapping(value = "/category/config", method = RequestMethod.GET)
-//    public CommonResult<Map<String, Object>> categoryConfig() {
-//        return CommonResult.success(pageLayoutService.getCategoryConfig());
-//    }
-//
-//    @PreAuthorize("hasAuthority('platform:page:layout:category:config:save')")
-//    @ApiOperation(value = "分类页配置保存")
-//    @RequestMapping(value = "/category/config/save", method = RequestMethod.POST)
-//    public CommonResult<Object> categoryConfigSave(@RequestBody JSONObject jsonObject) {
-//        if (pageLayoutService.categoryConfigSave(jsonObject)) {
-//            return CommonResult.success();
-//        }
-//        return CommonResult.failed();
-//    }
 }

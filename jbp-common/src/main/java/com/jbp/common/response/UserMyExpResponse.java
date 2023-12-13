@@ -7,16 +7,13 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
-
-import com.jbp.common.model.system.SystemUserLevel;
 
 /**
  * 我的经验响应对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -40,9 +37,49 @@ public class UserMyExpResponse implements Serializable {
     @ApiModelProperty(value = "当前经验")
     private Integer experience;
 
-    @ApiModelProperty(value = "用户等级")
+    @ApiModelProperty(value = "用户等级ID")
     private Integer level;
 
-    @ApiModelProperty(value = "会员等级列表")
-    private List<SystemUserLevel> systemLevelList;
+    @ApiModelProperty(value = "用户等级名称")
+    private String userLevelName;
+
+    @ApiModelProperty(value = "用户等级级别")
+    private Integer grade;
+
+    @ApiModelProperty(value = "用户等级图标")
+    private String icon;
+
+    @ApiModelProperty(value = "用户等级背景图")
+    private String backImage;
+
+    @ApiModelProperty(value = "用户等级文字背景色")
+    private String backColor;
+
+    @ApiModelProperty(value = "升级经验")
+    private Integer upExperience = 0;
+
+    @ApiModelProperty(value = "今天是否签到")
+    private Boolean todaySign = false;
+
+    @ApiModelProperty(value = "是否开启社区")
+    private Boolean isOpenCommunity = false;
+
+    @ApiModelProperty(value = "今天发布笔记数量")
+    private Integer noteNum = 0;
+
+    @ApiModelProperty(value = "获取经验笔记最大数量")
+    private Integer noteMaxNum;
+
+    @ApiModelProperty(value = "发布笔记经验成长值")
+    private Integer noteExp;
+
+    @ApiModelProperty(value = "用户等级开关")
+    private Boolean userLevelSwitch = true;
+
+    @ApiModelProperty(value = "今日获得经验值")
+    private Integer todayExp;
+
+    @ApiModelProperty(value = "下一等级名称")
+    private String nextLevelName;
+
 }

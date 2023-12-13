@@ -1,12 +1,11 @@
 package com.jbp.admin.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.bill.MerchantDailyStatement;
-import com.jbp.common.model.bill.MerchantMonthStatement;
-import com.jbp.common.model.bill.PlatformDailyStatement;
-import com.jbp.common.model.bill.PlatformMonthStatement;
+import com.jbp.common.model.bill.SummaryFinancialStatements;
 import com.jbp.common.model.user.UserClosing;
 import com.jbp.common.request.*;
+import com.jbp.common.request.merchant.MerchantClosingApplyRequest;
+import com.jbp.common.request.merchant.MerchantClosingSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.MerchantClosingConfigVo;
 
@@ -15,7 +14,7 @@ import com.jbp.common.vo.MerchantClosingConfigVo;
  *  +----------------------------------------------------------------------
  *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  *  +----------------------------------------------------------------------
- *  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ *  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  *  +----------------------------------------------------------------------
  *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  *  +----------------------------------------------------------------------
@@ -142,7 +141,7 @@ public interface FinanceService {
      * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<PlatformDailyStatement> getPlatformDailyStatementList(String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<PlatformStatementResponse> getPlatformDailyStatementList(String dateLimit, PageParamRequest pageParamRequest);
 
     /**
      * 平台端月帐单分页列表
@@ -150,7 +149,7 @@ public interface FinanceService {
      * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<PlatformMonthStatement> getPlatformMonthStatementList(String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<PlatformStatementResponse> getPlatformMonthStatementList(String dateLimit, PageParamRequest pageParamRequest);
 
     /**
      * 商户端日帐单分页列表
@@ -158,7 +157,7 @@ public interface FinanceService {
      * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<MerchantDailyStatement> getMerchantDailyStatementList(String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<MerchantStatementResponse> getMerchantDailyStatementList(String dateLimit, PageParamRequest pageParamRequest);
 
     /**
      * 商户端月帐单分页列表
@@ -166,5 +165,13 @@ public interface FinanceService {
      * @param pageParamRequest 分页参数
      * @return PageInfo
      */
-    PageInfo<MerchantMonthStatement> getMerchantMonthStatementList(String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<MerchantStatementResponse> getMerchantMonthStatementList(String dateLimit, PageParamRequest pageParamRequest);
+
+    /**
+     * 财务流水汇总列表
+     * @param dateLimit 时间参数
+     * @param pageParamRequest 分页参数
+     * @return PageInfo
+     */
+    PageInfo<SummaryFinancialStatements> summaryFinancialStatements(String dateLimit, PageParamRequest pageParamRequest);
 }

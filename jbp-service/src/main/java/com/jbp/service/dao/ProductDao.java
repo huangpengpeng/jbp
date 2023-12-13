@@ -3,7 +3,10 @@ package com.jbp.service.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.response.PlatformProductListResponse;
+import com.jbp.common.response.ProductActivityResponse;
 import com.jbp.common.response.ProductFrontResponse;
+
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -28,4 +31,29 @@ public interface ProductDao extends BaseMapper<Product> {
      * @param map 查询参数
      */
     List<ProductFrontResponse> findH5List(Map<String, Object> map);
+
+    /**
+     * 商品搜索分页列表（活动）
+     * @param map 查询参数
+     */
+    List<ProductActivityResponse> getActivitySearchPage(Map<String, Object> map);
+
+    /**
+     * 商品搜索分页列表（活动）商户
+     * @param map 查询参数
+     */
+    List<ProductActivityResponse> getActivitySearchPageByMerchant(Map<String, Object> map);
+
+    /**
+     * 根据关键字获取商品所有的品牌ID
+     * @param keyword 关键字
+     */
+    List<Integer> findProductBrandIdByKeyword(@Param(value = "keyword") String keyword);
+
+    /**
+     * 根据关键字获取商品所有的分类ID
+     * @param keyword 关键字
+     */
+    List<Integer> findProductCategoryIdByKeyword(@Param(value = "keyword") String keyword);
+
 }

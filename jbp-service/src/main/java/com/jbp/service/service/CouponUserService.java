@@ -2,8 +2,10 @@ package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.request.CouponUserSearchRequest;
+import com.jbp.common.request.MyCouponRequest;
 import com.jbp.common.request.OrderUseCouponRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.CouponUserOrderResponse;
@@ -11,6 +13,7 @@ import com.jbp.common.response.CouponUserResponse;
 import com.jbp.common.response.UserCouponResponse;
 import com.jbp.common.vo.MyRecord;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,7 +22,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -71,14 +74,6 @@ public interface CouponUserService extends IService<CouponUser> {
      */
     MyRecord paySuccessGiveAway(Integer couponId, Integer uid);
 
-//    /**
-//     * 根据uid获取列表
-//     * @param uid uid
-//     * @param pageParamRequest 分页参数
-//     * @return List<StoreCouponUser>
-//     */
-//    List<StoreCouponUser> findListByUid(Integer uid, PageParamRequest pageParamRequest);
-
     /**
      * 获取可用优惠券数量
      * @param uid 用户uid
@@ -87,11 +82,9 @@ public interface CouponUserService extends IService<CouponUser> {
 
     /**
      * 我的优惠券列表
-     * @param type 类型，usable-可用，unusable-不可用
-     * @param pageParamRequest 分页参数
      * @return PageInfo<StoreCouponUserResponse>
      */
-    PageInfo<UserCouponResponse> getMyCouponList(String type, PageParamRequest pageParamRequest);
+    PageInfo<UserCouponResponse> getMyCouponList(MyCouponRequest request);
 
     /**
      * 回退优惠券（到未使用状态）
@@ -99,4 +92,84 @@ public interface CouponUserService extends IService<CouponUser> {
      * @return 回退结果
      */
     Boolean rollbackByIds(List<Integer> couponIdList);
+
+    /**
+     * 优惠券失效处理（通过优惠券ID）
+     */
+    Boolean loseEfficacyByCouponId(Integer couponId);
+
+    /**
+     * 获取优惠券已使用数量
+     * @param couponId 优惠券ID
+     * @return 优惠券已使用数量
+     */
+    Integer getUsedNumByCouponId(Integer couponId);
+
+    /**
+     * 获取优惠券列表，通过优惠券ID和用户ID列表
+     * @param couponId 优惠券ID
+     * @param uidList 用户ID列表
+     */
+    List<CouponUser> findByCouponIdAndUidList(Integer couponId, List<Integer> uidList);
+
+    /**
+     * 平台端优惠券领取列表
+     * @param request 请求参数
+     * @param pageParamRequest 分页参数
+     */
+    PageInfo<CouponUserResponse> getPlatformList(CouponUserSearchRequest request, PageParamRequest pageParamRequest);
+
+    /**
+     * 获取用户领取的优惠券
+     * @param couponId 优惠券ID
+     * @param userId 用户ID
+     */
+    CouponUser getLastByCouponIdAndUid(Integer couponId, Integer userId);
+
+    /**
+     * 查询适用的优惠券列表
+     * @param userId 用户ID
+     * @param merId 商户ID
+     * @param proId 商品ID
+     * @param money 金额
+     */
+    List<CouponUser> findByUidAndMerIdAndMoneyAndProList(Integer userId, Integer merId, Integer proId, BigDecimal money);
+
+    /**
+     * 自动领取优惠券
+     */
+    Integer autoReceiveCoupon(Coupon coupon, Integer uid);
+
+    /**
+     * 查询适用的平台优惠券列表
+     * @param userId 用户ID
+     * @param proId 商品ID
+     * @param proCategoryIdList 商品分类ID列表
+     * @param merId 商户ID
+     * @param brandId 品牌ID
+     * @param money 金额
+     */
+    List<CouponUser> findPlatByUidAndMerIdAndMoneyAndProList(Integer userId, Integer proId, List<Integer> proCategoryIdList, Integer merId, Integer brandId, BigDecimal money);
+
+    /**
+     * 查询适用的优惠券列表(多商品)
+     * @param userId 用户ID
+     * @param merId 商户ID
+     * @param proIdList 商品ID列表
+     * @param money 金额
+     */
+    List<CouponUser> findManyByUidAndMerIdAndMoneyAndProList(Integer userId, Integer merId, List<Integer> proIdList, BigDecimal money);
+
+    /**
+     * 查询适用的平台优惠券列表(多商品)
+     * @param userId 用户ID
+     * @param proIdList 商品ID列表
+     * @param proCategoryIdList 商品分类ID列表
+     * @param merIdList 商户ID列表
+     * @param brandIdList 品牌ID列表
+     * @param money 金额
+     */
+    List<CouponUser> findManyPlatByUidAndMerIdAndMoneyAndProList(Integer userId, List<Integer> proIdList, List<Integer> proCategoryIdList, List<Integer> merIdList, List<Integer> brandIdList, BigDecimal money);
+
+    Boolean userIsCanReceiveCoupon(Coupon coupon, Integer userId);
 }

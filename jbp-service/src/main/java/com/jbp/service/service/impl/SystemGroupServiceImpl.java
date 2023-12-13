@@ -5,12 +5,12 @@ import cn.hutool.core.util.URLUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.SystemGroupDao;
-import com.jbp.service.service.SystemGroupService;
 import com.jbp.common.model.system.SystemGroup;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.SystemGroupRequest;
 import com.jbp.common.request.SystemGroupSearchRequest;
+import com.jbp.service.dao.SystemGroupDao;
+import com.jbp.service.service.SystemGroupService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------

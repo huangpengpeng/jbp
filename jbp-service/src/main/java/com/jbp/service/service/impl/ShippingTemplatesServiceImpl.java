@@ -7,11 +7,6 @@ import cn.hutool.core.util.URLUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
-import com.jbp.service.dao.ShippingTemplatesDao;
-import com.jbp.service.service.ProductService;
-import com.jbp.service.service.ShippingTemplatesFreeService;
-import com.jbp.service.service.ShippingTemplatesRegionService;
-import com.jbp.service.service.ShippingTemplatesService;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.express.ShippingTemplates;
@@ -24,6 +19,11 @@ import com.jbp.common.response.ShippingTemplatesInfoResponse;
 import com.jbp.common.response.ShippingTemplatesRegionResponse;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
+import com.jbp.service.dao.ShippingTemplatesDao;
+import com.jbp.service.service.ProductService;
+import com.jbp.service.service.ShippingTemplatesFreeService;
+import com.jbp.service.service.ShippingTemplatesRegionService;
+import com.jbp.service.service.ShippingTemplatesService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -94,8 +94,9 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
      */
     @Override
     public Boolean create(ShippingTemplatesRequest request) {
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         // 判断模板名称是否重复
-        if (isExistName(request.getName())) {
+        if (isExistName(request.getName(), admin.getMerId())) {
             throw new CrmebException("模板名称已存在,请更换模板名称!");
         }
         List<ShippingTemplatesRegionRequest> shippingTemplatesRegionRequestList = request.getShippingTemplatesRegionRequestList();
@@ -103,14 +104,12 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
             throw new CrmebException("不包邮，最少需要一条公共区域运费数据");
         }
 
-        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
-
         ShippingTemplates shippingTemplates = new ShippingTemplates();
         shippingTemplates.setName(request.getName());
         shippingTemplates.setSort(request.getSort());
         shippingTemplates.setType(request.getType());
         shippingTemplates.setAppoint(request.getAppoint());
-        shippingTemplates.setMerId(loginUserVo.getUser().getMerId());
+        shippingTemplates.setMerId(admin.getMerId());
         shippingTemplates.setId(null);
 
         return transactionTemplate.execute(e -> {
@@ -152,9 +151,12 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
     /**
      * 是否存在模板名称
      */
-    private Boolean isExistName(String name) {
+    private Boolean isExistName(String name, Integer merId) {
         ShippingTemplates templates = getByName(name);
         if (ObjectUtil.isNull(templates)) {
+            return Boolean.FALSE;
+        }
+        if (!templates.getMerId().equals(merId)) {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -175,15 +177,14 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
         if (request.getAppoint().equals(2) && CollUtil.isEmpty(shippingTemplatesRegionRequestList)) {
             throw new CrmebException("不包邮，最少需要一条公共区域运费数据");
         }
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
+            throw new CrmebException("不能操作非本商户的数据");
+        }
         if (!shippingTemplates.getName().equals(request.getName())) {
-            if (isExistName(request.getName())) {
+            if (isExistName(request.getName(), admin.getMerId())) {
                 throw new CrmebException("模板名称已存在,请更换模板名称!");
             }
-        }
-
-        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
-        if (!loginUserVo.getUser().getMerId().equals(shippingTemplates.getMerId())) {
-            throw new CrmebException("不能操作非本商户的数据");
         }
 
         shippingTemplates.setName(request.getName());
@@ -230,9 +231,9 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
     @Override
     public Boolean remove(Integer id) {
         ShippingTemplates shippingTemplates = getByIdException(id);
-        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
-        if (!loginUserVo.getUser().getMerId().equals(shippingTemplates.getMerId())) {
-            throw new CrmebException("不能操作非本商户的数据");
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
+            throw new CrmebException("运费模板不存在");
         }
         if (productService.isUseShippingTemplateId(id)) {
             throw new CrmebException("有商品使用此运费模板，无法删除");
@@ -254,6 +255,10 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
     @Override
     public ShippingTemplatesInfoResponse getInfo(Integer id) {
         ShippingTemplates shippingTemplates = getByIdException(id);
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
+            throw new CrmebException("运费模板不存在");
+        }
         ShippingTemplatesInfoResponse response = new ShippingTemplatesInfoResponse();
         BeanUtils.copyProperties(shippingTemplates, response);
         if (shippingTemplates.getAppoint().equals(0)) {

@@ -4,23 +4,19 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.request.OrderRemarkRequest;
-import com.jbp.common.request.OrderSearchRequest;
-import com.jbp.common.request.OrderSendRequest;
-import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.LogisticsResultVo;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 /**
 *  OrderService 接口
 *  +----------------------------------------------------------------------
 *  | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
 *  +----------------------------------------------------------------------
-*  | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+*  | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
 *  +----------------------------------------------------------------------
 *  | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
 *  +----------------------------------------------------------------------
@@ -57,6 +53,14 @@ public interface OrderService extends IService<Order> {
     PageInfo<Order> getUserOrderList(Integer userId, Integer status, PageParamRequest pageRequest);
 
     /**
+     * 获取用户订单列表V1.4
+     * @param userId 用户id
+     * @param request 搜索参数
+     * @return PageInfo
+     */
+    PageInfo<Order> getUserOrderList_v1_4(Integer userId, OrderFrontListRequest request);
+
+    /**
      * 取消订单
      * @param orderNo 订单编号
      * @param isUser 是否用户取消
@@ -91,6 +95,13 @@ public interface OrderService extends IService<Order> {
      * @return Boolean
      */
     Boolean send(OrderSendRequest request);
+
+    /**
+     * 小票打印
+     * @param orderNo 订单编号
+     * @return 打印结果
+     */
+    void printReceipt(String orderNo);
 
     /**
      * 商户删除订单
@@ -132,6 +143,13 @@ public interface OrderService extends IService<Order> {
      * @return PlatformOrderAdminDetailResponse
      */
     PlatformOrderAdminDetailResponse platformInfo(String orderNo);
+
+    /**
+     * 获取订单快递信息(商户端)
+     * @param invoiceId 发货单ID
+     * @return LogisticsResultVo
+     */
+    LogisticsResultVo getLogisticsInfoByMerchant(Integer invoiceId);
 
     /**
      * 获取订单快递信息
@@ -188,6 +206,13 @@ public interface OrderService extends IService<Order> {
      * @return 订单细节详情列表
      */
     List<OrderDetail> getDetailList(String orderNo);
+
+    /**
+     * 获取订单发货单列表(商户端)
+     * @param orderNo 订单号
+     * @return 发货单列表
+     */
+    List<OrderInvoiceResponse> getInvoiceListByMerchant(String orderNo);
 
     /**
      * 获取订单发货单列表
@@ -263,4 +288,27 @@ public interface OrderService extends IService<Order> {
      * @return Integer
      */
     Integer getAwaitVerificationNum(Integer merId);
+
+    /**
+     * 获取用户购买的商品数量
+     * @param uid 用户ID
+     * @param proId 商品ID
+     * @param productType 商品类型
+     */
+    Integer getProductNumCount(Integer uid, Integer proId, Integer productType);
+
+    /**
+     * 获取某一天的所有数据
+     * @param merId 商户id，0为所有商户
+     * @param date 日期：年-月-日
+     * @return List
+     */
+    List<Order> findPayByDate(Integer merId, String date);
+
+    /**
+     * 获取导出订单列表
+     * @param request 请求参数
+     * @return
+     */
+    List<Order> findExportList(OrderSearchRequest request);
 }

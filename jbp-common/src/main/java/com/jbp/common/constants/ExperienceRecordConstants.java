@@ -5,7 +5,7 @@ package com.jbp.common.constants;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -29,6 +29,9 @@ public class ExperienceRecordConstants {
     /** 经验记录关联类型—签到 */
     public static final String EXPERIENCE_RECORD_LINK_TYPE_SIGN = "sign";
 
+    /** 经验记录关联类型—社区笔记 */
+    public static final String EXPERIENCE_RECORD_LINK_TYPE_NOTE = "note";
+
     /** 经验记录关联类型—系统后台 */
     public static final String EXPERIENCE_RECORD_LINK_TYPE_SYSTEM = "system";
 
@@ -43,4 +46,7 @@ public class ExperienceRecordConstants {
 
     /** 经验记录标题—PC管理员操作 */
     public static final String EXPERIENCE_RECORD_TITLE_ADMIN = "管理员操作";
+
+    /** 经验记录标题—社区发布笔记奖励 */
+    public static final String EXPERIENCE_RECORD_TITLE_NOTE = "社区发布笔记奖励";
 }

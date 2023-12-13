@@ -70,8 +70,11 @@ public class RefundOrder implements Serializable {
     @ApiModelProperty(value = "是否整单退款")
     private Boolean isAll;
 
-    @ApiModelProperty(value = "退款状态：0:待审核 1:审核未通过 2：退款中 3:已退款")
+    @ApiModelProperty(value = "售后状态：0:待审核 1:商家拒绝 2：退款中 3:已退款 4:用户退货 5:商家待收货 6:已撤销")
     private Integer refundStatus;
+
+    @ApiModelProperty(value = "退运费金额")
+    private BigDecimal refundFreightFee;
 
     @ApiModelProperty(value = "拒绝退款说明")
     private String refundReason;
@@ -121,5 +124,30 @@ public class RefundOrder implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "退还平台优惠券补贴金额")
+    private BigDecimal refundPlatCouponPrice;
 
+    @ApiModelProperty(value = "售后类型：1-仅退款，2-退货退款")
+    private Integer afterSalesType;
+
+    @ApiModelProperty(value = "退货类型：0-不退货 1-快递退回，2-到店退货")
+    private Integer returnGoodsType;
+
+    @ApiModelProperty(value = "收货人姓名")
+    private String receiver;
+
+    @ApiModelProperty(value = "收货人电话")
+    private String receiverPhone;
+
+    @ApiModelProperty(value = "收货人详细地址")
+    private String receiverAddressDetail;
+
+    @ApiModelProperty(value = "物流公司名称")
+    private String expressName;
+
+    @ApiModelProperty(value = "运单号")
+    private String trackingNumber;
+
+    @ApiModelProperty(value = "用户联系电话")
+    private String telephone;
 }

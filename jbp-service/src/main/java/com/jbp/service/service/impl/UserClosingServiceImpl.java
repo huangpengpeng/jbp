@@ -12,8 +12,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.service.dao.UserClosingDao;
-import com.jbp.service.service.*;
 import com.jbp.common.constants.BrokerageRecordConstants;
 import com.jbp.common.constants.ClosingConstant;
 import com.jbp.common.constants.Constants;
@@ -27,6 +25,8 @@ import com.jbp.common.request.*;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.service.dao.UserClosingDao;
+import com.jbp.service.service.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -390,6 +390,19 @@ public class UserClosingServiceImpl extends ServiceImpl<UserClosingDao, UserClos
             userClosing.setClosingPrice(BigDecimal.ZERO);
         }
         return userClosing;
+    }
+
+    /**
+     * 获取某一天的所有数据
+     * @param date 日期：年-月-日
+     * @return List
+     */
+    public List<UserClosing> findByDate(String date) {
+        LambdaQueryWrapper<UserClosing> lqw = Wrappers.lambdaQuery();
+        lqw.eq(UserClosing::getAuditStatus, ClosingConstant.CLOSING_AUDIT_STATUS_SUCCESS);
+        lqw.eq(UserClosing::getAccountStatus, ClosingConstant.CLOSING_ACCOUNT_STATUS_SUCCESS);
+        lqw.apply("date_format(update_time, '%Y-%m-%d') = {0}", date);
+        return dao.selectList(lqw);
     }
 
 //    /**

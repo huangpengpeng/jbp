@@ -17,7 +17,7 @@ import java.util.Date;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -33,13 +33,18 @@ public class CouponFrontResponse implements Serializable {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "优惠券表ID")
-    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
+    @ApiModelProperty(value = "商户ID")
+    private Integer merId;
 
     @ApiModelProperty(value = "优惠券名称")
     private String name;
 
-    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-平台券")
+    @ApiModelProperty(value = "发行方，1-平台，2-商户")
+    private Integer publisher;
+
+    @ApiModelProperty(value = "类别 1-商家券, 2-商品券, 3-通用券，4-品类券，5-品牌券，6-跨店券")
     private Integer category;
 
     @ApiModelProperty(value = "优惠券类型 1-满减券,2-折扣券")
@@ -80,4 +85,5 @@ public class CouponFrontResponse implements Serializable {
 
     @ApiModelProperty(value = "可使用时间范围 结束时间字符串")
     private String useEndTimeStr;
+
 }

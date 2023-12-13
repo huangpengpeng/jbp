@@ -15,7 +15,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -81,4 +81,25 @@ public interface CityRegionService extends IService<CityRegion> {
      * @return 城市数据
      */
     CityRegion getByRegionName(String regionName, Integer parentId, Integer regionType);
+
+    /**
+     * 获取省级城市数据
+     */
+    List<CityRegion> findProvinceList();
+
+    /**
+     * 获取市级城市数据
+     */
+    List<CityRegion> findCityList(Integer provinceId);
+
+    /**
+     * 获取区级城市数据
+     */
+    List<CityRegion> findDistrictList(Integer cityId);
+
+    /**
+     * 获取街道级城市数据
+     */
+    List<CityRegion> findStreetList(Integer districtId);
+
 }

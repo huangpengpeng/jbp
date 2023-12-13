@@ -3,17 +3,18 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.merchant.MerchantCategory;
-import com.jbp.common.request.MerchantCategoryRequest;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.merchant.MerchantCategoryRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * MerchantCategoryService 接口
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -55,4 +56,12 @@ public interface MerchantCategoryService extends IService<MerchantCategory> {
      * @return List
      */
     List<MerchantCategory> allList();
+
+    /**
+     * 全部商户分类Map
+     * @return Map
+     */
+    Map<Integer, MerchantCategory> allMap();
+
+    MerchantCategory getByIdException(Integer categoryId);
 }

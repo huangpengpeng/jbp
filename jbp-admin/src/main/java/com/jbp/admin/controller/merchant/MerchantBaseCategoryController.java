@@ -11,6 +11,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.vo.CategoryTreeVo;
 import com.jbp.service.service.CategoryService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -29,7 +30,7 @@ import java.util.List;
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
- * | Copyright (c) 2016~2022 https://www.crmeb.com All rights reserved.
+ * | Copyright (c) 2016~2023 https://www.crmeb.com All rights reserved.
  * +----------------------------------------------------------------------
  * | Licensed CRMEB并不是自由软件，未经许可不能去掉CRMEB相关版权
  * +----------------------------------------------------------------------
@@ -90,7 +91,7 @@ public class MerchantBaseCategoryController {
     @ApiOperation(value = "基础分类详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     public CommonResult<Category> info(@PathVariable(value = "id") Integer id) {
-        return CommonResult.success(categoryService.getByIdException(id));
+        return CommonResult.success(categoryService.getBaseCategoryInfo(id));
     }
 
 
@@ -113,7 +114,7 @@ public class MerchantBaseCategoryController {
     @PreAuthorize("hasAuthority('merchant:category:list:ids')")
     @ApiOperation(value = "根据id集合获取基础分类列表")
     @RequestMapping(value = "/list/ids", method = RequestMethod.GET)
-    @ApiImplicitParam(name = "ids", value = "分类id集合")
+    @ApiImplicitParam(name = "ids", value = "分类id集合,英文逗号分隔")
     public CommonResult<List<Category>> getByIds(@Validated @RequestParam(name = "ids") String ids) {
         return CommonResult.success(categoryService.getByIds(CrmebUtil.stringToArray(ids)));
     }
