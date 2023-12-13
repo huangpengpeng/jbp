@@ -28,7 +28,7 @@ crmeb:
 server:
   port: 8080
   servlet:
-    context-path: /         # 访问path
+    context-path: /admin         # 访问path
   tomcat:
     uri-encoding: UTF-8     # 默认编码格式
     max-threads: 1000       # 最大线程数量 默认200

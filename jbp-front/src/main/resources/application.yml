@@ -54,13 +54,13 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/release_test?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
-    username: release_test
-    password: 111111
+    url: jdbc:mysql://rm-wz994y2avm6g581dv0o.mysql.rds.aliyuncs.com:3306/release_test?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    username: kk_account
+    password: kk_account2018
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
-    password: 111111
+    password:
     timeout: 30000 # 连接超时时间（毫秒）
     database: 15  #默认数据库
     jedis:
@@ -100,7 +100,7 @@ mybatis-plus:
 aj:
   captcha:
     type: default       # 验证码类型
-    water-mark: CRMEB Java   # 水印
+    water-mark: Jbp Java   # 水印
     slip-offset: 5      # 校验滑动拼图允许误差偏移量(默认5像素)
     aes-status: true    # aes加密坐标开启或者禁用(true|false)
     interference-options: 2 # 滑动干扰项(0/1/2)
@@ -117,8 +117,8 @@ swagger:
   basic:
     enable: true #是否开启
     check: false #是否打开验证
-    username: #访问swagger的账号
-    password: #访问swagger的密码
+    username: root
+    password: 12345Aa#
 
 # wx-java-tools 第三方框架仅仅用到了微信小程序直播功能 是用小程序直播时必须配置
 wx:

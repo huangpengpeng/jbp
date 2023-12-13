@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+
 /**
  * @ClassName RedissonConfig
  * @Description Redisson配置类
@@ -31,6 +33,7 @@ public class RedissonConfig {
         Config config = new Config();
         String address = "redis://" + host + ":" + port;
         config.useSingleServer().setAddress(address);
+        if(StringUtils.isNotBlank(password))
         config.useSingleServer().setPassword(password);
         config.useSingleServer().setDatabase(database);
         return Redisson.create(config);
