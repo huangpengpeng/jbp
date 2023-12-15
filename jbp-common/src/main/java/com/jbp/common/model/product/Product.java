@@ -48,6 +48,7 @@ public class Product implements Serializable {
     private String sliderImage;
 
     @ApiModelProperty(value = "商品名称")
+    @TableField(value = "`name`")
     private String name;
 
     @ApiModelProperty(value = "商品简介")
@@ -108,9 +109,11 @@ public class Product implements Serializable {
     private Integer tempId;
 
     @ApiModelProperty(value = "排序")
+    @TableField(value = "`sort`")
     private Integer sort;
 
     @ApiModelProperty(value = "总后台排序")
+    @TableField(value = "`rank`")
     private Integer rank;
 
     @ApiModelProperty(value = "规格 0单 1多")
