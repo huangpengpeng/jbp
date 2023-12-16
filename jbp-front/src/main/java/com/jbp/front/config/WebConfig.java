@@ -1,9 +1,5 @@
 package com.jbp.front.config;
 
-import com.jbp.common.interceptor.SwaggerInterceptor;
-import com.jbp.front.filter.ResponseFilter;
-import com.jbp.front.interceptor.FrontTokenInterceptor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -14,6 +10,11 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.MappedInterceptor;
+
+import com.jbp.common.interceptor.SwaggerInterceptor;
+import com.jbp.front.filter.ResponseFilter;
+import com.jbp.front.filter.XssFilter;
+import com.jbp.front.interceptor.FrontTokenInterceptor;
 
 /**
  * token验证拦截器
@@ -37,6 +38,23 @@ public class WebConfig implements WebMvcConfigurer {
     public HandlerInterceptor frontTokenInterceptor(){
         return new FrontTokenInterceptor();
     }
+    
+	@Bean
+	public FilterRegistrationBean<?> XssFilter() {
+		FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<XssFilter>();
+		registration.setFilter(new XssFilter());
+		registration.addUrlPatterns("/*");
+		registration.addInitParameter("SplitChar", "@");
+		registration.addInitParameter("FilterChar",
+				"'@(@)@from@From@FRom@FROm@FROM@IFRAME@IFRAMe@IFRAme@IFRame@IFrame@Iframe@iframe@SCRIPT@SCRIPt@SCRipt@SCript@Script@script@SQL@SQl@Sql@sql@--@UNION@union@\\");
+		registration.addInitParameter("ReplaceChar",
+				"‘@（@）@＼from@＼from@＼from@＼from@＼from@＼iframe@＼iframe@＼iframe@＼iframe@＼iframe@＼iframe@＼iframe@＼script@＼script@＼script@＼script@＼script@＼script@＼sql@＼sql@＼sql@＼sql@————@＼UNION@＼UNION@＼");
+		registration.addInitParameter("excludeUrls", "");
+		registration.setName("XssFilter");
+		registration.setOrder(1);
+		return registration;
+	}
+
 
     @Bean
     public ResponseFilter responseFilter(){ return new ResponseFilter(); }

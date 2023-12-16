@@ -74,6 +74,9 @@ public class SystemAdmin implements Serializable {
 
     @ApiModelProperty(value = "商户id，0-平台")
     private Integer merId;
+    
+    @ApiModelProperty(value = "mfa 秘钥")
+    private String mfa;
 
     @ApiModelProperty(value = "后台管理员添加时间")
     private Date createTime;

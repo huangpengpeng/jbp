@@ -1,8 +1,20 @@
 package com.jbp.admin.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Service;
 
 import com.jbp.admin.filter.TokenComponent;
 import com.jbp.admin.service.AdminLoginService;
@@ -16,29 +28,24 @@ import com.jbp.common.model.admin.SystemPermissions;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.request.LoginAdminUpdateRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
-import com.jbp.common.response.AdminLoginPicResponse;
+import com.jbp.common.response.AdminLoginInfoResponse;
 import com.jbp.common.response.LoginAdminResponse;
 import com.jbp.common.response.MenusResponse;
 import com.jbp.common.response.SystemLoginResponse;
+import com.jbp.common.token.GoogleAuthUtil;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MenuTree;
-import com.jbp.service.service.*;
+import com.jbp.service.service.AsyncService;
+import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SystemAdminService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.SystemMenuService;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 
 /**
  * 管理端登录服务实现类
@@ -163,11 +170,12 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      * @return AdminLoginPicResponse
      */
     @Override
-    public AdminLoginPicResponse getLoginPic() {
-        AdminLoginPicResponse loginPicResponse = new AdminLoginPicResponse();
+    public AdminLoginInfoResponse getLoginInfo() {
+    	AdminLoginInfoResponse loginPicResponse = new AdminLoginInfoResponse();
         loginPicResponse.setBackgroundImage(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_BACKGROUND_IMAGE));
         loginPicResponse.setLoginLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN));
         loginPicResponse.setLeftLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LEFT_LOGO));
+        loginPicResponse.setMfaOpen(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_MFA_OPEN));
         return loginPicResponse;
     }
 
@@ -177,11 +185,12 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      * @return AdminLoginPicResponse
      */
     @Override
-    public AdminLoginPicResponse getMerchantLoginPic() {
-        AdminLoginPicResponse loginPicResponse = new AdminLoginPicResponse();
+    public AdminLoginInfoResponse getMerchantLoginInfo() {
+    	AdminLoginInfoResponse loginPicResponse = new AdminLoginInfoResponse();
         loginPicResponse.setBackgroundImage(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_BACKGROUND_IMAGE));
         loginPicResponse.setLoginLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LOGIN));
         loginPicResponse.setLeftLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LEFT_LOGO));
+        loginPicResponse.setMerOpen(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_MER_OPEN));
         return loginPicResponse;
     }
 
@@ -270,4 +279,14 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         boolean codeCheckResult = validateCodeService.check(request.getKey(), request.getCode());
         if (!codeCheckResult) throw new CrmebException("验证码不正确");
     }
+    
+
+	@Override
+	public Map<String,String> loginUserMfaKey() {
+		SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+		Map<String,String> result=	GoogleAuthUtil.genAuthQrCode(admin.getAccount());
+		admin.setMfa(result.get("secret"));
+		systemAdminService.updateById(admin);
+		return result;
+	}
 }

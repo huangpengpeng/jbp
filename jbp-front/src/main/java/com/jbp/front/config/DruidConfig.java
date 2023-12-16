@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,8 +54,10 @@ public class DruidConfig {
 
     @Bean("dataSource")
     @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource druidDataSource() {
-        return new DruidDataSource();
+    public DataSource druidDataSource() throws SQLException {
+    	DruidDataSource dataSource=new DruidDataSource();
+    	dataSource.setFilters("wall,config,slf4j");
+        return dataSource;
     }
 }
 
