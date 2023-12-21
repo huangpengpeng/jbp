@@ -96,7 +96,7 @@ public class PlatformLoginController {
     
 	@PreAuthorize("hasAuthority('platform:login:admin:maf_update')")
 	@ApiOperation(value = "修改登录用户信息")
-	@RequestMapping(value = "/login/admin/maf_update", method = RequestMethod.POST)
+	@RequestMapping(value = "/maf_update", method = RequestMethod.GET)
 	public CommonResult<Object> loginUserMfaKey() {
 		return CommonResult.success(loginService.loginUserMfaKey());
 	}

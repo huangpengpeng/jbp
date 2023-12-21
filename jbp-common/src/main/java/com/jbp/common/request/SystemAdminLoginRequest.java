@@ -35,6 +35,8 @@ public class SystemAdminLoginRequest {
     private String key;
 
     @ApiModelProperty(value = "code", required = true)
-    @NotEmpty(message = "验证码 不能为空")
     private String code;
+    
+    @ApiModelProperty(value = "mfa", required = true)
+    private String mfa;
 }
