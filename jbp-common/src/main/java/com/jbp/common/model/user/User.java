@@ -79,20 +79,21 @@ public class User implements Serializable {
     @ApiModelProperty(value = "性别，0未知，1男，2女，3保密")
     private Integer sex;
 
-    @ApiModelProperty(value = "用户积分")
-    private Integer integral;
 
-    @ApiModelProperty(value = "用户经验")
-    private Integer experience;
+//    @ApiModelProperty(value = "用户积分")
+//    private Integer integral;
 
-    @ApiModelProperty(value = "用户余额")
-    private BigDecimal nowMoney;
+//    @ApiModelProperty(value = "用户经验")
+//    private Integer experience;
 
-    @ApiModelProperty(value = "佣金金额")
-    private BigDecimal brokeragePrice;
+//    @ApiModelProperty(value = "用户余额")
+//    private BigDecimal nowMoney;
 
-    @ApiModelProperty(value = "等级")
-    private Integer level;
+//    @ApiModelProperty(value = "佣金金额")
+//    private BigDecimal brokeragePrice;
+
+//    @ApiModelProperty(value = "等级")
+//    private Integer level;
 
     @ApiModelProperty(value = "连续签到天数")
     private Integer signNum;
@@ -121,14 +122,16 @@ public class User implements Serializable {
     @ApiModelProperty(value = "成为分销员时间")
     private Date promoterTime;
 
-    @ApiModelProperty(value = "上级推广员id")
-    private Integer spreadUid;
 
-    @ApiModelProperty(value = "绑定上级推广员时间")
-    private Date spreadTime;
+//    @ApiModelProperty(value = "上级推广员id")
+//    private Integer spreadUid;
 
-    @ApiModelProperty(value = "下级人数")
-    private Integer spreadCount;
+//    @ApiModelProperty(value = "绑定上级推广员时间")
+//    private Date spreadTime;
+
+//    @ApiModelProperty(value = "下级人数")
+//    private Integer spreadCount;
+
 
     @ApiModelProperty(value = "注册类型：wechat-公众号，routine-小程序，H5-H5,iosWx-微信ios，androidWx-微信安卓，ios-ios")
     private String registerType;

@@ -23,6 +23,7 @@ import com.jbp.common.request.IntegralPageSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.IntegralRecordPageResponse;
 import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.UserIntegralRecordDao;
 import com.jbp.service.service.UserIntegralRecordService;
@@ -36,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -65,6 +68,28 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    @Override
+    public UserIntegralRecord add(Integer uid, String integralType, String externalNo, Integer type,
+                                  String title, BigDecimal integral, BigDecimal balance, String mark, String postscript) {
+        Date time = DateTimeUtils.getNow();
+        UserIntegralRecord record = UserIntegralRecord
+                .builder()
+                .uid(uid)
+                .integralType(integralType)
+                .externalNo(externalNo)
+                .type(type)
+                .title(title)
+                .integral(integral)
+                .balance(balance)
+                .mark(mark)
+                .postscript(postscript)
+                .createTime(time)
+                .updateTime(time)
+                .build();
+        save(record);
+        return record;
+    }
 
     /**
      * 根据订单编号、uid获取记录列表

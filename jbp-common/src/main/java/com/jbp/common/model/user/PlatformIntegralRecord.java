@@ -1,9 +1,9 @@
 package com.jbp.common.model.user;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.utils.DateTimeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -13,28 +13,34 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * 用户积分记录表
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_user_integral_record")
-@ApiModel(value="UserIntegralRecord对象", description="用户积分记录表")
-public class UserIntegralRecord implements Serializable {
+@TableName("eb_platform_integral_record")
+@ApiModel(value="PlatformIntegralRecord对象", description="平台积分明细")
+public class PlatformIntegralRecord implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID=1L;
 
+    public PlatformIntegralRecord(String integralType, String externalNo,
+                                  Integer type, String title, BigDecimal integral, BigDecimal balance, String postscript) {
+        this.integralType = integralType;
+        this.externalNo = externalNo;
+        this.type = type;
+        this.title = title;
+        this.integral = integral;
+        this.balance = balance;
+        this.postscript = postscript;
+        this.createTime = DateTimeUtils.getNow();
+        this.updateTime = createTime;
+    }
 
     @ApiModelProperty(value = "记录id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-
-    @ApiModelProperty(value = "用户uid")
-    private Integer uid;
 
     @ApiModelProperty(value = "积分类型  配置表单的积分类型")
     private String integralType;
