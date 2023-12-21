@@ -13,6 +13,8 @@ import com.jbp.service.service.UserIntegralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -103,15 +105,10 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
         }
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public void transferToUser(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript) {
-        Boolean execute = transactionTemplate.execute(e -> {
-            reduce(integralType, externalNo, title, integral, postscript);
-            userIntegralService.increase(uid, integralType, externalNo, title, integral, postscript);
-            return Boolean.TRUE;
-        });
-        if (!execute) {
-            logger.error(StrUtil.format(StrUtil.format("转账给用户错误， type={}, uid={}", integralType, uid)));
-        }
+        reduce(integralType, externalNo, title, integral, postscript);
+        userIntegralService.increase(uid, integralType, externalNo, title, integral, postscript);
     }
 }
