@@ -27,7 +27,6 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     private static final Logger logger = LoggerFactory.getLogger(PlatformIntegralServiceImpl.class);
     @Resource
     private TransactionTemplate transactionTemplate;
-
     @Resource
     PlatformIntegralRecordService platformIntegralRecordService;
 
