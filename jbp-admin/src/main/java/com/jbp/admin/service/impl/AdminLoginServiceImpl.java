@@ -18,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import com.Jwebmall.tools.GoogleAuthenticator;
 import com.jbp.admin.filter.TokenComponent;
 import com.jbp.admin.service.AdminLoginService;
 import com.jbp.admin.service.ValidateCodeService;
@@ -99,7 +98,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 	private SystemLoginResponse login(SystemAdminLoginRequest request, Integer adminType, String ip) {
 		AdminLoginInfoResponse adminLoginInfoResponse = getLoginInfo();
 		// 开启了mfa
-		if (!StringUtils.equalsIgnoreCase(adminLoginInfoResponse.getMfaOpen(), "true")) {
+		if (StringUtils.equalsIgnoreCase(adminLoginInfoResponse.getMfaOpen(), "'0'")) {
 			// 校验验证码
 			checkCaptcha(request);
 		} else {

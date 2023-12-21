@@ -115,6 +115,9 @@ public class GoogleAuthenticator {
 				throw new RuntimeException(e.getMessage());
 				// return false;
 			}
+			{
+				System.out.println("hash :"+ hash);
+			}
 			if (hash == code) {
 				return true;
 			}
@@ -157,5 +160,10 @@ public class GoogleAuthenticator {
 		truncatedHash &= 0x7FFFFFFF;
 		truncatedHash %= 1000000;
 		return (int) truncatedHash;
+	}
+	
+	public static void main(String [] args) {
+		GoogleAuthenticator authenticator=new GoogleAuthenticator();
+		authenticator.check_code("4SBX723AU2V2KIR4HEXWBBCKRIM27PI5", 123456, System.currentTimeMillis());
 	}
 }
