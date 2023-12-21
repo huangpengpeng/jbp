@@ -34,7 +34,7 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     @Override
     public PlatformIntegral get(String type) {
         return lambdaQuery()
-                .eq(PlatformIntegral::getType,type)
+                .eq( PlatformIntegral::getType,type)
                 .one();
     }
 
@@ -86,10 +86,10 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
         }
         PlatformIntegral platformIntegral = get(integralType);
         if (platformIntegral == null) {
-            throw new CrmebException(StrUtil.format("减少用户积分账户不存在， type={}, integral={}",  integralType, integral));
+            throw new CrmebException(StrUtil.format("减少平台积分账户不存在， type={}, integral={}",  integralType, integral));
         }
         if (ArithmeticUtils.less(platformIntegral.getIntegral(), integral)) {
-            throw new CrmebException(StrUtil.format("减少用户积分不足， type={}, integral={}", integralType, integral));
+            throw new CrmebException(StrUtil.format("减少平台积分不足， type={}, integral={}", integralType, integral));
         }
         Boolean execute=transactionTemplate.execute(e->{
             platformIntegral.setIntegral(platformIntegral.getIntegral().subtract(integral));
