@@ -9,11 +9,14 @@ import com.jbp.common.model.user.UserIntegral;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.UserIntegralDao;
+import com.jbp.service.service.PlatformIntegralService;
 import com.jbp.service.service.UserIntegralRecordService;
 import com.jbp.service.service.UserIntegralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -28,6 +31,8 @@ public class UserIntegralServiceImpl extends ServiceImpl<UserIntegralDao, UserIn
     private TransactionTemplate transactionTemplate;
     @Resource
     private UserIntegralRecordService userIntegralRecordService;
+    @Resource
+    private PlatformIntegralService platformIntegralService;
 
 
     @Override
@@ -106,8 +111,10 @@ public class UserIntegralServiceImpl extends ServiceImpl<UserIntegralDao, UserIn
         }
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public void transferToPlatform(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript) {
-
+        platformIntegralService.increase(integralType, externalNo, title, integral, postscript);
+        reduce(uid, integralType, externalNo, title, integral, postscript);
     }
 }

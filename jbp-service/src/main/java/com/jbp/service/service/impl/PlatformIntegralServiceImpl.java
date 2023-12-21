@@ -12,6 +12,7 @@ import com.jbp.service.dao.PlatformIntegralDao;
 import com.jbp.service.dao.PlatformIntegralRecordDao;
 import com.jbp.service.service.PlatformIntegralRecordService;
 import com.jbp.service.service.PlatformIntegralService;
+import com.jbp.service.service.UserIntegralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     private TransactionTemplate transactionTemplate;
     @Resource
     PlatformIntegralRecordService platformIntegralRecordService;
+    @Resource
+    private UserIntegralService userIntegralService;
 
     @Override
     public PlatformIntegral get(String type) {
@@ -85,21 +88,19 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
         }
         PlatformIntegral platformIntegral = get(integralType);
         if (platformIntegral == null) {
-            throw new CrmebException(StrUtil.format("减少用户积分账户不存在， type={}, integral={}",  integralType, integral));
+            platformIntegral = add(integralType);
         }
         if (ArithmeticUtils.less(platformIntegral.getIntegral(), integral)) {
-            throw new CrmebException(StrUtil.format("减少用户积分不足， type={}, integral={}", integralType, integral));
+            increase(integralType, externalNo, title, integral,  "减少平台积分时不足初始化增加");
         }
-        Boolean execute=transactionTemplate.execute(e->{
-            platformIntegral.setIntegral(platformIntegral.getIntegral().subtract(integral));
-            platformIntegral.setUpdateTime(DateTimeUtils.getNow());
-            updateById(platformIntegral);
+        Boolean execute= transactionTemplate.execute(e->{
+            PlatformIntegral finalPlatformIntegral =  get(integralType);
+            finalPlatformIntegral.setIntegral(finalPlatformIntegral.getIntegral().subtract(integral));
+            finalPlatformIntegral.setUpdateTime(DateTimeUtils.getNow());
+            updateById(finalPlatformIntegral);
             //添加明细
             platformIntegralRecordService.add(integralType,externalNo,2,title,integral,
-                    platformIntegral.getIntegral(),postscript);
-            if (ArithmeticUtils.less(platformIntegral.getIntegral(), BigDecimal.ZERO)) {
-                return Boolean.FALSE;
-            }
+                    finalPlatformIntegral.getIntegral(),postscript);
             return Boolean.TRUE;
         });
         if (!execute) {
@@ -109,6 +110,13 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
 
     @Override
     public void transferToUser(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript) {
-
+        Boolean execute=transactionTemplate.execute(e-> {
+            reduce(integralType, externalNo, title, integral, postscript);
+            userIntegralService.increase(uid, integralType, externalNo, title, integral, postscript);
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            logger.error(StrUtil.format(StrUtil.format("转账给用户错误， type={}, uid={}", integralType, uid)));
+        }
     }
 }
