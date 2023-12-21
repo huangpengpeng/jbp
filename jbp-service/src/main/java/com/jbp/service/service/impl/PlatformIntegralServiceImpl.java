@@ -1,24 +1,19 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.PlatformIntegral;
-import com.jbp.common.model.user.PlatformIntegralRecord;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.PlatformIntegralDao;
-import com.jbp.service.dao.PlatformIntegralRecordDao;
 import com.jbp.service.service.PlatformIntegralRecordService;
 import com.jbp.service.service.PlatformIntegralService;
 import com.jbp.service.service.UserIntegralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.unit.DataUnit;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -36,7 +31,7 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     @Override
     public PlatformIntegral get(String type) {
         return lambdaQuery()
-                .eq(PlatformIntegral::getType,type)
+                .eq( PlatformIntegral::getType,type)
                 .one();
     }
 
