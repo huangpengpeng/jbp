@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jbp.service.dao.UserTeamMapper">
+
+    <select id="adminPage" parameterType="java.util.Map"  resultType="com.jbp.common.model.user.UserTeam">
+        select uc.*, u.accountNo from userTeam uc
+        left join user u on u.id = uc.userId
+        where 1=1
+        <if test=" map.accountNo != null and map.accountNo !='' " >
+            and u.accountNo = #{map.accountNo}
+        </if>
+        <if test=" map.name != null and map.name !='' " >
+            and uc.accountNo = #{map.name}
+        </if>
+        <if test=" map.ifHead != null and map.ifHead !='' " >
+            and uc.ifHead = #{map.ifHead}
+        </if>
+        order by uc.id desc
+    </select>
+
+
+
+</mapper>

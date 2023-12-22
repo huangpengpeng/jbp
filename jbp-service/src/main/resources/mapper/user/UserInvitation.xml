@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jbp.service.dao.UserInvitationMapper">
+
+    <select id="adminPage" parameterType="java.util.Map"  resultType="com.jbp.common.dto.UserInvitationDto">
+        select ui.*, u.username, u.accountNo, u2.username as pUsername, u2.accountNo as pAccountNo, u3.username as mUsername, u3.accountNo as mAccountNo
+        from userInvitation ui
+        left join user u on u.id = ui.userId
+        left join user u2 on u2.id = ui.pId
+        left join user u3 on u3.id = ui.mId
+        where 1=1
+        <if test=" map.accountNo != null and map.accountNo !='' " >
+            and u.accountNo = #{map.accountNo}
+        </if>
+        <if test=" map.pAccountNo != null and map.pAccountNo !='' " >
+            and u2.accountNo = #{map.accountNo}
+        </if>
+        <if test=" map.mAccountNo != null and map.mAccountNo !='' " >
+            and u3.accountNo = #{map.accountNo}
+        </if>
+        order by ui.id desc
+
+    </select>
+
+    <select id="getAllUpper" parameterType="java.util.Map"  resultType="com.jbp.common.model.UserUpperModel">
+        select t1.*
+        from(
+                select @r as uId,  (select @r := ifnull(mId, pId)  from UserInvitation where userId = uId) as pId, @I := @I + 1 as level
+        from (select @r := #{userId} ,@I := 0) vars, UserInvitation h
+            ) t1
+            join UserInvitation t2
+        on t1.uId = t2.userId
+        ORDER BY level ;
+    </select>
+
+    <select id="getUnder4PId" parameterType="java.util.Map"  resultType="com.jbp.common.model.UserUpperModel">
+        select t1.*
+        from(
+                select @r as uId,  (select @r := ifnull(mId, pId)  from UserInvitation where userId = uId) as pId, @I := @I + 1 as level
+        from (select @r := #{userId} ,@I := 0) vars, UserInvitation h
+            ) t1
+            join UserInvitation t2
+        on t1.uId = t2.userId AND t1.pId = #{pId};
+    </select>
+
+    <select id="getAllUpperNoMount" parameterType="java.util.Map"  resultType="com.jbp.common.model.UserUpperModel">
+        select t1.*
+        from(
+                select @r as uId,  (select @r := pId  from UserInvitation where userId = uId) as pId, @I := @I + 1 as level
+        from (select @r := #{userId} ,@I := 0) vars, UserInvitation h
+            ) t1
+            join UserInvitation t2
+        on t1.uId = t2.userId
+        ORDER BY level ;
+    </select>
+
+    <select id="getUnder4PIdNoMount" parameterType="java.util.Map"  resultType="com.jbp.common.model.UserUpperModel">
+        select t1.*
+        from(
+                select @r as uId,  (select @r := pId  from UserInvitation where userId = uId) as pId, @I := @I + 1 as level
+        from (select @r := #{userId} ,@I := 0) vars, UserInvitation h
+            ) t1
+            join UserInvitation t2
+        on t1.uId = t2.userId AND t1.pId = #{pId};
+    </select>
+
+    <select id="getUnderCount4Capa" parameterType="java.util.Map"  resultType="java.lang.Integer">
+       select ifnull(count(uf.id), 0) from UserInvitationFlow uf left join userCapa uc on uc.userId = uf.userId
+       where uf.pId = #{userId} AND uc.capaId >= #{capaId}
+        <if test=" level != null and level !='' " >
+            and uf.level = #{level}
+        </if>
+    </select>
+
+    <select id="getUnderCount4CapaXs" parameterType="java.util.Map"  resultType="java.lang.Integer">
+        select ifnull(count(uf.id), 0) from UserInvitationFlow uf left join userCapaXs uc on uc.userId = uf.userId
+        where uf.pId = #{userId} AND uc.capaId >= #{capaId}
+    </select>
+
+    <select id="getNoInvitationFlowList" parameterType="java.util.Map"  resultType="com.jbp.common.model.user.UserInvitation">
+        select u.*  from UserInvitation u left join UserInvitationFlow f on u.userId = f.userId WHERE f.id is null
+    </select>
+
+</mapper>
