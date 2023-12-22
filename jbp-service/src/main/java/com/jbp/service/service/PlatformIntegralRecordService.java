@@ -10,7 +10,7 @@ import com.jbp.common.vo.IntegralRecordVo;
 import java.math.BigDecimal;
 
 public interface PlatformIntegralRecordService extends IService<PlatformIntegralRecord> {
-    PlatformIntegralRecord add(String integralType, String externalNo, Integer type, String title, BigDecimal integral, BigDecimal balance, String postscript);
+    PlatformIntegralRecord add(Integer integralType, String externalNo, Integer type, String title, BigDecimal integral, BigDecimal balance, String postscript);
 
 
     PageInfo<IntegralRecordVo> page(IntegralPageSearchRequest request, PageParamRequest pageRequest);

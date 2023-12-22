@@ -31,7 +31,7 @@ public class UserIntegral implements Serializable {
     private Integer uid;
 
     @ApiModelProperty(value = "类型  奖励  换购  消费  购物")
-    private String type;
+    private Integer type;
 
     @ApiModelProperty(value = "积分")
     private BigDecimal integral;

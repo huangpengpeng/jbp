@@ -23,7 +23,7 @@ public class PlatformIntegral implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    public PlatformIntegral(String type) {
+    public PlatformIntegral(Integer type) {
         this.type = type;
         this.integral = BigDecimal.ZERO;
         this.createTime = DateTimeUtils.getNow();
@@ -35,7 +35,7 @@ public class PlatformIntegral implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "类型  奖励  换购  消费  购物")
-    private String type;
+    private Integer type;
 
     @ApiModelProperty(value = "积分")
     private BigDecimal integral;

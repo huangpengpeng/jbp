@@ -37,7 +37,7 @@ public class UserIntegralRecord implements Serializable {
     private Integer uid;
 
     @ApiModelProperty(value = "积分类型  配置表单的积分类型")
-    private String integralType;
+    private Integer integralType;
 
     @ApiModelProperty(value = "外部单号")
     private String externalNo;

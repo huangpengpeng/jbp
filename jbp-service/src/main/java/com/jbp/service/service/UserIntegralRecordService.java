@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.request.IntegralPageSearchRequest;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.IntegralRecordPageResponse;
 import com.jbp.common.vo.IntegralRecordVo;
 
 import java.math.BigDecimal;
@@ -37,7 +36,7 @@ public interface UserIntegralRecordService extends IService<UserIntegralRecord> 
      * @param postscript  附言
      * @return
      */
-    UserIntegralRecord add(Integer uid, String integralType, String externalNo, Integer type, String title, BigDecimal integral,
+    UserIntegralRecord add(Integer uid, Integer integralType, String externalNo, Integer type, String title, BigDecimal integral,
                            BigDecimal balance, String mark, String postscript);
 
     /**

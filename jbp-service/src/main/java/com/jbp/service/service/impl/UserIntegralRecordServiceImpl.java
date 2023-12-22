@@ -45,7 +45,7 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
     private UserIntegralRecordDao dao;
 
     @Override
-    public UserIntegralRecord add(Integer uid, String integralType, String externalNo, Integer type,
+    public UserIntegralRecord add(Integer uid, Integer integralType, String externalNo, Integer type,
                                   String title, BigDecimal integral, BigDecimal balance, String mark, String postscript) {
         Date time = DateTimeUtils.getNow();
         UserIntegralRecord record = UserIntegralRecord

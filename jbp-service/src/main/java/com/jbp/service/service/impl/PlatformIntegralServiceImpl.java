@@ -31,14 +31,14 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     private UserIntegralService userIntegralService;
 
     @Override
-    public PlatformIntegral get(String type) {
+    public PlatformIntegral get(Integer type) {
         return lambdaQuery()
                 .eq(PlatformIntegral::getType, type)
                 .one();
     }
 
     @Override
-    public PlatformIntegral add(String type) {
+    public PlatformIntegral add(Integer type) {
         PlatformIntegral platformIntegral = PlatformIntegral.builder()
                 .type(type)
                 .integral(BigDecimal.ZERO)
@@ -50,7 +50,7 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     }
 
     @Override
-    public void increase(String integralType, String externalNo, String title, BigDecimal integral, String postscript) {
+    public void increase(Integer integralType, String externalNo, String title, BigDecimal integral, String postscript) {
         if (ArithmeticUtils.gte(BigDecimal.ZERO, integral)) {
             throw new CrmebException(StrUtil.format("增加平台积分值不能小于0， type={}, integral={}", integralType, integral));
         }
@@ -79,7 +79,7 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
     }
 
     @Override
-    public void reduce(String integralType, String externalNo, String title, BigDecimal integral, String postscript) {
+    public void reduce(Integer integralType, String externalNo, String title, BigDecimal integral, String postscript) {
         if (ArithmeticUtils.gte(BigDecimal.ZERO, integral)) {
             throw new CrmebException(StrUtil.format("减少平台积分值不能小于0， type={}, integral={}", integralType, integral));
         }
@@ -107,7 +107,7 @@ public class PlatformIntegralServiceImpl extends ServiceImpl<PlatformIntegralDao
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
-    public void transferToUser(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript) {
+    public void transferToUser(Integer uid, Integer integralType, String externalNo, String title, BigDecimal integral, String postscript) {
         reduce(integralType, externalNo, title, integral, postscript);
         userIntegralService.increase(uid, integralType, externalNo, title, integral, postscript);
     }

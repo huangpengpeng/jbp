@@ -11,13 +11,13 @@ import java.util.Date;
  */
 public interface UserIntegralService extends IService<UserIntegral> {
 
-    UserIntegral add(Integer uid, String type);
+    UserIntegral add(Integer uid, Integer type);
 
-    UserIntegral getByUser(Integer uid, String type);
+    UserIntegral getByUser(Integer uid, Integer type);
 
-    void increase(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript);
+    void increase(Integer uid, Integer integralType, String externalNo, String title, BigDecimal integral, String postscript);
 
-    void reduce(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript);
+    void reduce(Integer uid, Integer integralType, String externalNo, String title, BigDecimal integral, String postscript);
 
-    void transferToPlatform(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript);
+    void transferToPlatform(Integer uid, Integer integralType, String externalNo, String title, BigDecimal integral, String postscript);
 }

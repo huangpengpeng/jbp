@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Service
 public class PlatformIntegralRecordServiceImpl extends ServiceImpl<PlatformIntegralRecordDao, PlatformIntegralRecord> implements PlatformIntegralRecordService {
     @Override
-    public PlatformIntegralRecord add(String integralType, String externalNo, Integer type,
+    public PlatformIntegralRecord add(Integer integralType, String externalNo, Integer type,
                                       String title, BigDecimal integral, BigDecimal balance, String postscript) {
         PlatformIntegralRecord record = new PlatformIntegralRecord(integralType, externalNo, type, title, integral, balance, postscript);
         save(record);

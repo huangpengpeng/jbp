@@ -7,15 +7,15 @@ import com.jbp.common.model.user.PlatformIntegralRecord;
 import java.math.BigDecimal;
 
 public interface PlatformIntegralService extends IService<PlatformIntegral> {
-    PlatformIntegral get(String type);
+    PlatformIntegral get(Integer type);
 
-    PlatformIntegral add(String type);
+    PlatformIntegral add(Integer type);
 
-    void increase(String integralType, String externalNo, String title, BigDecimal integral, String postscript);
+    void increase(Integer integralType, String externalNo, String title, BigDecimal integral, String postscript);
 
-    void reduce(String integralType, String externalNo, String title, BigDecimal integral, String postscript);
+    void reduce(Integer integralType, String externalNo, String title, BigDecimal integral, String postscript);
 
-    void transferToUser(Integer uid, String integralType, String externalNo, String title, BigDecimal integral, String postscript);
+    void transferToUser(Integer uid, Integer integralType, String externalNo, String title, BigDecimal integral, String postscript);
 
 
 
