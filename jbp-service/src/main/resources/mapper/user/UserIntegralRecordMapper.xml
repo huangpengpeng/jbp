@@ -2,4 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.UserIntegralRecordDao">
 
+    <select id="findList" resultType="com.jbp.common.vo.IntegralRecordVo" parameterType="Map">
+        select r.*, u.account from eb_user_integral_record r left join eb_user u on u.id = r.uid
+        where 1=1
+        <if test="uid != '' and uid != null ">
+            and r.uid = #{uid}
+        </if>
+        <if test="account != '' and account != null ">
+            and u.account = #{account}
+        </if>
+        <if test="integralType != '' and integralType != null ">
+            and r.integralType = #{integralType}
+        </if>
+        <if test="externalNo != '' and externalNo != null ">
+            and r.externalNo = #{externalNo}
+        </if>
+        <if test="title != '' and title != null ">
+            and r.title = #{title}
+        </if>
+        <if test="type != '' and type != null ">
+            and r.type = #{type}
+        </if>
+        order by r.id desc
+
+    </select>
+
 </mapper>

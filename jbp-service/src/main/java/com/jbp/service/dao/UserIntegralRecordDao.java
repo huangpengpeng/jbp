@@ -2,6 +2,10 @@ package com.jbp.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.user.UserIntegralRecord;
+import com.jbp.common.vo.IntegralRecordVo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户积分记录表 Mapper 接口
@@ -16,5 +20,6 @@ import com.jbp.common.model.user.UserIntegralRecord;
  * +----------------------------------------------------------------------
  */
 public interface UserIntegralRecordDao extends BaseMapper<UserIntegralRecord> {
+    List<IntegralRecordVo> findList(Map<String, Object> map);
 
 }

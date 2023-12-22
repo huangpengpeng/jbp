@@ -6,10 +6,9 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.request.IntegralPageSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.IntegralRecordPageResponse;
+import com.jbp.common.vo.IntegralRecordVo;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 用户积分记录Service
@@ -42,10 +41,10 @@ public interface UserIntegralRecordService extends IService<UserIntegralRecord> 
                            BigDecimal balance, String mark, String postscript);
 
     /**
-     * 管理端查询积分记录分页列表
-     * @param request 搜索条件
-     * @param pageRequest 分页参数
-     * @return 记录列表
+     * 积分明细分页查询
      */
-    PageInfo<IntegralRecordPageResponse> findRecordPageListByPlat(IntegralPageSearchRequest request, PageParamRequest pageRequest);
+    PageInfo<IntegralRecordVo> page(IntegralPageSearchRequest request, PageParamRequest pageRequest);
+
+
+
 }

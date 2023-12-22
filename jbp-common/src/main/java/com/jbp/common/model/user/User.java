@@ -129,7 +129,7 @@ public class User implements Serializable {
 //    @ApiModelProperty(value = "绑定上级推广员时间")
 //    private Date spreadTime;
 
-//    @ApiModelProperty(value = "下级人数")
+//    @ApiModelProperty(value = "一阶下级人数")
 //    private Integer spreadCount;
 
 

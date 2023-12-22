@@ -28,12 +28,27 @@ public class IntegralPageSearchRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "添加时间")
-    private String dateLimit;
+    @ApiModelProperty(value = "开始时间")
+    private String startTime;
 
-    @ApiModelProperty(value = "搜索关键字:订单号、退款单号")
-    private String keywords;
+    @ApiModelProperty(value = "结束时间")
+    private String endTime;
 
-//    @ApiModelProperty(value = "用户id")
-//    private Integer uid;
+    @ApiModelProperty(value = "用户id")
+    private Integer uid;
+
+    @ApiModelProperty(value = "账号")
+    private String account;
+
+    @ApiModelProperty(value = "积分类型")
+    private String integralType;
+
+    @ApiModelProperty(value = "外部单号")
+    private String externalNo;
+
+    @ApiModelProperty(value = "标题")
+    private String title;
+
+    @ApiModelProperty(value = "增加 1  减少 2")
+    private String type;
 }
