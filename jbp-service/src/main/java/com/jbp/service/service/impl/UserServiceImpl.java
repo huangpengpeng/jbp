@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -35,6 +36,7 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -117,8 +119,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public User registerPhone(String phone, Integer spreadUid) {
         User user = new User();
-        user.setAccount(phone);
+        user.setAccount(getAccount());
         user.setPwd(CommonUtil.createPwd(phone));
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
+            throw new CrmebException("手机号重复");
+        }
         user.setPhone(phone);
         user.setRegisterType(UserConstants.REGISTER_TYPE_H5);
         user.setNickname(CommonUtil.createNickName(phone));
@@ -127,7 +132,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
         user.setLevel(1);
-
         // 推广人
         user.setSpreadUid(0);
         if (spreadUid > 0) {
@@ -137,29 +141,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 user.setSpreadTime(nowDate);
             }
         }
-
-        try {
-            HttpServletRequest request = RequestUtil.getRequest();
-            String clientIP = ServletUtil.getClientIP(request, null);
-            if (StrUtil.isBlank(clientIP)) {
-                logger.error("获取用户ip失败，用户phone = " + user.getPhone());
-            } else {
-    //            MyRecord myRecord = IPUtil.getAddressByIp(clientIP);
-    //            user.setCountry(myRecord.getStr("country").equals("中国") ? "CN" : "OTHER");
-    //            user.setProvince(myRecord.getStr("region"));
-    //            user.setCity(myRecord.getStr("city"));
-                IpLocation ipLocation = IPUtil.getLocation(clientIP);
-                if (ObjectUtil.isNotNull(ipLocation.getCountry())) {
-                    user.setCountry(ipLocation.getCountry().equals("中国") ? "CN" : "OTHER");
-                    user.setProvince(ipLocation.getProvince());
-                    user.setCity(ipLocation.getCity());
-                }
-            }
-        } catch (Exception e) {
-            logger.error("通过ip获取用户位置失败，用户phone = {}", user.getPhone());
-            logger.error("通过ip获取用户位置失败,e = {}", e);
-        }
-
         Boolean execute = transactionTemplate.execute(e -> {
             save(user);
             // 推广人处理
@@ -181,12 +162,37 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @return 用户信息
      */
     @Override
-    public User getByPhone(String phone) {
+    public List<User> getByPhone(String phone) {
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getPhone, phone);
         lqw.eq(User::getIsLogoff, 0);
-        lqw.last(" limit 1");
-        return dao.selectOne(lqw);
+        return dao.selectList(lqw);
+    }
+
+    @Override
+    public User getByAccount(String account) {
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getAccount, account);
+        return getOne(lqw);
+    }
+
+    @Override
+    public String getAccount() {
+        String accountPrefix = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_PREFIX);
+        String accountNum = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_NUM);
+        String account = StringUtils.EMPTY;
+        do {
+            account = CrmebUtil.getAccount(accountPrefix, accountNum); // 默认是A 开头 8为数字
+            if (getByAccount(account) == null) {
+               return account;
+            }
+        }while (true);
+    }
+
+    @Override
+    public boolean isUnique4Phone() {
+        String value = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_PHONE_IS_UNIQUE);
+        return StringUtils.isNotBlank(value) && value.equals("1");
     }
 
     /**
@@ -364,12 +370,17 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      */
     @Override
     public Boolean updatePhoneCode(UserBindingPhoneUpdateRequest request) {
+        // 校验老手机号验证码
         User user = getInfo();
         checkValidateCode(user.getPhone(), request.getCaptcha());
-        User tempUser = getByPhone(request.getPhone());
-        if (ObjectUtil.isNotNull(tempUser)) {
-            throw new CrmebException("手机号已被占用");
+        List<User> tempUsers = getByPhone(request.getPhone());
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(tempUsers)) {
+            List<User> collect = tempUsers.stream().filter(u -> u.getId() != user.getId()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(collect)) {
+                throw new CrmebException("手机号已被占用");
+            }
         }
+        // 新手机发送验证码
         return smsService.sendCommonCode(request.getPhone());
     }
 
@@ -381,21 +392,26 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Boolean updatePhone(UserBindingPhoneUpdateRequest request) {
         checkValidateCode(request.getPhone(), request.getCaptcha());
-        User tempUser = getByPhone(request.getPhone());
-        if (ObjectUtil.isNotNull(tempUser)) {
-            throw new CrmebException("手机号已被占用");
-        }
         User user = getInfo();
+        if (request.getPhone().equals(user.getPhone())) {
+            return true;
+        }
+        // 如果手机号唯一
+        List<User> tempUsers = getByPhone(request.getPhone());
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(tempUsers)) {
+            List<User> collect = tempUsers.stream().filter(u -> u.getId() != user.getId()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(collect)) {
+                throw new CrmebException("手机号已被占用");
+            }
+        }
         String password = "";
         try {
             password = CrmebUtil.decryptPassowrd(user.getPwd(), user.getPhone());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         LambdaUpdateWrapper<User> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(User::getPhone, request.getPhone());
-        wrapper.set(User::getAccount, request.getPhone());
         wrapper.set(User::getPwd, CrmebUtil.encryptPassword(password, request.getPhone()));
         wrapper.eq(User::getId, user.getId());
         return update(wrapper);

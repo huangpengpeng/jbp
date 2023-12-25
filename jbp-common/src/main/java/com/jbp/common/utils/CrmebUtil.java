@@ -702,6 +702,38 @@ public class CrmebUtil {
     }
 
     /**
+     * 账号生成
+     * @return 生成的随机码
+     */
+    public static String getAccount(String prefix,  String sizeStr) {
+        if(StringUtils.isEmpty(prefix)){
+            prefix = "A";
+        }
+        if(StringUtils.isEmpty(sizeStr)){
+            sizeStr = "8";
+        }
+        String[] chars = new String[] { "1", "2", "3", "4", "5", "6",
+                "7", "8", "9", "1", "2", "3", "4", "5", "6", "7", "8", "9", "1",
+                "2", "3", "4", "5", "6", "7", "8", "0", "1", "2", "3", "4", "5",
+                "6", "7", "8", "9", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "1", "2", "3", "4",
+                "5", "6", "7", "9" };
+        //调用Java提供的生成随机字符串的对象：32位，十六进制，中间包含-
+        StringBuffer shortBuffer = new StringBuffer();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+
+        for (int i = 0; i < Integer.valueOf(sizeStr); i++) {                       //分为8组
+            String str = uuid.substring(i * 4, i * 4 + 4);  //每组4位
+            int x = Integer.parseInt(str, 16);              //将4位str转化为int 16进制下的表示
+
+            //用该16进制数取模62（十六进制表示为314（14即E）），结果作为索引取出字符
+            shortBuffer.append(chars[x % 0x3E]);
+        }
+        return prefix + shortBuffer.toString();
+    }
+
+
+    /**
      * map排序
      *
      * @param map Map<String, Object> 支付类型

@@ -35,12 +35,22 @@ public interface UserService extends IService<User> {
     User registerPhone(String phone, Integer spreadUid);
 
     /**
-     * 根据手机号查询用户
+     * 根据手机号查询用户 [根据系统配置设置手机号是否唯一]
      *
      * @param phone 用户手机号
      * @return 用户信息
      */
-    User getByPhone(String phone);
+    List<User> getByPhone(String phone);
+
+    User getByAccount(String account);
+
+    /**
+     * 获取用户账户
+     * @return
+     */
+    String getAccount();
+
+    boolean isUnique4Phone();
 
     /**
      * 检测能否绑定关系

@@ -8,6 +8,8 @@ import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.vo.MyRecord;
 
+import java.util.List;
+
 /**
  * 移动端登录服务类
  * +----------------------------------------------------------------------
@@ -41,6 +43,8 @@ public interface LoginService {
      * @return LoginResponse
      */
     LoginResponse phoneCaptchaLogin(LoginMobileRequest loginRequest);
+
+    List<String> getAccount(LoginMobileRequest loginRequest);
 
     /**
      * 手机号密码登录

@@ -70,7 +70,7 @@ public class UserController {
         return CommonResult.failed();
     }
 
-    @ApiOperation(value = "换绑手机号获取验证码")
+    @ApiOperation(value = "换绑手机号老手机校验验证码 新手机发送验证码")
     @RequestMapping(value = "/update/binding/phone/code", method = RequestMethod.POST)
     public CommonResult<String> updatePhoneCode(@RequestBody @Validated UserBindingPhoneUpdateRequest request) {
         if (userService.updatePhoneCode(request)) {
@@ -79,7 +79,7 @@ public class UserController {
         return CommonResult.failed();
     }
 
-    @ApiOperation(value = "换绑手机号")
+    @ApiOperation(value = "换绑手机号  新手号+新手机号验证码校验")
     @RequestMapping(value = "/update/binding", method = RequestMethod.POST)
     public CommonResult<String> updatePhone(@RequestBody @Validated UserBindingPhoneUpdateRequest request) {
         if (userService.updatePhone(request)) {

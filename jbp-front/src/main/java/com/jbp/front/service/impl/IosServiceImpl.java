@@ -3,18 +3,23 @@ package com.jbp.front.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 
 import com.jbp.common.constants.SmsConstants;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.IosBindingPhoneRequest;
 import com.jbp.common.utils.CommonUtil;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.front.service.IosService;
 import com.jbp.service.service.UserService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * IOS服务实现类
@@ -39,6 +44,8 @@ public class IosServiceImpl implements IosService {
     @Autowired
     private RedisUtil redisUtil;
 
+
+
     /**
      * ios绑定手机号（登录后）
      *
@@ -49,18 +56,21 @@ public class IosServiceImpl implements IosService {
     public Boolean bindingPhone(IosBindingPhoneRequest request) {
         logger.info("ios ================ 绑定手机号 请求参数：request = " + request);
         checkValidateCode(request.getPhone(), request.getCaptcha());
-
-        User tempUser = userService.getByPhone(request.getPhone());
-        if (ObjectUtil.isNotNull(tempUser)) {
-            throw new CrmebException("手机号已注册");
-        }
-
         // 可以绑定
         Integer userId = userService.getUserIdException();
         User user = userService.getById(userId);
+        List<User> temUserList = userService.getByPhone(request.getPhone());
+        if (userService.isUnique4Phone() && !temUserList.isEmpty()) {
+            if (temUserList.size() > 1) {
+                throw new CrmebException("手机号已注册");
+            }
+            if (temUserList.get(0).getId() != userId) {
+                throw new CrmebException("手机号已注册");
+            }
+        }
         user.setPhone(request.getPhone());
         user.setPwd(CommonUtil.createPwd(request.getPhone()));
-        user.setAccount(request.getPhone());
+        user.setAccount(userService.getAccount());
         return userService.updateById(user);
     }
 

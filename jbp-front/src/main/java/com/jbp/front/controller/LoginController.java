@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 用户登陆 前端控制器
@@ -44,6 +45,12 @@ public class LoginController {
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     public CommonResult<FrontLoginConfigResponse> getLoginConfig() {
         return CommonResult.success(loginService.getLoginConfig());
+    }
+
+    @ApiOperation(value = "手机号获取账号")
+    @RequestMapping(value = "/account/List", method = RequestMethod.POST)
+    public CommonResult<List<String>> accountList(@RequestBody @Validated LoginMobileRequest loginRequest) {
+        return CommonResult.success(loginService.getAccount(loginRequest));
     }
 
     @ApiOperation(value = "手机号验证码登录")

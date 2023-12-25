@@ -28,6 +28,11 @@ public class CommonUtil {
         return CrmebUtil.encryptPassword(password, phone);
     }
 
+    public static void main(String[] args) {
+        String password = "Abc" + CrmebUtil.randomCount(10000, 99999);
+        System.out.println(password);
+    }
+
     /**
      * 随机生成用户昵称
      *

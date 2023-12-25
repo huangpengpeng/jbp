@@ -38,6 +38,10 @@ public class LoginPasswordRequest implements Serializable {
     @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
     private String phone;
 
+    @ApiModelProperty(value = "账号", required = true)
+    @NotBlank(message = "账号不能为空")
+    private String account;
+
     @ApiModelProperty(value = "密码", required = true, example = "1~[6,18]")
 //    @Pattern(regexp = RegularConstants.PASSWORD, message = "密码格式错误，密码必须以字母开头，长度在6~18之间，只能包含字符、数字和下划线")
     private String password;

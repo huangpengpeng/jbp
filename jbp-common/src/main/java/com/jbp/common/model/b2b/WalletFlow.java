@@ -2,7 +2,6 @@ package com.jbp.common.model.b2b;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.mall.common.model.BaseModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 @TableName("WalletFlow")
 @NoArgsConstructor
-public class WalletFlow extends BaseModel {
+public class WalletFlow{
 
     public WalletFlow(Long userId, String walletType, String action, String operate,
                       String uniqueNo, String externalNo, String postscript,

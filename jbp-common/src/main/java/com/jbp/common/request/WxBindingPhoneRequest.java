@@ -34,6 +34,10 @@ public class WxBindingPhoneRequest implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    @ApiModelProperty(value = "请输入账户")
+    @NotBlank(message = "账户账户不能为空")
+    private String account;
+
     @ApiModelProperty(value = "手机号,公众号、app微信必传")
     @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
     private String phone;

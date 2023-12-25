@@ -24,6 +24,8 @@ import com.jbp.common.vo.WeChatOauthToken;
 import com.jbp.front.service.LoginService;
 import com.jbp.service.service.*;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 移动端登录服务类
@@ -104,6 +107,17 @@ public class LoginServiceImpl implements LoginService {
         redisUtil.delete(SmsConstants.SMS_VALIDATE_PHONE + phone);
     }
 
+    private void checkValidateCodeNoDel(String phone, String code) {
+        Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
+        if (ObjectUtil.isNull(validateCode)) {
+            throw new CrmebException("验证码已过期");
+        }
+        if (!validateCode.toString().equals(code)) {
+            throw new CrmebException("验证码错误");
+        }
+        //删除验证码
+    }
+
     /**
      * 退出登录
      * @param request HttpServletRequest
@@ -127,13 +141,28 @@ public class LoginServiceImpl implements LoginService {
         //检测验证码
         checkValidateCode(loginRequest.getPhone(), loginRequest.getCaptcha());
         //查询用户信息
-        User user = userService.getByPhone(loginRequest.getPhone());
-        if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
-            user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
+        List<User> userList = userService.getByPhone(loginRequest.getPhone());
+        if (userList.isEmpty()) {// 此用户不存在，走新用户注册流程
+            User user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
             return getLoginResponse_V1_3(user, true);
         }
-        return commonLogin(user, spreadPid);
+        if (userList.size() > 1 && StringUtils.isEmpty(loginRequest.getAccount())) {
+            throw new CrmebException("当前手机号存在多个账号, 请选择账号在进行登录");
+        }
+        if (userList.size() == 1) {
+            return commonLogin(userList.get(0), spreadPid);
+        }
+        return commonLogin(userService.getByAccount(loginRequest.getAccount()), spreadPid);
+    }
 
+    @Override
+    public List<String> getAccount(LoginMobileRequest loginRequest) {
+        if (StrUtil.isBlank(loginRequest.getCaptcha())) {
+            throw new CrmebException("手机号码验证码不能为空");
+        }
+        checkValidateCodeNoDel(loginRequest.getPhone(), loginRequest.getCaptcha());
+        List<User> userList = userService.getByPhone(loginRequest.getPhone());
+        return ListUtils.emptyIfNull(userList).stream().map(User::getAccount).collect(Collectors.toList());
     }
 
     /**
@@ -146,9 +175,8 @@ public class LoginServiceImpl implements LoginService {
         if (StrUtil.isBlank(loginRequest.getPassword())) {
             throw new CrmebException("密码不能为空");
         }
-
         //查询用户信息
-        User user = userService.getByPhone(loginRequest.getPhone());
+        User user = userService.getByAccount(loginRequest.getAccount());
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("用户名或密码不正确");
         }
@@ -230,12 +258,15 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 微信注册绑定手机号
+     * 一个微信 在相同的客户端 只能绑定一个账户
+     * 1、保证这个原则，主需要检查当前微信在需要绑定的客户端是否存在 存在就报错
+     * 2、要保证 微信授权登录只能查出来一个账号
      * @param request 请求参数
      * @return 登录信息
      */
     @Override
     public LoginResponse wechatRegisterBindingPhone(WxBindingPhoneRequest request) {
-        // 检验并获取手机号
+        // 检验并获取手机号【可以是传进来 也可以是自动获取的】
         checkBindingPhone(request);
 
         // 进入创建用户绑定手机号流程
@@ -247,12 +278,19 @@ public class LoginServiceImpl implements LoginService {
         if (!request.getType().equals(registerThirdUserRequest.getType())) {
             throw new CrmebException("用户的类型与缓存中的类型不符");
         }
-
-        boolean isNew = true;
-        User user = userService.getByPhone(request.getPhone());
-        // 查询是否用对应得token
         Integer userTokenType = getUserTokenType(request.getType());
-        if (ObjectUtil.isNotNull(user)) {// 历史用户校验
+        UserToken userToken = userTokenService.getByOpenidAndType(registerThirdUserRequest.getOpenId(), userTokenType);
+        if (userToken != null) {
+            throw new CrmebException("当前微信已经绑定过账户");
+        }
+        boolean isNew = true;
+        List<User> userList = userService.getByPhone(request.getPhone());
+        User user = userList.isEmpty() ? null : userList.get(0);
+        // 手机号唯一  并且存在用户的情况下
+        if (userService.isUnique4Phone() && !userList.isEmpty()) {
+            if (userList.size() > 1) { // 要求唯一但存在多个 说明数据错误 不需要考虑业务逻辑直接异常
+                throw new CrmebException("当前手机号重复注册" + request.getPhone());
+            }
             if (request.getType().equals(UserConstants.REGISTER_TYPE_WECHAT) && user.getIsWechatPublic()) {
                 throw new CrmebException("该手机号已绑定微信公众号");
             }
@@ -265,16 +303,17 @@ public class LoginServiceImpl implements LoginService {
             if (request.getType().equals(UserConstants.REGISTER_TYPE_IOS_WX) && user.getIsWechatIos()) {
                 throw new CrmebException("该手机号已绑定微信IOS");
             }
-            UserToken userToken = userTokenService.getTokenByUserId(user.getId(), userTokenType);
+            userToken = userTokenService.getTokenByUserId(user.getId(), userTokenType);
             if (ObjectUtil.isNotNull(userToken)) {
                 throw new CrmebException("该手机号已被注册");
             }
             isNew = false;
         } else {
+            // 手机号不是唯一 或者 手机号没注册  走注册流程
             user = new User();
             user.setRegisterType(registerThirdUserRequest.getType());
             user.setPhone(request.getPhone());
-            user.setAccount(request.getPhone());
+            user.setAccount(userService.getAccount());
             user.setSpreadUid(0);
             user.setPwd(CommonUtil.createPwd(request.getPhone()));
             user.setNickname(CommonUtil.createNickName(request.getPhone()));
@@ -521,13 +560,12 @@ public class LoginServiceImpl implements LoginService {
         }
         // 没有用户Ios直接创建新用户
         User user = new User();
-        String randomString = RandomUtil.randomString(11);
-        user.setPhone("");
-        user.setAccount(randomString);
+        user.setAccount(userService.getAccount());
+        user.setPhone(userService.getAccount());
         user.setSpreadUid(0);
         user.setPwd("123");
         user.setRegisterType(UserConstants.REGISTER_TYPE_IOS);
-        user.setNickname(CommonUtil.createNickName(randomString));
+        user.setNickname(user.getAccount());
         user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
         user.setSex(0);
         user.setAddress("");

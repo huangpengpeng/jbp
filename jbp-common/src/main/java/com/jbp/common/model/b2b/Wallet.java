@@ -2,8 +2,7 @@ package com.jbp.common.model.b2b;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.mall.common.model.VersionModel;
-import com.mall.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.ArithmeticUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.math.BigDecimal;
 @Data
 @TableName("Wallet")
 @NoArgsConstructor
-public class Wallet extends VersionModel {
+public class Wallet  {
 
     public Wallet(Long userId, String type) {
         this.userId = userId;

@@ -335,4 +335,13 @@ public class SysConfigConstants {
     /** 系统商品复制类型 */
     public static final String CONFIG_PRODUCT_COPY_TYPE = "system_product_copy_type";
 
+    /** 注册账户前缀 */
+    public static final String CONFIG_REGISTER_ACCOUNT_PREFIX = "system_register_account_prefix";
+
+    /** 注册账户长度 */
+    public static final String CONFIG_REGISTER_ACCOUNT_NUM = "system_register_account_num";
+
+    /** 系统手机号是否唯一 */
+    public static final String CONFIG_REGISTER_PHONE_IS_UNIQUE = "system_phone_is_unique";
+
 }
