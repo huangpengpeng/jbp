@@ -67,14 +67,6 @@ public class UserWhiteServiceImpl extends ServiceImpl<UserWhiteDao, UserWhite> i
     @Override
     public List<UserWhite> importUserWhite(List<UserWhiteExpress> userWhiteExpresses) {
         List<UserWhite> userWhiteList=new ArrayList<>();
-       /* userWhiteExpresses.forEach(e -> {
-            UserWhite userWhite = new UserWhite();
-            userWhite.setUserId(Long.valueOf(userDao.selectOne(new LambdaQueryWrapper<User>().eq(e.getAccountNo() != null &&
-                    e.getAccountNo() != "", User::getAccount, e.getAccountNo())).getId()));
-            userWhite.setWhiteId(Long.valueOf(whiteDao.selectOne(new LambdaQueryWrapper<White>()
-                    .eq(e.getWhiteName()!=null&&e.getWhiteName()!="",White::getName,e.getWhiteName())).getId()));
-            userWhiteList.add(userWhite);
-        });*/
         for (int i = 0; i < userWhiteExpresses.size(); i++) {
             UserWhite userWhite = new UserWhite();
             try {
@@ -94,6 +86,10 @@ public class UserWhiteServiceImpl extends ServiceImpl<UserWhiteDao, UserWhite> i
             userWhiteList.add(userWhite);
         }
         saveBatch(userWhiteList);
+        userWhiteList.forEach(e->{
+            e.setWhiteName(whiteDao.selectById(e.getWhiteId()).getName());
+            e.setAccountNo(userDao.selectById(e.getUserId()).getAccount());
+        });
         return userWhiteList;
 
     }
