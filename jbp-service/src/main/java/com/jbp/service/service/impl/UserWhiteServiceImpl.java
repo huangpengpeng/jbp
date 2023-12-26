@@ -90,6 +90,7 @@ public class UserWhiteServiceImpl extends ServiceImpl<UserWhiteDao, UserWhite> i
             }catch (NullPointerException e){
                 throw new RuntimeException("账号:"+userWhiteExpresses.get(i).getAccountNo()+"不存在");
             }
+            userWhite.setGmtCreated(new Date());
             userWhiteList.add(userWhite);
         }
         saveBatch(userWhiteList);
