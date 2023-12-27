@@ -64,11 +64,7 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
                 list.add(flow);
             }
         }
-        // 没有关系退出
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
-        // 保存
+        // 保存 list空 mybatis自带剔除
         saveBatch(list);
     }
 }

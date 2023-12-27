@@ -20,18 +20,25 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("b2b_user_invitation_flow")
-@ApiModel(value="UserRelationFlow对象", description="服务关系上下层级关系")
-public class UserRelationFlow  implements Serializable {
+@ApiModel(value = "UserRelationFlow对象", description = "服务关系上下层级关系")
+public class UserRelationFlow implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public UserRelationFlow(Integer uId, Integer pId, int level, int node) {
+        this.uId = uId;
+        this.pId = pId;
+        this.level = level;
+        this.node = node;
+    }
+
     @ApiModelProperty("用户ID")
-    @TableField("userId")
-    private Long userId;
+    @TableField("uId")
+    private Integer uId;
 
     @ApiModelProperty("邀请上级")
     @TableField("pId")
-    private Long pId;
+    private Integer pId;
 
     @ApiModelProperty("层级")
     @TableField("level")
