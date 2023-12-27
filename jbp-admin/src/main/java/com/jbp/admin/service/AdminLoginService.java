@@ -1,14 +1,14 @@
 package com.jbp.admin.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.jbp.common.request.LoginAdminUpdateRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
-import com.jbp.common.response.AdminLoginInfoResponse;
+import com.jbp.common.response.AdminLoginPicResponse;
 import com.jbp.common.response.LoginAdminResponse;
 import com.jbp.common.response.MenusResponse;
 import com.jbp.common.response.SystemLoginResponse;
+import com.jbp.common.vo.MyRecord;
 
 /**
  * 管理端登录服务
@@ -44,14 +44,14 @@ public interface AdminLoginService {
      *
      * @return AdminLoginPicResponse
      */
-    AdminLoginInfoResponse getLoginInfo();
+    AdminLoginPicResponse getLoginPic();
 
     /**
      * 获取商户端登录页图片
      *
      * @return AdminLoginPicResponse
      */
-    AdminLoginInfoResponse getMerchantLoginInfo();
+    AdminLoginPicResponse getMerchantLoginPic();
 
     /**
      * 获取管理员可访问目录
@@ -64,12 +64,6 @@ public interface AdminLoginService {
      * 根据Token获取对应用户信息
      */
     LoginAdminResponse getInfoByToken();
-    
-    /**
-     * 设置登录用户mfakey
-     * @return
-     */
-    Map<String,String> loginUserMfaKey();
 
     /**
      * 修改登录用户信息

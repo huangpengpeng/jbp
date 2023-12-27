@@ -1,21 +1,12 @@
 package com.jbp.common.utils;
 
-import cn.hutool.core.io.IORuntimeException;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.exception.CrmebException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +25,6 @@ import java.util.Objects;
  *  +----------------------------------------------------------------------
  */
 public class RequestUtil extends HttpServlet{
-	
-	
-	private static String REQUESTBODY = "requestBodyMessage";
 
     public static HttpServletRequest getRequest() {
         if(RequestContextHolder.getRequestAttributes() != null){
@@ -100,20 +88,6 @@ public class RequestUtil extends HttpServlet{
             return null;
         }
     }
-    
-	public static String getParams(String name) {
-		try {
-			String value = getRequest().getParameter(name);
-			if (StringUtils.isNotBlank(value)) {
-				return value;
-			}
-			String params = (String) getRequest().getAttribute(REQUESTBODY);
-			JSONObject jsonObject = JSONObject.parseObject(params);
-			return jsonObject.getString(name);
-		} catch (Exception e) {
-			throw new CrmebException(e.getMessage());
-		}
-	}
 
     public static String getDomain(){
         HttpServletRequest request = getRequest();

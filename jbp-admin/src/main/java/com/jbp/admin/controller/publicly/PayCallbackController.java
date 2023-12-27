@@ -1,21 +1,20 @@
 package com.jbp.admin.controller.publicly;
 
-import javax.servlet.http.HttpServletRequest;
+import com.alibaba.fastjson.JSON;
+import com.jbp.common.annotation.CustomResponseAnnotation;
+import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.PayCallbackService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.jbp.common.annotation.CustomResponseAnnotation;
-import com.jbp.common.encryptapi.EncryptIgnore;
-import com.jbp.service.service.PayCallbackService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -35,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/publicly/payment/callback")
 @Api(tags = "支付回调控制器")
 @CustomResponseAnnotation
-@EncryptIgnore
 public class PayCallbackController {
 
     @Autowired

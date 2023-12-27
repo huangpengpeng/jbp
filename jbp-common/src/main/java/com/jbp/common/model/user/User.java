@@ -162,7 +162,4 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "用户签名")
     private String signature;
-    
-    @ApiModelProperty(value = "用户最后一次登录验证码")
-    private String lastCheckCode;
 }

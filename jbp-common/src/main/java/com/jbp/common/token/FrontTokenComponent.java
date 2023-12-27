@@ -2,12 +2,10 @@ package com.jbp.common.token;
 
 import cn.hutool.core.util.StrUtil;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.RedisConstants;
-import com.jbp.common.encryptapi.SecretKeyConfig;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.RequestUtil;
@@ -33,9 +31,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class FrontTokenComponent {
 
-	@Autowired
-	private SecretKeyConfig secretKeyConfig;
-	
     @Resource
     private RedisUtil redisUtil;
 
@@ -57,23 +52,23 @@ public class FrontTokenComponent {
         }
     }
 
-	/**
-	 * 创建令牌
-	 *
-	 * @param user 用户信息
-	 * @return 令牌
-	 */
-	public String createToken(User user) {
-		String token = UUID.randomUUID().toString().replace("-", "") + "@" + secretKeyConfig.encryptStr(secretKeyConfig.encryptStr(getCheck()));
-		redisUtil.set(getTokenKey(token), user.getId(), Constants.TOKEN_EXPRESS_MINUTES, TimeUnit.MINUTES);
-		return token;
-	}
+    /**
+     * 创建令牌
+     *
+     * @param user 用户信息
+     * @return 令牌
+     */
+    public String createToken(User user) {
+        String token = UUID.randomUUID().toString().replace("-", "");
+        redisUtil.set(getTokenKey(token), user.getId(), Constants.TOKEN_EXPRESS_MINUTES, TimeUnit.MINUTES);
+        return token;
+    }
 
-	/**
-	 * 验证令牌有效期，相差不足20分钟，自动刷新缓存
-	 *
-	 * @param loginUser LoginUserVo
-	 */
+    /**
+     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
+     *
+     * @param loginUser LoginUserVo
+     */
     public void verifyToken(LoginUserVo loginUser) {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
@@ -133,11 +128,6 @@ public class FrontTokenComponent {
             return null;
         }
         return redisUtil.get(getTokenKey(token));
-    }
-    
-    public String getCheck() {
-    	  String checkCode =RequestUtil.getParams("checkCode");
-    	  return secretKeyConfig.decryptStr(checkCode);
     }
 
     public Boolean check(String token) {

@@ -34,9 +34,4 @@ public class SecurityUtil {
         return loginUserVo;
     }
 
-	public static Boolean hasLogin() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object loginUserVo = authentication.getPrincipal();
-		return loginUserVo instanceof LoginUserVo;
-	}
 }

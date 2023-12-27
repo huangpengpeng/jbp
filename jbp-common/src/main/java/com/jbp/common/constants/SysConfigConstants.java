@@ -44,12 +44,6 @@ public class SysConfigConstants {
     public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_TITLE = "wechat_share_title";
     /** 微信分享简介（公众号） */
     public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_SYNOPSIS = "wechat_share_synopsis";
-    
-    /** 平台端-开启mfa登录 */
-    public static final String CONFIG_KEY_ADMIN_MFA_OPEN = "mfa_open";
-    
-    /** 开启商户端 */
-    public static final String CONFIG_KEY_ADMIN_MER_OPEN = "mer_open";
 
 
     /** 是否启用分销:1-启用，0-禁止 */

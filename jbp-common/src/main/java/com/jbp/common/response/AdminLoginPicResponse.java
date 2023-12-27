@@ -24,8 +24,8 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "AdminLoginInfoResponse对象", description = "管理端登录页图片Response对象")
-public class AdminLoginInfoResponse implements Serializable {
+@ApiModel(value = "AdminLoginPicResponse对象", description = "管理端登录页图片Response对象")
+public class AdminLoginPicResponse implements Serializable {
 
     private static final long serialVersionUID = 3285713110515203543L;
 
@@ -37,10 +37,4 @@ public class AdminLoginInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "登录页左侧logo")
     private String leftLogo;
-    
-    @ApiModelProperty(value = "开启mfa登录")
-    private String mfaOpen;
-    
-    @ApiModelProperty(value = "开启商户端登录")
-    private String merOpen;
 }
