@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@TableName("eb_user_white")
+@TableName("eb_white_user")
 @NoArgsConstructor
 @AllArgsConstructor
 public class WhiteUser extends BaseModel {

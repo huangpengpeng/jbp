@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
-public interface UserWhiteDao extends BaseMapper<WhiteUser> {
-    List<WhiteUser> selectUserWhiteList(@Param("ew") LambdaQueryWrapper<WhiteUser> lambdaQueryWrapper);
+public interface WhiteUserDao extends BaseMapper<WhiteUser> {
 
 }
