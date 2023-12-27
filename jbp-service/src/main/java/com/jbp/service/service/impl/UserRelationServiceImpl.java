@@ -10,6 +10,7 @@ import com.jbp.service.service.UserRelationFlowService;
 import com.jbp.service.service.UserRelationService;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,6 +25,8 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     private UserInvitationService userInvitationService;
     @Resource
     private UserRelationFlowService userRelationFlowService;
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     @Override
     public UserRelation getByUid(Integer uId) {
@@ -80,9 +83,15 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         userRelation.setNode(node);
         userRelation.setUId(uId);
         userRelation.setPId(pId);
-        saveOrUpdate(userRelation);
-        // 删除关系留影
-        userRelationFlowService.clear(uId);
+
+        // 执行更新
+        UserRelation finalUserRelation = userRelation;
+        transactionTemplate.execute(e -> {
+            saveOrUpdate(finalUserRelation);
+            // 删除关系留影
+            userRelationFlowService.clear(uId);
+            return Boolean.TRUE;
+        });
         return userRelation;
     }
 

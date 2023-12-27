@@ -1,0 +1,61 @@
+package com.jbp.service.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jbp.common.model.b2b.CapaXs;
+import com.jbp.common.model.b2b.CapaXsCondition;
+import com.jbp.service.dao.b2b.CapaXsDao;
+import com.jbp.service.service.CapaXsConditionService;
+import com.jbp.service.service.CapaXsService;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
+
+    @Resource
+    private CapaXsConditionService capaXsConditionService;
+    @Resource
+    private TransactionTemplate transactionTemplate;
+
+    @Override
+    public CapaXs getMinCapa() {
+        return getOne(new QueryWrapper<CapaXs>().lambda().orderByAsc(CapaXs::getRankNum).last(" limit 1"));
+    }
+
+    @Override
+    public CapaXs getNext(Long capaId) {
+        if(capaId == null){
+            return getMinCapa();
+        }
+        CapaXs capa = getById(capaId);
+        if(capa.getPCapaId() == null){
+            return null;
+        }
+        return getById(capa.getPCapaId());
+    }
+
+    @Override
+    public CapaXs getByName(String name) {
+        return getOne(new QueryWrapper<CapaXs>().lambda().eq(CapaXs::getName, name));
+    }
+
+    @Override
+    public CapaXs getByRankNum(Integer rankNum) {
+        return getOne(new QueryWrapper<CapaXs>().lambda().eq(CapaXs::getRankNum, rankNum));
+    }
+
+    @Override
+    public void saveOrUpdate(Long capaId, List<CapaXsCondition> conditionList, String parser) {
+        transactionTemplate.execute(s -> {
+                    capaXsConditionService.deleteByCapa(capaId);
+                    capaXsConditionService.saveBatch(conditionList);
+                    CapaXs capaXs = getById(capaId);
+                    capaXs.setParser(parser);
+                    updateById(capaXs);
+                    return Boolean.TRUE;
+                }
+        );
+    }
+}

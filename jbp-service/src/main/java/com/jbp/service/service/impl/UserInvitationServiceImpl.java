@@ -10,6 +10,7 @@ import com.jbp.service.service.UserInvitationService;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,6 +26,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     private UserInvitationDao dao;
     @Resource
     private UserInvitationFlowService userInvitationFlowService;
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     @Override
     public UserInvitation getByUser(Integer uId) {
@@ -85,9 +88,15 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         }
         userInvitation.setUId(uId);
         userInvitation.setIfForce(ifForce);
-        saveOrUpdate(userInvitation);
-        // 删除关系留影
-        userInvitationFlowService.clear(uId);
+
+        // 执行更新
+        UserInvitation finalUserInvitation = userInvitation;
+        transactionTemplate.execute(s->{
+            saveOrUpdate(finalUserInvitation);
+            // 删除关系留影
+            userInvitationFlowService.clear(uId);
+            return Boolean.TRUE;
+        });
         return userInvitation;
     }
 
