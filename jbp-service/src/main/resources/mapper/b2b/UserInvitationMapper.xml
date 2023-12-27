@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.b2b.UserInvitationDao">
+
+    <select id="getAllUpper" parameterType="java.util.Map" resultType="com.jbp.common.dto.UserUpperDto">
+        select t1.*
+            from(select @r as uId,
+                        (select @r := ifnull(mId, pId)  from UserInvitation where userId = uId) as pId, @I := @I + 1 as level
+            from (select @r := #{uId} ,@I := 0) vars, UserInvitation h) t1 join UserInvitation t2 on t1.uId = t2.userId
+        order by level asc
+    </select>
+
+    <select id="getNoMountAllUpper" parameterType="java.util.Map" resultType="com.jbp.common.dto.UserUpperDto">
+        select t1.*
+        from(select @r as uId,
+                    (select @r := pId  from UserInvitation where userId = uId) as pId, @I := @I + 1 as level
+        from (select @r := #{uId} ,@I := 0) vars, UserInvitation h) t1 join UserInvitation t2 on t1.uId = t2.userId
+        order by level asc
+    </select>
+
+
+
+</mapper>
