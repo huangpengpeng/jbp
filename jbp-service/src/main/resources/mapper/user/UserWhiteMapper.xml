@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.UserWhiteDao">
+    <resultMap id="userWhite" type="com.jbp.common.model.user.UserWhite">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="white_id" property="whiteId"/>
+        <result column="orders_sn" property="ordersSn"/>
+        <result column="create_time" property="gmtCreated"/>
+        <result column="update_time" property="gmtModify"/>
+        <association property="accountNo" select="com.jbp.service.dao.UserDao.getById" column="user_id"/>
+        <association property="whiteName"  select="com.jbp.service.dao.WhiteDao.getById" column="white_id"/>
+    </resultMap>
+    <!--List<UserWhite> selectUserWhiteList(@Param("ew") LambdaQueryWrapper<UserWhite> lambdaQueryWrapper);-->
+    <select id="selectUserWhiteList" resultMap="userWhite">
+         #{ew}
+    </select>
+
+</mapper>
