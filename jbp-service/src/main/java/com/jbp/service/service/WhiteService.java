@@ -8,7 +8,7 @@ import com.jbp.common.request.WhiteRequest;
 
 import java.util.List;
 
-public interface WhiteServicel extends IService<White> {
+public interface WhiteService extends IService<White> {
     PageInfo<White> pageList(WhiteRequest request, PageParamRequest pageParamRequest);
 
     Boolean addWhiten(WhiteRequest white);

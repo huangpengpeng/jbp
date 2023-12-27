@@ -10,27 +10,29 @@ import com.jbp.common.model.user.White;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.WhiteRequest;
-import com.jbp.service.dao.UserWhiteDao;
 import com.jbp.service.dao.WhiteDao;
-import com.jbp.service.service.WhiteServicel;
+import com.jbp.service.service.WhiteService;
+import com.jbp.service.service.WhiteUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
-public class WhiteServicelImpl extends ServiceImpl<WhiteDao, White> implements WhiteServicel {
-    @Autowired
+public class WhiteServicelImpl extends ServiceImpl<WhiteDao, White> implements WhiteService {
+    @Resource
     WhiteDao whiteDao;
-    @Autowired
-    UserWhiteDao userWhiteDao;
+    @Resource
+    WhiteUserService whiteUserService;
 
     @Override
     public  PageInfo<White>  pageList(WhiteRequest request, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<White> lambdaQueryWrapper=new LambdaQueryWrapper<White>()
-                .in(request.getName()!=null&&request.getName()!="",White::getName,request.getName());
+                .in(!Objects.isNull(request.getName())&&request.getName()!="",White::getName,request.getName());
         Page<White> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<White> whites = whiteDao.selectList(lambdaQueryWrapper);
        return CommonPage.copyPageInfo(page, whites);
@@ -39,12 +41,13 @@ public class WhiteServicelImpl extends ServiceImpl<WhiteDao, White> implements W
     @Override
     public Boolean addWhiten(WhiteRequest white) {
         LambdaQueryWrapper<White> whiteLambda=new LambdaQueryWrapper<White>()
-                .eq(white.getName()!=null,White::getName,white.getName());
+                .eq(!Objects.isNull(white.getName()),White::getName,white.getName());
         White one = whiteDao.selectOne(whiteLambda);
        if (one==null){
            one=new White();
            one.setName(white.getName());
            one.setGmtCreated(new Date());
+           one.setGmtModify(new Date());
            whiteDao.insert(one);
            return true;
        }
@@ -54,12 +57,7 @@ public class WhiteServicelImpl extends ServiceImpl<WhiteDao, White> implements W
 
     @Override
     public Boolean cascadingDelte(Long id) {
-        LambdaQueryWrapper<WhiteUser> userWhiteQeryWrappper=new LambdaQueryWrapper<WhiteUser>()
-                .eq(id!=0&&id!=null, WhiteUser::getWhiteId,id);
-        List<WhiteUser> userWhites = userWhiteDao.selectList(userWhiteQeryWrappper);
-        List<Long> userWhiteid = new ArrayList<>();
-        userWhites.forEach(e->{userWhiteid.add(e.getId());});
-        userWhiteDao.deleteBatchIds(userWhiteid);
+        whiteUserService.remove(new LambdaQueryWrapper<WhiteUser>().eq(!Objects.isNull(id),WhiteUser::getWhiteId,id));
         whiteDao.deleteById(id);
         return true;
 

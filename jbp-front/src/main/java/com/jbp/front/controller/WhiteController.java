@@ -8,7 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.WhiteRequest;
 import com.jbp.common.response.CouponFrontResponse;
 import com.jbp.common.result.CommonResult;
-import com.jbp.service.service.WhiteServicel;
+import com.jbp.service.service.WhiteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.Get;
@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "白名单管理")
 public class WhiteController {
     @Autowired
-    WhiteServicel whiteServicel;
+    WhiteService whiteService;
 
 
     @ApiOperation("新增白名单")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult addWhiten(@RequestBody WhiteRequest white) {
-        if (whiteServicel.addWhiten(white)) {
+        if (whiteService.addWhiten(white)) {
             return CommonResult.success();
         }
         return CommonResult.failed();
@@ -37,13 +37,13 @@ public class WhiteController {
     @ApiOperation("白名单列表")
     public CommonResult<CommonPage<White>> getList(@ModelAttribute @Validated WhiteRequest request,
                                                    @ModelAttribute PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(whiteServicel.pageList(request, pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(whiteService.pageList(request, pageParamRequest)));
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     @ApiOperation("指定白名单删除")
     public CommonResult cascadingDelte(@PathVariable("id") Long id) {
-        if (whiteServicel.cascadingDelte(id)) {
+        if (whiteService.cascadingDelte(id)) {
             return CommonResult.success();
         }
         return CommonResult.failed();

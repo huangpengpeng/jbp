@@ -13,7 +13,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "UserWhiteRequest对象", description = "用户白名单请求对象")
-public class UserWhiteRequest  implements Serializable {
+public class WhiteUserRequest  implements Serializable {
     private static final long serialVersionUID = 1L;
     @ApiModelProperty(value = "白名单Id ")
     private Integer whiteId;
