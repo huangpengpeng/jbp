@@ -42,5 +42,8 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "公司名称")
     private String siteName;
+    
+    @ApiModelProperty(value = "版权logo")
+    private String copyrightLogo;
 
 }

@@ -61,6 +61,10 @@ public class ResponseRouter {
 				data = SpringUtil.getBean(SystemAttachmentService.class).prefixImage(data);
 			}
 		}
+		
+		if(!secretKeyConfig.isOpen()) {
+			return data;
+		}
 
 		// 对返回数据加密处理
 		EncryptIgnore EncryptIgnore = (EncryptIgnore) request.getAttribute(CUSTOM_RESPONSE_RESULT_ENCRYPTIGNORE);

@@ -19,6 +19,7 @@ import com.google.common.cache.CacheBuilder;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.User;
 import com.jbp.common.token.FrontTokenComponent;
+import com.jbp.common.utils.RequestUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 
@@ -34,11 +35,21 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
+		
+		String path=RequestUtil.getUri(request);
+		if (!path.contains("api/admin/") && !path.contains("api/front/")) {
+			return super.preHandle(request, response, handler);
+		}
+		
+		
 		SecretKeyConfig secretKeyConfig = com.jbp.common.utils.SpringUtil.getBean(SecretKeyConfig.class);
 		FrontTokenComponent frontTokenComponent = com.jbp.common.utils.SpringUtil.getBean(FrontTokenComponent.class);
 
 		HandlerMethod hm = (HandlerMethod) handler;
 		Method method = hm.getMethod();
+		
+		
+
 
 		if (method.isAnnotationPresent(EncryptIgnore.class)) {
 			return super.preHandle(request, response, handler);

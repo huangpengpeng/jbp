@@ -24,3 +24,8 @@
 2023-12-27 19:02:28.468 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
 2023-12-27 19:08:10.764 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
 2023-12-27 19:12:17.895 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
+2023-12-27 21:24:10.173 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
+2023-12-27 21:25:09.121 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
+2023-12-27 21:31:34.829 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
+2023-12-27 21:37:29.376 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
+2023-12-27 21:52:07.412 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.jbp.front]' package. Please check your configuration.
