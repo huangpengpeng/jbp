@@ -1,25 +1,20 @@
 package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.merchant.MerchantApply;
-import com.jbp.common.model.user.UserWhite;
+import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.model.user.White;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.UserWhiteRequest;
 import com.jbp.common.request.WhiteRequest;
-import com.jbp.common.result.CommonResult;
 import com.jbp.service.dao.UserWhiteDao;
 import com.jbp.service.dao.WhiteDao;
 import com.jbp.service.service.WhiteServicel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.unit.DataUnit;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,9 +54,9 @@ public class WhiteServicelImpl extends ServiceImpl<WhiteDao, White> implements W
 
     @Override
     public Boolean cascadingDelte(Long id) {
-        LambdaQueryWrapper<UserWhite> userWhiteQeryWrappper=new LambdaQueryWrapper<UserWhite>()
-                .eq(id!=0&&id!=null,UserWhite::getWhiteId,id);
-        List<UserWhite> userWhites = userWhiteDao.selectList(userWhiteQeryWrappper);
+        LambdaQueryWrapper<WhiteUser> userWhiteQeryWrappper=new LambdaQueryWrapper<WhiteUser>()
+                .eq(id!=0&&id!=null, WhiteUser::getWhiteId,id);
+        List<WhiteUser> userWhites = userWhiteDao.selectList(userWhiteQeryWrappper);
         List<Long> userWhiteid = new ArrayList<>();
         userWhites.forEach(e->{userWhiteid.add(e.getId());});
         userWhiteDao.deleteBatchIds(userWhiteid);

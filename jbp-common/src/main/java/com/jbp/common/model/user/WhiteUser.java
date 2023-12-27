@@ -14,12 +14,10 @@ import lombok.NoArgsConstructor;
 @TableName("eb_user_white")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserWhite extends BaseModel {
-
+public class WhiteUser extends BaseModel {
 
     @ApiModelProperty("用户ID")
-    @TableField("user_id")
-    private Long userId;
+    private Integer uid;
 
     @ApiModelProperty("白名单ID")
     @TableField("white_id")
@@ -32,7 +30,7 @@ public class UserWhite extends BaseModel {
 
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 
     @ApiModelProperty("白名单名称")
     @TableField(exist = false)
