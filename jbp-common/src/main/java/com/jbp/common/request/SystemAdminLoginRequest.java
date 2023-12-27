@@ -30,13 +30,12 @@ public class SystemAdminLoginRequest {
     @Length(min = 6, max = 30 ,message = "密码长度在6-30个字符")
     private String pwd;
 
-    @ApiModelProperty(value = "key", required = true)
-    @NotEmpty(message = "验证码key 不能为空")
+    @ApiModelProperty(value = "key", required = false)
     private String key;
 
-    @ApiModelProperty(value = "code", required = true)
-    private String code;
+    @ApiModelProperty(value = "code", required = false)
+    private String reqCode;
     
-    @ApiModelProperty(value = "mfa", required = true)
-    private String mfa;
+    @ApiModelProperty(value = "mfa", required = false)
+    private String reqMfa;
 }

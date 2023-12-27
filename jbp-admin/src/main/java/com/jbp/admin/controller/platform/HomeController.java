@@ -1,6 +1,15 @@
 package com.jbp.admin.controller.platform;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jbp.admin.service.HomeService;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.response.HomeOperatingDataResponse;
 import com.jbp.common.response.PlatformHomeRateResponse;
 import com.jbp.common.response.UserChannelDataResponse;
@@ -9,13 +18,6 @@ import com.jbp.common.result.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 
 /**

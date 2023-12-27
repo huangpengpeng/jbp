@@ -4,6 +4,7 @@ import com.jbp.admin.filter.ResponseFilter;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.UploadConstants;
+import com.jbp.common.encryptapi.SignInterceptor;
 import com.jbp.common.interceptor.ResultInterceptor;
 import com.jbp.common.interceptor.SwaggerInterceptor;
 
@@ -51,16 +52,17 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${swagger.basic.check}")
     private Boolean check;
 
-    /**
-     * 添加自定义拦截器
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        //添加token拦截器
-        //addPathPatterns添加需要拦截的命名空间；
-        //excludePathPatterns添加排除拦截命名空间
-        registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
-    }
+	/**
+	 * 添加自定义拦截器
+	 */
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		// 添加token拦截器
+		// addPathPatterns添加需要拦截的命名空间；
+		// excludePathPatterns添加排除拦截命名空间
+		registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
+		registry.addInterceptor(new SignInterceptor()).addPathPatterns("/**");
+	}
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

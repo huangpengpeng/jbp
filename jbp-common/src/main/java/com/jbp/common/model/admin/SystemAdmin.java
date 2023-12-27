@@ -77,6 +77,9 @@ public class SystemAdmin implements Serializable {
     
     @ApiModelProperty(value = "mfa 秘钥")
     private String mfa;
+    
+    @ApiModelProperty(value = "最后一次使用的验证 code")
+    private String lastCheckCode;
 
     @ApiModelProperty(value = "后台管理员添加时间")
     private Date createTime;

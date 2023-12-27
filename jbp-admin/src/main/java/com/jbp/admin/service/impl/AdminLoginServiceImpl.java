@@ -22,6 +22,7 @@ import com.jbp.admin.filter.TokenComponent;
 import com.jbp.admin.service.AdminLoginService;
 import com.jbp.admin.service.ValidateCodeService;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.encryptapi.SecretKeyConfig;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -48,6 +49,7 @@ import com.jbp.service.service.SystemMenuService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.crypto.SecureUtil;
 
 /**
  * 管理端登录服务实现类
@@ -82,6 +84,9 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     @Autowired
     private AsyncService asyncService;
 
+	@Autowired
+	private SecretKeyConfig secretKeyConfig;
+	
     @Autowired
     private ValidateCodeService validateCodeService;
     @Autowired
@@ -99,11 +104,20 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 		AdminLoginInfoResponse adminLoginInfoResponse = getLoginInfo();
 		// 开启了mfa
 		if (StringUtils.equalsIgnoreCase(adminLoginInfoResponse.getMfaOpen(), "'0'")) {
+			//客户端传入经过了加密，需要先解密
+			request.setReqCode( secretKeyConfig.decryptStr(request.getReqCode()));
 			// 校验验证码
 			checkCaptcha(request);
+			SystemAdmin systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
+			systemAdmin.setLastCheckCode(request.getReqCode());
+			systemAdminService.updateById(systemAdmin);
 		} else {
+			// 客户端传入经过了加密，需要先解密
+			request.setReqMfa(secretKeyConfig.decryptStr(request.getReqMfa()));
 			SystemAdmin systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
 			checkmfa(request, systemAdmin.getMfa());
+			systemAdmin.setLastCheckCode(request.getReqMfa());
+			systemAdminService.updateById(systemAdmin);
 		}
 		// 用户验证
 		Authentication authentication = null;
@@ -130,6 +144,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 		systemAdmin.setUpdateTime(DateUtil.date());
 		systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
 		systemAdmin.setLastIp(ip);
+
 		systemAdminService.updateById(systemAdmin);
 
 		// 返回后台LOGO图标
@@ -290,7 +305,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      */
     private void checkCaptcha(SystemAdminLoginRequest request) {
         // 判断验证码
-        boolean codeCheckResult = validateCodeService.check(request.getKey(), request.getCode());
+        boolean codeCheckResult = validateCodeService.check(request.getKey(), request.getReqCode());
         if (!codeCheckResult) throw new CrmebException("验证码不正确");
     }
     
@@ -300,7 +315,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     		throw new CrmebException("不能使用弱口令密码登录");
 		}
 		com.jbp.common.token.GoogleAuthenticator ga = new com.jbp.common.token.GoogleAuthenticator();
-		boolean codeCheckResult=ga.check_code(secret, Long.parseLong(request.getMfa()), System.currentTimeMillis());
+		boolean codeCheckResult=ga.check_code(secret, Long.parseLong(request.getReqMfa()), System.currentTimeMillis());
 		 if (!codeCheckResult) throw new CrmebException("验证码不正确");
 	}
     

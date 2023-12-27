@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jbp.admin.service.AdminLoginService;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.request.LoginAdminUpdateRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
 import com.jbp.common.response.AdminLoginInfoResponse;

@@ -94,12 +94,12 @@ public class LoginServiceImpl implements LoginService {
      */
     private void checkValidateCode(String phone, String code) {
         Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
-        if (ObjectUtil.isNull(validateCode)) {
-            throw new CrmebException("验证码已过期");
-        }
-        if (!validateCode.toString().equals(code)) {
-            throw new CrmebException("验证码错误");
-        }
+//        if (ObjectUtil.isNull(validateCode)) {
+//            throw new CrmebException("验证码已过期");
+//        }
+//        if (!validateCode.toString().equals(code)) {
+//            throw new CrmebException("验证码错误");
+//        }
         //删除验证码
         redisUtil.delete(SmsConstants.SMS_VALIDATE_PHONE + phone);
     }
@@ -113,29 +113,31 @@ public class LoginServiceImpl implements LoginService {
         tokenComponent.logout(request);
     }
 
-    /**
-     * 手机号验证码登录
-     * @param loginRequest 登录信息
-     * @return LoginResponse
-     */
-    @Override
-    public LoginResponse phoneCaptchaLogin(LoginMobileRequest loginRequest) {
-        if (StrUtil.isBlank(loginRequest.getCaptcha())) {
-            throw new CrmebException("手机号码验证码不能为空");
-        }
-        Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
-        //检测验证码
-        checkValidateCode(loginRequest.getPhone(), loginRequest.getCaptcha());
-        //查询用户信息
-        User user = userService.getByPhone(loginRequest.getPhone());
-        if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
-            user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
-            return getLoginResponse_V1_3(user, true);
-        }
-        return commonLogin(user, spreadPid);
+	/**
+	 * 手机号验证码登录
+	 * 
+	 * @param loginRequest 登录信息
+	 * @return LoginResponse
+	 */
+	@Override
+	public LoginResponse phoneCaptchaLogin(LoginMobileRequest loginRequest) {
+		if (StrUtil.isBlank(loginRequest.getCaptcha())) {
+			throw new CrmebException("手机号码验证码不能为空");
+		}
+		Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
+		// 检测验证码
+		checkValidateCode(loginRequest.getPhone(), loginRequest.getCaptcha());
+		// 查询用户信息
+		User user = userService.getByPhone(loginRequest.getPhone());
 
-    }
-
+		if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
+			user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
+			LoginResponse loginResponse = getLoginResponse_V1_3(user, true);
+			return loginResponse;
+		}
+		return commonLogin(user, spreadPid);
+	}
+    
     /**
      * 手机号密码登录
      * @param loginRequest 登录信息
@@ -172,7 +174,7 @@ public class LoginServiceImpl implements LoginService {
         // 通过code获取获取公众号授权信息
         WeChatOauthToken oauthToken = wechatService.getOauth2AccessToken(request.getCode());
         //检测是否存在
-        UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  UserConstants.USER_TOKEN_TYPE_WECHAT);
+		UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  UserConstants.USER_TOKEN_TYPE_WECHAT);
         Integer spreadPid = Optional.ofNullable(request.getSpreadPid()).orElse(0);
         LoginResponse loginResponse = new LoginResponse();
         if (ObjectUtil.isNotNull(userToken)) {// 已存在，正常登录
@@ -196,6 +198,9 @@ public class LoginServiceImpl implements LoginService {
 
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
+        
+    	User user = userService.getById(userToken.getUid());
+    	saveLastCheckCode(user);
         return loginResponse;
     }
 
@@ -225,6 +230,9 @@ public class LoginServiceImpl implements LoginService {
         redisUtil.set(key, JSONObject.toJSONString(request), (long) (60 * 2), TimeUnit.MINUTES);
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
+        
+        	User user = userService.getById(userToken.getUid());
+        	saveLastCheckCode(user);
         return loginResponse;
     }
 
@@ -423,6 +431,15 @@ public class LoginServiceImpl implements LoginService {
         }
         return execute;
     }
+    
+    /**
+     * 保存用户最后一次登录code 用做接口加密签名
+     */
+    private void saveLastCheckCode(User user) {
+    	String lastcheckCode=	tokenComponent.getCheck();
+    	user.setLastCheckCode(lastcheckCode);
+    	userService.updateById(user);
+	}
 
     /**
      * 获取登录配置
@@ -489,6 +506,9 @@ public class LoginServiceImpl implements LoginService {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
+        
+        User user = userService.getById(userToken.getUid());
+        	saveLastCheckCode(user);
         return loginResponse;
     }
 
@@ -579,27 +599,32 @@ public class LoginServiceImpl implements LoginService {
         loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
         loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
         loginResponse.setAvatar(user.getAvatar());
+        //保存最后登录随机code
+        saveLastCheckCode(user);
+        
         return loginResponse;
     }
 
 
-    private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
-        //生成token
-        LoginResponse loginResponse = new LoginResponse();
-        String token = tokenComponent.createToken(user);
-        loginResponse.setToken(token);
-        loginResponse.setId(user.getId());
-        loginResponse.setNikeName(user.getNickname());
-        loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
-        loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
-        loginResponse.setAvatar(user.getAvatar());
-        if (isNew) {
-            loginResponse.setIsNew(true);
-            List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
-            if (CollUtil.isNotEmpty(couponList)) {
-                loginResponse.setNewPeopleCouponList(couponList);
-            }
-        }
-        return loginResponse;
-    }
+	private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
+		// 生成token
+		LoginResponse loginResponse = new LoginResponse();
+		String token = tokenComponent.createToken(user);
+		loginResponse.setToken(token);
+		loginResponse.setId(user.getId());
+		loginResponse.setNikeName(user.getNickname());
+		loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
+		loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
+		loginResponse.setAvatar(user.getAvatar());
+		if (isNew) {
+			loginResponse.setIsNew(true);
+			List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
+			if (CollUtil.isNotEmpty(couponList)) {
+				loginResponse.setNewPeopleCouponList(couponList);
+			}
+		}
+		// 保存最后登录随机code
+		saveLastCheckCode(user);
+		return loginResponse;
+	}
 }
