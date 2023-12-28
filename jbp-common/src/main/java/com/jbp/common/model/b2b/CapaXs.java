@@ -31,6 +31,16 @@ import java.util.stream.Collectors;
 @ApiModel(value="CapaXs对象", description="平台星级")
 public class CapaXs extends BaseModel {
 
+    public CapaXs(String name, Long pCapaId, Integer rankNum, String iconUrl,
+                  String riseImgUrl, String shareImgUrl) {
+        this.name = name;
+        this.pCapaId = pCapaId;
+        this.rankNum = rankNum;
+        this.iconUrl = iconUrl;
+        this.riseImgUrl = riseImgUrl;
+        this.shareImgUrl = shareImgUrl;
+    }
+
     @ApiModelProperty("等级名字")
     @TableField("name")
     private String name;

@@ -2,8 +2,15 @@ package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.b2b.Capa;
 import com.jbp.common.model.b2b.CapaXs;
 import com.jbp.common.model.b2b.CapaXsCondition;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.b2b.CapaXsDao;
 import com.jbp.service.service.CapaXsConditionService;
 import com.jbp.service.service.CapaXsService;
@@ -18,6 +25,25 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
     private CapaXsConditionService capaXsConditionService;
     @Resource
     private TransactionTemplate transactionTemplate;
+
+    @Override
+    public PageInfo<CapaXs> page(PageParamRequest pageParamRequest) {
+        Page<CapaXs> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        return CommonPage.copyPageInfo(page, list());
+    }
+
+    @Override
+    public CapaXs save(String name, Long pCapaId, int rankNum, String iconUrl, String riseImgUrl, String shareImgUrl) {
+        if (getByName(name) != null) {
+            throw new CrmebException("星级名称不能重复");
+        }
+        if (getByRankNum(rankNum) != null) {
+            throw new CrmebException("星级编号不能重复");
+        }
+        CapaXs capaXs = new CapaXs(name, pCapaId, rankNum, iconUrl, riseImgUrl, shareImgUrl);
+        save(capaXs);
+        return capaXs;
+    }
 
     @Override
     public CapaXs getMinCapa() {
