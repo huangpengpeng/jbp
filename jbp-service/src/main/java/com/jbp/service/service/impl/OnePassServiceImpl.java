@@ -170,7 +170,8 @@ public class OnePassServiceImpl implements OnePassService {
         HashMap<String, String> header = onePassUtil.getCommonHeader(accessToken);
         JSONObject jsonObject = onePassUtil.postFrom(OnePassConstants.ONE_PASS_API_URL + OnePassConstants.USER_INFO_URI, null, header);
         OnePassUserInfoVo userInfoVo = jsonObject.getObject("data", OnePassUserInfoVo.class);
-        userInfoVo.setAccount(loginVo.getAccount());
+        userInfoVo.setAccount(CrmebUtil.maskMobile(loginVo.getAccount()));
+        userInfoVo.setPhone(CrmebUtil.maskMobile(userInfoVo.getPhone()));
         return userInfoVo;
     }
 

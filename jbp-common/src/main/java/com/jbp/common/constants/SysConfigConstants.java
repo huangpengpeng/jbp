@@ -82,6 +82,9 @@ public class SysConfigConstants {
 
     /** 网站名称 */
     public static final String CONFIG_KEY_SITE_NAME = "site_name";
+    
+    /** 版权LOGO */
+    public static final String CONFIG_KEY_COPY_RIGHT_LOGO = "copyright_logo";
 
     /** 用户默认头像 */
     public static final String USER_DEFAULT_AVATAR_CONFIG_KEY = "h5_avatar";

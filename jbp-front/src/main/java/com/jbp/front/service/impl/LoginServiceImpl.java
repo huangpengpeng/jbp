@@ -94,12 +94,12 @@ public class LoginServiceImpl implements LoginService {
      */
     private void checkValidateCode(String phone, String code) {
         Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
-//        if (ObjectUtil.isNull(validateCode)) {
-//            throw new CrmebException("验证码已过期");
-//        }
-//        if (!validateCode.toString().equals(code)) {
-//            throw new CrmebException("验证码错误");
-//        }
+        if (ObjectUtil.isNull(validateCode)) {
+            throw new CrmebException("验证码已过期");
+        }
+        if (!validateCode.toString().equals(code)) {
+            throw new CrmebException("验证码错误");
+        }
         //删除验证码
         redisUtil.delete(SmsConstants.SMS_VALIDATE_PHONE + phone);
     }
@@ -231,8 +231,6 @@ public class LoginServiceImpl implements LoginService {
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
         
-        	User user = userService.getById(userToken.getUid());
-        	saveLastCheckCode(user);
         return loginResponse;
     }
 
@@ -452,6 +450,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION);
         keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
         keyList.add(SysConfigConstants.CONFIG_KEY_SITE_NAME);
+        keyList.add(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO);
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
         response.setLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
@@ -459,6 +458,7 @@ public class LoginServiceImpl implements LoginService {
         response.setRoutinePhoneVerification(record.getStr(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION));
         response.setMobileLoginLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
         response.setSiteName(record.getStr(SysConfigConstants.CONFIG_KEY_SITE_NAME));
+        response.setCopyrightLogo(record.getStr(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO));
         return response;
     }
 
