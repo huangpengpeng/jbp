@@ -15,6 +15,8 @@ public interface CapaService extends IService<Capa> {
 
     PageInfo<Capa> page(PageParamRequest pageParamRequest);
 
+    Capa save(String name, Long pCapaId, int rankNum, String iconUrl, String riseImgUrl, String shareImgUrl);
+
     Capa getMinCapa();
 
     Capa getNext(Long capaId);

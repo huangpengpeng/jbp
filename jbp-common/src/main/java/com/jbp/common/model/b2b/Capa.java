@@ -35,6 +35,15 @@ public class Capa extends BaseModel {
 
     private static final long serialVersionUID = -3068573610140753926L;
 
+    public Capa(String name, Long pCapaId, int rankNum, String iconUrl, String riseImgUrl, String shareImgUrl) {
+        this.name = name;
+        this.pCapaId = pCapaId;
+        this.rankNum = rankNum;
+        this.iconUrl = iconUrl;
+        this.riseImgUrl = riseImgUrl;
+        this.shareImgUrl = shareImgUrl;
+    }
+
     @ApiModelProperty("等级名字")
     @TableField("name")
     private String name;
@@ -60,7 +69,7 @@ public class Capa extends BaseModel {
     private String shareImgUrl;
 
     @ApiModelProperty("计算表达式")
-    @TableField(value = "parser")
+    @TableField(value = "parser", updateStrategy = FieldStrategy.IGNORED)
     private String parser;
 
 
@@ -101,5 +110,5 @@ public class Capa extends BaseModel {
         return false;
     }
 
-    
+
 }
