@@ -6,8 +6,10 @@ import com.jbp.common.model.BaseModel;
 import com.jbp.common.utils.ArithmeticUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -16,7 +18,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("b2b_platform_wallet")
+@TableName("eb_platform_wallet")
 @ApiModel(value="PlatformWallet对象", description="平台钱包")
 public class PlatformWallet extends BaseModel {
 
