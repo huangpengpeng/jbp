@@ -22,10 +22,10 @@ public class BaseModel<T extends BaseModel<?>> extends Model {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @TableField( fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
     private Date gmtCreated;
 
     @JsonIgnore
-    @TableField( fill = FieldFill.INSERT_UPDATE, update = "now()")
+    @TableField(fill = FieldFill.INSERT_UPDATE, update = "now()")
     private Date gmtModify;
 }

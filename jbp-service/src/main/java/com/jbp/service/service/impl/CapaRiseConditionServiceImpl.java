@@ -22,7 +22,7 @@ public class CapaRiseConditionServiceImpl extends ServiceImpl<CapaRiseConditionD
 
     @Override
     public CapaRiseCondition add(Integer type, String name, String description, JSONObject value) {
-        CapaRiseCondition capaRiseCondition = new CapaRiseCondition(type, description, value);
+        CapaRiseCondition capaRiseCondition = new CapaRiseCondition(type, name, description, value);
         save(capaRiseCondition);
         return capaRiseCondition;
     }

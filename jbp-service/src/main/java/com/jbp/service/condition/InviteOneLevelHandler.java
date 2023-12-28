@@ -1,0 +1,70 @@
+package com.jbp.service.condition;
+
+import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.model.agent.CapaRiseCondition;
+import com.jbp.common.utils.JacksonTool;
+import com.jbp.service.service.CapaRiseConditionService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+/**
+ * 邀请一阶条件
+ */
+@Component
+public class InviteOneLevelHandler implements ConditionHandler{
+
+    @Resource
+    private CapaRiseConditionService capaRiseConditionService;
+
+    @Override
+    public Integer getType() {
+        return 0;
+    }
+
+    @Override
+    public String getName() {
+        return "VIP升区代一阶条件";
+    }
+
+    @Override
+    public void save(CapaRiseCondition riseCondition) {
+        getRule(riseCondition);
+        capaRiseConditionService.save(riseCondition);
+    }
+
+    @Override
+    public InviteOneLevelHandler.Rule  getRule(CapaRiseCondition riseCondition) {
+        try {
+            Rule rule = riseCondition.getValue().toJavaObject(Rule.class);
+            if (rule.getNum() == null || rule.getCapaId() == null) {
+                throw new RuntimeException(getName() + ":升级规则格式错误0");
+            }
+            return rule;
+        } catch (Exception e) {
+            throw new RuntimeException(getName() + ":升级规则格式错误"+ e.getMessage());
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Rule{
+
+        /**
+         * 一阶人数
+         */
+        private Integer num;
+
+        /**
+         * 等级要求
+         */
+        private Long capaId;
+
+    }
+}
