@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Wallet extends BaseModel {
 
-    public Wallet(Long userId, String type) {
-        this.userId = userId;
+    public Wallet(Long uId, Integer type) {
+        this.uId = uId;
         this.type = type;
         this.balance = BigDecimal.ZERO;
         this.freeze = BigDecimal.ZERO;
@@ -30,12 +30,12 @@ public class Wallet extends BaseModel {
     }
 
     @ApiModelProperty("用户ID")
-    @TableField("userId")
-    private Long userId;
+    @TableField("uid")
+    private Long uId;
 
     @ApiModelProperty("钱包类型")
     @TableField("type")
-    private String type;
+    private Integer type;
 
     @ApiModelProperty("余额")
     @TableField("balance")
