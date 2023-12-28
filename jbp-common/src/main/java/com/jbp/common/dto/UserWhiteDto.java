@@ -1,15 +1,18 @@
-package com.jbp.common.model.express;
+package com.jbp.common.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * 用户白名单对象
+ */
 @Data
 @NoArgsConstructor
-public class UserWhiteExpress implements Serializable {
+public class UserWhiteDto implements Serializable {
+
     @ApiModelProperty("用户账户")
     private String account;
 
