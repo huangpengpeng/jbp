@@ -6,5 +6,6 @@ import com.jbp.common.request.WalletRequest;
 
 public interface WalletService extends IService<Wallet> {
     void add(WalletRequest walletRequest);
+
     Wallet getType(Long uid, Integer type);
 }

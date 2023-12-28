@@ -19,8 +19,9 @@ import lombok.experimental.Accessors;
 @ApiModel(value="CapaRiseCondition对象", description="晋升条件")
 public class CapaRiseCondition extends BaseModel {
 
-    public CapaRiseCondition(Integer type, String description, JSONObject value) {
+    public CapaRiseCondition(Integer type, String name, String description, JSONObject value) {
         this.type = type;
+        this.name = name;
         this.description = description;
         this.value = value;
     }
@@ -28,6 +29,10 @@ public class CapaRiseCondition extends BaseModel {
     @ApiModelProperty("等级类型  0 等级  1 星级")
     @TableField("type")
     private Integer type;
+
+    @ApiModelProperty("名称唯一")
+    @TableField("name")
+    private String name;
 
     @ApiModelProperty("条件描述")
     @TableField("description")

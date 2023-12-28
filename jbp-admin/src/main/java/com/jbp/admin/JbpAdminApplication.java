@@ -1,10 +1,15 @@
 package com.jbp.admin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.agent.CapaRiseCondition;
+import com.jbp.service.condition.ConditionChain;
+import com.jbp.service.service.CapaRiseConditionService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,7 +39,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class JbpAdminApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(JbpAdminApplication.class, args);
+        ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
     }
 
 }

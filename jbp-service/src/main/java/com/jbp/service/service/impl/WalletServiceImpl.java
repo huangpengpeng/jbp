@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 @Service
-public class WalletServiceImpl extends ServiceImpl<WalletDao,Wallet> implements WalletService {
+public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements WalletService {
     @Override
     public void add(WalletRequest walletRequest) {
-        if (ObjectUtil.isNull(getType(walletRequest.getUid(),walletRequest.getType()))){
-            throw  new RuntimeException(String.format("用户钱包{}类型已存在",walletRequest.getType()));
+        if (ObjectUtil.isNull(getType(walletRequest.getUid(), walletRequest.getType()))) {
+            throw new RuntimeException(String.format("用户钱包{}类型已存在", walletRequest.getType()));
         }
         Wallet wallet = new Wallet();
         wallet.setType(walletRequest.getType());
@@ -29,10 +29,9 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao,Wallet> implements 
 
     @Override
     public Wallet getType(Long uid, Integer type) {
-        LambdaQueryWrapper<Wallet> wrapper=new LambdaQueryWrapper<Wallet>()
-                .eq(Wallet::getUId,uid)
-                .eq(Wallet::getType,type);
+        LambdaQueryWrapper<Wallet> wrapper = new LambdaQueryWrapper<Wallet>()
+                .eq(Wallet::getUId, uid)
+                .eq(Wallet::getType, type);
         return getOne(wrapper);
     }
-
 }

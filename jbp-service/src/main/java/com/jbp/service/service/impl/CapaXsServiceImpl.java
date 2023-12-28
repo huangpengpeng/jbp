@@ -11,7 +11,9 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.CapaXsDao;
 import com.jbp.service.service.CapaXsService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
 
     @Override
