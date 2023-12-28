@@ -32,14 +32,13 @@ public class ConditionChain implements ApplicationContextAware {
 
     private Table<Integer, String, ConditionHandler> handlers = HashBasedTable.create();
 
-    public void addHandler(ConditionHandler handler) {handlers.put(handler.getType(), handler.getName(), handler);
-    }
-
+    public void addHandler(ConditionHandler handler) {handlers.put(handler.getType(), handler.getName(), handler);}
 
     /**
      * 保存
      */
     public void save(CapaRiseCondition riseCondition) {
+        validNamePattern(riseCondition.getName());
         ConditionHandler handler = handlers.get(riseCondition.getType(), riseCondition.getName());
         if(handler == null){
             throw new CrmebException("当前升级条件不存在");
@@ -47,7 +46,19 @@ public class ConditionChain implements ApplicationContextAware {
         handler.save(riseCondition);
     }
 
+    public void isOk(CapaRiseCondition riseCondition) {
+        ConditionHandler handler = handlers.get(riseCondition.getType(), riseCondition.getName());
+        if(handler == null){
+            throw new CrmebException("当前升级条件不存在");
+        }
+        handler.save(riseCondition);
+    }
 
+    void validNamePattern(String name){
+        if(name.contains("(") || name.contains(")") || name.contains("&") || name.contains("|") ||  name.contains(" ")){
+            throw new RuntimeException("条件名称格式错误不能包含 (、)、&、|、空格 等字符");
+        }
+    }
 
 
 

@@ -12,4 +12,6 @@ public interface ConditionHandler {
 
 
     <T>T getRule(CapaRiseCondition riseCondition);
+
+    Boolean  isOk(Integer uid, CapaRiseCondition riseCondition);
 }

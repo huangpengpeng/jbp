@@ -39,7 +39,7 @@ public class InviteOneLevelHandler implements ConditionHandler{
     }
 
     @Override
-    public InviteOneLevelHandler.Rule  getRule(CapaRiseCondition riseCondition) {
+    public InviteOneLevelHandler.Rule getRule(CapaRiseCondition riseCondition) {
         try {
             Rule rule = riseCondition.getValue().toJavaObject(Rule.class);
             if (rule.getNum() == null || rule.getCapaId() == null) {
@@ -51,6 +51,15 @@ public class InviteOneLevelHandler implements ConditionHandler{
         }
     }
 
+    @Override
+    public Boolean isOk(Integer uid, CapaRiseCondition riseCondition) {
+        // 当前用户是否满足改升级条件  满足返回 true  不满足返回false
+        return null;
+    }
+
+    /**
+     * 升级条件规则信息
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
