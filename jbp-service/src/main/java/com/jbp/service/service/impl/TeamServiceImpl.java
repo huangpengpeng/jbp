@@ -4,13 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.b2b.Team;
-import com.jbp.common.model.b2b.TeamUser;
-import com.jbp.service.dao.b2b.TeamDao;
+import com.jbp.common.model.agent.Team;
+import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserInvitationFlowService;
-import com.jbp.service.service.UserInvitationService;
-import com.jbp.service.service.TeamUserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

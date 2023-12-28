@@ -1,7 +1,7 @@
 package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jbp.common.model.b2b.UserInvitationFlow;
+import com.jbp.common.model.agent.UserInvitationFlow;
 
 public interface UserInvitationFlowService extends IService<UserInvitationFlow> {
 

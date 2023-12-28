@@ -2,8 +2,8 @@ package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.common.model.b2b.TeamUser;
-import com.jbp.service.dao.b2b.TeamUserDao;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.service.dao.agent.TeamUserDao;
 import com.jbp.service.service.TeamUserService;
 import org.springframework.stereotype.Service;
 

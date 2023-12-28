@@ -6,26 +6,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.b2b.Capa;
-import com.jbp.common.model.b2b.CapaCondition;
+import com.jbp.common.model.agent.Capa;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.service.dao.b2b.CapaDao;
-import com.jbp.service.service.CapaConditionService;
+import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.CapaService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 @Service
 public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaService {
-
-    @Resource
-    private CapaConditionService capaConditionService;
-    @Resource
-    private TransactionTemplate transactionTemplate;
 
     @Override
     public PageInfo<Capa> page(PageParamRequest pageParamRequest) {
@@ -73,17 +62,4 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         return getOne(new QueryWrapper<Capa>().lambda().eq(Capa::getRankNum, rankNum));
     }
 
-    @Override
-    public void saveOrUpdate(Long capaId, List<CapaCondition> conditionList, String parser) {
-        transactionTemplate.execute(s -> {
-            // 删除
-            capaConditionService.deleteByCapa(capaId);
-            // 新增
-            capaConditionService.saveBatch(conditionList);
-            Capa capa = getById(capaId);
-            capa.setParser(parser);
-            updateById(capa);
-            return Boolean.TRUE;
-        });
-    }
 }

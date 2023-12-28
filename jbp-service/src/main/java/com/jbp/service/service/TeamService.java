@@ -2,7 +2,7 @@ package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.b2b.Team;
+import com.jbp.common.model.agent.Team;
 
 import java.util.List;
 

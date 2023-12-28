@@ -6,25 +6,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.b2b.Capa;
-import com.jbp.common.model.b2b.CapaXs;
-import com.jbp.common.model.b2b.CapaXsCondition;
+import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.service.dao.b2b.CapaXsDao;
-import com.jbp.service.service.CapaXsConditionService;
+import com.jbp.service.dao.agent.CapaXsDao;
 import com.jbp.service.service.CapaXsService;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
-
-    @Resource
-    private CapaXsConditionService capaXsConditionService;
-    @Resource
-    private TransactionTemplate transactionTemplate;
 
     @Override
     public PageInfo<CapaXs> page(PageParamRequest pageParamRequest) {
@@ -70,18 +58,5 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
     @Override
     public CapaXs getByRankNum(Integer rankNum) {
         return getOne(new QueryWrapper<CapaXs>().lambda().eq(CapaXs::getRankNum, rankNum));
-    }
-
-    @Override
-    public void saveOrUpdate(Long capaId, List<CapaXsCondition> conditionList, String parser) {
-        transactionTemplate.execute(s -> {
-                    capaXsConditionService.deleteByCapa(capaId);
-                    capaXsConditionService.saveBatch(conditionList);
-                    CapaXs capaXs = getById(capaId);
-                    capaXs.setParser(parser);
-                    updateById(capaXs);
-                    return Boolean.TRUE;
-                }
-        );
     }
 }

@@ -1,9 +1,8 @@
 package com.jbp.front.controller;
 
-import com.jbp.common.model.b2b.PlatformWallet;
+import com.jbp.common.model.agent.PlatformWallet;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.WhiteRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.PlatformWalletService;
 import io.swagger.annotations.Api;
