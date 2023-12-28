@@ -20,12 +20,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "Wallet对象", description = "用户钱包")
 public class Wallet extends BaseModel {
 
-    public Wallet(Long uId, Integer type) {
-        this.uId = uId;
-        this.type = type;
-        this.balance = BigDecimal.ZERO;
-        this.freeze = BigDecimal.ZERO;
-    }
+
 
     public boolean hasError() {
         if (ArithmeticUtils.less(balance, BigDecimal.ZERO)) {
