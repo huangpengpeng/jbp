@@ -12,10 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -39,8 +36,11 @@ public class CapaController {
 
     @PreAuthorize("hasAuthority('capa:add')")
     @ApiOperation(value = "用户等级新增")
-    @GetMapping(value = "/add")
-    public CommonResult<List<MerchantAddress>> getList(@Validated MerchantAddressSearchRequest request) {
+    @PostMapping(value = "/add")
+    public CommonResult<Object> add(@RequestBody Capa capa) {
+
+
+
         return CommonResult.success();
     }
 
