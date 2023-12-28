@@ -1,9 +1,21 @@
 package com.jbp.admin.controller.merchant;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jbp.admin.service.AdminLoginService;
 import com.jbp.common.request.LoginAdminUpdateRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
-import com.jbp.common.response.AdminLoginPicResponse;
+import com.jbp.common.response.AdminLoginInfoResponse;
 import com.jbp.common.response.LoginAdminResponse;
 import com.jbp.common.response.MenusResponse;
 import com.jbp.common.response.SystemLoginResponse;
@@ -13,16 +25,6 @@ import com.jbp.common.utils.CrmebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 商户端登录控制器
@@ -70,8 +72,8 @@ public class MerchantLoginController {
 
     @ApiOperation(value = "获取登录页图片")
     @RequestMapping(value = "/getLoginPic", method = RequestMethod.GET)
-    public CommonResult<AdminLoginPicResponse> getLoginPic() {
-        return CommonResult.success(loginService.getMerchantLoginPic());
+    public CommonResult<AdminLoginInfoResponse> getLoginPic() {
+        return CommonResult.success(loginService.getMerchantLoginInfo());
     }
 
     @PreAuthorize("hasAuthority('merchant:login:menus')")

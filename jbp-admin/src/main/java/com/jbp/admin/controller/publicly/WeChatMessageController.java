@@ -2,6 +2,7 @@ package com.jbp.admin.controller.publicly;
 
 import com.jbp.admin.service.WechatMessageService;
 import com.jbp.common.annotation.CustomResponseAnnotation;
+import com.jbp.common.encryptapi.EncryptIgnore;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,7 @@ import java.io.PrintWriter;
 @RestController
 @RequestMapping("api/publicly/wechat/public/callback")
 @Api(tags = "微信公众号回调管理")
+@EncryptIgnore
 @CustomResponseAnnotation
 public class WeChatMessageController {
 
