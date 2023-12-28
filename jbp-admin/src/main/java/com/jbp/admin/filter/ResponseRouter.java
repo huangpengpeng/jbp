@@ -48,6 +48,7 @@ public class ResponseRouter {
 		if (!path.contains("api/admin/") && !path.contains("api/front/")) {
 			return data;
 		}
+		
 
 		// 根据需要处理返回值
 		if ((data.contains(UploadConstants.UPLOAD_FILE_KEYWORD + "/") && !data.contains("data:image/png;base64"))
