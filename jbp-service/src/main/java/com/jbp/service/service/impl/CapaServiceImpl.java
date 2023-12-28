@@ -2,8 +2,13 @@ package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.b2b.Capa;
 import com.jbp.common.model.b2b.CapaCondition;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.b2b.CapaDao;
 import com.jbp.service.service.CapaConditionService;
 import com.jbp.service.service.CapaService;
@@ -20,6 +25,12 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     private CapaConditionService capaConditionService;
     @Resource
     private TransactionTemplate transactionTemplate;
+
+    @Override
+    public PageInfo<Capa> page(PageParamRequest pageParamRequest) {
+        Page<Capa> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        return CommonPage.copyPageInfo(page, list());
+    }
 
     @Override
     public Capa getMinCapa() {
