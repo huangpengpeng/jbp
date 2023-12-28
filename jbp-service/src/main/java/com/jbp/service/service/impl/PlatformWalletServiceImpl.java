@@ -15,8 +15,12 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     @Resource
     private PlatformWalletDao platformWalletDao;
 
-    @Override
-    public List<PlatformWallet> pageList(PlatformWallet request, PageParamRequest pageParamRequest) {
-        return null;
-    }
+
+//todo  d111
+
+
+//    @Override
+//    public List<PlatformWallet> pageList(PlatformWallet request, PageParamRequest pageParamRequest) {
+//        return null;
+//    }
 }
