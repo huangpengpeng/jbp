@@ -2,6 +2,7 @@ package com.jbp.common.model.b2b;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,9 +18,9 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @TableName("b2b_platform_wallet_flow")
 @ApiModel(value="PlatformWalletFlow对象", description="平台钱包")
-public class PlatformWalletFlow implements Serializable {
+public class PlatformWalletFlow extends BaseModel {
 
-    public PlatformWalletFlow(String walletType, String action, String operate, String uniqueNo, String externalNo,
+    public PlatformWalletFlow(Integer walletType, String action, String operate, String uniqueNo, String externalNo,
                               String postscript, BigDecimal amt, BigDecimal orgBalance, BigDecimal tagBalance) {
         this.walletType = walletType;
         this.action = action;
@@ -33,8 +34,8 @@ public class PlatformWalletFlow implements Serializable {
     }
 
     @ApiModelProperty("钱包类型")
-    @TableField("walletType")
-    private String walletType;
+    @TableField("wallet_type")
+    private Integer walletType;
 
     @ApiModelProperty("资金方向")
     @TableField("action")
@@ -45,11 +46,11 @@ public class PlatformWalletFlow implements Serializable {
     private String operate;
 
     @ApiModelProperty("流水单号")
-    @TableField("uniqueNo")
+    @TableField("unique_no")
     private String uniqueNo;
 
     @ApiModelProperty("外部单号")
-    @TableField("externalNo")
+    @TableField("external_no")
     private String externalNo;
 
     @ApiModelProperty("附言")
@@ -61,10 +62,10 @@ public class PlatformWalletFlow implements Serializable {
     private BigDecimal amt;
 
     @ApiModelProperty("变动前余额")
-    @TableField("orgBalance")
+    @TableField("org_balance")
     private BigDecimal orgBalance;
 
     @ApiModelProperty("变动后余额")
-    @TableField("tagBalance")
+    @TableField("tag_balance")
     private BigDecimal tagBalance;
 }
