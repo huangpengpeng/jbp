@@ -4,7 +4,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.b2b.CapaXsRequest;
+import com.jbp.common.request.agent.CapaXsRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.CapaXsService;
 import io.swagger.annotations.Api;

@@ -9,15 +9,13 @@ import com.jbp.common.model.VersionModel;
 import com.jbp.common.utils.ArithmeticUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_platform_wallet")
@@ -29,6 +27,11 @@ public class PlatformWallet extends VersionModel {
             return true;
         }
         return false;
+    }
+
+    public PlatformWallet(Integer type) {
+        this.type = type;
+        this.balance = BigDecimal.ZERO;
     }
 
     @ApiModelProperty("钱包类型")

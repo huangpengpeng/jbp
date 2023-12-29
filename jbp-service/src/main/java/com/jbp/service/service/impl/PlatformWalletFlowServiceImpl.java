@@ -12,23 +12,22 @@ import java.math.BigDecimal;
 @Service
 public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlowDao, PlatformWalletFlow> implements PlatformWalletFlowService {
 
-
-
     @Override
-    public void addByPlatformWalletFlow(Integer type, String operate, String action, String externalNo, String postscript, BigDecimal transferIntegral, BigDecimal platformWalletOrgBalance, BigDecimal platformWalletTagBalance) {
-        PlatformWalletFlow platformWalletFlow=PlatformWalletFlow
+    public PlatformWalletFlow add(Integer type, String operate, String action, String externalNo, String postscript,
+                                  BigDecimal amt, BigDecimal orgBalance, BigDecimal tagBalance) {
+        PlatformWalletFlow platformWalletFlow = PlatformWalletFlow
                 .builder()
                 .walletType(type)
                 .action(action)
                 .operate(operate)
                 .uniqueNo(StringUtils.N_TO_10("PW_"))
-                        .externalNo(externalNo)
-                        .postscript(postscript)
-                        .amt(transferIntegral)
-                        .orgBalance(platformWalletOrgBalance)
-                        .tagBalance(platformWalletTagBalance).build();
-
-       save(platformWalletFlow);
+                .externalNo(externalNo)
+                .postscript(postscript)
+                .amt(amt)
+                .orgBalance(orgBalance)
+                .tagBalance(tagBalance).build();
+        save(platformWalletFlow);
+        return platformWalletFlow;
     }
 
 

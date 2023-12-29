@@ -1,4 +1,4 @@
-package com.jbp.common.request.b2b;
+package com.jbp.common.request.agent;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

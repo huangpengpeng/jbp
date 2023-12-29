@@ -21,6 +21,14 @@ import java.math.BigDecimal;
 public class PlatformWalletFlow extends BaseModel {
     private static final long serialVersionUID = 1L;
 
+    public static enum OperateEnum {
+        调账, 分佣
+    }
+
+    public static enum ActionEnum {
+        收入, 支出
+    }
+
     @ApiModelProperty("钱包类型")
     @TableField("wallet_type")
     private Integer walletType;

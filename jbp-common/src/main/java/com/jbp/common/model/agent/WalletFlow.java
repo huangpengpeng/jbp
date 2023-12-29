@@ -21,10 +21,17 @@ import java.math.BigDecimal;
 public class WalletFlow extends BaseModel {
     private static final long serialVersionUID = 1L;
 
+    public static enum OperateEnum {
+        调账, 付款, 兑换, 转账
+    }
+
+    public static enum ActionEnum {
+        收入, 支出
+    }
 
     @ApiModelProperty("用户ID")
     @TableField("uid")
-    private Long uid;
+    private Integer uid;
 
     @ApiModelProperty("钱包类型")
     @TableField("wallet_type")
