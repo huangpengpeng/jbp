@@ -1,4 +1,4 @@
-package com.jbp.admin.controller.platform;
+package com.jbp.admin.controller.agent;
 
 import com.jbp.common.model.agent.PlatformWallet;
 import com.jbp.common.model.agent.PlatformWalletFlow;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("api/admin/platform/wallet")
+@RequestMapping("api/admin/agent/wallet")
 @Api(tags = "平台积分")
 public class PlatformWalletController {
     @Resource
@@ -27,14 +27,14 @@ public class PlatformWalletController {
     @Resource
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('platform:platformWallet:page')")
+    @PreAuthorize("hasAuthority('agent:platformWallet:page')")
     @ApiOperation("平台积分列表")
     @GetMapping("/page")
     public CommonResult<CommonPage<PlatformWallet>> getList(PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(platformWalletService.pageList(pageParamRequest)));
     }
 
-    @PreAuthorize("hasAuthority('platform:platformWallet:increase')")
+    @PreAuthorize("hasAuthority('agent:platformWallet:increase')")
     @ApiOperation("增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated PlatformWalletEditRequest request) {
@@ -44,7 +44,7 @@ public class PlatformWalletController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('platform:platformWallet:reduce')")
+    @PreAuthorize("hasAuthority('agent:platformWallet:reduce')")
     @ApiOperation("减少积分")
     @PostMapping("/reduce")
     public CommonResult reduce(@RequestBody @Validated PlatformWalletEditRequest request) {
@@ -54,7 +54,7 @@ public class PlatformWalletController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('platform:platformWallet:transfer')")
+    @PreAuthorize("hasAuthority('agent:platformWallet:transfer')")
     @ApiOperation("转用户")
     @PostMapping("/transfer")
     public CommonResult transfer(@RequestBody @Validated PlatformWalletTransferRequest request) {

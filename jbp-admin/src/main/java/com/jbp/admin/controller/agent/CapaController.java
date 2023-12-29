@@ -19,7 +19,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("api/admin/capa")
+@RequestMapping("api/admin/agent/capa")
 @Api(tags = "用户等级")
 public class CapaController {
 
