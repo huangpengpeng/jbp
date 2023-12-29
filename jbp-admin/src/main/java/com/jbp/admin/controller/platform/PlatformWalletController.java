@@ -40,6 +40,7 @@ public class PlatformWalletController {
     public CommonResult increase(@RequestBody @Validated PlatformWalletEditRequest request) {
         platformWalletService.increase(request.getType(), request.getAmt(), PlatformWalletFlow.OperateEnum.调账.name(),
                 request.getExternalNo(), request.getPostscript());
+        // todo 操作记录
         return CommonResult.success();
     }
 
@@ -49,6 +50,7 @@ public class PlatformWalletController {
     public CommonResult reduce(@RequestBody @Validated PlatformWalletEditRequest request) {
         platformWalletService.reduce(request.getType(), request.getAmt(), PlatformWalletFlow.OperateEnum.调账.name(),
                 request.getExternalNo(), request.getPostscript());
+        // todo 操作记录
         return CommonResult.success();
     }
 
@@ -62,6 +64,7 @@ public class PlatformWalletController {
         }
         platformWalletService.transferToUser(user.getId(), request.getType(), request.getAmt(),
                 PlatformWalletFlow.OperateEnum.调账.name(), request.getExternalNo(), request.getPostscript());
+        // todo 操作记录
         return CommonResult.success();
     }
 }
