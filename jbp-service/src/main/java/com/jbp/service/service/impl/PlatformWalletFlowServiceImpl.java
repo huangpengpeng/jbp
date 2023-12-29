@@ -4,8 +4,33 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.agent.PlatformWalletFlow;
 import com.jbp.service.dao.PlatformWalletFlowDao;
 import com.jbp.service.service.PlatformWalletFlowService;
+import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlowDao, PlatformWalletFlow> implements PlatformWalletFlowService {
+
+
+
+    @Override
+    public void addByPlatformWalletFlow(Integer type, String operate, String action, String externalNo, String postscript, BigDecimal transferIntegral, BigDecimal platformWalletOrgBalance, BigDecimal platformWalletTagBalance) {
+        PlatformWalletFlow platformWalletFlow=PlatformWalletFlow
+                .builder()
+                .walletType(type)
+                .action(action)
+                .operate(operate)
+                .uniqueNo(StringUtils.N_TO_10("PW_"))
+                        .externalNo(externalNo)
+                        .postscript(postscript)
+                        .amt(transferIntegral)
+                        .orgBalance(platformWalletOrgBalance)
+                        .tagBalance(platformWalletTagBalance).build();
+
+       save(platformWalletFlow);
+    }
+
+
+
 }

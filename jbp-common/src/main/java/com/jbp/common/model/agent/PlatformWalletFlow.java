@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -15,21 +16,10 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_platform_wallet_flow")
+@Builder
 @ApiModel(value="PlatformWalletFlow对象", description="平台钱包")
 public class PlatformWalletFlow extends BaseModel {
-
-    public PlatformWalletFlow(Integer walletType, String action, String operate, String uniqueNo, String externalNo,
-                              String postscript, BigDecimal amt, BigDecimal orgBalance, BigDecimal tagBalance) {
-        this.walletType = walletType;
-        this.action = action;
-        this.operate = operate;
-        this.uniqueNo = uniqueNo;
-        this.externalNo = externalNo;
-        this.postscript = postscript;
-        this.amt = amt;
-        this.orgBalance = orgBalance;
-        this.tagBalance = tagBalance;
-    }
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("钱包类型")
     @TableField("wallet_type")

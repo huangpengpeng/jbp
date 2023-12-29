@@ -23,6 +23,8 @@ public class PlatformWalletFlowRequest implements Serializable {
     private String operate;
     @ApiModelProperty("流水单号")
     private String uniqueNo;
+    @ApiModelProperty("外部单号")
+    private String externalNo;
     @ApiModelProperty("附言")
     private String postscript;
     @ApiModelProperty("用户ID")
