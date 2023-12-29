@@ -1,8 +1,11 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.model.VersionModel;
 import com.jbp.common.utils.ArithmeticUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +21,7 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @TableName("eb_wallet")
 @ApiModel(value = "Wallet对象", description = "用户钱包")
-public class Wallet extends BaseModel {
+public class Wallet extends VersionModel {
 
 
 
@@ -48,4 +51,5 @@ public class Wallet extends BaseModel {
     @ApiModelProperty("账户")
     @TableField(exist = false)
     private String accountNo;
+
 }

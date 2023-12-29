@@ -14,6 +14,7 @@ import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.admin.SystemMenu;
 import com.jbp.common.model.admin.SystemPermissions;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.LoginAdminUpdateRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
 import com.jbp.common.response.AdminLoginPicResponse;
@@ -24,6 +25,7 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MenuTree;
+import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 
 import org.springframework.beans.BeanUtils;
@@ -79,6 +81,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     private MerchantService merchantService;
 
 
+
     /**
      * PC登录
      *
@@ -88,7 +91,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      */
     private SystemLoginResponse login(SystemAdminLoginRequest request, Integer adminType, String ip) {
         // 校验验证码
-        checkCaptcha(request);
+//        checkCaptcha(request);
         // 用户验证
         Authentication authentication = null;
         // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
