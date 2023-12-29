@@ -45,7 +45,7 @@ public class PlatformWalletController {
     }
 
     @PreAuthorize("hasAuthority('platform:platformWallet:reduce')")
-    @ApiOperation("增加积分")
+    @ApiOperation("减少积分")
     @PostMapping("/reduce")
     public CommonResult reduce(@RequestBody @Validated PlatformWalletEditRequest request) {
         platformWalletService.reduce(request.getType(), request.getAmt(), PlatformWalletFlow.OperateEnum.调账.name(),
