@@ -10,7 +10,6 @@ public interface ConditionHandler {
 
     void save(CapaRiseCondition riseCondition);
 
-
     <T>T getRule(CapaRiseCondition riseCondition);
 
     Boolean  isOk(Integer uid, CapaRiseCondition riseCondition);

@@ -46,12 +46,12 @@ public class ConditionChain implements ApplicationContextAware {
         handler.save(riseCondition);
     }
 
-    public void isOk(CapaRiseCondition riseCondition) {
+    public Boolean isOk(Integer uid, CapaRiseCondition riseCondition) {
         ConditionHandler handler = handlers.get(riseCondition.getType(), riseCondition.getName());
         if(handler == null){
             throw new CrmebException("当前升级条件不存在");
         }
-        handler.save(riseCondition);
+        return handler.isOk(uid, riseCondition);
     }
 
     void validNamePattern(String name){
