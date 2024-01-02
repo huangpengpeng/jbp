@@ -106,25 +106,25 @@ public class SwaggerConfig {
 //                .globalOperationParameters(pars) // 针对单个url的验证 如果需要的话
                 .pathMapping("/");
     }
-//    @Bean("agent")
-//    public Docket create4RestApis() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .groupName("agent")
-//                .host(domain)
-//                .apiInfo(apiInfo())
-//                // 是否开启
-//                .enable(swaggerEnabled)
-//                .select()
-//                // 扫描的路径包
-//                .apis(RequestHandlerSelectors.basePackage("com.jbp.admin.controller.agent"))
-//                // 指定路径处理PathSelectors.any()代表所有的路径
-//                .paths(agentAnt())
-//                .build()
-//                .securitySchemes(security())
-//                .securityContexts(securityContexts())
-////                .globalOperationParameters(pars) // 针对单个url的验证 如果需要的话
-//                .pathMapping("/");
-//    }
+    @Bean("agent")
+    public Docket create4RestApis() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("agent")
+                .host(domain)
+                .apiInfo(apiInfo())
+                // 是否开启
+                .enable(swaggerEnabled)
+                .select()
+                // 扫描的路径包
+                .apis(RequestHandlerSelectors.basePackage("com.jbp.admin.controller.agent"))
+                // 指定路径处理PathSelectors.any()代表所有的路径
+                .paths(agentAnt())
+                .build()
+                .securitySchemes(security())
+                .securityContexts(securityContexts())
+//                .globalOperationParameters(pars) // 针对单个url的验证 如果需要的话
+                .pathMapping("/");
+    }
     private Predicate<String> merchantPathsAnt() {
         return PathSelectors.ant("/api/admin/merchant/**");
     }
@@ -136,9 +136,9 @@ public class SwaggerConfig {
     private Predicate<String> publicPathsAnt() {
         return PathSelectors.ant("/api/publicly/**");
     }
-//    private Predicate<String> agentAnt() {
-//        return PathSelectors.ant("/api/admin/agent/**");
-//    }
+    private Predicate<String> agentAnt() {
+        return PathSelectors.ant("/api/admin/agent/**");
+    }
 
     private List<ApiKey> security() {
         return newArrayList(

@@ -26,13 +26,11 @@ public class WalletflowController {
     WalletService walletService;
     @Resource
     private UserService userService;
-    @PreAuthorize("hasAuthority('agent:walletflow:page')")
     @ApiOperation("用户积分列表")
     @GetMapping("/page")
     public CommonResult<CommonPage<Wallet>> getList(PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(walletService.pageList(pageParamRequest)));
     }
-    @PreAuthorize("hasAuthority('agent:walletflow:increase')")
     @ApiOperation("增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated WalletformEditRequest request) {
@@ -42,7 +40,6 @@ public class WalletflowController {
         // todo 操作记录
         return CommonResult.success();
     }
-    @PreAuthorize("hasAuthority('agent:walletflow:reduce')")
     @ApiOperation("减少积分")
     @PostMapping("/reduce")
     public CommonResult reduce(@RequestBody @Validated WalletformEditRequest request) {
@@ -52,7 +49,6 @@ public class WalletflowController {
         // todo 操作记录
         return CommonResult.success();
     }
-    @PreAuthorize("hasAuthority('agent:walletflow:transfer')")
     @ApiOperation("转平台")
     @PostMapping("/transfer")
     public CommonResult transfer(@RequestBody @Validated WalletformEditRequest request) {
