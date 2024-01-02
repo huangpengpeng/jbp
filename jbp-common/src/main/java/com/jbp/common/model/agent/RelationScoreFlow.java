@@ -76,26 +76,29 @@ public class RelationScoreFlow extends BaseModel {
     @TableField("payTime")
     private Date payTime;
 
-    @ApiModelProperty("商品信息")
+    @ApiModelProperty("商品信息【新增积分=产品积分  减少是不相同的根据可用区最小值对碰】")
     @TableField(value = "productInfo", typeHandler = ProductInfoListHandler.class)
     private List<ProductInfoDto> productInfo;
-
-    @ApiModelProperty("备注")
-    @TableField("remark")
-    private String remark;
-
-    @ApiModelProperty("层数")
-    @TableField("level")
-    private Integer level;
 
     @ApiModelProperty("奖金")
     @TableField("amt")
     private BigDecimal amt;
 
+    @ApiModelProperty("层数")
+    @TableField("level")
+    private Integer level;
+
+    @ApiModelProperty("层级比例")
+    @TableField("levelRatio")
+    private BigDecimal levelRatio;
+
     @ApiModelProperty("比例")
     @TableField("ratio")
     private BigDecimal ratio;
 
+    @ApiModelProperty("备注")
+    @TableField("remark")
+    private String remark;
 
     @ApiModelProperty("用户账户")
     @TableField(exist = false)

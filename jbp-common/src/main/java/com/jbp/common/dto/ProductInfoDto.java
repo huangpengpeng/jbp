@@ -34,6 +34,9 @@ public class ProductInfoDto implements Serializable {
     @ApiModelProperty("单价")
     private BigDecimal price;
 
+    @ApiModelProperty("pv系数")
+    private BigDecimal scale;
+
     @ApiModelProperty("pv值")
     private BigDecimal pv;
 }

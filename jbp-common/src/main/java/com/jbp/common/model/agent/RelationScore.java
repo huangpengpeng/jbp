@@ -40,7 +40,6 @@ public class RelationScore extends BaseModel {
     @TableField("node")
     private int node;
 
-
     @ApiModelProperty("账户")
     @TableField(exist = false)
     private String accountNo;

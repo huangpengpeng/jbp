@@ -1,14 +1,10 @@
 package com.jbp.service.condition;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.CapaRiseCondition;
-import com.jbp.common.utils.JacksonTool;
 import com.jbp.service.service.CapaRiseConditionService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.MapUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -17,19 +13,19 @@ import javax.annotation.Resource;
  * 邀请一阶条件
  */
 @Component
-public class InviteOneLevelHandler implements ConditionHandler{
+public class InviteOneLevelHandler implements ConditionHandler {
 
     @Resource
     private CapaRiseConditionService capaRiseConditionService;
 
     @Override
     public Integer getType() {
-        return 0;
+        return ConditionEnum.等级_直属一阶等级人数.getType();
     }
 
     @Override
     public String getName() {
-        return "VIP升区代一阶条件";
+        return ConditionEnum.等级_直属一阶等级人数.getName();
     }
 
     @Override
@@ -47,7 +43,7 @@ public class InviteOneLevelHandler implements ConditionHandler{
             }
             return rule;
         } catch (Exception e) {
-            throw new RuntimeException(getName() + ":升级规则格式错误"+ e.getMessage());
+            throw new RuntimeException(getName() + ":升级规则格式错误" + e.getMessage());
         }
     }
 
@@ -63,7 +59,7 @@ public class InviteOneLevelHandler implements ConditionHandler{
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Rule{
+    public static class Rule {
 
         /**
          * 一阶人数
