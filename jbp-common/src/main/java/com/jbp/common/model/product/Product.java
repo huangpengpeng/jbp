@@ -108,6 +108,9 @@ public class Product implements Serializable {
     @ApiModelProperty(value = "运费模板ID")
     private Integer tempId;
 
+    @ApiModelProperty(value = "购买限制模版ID")
+    private Long limitTempId;
+
     @ApiModelProperty(value = "排序")
     @TableField(value = "`sort`")
     private Integer sort;

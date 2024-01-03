@@ -1,4 +1,4 @@
-package com.jbp.service.comm;
+package com.jbp.service.product.comm;
 
 import lombok.Getter;
 

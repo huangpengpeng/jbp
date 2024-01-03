@@ -40,6 +40,13 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     @Override
     public UserCapaXs saveOrUpdateCapa(Integer uid, Long capaXsId, String remark, String description) {
         transactionTemplate.execute(s -> {
+            if (capaXsId == null) {
+                remove(new QueryWrapper<UserCapaXs>().lambda().eq(UserCapaXs::getUid, uid));
+                // 记录快照
+                UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(capaXsId).type("删除").remark(remark).description(description).build();
+                snapshotService.save(snapshot);
+                return Boolean.TRUE;
+            }
             UserCapaXs userCapaXs = getByUser(uid);
             // 等级相同无须处理
             if (userCapaXs != null && NumberUtil.compare(capaXsId, userCapaXs.getCapaId()) == 0) {

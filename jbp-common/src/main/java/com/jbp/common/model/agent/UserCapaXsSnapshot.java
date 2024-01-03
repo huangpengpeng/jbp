@@ -54,6 +54,6 @@ public class UserCapaXsSnapshot extends BaseModel {
     private String capaUrl;
 
     public static enum Constants {
-         升级, 降级
+         升级, 降级, 删除
     }
 }

@@ -1,14 +1,10 @@
-package com.jbp.service.comm;
+package com.jbp.service.product.comm;
 
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.CapaRiseCondition;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductComm;
 import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.service.condition.ConditionEnum;
-import com.jbp.service.condition.ConditionHandler;
-import com.jbp.service.service.CapaRiseConditionService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.ProductCommService;
 import lombok.AllArgsConstructor;
