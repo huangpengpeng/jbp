@@ -94,7 +94,7 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     @Override
     public Boolean transferToUser(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         reduce(type, amt, operate, externalNo, postscript);
-        walletService.reduce(uid, type, amt, operate, externalNo, postscript);
+        walletService.increase(uid, type, amt, operate, externalNo, postscript);
         return Boolean.TRUE;
     }
 

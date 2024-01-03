@@ -1,10 +1,16 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserInvitationFlowService;
@@ -52,14 +58,14 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
     @Override
     public void delete(Integer id) {
         Team team = getById(id);
-        delete(id);
+        removeById(id);
         userInvitationFlowService.clear(team.getLeaderId());
     }
 
 
     @Override
     public void editName(Integer id, String name) {
-        Team team = new Team();
+        Team team = getById(id);
         team.setId(id);
         team.setName(name);
         updateById(team);
@@ -76,6 +82,14 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
         Team team = new Team(name, leaderId);
         save(team);
         userInvitationFlowService.clear(team.getLeaderId());
+    }
+
+    @Override
+    public PageInfo<Team> pageList(String name, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<Team> lambdaQueryWrapper = new LambdaQueryWrapper<Team>()
+                .eq(!ObjectUtil.isNull(name) && !name.equals(""), Team::getName, name);
+        Page<Team> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        return CommonPage.copyPageInfo(page, list(lambdaQueryWrapper));
     }
 
 }

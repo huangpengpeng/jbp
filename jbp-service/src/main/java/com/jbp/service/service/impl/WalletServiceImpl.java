@@ -2,10 +2,15 @@ package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.PlatformWallet;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.dao.WalletDao;
 import com.jbp.service.service.PlatformWalletService;
@@ -80,5 +85,19 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         }
         walletFlowService.add(uid, type, amt, operate, WalletFlow.ActionEnum.支出.name(), externalNo, orgBalance, wallet.getBalance(), postscript);
         return ifSuccess;
+    }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public Boolean transferToPlatform(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
+        reduce(uid,type, amt, operate, externalNo, postscript);
+        platformWalletService.increase(type,amt,operate,externalNo,postscript);
+        return Boolean.TRUE;
+    }
+
+
+    @Override
+    public PageInfo<Wallet> pageList(PageParamRequest pageParamRequest) {
+        Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        return CommonPage.copyPageInfo(page, list());
     }
 }
