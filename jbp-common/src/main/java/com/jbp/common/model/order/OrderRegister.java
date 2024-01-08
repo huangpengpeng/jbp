@@ -31,9 +31,9 @@ public class OrderRegister implements Serializable {
     private Integer node;
 
     @ApiModelProperty(value = "等级编号")
-    private Integer capaId;
+    private Long capaId;
 
     @ApiModelProperty(value = "星级编号")
-    private Integer capaXsId;
+    private Long capaXsId;
 
 }

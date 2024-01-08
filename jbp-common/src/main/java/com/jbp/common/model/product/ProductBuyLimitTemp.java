@@ -21,6 +21,31 @@ public class ProductBuyLimitTemp extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
+    public ProductBuyLimitTemp(String name, List<Long> capaIdList, List<Long> capaXsIdList,
+                               List<Long> whiteIdList, List<Long> teamIdList,
+                               Boolean hasPartner,
+                               List<Long> pCapaIdList, Boolean hasRelation,
+                               List<Long> pCapaXsIdList) {
+        this.name = name;
+        this.capaIdList = capaIdList;
+        this.capaXsIdList = capaXsIdList;
+        this.whiteIdList = whiteIdList;
+        this.teamIdList = teamIdList;
+        this.hasPartner = hasPartner;
+        this.pCapaIdList = pCapaIdList;
+        this.hasRelation = hasRelation;
+        this.pCapaXsIdList = pCapaXsIdList;
+    }
+
+    public void init(){
+        if (getHasPartner() == null){
+            setHasPartner(false);
+        }
+        if (getHasRelation() == null){
+            setHasRelation(false);
+        }
+    }
+
     @ApiModelProperty(value = "模版名称")
     private String name;
 

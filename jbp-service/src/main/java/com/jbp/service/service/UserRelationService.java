@@ -10,6 +10,8 @@ public interface UserRelationService extends IService<UserRelation> {
 
     UserRelation getByUid(Integer uId);
 
+    Integer getPid(Integer uId);
+
     List<UserRelation> getByPid(Integer pId);
 
     UserRelation getByPid(Integer pId, Integer node);

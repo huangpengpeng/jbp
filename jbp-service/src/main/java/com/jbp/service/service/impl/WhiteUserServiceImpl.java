@@ -17,6 +17,7 @@ import com.jbp.service.dao.WhiteUserDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WhiteService;
 import com.jbp.service.service.WhiteUserService;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -24,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> implements WhiteUserService {
@@ -118,5 +120,11 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
     @Override
     public WhiteUser getByUser(Integer uid, Long whiteId) {
         return getOne(new LambdaQueryWrapper<WhiteUser>().eq(WhiteUser::getUid, uid).eq(WhiteUser::getWhiteId, whiteId));
+    }
+
+    @Override
+    public List<Long> getByUser(Integer uid) {
+        List<WhiteUser> list = list(new LambdaQueryWrapper<WhiteUser>().eq(WhiteUser::getUid, uid));
+        return ListUtils.emptyIfNull(list).stream().map(WhiteUser::getId).collect(Collectors.toList());
     }
 }

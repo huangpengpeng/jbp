@@ -19,4 +19,6 @@ public interface WhiteUserService extends IService<WhiteUser> {
     void deleteByWhite(Long id);
 
     WhiteUser getByUser(Integer uid, Long  whiteId);
+
+    List<Long> getByUser(Integer uid);
 }

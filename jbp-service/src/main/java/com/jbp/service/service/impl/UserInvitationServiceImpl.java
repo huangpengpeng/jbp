@@ -37,6 +37,12 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     }
 
     @Override
+    public Integer getPid(Integer uId) {
+        UserInvitation userInvitation = getByUser(uId);
+        return userInvitation == null ? null : userInvitation.getRealPid();
+    }
+
+    @Override
     public List<UserUpperDto> getAllUpper(Integer uId) {
         return dao.getAllUpper(uId);
     }

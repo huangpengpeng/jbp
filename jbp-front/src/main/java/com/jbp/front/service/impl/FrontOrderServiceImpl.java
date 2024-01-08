@@ -8,6 +8,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Sets;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
@@ -135,6 +136,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private RefundOrderStatusService refundOrderStatusService;
     @Autowired
     private CrmebConfig crmebConfig;
+    @Autowired
+    private ProductBuyLimitTempService productBuyLimitTempService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
+    @Autowired
+    private TeamUserService teamUserService;
+    @Autowired
+    private WhiteUserService whiteUserService;
+
 
     /**
      * 订单预下单
@@ -2189,6 +2201,16 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merchantOrderVoList.add(merchantOrderVo);
             }
         });
+        // 检查支付方式  购买权限
+        Set<Integer> payTypeSet = Sets.newHashSet();
+        for (PreOrderDetailRequest orderDetail : request.getOrderDetails()) {
+            Product product = productService.getById(orderDetail.getProductId());
+            productBuyLimitTempService.valid(user.getId(), product, null);
+            payTypeSet.add(product.getPayType());
+        }
+        if(payTypeSet.isEmpty() || payTypeSet.size() > 1){
+            throw new CrmebException("购物车结算只能选中相同支付方式的产品");
+        }
         return merchantOrderVoList;
     }
 

@@ -66,6 +66,12 @@ public class ProductAttrValue implements Serializable {
     @ApiModelProperty(value = "体积")
     private BigDecimal volume;
 
+    @ApiModelProperty(value = "业绩类型  1 金额  2 比例")
+    private Integer scoreType;
+
+    @ApiModelProperty(value = "业绩值  比例 0.00 数字就是金额")
+    private BigDecimal scoreValue;
+
     @ApiModelProperty(value = "一级返佣")
     private Integer brokerage;
 

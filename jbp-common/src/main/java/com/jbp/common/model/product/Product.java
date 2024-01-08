@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +14,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -25,7 +27,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_product")
+@TableName(value = "eb_product", autoResultMap = true)
 @ApiModel(value = "Product对象", description = "商品表")
 public class Product implements Serializable {
 
@@ -121,6 +123,13 @@ public class Product implements Serializable {
 
     @ApiModelProperty(value = "规格 0单 1多")
     private Boolean specType;
+
+    @ApiModelProperty(value = "付款方式  0 在线支付  1 积分支付")
+    private Integer payType;
+
+    @ApiModelProperty(value = "消费抵扣")
+    @TableField(typeHandler = ProductDeductionListHandler.class)
+    private List<ProductDeduction> deductionList;
 
     @ApiModelProperty(value = "是否回收站")
     private Boolean isRecycle;

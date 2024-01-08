@@ -34,6 +34,12 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     }
 
     @Override
+    public Integer getPid(Integer uId) {
+        UserRelation  userRelation = getByUid(uId);
+        return userRelation == null ? null : userRelation.getPId();
+    }
+
+    @Override
     public List<UserRelation> getByPid(Integer pId) {
         return list(new LambdaQueryWrapper<UserRelation>().eq(UserRelation::getPId, pId).orderByAsc(UserRelation::getNode));
     }

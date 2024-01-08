@@ -51,4 +51,9 @@ public class UserInvitation implements Serializable {
     @JsonIgnore
     @TableField(value = "gmtModify", fill = FieldFill.INSERT_UPDATE, update = "now()")
     private Date gmtModify;
+
+
+    public Integer getRealPid(){
+        return  getMId() != null ? getMId() : getPId();
+    }
 }
