@@ -9,6 +9,26 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
+	<!-- 配置远程仓库-->
+	<repositories>
+		<repository>
+			<id>aliyun</id>
+			<name>aliyun Repository</name>
+			<url>https://maven.aliyun.com/repository/public</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jeecg</id>
+			<name>jeecg Repository</name>
+			<url>https://maven.jeecg.org/nexus/content/repositories/jeecg</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>jbp-admin</artifactId>
@@ -16,13 +36,54 @@
 
 	<properties>
 		<jbp-service>0.0.1-SNAPSHOT</jbp-service>
+		<!-- jdk版本号-->
+		<java.version>1.8</java.version>
+		<jimureport.version>1.6.6</jimureport.version>
+		<java.version>1.8</java.version>
+		<minio.version>8.0.3</minio.version>
 	</properties>
 
 	<dependencies>
+
+		<!-- JimuReport -->
+		<dependency>
+			<groupId>org.jeecgframework.jimureport</groupId>
+			<artifactId>jimureport-spring-boot-starter</artifactId>
+			<version>${jimureport.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.alibaba</groupId>
+					<artifactId>fastjson</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.github.jsqlparser</groupId>
+					<artifactId>jsqlparser</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		 <dependency>
+            <groupId>org.jeecgframework.jimureport</groupId>
+            <artifactId>jimureport-nosql-starter</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+
+			
+
 		<dependency>
 			<groupId>jbp</groupId>
 			<artifactId>jbp-service</artifactId>
 			<version>${jbp-service}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!--quartz定时调度依赖-->
 		<dependency>
@@ -40,8 +101,12 @@
 			<artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
 			<version>4.4.0</version>
 		</dependency>
-		
-		
+
+<dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>commons-lang3</artifactId>
+  <version>3.12.0</version>
+</dependency>
 
 	</dependencies>
 

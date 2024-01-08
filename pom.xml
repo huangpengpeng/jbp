@@ -25,7 +25,6 @@
 		<swagger-bootstrap-ui.version>1.9.3</swagger-bootstrap-ui.version>
 		<!-- 兼容个别 mav 环境 GBK问题 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<fastjson.version>1.2.56</fastjson.version>
 		<druid.version>1.1.20</druid.version>
 		<mysql.version>8.0.21</mysql.version>
 		<mysql.plus.version>3.3.1</mysql.plus.version>
@@ -43,12 +42,6 @@
 				<scope>import</scope>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
-			<dependency>
-				<groupId>com.alibaba</groupId>
-				<artifactId>fastjson</artifactId>
-				<version>${fastjson.version}</version>
-			</dependency>
 
 			<!--添加 Alibaba 数据源-->
 			<dependency>
@@ -150,19 +143,8 @@
 				<version>3.1.0</version>
 			</dependency>
 
-			<!-- 分页插件 -->
-			<dependency>
-				<groupId>com.github.pagehelper</groupId>
-				<artifactId>pagehelper-spring-boot-starter</artifactId>
-				<version>1.2.5</version>
-				<!--            mybatis plus 和 pagehelper 冲突-->
-				<exclusions>
-					<exclusion>
-						<groupId>org.mybatis</groupId>
-						<artifactId>mybatis</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
+		
+
 
 			<dependency>
 				<groupId>javax.validation</groupId>
@@ -319,8 +301,8 @@
 				<artifactId>ip2region</artifactId>
 				<version>2.7.0</version>
 			</dependency>
-			
-			
+
+
 			<dependency>
 				<groupId>cn.shuibo</groupId>
 				<artifactId>rsa-encrypt-body-spring-boot</artifactId>

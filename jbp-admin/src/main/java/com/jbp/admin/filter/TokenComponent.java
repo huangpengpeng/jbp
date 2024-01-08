@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component;
 
 import com.jbp.common.constants.Constants;
 import com.jbp.common.enums.RoleEnum;
+import com.jbp.common.utils.CookieUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.LoginUserVo;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -138,25 +140,40 @@ public class TokenComponent {
         redisUtil.set(userKey, loginUser, (long) expireTime, TimeUnit.MINUTES);
     }
 
-    /**
-     * 获取请求token
-     *
-     * @param request HttpServletRequest
-     * @return token
-     */
-    private String getToken(HttpServletRequest request) {
-        String token = request.getHeader(Constants.HEADER_AUTHORIZATION_KEY);
-        if (StrUtil.isEmpty(token)) {
-            return token;
-        }
-        if (token.startsWith(TOKEN_PLATFORM_START_PREFIX)) {
-            token = getPlatformTokenKey(token.replace(TOKEN_PLATFORM_START_PREFIX, ""));
-        }
-        if (token.startsWith(TOKEN_MERCHANT_START_PREFIX)) {
-            token = getMerchantTokenKey(token.replace(TOKEN_MERCHANT_START_PREFIX, ""));
-        }
-        return token;
-    }
+	/**
+	 * 获取请求token
+	 *
+	 * @param request HttpServletRequest
+	 * @return token
+	 */
+	public String getToken(HttpServletRequest request) {
+		String token = request.getHeader(Constants.HEADER_AUTHORIZATION_KEY);
+		if (StrUtil.isEmpty(token)) {
+			Cookie cookie = CookieUtil.getCookie(request, Constants.HEADER_AUTHORIZATION_KEY);
+			if (cookie != null) {
+				token = cookie.getValue();
+			}
+		}
+		if (StrUtil.isEmpty(token)) {
+			token = request.getParameter(Constants.HEADER_AUTHORIZATION_KEY);
+		}
+		if (StrUtil.isEmpty(token)) {
+			token = request.getParameter(Constants.HEADER_TOKEN_KEY);
+		}
+		if (StrUtil.isEmpty(token)) {
+			token = request.getHeader(Constants.HEADER_TOKEN_KEY);
+		}
+		if (StrUtil.isEmpty(token)) {
+			return token;
+		}
+		if (token.startsWith(TOKEN_PLATFORM_START_PREFIX)) {
+			token = getPlatformTokenKey(token.replace(TOKEN_PLATFORM_START_PREFIX, ""));
+		}
+		if (token.startsWith(TOKEN_MERCHANT_START_PREFIX)) {
+			token = getMerchantTokenKey(token.replace(TOKEN_MERCHANT_START_PREFIX, ""));
+		}
+		return token;
+	}
 
     private String getPlatformTokenKey(String uuid) {
         return TOKEN_PLATFORM_REDIS + uuid;
