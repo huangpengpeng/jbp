@@ -1,7 +1,7 @@
 package com.jbp.service.product.comm;
 
+import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
-import com.jbp.common.model.product.ProductComm;
 
 import java.util.List;
 

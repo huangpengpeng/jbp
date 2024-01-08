@@ -2,7 +2,8 @@ package com.jbp.service.product.comm;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.model.product.ProductComm;
+import com.jbp.common.model.agent.ProductComm;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

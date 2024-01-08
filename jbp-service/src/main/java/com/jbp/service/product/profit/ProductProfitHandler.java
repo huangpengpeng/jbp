@@ -1,8 +1,8 @@
 package com.jbp.service.product.profit;
 
+import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.product.ProductProfit;
 
 import java.util.List;
 

@@ -7,11 +7,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.CapaRiseCondition;
+import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.product.ProductProfit;
 import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.ProductProfitService;
+import com.jbp.service.service.agent.ProductProfitService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

@@ -1,12 +1,13 @@
 package com.jbp.service.product.comm;
 
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.product.ProductComm;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.ProductCommService;
+import com.jbp.service.service.agent.ProductCommService;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

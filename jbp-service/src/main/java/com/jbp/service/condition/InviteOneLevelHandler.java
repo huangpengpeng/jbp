@@ -1,7 +1,8 @@
 package com.jbp.service.condition;
 
 import com.jbp.common.model.agent.CapaRiseCondition;
-import com.jbp.service.service.CapaRiseConditionService;
+import com.jbp.service.service.agent.CapaRiseConditionService;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -6,7 +6,8 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaXsRequest;
 import com.jbp.common.result.CommonResult;
-import com.jbp.service.service.CapaXsService;
+import com.jbp.service.service.agent.CapaXsService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

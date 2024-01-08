@@ -8,7 +8,8 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletformEditRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.WalletService;
+import com.jbp.service.service.agent.WalletService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
