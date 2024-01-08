@@ -1,5 +1,6 @@
 package com.jbp.admin.filter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.FilterInvocation;
@@ -10,6 +11,7 @@ import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.encryptapi.CryptoConfig;
 import com.jbp.common.encryptapi.SecretKeyConfig;
 import com.jbp.common.utils.RequestUtil;
+import com.jbp.service.service.SystemConfigService;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,8 @@ public class ResponseFilter implements Filter {
 	CryptoConfig cryptoConfig;
 	@Autowired
 	CrmebConfig crmebConfig;
+	@Autowired
+	SystemConfigService systemConfigService;
 
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse response, FilterChain filterChain)
@@ -51,7 +55,7 @@ public class ResponseFilter implements Filter {
 			fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
 			return;
 		}
-
+		
 		// 这里只拦截返回，直接让请求过去，如果在请求前有处理，可以在这里处理
 		filterChain.doFilter(request, wrapperResponse);
 		byte[] content = wrapperResponse.getContent();// 获取返回值
@@ -62,7 +66,7 @@ public class ResponseFilter implements Filter {
 			try {
 				HttpServletRequest req = (HttpServletRequest) request;
 				str = new ResponseRouter().filter(req, str, RequestUtil.getUri(req), crmebConfig, cryptoConfig,
-						secretKeyConfig);
+						secretKeyConfig,systemConfigService);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

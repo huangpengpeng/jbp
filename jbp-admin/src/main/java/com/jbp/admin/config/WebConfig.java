@@ -88,6 +88,7 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean registration = new FilterRegistrationBean(responseFilter());
         // 仅仅api前缀的请求才会拦截
         registration.addUrlPatterns("/api/*");
+        registration.addUrlPatterns("/jmreport/desreport_/corelib/*");
         return registration;
     }
 
