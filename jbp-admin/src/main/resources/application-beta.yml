@@ -23,17 +23,16 @@ crmeb:
       - /actuator/**
       - /druid/**
       - api/admin/platform/pagediy/info
-
+      - /jmreport/**
 # 配置端口
 server:
-  port: 8188
+  port: 8181
   servlet:
     context-path: /         # 访问path
   tomcat:
     uri-encoding: UTF-8     # 默认编码格式
     max-threads: 1000       # 最大线程数量 默认200
     min-spare-threads: 30   # 初始化启动线程数量
-
 spring:
   profiles:
     active: beta
@@ -83,7 +82,6 @@ spring:
     throw-exception-if-no-handler-found: true
   resources:
     add-mappings: false
-
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
@@ -97,17 +95,16 @@ spring:
         max-idle: 10 # 连接池中的最大空闲连接
         min-idle: 0 # 连接池中的最小空闲连接
         time-between-eviction-runs: -1 #逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
-
 debug: true
 logging:
   level:
     io.swagger.*: error
-    com.zbjk.crmeb: debug
+    com.zbjk.crmeb: INFO
     org.springframework.boot.autoconfigure: ERROR
+    org.springframework.web: INFO
   config: classpath:logback-spring.xml
   file:
     path: ./crmeb_log
-
 # mybatis 配置
 mybatis-plus:
   mapper-locations: classpath*:mapper/*/*Mapper.xml #xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）
@@ -120,8 +117,6 @@ mybatis-plus:
 #      logic-delete-field: isDel  #全局逻辑删除字段值 3.3.0开始支持，详情看下面。
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
-
-
 #swagger 配置
 swagger:
   basic:
@@ -133,11 +128,44 @@ swagger:
 wx:
   miniapp:
     configs:
-      - appid: 111 #微信小程序的appid
-        secret: 111 #微信小程序的Secret
+      - appid: wx69627cafde0080bf #微信小程序的appid
+        secret: 6a1851dd9474b745e91779f0a2319390 #微信小程序的Secret
         token: CrmebJava #微信小程序消息服务器配置的token
         aesKey:  #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON
 
     config-storage:
        type: redistemplate
+rsa:
+  encrypt:
+    open: false # 是否开启加密 true  or  false
+    showLog: true # 是否打印加解密log true  or  false
+    key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo8jKuU2/N4zvyDVdvlLwUoPTW672DtbGV7Tvek1dlmaaxV4IiA2ZNIfpXfzD3ERzN9/MQii80YkmOkpDlAAPIAOHikMhhfbMqsy13tL/z9pQO5Icu6X2VfdHUdKDEOUTnD/lA0tRwu80dw/+VOkvzg7I3qDcT6gsRs9J92SN+KydMeulqk/AjZomP9/ISgz2i8gLi62jCswbCsvqg9kx7FMq4p/fHTqCXvDPt6ebEQbFh0FP2TmD/f7XISUeplD45u19yheYfPt1UvjePKZrbuHWTmB7YfNSdBv9rCREllxc/nQ6o4LB2alW7ZoGWc3PjlH1MwpTe0Q3Iopi6nT20QIDAQAB
+minidao:
+  base-package: org.jeecg.modules.jmreport.*
+jeecg:
+  # local|minio|alioss
+  uploadType: local
+  # local
+  path:
+    #文件路径
+    upload: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/
+  #大屏报表参数设置
+  jmreport:
+    #多租户模式，默认值为空(created:按照创建人隔离、tenant:按照租户隔离)
+    saasMode:
+    # 平台上线安全配置
+    firewall:
+      # 数据源安全 (开启后，不允许使用平台数据源、SQL解析加签并且不允许查询数据库)
+      dataSourceSafe: false
+      # 低代码开发模式（dev:开发模式，prod:发布模式—关闭在线报表设计功能，分配角色admin、lowdeveloper可放开限制）
+      lowCodeMode: dev
+    # 展示列数
+    col: 100
+    # 展示行数
+    row: 200
+    pageSize:
+      - 10
+      - 20
+      - 30
+      - 40

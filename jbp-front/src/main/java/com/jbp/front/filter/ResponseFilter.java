@@ -1,18 +1,26 @@
 package com.jbp.front.filter;
 
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.FilterInvocation;
 
 import com.jbp.common.config.CrmebConfig;
+import com.jbp.common.encryptapi.CryptoConfig;
+import com.jbp.common.encryptapi.SecretKeyConfig;
 import com.jbp.common.utils.RequestUtil;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -30,8 +38,12 @@ import java.nio.charset.StandardCharsets;
 //@Component
 public class ResponseFilter implements Filter {
 
-    @Autowired
-    CrmebConfig crmebConfig;
+	@Autowired
+	SecretKeyConfig secretKeyConfig;
+	@Autowired
+	CryptoConfig cryptoConfig;
+	@Autowired
+	CrmebConfig crmebConfig;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse response, FilterChain filterChain)
@@ -53,11 +65,12 @@ public class ResponseFilter implements Filter {
             String str = new String(content, StandardCharsets.UTF_8);
 
             try {
-                HttpServletRequest req = (HttpServletRequest) request;
-                str = new ResponseRouter().filter(str, RequestUtil.getUri(req), crmebConfig);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+				HttpServletRequest req = (HttpServletRequest) request;
+				str = new ResponseRouter().filter(req, str, RequestUtil.getUri(req), crmebConfig, cryptoConfig,
+						secretKeyConfig);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
             //把返回值输出到客户端
             ServletOutputStream outputStream = response.getOutputStream();
             if (str.length() > 0) {

@@ -58,3 +58,6 @@ front 开发文档 http://api.front.merchant.java.crmeb.net/doc.html
 
 # 行为验证码 安吉加加
 https://captcha.anji-plus.com/
+
+#report
+https://help.jeecg.com/jimureport/integratedDoc.html

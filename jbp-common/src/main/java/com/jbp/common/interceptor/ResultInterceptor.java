@@ -7,6 +7,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jbp.common.annotation.CustomResponseAnnotation;
+import com.jbp.common.encryptapi.EncryptIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +25,8 @@ public class ResultInterceptor implements HandlerInterceptor {
 
     /* 使用自定义响应的标识 */
     private static final String CUSTOM_RESPONSE_RESULT_ANNOTATION = "CUSTOM-RESPONSE-RESULT-ANNOTATION";
+    //是否忽略签名
+    private static final String CUSTOM_RESPONSE_RESULT_ENCRYPTIGNORE = "CUSTOM-RESPONSE-RESULT-ENCRYPTIGNORE";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -40,10 +43,23 @@ public class ResultInterceptor implements HandlerInterceptor {
                 request.setAttribute(CUSTOM_RESPONSE_RESULT_ANNOTATION, clazz.getAnnotation(CustomResponseAnnotation.class));
             }
             // 判断是否在方法上加了注解
-            else if (method.isAnnotationPresent(CustomResponseAnnotation.class)) {
+            if (method.isAnnotationPresent(CustomResponseAnnotation.class)) {
                 // 设置该请求返回体，不需要包装，往下传递，在ResponseBodyAdvice接口进行判断
                 request.setAttribute(CUSTOM_RESPONSE_RESULT_ANNOTATION,method.getAnnotation(CustomResponseAnnotation.class));
             }
+            
+            // 判断是否在类对象上加了注解
+            if (clazz.isAnnotationPresent(EncryptIgnore.class)) {
+                // 设置该请求返回体，不需要包装，往下传递，在ResponseBodyAdvice接口进行判断
+                request.setAttribute(CUSTOM_RESPONSE_RESULT_ENCRYPTIGNORE, clazz.getAnnotation(EncryptIgnore.class));
+            }
+            
+            // 判断是否在方法上加了注解
+            if (method.isAnnotationPresent(EncryptIgnore.class)) {
+                // 设置该请求返回体，不需要包装，往下传递，在ResponseBodyAdvice接口进行判断
+                request.setAttribute(CUSTOM_RESPONSE_RESULT_ENCRYPTIGNORE,method.getAnnotation(EncryptIgnore.class));
+            }
+            
         }
         return true;
     }

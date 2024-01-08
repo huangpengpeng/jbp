@@ -1,13 +1,32 @@
 package com.jbp.admin.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Service;
 
 import com.jbp.admin.filter.TokenComponent;
 import com.jbp.admin.service.AdminLoginService;
 import com.jbp.admin.service.ValidateCodeService;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.encryptapi.SecretKeyConfig;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -26,7 +45,11 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MenuTree;
 import com.jbp.service.dao.UserDao;
-import com.jbp.service.service.*;
+import com.jbp.service.service.AsyncService;
+import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SystemAdminService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.SystemMenuService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +60,38 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.jbp.admin.filter.TokenComponent;
+import com.jbp.admin.service.AdminLoginService;
+import com.jbp.admin.service.ValidateCodeService;
+import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.encryptapi.SecretKeyConfig;
+import com.jbp.common.enums.RoleEnum;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.admin.SystemMenu;
+import com.jbp.common.model.admin.SystemPermissions;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.request.LoginAdminUpdateRequest;
+import com.jbp.common.request.SystemAdminLoginRequest;
+import com.jbp.common.response.AdminLoginInfoResponse;
+import com.jbp.common.response.LoginAdminResponse;
+import com.jbp.common.response.MenusResponse;
+import com.jbp.common.response.SystemLoginResponse;
+import com.jbp.common.token.GoogleAuthUtil;
+import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.LoginUserVo;
+import com.jbp.common.vo.MenuTree;
+import com.jbp.service.service.AsyncService;
+import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SystemAdminService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.SystemMenuService;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.crypto.SecureUtil;
 
 /**
  * 管理端登录服务实现类
@@ -75,6 +126,9 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     @Autowired
     private AsyncService asyncService;
 
+	@Autowired
+	private SecretKeyConfig secretKeyConfig;
+	
     @Autowired
     private ValidateCodeService validateCodeService;
     @Autowired
@@ -82,52 +136,74 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
 
 
-    /**
-     * PC登录
-     *
-     * @param request   请求信息
-     * @param adminType 管理员类型
-     * @param ip        ip
-     */
-    private SystemLoginResponse login(SystemAdminLoginRequest request, Integer adminType, String ip) {
-        // 校验验证码
-//        checkCaptcha(request);
-        // 用户验证
-        Authentication authentication = null;
-        // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
-        try {
-            String principal = request.getAccount() + adminType;
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(principal, request.getPwd()));
-        } catch (AuthenticationException e) {
-            if (e instanceof BadCredentialsException) {
-                throw new CrmebException("用户不存在或密码错误");
-            }
-            throw new CrmebException(e.getMessage());
-        }
-        LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
-        SystemAdmin systemAdmin = loginUser.getUser();
+	/**
+	 * PC登录
+	 *
+	 * @param request   请求信息
+	 * @param adminType 管理员类型
+	 * @param ip        ip
+	 */
+	private SystemLoginResponse login(SystemAdminLoginRequest request, Integer adminType, String ip) {
+		AdminLoginInfoResponse adminLoginInfoResponse = getLoginInfo();
+		// 开启了mfa
+		if (StringUtils.equalsIgnoreCase(adminLoginInfoResponse.getMfaOpen(), "'0'")) {
+			//客户端传入经过了加密，需要先解密
+			request.setReqCode( secretKeyConfig.decryptStr(request.getReqCode()));
+			// 校验验证码
+			checkCaptcha(request);
+			SystemAdmin systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
+			systemAdmin.setLastCheckCode(request.getReqCode());
+			systemAdminService.updateById(systemAdmin);
+		} else {
+			// 客户端传入经过了加密，需要先解密
+			request.setReqMfa(secretKeyConfig.decryptStr(request.getReqMfa()));
+			SystemAdmin systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
+			checkmfa(request, systemAdmin.getMfa());
+			systemAdmin.setLastCheckCode(request.getReqMfa());
+			systemAdminService.updateById(systemAdmin);
+		}
+		// 用户验证
+		Authentication authentication = null;
+		// 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+		try {
+			String principal = request.getAccount() + adminType;
+			authentication = authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(principal, request.getPwd()));
+		} catch (AuthenticationException e) {
+			if (e instanceof BadCredentialsException) {
+				throw new CrmebException("用户不存在或密码错误");
+			}
+			throw new CrmebException(e.getMessage());
+		}
+		LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
+		SystemAdmin systemAdmin = loginUser.getUser();
 
-        String token = tokenComponent.createToken(loginUser);
-        SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
-        systemAdminResponse.setToken(token);
-        BeanUtils.copyProperties(systemAdmin, systemAdminResponse);
+		String token = tokenComponent.createToken(loginUser);
+		SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
+		systemAdminResponse.setToken(token);
+		BeanUtils.copyProperties(systemAdmin, systemAdminResponse);
 
-        //更新最后登录信息
-        systemAdmin.setUpdateTime(DateUtil.date());
-        systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
-        systemAdmin.setLastIp(ip);
-        systemAdminService.updateById(systemAdmin);
+		// 更新最后登录信息
+		systemAdmin.setUpdateTime(DateUtil.date());
+		systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
+		systemAdmin.setLastIp(ip);
 
-        // 返回后台LOGO图标
-        if (adminType.equals(RoleEnum.PLATFORM_ADMIN.getValue())) {
-            systemAdminResponse.setLeftTopLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP));
-            systemAdminResponse.setLeftSquareLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE));
-        } else {
-            systemAdminResponse.setLeftTopLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LEFT_TOP));
-            systemAdminResponse.setLeftSquareLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE));
-        }
-        return systemAdminResponse;
-    }
+		systemAdminService.updateById(systemAdmin);
+
+		// 返回后台LOGO图标
+		if (adminType.equals(RoleEnum.PLATFORM_ADMIN.getValue())) {
+			systemAdminResponse.setLeftTopLogo(
+					systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP));
+			systemAdminResponse.setLeftSquareLogo(
+					systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE));
+		} else {
+			systemAdminResponse.setLeftTopLogo(
+					systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LEFT_TOP));
+			systemAdminResponse.setLeftSquareLogo(
+					systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE));
+		}
+		return systemAdminResponse;
+	}
 
     /**
      * 平台端登录
@@ -166,11 +242,12 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      * @return AdminLoginPicResponse
      */
     @Override
-    public AdminLoginPicResponse getLoginPic() {
-        AdminLoginPicResponse loginPicResponse = new AdminLoginPicResponse();
+    public AdminLoginInfoResponse getLoginInfo() {
+    	AdminLoginInfoResponse loginPicResponse = new AdminLoginInfoResponse();
         loginPicResponse.setBackgroundImage(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_BACKGROUND_IMAGE));
         loginPicResponse.setLoginLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN));
         loginPicResponse.setLeftLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LEFT_LOGO));
+        loginPicResponse.setMfaOpen(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_MFA_OPEN));
         return loginPicResponse;
     }
 
@@ -180,11 +257,12 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      * @return AdminLoginPicResponse
      */
     @Override
-    public AdminLoginPicResponse getMerchantLoginPic() {
-        AdminLoginPicResponse loginPicResponse = new AdminLoginPicResponse();
+    public AdminLoginInfoResponse getMerchantLoginInfo() {
+    	AdminLoginInfoResponse loginPicResponse = new AdminLoginInfoResponse();
         loginPicResponse.setBackgroundImage(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_BACKGROUND_IMAGE));
         loginPicResponse.setLoginLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LOGIN));
         loginPicResponse.setLeftLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LEFT_LOGO));
+        loginPicResponse.setMerOpen(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_MER_OPEN));
         return loginPicResponse;
     }
 
@@ -270,7 +348,27 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      */
     private void checkCaptcha(SystemAdminLoginRequest request) {
         // 判断验证码
-        boolean codeCheckResult = validateCodeService.check(request.getKey(), request.getCode());
+        boolean codeCheckResult = validateCodeService.check(request.getKey(), request.getReqCode());
         if (!codeCheckResult) throw new CrmebException("验证码不正确");
     }
+    
+    private void checkmfa(SystemAdminLoginRequest request,String secret) {
+    	if(StringUtils.isBlank(request.getPwd()) || StringUtils.equals(request.getPwd(), DigestUtils.md5Hex("123456"))
+				|| StringUtils.equals(request.getPwd(), DigestUtils.md5Hex("12345"))) {
+    		throw new CrmebException("不能使用弱口令密码登录");
+		}
+		com.jbp.common.token.GoogleAuthenticator ga = new com.jbp.common.token.GoogleAuthenticator();
+		boolean codeCheckResult=ga.check_code(secret, Long.parseLong(request.getReqMfa()), System.currentTimeMillis());
+		 if (!codeCheckResult) throw new CrmebException("验证码不正确");
+	}
+    
+
+	@Override
+	public Map<String,String> loginUserMfaKey() {
+		SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+		Map<String,String> result=	GoogleAuthUtil.genAuthQrCode(admin.getAccount());
+		admin.setMfa(result.get("secret"));
+		systemAdminService.updateById(admin);
+		return result;
+	}
 }

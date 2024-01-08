@@ -27,6 +27,8 @@ public class Constants {
 
     //头部 token令牌key
     public static final String HEADER_AUTHORIZATION_KEY = "Authori-zation";
+    // 兼容积木报表
+    public static final String HEADER_TOKEN_KEY = "token";
 
     //默认分页
     public static final int DEFAULT_PAGE = 1;

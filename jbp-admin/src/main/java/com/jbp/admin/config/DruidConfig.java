@@ -9,6 +9,8 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
 /**
@@ -29,8 +31,8 @@ public class DruidConfig {
     @Bean
     public ServletRegistrationBean druidServlet() { // 主要实现WEB监控的配置处理
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*"); // 进行druid监控的配置处理操作
-        servletRegistrationBean.addInitParameter("loginUsername", "kf"); // 用户名
-        servletRegistrationBean.addInitParameter("loginPassword", "654321"); // 密码
+        servletRegistrationBean.addInitParameter("loginUsername", "druidadmin"); // 用户名
+        servletRegistrationBean.addInitParameter("loginPassword", "12345Aa#"); // 密码
         servletRegistrationBean.addInitParameter("resetEnable", "true"); // 是否可以重置数据源
         return servletRegistrationBean;
     }
@@ -48,8 +50,10 @@ public class DruidConfig {
 
     @Bean("dataSource")
     @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource druidDataSource() {
-        return new DruidDataSource();
+    public DataSource druidDataSource() throws SQLException {
+    	DruidDataSource dataSource=new DruidDataSource();
+    	dataSource.setFilters("wall,config,slf4j");
+        return dataSource;
     }
 }
 

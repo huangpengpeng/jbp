@@ -1,128 +1,197 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-   
-    <parent>
-        <groupId>jbp</groupId>
-    <artifactId>com.jbp</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-    
-    <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <artifactId>jbp-admin</artifactId>
-    <packaging>jar</packaging>
+	<parent>
+		<groupId>jbp</groupId>
+		<artifactId>com.jbp</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
 
-    <properties>
-        <jbp-service>0.0.1-SNAPSHOT</jbp-service>
-    </properties>
+	<!-- 配置远程仓库-->
+	<repositories>
+		<repository>
+			<id>aliyun</id>
+			<name>aliyun Repository</name>
+			<url>https://maven.aliyun.com/repository/public</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jeecg</id>
+			<name>jeecg Repository</name>
+			<url>https://maven.jeecg.org/nexus/content/repositories/jeecg</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>jbp</groupId>
-            <artifactId>jbp-service</artifactId>
-            <version>${jbp-service}</version>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>jbp-admin</artifactId>
+	<packaging>jar</packaging>
+
+	<properties>
+		<jbp-service>0.0.1-SNAPSHOT</jbp-service>
+		<!-- jdk版本号-->
+		<java.version>1.8</java.version>
+		<jimureport.version>1.6.6</jimureport.version>
+		<java.version>1.8</java.version>
+		<minio.version>8.0.3</minio.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- JimuReport -->
+		<dependency>
+			<groupId>org.jeecgframework.jimureport</groupId>
+			<artifactId>jimureport-spring-boot-starter</artifactId>
+			<version>${jimureport.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.alibaba</groupId>
+					<artifactId>fastjson</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.github.jsqlparser</groupId>
+					<artifactId>jsqlparser</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		 <dependency>
+            <groupId>org.jeecgframework.jimureport</groupId>
+            <artifactId>jimureport-nosql-starter</artifactId>
+            <version>1.6.0</version>
         </dependency>
-        <!--quartz定时调度依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-      
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
-            <version>4.4.0</version>
-        </dependency>
-    </dependencies>
 
-    <build>
-        <!--打包配置-->
-        <finalName>Jbp-admin</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.3.0.RELEASE</version>
-<!--                正确打包本地加密jar包，不可删除-->
-                <configuration>
-                    <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
-                    <fork>true</fork>
-                    <includeSystemScope>true</includeSystemScope>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <!-- 使用默认的变量标记方法即${*} -->
-                    <useDefaultDelimiters>true</useDefaultDelimiters>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>eot</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>svg</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-        </plugins>
+		<dependency>
+			<groupId>jbp</groupId>
+			<artifactId>jbp-service</artifactId>
+			<version>${jbp-service}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!--quartz定时调度依赖-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <resources>
-            <!--            <resource>-->
-            <!--                <directory>src/main/resources</directory>-->
-            <!--                &lt;!&ndash; 处理文件时替换文件中的变量 &ndash;&gt;-->
-            <!--                <filtering>true</filtering>-->
-            <!--                <excludes>-->
-            <!--                    &lt;!&ndash; 打包时排除文件 &ndash;&gt;-->
-            <!--&lt;!&ndash;                    <exclude>application.yml</exclude>&ndash;&gt;-->
-            <!--                    <exclude>application-{profile}.yml</exclude>-->
-            <!--&lt;!&ndash;                    <exclude>application-beta.yml</exclude>&ndash;&gt;-->
-            <!--&lt;!&ndash;                    <exclude>application-prod.yml</exclude>&ndash;&gt;-->
-            <!--                </excludes>-->
-            <!--            </resource>-->
-<!--            <resource>-->
-<!--                <directory>src/main/resources</directory>-->
-<!--                <filtering>true</filtering>-->
-<!--            </resource>-->
-            <!--            <resource>-->
-            <!--                <directory>src/main/resources.${spring.profiles.active}</directory>-->
-            <!--                <filtering>false</filtering>-->
-            <!--            </resource>-->
-            <!--这个元素描述了项目相关的所有资源路径列表，例如和项目相关的属性文件，这些资源被包含在最终的打包文件里。-->
-<!--            <resource>-->
-<!--                   描述存放资源的目录，该路径相对POM路径-->
-<!--                <directory>src/main/java</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
+			<version>4.4.0</version>
+		</dependency>
 
-<!--            <resource>-->
-<!--                <filtering>true</filtering>-->
-<!--                <directory>src/main/resources</directory>-->
-<!--                <excludes>-->
-<!--                    <exclude>**/*.woff</exclude>-->
-<!--                    <exclude>**/*.ttf</exclude>-->
-<!--                    <exclude>**/*.eot</exclude>-->
-<!--                    <exclude>**/*.svg</exclude>-->
-<!--                </excludes>-->
-<!--            </resource>-->
-        </resources>
-    </build>
+<dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>commons-lang3</artifactId>
+  <version>3.12.0</version>
+</dependency>
+
+	</dependencies>
+
+	<build>
+		<!--打包配置-->
+		<finalName>Jbp-admin</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.3.0.RELEASE</version>
+				<!--                正确打包本地加密jar包，不可删除-->
+				<configuration>
+					<jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+					<fork>true</fork>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<!-- 使用默认的变量标记方法即${*} -->
+					<useDefaultDelimiters>true</useDefaultDelimiters>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>woff</nonFilteredFileExtension>
+						<nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+						<nonFilteredFileExtension>eot</nonFilteredFileExtension>
+						<nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+						<nonFilteredFileExtension>svg</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<resources>
+			<!--            <resource>-->
+			<!--                <directory>src/main/resources</directory>-->
+			<!--                &lt;!&ndash; 处理文件时替换文件中的变量 &ndash;&gt;-->
+			<!--                <filtering>true</filtering>-->
+			<!--                <excludes>-->
+			<!--                    &lt;!&ndash; 打包时排除文件 &ndash;&gt;-->
+			<!--&lt;!&ndash;                    <exclude>application.yml</exclude>&ndash;&gt;-->
+			<!--                    <exclude>application-{profile}.yml</exclude>-->
+			<!--&lt;!&ndash;                    <exclude>application-beta.yml</exclude>&ndash;&gt;-->
+			<!--&lt;!&ndash;                    <exclude>application-prod.yml</exclude>&ndash;&gt;-->
+			<!--                </excludes>-->
+			<!--            </resource>-->
+			<!--            <resource>-->
+			<!--                <directory>src/main/resources</directory>-->
+			<!--                <filtering>true</filtering>-->
+			<!--            </resource>-->
+			<!--            <resource>-->
+			<!--
+			<directory>src/main/resources.${spring.profiles.active}</directory>-->
+			<!--                <filtering>false</filtering>-->
+			<!--            </resource>-->
+			<!--这个元素描述了项目相关的所有资源路径列表，例如和项目相关的属性文件，这些资源被包含在最终的打包文件里。-->
+			<!--            <resource>-->
+			<!--                   描述存放资源的目录，该路径相对POM路径-->
+			<!--                <directory>src/main/java</directory>-->
+			<!--                <includes>-->
+			<!--                    <include>**/*.xml</include>-->
+			<!--                </includes>-->
+			<!--            </resource>-->
+
+			<!--            <resource>-->
+			<!--                <filtering>true</filtering>-->
+			<!--                <directory>src/main/resources</directory>-->
+			<!--                <excludes>-->
+			<!--                    <exclude>**/*.woff</exclude>-->
+			<!--                    <exclude>**/*.ttf</exclude>-->
+			<!--                    <exclude>**/*.eot</exclude>-->
+			<!--                    <exclude>**/*.svg</exclude>-->
+			<!--                </excludes>-->
+			<!--            </resource>-->
+		</resources>
+	</build>
 
 </project>

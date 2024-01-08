@@ -116,6 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/platform/login").permitAll()
                 .antMatchers("/api/admin/merchant/getLoginPic").permitAll()
                 .antMatchers("/api/admin/merchant/login").permitAll()
+                .antMatchers("/jmreport/desreport_/cdn/iview/fonts/**").permitAll()
                 // 放行资源路径
                 .antMatchers("/" + UploadConstants.UPLOAD_FILE_KEYWORD + "/**").permitAll()
                 .antMatchers("/" + UploadConstants.DOWNLOAD_FILE_KEYWORD + "/**").permitAll()

@@ -1,5 +1,6 @@
 package com.jbp.common.response;
 
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 
 /**
- * 移动端登录配置响应对象
+ * 管理端登录页图片Response对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
@@ -23,27 +24,23 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "FrontLoginConfigResponse", description = "用户登录返回数据")
-public class FrontLoginConfigResponse implements Serializable {
+@ApiModel(value = "AdminLoginInfoResponse对象", description = "管理端登录页图片Response对象")
+public class AdminLoginInfoResponse implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3285713110515203543L;
 
-    @ApiModelProperty(value = "登录logo")
-    private String logo;
+    @ApiModelProperty(value = "登录页背景图")
+    private String backgroundImage;
 
-    @ApiModelProperty(value = "公众号-浏览访问方式")
-    private String wechatBrowserVisit;
+    @ApiModelProperty(value = "登录页LOGO")
+    private String loginLogo;
 
-    @ApiModelProperty(value = "小程序—手机号授权验证类型")
-    private String routinePhoneVerification;
-
-    @ApiModelProperty(value = "移动端登录Logo")
-    private String mobileLoginLogo;
-
-    @ApiModelProperty(value = "公司名称")
-    private String siteName;
+    @ApiModelProperty(value = "登录页左侧logo")
+    private String leftLogo;
     
-    @ApiModelProperty(value = "版权logo")
-    private String copyrightLogo;
-
+    @ApiModelProperty(value = "开启mfa登录")
+    private String mfaOpen;
+    
+    @ApiModelProperty(value = "开启商户端登录")
+    private String merOpen;
 }

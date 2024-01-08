@@ -20,7 +20,7 @@ import java.util.Objects;
 
 /**
  * @ClassName ResultAdvice
- * @Description 返回值/响应体统一处理
+ * @Description 返回值/响应体统一处理 此类已经被加密拦截器替换
  * @Author HZW
  * @Date 2023/2/21 16:44
  * @Version 1.0

@@ -1,30 +1,13 @@
 package com.jbp.front.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.constants.*;
-import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.coupon.Coupon;
-import com.jbp.common.model.user.User;
-import com.jbp.common.model.user.UserToken;
-import com.jbp.common.request.*;
-import com.jbp.common.response.FrontLoginConfigResponse;
-import com.jbp.common.response.LoginResponse;
-import com.jbp.common.token.FrontTokenComponent;
-import com.jbp.common.utils.*;
-import com.jbp.common.vo.MyRecord;
-import com.jbp.common.vo.WeChatAuthorizeLoginUserInfoVo;
-import com.jbp.common.vo.WeChatMiniAuthorizeVo;
-import com.jbp.common.vo.WeChatOauthToken;
-import com.jbp.front.service.LoginService;
-import com.jbp.service.service.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,12 +17,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.constants.Constants;
+import com.jbp.common.constants.LoginConstants;
+import com.jbp.common.constants.SmsConstants;
+import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.constants.UserConstants;
+import com.jbp.common.constants.WeChatConstants;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.coupon.Coupon;
+import com.jbp.common.model.user.User;
+import com.jbp.common.model.user.UserToken;
+import com.jbp.common.request.IosLoginRequest;
+import com.jbp.common.request.LoginMobileRequest;
+import com.jbp.common.request.LoginPasswordRequest;
+import com.jbp.common.request.RegisterAppWxRequest;
+import com.jbp.common.request.RegisterThirdUserRequest;
+import com.jbp.common.request.WechatPublicLoginRequest;
+import com.jbp.common.request.WxBindingPhoneRequest;
+import com.jbp.common.response.FrontLoginConfigResponse;
+import com.jbp.common.response.LoginResponse;
+import com.jbp.common.token.FrontTokenComponent;
+import com.jbp.common.utils.CommonUtil;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.RedisUtil;
+import com.jbp.common.utils.WxUtil;
+import com.jbp.common.vo.MyRecord;
+import com.jbp.common.vo.WeChatAuthorizeLoginUserInfoVo;
+import com.jbp.common.vo.WeChatMiniAuthorizeVo;
+import com.jbp.common.vo.WeChatOauthToken;
+import com.jbp.front.service.LoginService;
+import com.jbp.service.service.CouponService;
+import com.jbp.service.service.SmsService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.UserTokenService;
+import com.jbp.service.service.WechatService;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 
 /**
  * 移动端登录服务类
@@ -200,7 +220,7 @@ public class LoginServiceImpl implements LoginService {
         // 通过code获取获取公众号授权信息
         WeChatOauthToken oauthToken = wechatService.getOauth2AccessToken(request.getCode());
         //检测是否存在
-        UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  UserConstants.USER_TOKEN_TYPE_WECHAT);
+		UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  UserConstants.USER_TOKEN_TYPE_WECHAT);
         Integer spreadPid = Optional.ofNullable(request.getSpreadPid()).orElse(0);
         LoginResponse loginResponse = new LoginResponse();
         if (ObjectUtil.isNotNull(userToken)) {// 已存在，正常登录
@@ -224,6 +244,9 @@ public class LoginServiceImpl implements LoginService {
 
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
+        
+    	User user = userService.getById(userToken.getUid());
+    	saveLastCheckCode(user);
         return loginResponse;
     }
 
@@ -253,6 +276,7 @@ public class LoginServiceImpl implements LoginService {
         redisUtil.set(key, JSONObject.toJSONString(request), (long) (60 * 2), TimeUnit.MINUTES);
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
+        
         return loginResponse;
     }
 
@@ -462,6 +486,15 @@ public class LoginServiceImpl implements LoginService {
         }
         return execute;
     }
+    
+    /**
+     * 保存用户最后一次登录code 用做接口加密签名
+     */
+    private void saveLastCheckCode(User user) {
+    	String lastcheckCode=	tokenComponent.getCheck();
+    	user.setLastCheckCode(lastcheckCode);
+    	userService.updateById(user);
+	}
 
     /**
      * 获取登录配置
@@ -474,6 +507,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION);
         keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
         keyList.add(SysConfigConstants.CONFIG_KEY_SITE_NAME);
+        keyList.add(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO);
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
         response.setLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
@@ -481,6 +515,7 @@ public class LoginServiceImpl implements LoginService {
         response.setRoutinePhoneVerification(record.getStr(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION));
         response.setMobileLoginLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
         response.setSiteName(record.getStr(SysConfigConstants.CONFIG_KEY_SITE_NAME));
+        response.setCopyrightLogo(record.getStr(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO));
         return response;
     }
 
@@ -528,6 +563,9 @@ public class LoginServiceImpl implements LoginService {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
+        
+        User user = userService.getById(userToken.getUid());
+        	saveLastCheckCode(user);
         return loginResponse;
     }
 
@@ -561,7 +599,7 @@ public class LoginServiceImpl implements LoginService {
         // 没有用户Ios直接创建新用户
         User user = new User();
         user.setAccount(userService.getAccount());
-        user.setPhone(userService.getAccount());
+        user.setPhone("");
         user.setSpreadUid(0);
         user.setPwd("123");
         user.setRegisterType(UserConstants.REGISTER_TYPE_IOS);
@@ -617,27 +655,32 @@ public class LoginServiceImpl implements LoginService {
         loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
         loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
         loginResponse.setAvatar(user.getAvatar());
+        //保存最后登录随机code
+        saveLastCheckCode(user);
+        
         return loginResponse;
     }
 
 
-    private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
-        //生成token
-        LoginResponse loginResponse = new LoginResponse();
-        String token = tokenComponent.createToken(user);
-        loginResponse.setToken(token);
-        loginResponse.setId(user.getId());
-        loginResponse.setNikeName(user.getNickname());
-        loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
-        loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
-        loginResponse.setAvatar(user.getAvatar());
-        if (isNew) {
-            loginResponse.setIsNew(true);
-            List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
-            if (CollUtil.isNotEmpty(couponList)) {
-                loginResponse.setNewPeopleCouponList(couponList);
-            }
-        }
-        return loginResponse;
-    }
+	private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
+		// 生成token
+		LoginResponse loginResponse = new LoginResponse();
+		String token = tokenComponent.createToken(user);
+		loginResponse.setToken(token);
+		loginResponse.setId(user.getId());
+		loginResponse.setNikeName(user.getNickname());
+		loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
+		loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
+		loginResponse.setAvatar(user.getAvatar());
+		if (isNew) {
+			loginResponse.setIsNew(true);
+			List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
+			if (CollUtil.isNotEmpty(couponList)) {
+				loginResponse.setNewPeopleCouponList(couponList);
+			}
+		}
+		// 保存最后登录随机code
+		saveLastCheckCode(user);
+		return loginResponse;
+	}
 }
