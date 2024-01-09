@@ -40,5 +40,8 @@ public class PlatformWallet extends VersionModel {
     @ApiModelProperty("余额")
     @TableField("balance")
     private BigDecimal balance;
+    @ApiModelProperty("钱包名称")
+    @TableField(exist = false)
+    private String typeName;
 
 }

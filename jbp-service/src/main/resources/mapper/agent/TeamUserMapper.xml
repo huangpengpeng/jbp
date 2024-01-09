@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.TeamUserDao">
+<resultMap id="TeamUserType" type="com.jbp.common.model.agent.TeamUser">
+    <id column="id" property="id"/>
+    <result column="uid" property="uid"/>
+    <result column="tid" property="tid"/>
+    <result column="gmt_modify" property="gmtModify"/>
+    <result column="gmt_created" property="gmtCreated"/>
+    <result column="name" property="name"/>
+    <result column="account" property="account"/>
+</resultMap>
+<!-- List<TeamUser> pageList(@Param("tid") Integer tid,@Param("account") String account,@Param("teamLeader") Integer teamLeader);-->
+<select id="pageList" resultMap="TeamUserType">
+    SELECT a.id,a.uid,a.tid,a.gmt_modify,a.gmt_created,eb_user.account,eb_team.leader_id,eb_team.`name`,eb_user.account FROM  eb_team_user as a
+        LEFT  JOIN eb_user on a.uid = eb_user.id
+        LEFT  JOIN eb_team on a.tid=eb_team.id
+    <where>
+        <if test="account!=null and account !=''">
+            and account=#{account}
+        </if>
+    <if test="tid!=null">
+        and tid=#{tid}
+    </if>
+     <if test="teamLeader!=null">
+         <if test="teamLeader==0">
+             and uid != leader_id
+         </if>
+         <if test="teamLeader==1">
+             and uid=leader_id
+         </if>
+     </if>
+    </where>
+
+</select>
+</mapper>

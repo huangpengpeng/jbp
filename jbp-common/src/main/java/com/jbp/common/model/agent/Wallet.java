@@ -27,6 +27,7 @@ public class Wallet extends VersionModel {
         this.uId = uId;
         this.type = type;
         this.balance = BigDecimal.ZERO;
+        this.freeze=BigDecimal.ZERO;
     }
 
     public boolean hasError() {
@@ -54,6 +55,9 @@ public class Wallet extends VersionModel {
 
     @ApiModelProperty("账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
+    @ApiModelProperty("钱包名称")
+    @TableField(exist = false)
+    private String typeName;
 
 }

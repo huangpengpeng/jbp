@@ -6,15 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TeamPageRequest对象", description = "团队管理分页对象")
-public class TeamPageRequest implements Serializable {
-
+@ApiModel(value = "TeamUserAddRequest对象", description = "团队用户添加对象")
+public class TeamUserAddRequest {
     @ApiModelProperty("团队名称")
-    private String name;
-
+    private Integer tid;
+    @ApiModelProperty("用户账号")
+    private String account;
 }

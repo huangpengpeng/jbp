@@ -1,19 +1,27 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.PlatformWallet;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaSnapshot;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserCapaDao;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
@@ -32,6 +40,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private UserCapaSnapshotService snapshotService;
     @Resource
     private TransactionTemplate transactionTemplate;
+    @Resource
+    private UserService userService;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -93,5 +103,22 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             }
         }
         return list;
+    }
+
+    @Override
+    public PageInfo<UserCapa> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<UserCapa> userCapaLambdaQueryWrapper = new LambdaQueryWrapper<UserCapa>();
+        userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(uid), UserCapa::getUid, uid);
+        userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(capaId), UserCapa::getCapaId, capaId);
+        Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<UserCapa> list = list(userCapaLambdaQueryWrapper);
+        list.forEach(e -> {
+            e.setAccount(userService.getById(e.getUid()).getAccount());
+            Capa capa = capaService.getById(e.getCapaId());
+            e.setCapaName(capa.getName());
+            e.setCapaUrl(capa.getIconUrl());
+        });
+        return CommonPage.copyPageInfo(page, list);
+
     }
 }

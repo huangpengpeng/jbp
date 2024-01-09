@@ -35,7 +35,7 @@ public class PlatformWalletController {
         return CommonResult.success(CommonPage.restPage(platformWalletService.pageList(pageParamRequest)));
     }
 
-    @PreAuthorize("hasAuthority('agent:platformWallet:increase')")
+      @PreAuthorize("hasAuthority('agent:platformWallet:increase')")
     @ApiOperation("增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated PlatformWalletEditRequest request) {

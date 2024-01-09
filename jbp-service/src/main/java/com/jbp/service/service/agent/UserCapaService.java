@@ -1,7 +1,10 @@
 package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.request.PageParamRequest;
 
 import java.util.List;
 
@@ -19,4 +22,5 @@ public interface UserCapaService extends IService<UserCapa> {
      */
     List<UserCapa> getUpperList(Integer uid, List<Long> capaIds, Integer num);
 
+    PageInfo<UserCapa> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest);
 }

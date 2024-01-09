@@ -8,9 +8,11 @@ import com.jbp.common.request.agent.CapaRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.CapaService;
 
+import com.jbp.service.service.SystemAttachmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +23,13 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("api/admin/agent/capa")
-@Api(tags = "用户等级")
+@Api(tags = "等级")
 public class CapaController {
 
     @Resource
     private CapaService capaService;
+    @Resource
+    private SystemAttachmentService systemAttachmentService;
 
     @PreAuthorize("hasAuthority('capa:list')")
     @ApiOperation(value = "用户等级列表")
@@ -61,12 +65,13 @@ public class CapaController {
         if (capaToName != null && NumberUtil.compare(capaToName.getId(), capa.getId()) != 0) {
             return CommonResult.failed("等级名称不能重复");
         }
+        String cdnUrl = systemAttachmentService.getCdnUrl();
         capa.setName(capaRequest.getName());
         capa.setPCapaId(capaRequest.getPCapaId());
         capa.setRankNum(capaRequest.getRankNum());
-        capa.setIconUrl(capaRequest.getIconUrl());
-        capa.setRiseImgUrl(capaRequest.getRiseImgUrl());
-        capa.setShareImgUrl(capaRequest.getShareImgUrl());
+        capa.setIconUrl(systemAttachmentService.clearPrefix(capaRequest.getIconUrl(),cdnUrl));
+        capa.setRiseImgUrl(systemAttachmentService.clearPrefix(capaRequest.getRiseImgUrl(),cdnUrl));
+        capa.setShareImgUrl(systemAttachmentService.clearPrefix( capaRequest.getShareImgUrl(),cdnUrl));
         capaService.updateById(capa);
         return CommonResult.success();
     }

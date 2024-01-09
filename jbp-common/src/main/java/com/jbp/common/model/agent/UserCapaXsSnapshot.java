@@ -26,7 +26,7 @@ public class UserCapaXsSnapshot extends BaseModel {
     private Integer uid;
 
     @ApiModelProperty("等级ID")
-    @TableField("capaId")
+    @TableField("capa_id")
     private Long capaId;
 
     @ApiModelProperty("类型")
@@ -43,7 +43,7 @@ public class UserCapaXsSnapshot extends BaseModel {
 
     @ApiModelProperty("账户名称")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 
     @ApiModelProperty("等级名称")
     @TableField(exist = false)

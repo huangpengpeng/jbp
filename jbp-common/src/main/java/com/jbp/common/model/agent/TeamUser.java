@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -31,6 +32,9 @@ public class TeamUser implements Serializable {
     @ApiModelProperty("团队名称")
     @TableField(exist = false)
     private String name;
+    @ApiModelProperty("用户账户")
+    @TableField(exist = false)
+    private String account;
     @TableField(value = "gmt_created", fill = FieldFill.INSERT)
     private Date gmtCreated;
     @JsonIgnore

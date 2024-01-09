@@ -46,23 +46,23 @@ public class CapaXs extends BaseModel {
     private String name;
 
     @ApiModelProperty("下一个级别")
-    @TableField(value="pCapaId", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value="p_capa_id", updateStrategy = FieldStrategy.IGNORED)
     private Long pCapaId;
 
     @ApiModelProperty("数字等级")
-    @TableField("rankNum")
+    @TableField("rank_num")
     private Integer rankNum;
 
     @ApiModelProperty("等级图标地址")
-    @TableField("iconUrl")
+    @TableField("icon_url")
     private String iconUrl;
 
     @ApiModelProperty("升级提醒图片")
-    @TableField("riseImgUrl")
+    @TableField("rise_img_url")
     private String riseImgUrl;
 
     @ApiModelProperty("邀请图片")
-    @TableField("shareImgUrl")
+    @TableField("share_img_url")
     private String shareImgUrl;
 
     @ApiModelProperty("计算表达式")
