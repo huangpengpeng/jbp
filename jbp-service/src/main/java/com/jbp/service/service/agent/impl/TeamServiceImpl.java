@@ -13,8 +13,8 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +27,9 @@ import java.util.List;
 public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamService {
 
     @Resource
+    TeamUserService teamUserService;
+    @Resource
     private UserInvitationFlowService userInvitationFlowService;
-
 
     /**
      * 获取最近的一个团队
@@ -78,13 +79,15 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
     @Override
     public void save(Integer leaderId, String name) {
         if (getByLeader(leaderId) != null) {
-            throw new CrmebException("已经是团队长不允许重复添加");
+            throw new CrmebException("改用户已有团队不允许重复添加");
         }
         if (getByName(name) != null) {
             throw new CrmebException("团队名称重复不允许重复添加");
         }
         Team team = new Team(name, leaderId);
         save(team);
+//        添加团队用户
+        teamUserService.save(leaderId, team.getId());
         userInvitationFlowService.clear(team.getLeaderId());
     }
 

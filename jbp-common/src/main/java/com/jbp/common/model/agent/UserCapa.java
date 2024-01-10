@@ -26,12 +26,12 @@ public class UserCapa extends BaseModel {
     private Integer uid;
 
     @ApiModelProperty("等级ID")
-    @TableField("capaId")
+    @TableField("capa_id")
     private Long capaId;
 
     @ApiModelProperty("账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 
     @ApiModelProperty("等级名称")
     @TableField(exist = false)

@@ -23,4 +23,5 @@ public interface TeamService extends IService<Team> {
     void save(Integer leaderId, String name);
 
      PageInfo<Team> pageList(String name, PageParamRequest pageParamRequest);
+
 }

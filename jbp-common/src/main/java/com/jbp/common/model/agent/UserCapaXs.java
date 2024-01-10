@@ -21,13 +21,18 @@ import lombok.experimental.Accessors;
 @ApiModel(value="UserCapaXs对象", description="用户星级")
 public class UserCapaXs extends BaseModel {
 
+
     @ApiModelProperty("用户ID")
     @TableField("uid")
     private Integer uid;
 
     @ApiModelProperty("等级ID")
-    @TableField("capaId")
+    @TableField("capa_id")
     private Long capaId;
+
+    @ApiModelProperty("账户")
+    @TableField(exist = false)
+    private String account;
 
     @ApiModelProperty("等级名称")
     @TableField(exist = false)

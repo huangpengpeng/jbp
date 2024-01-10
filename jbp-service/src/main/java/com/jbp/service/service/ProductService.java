@@ -60,7 +60,6 @@ public interface ProductService extends IService<Product> {
      * @return 恢复结果
      */
     Boolean restoreProduct(Integer productId);
-
     /**
      * 更新商品信息
      * @param productRequest 商品参数

@@ -10,15 +10,18 @@ import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.CapaXsDao;
+import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaXsService;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
+import javax.annotation.Resource;
 @Service
 public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
+    @Resource
+    private SystemAttachmentService systemAttachmentService;
 
     @Override
     public PageInfo<CapaXs> page(PageParamRequest pageParamRequest) {
@@ -34,7 +37,8 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
         if (getByRankNum(rankNum) != null) {
             throw new CrmebException("星级编号不能重复");
         }
-        CapaXs capaXs = new CapaXs(name, pCapaId, rankNum, iconUrl, riseImgUrl, shareImgUrl);
+        String cdnUrl = systemAttachmentService.getCdnUrl();
+        CapaXs capaXs = new CapaXs(name, pCapaId, rankNum, systemAttachmentService.clearPrefix(iconUrl, cdnUrl), systemAttachmentService.clearPrefix(riseImgUrl, cdnUrl), systemAttachmentService.clearPrefix(shareImgUrl, cdnUrl));
         save(capaXs);
         return capaXs;
     }
@@ -46,11 +50,11 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
 
     @Override
     public CapaXs getNext(Long capaId) {
-        if(capaId == null){
+        if (capaId == null) {
             return getMinCapa();
         }
         CapaXs capa = getById(capaId);
-        if(capa.getPCapaId() == null){
+        if (capa.getPCapaId() == null) {
             return null;
         }
         return getById(capa.getPCapaId());

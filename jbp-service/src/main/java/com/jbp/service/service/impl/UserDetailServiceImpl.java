@@ -60,6 +60,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (roles.contains(1)) {// 超级管理员
             // 获取全部权限
             menuList = systemMenuService.getAllPermissions(RoleEnum.PLATFORM_ADMIN.getValue());
+            menuList.addAll(systemMenuService.getAllPermissions(RoleEnum.MERCHANT_ADMIN.getValue()));
         } else if (roles.contains(2)) {
             menuList = systemMenuService.getAllPermissions(RoleEnum.MERCHANT_ADMIN.getValue());
         } else {

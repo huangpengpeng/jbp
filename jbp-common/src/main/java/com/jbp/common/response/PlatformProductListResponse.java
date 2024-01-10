@@ -76,4 +76,7 @@ public class PlatformProductListResponse implements Serializable {
     @ApiModelProperty(value = "是否自营：0-非自营，1-自营")
     private Boolean isSelf;
 
+    @ApiModelProperty(value = "是否自营：0-非自营，1-自营")
+    private Boolean isShow;
+
 }

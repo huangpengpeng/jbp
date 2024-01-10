@@ -44,7 +44,7 @@ import com.jbp.common.vo.SimpleProductVo;
 import com.jbp.service.dao.ProductDao;
 import com.jbp.service.service.*;
 import com.jbp.service.util.ProductUtils;
-
+import org.apache.el.parser.BooleanNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -216,9 +216,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             throw new CrmebException("必须选择商品平台第三级分类");
         }
 
-        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+            SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Boolean ifPlatformAdd = admin.getMerId()==0;// 是否平台新增商品
 
-        Merchant merchant = merchantService.getByIdException(admin.getMerId());
+        Merchant merchant;
+        if(!ifPlatformAdd){
+            merchant = merchantService.getByIdException(admin.getMerId());
+        } else {
+            merchant = null;
+        }
+
 
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
@@ -274,7 +281,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         spd.setType(ProductConstants.PRODUCT_TYPE_NORMAL);
 
         Boolean execute = transactionTemplate.execute(e -> {
-            if (merchant.getProductSwitch()) {// 开启商品审核
+
+            if (!ifPlatformAdd && merchant.getProductSwitch()) {// 开启商品审核
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
             }
             save(product);
@@ -372,7 +380,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         Product product = new Product();
         BeanUtils.copyProperties(productRequest, product);
         product.setAuditStatus(tempProduct.getAuditStatus());
-        Merchant merchant = merchantService.getByIdException(tempProduct.getMerId());
+        Boolean ifPlatformAdd=admin.getMerId()==0;
+        Merchant merchant;
+        if (!ifPlatformAdd) {
+            merchant = merchantService.getByIdException(tempProduct.getMerId());
+        }else {
+            merchant=null;
+        }
 
         String cdnUrl = systemAttachmentService.getCdnUrl();
         //主图
@@ -435,7 +449,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         spd.setProductId(product.getId());
 
         Boolean execute = transactionTemplate.execute(e -> {
-            if (!merchant.getProductSwitch() && product.getAuditStatus().equals(ProductConstants.AUDIT_STATUS_EXEMPTION)) {
+            if (!ifPlatformAdd&&!merchant.getProductSwitch() && product.getAuditStatus().equals(ProductConstants.AUDIT_STATUS_EXEMPTION)) {
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
             } else {
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
@@ -855,8 +869,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             throw new CrmebException("商品状态异常无法上架");
         }
         LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
-        Merchant merchant = merchantService.getById(loginUserVo.getUser().getMerId());
-        if (!merchant.getIsSwitch()) {
+        Boolean ifPlatformAdd=admin.getMerId()==0;
+        Merchant merchant ;
+        if(!ifPlatformAdd){
+            merchant = merchantService.getById(loginUserVo.getUser().getMerId());
+        }else {
+            merchant=null;
+        }
+
+        if (!ifPlatformAdd&&!merchant.getIsSwitch()) {
             throw new CrmebException("打开商户开关后方能上架商品");
         }
         product.setIsShow(true);
@@ -948,27 +969,27 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         if (ObjectUtil.isNotNull(request.getTagId())) {
             ProductTagsForSearchResponse tagSearchConfig = productTagService.getProductIdListByProductTagId(request.getTagId());
-            if(CollUtil.isNotEmpty(tagSearchConfig.getProductIds())){
+            if (CollUtil.isNotEmpty(tagSearchConfig.getProductIds())) {
                 map.put("id", tagSearchConfig.getProductIds().stream().map(Objects::toString).collect(Collectors.joining(",")));
             }
-            if(ObjectUtil.isNotNull(tagSearchConfig.getBrandId())){
+            if (ObjectUtil.isNotNull(tagSearchConfig.getBrandId())) {
                 brandIds.add(tagSearchConfig.getBrandId().stream().map(Objects::toString).collect(Collectors.joining(",")));
             }
-            if(ObjectUtil.isNotNull(tagSearchConfig.getMerId())){
+            if (ObjectUtil.isNotNull(tagSearchConfig.getMerId())) {
                 merIds.add(tagSearchConfig.getMerId().stream().map(Objects::toString).collect(Collectors.joining(",")));
             }
-            if(ObjectUtil.isNotNull(tagSearchConfig.getCategoryId())){
+            if (ObjectUtil.isNotNull(tagSearchConfig.getCategoryId())) {
                 categoryIds.add(tagSearchConfig.getCategoryId().stream().map(Objects::toString).collect(Collectors.joining(",")));
             }
         }
 
-        if(StrUtil.isNotEmpty(brandIds.toString())){
+        if (StrUtil.isNotEmpty(brandIds.toString())) {
             map.put("brandId", brandIds.toString());
         }
-        if(StrUtil.isNotEmpty(merIds.toString())){
+        if (StrUtil.isNotEmpty(merIds.toString())) {
             map.put("merId", merIds.toString());
         }
-        if(StrUtil.isNotEmpty(categoryIds.toString())){
+        if (StrUtil.isNotEmpty(categoryIds.toString())) {
             map.put("categoryId", categoryIds.toString());
         }
 
@@ -1022,7 +1043,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
         makeProductList.forEach(p -> {
             responseList.stream().map(resProduct -> {
-                if(p.getId().equals(resProduct.getId())){
+                if (p.getId().equals(resProduct.getId())) {
                     resProduct.setActivityStyle(p.getActivityStyle());
                 }
                 return resProduct;
@@ -1259,9 +1280,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         } else {
             // 审核成功
             product.setAuditStatus(ProductConstants.AUDIT_STATUS_SUCCESS);
-            // 免审店铺商品回归免审状态
-            Merchant merchant = merchantService.getByIdException(product.getMerId());
-            if (!merchant.getProductSwitch()) {
+            Boolean ifPlatformAdd=product.getMerId()==0;
+            Merchant merchant;
+            if (!ifPlatformAdd){
+                // 免审店铺商品回归免审状态
+                 merchant = merchantService.getByIdException(product.getMerId());
+            }else {
+                merchant=null;
+            }
+
+            if (!ifPlatformAdd&&!merchant.getProductSwitch()) {
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
             }
         }
@@ -1510,7 +1538,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     /**
      * 优惠券商品列表
      *
-     * @param request          搜索参数
+     * @param request 搜索参数
      */
     @Override
     public PageInfo<Product> getCouponProList(CouponProductSearchRequest request) {
@@ -1890,7 +1918,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             } else {
                 map.put("lastStr", " order by (p.sales + p.ficti) asc, p.rank desc, p.sort desc, p.id desc");
             }
-        } else if (StrUtil.isNotBlank(request.getPriceOrder())){
+        } else if (StrUtil.isNotBlank(request.getPriceOrder())) {
             if (request.getPriceOrder().equals(Constants.SORT_DESC)) {
                 map.put("lastStr", " order by p.price desc, p.rank desc, p.sort desc, p.id desc");
             } else {
@@ -2128,6 +2156,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 通过ID获取商品列表
+     *
      * @param proIdsList 商品ID列表
      */
     @Override
@@ -2137,8 +2166,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 通过ID获取商品列表
+     *
      * @param proIdsList 商品ID列表
-     * @param label admin-管理端，front-移动端
+     * @param label      admin-管理端，front-移动端
      */
     @Override
     public List<Product> findByIds(List<Integer> proIdsList, String label) {
@@ -2147,8 +2177,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 通过ID获取商品列表
+     *
      * @param proIdsList 商品ID列表
-     * @param label admin-管理端，front-移动端
+     * @param label      admin-管理端，front-移动端
      */
     private List<Product> findByIdsAndLabel(List<Integer> proIdsList, String label) {
         LambdaQueryWrapper<Product> lqw = Wrappers.lambdaQuery();
@@ -2227,6 +2258,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 校验商品是否可用（移动端可用）
+     *
      * @param proId 商品ID
      */
     @Override
@@ -2245,6 +2277,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 根据关键字获取商品所有的品牌ID
+     *
      * @param keyword 关键字
      */
     @Override
@@ -2254,6 +2287,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
     /**
      * 根据关键字获取商品所有的分类ID
+     *
      * @param keyword 关键字
      */
     @Override

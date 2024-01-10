@@ -1,3 +1,40 @@
-spring:
-  profiles:
-    active: dev
+
+  # CRMEB 相关配置
+  crmeb:
+    version: CRMEB-JAVACORE-MER-DFYHZ-v1.4_beta # 当前代码版本为企业版本 授权给巅峰云（杭州）网络科技有限公司
+    domain: #配合swagger使用 # 待部署域名
+    wechat-api-url:  #请求微信接口中专服务器
+    asyncConfig: false #是否同步config表数据到redis
+    imagePath: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/ # 服务器图片路径配置 斜杠结尾
+    retailStoreBrokerageRatio: 30 #佣金返佣比例和上限
+    activityStyleCachedTime: 10 #活动边框缓存周期 秒为单位，生产环境适当5-10分钟即可
+    activityStyleProductLimit: 100 # 活动边框指定商品上线
+    productTagCacheMinutes: 10 # 商品标签缓存分钟数
+    orderCancelTime: 30 # 订单支付取消时间，单位分钟
+    ignored: #安全路径白名单
+      - swagger-ui/
+      - swagger-resources/**
+      - /**/v2/api-docs
+      - /**/*.html
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.map
+      - /favicon.ico
+      - /actuator/**
+      - /druid/**
+      - api/admin/platform/pagediy/info
+
+  # 配置端口
+  server:
+    port: 8080
+    servlet:
+      context-path: /         # 访问path
+    tomcat:
+      uri-encoding: UTF-8     # 默认编码格式
+      max-threads: 1000       # 最大线程数量 默认200
+      min-spare-threads: 30   # 初始化启动线程数量
+
+  spring:
+    profiles:
+      active: dev

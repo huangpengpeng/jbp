@@ -13,10 +13,10 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.dao.agent.PlatformWalletDao;
+import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletFlowService;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.WalletService;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -33,7 +34,7 @@ import java.math.BigDecimal;
 @Slf4j
 public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, PlatformWallet> implements PlatformWalletService {
     @Resource
-    private PlatformWalletDao platformWalletDao;
+    WalletConfigService walletConfigService;
     @Resource
     private WalletService walletService;
     @Resource
@@ -42,7 +43,11 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     @Override
     public PageInfo<PlatformWallet> pageList(PageParamRequest pageParamRequest) {
         Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        return CommonPage.copyPageInfo(page, list());
+        List<PlatformWallet> list = list();
+        list.forEach(e -> {
+            e.setTypeName(walletConfigService.getByType(e.getType()).getName());
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 
 
@@ -54,6 +59,9 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     public Boolean increase(Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
             throw new CrmebException(type + "增加平台积分金额不能小于0:" + amt);
+        }
+        if (walletConfigService.getByType(type).getRecharge().equals(0)) {
+            throw new CrmebException(type + "禁用充值");
         }
         PlatformWallet platformWallet = getType(type);
         if (null == platformWallet) {
@@ -75,6 +83,9 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     public Boolean reduce(Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
             throw new CrmebException(type + "减少平台积分金额不能小于0:" + amt);
+        }
+        if (walletConfigService.getByType(type).getCanWithdraw().equals(0)) {
+            throw new CrmebException(type + "禁用提现或转账");
         }
         PlatformWallet platformWallet = getType(type);
         if (ArithmeticUtils.less(platformWallet.getBalance(), amt)) {

@@ -7,18 +7,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TeamUserRequest对象", description = "团队用户请求对象")
-public class TeamUserRequest implements Serializable {
-    @ApiModelProperty("团队名称")
-    @TableField("tid")
-    private Integer tid;
+@ApiModel(value = "UserCapaXsAddRequest对象", description = "用户星级添加请求对象")
+public class UserCapaXsAddRequest {
     @ApiModelProperty("用户账号")
     private String account;
-    @ApiModelProperty("是否为团队头")
-    private Integer teamLeader;
+    @ApiModelProperty("等级ID")
+    @TableField("capa_id")
+    private Long capaId;
+    @ApiModelProperty("备注")
+    private String remark;
+    @ApiModelProperty("系统描述")
+    private String description;
 }

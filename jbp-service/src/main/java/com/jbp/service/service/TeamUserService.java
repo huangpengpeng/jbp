@@ -13,5 +13,5 @@ public interface TeamUserService extends IService<TeamUser> {
 
     void deleteByUid(Integer uId);
 
-     PageInfo<TeamUser> pageList(Integer tid, Integer uid, PageParamRequest pageParamRequest);
+     PageInfo<TeamUser> pageList(Integer tid, String account,Integer teamLeader, PageParamRequest pageParamRequest);
 }
