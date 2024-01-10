@@ -15,10 +15,13 @@ import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow> implements WalletFlowService {
 

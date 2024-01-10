@@ -11,6 +11,8 @@ import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * 用户销售关系网
  */
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, UserInvitation> implements UserInvitationService {
 
