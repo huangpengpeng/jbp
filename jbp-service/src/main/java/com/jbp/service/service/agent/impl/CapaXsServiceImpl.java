@@ -1,5 +1,11 @@
 package com.jbp.service.service.agent.impl;
 
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -12,12 +18,9 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.CapaXsDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaXsService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
+
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
-import javax.annotation.Resource;
 @Service
 public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
     @Resource
