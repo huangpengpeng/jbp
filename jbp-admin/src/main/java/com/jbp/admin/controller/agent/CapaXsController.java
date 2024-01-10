@@ -6,13 +6,11 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaXsRequest;
 import com.jbp.common.result.CommonResult;
-import com.jbp.service.service.agent.CapaXsService;
-
 import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.agent.CapaXsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -70,9 +68,9 @@ public class CapaXsController {
         capa.setName(capaRequest.getName());
         capa.setPCapaId(capaRequest.getPCapaId());
         capa.setRankNum(capaRequest.getRankNum());
-        capa.setIconUrl(systemAttachmentService.clearPrefix( capaRequest.getIconUrl(),cdnUrl));
-        capa.setRiseImgUrl(systemAttachmentService.clearPrefix(  capaRequest.getRiseImgUrl(),cdnUrl));
-        capa.setShareImgUrl(systemAttachmentService.clearPrefix( capaRequest.getShareImgUrl(),cdnUrl));
+        capa.setIconUrl(systemAttachmentService.clearPrefix(capaRequest.getIconUrl(), cdnUrl));
+        capa.setRiseImgUrl(systemAttachmentService.clearPrefix(capaRequest.getRiseImgUrl(), cdnUrl));
+        capa.setShareImgUrl(systemAttachmentService.clearPrefix(capaRequest.getShareImgUrl(), cdnUrl));
         capaXsService.updateById(capa);
         return CommonResult.success();
     }
@@ -83,6 +81,7 @@ public class CapaXsController {
     public CommonResult<CapaXs> detail(@PathVariable(value = "id") Long id) {
         return CommonResult.success(capaXsService.getById(id));
     }
+
     @ApiOperation(value = "等级列表")
     @GetMapping(value = "/list")
     public CommonResult<List<CapaXs>> list() {

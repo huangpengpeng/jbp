@@ -6,13 +6,11 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaRequest;
 import com.jbp.common.result.CommonResult;
-import com.jbp.service.service.agent.CapaService;
-
 import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.agent.CapaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -69,9 +67,9 @@ public class CapaController {
         capa.setName(capaRequest.getName());
         capa.setPCapaId(capaRequest.getPCapaId());
         capa.setRankNum(capaRequest.getRankNum());
-        capa.setIconUrl(systemAttachmentService.clearPrefix(capaRequest.getIconUrl(),cdnUrl));
-        capa.setRiseImgUrl(systemAttachmentService.clearPrefix(capaRequest.getRiseImgUrl(),cdnUrl));
-        capa.setShareImgUrl(systemAttachmentService.clearPrefix( capaRequest.getShareImgUrl(),cdnUrl));
+        capa.setIconUrl(systemAttachmentService.clearPrefix(capaRequest.getIconUrl(), cdnUrl));
+        capa.setRiseImgUrl(systemAttachmentService.clearPrefix(capaRequest.getRiseImgUrl(), cdnUrl));
+        capa.setShareImgUrl(systemAttachmentService.clearPrefix(capaRequest.getShareImgUrl(), cdnUrl));
         capaService.updateById(capa);
         return CommonResult.success();
     }

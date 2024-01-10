@@ -20,6 +20,9 @@ import com.jbp.common.constants.*;
 import com.jbp.common.dto.IpLocation;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.UserBill;
 import com.jbp.common.model.system.SystemUserLevel;
@@ -36,6 +39,10 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.CapaXsService;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +115,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private CommunityNotesRelationService communityNotesRelationService;
     @Autowired
     private SystemUserLevelService systemUserLevelService;
+    @Resource
+    private CapaService capaService;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private CapaXsService capaXsService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
+    @Resource
+    private TeamService teamService;
+    @Resource
+    private TeamUserService teamUserService;
 
     /**
      * 手机号注册用户
@@ -477,6 +496,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
             if (user.getSpreadUid() > 0) {
                 userResponse.setSpreadName(userMap.get(user.getSpreadUid()).getNickname());
+            }
+            //获取等级名称
+            UserCapa userCapa = userCapaService.getByUser(user.getId());
+            if (!ObjectUtil.isNull(userCapa)){
+                userResponse.setCapaName(capaService.getById(userCapa.getCapaId()).getName());
+            }
+            //获取星级名称
+            UserCapaXs userCapaXs=userCapaXsService.getByUser(user.getId());
+            if (!ObjectUtil.isNull(userCapaXs)) {
+                userResponse.setCapaXsName(capaXsService.getById(userCapaXs.getCapaId()).getName());
+            }
+            //获取团队名称
+            TeamUser teamUser=teamUserService.getByUser(user.getId());
+            if (!ObjectUtil.isNull(teamUser)) {
+                userResponse.setTeamName(teamService.getById(teamUser.getTid()).getName());
             }
             userResponses.add(userResponse);
         }

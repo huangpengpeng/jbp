@@ -10,7 +10,6 @@ import com.jbp.common.request.agent.PlatformWalletTransferRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.PlatformWalletService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +34,7 @@ public class PlatformWalletController {
         return CommonResult.success(CommonPage.restPage(platformWalletService.pageList(pageParamRequest)));
     }
 
-      @PreAuthorize("hasAuthority('agent:platformWallet:increase')")
+    @PreAuthorize("hasAuthority('agent:platformWallet:increase')")
     @ApiOperation("增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated PlatformWalletEditRequest request) {

@@ -30,7 +30,6 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 	
 	final static com.google.common.cache.Cache<String, Object>  CACHE_NONCE = CacheBuilder.newBuilder().expireAfterWrite(180, TimeUnit.SECONDS).build();
 	
-	@Autowired
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

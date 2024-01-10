@@ -1,5 +1,6 @@
 package com.jbp.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -95,4 +96,14 @@ public class UserResponse {
 
     @ApiModelProperty(value = "是否注销")
     private Boolean isLogoff;
+    @ApiModelProperty(value = "等级")
+    @TableField(exist = false)
+    private String capaName;
+    @ApiModelProperty(value = "星级")
+    @TableField(exist = false)
+    private String capaXsName;
+    @ApiModelProperty(value = "团队")
+    @TableField(exist = false)
+    private String teamName;
+
 }
