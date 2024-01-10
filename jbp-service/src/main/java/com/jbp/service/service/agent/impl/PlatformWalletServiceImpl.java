@@ -20,6 +20,7 @@ import com.jbp.service.service.agent.WalletService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 @Slf4j
 public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, PlatformWallet> implements PlatformWalletService {
@@ -48,7 +50,6 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
         return getOne(new LambdaQueryWrapper<PlatformWallet>().eq(PlatformWallet::getType, type));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Boolean increase(Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
@@ -70,7 +71,6 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
         return ifSuccess;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Boolean reduce(Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
@@ -91,7 +91,6 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
         return ifSuccess;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Boolean transferToUser(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         reduce(type, amt, operate, externalNo, postscript);

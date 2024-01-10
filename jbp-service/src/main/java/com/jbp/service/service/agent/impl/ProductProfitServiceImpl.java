@@ -11,12 +11,14 @@ import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.agent.ProductProfitService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
 
-
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class ProductProfitServiceImpl extends ServiceImpl<ProductProfitDao, ProductProfit> implements ProductProfitService {
 

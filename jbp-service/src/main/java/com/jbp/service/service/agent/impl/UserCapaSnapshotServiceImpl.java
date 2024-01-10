@@ -7,9 +7,12 @@ import com.jbp.service.dao.agent.UserCapaSnapshotDao;
 import com.jbp.service.service.agent.UserCapaSnapshotService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserCapaSnapshotServiceImpl extends ServiceImpl<UserCapaSnapshotDao, UserCapaSnapshot> implements UserCapaSnapshotService {
 

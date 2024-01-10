@@ -6,9 +6,12 @@ import com.jbp.service.dao.agent.PlatformWalletFlowDao;
 import com.jbp.service.service.agent.PlatformWalletFlowService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlowDao, PlatformWalletFlow> implements PlatformWalletFlowService {
 

@@ -12,10 +12,13 @@ import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserCapaXsSnapshotService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs> implements UserCapaXsService {
 
@@ -38,38 +41,37 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         return userCapaXs;
     }
 
-    @Override
-    public UserCapaXs saveOrUpdateCapa(Integer uid, Long capaXsId, String remark, String description) {
-        transactionTemplate.execute(s -> {
-            if (capaXsId == null) {
-                remove(new QueryWrapper<UserCapaXs>().lambda().eq(UserCapaXs::getUid, uid));
-                // 记录快照
-                UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(capaXsId).type("删除").remark(remark).description(description).build();
-                snapshotService.save(snapshot);
-                return Boolean.TRUE;
-            }
-            UserCapaXs userCapaXs = getByUser(uid);
-            // 等级相同无须处理
-            if (userCapaXs != null && NumberUtil.compare(capaXsId, userCapaXs.getCapaId()) == 0) {
-                return Boolean.TRUE;
-            }
-            String type = "";
-            // 新增等级
-            if (userCapaXs == null) {
-                userCapaXs = UserCapaXs.builder().uid(uid).capaId(capaXsId).build();
-                type = UserCapaXsSnapshot.Constants.升级.toString();
-            } else {
-                type = NumberUtil.compare(userCapaXs.getCapaId(), capaXsId) > 0 ?
-                        UserCapaXsSnapshot.Constants.降级.toString() : UserCapaXsSnapshot.Constants.升级.toString();
-                userCapaXs.setCapaId(capaXsId);
-            }
-            saveOrUpdate(userCapaXs);
-            // 记录快照
-            UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(capaXsId).type(type).remark(remark).description(description).build();
-            snapshotService.save(snapshot);
-            return Boolean.TRUE;
-        });
-        return getByUser(uid);
-    }
+	@Override
+	public UserCapaXs saveOrUpdateCapa(Integer uid, Long capaXsId, String remark, String description) {
+		if (capaXsId == null) {
+			remove(new QueryWrapper<UserCapaXs>().lambda().eq(UserCapaXs::getUid, uid));
+			// 记录快照
+			UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(capaXsId).type("删除")
+					.remark(remark).description(description).build();
+			snapshotService.save(snapshot);
+			return getByUser(uid);
+		}
+		UserCapaXs userCapaXs = getByUser(uid);
+		// 等级相同无须处理
+		if (userCapaXs != null && NumberUtil.compare(capaXsId, userCapaXs.getCapaId()) == 0) {
+			return getByUser(uid);
+		}
+		String type = "";
+		// 新增等级
+		if (userCapaXs == null) {
+			userCapaXs = UserCapaXs.builder().uid(uid).capaId(capaXsId).build();
+			type = UserCapaXsSnapshot.Constants.升级.toString();
+		} else {
+			type = NumberUtil.compare(userCapaXs.getCapaId(), capaXsId) > 0 ? UserCapaXsSnapshot.Constants.降级.toString()
+					: UserCapaXsSnapshot.Constants.升级.toString();
+			userCapaXs.setCapaId(capaXsId);
+		}
+		saveOrUpdate(userCapaXs);
+		// 记录快照
+		UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(capaXsId).type(type).remark(remark)
+				.description(description).build();
+		snapshotService.save(snapshot);
+		return getByUser(uid);
+	}
 
 }

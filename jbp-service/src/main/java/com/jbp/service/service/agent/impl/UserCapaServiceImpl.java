@@ -15,12 +15,15 @@ import com.jbp.service.service.agent.UserCapaSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> implements UserCapaService {
 
@@ -44,34 +47,31 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         return userCapa;
     }
 
-    @Override
-    public UserCapa saveOrUpdateCapa(Integer uid, Long capaId, String remark, String description) {
-        transactionTemplate.execute(s -> {
-            UserCapa userCapa = getByUser(uid);
-            // 等级相同无须处理
-            if (userCapa != null && NumberUtil.compare(capaId, userCapa.getCapaId()) == 0) {
-                return Boolean.TRUE;
-            }
-            // 新增等级
-            String type = "";
-            if (userCapa == null) {
-                userCapa = UserCapa.builder().uid(uid).capaId(capaId).build();
-                type = UserCapaSnapshot.Constants.升级.toString();
-            } else {
-                type = NumberUtil.compare(userCapa.getCapaId(), capaId) > 0 ?
-                        UserCapaSnapshot.Constants.降级.toString() : UserCapaSnapshot.Constants.升级.toString();
-                userCapa.setCapaId(capaId);
-            }
-            saveOrUpdate(userCapa);
-            // 记录快照
-            UserCapaSnapshot snapshot = UserCapaSnapshot.builder().uid(uid).capaId(capaId).type(type).remark(remark).description(description).build();
-            snapshotService.save(snapshot);
-            return Boolean.TRUE;
+	@Override
+	public UserCapa saveOrUpdateCapa(Integer uid, Long capaId, String remark, String description) {
+		UserCapa userCapa = getByUser(uid);
+		// 等级相同无须处理
+		if (userCapa != null && NumberUtil.compare(capaId, userCapa.getCapaId()) == 0) {
+			return userCapa;
+		}
+		// 新增等级
+		String type = "";
+		if (userCapa == null) {
+			userCapa = UserCapa.builder().uid(uid).capaId(capaId).build();
+			type = UserCapaSnapshot.Constants.升级.toString();
+		} else {
+			type = NumberUtil.compare(userCapa.getCapaId(), capaId) > 0 ? UserCapaSnapshot.Constants.降级.toString()
+					: UserCapaSnapshot.Constants.升级.toString();
+			userCapa.setCapaId(capaId);
+		}
+		saveOrUpdate(userCapa);
+		// 记录快照
+		UserCapaSnapshot snapshot = UserCapaSnapshot.builder().uid(uid).capaId(capaId).type(type).remark(remark)
+				.description(description).build();
+		snapshotService.save(snapshot);
 
-        });
-
-        return getByUser(uid);
-    }
+		return getByUser(uid);
+	}
 
     @Override
     public List<UserCapa> getUpperList(Integer uid, List<Long> capaIds, Integer num) {

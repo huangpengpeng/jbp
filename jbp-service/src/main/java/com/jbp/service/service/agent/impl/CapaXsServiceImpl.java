@@ -13,7 +13,10 @@ import com.jbp.service.dao.agent.CapaXsDao;
 import com.jbp.service.service.agent.CapaXsService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
 

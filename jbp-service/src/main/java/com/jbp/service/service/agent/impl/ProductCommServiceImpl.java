@@ -9,6 +9,8 @@ import com.jbp.service.dao.agent.ProductCommDao;
 import com.jbp.service.service.agent.ProductCommService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 /**
  * 商品佣金
  */
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class ProductCommServiceImpl extends ServiceImpl<ProductCommDao, ProductComm>implements ProductCommService {
 

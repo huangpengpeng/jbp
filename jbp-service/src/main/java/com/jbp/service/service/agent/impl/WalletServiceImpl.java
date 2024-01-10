@@ -19,12 +19,14 @@ import com.jbp.service.service.agent.WalletService;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements WalletService {
     @Resource
@@ -48,7 +50,6 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     }
 
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Boolean increase(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
@@ -68,7 +69,6 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         return ifSuccess;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Boolean reduce(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
@@ -87,12 +87,12 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         walletFlowService.add(uid, type, amt, operate, WalletFlow.ActionEnum.支出.name(), externalNo, orgBalance, wallet.getBalance(), postscript);
         return ifSuccess;
     }
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    
     @Override
     public Boolean transferToPlatform(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         reduce(uid,type, amt, operate, externalNo, postscript);
         platformWalletService.increase(type,amt,operate,externalNo,postscript);
-        return Boolean.TRUE;
+        return true;
     }
 
 

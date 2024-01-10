@@ -13,7 +13,10 @@ import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.agent.CapaService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaService {
 
