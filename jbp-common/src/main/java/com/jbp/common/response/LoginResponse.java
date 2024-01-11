@@ -49,6 +49,9 @@ public class LoginResponse implements Serializable {
     @ApiModelProperty(value = "登录用户手机号")
     private String phone;
 
+    @ApiModelProperty(value = "登录用户账号")
+    private String account;
+
     @ApiModelProperty(value = "用户头像")
     private String avatar;
 

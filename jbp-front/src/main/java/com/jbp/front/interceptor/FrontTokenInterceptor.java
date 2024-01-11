@@ -7,9 +7,11 @@ import com.jbp.common.result.CommonResultCode;
 import com.jbp.common.token.FrontTokenComponent;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class FrontTokenInterceptor implements HandlerInterceptor {
 
-    @Autowired
+    @Resource
     private FrontTokenComponent frontTokenComponent;
 
     //程序处理之前需要处理的业务

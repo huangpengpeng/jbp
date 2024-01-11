@@ -196,7 +196,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public String getAccount() {
+    public String  getAccount() {
         String accountPrefix = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_PREFIX);
         String accountNum = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_NUM);
         String account = StringUtils.EMPTY;

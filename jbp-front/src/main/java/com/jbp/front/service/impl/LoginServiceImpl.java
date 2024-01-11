@@ -655,6 +655,7 @@ public class LoginServiceImpl implements LoginService {
         loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
         loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
         loginResponse.setAvatar(user.getAvatar());
+        loginResponse.setAccount(user.getAccount());
         //保存最后登录随机code
         saveLastCheckCode(user);
         
