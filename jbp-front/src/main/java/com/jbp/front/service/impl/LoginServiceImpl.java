@@ -135,7 +135,6 @@ public class LoginServiceImpl implements LoginService {
         if (!validateCode.toString().equals(code)) {
             throw new CrmebException("验证码错误");
         }
-        //删除验证码
     }
 
     /**
