@@ -93,6 +93,8 @@ public class UserResponse {
 
     @ApiModelProperty(value = "上级推广员昵称")
     private String spreadName;
+    @ApiModelProperty(value = "用户账号")
+    private String account;
 
     @ApiModelProperty(value = "是否注销")
     private Boolean isLogoff;

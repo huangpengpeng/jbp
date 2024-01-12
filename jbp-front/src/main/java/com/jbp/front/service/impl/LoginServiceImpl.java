@@ -501,7 +501,7 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public FrontLoginConfigResponse getLoginConfig() {
         List<String> keyList = new ArrayList<>();
-        keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
+        keyList.add(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE);
         keyList.add(SysConfigConstants.WECHAT_PUBLIC_LOGIN_TYPE);
         keyList.add(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION);
         keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
@@ -509,7 +509,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO);
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
-        response.setLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
+        response.setLogo(record.getStr(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE));
         response.setWechatBrowserVisit(record.getStr(SysConfigConstants.WECHAT_PUBLIC_LOGIN_TYPE));
         response.setRoutinePhoneVerification(record.getStr(SysConfigConstants.WECHAT_ROUTINE_PHONE_VERIFICATION));
         response.setMobileLoginLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));

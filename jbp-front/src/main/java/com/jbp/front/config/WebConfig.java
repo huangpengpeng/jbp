@@ -90,6 +90,8 @@ public class WebConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/api/front/agreement/**").excludePathPatterns("/api/front/merchant/search/list")
 				.excludePathPatterns("/api/front/merchant/street")
 				.excludePathPatterns("/api/front/merchant/index/info/*")
+				//
+				.excludePathPatterns("/api/front/login/account/List")
 				.excludePathPatterns("/api/front/merchant/detail/*")
 				.excludePathPatterns("/api/front/merchant/all/type/list")
 				.excludePathPatterns("/api/front/merchant/all/category/list")
