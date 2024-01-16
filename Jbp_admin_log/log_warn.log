@@ -1,0 +1,2 @@
+2024-01-16 01:00:01.354 [task-executor-13] WARN  c.b.wx.miniapp.api.impl.BaseWxMaServiceImpl - 即将重新获取新的access_token，错误代码：40001，错误信息：access_token 无效或 AppSecret 错误
+2024-01-16 04:00:01.267 [task-executor-15] WARN  c.b.wx.miniapp.api.impl.BaseWxMaServiceImpl - 即将重新获取新的access_token，错误代码：40001，错误信息：access_token 无效或 AppSecret 错误

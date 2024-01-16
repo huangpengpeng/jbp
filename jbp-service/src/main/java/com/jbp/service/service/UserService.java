@@ -46,6 +46,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取用户账户
+     *
      * @return
      */
     String getAccount();
@@ -169,12 +170,14 @@ public interface UserService extends IService<User> {
 
     /**
      * 清除对应的用户等级
+     *
      * @param levelId 等级id
      */
     Boolean removeLevelByLevelId(Integer levelId);
 
     /**
      * 获取uidMap
+     *
      * @param uidList uid列表
      * @return Map
      */
@@ -182,43 +185,48 @@ public interface UserService extends IService<User> {
 
     /**
      * 更新余额
-     * @param uid 用户ID
+     *
+     * @param uid   用户ID
      * @param price 金额
-     * @param type 增加add、扣减sub
+     * @param type  增加add、扣减sub
      * @return Boolean
      */
     Boolean updateNowMoney(Integer uid, BigDecimal price, String type);
 
     /**
      * 更新用户积分
-     * @param uid 用户ID
+     *
+     * @param uid      用户ID
      * @param integral 积分
-     * @param type 增加add、扣减sub
+     * @param type     增加add、扣减sub
      * @return Boolean
      */
     Boolean updateIntegral(Integer uid, Integer integral, String type);
 
     /**
      * 更新用户佣金
-     * @param uid 用户ID
+     *
+     * @param uid   用户ID
      * @param price 金额
-     * @param type 增加add、扣减sub
+     * @param type  增加add、扣减sub
      * @return Boolean
      */
     Boolean updateBrokerage(Integer uid, BigDecimal price, String type);
 
     /**
      * 更新用户经验
-     * @param uid 用户ID
+     *
+     * @param uid        用户ID
      * @param experience 经验
-     * @param type 增加add、扣减sub
+     * @param type       增加add、扣减sub
      * @return Boolean
      */
     Boolean updateExperience(Integer uid, Integer experience, String type);
 
     /**
      * 佣金转余额
-     * @param uid 用户ID
+     *
+     * @param uid   用户ID
      * @param price 转入金额
      * @return Boolean
      */
@@ -226,6 +234,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 操作用户积分
+     *
      * @param request 请求参数
      * @return Boolean
      */
@@ -233,6 +242,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 操作用户余额
+     *
      * @param request 请求参数
      * @return Boolean
      */
@@ -240,7 +250,8 @@ public interface UserService extends IService<User> {
 
     /**
      * 支付成功，用户信息变更
-     * @param id 用户id
+     *
+     * @param id         用户id
      * @param isPromoter 是否成为推广员
      */
     Boolean paySuccessChange(Integer id, Boolean isPromoter);
@@ -260,13 +271,15 @@ public interface UserService extends IService<User> {
 
     /**
      * 推广人排行(取前50)
-     * @param type             时间范围(week-周，month-月)
+     *
+     * @param type 时间范围(week-周，month-月)
      * @return List<User>
      */
     List<User> getSpreadPeopleTopByDate(String type);
 
     /**
      * 绑定推广关系（登录状态）
+     *
      * @param spreadUid 推广人id
      */
     void bindSpread(Integer spreadUid);
@@ -278,6 +291,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 根据日期获取注册用户数量
+     *
      * @param date 日期 yyyy-MM-dd
      * @return 新增用户数
      */
@@ -285,21 +299,24 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取用户渠道数据
+     *
      * @return List
      */
     List<User> getChannelData();
 
     /**
      * 更新用户推广人
-     * @param userId 用户ID
+     *
+     * @param userId    用户ID
      * @param spreadUid 推广人ID
      */
     Boolean updateSpreadByUid(Integer userId, Integer spreadUid);
 
     /**
      * PC后台分销员列表
-     * @param keywords 搜索参数
-     * @param dateLimit 时间参数
+     *
+     * @param keywords    搜索参数
+     * @param dateLimit   时间参数
      * @param pageRequest 分页参数
      */
     PageInfo<User> getRetailStorePeoplePage(String keywords, String dateLimit, PageParamRequest pageRequest);
@@ -314,8 +331,9 @@ public interface UserService extends IService<User> {
 
     /**
      * 更新用户连续签到天数
+     *
      * @param day 连续签到天数
-     * @param id 用户ID
+     * @param id  用户ID
      * @return Boolean
      */
     Boolean updateSignNumByUid(Integer day, Integer id);
@@ -332,23 +350,25 @@ public interface UserService extends IService<User> {
 
     /**
      * 管理端用户详情
+     *
      * @param id 用户ID
      */
     UserAdminDetailResponse getAdminDetail(Integer id);
 
     /**
      * 更新用户等级
+     *
      * @param userId 用户ID
-     * @param level 用户等级
+     * @param level  用户等级
      */
     Boolean updateUserLevel(Integer userId, Integer level);
 
     /**
      * 通过生日获取用户列表
+     *
      * @param birthday 生日日期
      */
     List<User> findByBirthday(String birthday);
-
 
 
 }

@@ -1,8 +1,6 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.jbp.common.model.agent.UserRegion;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -14,15 +12,13 @@ import com.jbp.service.service.agent.UserRegionService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin/agent/user/region")
@@ -33,9 +29,9 @@ public class UserRegionController {
     private UserRegionService userRegionService;
     @Resource
     private UserService userService;
-
+    @PreAuthorize("hasAuthority('agent:user:region:page')")
     @ApiOperation(value = "区域用户列表", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping("/user_region/page")
+    @GetMapping("/page")
     public CommonResult<CommonPage<UserRegion>> page(UserRegionRequest request, PageParamRequest pageParamRequest) {
         User user = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNull(user)) {
@@ -45,11 +41,11 @@ public class UserRegionController {
                 return CommonResult.failed("账户信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(userRegionService.pageList(user.getId(),request.getProvince(),request.getCity(),request.getArea(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userRegionService.pageList(user.getId(), request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
     }
-
+    @PreAuthorize("hasAuthority('agent:user:region:add')")
     @ApiOperation(value = "区域用户新增", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping("/user_region/add")
+    @GetMapping("/add")
     public CommonResult add(String account, String province, String city, String area, String address) {
         if (StringUtils.isAnyBlank(account, province, city, area, address)) {
             return CommonResult.failed("请填写完整信息");
@@ -66,9 +62,9 @@ public class UserRegionController {
         userRegionService.save(userRegion);
         return CommonResult.success();
     }
-
+    @PreAuthorize("hasAuthority('agent:user:region:del')")
     @ApiOperation(value = "区域用户删除", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping("/user_region/del")
+    @GetMapping("/del")
     public CommonResult userRegionEdit(Long id) {
         userRegionService.removeById(id);
         return CommonResult.success();

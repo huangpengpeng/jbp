@@ -34,7 +34,7 @@ public class WalletflowController {
         return CommonResult.success(CommonPage.restPage(walletService.pageList(pageParamRequest)));
     }
 
-    @PreAuthorize("hasAuthority('agent:user:wallet::increase')")
+    @PreAuthorize("hasAuthority('agent:user:wallet:increase')")
     @ApiOperation("增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated WalletformEditRequest request) {
@@ -45,7 +45,7 @@ public class WalletflowController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:user:wallet::reduce')")
+    @PreAuthorize("hasAuthority('agent:user:wallet:reduce')")
     @ApiOperation("减少积分")
     @PostMapping("/reduce")
     public CommonResult reduce(@RequestBody @Validated WalletformEditRequest request) {
@@ -56,7 +56,7 @@ public class WalletflowController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:user:wallet::transfer')")
+    @PreAuthorize("hasAuthority('agent:user:wallet:transfer')")
     @ApiOperation("转平台")
     @PostMapping("/transfer")
     public CommonResult transfer(@RequestBody @Validated WalletformEditRequest request) {
