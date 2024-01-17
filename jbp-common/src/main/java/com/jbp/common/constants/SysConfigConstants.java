@@ -1,5 +1,7 @@
 package com.jbp.common.constants;
 
+import com.jbp.common.vo.MyRecord;
+
 /**
  *  系统设置常量类
  *  +----------------------------------------------------------------------
@@ -99,6 +101,8 @@ public class SysConfigConstants {
     public static final String CONFIG_KEY_ACCOUNT_LOGIN_OPEN = "account_login_open";
     /** 开启隐私协议 */
     public static final String CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN = "login_privacy_agreement_open";
+    /** 手机号验证码登录默认注册 */
+    public static final String CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN = "mobile_default_register_open";
 
 
     /** 用户默认头像 */

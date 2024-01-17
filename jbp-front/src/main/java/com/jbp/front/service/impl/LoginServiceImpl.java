@@ -8,7 +8,9 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +163,13 @@ public class LoginServiceImpl implements LoginService {
         checkValidateCode(loginRequest.getPhone(), loginRequest.getCaptcha());
         //查询用户信息
         List<User> userList = userService.getByPhone(loginRequest.getPhone());
-        if (userList.isEmpty()) {// 此用户不存在，走新用户注册流程
+        // 默认注册
+        MyRecord record = systemConfigService.getValuesByKeyList(Lists.newArrayList(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN));
+        Boolean defaultRegister = record.getBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN);
+        if (userList.isEmpty()) {// 此用户不存在，走新用户注册流程，默认注册用户走注册
+            if(BooleanUtils.isNotTrue(defaultRegister)){
+                throw new CrmebException("当前手机号未注册请先申请账号");
+            }
             User user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
             return getLoginResponse_V1_3(user, true);
         }
