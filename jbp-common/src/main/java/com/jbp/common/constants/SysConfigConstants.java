@@ -127,7 +127,7 @@ public class SysConfigConstants {
 
     /** 移动端登录 logo */
     public static final String CONFIG_KEY_MOBILE_LOGIN_LOGO = "mobile_login_logo";
-    /** 是否 开启微信公众号授权等你 */
+    /** 是否 开启微信公众号授权 */
     public static final String CONFIG_WECHAT_BROWSER_VISIT = "wechat_browser_visit";
 
     /** 图片上传类型 1本地 2七牛云 3OSS 4COS 5京东, 默认本地 */
