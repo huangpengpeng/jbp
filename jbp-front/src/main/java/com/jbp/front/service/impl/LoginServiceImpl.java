@@ -507,6 +507,12 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
         keyList.add(SysConfigConstants.CONFIG_KEY_SITE_NAME);
         keyList.add(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO);
+
+        keyList.add(SysConfigConstants.CONFIG_KEY_WECHAT_LOGIN_OPEN);
+        keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN);
+        keyList.add(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN);
+        keyList.add(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN);
+
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
         response.setLogo(record.getStr(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE));
@@ -515,6 +521,10 @@ public class LoginServiceImpl implements LoginService {
         response.setMobileLoginLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
         response.setSiteName(record.getStr(SysConfigConstants.CONFIG_KEY_SITE_NAME));
         response.setCopyrightLogo(record.getStr(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO));
+        response.setOpenWechatLogin(record.getBoolean(SysConfigConstants.CONFIG_KEY_WECHAT_LOGIN_OPEN));
+        response.setOpenMobileLogin(record.getBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN));
+        response.setOpenAccountLogin(record.getBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
+        response.setOpenPrivacyAgreement(record.getBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
         return response;
     }
 

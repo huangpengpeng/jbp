@@ -91,6 +91,15 @@ public class SysConfigConstants {
     
     /** 版权LOGO */
     public static final String CONFIG_KEY_COPY_RIGHT_LOGO = "copyright_logo";
+    /** 开启微信登录 */
+    public static final String CONFIG_KEY_WECHAT_LOGIN_OPEN = "wechat_login_open";
+    /** 开启手机号登录 */
+    public static final String CONFIG_KEY_MOBILE_LOGIN_OPEN = "mobile_login_open";
+    /** 开启账号登录 */
+    public static final String CONFIG_KEY_ACCOUNT_LOGIN_OPEN = "account_login_open";
+    /** 开启隐私协议 */
+    public static final String CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN = "login_privacy_agreement_open";
+
 
     /** 用户默认头像 */
     public static final String USER_DEFAULT_AVATAR_CONFIG_KEY = "h5_avatar";

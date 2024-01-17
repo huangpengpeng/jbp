@@ -46,4 +46,16 @@ public class FrontLoginConfigResponse implements Serializable {
     @ApiModelProperty(value = "版权logo")
     private String copyrightLogo;
 
+    @ApiModelProperty(value = "开启微信登录")
+    private Boolean openWechatLogin ;
+
+    @ApiModelProperty(value = "开启手机号登录")
+    private Boolean openMobileLogin ;
+
+    @ApiModelProperty(value = "开启账号登录")
+    private Boolean openAccountLogin ;
+
+    @ApiModelProperty(value = "开启隐私协议")
+    private Boolean openPrivacyAgreement;
+
 }
