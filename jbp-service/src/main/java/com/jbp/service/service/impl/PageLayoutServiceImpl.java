@@ -230,6 +230,24 @@ public class PageLayoutServiceImpl implements PageLayoutService {
         });
     }
 
+    @Override
+    public boolean orderCenterSave(JSONObject jsonObject) {
+        List<JSONObject> userMenu = CrmebUtil.jsonArrayToJsonObjectList(jsonObject.getJSONArray("orderCenter"));
+        List<SystemGroupData> dataList = convertGroupData(userMenu, GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
+        return transactionTemplate.execute(e -> {
+            // 先删除历史数据
+            systemGroupDataService.deleteByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
+            // 保存新数据
+            systemGroupDataService.saveBatch(dataList, 100);
+            return Boolean.TRUE;
+        });
+    }
+
+    @Override
+    public List<SystemGroupData> getOrderCeterList() {
+        return  systemGroupDataService.getListByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER,SystemGroupData.class);
+    }
+
     /**
      * 转换组合数据
      * @param jsonObjectList 数组

@@ -11,10 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 页面设计 前端控制器
@@ -120,5 +117,18 @@ public class PageLayoutController {
         }
         return CommonResult.failed();
     }
+    @PostMapping("/order/center/add")
+    @ApiOperation("订单中心修改")
+    public CommonResult<Object> orderCenterSave(@RequestBody JSONObject jsonObject){
+        if (pageLayoutService.orderCenterSave(jsonObject)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
 
+    @GetMapping("/order/center/list")
+    @ApiOperation("订单中心获取")
+    public CommonResult<Object> orderCenterList() {
+        return CommonResult.success(pageLayoutService.getOrderCeterList());
+    }
 }

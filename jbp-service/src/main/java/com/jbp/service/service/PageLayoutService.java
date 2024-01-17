@@ -1,8 +1,12 @@
 package com.jbp.service.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.model.system.SystemGroupData;
 import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
+import com.jbp.common.vo.MyRecord;
+
+import java.util.List;
 
 /**
  * 页面布局接口
@@ -69,4 +73,8 @@ public interface PageLayoutService {
      * @return 保存结果
      */
     Boolean bottomNavigationSave(JSONObject jsonObject);
+
+    boolean orderCenterSave(JSONObject jsonObject);
+
+    List<SystemGroupData> getOrderCeterList();
 }
