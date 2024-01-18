@@ -76,7 +76,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Resource
     private UserDao dao;
-
     @Autowired
     private FrontTokenComponent tokenComponent;
     @Autowired
@@ -128,6 +127,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Resource
     private TeamUserService teamUserService;
 
+
     /**
      * 手机号注册用户
      *
@@ -166,6 +166,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             if (user.getSpreadUid() > 0) {
                 updateSpreadCountByUid(spreadUid, Constants.OPERATION_TYPE_ADD);
             }
+            // 增加代理等级
+            userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
             return Boolean.TRUE;
         });
         if (!execute) {
