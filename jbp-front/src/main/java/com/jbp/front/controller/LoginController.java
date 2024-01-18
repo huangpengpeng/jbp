@@ -2,6 +2,7 @@ package com.jbp.front.controller;
 
 
 import com.jbp.common.request.*;
+import com.jbp.common.response.AccountCapaResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
@@ -11,6 +12,7 @@ import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户登陆 前端控制器
@@ -52,8 +55,9 @@ public class LoginController {
 
     @ApiOperation(value = "手机号获取账号")
     @RequestMapping(value = "/account/List", method = RequestMethod.POST)
-    public CommonResult<List<String>> accountList(@RequestBody @Validated LoginMobileRequest loginRequest) {
-        return CommonResult.success(loginService.getAccount(loginRequest));
+    public CommonResult<List<AccountCapaResponse>> accountList(@RequestBody @Validated LoginMobileRequest loginRequest) {
+        List<AccountCapaResponse> account = loginService.getAccount(loginRequest);
+        return CommonResult.success(account);
     }
 
     @ApiOperation(value = "手机号验证码登录")

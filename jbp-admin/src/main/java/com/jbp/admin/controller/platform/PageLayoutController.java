@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.platform;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.response.OrderCenterResponse;
 import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
 import com.jbp.common.result.CommonResult;
@@ -12,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 页面设计 前端控制器
@@ -128,7 +132,7 @@ public class PageLayoutController {
 
     @GetMapping("/order/center/list")
     @ApiOperation("订单中心获取")
-    public CommonResult<Object> orderCenterList() {
+    public CommonResult< List<OrderCenterResponse> > orderCenterList() {
         return CommonResult.success(pageLayoutService.getOrderCeterList());
     }
 }

@@ -88,5 +88,5 @@ public class ProductBuyLimitTemp extends BaseModel {
     private List<Long> rCapaXsIdList;
 
 
-    
+
 }

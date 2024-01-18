@@ -3,13 +3,17 @@ package com.jbp.service.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbp.common.constants.GroupDataConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.system.SystemGroupData;
 import com.jbp.common.request.SystemFormItemCheckRequest;
+import com.jbp.common.response.OrderCenterResponse;
 import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
 import com.jbp.common.utils.CrmebUtil;
@@ -19,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,7 +215,7 @@ public class PageLayoutServiceImpl implements PageLayoutService {
      * @return 保存结果
      */
     @Override
-    public Boolean bottomNavigationSave(JSONObject jsonObject) {
+    public Boolean  bottomNavigationSave(JSONObject jsonObject) {
         String isCustom = jsonObject.getString("isCustom");
         if (StrUtil.isBlank(isCustom)) {
             throw new CrmebException("请选择是否自定义");
@@ -244,8 +250,22 @@ public class PageLayoutServiceImpl implements PageLayoutService {
     }
 
     @Override
-    public List<SystemGroupData> getOrderCeterList() {
-        return  systemGroupDataService.getListByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER,SystemGroupData.class);
+    public   List<OrderCenterResponse>  getOrderCeterList() {
+//        List<HashMap<String, Object>> listMapByGid = systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
+//
+//
+//        return listMapByGid;
+        List<OrderCenterResponse> orderCenterResponseList = new ArrayList<>();
+        List<HashMap<String, Object>> listMapByGid = systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
+        listMapByGid.forEach(e->{
+            OrderCenterResponse orderCenterResponse = new OrderCenterResponse();
+            JSONArray jsonArray = JSONArray.parseArray(e.get("value").toString());
+            orderCenterResponse.setValue(jsonArray);
+            orderCenterResponse.setGid((Integer) e.get("gid"));
+            orderCenterResponseList.add(orderCenterResponse);
+
+        });
+        return orderCenterResponseList ;
     }
 
     /**

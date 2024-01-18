@@ -4,11 +4,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
+import com.jbp.common.response.AccountCapaResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.vo.MyRecord;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 移动端登录服务类
@@ -44,7 +46,7 @@ public interface LoginService {
      */
     LoginResponse phoneCaptchaLogin(LoginMobileRequest loginRequest);
 
-    List<String> getAccount(LoginMobileRequest loginRequest);
+    List<AccountCapaResponse> getAccount(LoginMobileRequest loginRequest);
 
     /**
      * 手机号密码登录

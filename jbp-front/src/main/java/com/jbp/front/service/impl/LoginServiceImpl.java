@@ -1,17 +1,33 @@
 package com.jbp.front.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.jbp.common.constants.*;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.coupon.Coupon;
+import com.jbp.common.model.user.User;
+import com.jbp.common.model.user.UserToken;
+import com.jbp.common.request.*;
+import com.jbp.common.response.AccountCapaResponse;
+import com.jbp.common.response.FrontLoginConfigResponse;
+import com.jbp.common.response.LoginResponse;
+import com.jbp.common.token.FrontTokenComponent;
+import com.jbp.common.utils.*;
+import com.jbp.common.vo.MyRecord;
+import com.jbp.common.vo.WeChatAuthorizeLoginUserInfoVo;
+import com.jbp.common.vo.WeChatMiniAuthorizeVo;
+import com.jbp.common.vo.WeChatOauthToken;
+import com.jbp.front.service.LoginService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,49 +37,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.constants.Constants;
-import com.jbp.common.constants.LoginConstants;
-import com.jbp.common.constants.SmsConstants;
-import com.jbp.common.constants.SysConfigConstants;
-import com.jbp.common.constants.UserConstants;
-import com.jbp.common.constants.WeChatConstants;
-import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.coupon.Coupon;
-import com.jbp.common.model.user.User;
-import com.jbp.common.model.user.UserToken;
-import com.jbp.common.request.IosLoginRequest;
-import com.jbp.common.request.LoginMobileRequest;
-import com.jbp.common.request.LoginPasswordRequest;
-import com.jbp.common.request.RegisterAppWxRequest;
-import com.jbp.common.request.RegisterThirdUserRequest;
-import com.jbp.common.request.WechatPublicLoginRequest;
-import com.jbp.common.request.WxBindingPhoneRequest;
-import com.jbp.common.response.FrontLoginConfigResponse;
-import com.jbp.common.response.LoginResponse;
-import com.jbp.common.token.FrontTokenComponent;
-import com.jbp.common.utils.CommonUtil;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.CrmebUtil;
-import com.jbp.common.utils.RedisUtil;
-import com.jbp.common.utils.WxUtil;
-import com.jbp.common.vo.MyRecord;
-import com.jbp.common.vo.WeChatAuthorizeLoginUserInfoVo;
-import com.jbp.common.vo.WeChatMiniAuthorizeVo;
-import com.jbp.common.vo.WeChatOauthToken;
-import com.jbp.front.service.LoginService;
-import com.jbp.service.service.CouponService;
-import com.jbp.service.service.SmsService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.UserTokenService;
-import com.jbp.service.service.WechatService;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 移动端登录服务类
@@ -197,13 +175,25 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public List<String> getAccount(LoginMobileRequest loginRequest) {
+    public List<AccountCapaResponse> getAccount(LoginMobileRequest loginRequest) {
         if (StrUtil.isBlank(loginRequest.getCaptcha())) {
             throw new CrmebException("手机号码验证码不能为空");
         }
         checkValidateCodeNoDel(loginRequest.getPhone(), loginRequest.getCaptcha());
         List<User> userList = userService.getByPhone(loginRequest.getPhone());
-        return ListUtils.emptyIfNull(userList).stream().map(User::getAccount).collect(Collectors.toList());
+        List<AccountCapaResponse> mapList = new ArrayList<>();
+        userList.forEach(e -> {
+            AccountCapaResponse accountCapaResponse = new AccountCapaResponse();
+            accountCapaResponse.setAccount(e.getAccount());
+            UserCapa userCapa = userCapaService.getByUser(e.getId());
+            if (!ObjectUtil.isNull(userCapa)) {
+                Capa capa = capaService.getById(userCapa.getCapaId());
+                accountCapaResponse.setCapaId(Math.toIntExact(capa.getId()));
+                accountCapaResponse.setIconUrl(capa.getIconUrl());
+            }
+            mapList.add(accountCapaResponse);
+        });
+        return mapList;
     }
 
     /**
