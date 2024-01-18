@@ -72,10 +72,21 @@ public class ProductBuyLimitTemp extends BaseModel {
     @TableField(typeHandler = LongListHandler.class)
     private List<Long> pCapaIdList;
 
-    @ApiModelProperty(value = "要求必须有服务上级")
-    private Boolean  hasRelation;
-
     @ApiModelProperty(value = "上级星级")
     @TableField(typeHandler = LongListHandler.class)
     private List<Long> pCapaXsIdList;
+
+    @ApiModelProperty(value = "要求必须有服务上级")
+    private Boolean  hasRelation;
+
+    @ApiModelProperty(value = "服务上级等级")
+    @TableField(typeHandler = LongListHandler.class)
+    private List<Long> rCapaIdList;
+
+    @ApiModelProperty(value = "服务上级星级")
+    @TableField(typeHandler = LongListHandler.class)
+    private List<Long> rCapaXsIdList;
+
+
+    
 }
