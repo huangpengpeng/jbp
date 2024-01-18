@@ -558,7 +558,6 @@ public class LoginServiceImpl implements LoginService {
     public LoginResponse wechatAppLogin(RegisterAppWxRequest request) {
         //检测是否存在
         UserToken userToken = null;
-
         if (request.getType().equals(UserConstants.REGISTER_TYPE_IOS_WX)) {
             userToken = userTokenService.getByOpenidAndType(request.getOpenId(), UserConstants.USER_TOKEN_TYPE_IOS_WX);
         }
@@ -584,9 +583,7 @@ public class LoginServiceImpl implements LoginService {
             }
             return getLoginResponse(user);
         }
-        // 没有用户，走创建用户流程
-
-        // 从微信获取用户信息，存入Redis中，将key返回给前端，前端在下一步绑定手机号的时候下发
+        // 没有用户，走创建用户流程, 从微信获取用户信息，存入Redis中，将key返回给前端，前端在下一步绑定手机号的时候下发
         RegisterThirdUserRequest registerThirdUserRequest = new RegisterThirdUserRequest();
         registerThirdUserRequest.setSpreadPid(0);
         registerThirdUserRequest.setType(request.getType());
@@ -596,9 +593,6 @@ public class LoginServiceImpl implements LoginService {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
-
-        User user = userService.getById(userToken.getUid());
-        saveLastCheckCode(user);
         return loginResponse;
     }
 
