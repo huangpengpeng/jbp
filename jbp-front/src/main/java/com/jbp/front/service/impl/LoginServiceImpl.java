@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.Lists;
+import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.UserCapaService;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -100,6 +102,10 @@ public class LoginServiceImpl implements LoginService {
     private UserTokenService userTokenService;
     @Autowired
     private CouponService couponService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private CapaService capaService;
 
     /**
      * 发送短信验证码
@@ -387,6 +393,7 @@ public class LoginServiceImpl implements LoginService {
                     finalUser.setSpreadTime(CrmebDateUtil.nowDateTime());
                     userService.updateSpreadCountByUid(registerThirdUserRequest.getSpreadPid(), Constants.OPERATION_TYPE_ADD);
                 }
+                userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType()+":注册");
                 userService.save(finalUser);
             } else {
                 userService.updateById(finalUser);
@@ -553,14 +560,14 @@ public class LoginServiceImpl implements LoginService {
         UserToken userToken = null;
 
         if (request.getType().equals(UserConstants.REGISTER_TYPE_IOS_WX)) {
-            userToken = userTokenService.getByOpenidAndType(request.getOpenId(),  UserConstants.USER_TOKEN_TYPE_IOS_WX);
+            userToken = userTokenService.getByOpenidAndType(request.getOpenId(), UserConstants.USER_TOKEN_TYPE_IOS_WX);
         }
         if (request.getType().equals(UserConstants.REGISTER_TYPE_ANDROID_WX)) {
-            userToken = userTokenService.getByOpenidAndType(request.getOpenId(),  UserConstants.USER_TOKEN_TYPE_ANDROID_WX);
+            userToken = userTokenService.getByOpenidAndType(request.getOpenId(), UserConstants.USER_TOKEN_TYPE_ANDROID_WX);
         }
         if (ObjectUtil.isNotNull(userToken)) {// 已存在，正常登录
             User user = userService.getById(userToken.getUid());
-            if (ObjectUtil.isNull(user) && user.getIsLogoff()) {
+            if (ObjectUtil.isNull(user) || user.getIsLogoff()) {
                 throw new CrmebException("当前账户异常，请联系管理员！");
             }
             if (!user.getStatus()) {
@@ -578,6 +585,7 @@ public class LoginServiceImpl implements LoginService {
             return getLoginResponse(user);
         }
         // 没有用户，走创建用户流程
+        
         // 从微信获取用户信息，存入Redis中，将key返回给前端，前端在下一步绑定手机号的时候下发
         RegisterThirdUserRequest registerThirdUserRequest = new RegisterThirdUserRequest();
         registerThirdUserRequest.setSpreadPid(0);
@@ -588,9 +596,9 @@ public class LoginServiceImpl implements LoginService {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
-        
+
         User user = userService.getById(userToken.getUid());
-        	saveLastCheckCode(user);
+        saveLastCheckCode(user);
         return loginResponse;
     }
 
