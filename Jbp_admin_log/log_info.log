@@ -9248,3 +9248,39 @@
 2024-01-18 15:01:06.577 [task-executor-16] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:01:06 CST 2024
 2024-01-18 15:01:06.578 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
 2024-01-18 15:01:06.578 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：1毫秒
+2024-01-18 15:02:00.418 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-18 15:02:00.418 [task-executor-17] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 15:02:00
+2024-01-18 15:02:00.455 [task-executor-17] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-18 15:02:00
+2024-01-18 15:02:00.455 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：36毫秒
+2024-01-18 15:02:01.464 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-18 15:02:01.464 [task-executor-18] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:02:01 CST 2024
+2024-01-18 15:02:01.495 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：30毫秒
+2024-01-18 15:02:02.194 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-18 15:02:02.194 [task-executor-19] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:02:02 CST 2024
+2024-01-18 15:02:02.195 [task-executor-19] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-18 15:02:02.195 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-18 15:02:02.912 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：7
+2024-01-18 15:02:02.912 [task-executor-20] INFO  com.jbp.admin.task.order.OrderCancelTask - ---OrderCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:02:02 CST 2024
+2024-01-18 15:02:02.913 [task-executor-20] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.cancelByUser | size:0
+2024-01-18 15:02:02.913 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：7  总共耗时：1毫秒
+2024-01-18 15:02:03.631 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-18 15:02:03.631 [task-executor-1] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:02:03 CST 2024
+2024-01-18 15:02:03.632 [task-executor-1] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-18 15:02:03.632 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-18 15:02:04.367 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-01-18 15:02:04.367 [task-executor-2] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:02:04 CST 2024
+2024-01-18 15:02:04.367 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-01-18 15:02:04.367 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：1毫秒
+2024-01-18 15:02:05.090 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-18 15:02:05.090 [task-executor-5] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:02:05 CST 2024
+2024-01-18 15:02:05.091 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-18 15:02:05.091 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：1毫秒
+2024-01-18 15:02:21.255 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-01-18 15:02:21.274 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'jmReportTaskExecutor'
+2024-01-18 15:02:21.276 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-18 15:02:21.282 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
+2024-01-18 15:02:21.282 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2024-01-18 15:02:21.283 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-01-18 15:02:21.284 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2024-01-18 15:02:21.307 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-18 15:02:21.316 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed

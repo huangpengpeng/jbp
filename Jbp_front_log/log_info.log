@@ -320,3 +320,6 @@ AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', 
 2024-01-18 14:51:57.211 [RMI TCP Connection(14)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
 2024-01-18 14:51:57.224 [RMI TCP Connection(14)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 12 ms
 2024-01-18 14:51:57.247 [RMI TCP Connection(15)-26.26.26.1] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-01-18 15:02:21.313 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-18 15:02:21.366 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-18 15:02:21.373 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
