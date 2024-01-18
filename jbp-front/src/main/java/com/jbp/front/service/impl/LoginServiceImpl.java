@@ -1,14 +1,21 @@
 package com.jbp.front.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+<<<<<<< HEAD
 import com.google.common.collect.Lists;
+=======
+import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.response.AccountCapaResponse;
+import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.UserCapaService;
+>>>>>>> af2baa2 (1)
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -100,6 +107,10 @@ public class LoginServiceImpl implements LoginService {
     private UserTokenService userTokenService;
     @Autowired
     private CouponService couponService;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private CapaService capaService;
 
     /**
      * 发送短信验证码
@@ -183,13 +194,25 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public List<String> getAccount(LoginMobileRequest loginRequest) {
+    public List<AccountCapaResponse> getAccount(LoginMobileRequest loginRequest) {
         if (StrUtil.isBlank(loginRequest.getCaptcha())) {
             throw new CrmebException("手机号码验证码不能为空");
         }
         checkValidateCodeNoDel(loginRequest.getPhone(), loginRequest.getCaptcha());
         List<User> userList = userService.getByPhone(loginRequest.getPhone());
-        return ListUtils.emptyIfNull(userList).stream().map(User::getAccount).collect(Collectors.toList());
+        List<AccountCapaResponse> mapList = new ArrayList<>();
+        userList.forEach(e->{
+            AccountCapaResponse accountCapaResponse=new AccountCapaResponse();
+           accountCapaResponse.setAccount(e.getAccount());
+            UserCapa userCapa = userCapaService.getByUser(e.getId());
+            if (!ObjectUtil.isNull(userCapa)){
+                Capa capa = capaService.getById(userCapa.getCapaId());
+                accountCapaResponse.setCapaId(Math.toIntExact(capa.getId()));
+                accountCapaResponse.setIconUrl(capa.getIconUrl());
+            }
+            mapList.add(accountCapaResponse);
+        });
+       return mapList;
     }
 
     /**

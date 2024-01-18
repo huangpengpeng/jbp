@@ -1,3 +1,0 @@
-2024-01-15 10:45:38.227 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
-2024-01-15 10:45:38.679 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
-2024-01-15 10:45:39.366 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
