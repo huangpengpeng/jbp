@@ -9060,3 +9060,137 @@
 2024-01-18 14:55:08.754 [task-executor-10] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 批量更新直播间结果:true
 2024-01-18 14:55:08.754 [task-executor-10] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 END
 2024-01-18 14:55:08.754 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：32  总共耗时：2078毫秒
+2024-01-18 14:56:00.452 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-18 14:56:00.452 [task-executor-11] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 14:56:00
+2024-01-18 14:56:00.483 [task-executor-11] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-18 14:56:00
+2024-01-18 14:56:00.483 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：30毫秒
+2024-01-18 14:56:01.247 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-18 14:56:01.247 [task-executor-12] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:56:01 CST 2024
+2024-01-18 14:56:01.280 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：33毫秒
+2024-01-18 14:56:02.102 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-18 14:56:02.102 [task-executor-13] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:56:02 CST 2024
+2024-01-18 14:56:02.103 [task-executor-13] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-18 14:56:02.103 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：2毫秒
+2024-01-18 14:56:02.896 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：7
+2024-01-18 14:56:02.896 [task-executor-14] INFO  com.jbp.admin.task.order.OrderCancelTask - ---OrderCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:56:02 CST 2024
+2024-01-18 14:56:02.896 [task-executor-14] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.cancelByUser | size:0
+2024-01-18 14:56:02.896 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：7  总共耗时：1毫秒
+2024-01-18 14:56:03.691 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-18 14:56:03.691 [task-executor-15] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:56:03 CST 2024
+2024-01-18 14:56:03.692 [task-executor-15] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-18 14:56:03.692 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-18 14:56:04.816 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-01-18 14:56:04.816 [task-executor-16] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:56:04 CST 2024
+2024-01-18 14:56:04.816 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-01-18 14:56:04.817 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：1毫秒
+2024-01-18 14:56:05.789 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-18 14:56:05.789 [task-executor-17] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:56:05 CST 2024
+2024-01-18 14:56:05.789 [task-executor-17] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-18 14:56:05.789 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：1毫秒
+2024-01-18 14:57:00.458 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-18 14:57:00.458 [task-executor-18] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 14:57:00
+2024-01-18 14:57:00.490 [task-executor-18] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-18 14:57:00
+2024-01-18 14:57:00.490 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：32毫秒
+2024-01-18 14:57:01.213 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-18 14:57:01.214 [task-executor-19] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:57:01 CST 2024
+2024-01-18 14:57:01.244 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：31毫秒
+2024-01-18 14:57:01.993 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-18 14:57:01.994 [task-executor-20] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:57:01 CST 2024
+2024-01-18 14:57:01.994 [task-executor-20] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-18 14:57:01.994 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-18 14:57:02.762 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：7
+2024-01-18 14:57:02.762 [task-executor-1] INFO  com.jbp.admin.task.order.OrderCancelTask - ---OrderCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:57:02 CST 2024
+2024-01-18 14:57:02.762 [task-executor-1] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.cancelByUser | size:0
+2024-01-18 14:57:02.762 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：7  总共耗时：1毫秒
+2024-01-18 14:57:03.528 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-18 14:57:03.529 [task-executor-2] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:57:03 CST 2024
+2024-01-18 14:57:03.529 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-18 14:57:03.529 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：2毫秒
+2024-01-18 14:57:04.290 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-01-18 14:57:04.291 [task-executor-3] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:57:04 CST 2024
+2024-01-18 14:57:04.291 [task-executor-3] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-01-18 14:57:04.291 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：1毫秒
+2024-01-18 14:57:05.050 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-18 14:57:05.051 [task-executor-4] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:57:05 CST 2024
+2024-01-18 14:57:05.051 [task-executor-4] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-18 14:57:05.051 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：0毫秒
+2024-01-18 14:58:00.452 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-18 14:58:00.452 [task-executor-5] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 14:58:00
+2024-01-18 14:58:00.482 [task-executor-5] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-18 14:58:00
+2024-01-18 14:58:00.482 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-18 14:58:01.215 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-18 14:58:01.215 [task-executor-6] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:58:01 CST 2024
+2024-01-18 14:58:01.245 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：30毫秒
+2024-01-18 14:58:01.971 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-18 14:58:01.971 [task-executor-7] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:58:01 CST 2024
+2024-01-18 14:58:01.971 [task-executor-7] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-18 14:58:01.972 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：15毫秒
+2024-01-18 14:58:02.755 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：7
+2024-01-18 14:58:02.755 [task-executor-8] INFO  com.jbp.admin.task.order.OrderCancelTask - ---OrderCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:58:02 CST 2024
+2024-01-18 14:58:02.755 [task-executor-8] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.cancelByUser | size:0
+2024-01-18 14:58:02.755 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：7  总共耗时：0毫秒
+2024-01-18 14:58:03.518 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-18 14:58:04.282 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-01-18 14:58:05.054 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-18 14:58:05.118 [task-executor-11] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:58:05 CST 2024
+2024-01-18 14:58:05.118 [task-executor-9] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:58:05 CST 2024
+2024-01-18 14:58:05.118 [task-executor-10] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:58:05 CST 2024
+2024-01-18 14:58:05.119 [task-executor-11] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-18 14:58:05.119 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：62毫秒
+2024-01-18 14:58:05.119 [task-executor-9] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-18 14:58:05.119 [task-executor-10] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-01-18 14:58:05.119 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1594毫秒
+2024-01-18 14:58:05.120 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：837毫秒
+2024-01-18 14:59:00.449 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-18 14:59:00.449 [task-executor-12] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 14:59:00
+2024-01-18 14:59:00.480 [task-executor-12] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-18 14:59:00
+2024-01-18 14:59:00.480 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-18 14:59:01.199 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-18 14:59:01.199 [task-executor-13] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:59:01 CST 2024
+2024-01-18 14:59:01.230 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：31毫秒
+2024-01-18 14:59:01.925 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-18 14:59:01.925 [task-executor-14] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:59:01 CST 2024
+2024-01-18 14:59:01.926 [task-executor-14] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-18 14:59:01.926 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-18 14:59:02.665 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：7
+2024-01-18 14:59:02.665 [task-executor-15] INFO  com.jbp.admin.task.order.OrderCancelTask - ---OrderCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:59:02 CST 2024
+2024-01-18 14:59:02.665 [task-executor-15] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.cancelByUser | size:0
+2024-01-18 14:59:02.665 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：7  总共耗时：0毫秒
+2024-01-18 14:59:03.399 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-18 14:59:03.399 [task-executor-16] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:59:03 CST 2024
+2024-01-18 14:59:03.399 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-18 14:59:03.399 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-18 14:59:04.130 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-01-18 14:59:04.130 [task-executor-17] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:59:04 CST 2024
+2024-01-18 14:59:04.130 [task-executor-17] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-01-18 14:59:04.130 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：0毫秒
+2024-01-18 14:59:04.881 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-18 14:59:04.881 [task-executor-18] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 14:59:04 CST 2024
+2024-01-18 14:59:04.882 [task-executor-18] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-18 14:59:04.882 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：0毫秒
+2024-01-18 15:00:00.435 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：2
+2024-01-18 15:00:00.435 [task-executor-19] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---BrokerageFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:00:00 CST 2024
+2024-01-18 15:00:00.475 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：2  总共耗时：46毫秒
+2024-01-18 15:00:01.177 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-18 15:00:01.177 [task-executor-20] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 15:00:01
+2024-01-18 15:00:01.207 [task-executor-20] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-18 15:00:01
+2024-01-18 15:00:01.207 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：32毫秒
+2024-01-18 15:00:01.916 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-18 15:00:01.916 [task-executor-1] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:00:01 CST 2024
+2024-01-18 15:00:01.948 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：31毫秒
+2024-01-18 15:00:02.650 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-18 15:00:02.650 [task-executor-2] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:00:02 CST 2024
+2024-01-18 15:00:02.650 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-18 15:00:02.650 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-18 15:00:03.404 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：6
+2024-01-18 15:00:03.405 [task-executor-3] INFO  com.jbp.admin.task.order.OrderAutoCompleteTask - ---OrderAutoCompleteTask task------produce Data with fixed rate task: Execution Time - 2024-01-18 15:00:03
+2024-01-18 15:00:03.477 [task-executor-3] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoComplete | size:0
+2024-01-18 15:00:04.149 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：7
+2024-01-18 15:00:04.883 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-18 15:00:05.114 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：6  总共耗时：1711毫秒
+2024-01-18 15:00:05.114 [task-executor-4] INFO  com.jbp.admin.task.order.OrderCancelTask - ---OrderCancelTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:00:05 CST 2024
+2024-01-18 15:00:05.114 [task-executor-5] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Thu Jan 18 15:00:05 CST 2024
+2024-01-18 15:00:05.115 [task-executor-4] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.cancelByUser | size:0
+2024-01-18 15:00:05.115 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：7  总共耗时：956毫秒
+2024-01-18 15:00:05.115 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-18 15:00:05.115 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：231毫秒
