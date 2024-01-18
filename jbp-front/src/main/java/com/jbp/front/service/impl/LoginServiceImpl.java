@@ -585,7 +585,7 @@ public class LoginServiceImpl implements LoginService {
             return getLoginResponse(user);
         }
         // 没有用户，走创建用户流程
-        
+
         // 从微信获取用户信息，存入Redis中，将key返回给前端，前端在下一步绑定手机号的时候下发
         RegisterThirdUserRequest registerThirdUserRequest = new RegisterThirdUserRequest();
         registerThirdUserRequest.setSpreadPid(0);
