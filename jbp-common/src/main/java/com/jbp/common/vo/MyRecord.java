@@ -320,6 +320,18 @@ public class MyRecord implements Serializable {
         return (Boolean) getColumns().get(column);
     }
 
+    public Boolean getStrBoolean(String column) {
+        final Object o = getColumns().get(column);
+        if (o == null) {
+            return false;
+        }
+        String s = String.valueOf(o);
+        if (StringUtils.isEmpty(s)) {
+            return false;
+        }
+        return s.equals("'true'");
+    }
+
     /**
      * Get column of mysql type: decimal, numeric
      */

@@ -1,8 +1,10 @@
 package com.jbp.front;
 
+import com.jbp.front.service.LoginService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,6 +36,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @MapperScan(basePackages = {"com.jbp.**.dao"})
 public class JbpFrontApplication {
     public static void main(String[] args) {
-        SpringApplication.run(JbpFrontApplication.class, args);
+        ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
+//        final LoginService bean = run.getBean(LoginService.class);
+//        bean.getLoginConfig();
     }
 }

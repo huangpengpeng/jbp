@@ -7,6 +7,7 @@ import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.front.service.LoginService;
 
+import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,8 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private UserService userService;
 
     @ApiOperation(value = "获取登录配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)
@@ -116,6 +119,16 @@ public class LoginController {
     public CommonResult<Boolean> tokenIsExist() {
         return CommonResult.success(loginService.tokenIsExist());
     }
+
+
+    @ApiOperation(value = "上级帮忙注册")
+    @RequestMapping(value = "/help/register", method = RequestMethod.POST)
+    public CommonResult<Boolean> register(@RequestBody @Validated UserHelpRegisterRequest request) {
+
+
+        return CommonResult.success();
+    }
+
 
 }
 

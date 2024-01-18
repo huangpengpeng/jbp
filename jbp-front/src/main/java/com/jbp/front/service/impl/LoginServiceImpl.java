@@ -118,6 +118,10 @@ public class LoginServiceImpl implements LoginService {
      * @param code  验证码
      */
     private void checkValidateCode(String phone, String code) {
+        String value = systemConfigService.getValueByKey("sms_code_valid_open");
+        if(StringUtils.isNotEmpty(value) && "0".equals(value)){
+            return;
+        }
         Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
         if (ObjectUtil.isNull(validateCode)) {
             throw new CrmebException("验证码已过期");
@@ -130,6 +134,10 @@ public class LoginServiceImpl implements LoginService {
     }
 
     private void checkValidateCodeNoDel(String phone, String code) {
+        String value = systemConfigService.getValueByKey("sms_code_valid_open");
+        if(StringUtils.isNotEmpty(value) && "0".equals(value)){
+            return;
+        }
         Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
         if (ObjectUtil.isNull(validateCode)) {
             throw new CrmebException("验证码已过期");
@@ -165,7 +173,7 @@ public class LoginServiceImpl implements LoginService {
         List<User> userList = userService.getByPhone(loginRequest.getPhone());
         // 默认注册
         MyRecord record = systemConfigService.getValuesByKeyList(Lists.newArrayList(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN));
-        Boolean defaultRegister = record.getBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN);
+        Boolean defaultRegister = record.getStrBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN);
         if (userList.isEmpty()) {// 此用户不存在，走新用户注册流程，默认注册用户走注册
             if(BooleanUtils.isNotTrue(defaultRegister)){
                 throw new CrmebException("当前手机号未注册请先申请账号");
@@ -316,12 +324,12 @@ public class LoginServiceImpl implements LoginService {
         }
         boolean isNew = true;
         List<User> userList = userService.getByPhone(request.getPhone());
+        if(userList.size() > 1){
+            throw new CrmebException("当前手机号存在多个账号，一个微信只能绑定一个账号");
+        }
         User user = userList.isEmpty() ? null : userList.get(0);
-        // 手机号唯一  并且存在用户的情况下
-        if (userService.isUnique4Phone() && !userList.isEmpty()) {
-            if (userList.size() > 1) { // 要求唯一但存在多个 说明数据错误 不需要考虑业务逻辑直接异常
-                throw new CrmebException("当前手机号重复注册" + request.getPhone());
-            }
+        // 不管手机号是否唯一  微信授权只能绑定一个账号 多个账号直接不让绑定
+        if (user != null) {
             if (request.getType().equals(UserConstants.REGISTER_TYPE_WECHAT) && user.getIsWechatPublic()) {
                 throw new CrmebException("该手机号已绑定微信公众号");
             }
@@ -336,7 +344,7 @@ public class LoginServiceImpl implements LoginService {
             }
             userToken = userTokenService.getTokenByUserId(user.getId(), userTokenType);
             if (ObjectUtil.isNotNull(userToken)) {
-                throw new CrmebException("该手机号已被注册");
+                throw new CrmebException("该手机号已经被绑定");
             }
             isNew = false;
         } else {
@@ -529,10 +537,10 @@ public class LoginServiceImpl implements LoginService {
         response.setMobileLoginLogo(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_LOGO));
         response.setSiteName(record.getStr(SysConfigConstants.CONFIG_KEY_SITE_NAME));
         response.setCopyrightLogo(record.getStr(SysConfigConstants.CONFIG_KEY_COPY_RIGHT_LOGO));
-        response.setOpenWechatLogin(record.getBoolean(SysConfigConstants.CONFIG_KEY_WECHAT_LOGIN_OPEN));
-        response.setOpenMobileLogin(record.getBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN));
-        response.setOpenAccountLogin(record.getBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
-        response.setOpenPrivacyAgreement(record.getBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
+        response.setOpenWechatLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_WECHAT_LOGIN_OPEN));
+        response.setOpenMobileLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN));
+        response.setOpenAccountLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
+        response.setOpenPrivacyAgreement(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
         return response;
     }
 
