@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -22,6 +23,8 @@ import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
 import com.jbp.common.model.coupon.CouponUser;
@@ -43,6 +46,7 @@ import com.jbp.common.vo.OnePassUserInfoVo;
 import com.jbp.common.vo.SimpleProductVo;
 import com.jbp.service.dao.ProductDao;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.*;
 import com.jbp.service.util.ProductUtils;
 import org.apache.el.parser.BooleanNode;
 import org.slf4j.Logger;
@@ -123,6 +127,20 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private ActivityStyleService activityStyleService;
     @Autowired
     private ProductTagService productTagService;
+    @Autowired
+    private ProductLimitTempService productLimitTempService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
+    @Autowired
+    private TeamUserService teamUserService;
+    @Autowired
+    private WhiteUserService whiteUserService;
+    @Autowired
+    private UserInvitationService userInvitationService;
+    @Autowired
+    private UserRelationService userRelationService;
 
     /**
      * 获取产品列表Admin
@@ -991,6 +1009,25 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         if (StrUtil.isNotEmpty(categoryIds.toString())) {
             map.put("categoryId", categoryIds.toString());
+        }
+        // 显示权益
+        Integer pId = null, rId = null;
+        List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
+        if (request.getUId() != null) {
+            whiteIdList = whiteUserService.getByUser(request.getUId());
+            TeamUser teamUser = teamUserService.getByUser(request.getUId());
+            if (teamUser != null) {
+                teamIdList.add(Long.valueOf(teamUser.getTid()));
+            }
+            pId = userInvitationService.getPid(request.getUId());
+            rId = userRelationService.getPid(request.getUId());
+        }
+        List<Long> tempIds = productLimitTempService.hasLimits(request.getCapaId(), request.getCapaXsId(), whiteIdList, teamIdList, pId, rId);
+        if (tempIds != null) {
+            if (tempIds.isEmpty()) {
+                tempIds.add(-1L);
+            }
+            map.put("tempIds", tempIds.stream().map(Objects::toString).collect(Collectors.joining(",")));
         }
 
         // 排序部分

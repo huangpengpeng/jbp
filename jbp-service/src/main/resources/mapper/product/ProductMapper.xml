@@ -96,6 +96,9 @@
         <if test="merId != null">
             and find_in_set(p.mer_id, #{merId})
         </if>
+        <if test="tempIds != null">
+            and find_in_set(p.showLimitTempId, #{tempIds})
+        </if>
         ${lastStr}
     </select>
 

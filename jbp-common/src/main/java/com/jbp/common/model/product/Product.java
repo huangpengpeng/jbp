@@ -111,7 +111,10 @@ public class Product implements Serializable {
     private Integer tempId;
 
     @ApiModelProperty(value = "购买限制模版ID")
-    private Long limitTempId;
+    private Long buyLimitTempId;
+
+    @ApiModelProperty(value = "显示限制模版ID")
+    private Long showLimitTempId;
 
     @ApiModelProperty(value = "排序")
     @TableField(value = "`sort`")

@@ -1,6 +1,9 @@
 package com.jbp.front.controller;
 
 
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.request.merchant.MerchantProductSearchRequest;
@@ -8,6 +11,10 @@ import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.front.service.FrontProductService;
 
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +43,14 @@ public class ProductController {
 
     @Autowired
     private FrontProductService productService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private CapaService capaService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
 
     @ApiOperation(value = "商品分页列表前置信息")
     @RequestMapping(value = "/list/before", method = RequestMethod.GET)
@@ -47,6 +62,24 @@ public class ProductController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<ProductFrontResponse>> getList(@ModelAttribute @Validated ProductFrontSearchRequest request,
                                                                   @ModelAttribute @Validated PageParamRequest pageParamRequest) {
+        if (request.getUId() == null) {
+            User currentUser = userService.getInfo();
+            request.setUId(currentUser == null ? null : currentUser.getId());
+        }
+        if (request.getCapaId() == null) {
+            if (request.getUId() == null) {
+                request.setCapaId(capaService.getMinCapa().getId());
+            } else {
+                UserCapa userCapa = userCapaService.getByUser(request.getUId());
+                request.setCapaId(userCapa == null ? null : userCapa.getCapaId());
+            }
+        }
+        if (request.getCapaXsId() == null) {
+            if (request.getUId() != null) {
+                UserCapaXs userCapaXs = userCapaXsService.getByUser(request.getUId());
+                request.setCapaXsId(userCapaXs == null ? null : userCapaXs.getCapaId());
+            }
+        }
         return CommonResult.success(CommonPage.restPage(productService.getList(request, pageParamRequest)));
     }
 

@@ -249,6 +249,8 @@ public class SysConfigConstants {
     public static final String MERCHANT_SHARE_FREEZE_TIME = "merchant_share_freeze_time";
 
 
+    /** 商品限制列表 */
+    public static final String PRODUCT_LIMIT_TEM_LIST = "product_limit_tem_list";
 
     /** 系统配置列表 */
     public static final String CONFIG_LIST = "config_list";

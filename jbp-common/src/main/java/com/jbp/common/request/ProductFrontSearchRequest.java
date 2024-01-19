@@ -55,4 +55,13 @@ public class ProductFrontSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "商品标签id")
     private Integer tagId;
+
+    @ApiModelProperty(value = "用户ID")
+    private Integer uId;
+
+    @ApiModelProperty(value = "等级ID")
+    private Long capaId;
+
+    @ApiModelProperty(value = "星级ID")
+    private Long capaXsId;
 }
