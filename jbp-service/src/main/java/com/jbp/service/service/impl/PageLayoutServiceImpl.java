@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -250,22 +247,17 @@ public class PageLayoutServiceImpl implements PageLayoutService {
     }
 
     @Override
-    public   List<OrderCenterResponse>  getOrderCeterList() {
-//        List<HashMap<String, Object>> listMapByGid = systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
-//
-//
-//        return listMapByGid;
-        List<OrderCenterResponse> orderCenterResponseList = new ArrayList<>();
-        List<HashMap<String, Object>> listMapByGid = systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
-        listMapByGid.forEach(e->{
-            OrderCenterResponse orderCenterResponse = new OrderCenterResponse();
-            JSONArray jsonArray = JSONArray.parseArray(e.get("value").toString());
-            orderCenterResponse.setValue(jsonArray);
-            orderCenterResponse.setGid((Integer) e.get("gid"));
-            orderCenterResponseList.add(orderCenterResponse);
+    public   List<HashMap<String, Object>>  getOrderCeterList() {
+        List<SystemGroupData> listByGid = systemGroupDataService.findListByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
+        List<HashMap<String, Object>> hashMaps = convertData(listByGid);
+        return hashMaps ;
+    }
 
-        });
-        return orderCenterResponseList ;
+    @Override
+    public List<HashMap<String, Object>> orderCenterTemplate(String template) {
+        List<SystemGroupData> listByGid = systemGroupDataService.findListByGid(GroupDataConstants.GROUP_DATA_ID_ORDER_CENTER);
+        List<HashMap<String, Object>> hashMaps = convertData(listByGid).stream().filter(map->template.equals(map.get("template"))).collect(Collectors.toList());
+        return hashMaps;
     }
 
     /**
