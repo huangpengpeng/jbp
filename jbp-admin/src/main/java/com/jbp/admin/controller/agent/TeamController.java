@@ -17,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.print.DocFlavor;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/team")
@@ -62,6 +64,7 @@ public class TeamController {
         teamService.delete(byName.getId());
         return CommonResult.success();
     }
+
     @PreAuthorize("hasAuthority('agent:team:name')")
     @GetMapping("/name")
     @ApiOperation("获取团队名")
@@ -69,4 +72,9 @@ public class TeamController {
         return CommonResult.success(teamService.list());
     }
 
+    @ApiOperation("列表")
+    @GetMapping("/list")
+    public CommonResult<List<Team>> list(String name) {
+        return CommonResult.success(teamService.getByNameList(name));
+    }
 }

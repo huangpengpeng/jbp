@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/admin/white/user")
+@RequestMapping("api/admin/agent/white/user")
 @Api(tags = "用户白名单")
 public class WhiteUserController {
     @Autowired

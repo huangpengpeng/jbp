@@ -21,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication(exclude = {WxMaAutoConfiguration.class}) 
 @ComponentScan(basePackages = {"com.jbp"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
-@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})
+//@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})
 public class JbpAdminApplication {
 
     public static void main(String[] args) {

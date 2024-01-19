@@ -1,5 +1,6 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -66,5 +67,12 @@ public class WhiteServiceImpl extends ServiceImpl<WhiteDao, White> implements Wh
         LambdaQueryWrapper<White> wrapper = new LambdaQueryWrapper<White>();
         wrapper.eq(White::getName, whiteName);
         return getOne(wrapper);
+    }
+
+    @Override
+    public List<White> getByNameList(String name) {
+        LambdaQueryWrapper<White> wrapper = new LambdaQueryWrapper<White>();
+        wrapper.like(!ObjectUtil.isNull(name)&&!name.equals(""), White::getName, name);
+        return list(wrapper);
     }
 }

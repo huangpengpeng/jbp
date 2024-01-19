@@ -23,6 +23,7 @@ import com.jbp.service.service.TeamService;
 import com.jbp.service.service.WhiteService;
 import com.jbp.service.service.agent.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +37,7 @@ import java.util.Map;
 @Service
 public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> implements LimitTempService {
 
-    @Autowired
-    private LimitTempDao dao;
+
     @Autowired
     private UserCapaService userCapaService;
     @Autowired
@@ -56,14 +56,14 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
 
     @PostConstruct
     public void loadingTempCache() {
-        if (redisUtil.exists(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST)) {
-            Long hashSize = redisUtil.getHashSize(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST);
-            if (hashSize > 0) {
-                return;
-            }
-        }
+//        if (redisUtil.exists(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST)) {
+//            Long hashSize = redisUtil.getHashSize(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST);
+//            if (hashSize > 0) {
+//                return;
+//            }
+//        }
         LambdaQueryWrapper<LimitTemp> lqw = Wrappers.lambdaQuery();
-        List<LimitTemp> list = dao.selectList(lqw);
+        List<LimitTemp> list = list(lqw);
         list.forEach(temp -> redisUtil.hset(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST, temp.getId().toString(), temp));
     }
 
@@ -171,18 +171,42 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     public LimitTempResponse details(Integer id) {
         LimitTemp limitTemp = getById(id);
         LimitTempResponse limitTempRequest = new LimitTempResponse();
-        limitTempRequest.setName(limitTempRequest.getName());
-        limitTempRequest.setType(limitTempRequest.getType());
-        limitTempRequest.setCapaIdList(capaService.listByIds(limitTemp.getCapaIdList()));
-        limitTempRequest.setCapaXsIdList(capaXsService.listByIds(limitTemp.getCapaIdList()));
-        limitTempRequest.setWhiteIdList(whiteService.listByIds(limitTemp.getWhiteIdList()));
-        limitTempRequest.setTeamIdList(teamService.listByIds(limitTemp.getTeamIdList()));
+        limitTempRequest.setName(limitTemp.getName());
+        limitTempRequest.setType(limitTemp.getType());
+        if (limitTemp.getCapaIdList().size() > 0) {
+            limitTempRequest.setCapaIdList(capaService.listByIds(limitTemp.getCapaIdList()));
+        }
+
+        if (limitTemp.getCapaXsIdList().size() > 0) {
+            limitTempRequest.setCapaXsIdList(capaXsService.listByIds(limitTemp.getCapaXsIdList()));
+
+        }
+        if (limitTemp.getWhiteIdList().size() > 0) {
+            limitTempRequest.setWhiteIdList(whiteService.listByIds(limitTemp.getWhiteIdList()));
+
+        }
+        if (limitTemp.getTeamIdList().size() > 0) {
+            limitTempRequest.setTeamIdList(teamService.listByIds(limitTemp.getTeamIdList()));
+
+        }
         limitTempRequest.setHasPartner(limitTemp.getHasPartner());
-        limitTempRequest.setPCapaIdList(capaService.listByIds(limitTemp.getPCapaIdList()));
-        limitTempRequest.setPCapaXsIdList(capaXsService.listByIds(limitTemp.getPCapaXsIdList()));
+        if (limitTemp.getPCapaIdList().size() > 0) {
+            limitTempRequest.setPCapaIdList(capaService.listByIds(limitTemp.getPCapaIdList()));
+
+        }
+        if (limitTemp.getPCapaXsIdList().size() > 0) {
+            limitTempRequest.setPCapaXsIdList(capaXsService.listByIds(limitTemp.getPCapaXsIdList()));
+
+        }
         limitTempRequest.setHasRelation(limitTemp.getHasRelation());
-        limitTempRequest.setRCapaIdList(capaService.listByIds(limitTemp.getRCapaIdList()));
-        limitTempRequest.setRCapaXsIdList(capaXsService.listByIds(limitTemp.getRCapaXsIdList()));
+        if (limitTemp.getRCapaIdList().size() > 0) {
+            limitTempRequest.setRCapaIdList(capaService.listByIds(limitTemp.getRCapaIdList()));
+
+        }
+        if (limitTemp.getRCapaXsIdList().size() > 0) {
+            limitTempRequest.setRCapaXsIdList(capaXsService.listByIds(limitTemp.getRCapaXsIdList()));
+
+        }
         limitTempRequest.setDescription(limitTempRequest.getDescription());
         return limitTempRequest;
 

@@ -12,12 +12,14 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.LimitTempService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-@Slf4j
+
 @RestController
 @RequestMapping("api/admin/agent/limit/temp")
 @Api(tags = "限制模版")
@@ -25,6 +27,7 @@ public class LimitTempController {
     @Resource
     private LimitTempService limitTempService;
 
+    @PreAuthorize("hasAuthority('agent:limit:temp')")
     @ApiOperation(value = "限制模版等级列表")
     @GetMapping(value = "/page")
     private CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
@@ -42,6 +45,7 @@ public class LimitTempController {
         return CommonResult.success();
     }
 
+    @PreAuthorize("hasAuthority('agent:limit:update')")
     @ApiOperation("修改")
     @PostMapping("/update")
     private CommonResult update(@RequestBody LimitTempEditRequest request) {
@@ -53,6 +57,7 @@ public class LimitTempController {
         return CommonResult.success();
     }
 
+    @PreAuthorize("hasAuthority('agent:limit:details')")
     @ApiOperation("详情")
     @GetMapping("/details/{id}")
     private CommonResult<LimitTempResponse> details(@PathVariable("id") Integer id) {

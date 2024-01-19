@@ -99,4 +99,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
         return CommonPage.copyPageInfo(page, list(lambdaQueryWrapper));
     }
 
+    @Override
+    public List<Team> getByNameList(String name) {
+        LambdaQueryWrapper<Team> lambdaQueryWrapper = new LambdaQueryWrapper<Team>()
+                .eq(!ObjectUtil.isNull(name) && !name.equals(""), Team::getName, name);
+        return list(lambdaQueryWrapper);
+    }
+
 }
