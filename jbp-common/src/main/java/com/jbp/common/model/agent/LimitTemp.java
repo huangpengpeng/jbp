@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 @TableName(value = "eb_limit_temp", autoResultMap = true)
 @ApiModel(value="LimitTemp对象", description="限制模版")
+@NoArgsConstructor
 public class LimitTemp extends BaseModel {
 
     private static final long serialVersionUID = 1L;
