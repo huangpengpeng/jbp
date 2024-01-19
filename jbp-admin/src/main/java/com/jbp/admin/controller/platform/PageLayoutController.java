@@ -132,7 +132,12 @@ public class PageLayoutController {
 
     @GetMapping("/order/center/list")
     @ApiOperation("订单中心获取")
-    public CommonResult< List<OrderCenterResponse> > orderCenterList() {
+    public CommonResult< List<HashMap<String, Object>>> orderCenterList() {
         return CommonResult.success(pageLayoutService.getOrderCeterList());
+    }
+    @GetMapping("/order/center/{template}")
+    @ApiOperation("订单中心获取")
+    public CommonResult<List<HashMap<String, Object>>> orderCenterTemplate(@PathVariable("template") String template) {
+        return CommonResult.success(pageLayoutService.orderCenterTemplate(template));
     }
 }

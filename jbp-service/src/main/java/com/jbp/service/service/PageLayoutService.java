@@ -78,5 +78,7 @@ public interface PageLayoutService {
 
     boolean orderCenterSave(JSONObject jsonObject);
 
-    List<OrderCenterResponse>  getOrderCeterList();
+    List<HashMap<String, Object>>  getOrderCeterList();
+
+    List<HashMap<String, Object>> orderCenterTemplate(String template);
 }
