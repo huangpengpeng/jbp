@@ -6,13 +6,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ProductLimitTemp;
+import com.jbp.common.model.agent.LimitTemp;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.utils.RedisUtil;
-import com.jbp.service.dao.agent.ProductLimitTempDao;
-import com.jbp.service.service.agent.ProductLimitTempService;
+import com.jbp.service.dao.agent.LimitTempDao;
+import com.jbp.service.service.agent.LimitTempService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,10 @@ import java.util.Map;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
-public class ProductLimitTempServiceImpl extends ServiceImpl<ProductLimitTempDao, ProductLimitTemp> implements ProductLimitTempService {
+public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> implements LimitTempService {
 
     @Autowired
-    private ProductLimitTempDao dao;
+    private LimitTempDao dao;
     @Autowired
     private UserCapaService userCapaService;
     @Autowired
@@ -46,13 +46,13 @@ public class ProductLimitTempServiceImpl extends ServiceImpl<ProductLimitTempDao
                 return;
             }
         }
-        LambdaQueryWrapper<ProductLimitTemp> lqw = Wrappers.lambdaQuery();
-        List<ProductLimitTemp> list = dao.selectList(lqw);
+        LambdaQueryWrapper<LimitTemp> lqw = Wrappers.lambdaQuery();
+        List<LimitTemp> list = dao.selectList(lqw);
         list.forEach(temp -> redisUtil.hset(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST, temp.getId().toString(), temp));
     }
 
 
-    private void async(ProductLimitTemp temp) {
+    private void async(LimitTemp temp) {
         redisUtil.hset(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST, temp.getId().toString(), temp);
     }
 
@@ -61,8 +61,8 @@ public class ProductLimitTempServiceImpl extends ServiceImpl<ProductLimitTempDao
     }
 
     @Override
-    public ProductLimitTemp add(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList) {
-        ProductLimitTemp temp = new ProductLimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner, pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList);
+    public LimitTemp add(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList) {
+        LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner, pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList);
         temp.init();
         save(temp);
         async(temp);
@@ -117,7 +117,7 @@ public class ProductLimitTempServiceImpl extends ServiceImpl<ProductLimitTempDao
         hmget.forEach((k, v) -> {
             Long tempId = (Long) k;
             if (v != null) {
-                ProductLimitTemp temp = (ProductLimitTemp) v;
+                LimitTemp temp = (LimitTemp) v;
                 if (temp.check(capaId, capaXsId, whiteIdList, teamIdList, pId, pCapaId, pCapaXsId, rId, rCapaId, rCapaXsId)) {
                     list.add(tempId);
                 }

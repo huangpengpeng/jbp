@@ -24,7 +24,6 @@ import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
 import com.jbp.common.model.coupon.CouponUser;
@@ -48,7 +47,6 @@ import com.jbp.service.dao.ProductDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.ProductUtils;
-import org.apache.el.parser.BooleanNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -128,7 +126,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Autowired
     private ProductTagService productTagService;
     @Autowired
-    private ProductLimitTempService productLimitTempService;
+    private LimitTempService productLimitTempService;
     @Autowired
     private UserCapaService userCapaService;
     @Autowired

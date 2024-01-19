@@ -128,7 +128,7 @@ import com.jbp.service.service.UserAddressService;
 import com.jbp.service.service.UserIntegralRecordService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WhiteUserService;
-import com.jbp.service.service.agent.ProductLimitTempService;
+import com.jbp.service.service.agent.LimitTempService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 
@@ -221,7 +221,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private CrmebConfig crmebConfig;
     @Autowired
-    private ProductLimitTempService productBuyLimitTempService;
+    private LimitTempService productBuyLimitTempService;
     @Autowired
     private UserCapaService userCapaService;
     @Autowired

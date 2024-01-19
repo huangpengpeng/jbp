@@ -3,7 +3,6 @@ package com.jbp.common.model.agent;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
-import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.LongListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,13 +18,13 @@ import java.util.stream.Collectors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "eb_product_limit_temp", autoResultMap = true)
-@ApiModel(value="ProductLimitTemp对象", description="商品购买限制模版")
-public class ProductLimitTemp extends BaseModel {
+@TableName(value = "eb_limit_temp", autoResultMap = true)
+@ApiModel(value="LimitTemp对象", description="限制模版")
+public class LimitTemp extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    public ProductLimitTemp(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList) {
+    public LimitTemp(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList) {
         this.name = name;
         this.type = type;
         this.capaIdList = capaIdList;
@@ -53,7 +51,7 @@ public class ProductLimitTemp extends BaseModel {
     @ApiModelProperty(value = "模版名称")
     private String name;
 
-    @ApiModelProperty(value = "显示  购买")
+    @ApiModelProperty(value = "商品显示  商品购买  装修显示")
     private String type;
 
     @ApiModelProperty(value = "自己等级ID")
@@ -93,6 +91,9 @@ public class ProductLimitTemp extends BaseModel {
     @ApiModelProperty(value = "服务上级星级")
     @TableField(typeHandler = LongListHandler.class)
     private List<Long> rCapaXsIdList;
+
+    @ApiModelProperty(value = "说明")
+    private String  desc;
 
 
     public Boolean check(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList,
