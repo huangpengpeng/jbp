@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -26,13 +28,15 @@ import javax.annotation.Resource;
 public class LimitTempController {
     @Resource
     private LimitTempService limitTempService;
-    @PreAuthorize("hasAuthority('agent:limit:page')")
+
+    @PreAuthorize("hasAuthority('agent:limit:temp:page')")
     @ApiOperation(value = "限制模版等级列表")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(limitTempService.pageList(request.getName(), request.getType(), pageParamRequest)));
     }
-    @PreAuthorize("hasAuthority('agent:limit:add')")
+
+    @PreAuthorize("hasAuthority('agent:limit:temp:add')")
     @ApiOperation("添加")
     @PostMapping("/add")
     public CommonResult add(@RequestBody LimitTempAddRequest request) {
@@ -44,7 +48,7 @@ public class LimitTempController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:limit:update')")
+    @PreAuthorize("hasAuthority('agent:limit:temp:update')")
     @ApiOperation("修改")
     @PostMapping("/update")
     public CommonResult update(@RequestBody LimitTempEditRequest request) {
@@ -56,10 +60,21 @@ public class LimitTempController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:limit:details')")
+    @PreAuthorize("hasAuthority('agent:limit:temp:details')")
     @ApiOperation("详情")
     @GetMapping("/details/{id}")
     public CommonResult<LimitTempResponse> details(@PathVariable("id") Integer id) {
         return CommonResult.success(limitTempService.details(id));
     }
+
+    @GetMapping("/type")
+    @ApiOperation("状态列表")
+    public CommonResult<List<String>> typeList() {
+        List<String> list=new ArrayList<>();
+        list.add("商品显示");
+        list.add("商品购买");
+        list.add("装修显示");
+        return CommonResult.success(list);
+    }
+
 }
