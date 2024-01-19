@@ -26,17 +26,16 @@ import javax.annotation.Resource;
 public class LimitTempController {
     @Resource
     private LimitTempService limitTempService;
-
-    @PreAuthorize("hasAuthority('agent:limit:temp')")
+    @PreAuthorize("hasAuthority('agent:limit:page')")
     @ApiOperation(value = "限制模版等级列表")
     @GetMapping(value = "/page")
-    private CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(limitTempService.pageList(request.getName(), request.getType(), pageParamRequest)));
     }
-
+    @PreAuthorize("hasAuthority('agent:limit:add')")
     @ApiOperation("添加")
     @PostMapping("/add")
-    private CommonResult add(@RequestBody LimitTempAddRequest request) {
+    public CommonResult add(@RequestBody LimitTempAddRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
@@ -48,7 +47,7 @@ public class LimitTempController {
     @PreAuthorize("hasAuthority('agent:limit:update')")
     @ApiOperation("修改")
     @PostMapping("/update")
-    private CommonResult update(@RequestBody LimitTempEditRequest request) {
+    public CommonResult update(@RequestBody LimitTempEditRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
@@ -60,7 +59,7 @@ public class LimitTempController {
     @PreAuthorize("hasAuthority('agent:limit:details')")
     @ApiOperation("详情")
     @GetMapping("/details/{id}")
-    private CommonResult<LimitTempResponse> details(@PathVariable("id") Integer id) {
+    public CommonResult<LimitTempResponse> details(@PathVariable("id") Integer id) {
         return CommonResult.success(limitTempService.details(id));
     }
 }
