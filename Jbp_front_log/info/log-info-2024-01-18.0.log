@@ -1,0 +1,65 @@
+2024-01-18 16:10:48.667 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on MECHREV with PID 22340 (E:\杭州公司\新建文件夹\t\jbp\jbp-front\target\classes started by 30831 in E:\杭州公司\新建文件夹\t\jbp)
+2024-01-18 16:10:48.668 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-01-18 16:10:50.136 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-01-18 16:10:50.138 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-01-18 16:10:50.168 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18ms. Found 0 Redis repository interfaces.
+2024-01-18 16:10:51.155 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-01-18 16:10:51.165 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-01-18 16:10:51.165 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-18 16:10:51.165 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-01-18 16:10:51.463 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-01-18 16:10:51.468 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-01-18 16:10:51.469 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 2753 ms
+2024-01-18 16:11:04.559 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-01-18 16:11:05.628 [redisson-netty-2-14] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-01-18 16:11:05.648 [redisson-netty-2-19] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-01-18 16:11:09.594 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-01-18 16:11:09.598 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-01-18 16:11:09.600 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-01-18 16:11:09.613 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@493968a9, ORIGINAL=[Ljava.lang.String;@32428874, PIC_CLICK=[Ljava.lang.String;@3c65f00e]
+2024-01-18 16:11:09.613 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-01-18 16:11:09.655 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-01-18 16:11:09.703 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@13d5606c, ORIGINAL=[Ljava.lang.String;@6bf54260, PIC_CLICK=[Ljava.lang.String;@7165bde6]
+2024-01-18 16:11:09.703 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-01-18 16:11:09.726 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-01-18 16:11:19.312 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-01-18 16:11:19.524 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@70e8c019, org.springframework.security.web.context.SecurityContextPersistenceFilter@5f26cb8b, org.springframework.security.web.header.HeaderWriterFilter@75ef1392, org.springframework.security.web.authentication.logout.LogoutFilter@22e95960, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6a8da5c5, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@72a61e61, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2a79da3a, org.springframework.security.web.session.SessionManagementFilter@77925f76, org.springframework.security.web.access.ExceptionTranslationFilter@4693d24f, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@2ee5c08d]
+2024-01-18 16:11:19.543 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-01-18 16:11:19.562 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-01-18 16:11:19.563 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-01-18 16:11:20.235 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-01-18 16:11:20.248 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-01-18 16:11:20.280 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-18 16:11:20.461 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-01-18 16:11:20.508 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-01-18 16:11:20.532 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-01-18 16:11:20.648 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-01-18 16:11:20.655 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-01-18 16:11:20.764 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-01-18 16:11:20.796 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-01-18 16:11:20.842 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-01-18 16:11:20.878 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-01-18 16:11:20.913 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-01-18 16:11:20.917 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-01-18 16:11:21.020 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-01-18 16:11:21.024 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-01-18 16:11:21.028 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-01-18 16:11:21.030 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-01-18 16:11:21.035 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-01-18 16:11:21.036 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-01-18 16:11:21.072 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-01-18 16:11:21.075 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-01-18 16:11:21.116 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-01-18 16:11:21.126 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-01-18 16:11:21.138 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-18 16:11:21.150 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-01-18 16:11:21.168 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-01-18 16:11:21.171 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 33.1 seconds (JVM running for 34.077)
+2024-01-18 16:11:21.327 [RMI TCP Connection(17)-26.26.26.1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-01-18 16:11:21.327 [RMI TCP Connection(17)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-01-18 16:11:21.341 [RMI TCP Connection(17)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 14 ms
+2024-01-18 16:11:21.370 [RMI TCP Connection(18)-26.26.26.1] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-01-18 17:02:06.965 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-18 17:02:07.023 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-18 17:02:07.024 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed

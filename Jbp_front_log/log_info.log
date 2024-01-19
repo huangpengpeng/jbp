@@ -1,65 +1,218 @@
-2024-01-18 16:10:48.667 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on MECHREV with PID 22340 (E:\杭州公司\新建文件夹\t\jbp\jbp-front\target\classes started by 30831 in E:\杭州公司\新建文件夹\t\jbp)
-2024-01-18 16:10:48.668 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
-2024-01-18 16:10:50.136 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
-2024-01-18 16:10:50.138 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-2024-01-18 16:10:50.168 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18ms. Found 0 Redis repository interfaces.
-2024-01-18 16:10:51.155 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
-2024-01-18 16:10:51.165 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
-2024-01-18 16:10:51.165 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
-2024-01-18 16:10:51.165 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
-2024-01-18 16:10:51.463 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
-2024-01-18 16:10:51.468 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2024-01-18 16:10:51.469 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 2753 ms
-2024-01-18 16:11:04.559 [main] INFO  org.redisson.Version - Redisson 3.14.1
-2024-01-18 16:11:05.628 [redisson-netty-2-14] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
-2024-01-18 16:11:05.648 [redisson-netty-2-19] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
-2024-01-18 16:11:09.594 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+2024-01-19 14:48:51.872 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on MECHREV with PID 25916 (E:\杭州公司\新建文件夹\t\jbp\jbp-front\target\classes started by 30831 in E:\杭州公司\新建文件夹\t\jbp)
+2024-01-19 14:48:51.876 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-01-19 14:48:54.229 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on MECHREV with PID 29472 (E:\杭州公司\新建文件夹\t\jbp\jbp-front\target\classes started by 30831 in E:\杭州公司\新建文件夹\t\jbp)
+2024-01-19 14:48:54.231 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-01-19 14:48:54.322 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-01-19 14:48:54.325 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-01-19 14:48:54.363 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 22ms. Found 0 Redis repository interfaces.
+2024-01-19 14:48:55.505 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-01-19 14:48:55.513 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:48:55.514 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-19 14:48:55.514 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-01-19 14:48:55.786 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-01-19 14:48:55.791 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-01-19 14:48:55.791 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 3836 ms
+2024-01-19 14:48:56.168 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-01-19 14:48:56.172 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-01-19 14:48:56.230 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 39ms. Found 0 Redis repository interfaces.
+2024-01-19 14:48:57.555 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-01-19 14:48:57.580 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:48:57.582 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-19 14:48:57.583 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-01-19 14:48:58.176 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-01-19 14:48:58.182 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-01-19 14:48:58.183 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 3896 ms
+2024-01-19 14:49:08.163 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-01-19 14:49:10.749 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-01-19 14:49:11.301 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-01-19 14:49:12.666 [redisson-netty-2-13] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-01-19 14:49:12.691 [redisson-netty-2-19] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-01-19 14:49:13.886 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-01-19 14:49:15.373 [redisson-netty-2-13] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-01-19 14:49:15.408 [redisson-netty-2-19] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-01-19 14:49:15.410 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
 AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
-2024-01-18 16:11:09.598 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
-2024-01-18 16:11:09.600 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
-2024-01-18 16:11:09.613 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@493968a9, ORIGINAL=[Ljava.lang.String;@32428874, PIC_CLICK=[Ljava.lang.String;@3c65f00e]
-2024-01-18 16:11:09.613 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
-2024-01-18 16:11:09.655 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
-2024-01-18 16:11:09.703 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@13d5606c, ORIGINAL=[Ljava.lang.String;@6bf54260, PIC_CLICK=[Ljava.lang.String;@7165bde6]
-2024-01-18 16:11:09.703 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
-2024-01-18 16:11:09.726 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
-2024-01-18 16:11:19.312 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
-2024-01-18 16:11:19.524 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@70e8c019, org.springframework.security.web.context.SecurityContextPersistenceFilter@5f26cb8b, org.springframework.security.web.header.HeaderWriterFilter@75ef1392, org.springframework.security.web.authentication.logout.LogoutFilter@22e95960, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6a8da5c5, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@72a61e61, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2a79da3a, org.springframework.security.web.session.SessionManagementFilter@77925f76, org.springframework.security.web.access.ExceptionTranslationFilter@4693d24f, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@2ee5c08d]
-2024-01-18 16:11:19.543 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
-2024-01-18 16:11:19.562 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
-2024-01-18 16:11:19.563 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
-2024-01-18 16:11:20.235 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
-2024-01-18 16:11:20.248 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
-2024-01-18 16:11:20.280 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
-2024-01-18 16:11:20.461 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
-2024-01-18 16:11:20.508 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
-2024-01-18 16:11:20.532 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
-2024-01-18 16:11:20.648 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
-2024-01-18 16:11:20.655 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
-2024-01-18 16:11:20.764 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
-2024-01-18 16:11:20.796 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
-2024-01-18 16:11:20.842 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
-2024-01-18 16:11:20.878 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
-2024-01-18 16:11:20.913 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
-2024-01-18 16:11:20.917 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
-2024-01-18 16:11:21.020 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
-2024-01-18 16:11:21.024 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
-2024-01-18 16:11:21.028 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
-2024-01-18 16:11:21.030 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
-2024-01-18 16:11:21.035 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
-2024-01-18 16:11:21.036 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
-2024-01-18 16:11:21.072 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
-2024-01-18 16:11:21.075 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
-2024-01-18 16:11:21.116 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
-2024-01-18 16:11:21.126 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
-2024-01-18 16:11:21.138 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
-2024-01-18 16:11:21.150 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
-2024-01-18 16:11:21.168 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
-2024-01-18 16:11:21.171 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 33.1 seconds (JVM running for 34.077)
-2024-01-18 16:11:21.327 [RMI TCP Connection(17)-26.26.26.1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2024-01-18 16:11:21.327 [RMI TCP Connection(17)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2024-01-18 16:11:21.341 [RMI TCP Connection(17)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 14 ms
-2024-01-18 16:11:21.370 [RMI TCP Connection(18)-26.26.26.1] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
-2024-01-18 17:02:06.965 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
-2024-01-18 17:02:07.023 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
-2024-01-18 17:02:07.024 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-01-19 14:49:15.415 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-01-19 14:49:15.419 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-01-19 14:49:15.704 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@5d6d424d, ORIGINAL=[Ljava.lang.String;@391b01c5, PIC_CLICK=[Ljava.lang.String;@6e78177b]
+2024-01-19 14:49:15.704 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-01-19 14:49:16.180 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-01-19 14:49:16.243 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@195cbf5e, ORIGINAL=[Ljava.lang.String;@4cb82b09, PIC_CLICK=[Ljava.lang.String;@49665f92]
+2024-01-19 14:49:16.243 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-01-19 14:49:16.278 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-01-19 14:49:17.655 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-01-19 14:49:17.661 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-01-19 14:49:17.665 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-01-19 14:49:17.681 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@6fd07a56, ORIGINAL=[Ljava.lang.String;@1315befe, PIC_CLICK=[Ljava.lang.String;@45649467]
+2024-01-19 14:49:17.681 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-01-19 14:49:17.741 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-01-19 14:49:17.769 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@e30a8ef, ORIGINAL=[Ljava.lang.String;@2ffaa711, PIC_CLICK=[Ljava.lang.String;@3abb6aa]
+2024-01-19 14:49:17.769 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-01-19 14:49:17.792 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-01-19 14:49:23.979 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-01-19 14:49:24.300 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@60abe420, org.springframework.security.web.context.SecurityContextPersistenceFilter@33acec5e, org.springframework.security.web.header.HeaderWriterFilter@5bbaaf17, org.springframework.security.web.authentication.logout.LogoutFilter@5cc85ffc, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6edd8d56, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@30dabb23, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@21e60eed, org.springframework.security.web.session.SessionManagementFilter@79ef8115, org.springframework.security.web.access.ExceptionTranslationFilter@52811dc1, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@5014ccf9]
+2024-01-19 14:49:24.322 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-01-19 14:49:24.354 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-01-19 14:49:24.355 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-01-19 14:49:25.062 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-01-19 14:49:25.120 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-01-19 14:49:25.184 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-19 14:49:25.653 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-01-19 14:49:25.710 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-01-19 14:49:25.736 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-01-19 14:49:25.878 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-01-19 14:49:25.885 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-01-19 14:49:26.001 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-01-19 14:49:26.040 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-01-19 14:49:26.108 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-01-19 14:49:26.151 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-01-19 14:49:26.196 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-01-19 14:49:26.201 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-01-19 14:49:26.323 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-01-19 14:49:26.328 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-01-19 14:49:26.334 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-01-19 14:49:26.335 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-01-19 14:49:26.342 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-01-19 14:49:26.344 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-01-19 14:49:26.390 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-01-19 14:49:26.394 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-01-19 14:49:26.440 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-01-19 14:49:26.450 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-01-19 14:49:26.512 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-19 14:49:26.527 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:49:26.553 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-01-19 14:49:26.557 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 33.069 seconds (JVM running for 34.191)
+2024-01-19 14:49:27.243 [RMI TCP Connection(38)-26.26.26.1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-01-19 14:49:27.243 [RMI TCP Connection(38)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-01-19 14:49:27.259 [RMI TCP Connection(38)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 16 ms
+2024-01-19 14:49:31.203 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-01-19 14:49:31.497 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@58fbfefb, org.springframework.security.web.context.SecurityContextPersistenceFilter@5a010eec, org.springframework.security.web.header.HeaderWriterFilter@4423692a, org.springframework.security.web.authentication.logout.LogoutFilter@10b5ff4d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@180e33b0, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@468646ea, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1db9c2cf, org.springframework.security.web.session.SessionManagementFilter@2fe2fcc2, org.springframework.security.web.access.ExceptionTranslationFilter@25fcdcc6, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@48da5106]
+2024-01-19 14:49:31.516 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-01-19 14:49:31.539 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-01-19 14:49:31.540 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-01-19 14:49:32.170 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-01-19 14:49:32.183 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-01-19 14:49:32.213 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-19 14:49:32.382 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-01-19 14:49:32.424 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-01-19 14:49:32.445 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-01-19 14:49:32.552 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-01-19 14:49:32.558 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-01-19 14:49:32.652 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-01-19 14:49:32.682 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-01-19 14:49:32.728 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-01-19 14:49:32.779 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-01-19 14:49:32.821 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-01-19 14:49:32.826 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-01-19 14:49:32.930 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-01-19 14:49:32.933 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-01-19 14:49:32.938 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-01-19 14:49:32.939 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-01-19 14:49:32.944 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-01-19 14:49:32.945 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-01-19 14:49:32.982 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-01-19 14:49:32.985 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-01-19 14:49:33.024 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-01-19 14:49:33.033 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-01-19 14:49:33.047 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-19 14:49:33.059 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:49:33.256 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:49:33.256 [main] INFO  org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2024-01-19 14:49:33.261 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:49:33.262 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Destroying ProtocolHandler ["http-nio-8182"]
+2024-01-19 14:49:33.357 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-19 14:49:33.404 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-19 14:49:33.433 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-01-19 14:49:34.545 [http-nio-8182-exec-2] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：13469900 ns，cost：13 ms
+2024-01-19 14:49:34.935 [http-nio-8182-exec-3] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：407117900 ns，cost：407 ms
+2024-01-19 14:49:34.997 [http-nio-8182-exec-1] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：468875900 ns，cost：468 ms
+2024-01-19 14:49:35.027 [http-nio-8182-exec-6] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：459067600 ns，cost：459 ms
+2024-01-19 14:49:35.275 [http-nio-8182-exec-5] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexInfo()，prams：[]，cost time：725180900 ns，cost：725 ms
+2024-01-19 14:49:35.296 [http-nio-8182-exec-4] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.PageDiyController.info(Integer)，prams：[0]，cost time：734776300 ns，cost：734 ms
+2024-01-19 14:49:35.507 [http-nio-8182-exec-7] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexSeckillInfo()，prams：[]，cost time：117837100 ns，cost：117 ms
+2024-01-19 14:49:44.464 [http-nio-8182-exec-8] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：32900 ns，cost：0 ms
+2024-01-19 14:49:44.562 [http-nio-8182-exec-9] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：60312200 ns，cost：60 ms
+2024-01-19 14:49:48.591 [http-nio-8182-exec-17] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：49900 ns，cost：0 ms
+2024-01-19 14:49:48.622 [http-nio-8182-exec-12] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：31110900 ns，cost：31 ms
+2024-01-19 14:49:48.623 [http-nio-8182-exec-10] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：33158200 ns，cost：33 ms
+2024-01-19 14:49:48.931 [http-nio-8182-exec-15] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：65072800 ns，cost：65 ms
+2024-01-19 14:49:49.107 [http-nio-8182-exec-21] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexInfo()，prams：[]，cost time：258578300 ns，cost：258 ms
+2024-01-19 14:49:49.135 [http-nio-8182-exec-13] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.PageDiyController.info(Integer)，prams：[0]，cost time：287822600 ns，cost：287 ms
+2024-01-19 14:49:49.500 [http-nio-8182-exec-25] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：29200 ns，cost：0 ms
+2024-01-19 14:49:49.530 [http-nio-8182-exec-16] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：30189500 ns，cost：30 ms
+2024-01-19 14:49:49.530 [http-nio-8182-exec-26] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：29176100 ns，cost：29 ms
+2024-01-19 14:49:49.807 [http-nio-8182-exec-20] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：57216100 ns，cost：57 ms
+2024-01-19 14:49:49.999 [http-nio-8182-exec-14] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexInfo()，prams：[]，cost time：263029900 ns，cost：263 ms
+2024-01-19 14:49:50.140 [http-nio-8182-exec-27] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.PageDiyController.info(Integer)，prams：[0]，cost time：404988900 ns，cost：404 ms
+2024-01-19 14:49:50.312 [http-nio-8182-exec-22] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexSeckillInfo()，prams：[]，cost time：88763600 ns，cost：88 ms
+2024-01-19 14:49:52.033 [http-nio-8182-exec-23] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：21100 ns，cost：0 ms
+2024-01-19 14:49:52.145 [http-nio-8182-exec-24] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：57892900 ns，cost：57 ms
+2024-01-19 14:49:57.560 [http-nio-8182-exec-29] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：47800 ns，cost：0 ms
+2024-01-19 14:49:57.588 [http-nio-8182-exec-28] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：30562500 ns，cost：30 ms
+2024-01-19 14:49:57.590 [http-nio-8182-exec-30] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：27484900 ns，cost：27 ms
+2024-01-19 14:49:57.766 [http-nio-8182-exec-3] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：20900 ns，cost：0 ms
+2024-01-19 14:49:57.794 [http-nio-8182-exec-2] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：31397900 ns，cost：31 ms
+2024-01-19 14:49:57.797 [http-nio-8182-exec-1] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：28259800 ns，cost：28 ms
+2024-01-19 14:49:57.931 [http-nio-8182-exec-9] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：58241400 ns，cost：58 ms
+2024-01-19 14:49:58.154 [http-nio-8182-exec-5] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexInfo()，prams：[]，cost time：287547200 ns，cost：287 ms
+2024-01-19 14:49:58.316 [http-nio-8182-exec-7] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.PageDiyController.info(Integer)，prams：[0]，cost time：449636900 ns，cost：449 ms
+2024-01-19 14:49:58.465 [http-nio-8182-exec-12] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexSeckillInfo()，prams：[]，cost time：84339200 ns，cost：84 ms
+2024-01-19 14:49:59.467 [http-nio-8182-exec-10] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：22800 ns，cost：0 ms
+2024-01-19 14:49:59.548 [http-nio-8182-exec-21] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：55380300 ns，cost：55 ms
+2024-01-19 14:49:59.636 [http-nio-8182-exec-13] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.CityController.getList(CitySearchRequest)，prams：[CitySearchRequest(regionType=null, parentId=null)]，cost time：39579100 ns，cost：39 ms
+2024-01-19 14:50:02.348 [http-nio-8182-exec-16] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：30278700 ns，cost：30 ms
+2024-01-19 14:50:02.571 [http-nio-8182-exec-26] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@19984e3d, com.jbp.common.wrapper.ContentCachingRequestWrapper@73546dec]，cost time：168734000 ns，cost：168 ms
+2024-01-19 14:50:51.260 [http-nio-8182-exec-18] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：21200 ns，cost：0 ms
+2024-01-19 14:50:51.289 [http-nio-8182-exec-11] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：28926100 ns，cost：28 ms
+2024-01-19 14:50:51.290 [http-nio-8182-exec-19] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：27248000 ns，cost：27 ms
+2024-01-19 14:50:51.328 [http-nio-8182-exec-30] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：24600 ns，cost：0 ms
+2024-01-19 14:50:51.376 [http-nio-8182-exec-3] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.CityController.getList(CitySearchRequest)，prams：[CitySearchRequest(regionType=null, parentId=null)]，cost time：30937500 ns，cost：30 ms
+2024-01-19 14:50:51.466 [http-nio-8182-exec-2] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：57605200 ns，cost：57 ms
+2024-01-19 14:50:54.506 [http-nio-8182-exec-9] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：30438500 ns，cost：30 ms
+2024-01-19 14:50:54.521 [http-nio-8182-exec-8] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@55ec9976, com.jbp.common.wrapper.ContentCachingRequestWrapper@3c62b9c1]，cost time：45193900 ns，cost：45 ms
+2024-01-19 14:50:59.423 [http-nio-8182-exec-25] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：20500 ns，cost：0 ms
+2024-01-19 14:50:59.454 [http-nio-8182-exec-16] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：27495400 ns，cost：27 ms
+2024-01-19 14:50:59.455 [http-nio-8182-exec-26] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：29131400 ns，cost：29 ms
+2024-01-19 14:50:59.515 [http-nio-8182-exec-20] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：19100 ns，cost：0 ms
+2024-01-19 14:50:59.635 [http-nio-8182-exec-27] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：58816900 ns，cost：58 ms
+2024-01-19 14:51:02.763 [http-nio-8182-exec-18] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：28710700 ns，cost：28 ms
+2024-01-19 14:51:02.772 [http-nio-8182-exec-19] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@3d32b25b, com.jbp.common.wrapper.ContentCachingRequestWrapper@21ff82e2]，cost time：32835300 ns，cost：32 ms
+2024-01-19 14:51:20.313 [http-nio-8182-exec-28] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@7f708eef, com.jbp.common.wrapper.ContentCachingRequestWrapper@7dcc4121]，cost time：29705700 ns，cost：29 ms
+2024-01-19 14:51:20.340 [http-nio-8182-exec-30] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：29526600 ns，cost：29 ms
+2024-01-19 14:51:29.450 [http-nio-8182-exec-8] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：39200 ns，cost：0 ms
+2024-01-19 14:51:29.458 [http-nio-8182-exec-5] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：102800 ns，cost：0 ms
+2024-01-19 14:51:29.481 [http-nio-8182-exec-9] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：30885800 ns，cost：30 ms
+2024-01-19 14:51:29.481 [http-nio-8182-exec-17] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：30800800 ns，cost：30 ms
+2024-01-19 14:51:29.509 [http-nio-8182-exec-7] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.CityController.getList(CitySearchRequest)，prams：[CitySearchRequest(regionType=null, parentId=null)]，cost time：46579500 ns，cost：46 ms
+2024-01-19 14:51:29.542 [http-nio-8182-exec-15] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：59453300 ns，cost：59 ms
+2024-01-19 14:51:34.268 [http-nio-8182-exec-21] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：39989800 ns，cost：39 ms
+2024-01-19 14:51:34.269 [http-nio-8182-exec-13] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@6cfc665b, com.jbp.common.wrapper.ContentCachingRequestWrapper@1a9c2f9a]，cost time：37805500 ns，cost：37 ms
+2024-01-19 14:51:52.600 [http-nio-8182-exec-26] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@7848c052, com.jbp.common.wrapper.ContentCachingRequestWrapper@1be04c0e]，cost time：30610100 ns，cost：30 ms
+2024-01-19 14:51:52.605 [http-nio-8182-exec-20] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：33299400 ns，cost：33 ms
+2024-01-19 14:52:03.332 [http-nio-8182-exec-5] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：67794900 ns，cost：67 ms
+2024-01-19 14:52:03.531 [http-nio-8182-exec-29] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexInfo()，prams：[]，cost time：276559800 ns，cost：276 ms
+2024-01-19 14:52:03.602 [http-nio-8182-exec-6] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.PageDiyController.info(Integer)，prams：[0]，cost time：346376700 ns，cost：346 ms
+2024-01-19 14:52:03.775 [http-nio-8182-exec-17] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexSeckillInfo()，prams：[]，cost time：93859600 ns，cost：93 ms
+2024-01-19 14:53:04.685 [http-nio-8182-exec-20] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：ResponseModel com.jbp.front.controller.SafetyController.get(CaptchaVO,HttpServletRequest)，prams：[com.jbp.common.captcha.model.vo.CaptchaVO@1b3ccf0c, com.jbp.common.wrapper.ContentCachingRequestWrapper@7424ac17]，cost time：30039000 ns，cost：30 ms
+2024-01-19 14:53:04.727 [http-nio-8182-exec-14] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：70793800 ns，cost：70 ms
+2024-01-19 15:24:39.502 [http-nio-8182-exec-22] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.accountList(LoginMobileRequest)，prams：[LoginMobileRequest(account=null, phone=15257449029, captcha=123212, spreadPid=null)]，cost time：709119800 ns，cost：709 ms
+2024-01-19 15:24:40.333 [http-nio-8182-exec-27] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.phoneCaptchaLogin(LoginMobileRequest)，prams：[LoginMobileRequest(account=15257449029, phone=15257449029, captcha=123212, spreadPid=null)]，cost time：814249400 ns，cost：814 ms
+2024-01-19 15:24:40.449 [http-nio-8182-exec-11] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：10162600 ns，cost：10 ms
+2024-01-19 15:24:40.621 [http-nio-8182-exec-6] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：152133400 ns，cost：152 ms
+2024-01-19 15:24:40.930 [http-nio-8182-exec-8] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.UserCenterController.getUserCenterInfo()，prams：[]，cost time：479528100 ns，cost：479 ms
+2024-01-19 15:24:42.634 [http-nio-8182-exec-29] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.UserCenterController.getUserCenterOrderNum()，prams：[]，cost time：2168936600 ns，cost：2168 ms
+2024-01-19 15:24:48.129 [http-nio-8182-exec-4] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：390800 ns，cost：0 ms
+2024-01-19 15:24:48.160 [http-nio-8182-exec-10] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getColorConfig()，prams：[]，cost time：29062000 ns，cost：29 ms
+2024-01-19 15:24:48.162 [http-nio-8182-exec-9] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.getLoginConfig()，prams：[]，cost time：33170800 ns，cost：33 ms
+2024-01-19 15:24:48.372 [http-nio-8182-exec-26] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：57401700 ns，cost：57 ms
+2024-01-19 15:24:48.567 [http-nio-8182-exec-25] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexInfo()，prams：[]，cost time：263295100 ns，cost：263 ms
+2024-01-19 15:24:48.663 [http-nio-8182-exec-21] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.PageDiyController.info(Integer)，prams：[0]，cost time：360411000 ns，cost：360 ms
+2024-01-19 15:24:48.831 [http-nio-8182-exec-14] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getIndexSeckillInfo()，prams：[]，cost time：90263400 ns，cost：90 ms
+2024-01-19 15:24:52.988 [http-nio-8182-exec-23] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.LoginController.tokenIsExist()，prams：[]，cost time：411300 ns，cost：0 ms
+2024-01-19 15:24:53.072 [http-nio-8182-exec-22] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.IndexController.getBottomNavigation()，prams：[]，cost time：57007200 ns，cost：57 ms
+2024-01-19 15:24:53.171 [http-nio-8182-exec-19] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.UserCenterController.getUserCenterOrderNum()，prams：[]，cost time：172633500 ns，cost：172 ms
+2024-01-19 15:24:53.238 [http-nio-8182-exec-24] INFO  com.jbp.front.aspect.ControllerAspect - Controller method：CommonResult com.jbp.front.controller.UserCenterController.getUserCenterInfo()，prams：[]，cost time：240707100 ns，cost：240 ms
+2024-01-19 15:29:34.234 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-19 15:29:34.296 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-19 15:29:34.300 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed

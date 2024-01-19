@@ -24,7 +24,7 @@ public class LimitTemp extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    public LimitTemp(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList) {
+    public LimitTemp(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList,String description) {
         this.name = name;
         this.type = type;
         this.capaIdList = capaIdList;
@@ -37,6 +37,7 @@ public class LimitTemp extends BaseModel {
         this.hasRelation = hasRelation;
         this.rCapaIdList = rCapaIdList;
         this.rCapaXsIdList = rCapaXsIdList;
+        this.description=description;
     }
 
     public void init(){
@@ -49,51 +50,56 @@ public class LimitTemp extends BaseModel {
     }
 
     @ApiModelProperty(value = "模版名称")
+    @TableField("name")
     private String name;
 
     @ApiModelProperty(value = "商品显示  商品购买  装修显示")
+    @TableField("type")
     private String type;
 
     @ApiModelProperty(value = "自己等级ID")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "capaIdList",typeHandler = LongListHandler.class)
     private List<Long> capaIdList;
 
     @ApiModelProperty(value = "自己星级ID")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "capaXsIdList",typeHandler = LongListHandler.class)
     private List<Long> capaXsIdList;
 
     @ApiModelProperty(value = "白名单ID")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "whiteIdList",typeHandler = LongListHandler.class)
     private List<Long> whiteIdList;
 
     @ApiModelProperty(value = "团队ID")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "teamIdList",typeHandler = LongListHandler.class)
     private List<Long> teamIdList;
 
     @ApiModelProperty(value = "要求必须有上级")
+    @TableField("has_partner")
     private Boolean  hasPartner;
 
     @ApiModelProperty(value = "上级等级")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "pCapaIdList",typeHandler = LongListHandler.class)
     private List<Long> pCapaIdList;
 
     @ApiModelProperty(value = "上级星级")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "pCapaXsIdList",typeHandler = LongListHandler.class)
     private List<Long> pCapaXsIdList;
 
     @ApiModelProperty(value = "要求必须有服务上级")
+    @TableField(value = "has_relation")
     private Boolean  hasRelation;
 
     @ApiModelProperty(value = "服务上级等级")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "rCapaIdList",typeHandler = LongListHandler.class)
     private List<Long> rCapaIdList;
 
     @ApiModelProperty(value = "服务上级星级")
-    @TableField(typeHandler = LongListHandler.class)
+    @TableField(value = "rCapaXsIdList",typeHandler = LongListHandler.class)
     private List<Long> rCapaXsIdList;
 
     @ApiModelProperty(value = "说明")
-    private String  desc;
+    @TableField(value = "description")
+    private String  description;
 
 
     public Boolean check(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList,
