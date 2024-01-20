@@ -9764,3 +9764,23 @@
 2024-01-20 16:37:02.073 [task-executor-14] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Sat Jan 20 16:37:02 CST 2024
 2024-01-20 16:37:02.074 [task-executor-14] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
 2024-01-20 16:37:02.074 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：1毫秒
+2024-01-20 16:38:00.461 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-20 16:38:00.461 [task-executor-15] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Sat Jan 20 16:38:00 CST 2024
+2024-01-20 16:38:00.494 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：33毫秒
+2024-01-20 16:38:01.257 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-20 16:38:01.257 [task-executor-16] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Sat Jan 20 16:38:01 CST 2024
+2024-01-20 16:38:01.258 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-20 16:38:01.258 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-20 16:38:02.046 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-20 16:38:02.046 [task-executor-17] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Sat Jan 20 16:38:02 CST 2024
+2024-01-20 16:38:02.046 [task-executor-17] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-20 16:38:02.046 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：0毫秒
+2024-01-20 16:38:02.471 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-01-20 16:38:02.483 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'jmReportTaskExecutor'
+2024-01-20 16:38:02.485 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-20 16:38:02.491 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
+2024-01-20 16:38:02.492 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2024-01-20 16:38:02.492 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-01-20 16:38:02.492 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2024-01-20 16:38:02.511 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-20 16:38:02.514 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
