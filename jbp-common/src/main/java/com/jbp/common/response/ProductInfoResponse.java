@@ -1,5 +1,7 @@
 package com.jbp.common.response;
 
+import com.jbp.common.model.product.ProductAttr;
+import com.jbp.common.vo.CouponSimpleVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,11 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
-
-import com.jbp.common.model.product.ProductAttr;
-import com.jbp.common.vo.CouponSimpleVo;
 
 /**
  * 商品详情响应对象
@@ -28,7 +26,7 @@ import com.jbp.common.vo.CouponSimpleVo;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="StoreProductInfoResponse对象", description="商品详情响应对象")
+@ApiModel(value = "StoreProductInfoResponse对象", description = "商品详情响应对象")
 public class ProductInfoResponse implements Serializable {
 
     private static final long serialVersionUID = 9215241889318610262L;
@@ -101,4 +99,9 @@ public class ProductInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "是否单独分佣")
     private Boolean isSub;
+    @ApiModelProperty(value = "购买限制模版ID")
+    private Long buyLimitTempId;
+
+    @ApiModelProperty(value = "显示限制模版ID")
+    private Long showLimitTempId;
 }
