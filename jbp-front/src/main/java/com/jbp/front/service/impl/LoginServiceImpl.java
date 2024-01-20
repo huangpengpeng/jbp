@@ -162,7 +162,7 @@ public class LoginServiceImpl implements LoginService {
             if(BooleanUtils.isNotTrue(defaultRegister)){
                 throw new CrmebException("当前手机号未注册请先申请账号");
             }
-            User user = userService.registerPhone(loginRequest.getPhone(), spreadPid);
+            User user = userService.registerPhone(loginRequest.getPhone(), loginRequest.getPhone(), spreadPid);
             return getLoginResponse_V1_3(user, true);
         }
         if (userList.size() > 1 && StringUtils.isEmpty(loginRequest.getAccount())) {

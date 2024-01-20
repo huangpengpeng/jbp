@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
@@ -17,21 +18,25 @@ import java.io.Serializable;
 @ApiModel(value = "UserHelpRegisterRequest", description = "帮忙注册")
 public class UserHelpRegisterRequest implements Serializable {
 
-    @ApiModelProperty(value = "username", required = true)
+    @ApiModelProperty(value = "昵称", required = true)
     @NotBlank(message = "昵称不能为空")
     private String username;
 
-    @ApiModelProperty(value = "pAccount", required = true)
+    @ApiModelProperty(value = "手机号", required = true)
+    @NotBlank(message = "手机号不能为空")
+    private String phone;
+
+    @ApiModelProperty(value = "邀请上级", required = true)
     @NotBlank(message = "销售上级不能为空")
     private String pAccount;
 
-    @ApiModelProperty(value = "rAccount", required = true)
+    @ApiModelProperty(value = "服务上级", required = true)
     @NotBlank(message = "服务上级不能为空")
     private String rAccount;
 
     @ApiModelProperty(value = "市场位置", required = true)
-    @NotBlank(message = "请选择市场位置")
-    @Max(value = 1)
-    @Min(value = 0)
-    private int node;
+    @NotNull(message = "市场位置不能为空")
+    @Min(0)
+    @Max(1)
+    private Integer node;
 }

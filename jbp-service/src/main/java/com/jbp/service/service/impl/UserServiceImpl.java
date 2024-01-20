@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -17,7 +16,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
-import com.jbp.common.dto.IpLocation;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.TeamUser;
@@ -39,10 +37,7 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 
-import com.jbp.service.service.agent.CapaService;
-import com.jbp.service.service.agent.CapaXsService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +47,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -126,6 +121,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private TeamService teamService;
     @Resource
     private TeamUserService teamUserService;
+    @Resource
+    private UserInvitationService invitationService;
+    @Resource
+    private UserRelationService relationService;
 
 
     /**
@@ -136,7 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @return User
      */
     @Override
-    public User registerPhone(String phone, Integer spreadUid) {
+    public User registerPhone(String username, String phone, Integer spreadUid) {
         User user = new User();
         user.setAccount(getAccount());
         user.setPwd(CommonUtil.createPwd(phone));
@@ -145,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         user.setPhone(phone);
         user.setRegisterType(UserConstants.REGISTER_TYPE_H5);
-        user.setNickname(CommonUtil.createNickName(phone));
+        user.setNickname(com.jbp.common.utils.StringUtils.filterEmoji(username));
         user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
         Date nowDate = CrmebDateUtil.nowDateTime();
         user.setCreateTime(nowDate);
@@ -153,7 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setLevel(1);
         // 推广人
         user.setSpreadUid(0);
-        if (spreadUid > 0) {
+        if (spreadUid != null && spreadUid > 0) {
             Boolean check = checkBingSpread(user, spreadUid, "new");
             if (check) {
                 user.setSpreadUid(spreadUid);
@@ -174,6 +173,27 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("创建用户失败!");
         }
         return user;
+    }
+
+
+    @Override
+    public User helpRegister(String username, String phone, Integer pid, Integer rId, Integer node) {
+        // 开启事务
+        AtomicReference<User> result = null;
+        Boolean execute = transactionTemplate.execute(e -> {
+            // 注册用户
+            User user = registerPhone(username, phone, 0);
+            // 绑定上级
+            invitationService.band(user.getId(), pid, false, true);
+            // 绑定节点
+            relationService.band(user.getId(), rId, null, node);
+            result.set(user);
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            throw new CrmebException("创建用户失败!");
+        }
+        return result.get();
     }
 
     /**
@@ -352,6 +372,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         UserInfoResponse userInfoResponse = new UserInfoResponse();
         BeanUtils.copyProperties(currentUser, userInfoResponse);
         userInfoResponse.setPhone(CrmebUtil.maskMobile(userInfoResponse.getPhone()));
+        UserCapa userCapa = userCapaService.getByUser(currentUser.getId());
+        if(userCapa != null){
+            userInfoResponse.setCapa(capaService.getById(userCapa.getCapaId()));
+        }
+        UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser.getId());
+        if(userCapaXs != null){
+            userInfoResponse.setCapaXs(capaXsService.getById(userCapaXs.getCapaId()));
+        }
         return userInfoResponse;
     }
 

@@ -22,7 +22,7 @@ public class WalletFlow extends BaseModel {
     private static final long serialVersionUID = 1L;
 
     public static enum OperateEnum {
-        调账, 付款, 兑换, 转账
+        调账, 付款, 兑换, 转账, 提现
     }
 
     public static enum ActionEnum {

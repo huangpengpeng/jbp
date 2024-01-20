@@ -40,6 +40,9 @@ public class User implements Serializable {
     @ApiModelProperty(value = "用户密码")
     private String pwd;
 
+    @ApiModelProperty(value = "交易密码")
+    private String payPwd;
+
     @ApiModelProperty(value = "真实姓名")
     private String realName;
 

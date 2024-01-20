@@ -28,12 +28,18 @@ public class WalletConfig {
     @ApiModelProperty("状态")
     @TableField("status")
     private int status;
+
     @ApiModelProperty("可体现 类型： 0禁用 1：启用 ")
     @TableField("can_withdraw")
     private Boolean canWithdraw;
     @ApiModelProperty("可充值 类型： 0禁用 1：启用 ")
     @TableField("recharge")
+    // can_deposit
     private Boolean recharge;
+
+    // 转账
+    // can_transfer
+
     @ApiModelProperty("兑换目标积分 ")
     @TableField("change_type")
     private int changeType;

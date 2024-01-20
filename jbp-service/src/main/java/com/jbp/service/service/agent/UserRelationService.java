@@ -28,4 +28,9 @@ public interface UserRelationService extends IService<UserRelation> {
      * 存在服务级关系没有层级关系的明细记录列表
      */
     List<UserRelation> getNoFlowList();
+
+    /**
+     * 获取最左边的节点
+     */
+    UserRelation getLeftMost(Integer userId);
 }

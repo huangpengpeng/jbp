@@ -10,6 +10,8 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     UserInvitation getByUser(Integer uId);
 
+    List<UserInvitation> getNextList(Integer uid);
+
     Integer getPid(Integer uId);
 
     List<UserUpperDto> getAllUpper(Integer uId);

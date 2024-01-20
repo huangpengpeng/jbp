@@ -32,7 +32,9 @@ public interface UserService extends IService<User> {
      * @param spreadUid 推广人编号
      * @return User
      */
-    User registerPhone(String phone, Integer spreadUid);
+    User registerPhone(String username, String phone, Integer spreadUid);
+
+    User helpRegister(String username, String phone, Integer pid, Integer rId, Integer node);
 
     /**
      * 根据手机号查询用户 [根据系统配置设置手机号是否唯一]

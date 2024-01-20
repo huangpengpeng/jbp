@@ -1025,7 +1025,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             if (tempIds.isEmpty()) {
                 tempIds.add(-1L);
             }
-            map.put("tempIds", tempIds.stream().map(Objects::toString).collect(Collectors.joining(",")));
+            map.put("showLimitTempIds", tempIds.stream().map(Objects::toString).collect(Collectors.joining(",")));
         }
 
         // 排序部分

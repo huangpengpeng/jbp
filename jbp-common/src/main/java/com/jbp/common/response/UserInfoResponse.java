@@ -2,6 +2,8 @@ package com.jbp.common.response;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.CapaXs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -54,5 +56,13 @@ public class UserInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "性别，0未知，1男，2女，3保密")
     private Integer sex;
+
+    @ApiModelProperty(value = "等级")
+    private Capa capa;
+
+    @ApiModelProperty(value = "星级")
+    private CapaXs capaXs;
+
+
 
 }

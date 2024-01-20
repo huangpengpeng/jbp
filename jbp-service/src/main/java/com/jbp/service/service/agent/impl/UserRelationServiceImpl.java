@@ -3,8 +3,12 @@ package com.jbp.service.service.agent.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.UserRelationDao;
+import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserRelationFlowService;
 import com.jbp.service.service.agent.UserRelationService;
@@ -16,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -30,7 +36,7 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     @Resource
     private UserRelationFlowService userRelationFlowService;
     @Resource
-    private TransactionTemplate transactionTemplate;
+    private RelationScoreService relationScoreService;
 
     @Override
     public UserRelation getByUid(Integer uId) {
@@ -39,7 +45,7 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
 
     @Override
     public Integer getPid(Integer uId) {
-        UserRelation  userRelation = getByUid(uId);
+        UserRelation userRelation = getByUid(uId);
         return userRelation == null ? null : userRelation.getPId();
     }
 
@@ -95,18 +101,44 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         userRelation.setPId(pId);
 
         // 执行更新
-        UserRelation finalUserRelation = userRelation;
-        transactionTemplate.execute(e -> {
-            saveOrUpdate(finalUserRelation);
-            // 删除关系留影
-            userRelationFlowService.clear(uId);
-            return Boolean.TRUE;
-        });
+        saveOrUpdate(userRelation);
+        // 删除关系留影
+        userRelationFlowService.clear(uId);
         return userRelation;
     }
 
     @Override
     public List<UserRelation> getNoFlowList() {
         return dao.getNoFlowList();
+    }
+
+    @Override
+    public UserRelation getLeftMost(Integer userId) {
+        UserRelation userRelation = new UserRelation();
+        // 往下查询大区
+        do {
+            List<UserRelation> nextRelation = getByPid(userId);
+            if (nextRelation.isEmpty()) {
+                userRelation.setPId(userId);
+                userRelation.setNode(0);
+                return userRelation;
+            }
+            // 安置有一个下级
+            if (nextRelation.size() == 1) {
+                userId = nextRelation.get(0).getUId();
+            }
+            // 安置有2个小计 比较业绩大小
+            if (nextRelation.size() == 2) {
+                Map<Integer, UserRelation> map = FunctionUtil.keyValueMap(nextRelation, UserRelation::getNode);
+                // 左
+                RelationScore left = relationScoreService.getByUser(map.get(0).getUId(), map.get(0).getNode());
+                BigDecimal leftScore = left == null ? BigDecimal.ZERO : left.getUsableScore().add(left.getUsedScore());
+                // 右
+                RelationScore right = relationScoreService.getByUser(map.get(1).getUId(), map.get(1).getNode());
+                BigDecimal rightScore = right == null ? BigDecimal.ZERO : right.getUsableScore().add(right.getUsedScore());
+                // 返回大区 继续往下走
+                userId = ArithmeticUtils.gte(leftScore, rightScore) ? left.getUid() : right.getUid();
+            }
+        } while (true);
     }
 }

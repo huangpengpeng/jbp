@@ -1,23 +1,38 @@
 package com.jbp.front.controller;
 
 
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.PasswordRequest;
 import com.jbp.common.request.UserBindingPhoneUpdateRequest;
 import com.jbp.common.request.UserEditInfoRequest;
+import com.jbp.common.request.UserHelpRegisterRequest;
 import com.jbp.common.response.UserInfoResponse;
 import com.jbp.common.response.UserLogoffBeforeResponse;
+import com.jbp.common.response.UserRelationInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 
+import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.UserRelationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 用户 -- 用户中心
@@ -39,6 +54,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRelationService relationService;
+    @Autowired
+    private UserInvitationService invitationService;
 
     @ApiOperation(value = "手机号修改密码")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -58,7 +77,8 @@ public class UserController {
     @ApiOperation(value = "用户信息")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<UserInfoResponse> getUserCenter() {
-        return CommonResult.success(userService.getUserInfo());
+        UserInfoResponse userInfo = userService.getUserInfo();
+        return CommonResult.success(userInfo);
     }
 
     @ApiOperation(value = "获取用户手机号验证码")
@@ -102,6 +122,113 @@ public class UserController {
         }
         return CommonResult.failed();
     }
+
+
+    @ApiOperation(value = "获取默认节点")
+    @RequestMapping(value = "/relation/default/get", method = RequestMethod.GET)
+    public CommonResult<UserRelationInfoResponse> nodeGet(String pAccount) {
+        if (StringUtils.isBlank(pAccount)) {
+            throw new RuntimeException("账户为空");
+        }
+        User user = userService.getByAccount(pAccount);
+        if (user == null) {
+            throw new RuntimeException("账户错误");
+        }
+        // 邀请过其他人返回null
+        List<UserInvitation> nextList = invitationService.getNextList(user.getId());
+        if (CollectionUtils.isNotEmpty(nextList)) {
+            return CommonResult.success();
+        }
+        UserRelation userRelation = relationService.getLeftMost(user.getId());
+        if (userRelation == null) {
+            return CommonResult.success();
+        }
+        user = userService.getById(userRelation.getPId());
+        UserRelationInfoResponse response = new UserRelationInfoResponse(userRelation.getPId(), user.getAccount(), userRelation.getNode());
+        return CommonResult.success(response);
+    }
+
+    @ApiOperation(value = "获取滑落节点")
+    @RequestMapping(value = "/relation/slip/get", method = RequestMethod.GET)
+    public CommonResult<UserRelationInfoResponse> slipGet(String pAccount, Integer node) {
+        if (StringUtils.isBlank(pAccount)) {
+            throw new RuntimeException("账户为空");
+        }
+        User user = userService.getByAccount(pAccount);
+        if (user == null) {
+            throw new RuntimeException("账户错误");
+        }
+        if(node == null || node > 1 || node < 0){
+            throw new RuntimeException("节点错误");
+        }
+        // 当前安置节点没有被占用不返回滑落
+        UserRelation userRelation = relationService.getByPid(user.getId(), node);
+        if (!Objects.isNull(userRelation)) {
+            return CommonResult.success();
+        }
+        userRelation = relationService.getLeftMost(user.getId());
+        if (userRelation == null) {
+            return CommonResult.success();
+        }
+        user = userService.getById(userRelation.getPId());
+        UserRelationInfoResponse response = new UserRelationInfoResponse(userRelation.getPId(), user.getAccount(), userRelation.getNode());
+        return CommonResult.success(response);
+    }
+
+    @ApiOperation(value = "注册校验")
+    @RequestMapping(value = "/register/valid", method = RequestMethod.POST)
+    public CommonResult<Boolean> valid(@RequestBody @Validated UserHelpRegisterRequest request) {
+        User pUser = userService.getByAccount(request.getPAccount());
+        if (pUser == null) {
+            throw new CrmebException("邀请账号错误");
+        }
+        Integer pId = pUser.getId();
+        User rUser = userService.getByAccount(request.getRAccount());
+        if (rUser == null) {
+            throw new CrmebException("服务账号错误");
+        }
+        Integer rId = rUser.getId();
+        // 检查操作一张网
+        User loginUser = userService.getInfo();
+        if (loginUser.getId() != pId && !invitationService.hasChild(pId, loginUser.getId())) {
+            throw new CrmebException("只能帮自己或者下级注册");
+        }
+        if (loginUser.getId() != rId && !invitationService.hasChild(rId, loginUser.getId())) {
+            throw new CrmebException("只能帮自己或者下级安置");
+        }
+        if (relationService.getByPid(rId, request.getNode()) != null) {
+            throw new CrmebException("节点已被占用");
+        }
+        // 安置默认节点
+        if (invitationService.getNextList(rId).isEmpty()) {
+            UserRelation defaultRelation = relationService.getLeftMost(rId);
+            if (defaultRelation.getPId() != rId) {
+                throw new CrmebException("当前用户只能注册默认安置人");
+            }
+        }
+        return CommonResult.success(true);
+    }
+
+    @ApiOperation(value = "上级帮忙注册")
+    @RequestMapping(value = "/help/register", method = RequestMethod.POST)
+    public CommonResult<User> register(@RequestBody @Validated UserHelpRegisterRequest request) {
+        User pUser = userService.getByAccount(request.getPAccount());
+        if (pUser == null) {
+            throw new CrmebException("邀请账号错误");
+        }
+        Integer pId = pUser.getId();
+        User rUser = userService.getByAccount(request.getRAccount());
+        if (rUser == null) {
+            throw new CrmebException("服务账号错误");
+        }
+        Integer rId = rUser.getId();
+        User user = userService.helpRegister(request.getUsername(), request.getPhone(), pId, rId, request.getNode());
+        return CommonResult.success(user);
+    }
+
+
+
+
 }
 
 
