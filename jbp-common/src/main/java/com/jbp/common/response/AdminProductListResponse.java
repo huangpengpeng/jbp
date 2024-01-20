@@ -76,5 +76,10 @@ public class AdminProductListResponse implements Serializable {
 
     @ApiModelProperty(value = "拒绝原因")
     private String reason;
+    @ApiModelProperty(value = "购买限制模版ID")
+    private Long buyLimitTempId;
+
+    @ApiModelProperty(value = "显示限制模版ID")
+    private Long showLimitTempId;
 
 }

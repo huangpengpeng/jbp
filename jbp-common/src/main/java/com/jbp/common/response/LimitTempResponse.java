@@ -20,7 +20,7 @@ import java.util.List;
 @ApiModel(value = "LimitTempResponse对象", description = "限制模版响应对象")
 public class LimitTempResponse {
     @ApiModelProperty(value = "编号")
-    private Integer id;
+    private Long id;
     @ApiModelProperty(value = "模版名称")
     private String name;
 

@@ -7,6 +7,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserCompanyRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCompanyService;
 import com.jbp.service.util.StringUtils;
@@ -26,6 +27,8 @@ import javax.annotation.Resource;
 public class UserCompanyController {
     @Resource
     private UserCompanyService userCompanyService;
+    @Resource
+    private SystemAttachmentService systemAttachmentService;
     @Resource
     private UserService userService;
     @PreAuthorize("hasAuthority('agent:user:company:page')")
@@ -58,7 +61,8 @@ public class UserCompanyController {
         if (userCompany != null) {
             return CommonResult.failed("该市级地址已开通分公司");
         }
-        userCompany = UserCompany.builder().uid(user.getId()).companyName(companyName).licenseNo(licenseNo).licenseUrl(licenseUrl)
+        String cdnUrl = systemAttachmentService.getCdnUrl();
+        userCompany = UserCompany.builder().uid(user.getId()).companyName(companyName).licenseNo(systemAttachmentService.clearPrefix(licenseNo,cdnUrl)).licenseUrl(systemAttachmentService.clearPrefix(licenseUrl,cdnUrl))
                 .province(province).city(city).area(area).address(address).status(UserCompany.Constants.已开通.toString()).build();
         userCompanyService.save(userCompany);
         return CommonResult.success();

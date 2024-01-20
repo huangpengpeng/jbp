@@ -8,12 +8,10 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -31,7 +29,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="ProductAddRequest对象", description="商品添加对象")
+@ApiModel(value = "ProductAddRequest对象", description = "商品添加对象")
 public class ProductAddRequest implements Serializable {
 
     private static final long serialVersionUID = -452373239606480650L;
@@ -119,5 +117,10 @@ public class ProductAddRequest implements Serializable {
 
     @ApiModelProperty(value = "优惠券id集合")
     private List<Integer> couponIds;
+    @ApiModelProperty(value = "购买限制模版ID")
+    private Long buyLimitTempId;
+
+    @ApiModelProperty(value = "显示限制模版ID")
+    private Long showLimitTempId;
 
 }

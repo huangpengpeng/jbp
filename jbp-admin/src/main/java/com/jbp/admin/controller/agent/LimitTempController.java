@@ -53,14 +53,14 @@ public class LimitTempController {
     @PostMapping("/update")
     public CommonResult update(@RequestBody LimitTempEditRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
+        if (!request.getId().equals(limitTemp.getId())){
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
-        }
+        }}
         limitTempService.update(request.getId(), request.getName(), request.getType(), request.getCapaIdList(), request.getCapaXsIdList(), request.getWhiteIdList(), request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(), request.getPCapaXsIdList(), request.getHasRelation(), request.getRCapaIdList(), request.getRCapaXsIdList(), request.getDescription());
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:limit:temp:details')")
     @ApiOperation("详情")
     @GetMapping("/details/{id}")
     public CommonResult<LimitTempResponse> details(@PathVariable("id") Integer id) {
