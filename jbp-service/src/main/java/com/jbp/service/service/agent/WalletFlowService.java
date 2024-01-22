@@ -2,6 +2,7 @@ package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.request.PageParamRequest;
 
@@ -13,4 +14,5 @@ public interface WalletFlowService extends IService<WalletFlow> {
                    BigDecimal orgBalance, BigDecimal tagBalance, String postscript);
 
 
+    PageInfo<WalletFlow> pageList(Integer uid, Integer type, PageParamRequest pageParamRequest);
 }

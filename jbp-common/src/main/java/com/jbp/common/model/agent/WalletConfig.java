@@ -34,7 +34,6 @@ public class WalletConfig {
     private Boolean canWithdraw;
     @ApiModelProperty("可充值 类型： 0禁用 1：启用 ")
     @TableField("recharge")
-    // can_deposit
     private Boolean recharge;
 
     // 转账

@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_platform_wallet")
+@NoArgsConstructor
 @ApiModel(value="PlatformWallet对象", description="平台钱包")
 public class PlatformWallet extends VersionModel {
 

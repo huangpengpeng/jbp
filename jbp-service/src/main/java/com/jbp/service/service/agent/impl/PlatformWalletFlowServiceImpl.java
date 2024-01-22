@@ -1,38 +1,51 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.PlatformWalletFlow;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.PlatformWalletFlowDao;
+import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletFlowService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlowDao, PlatformWalletFlow> implements PlatformWalletFlowService {
+    @Resource
+    WalletConfigService walletConfigService;
 
     @Override
     public PlatformWalletFlow add(Integer type, String operate, String action, String externalNo, String postscript,
                                   BigDecimal amt, BigDecimal orgBalance, BigDecimal tagBalance) {
-        PlatformWalletFlow platformWalletFlow = PlatformWalletFlow
-                .builder()
-                .walletType(type)
-                .action(action)
-                .operate(operate)
-                .uniqueNo(StringUtils.N_TO_10("PW_"))
-                .externalNo(externalNo)
-                .postscript(postscript)
-                .amt(amt)
-                .orgBalance(orgBalance)
-                .tagBalance(tagBalance).build();
+        PlatformWalletFlow platformWalletFlow = new PlatformWalletFlow(type, action, operate, StringUtils.N_TO_10("PW_"), externalNo, postscript, amt, orgBalance, tagBalance);
         save(platformWalletFlow);
         return platformWalletFlow;
     }
 
+    @Override
+    public PageInfo<PlatformWalletFlow> pageList(Integer type, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<PlatformWalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<PlatformWalletFlow>()
+                .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type);
+        Page<PlatformWalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<PlatformWalletFlow> list = list(walletLambdaQueryWrapper);
+        list.forEach(e -> {
+            e.setTypeName(walletConfigService.getByType(e.getWalletType()).getName());
+        });
+        return CommonPage.copyPageInfo(page, list);
+    }
 
 
 }
