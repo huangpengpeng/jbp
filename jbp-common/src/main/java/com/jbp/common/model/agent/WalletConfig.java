@@ -36,9 +36,9 @@ public class WalletConfig {
     @TableField("recharge")
     private Boolean recharge;
 
-    // 转账
-    // can_transfer
-
+    @ApiModelProperty("转账")
+    @TableField("can_transfer")
+    private Boolean canTransfer;
     @ApiModelProperty("兑换目标积分 ")
     @TableField("change_type")
     private int changeType;

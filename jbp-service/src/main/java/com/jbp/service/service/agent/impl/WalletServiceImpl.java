@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.utils.SecurityUtil;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,7 +33,7 @@ import com.jbp.service.service.agent.WalletService;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
-public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements WalletService {
+public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet>  implements WalletService  {
     @Resource
     WalletFlowService walletFlowService;
     @Resource
@@ -106,6 +108,11 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         reduce(uid,type, amt, operate, externalNo, postscript);
         platformWalletService.increase(type,amt,operate,externalNo,postscript);
         return true;
+    }
+
+    @Override
+    public void tradePassword(String phone, String code, String tradePassword) {
+        SystemAdmin user = SecurityUtil.getLoginUserVo().getUser();
     }
 
 

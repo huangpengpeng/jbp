@@ -1,3 +1,6 @@
 2024-01-22 12:57:04.238 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
 2024-01-22 12:57:04.317 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
 2024-01-22 12:57:04.476 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-22 14:14:46.512 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-22 14:14:46.840 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-22 14:14:47.475 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}

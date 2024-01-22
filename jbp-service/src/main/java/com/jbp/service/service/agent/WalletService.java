@@ -21,4 +21,6 @@ public interface WalletService extends IService<Wallet> {
 
 
     Boolean transferToPlatform(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript);
+
+    void tradePassword(String phone, String code, String tradePassword);
 }
