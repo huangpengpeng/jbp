@@ -52,5 +52,14 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
         return CommonPage.copyPageInfo(page, list);
     }
 
+    @Override
+    public List<WalletFlow> details(Integer uid, String action) {
+        LambdaQueryWrapper<WalletFlow> wrapper=new LambdaQueryWrapper<WalletFlow>()
+                .eq(!ObjectUtil.isNull(action)&&!action.equals(""),WalletFlow::getAction,action )
+                .eq(WalletFlow::getUid,uid)
+                .orderByDesc(WalletFlow::getId);
+        return list(wrapper);
+    }
+
 
 }

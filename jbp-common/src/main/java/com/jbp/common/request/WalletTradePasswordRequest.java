@@ -9,13 +9,12 @@ import lombok.experimental.Accessors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Builder
 @Accessors(chain = true)
 @ApiModel(value = "WalletTradePasswordRequest对象", description = "设置交易密码请求对象")
 public class WalletTradePasswordRequest {
     @ApiModelProperty("手机号")
     private String phone;
-    @ApiModelProperty("钱包类型")
+    @ApiModelProperty("验证码")
     private String code;
     @ApiModelProperty("交易密码")
     private String tradePassword;

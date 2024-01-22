@@ -8,6 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.WalletRequest;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface WalletService extends IService<Wallet> {
     PageInfo<Wallet> pageList(Integer uid,Integer type, PageParamRequest pageParamRequest);
@@ -22,5 +23,4 @@ public interface WalletService extends IService<Wallet> {
 
     Boolean transferToPlatform(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript);
 
-    void tradePassword(String phone, String code, String tradePassword);
 }

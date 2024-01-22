@@ -1,18 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import cn.hutool.core.util.ObjectUtil;
-import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.utils.SecurityUtil;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -30,10 +18,18 @@ import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.service.agent.WalletService;
+import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
-public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet>  implements WalletService  {
+public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements WalletService {
     @Resource
     WalletFlowService walletFlowService;
     @Resource
@@ -102,25 +98,20 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet>  implement
         walletFlowService.add(uid, type, amt, operate, WalletFlow.ActionEnum.支出.name(), externalNo, orgBalance, wallet.getBalance(), postscript);
         return ifSuccess;
     }
-    
+
     @Override
     public Boolean transferToPlatform(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        reduce(uid,type, amt, operate, externalNo, postscript);
-        platformWalletService.increase(type,amt,operate,externalNo,postscript);
+        reduce(uid, type, amt, operate, externalNo, postscript);
+        platformWalletService.increase(type, amt, operate, externalNo, postscript);
         return true;
     }
 
-    @Override
-    public void tradePassword(String phone, String code, String tradePassword) {
-        SystemAdmin user = SecurityUtil.getLoginUserVo().getUser();
-    }
-
 
     @Override
-    public PageInfo<Wallet> pageList(Integer uid,Integer type, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<Wallet> walletLambdaQueryWrapper=new LambdaQueryWrapper<Wallet>()
-                .eq(!ObjectUtil.isNull(uid),Wallet::getUId,uid)
-                .eq(!ObjectUtil.isNull(type),Wallet::getType,type);
+    public PageInfo<Wallet> pageList(Integer uid, Integer type, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<Wallet> walletLambdaQueryWrapper = new LambdaQueryWrapper<Wallet>()
+                .eq(!ObjectUtil.isNull(uid), Wallet::getUId, uid)
+                .eq(!ObjectUtil.isNull(type), Wallet::getType, type);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<Wallet> list = list(walletLambdaQueryWrapper);
         list.forEach(e -> {
