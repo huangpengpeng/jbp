@@ -37,10 +37,4 @@ public class MybatisPlusConfig {
     }
 
 
-//    @Profile("test")
-//    @Bean
-//    public SqlLogInterceptor sqlLogInterceptor(){
-//        return new SqlLogInterceptor();
-//    }
-
 }

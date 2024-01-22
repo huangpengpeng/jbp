@@ -4116,3 +4116,4 @@ java.lang.IllegalStateException: JobStore is shutdown - aborting retry
 	at org.quartz.core.QuartzScheduler.notifyJobStoreJobComplete(QuartzScheduler.java:1786)
 	at org.quartz.core.JobRunShell.run(JobRunShell.java:269)
 	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:573)
+2024-01-22 20:45:01.717 [task-executor-8] ERROR c.j.a.task.wechat.live.AsyncWechatLiveGoodsTask - AsyncWechatLiveGoodsTask.task | msg : null

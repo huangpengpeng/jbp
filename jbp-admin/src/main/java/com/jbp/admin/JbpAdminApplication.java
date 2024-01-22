@@ -1,6 +1,9 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.UserSearchRequest;
+import com.jbp.service.service.UserService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,6 +27,13 @@ public class JbpAdminApplication {
 
     public static void main(String[] args) {
         final ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
+
+//        final UserService bean = run.getBean(UserService.class);
+//
+//        PageParamRequest pageParamRequest =  new PageParamRequest();
+//        pageParamRequest.setPage(1);
+//        pageParamRequest.setLimit(15);
+//        bean.getPlatformPage(new UserSearchRequest(), pageParamRequest);
         System.out.println("ok");
 
     }
