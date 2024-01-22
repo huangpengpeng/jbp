@@ -40,6 +40,10 @@ public class SysConfigConstants {
     /** 商户端-左上角缩回菜单logo(登陆后) */
     public static final String CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE = "site_logo_square";
 
+    /** 商户端-默认平台所属商户 */
+    public static final String CONFIG_KEY_PLAT_DEFAULT_MER_ID = "plat_default_mer_id";
+
+
     /** 微信分享图片（公众号） */
     public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_IMAGE = "wechat_share_img";
     /** 微信分享标题（公众号） */

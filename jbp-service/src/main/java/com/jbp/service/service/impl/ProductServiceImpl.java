@@ -232,17 +232,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             throw new CrmebException("必须选择商品平台第三级分类");
         }
 
-            SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Boolean ifPlatformAdd = admin.getMerId()==0;// 是否平台新增商品
 
         Merchant merchant;
         if(!ifPlatformAdd){
             merchant = merchantService.getByIdException(admin.getMerId());
         } else {
-            merchant = null;
+            merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
         }
-
-
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
         product.setId(null);
