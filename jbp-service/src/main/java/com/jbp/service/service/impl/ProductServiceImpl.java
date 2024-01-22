@@ -295,12 +295,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         spd.setType(ProductConstants.PRODUCT_TYPE_NORMAL);
 
         Boolean execute = transactionTemplate.execute(e -> {
-
             if (!ifPlatformAdd && merchant.getProductSwitch()) {// 开启商品审核
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
+            }else{
+                product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
             }
             save(product);
-
             attrList.forEach(attr -> attr.setProductId(product.getId()));
             attrValueList.forEach(value -> value.setProductId(product.getId()));
             attrService.saveBatch(attrList);
@@ -397,12 +397,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         Product product = new Product();
         BeanUtils.copyProperties(productRequest, product);
         product.setAuditStatus(tempProduct.getAuditStatus());
-        Boolean ifPlatformAdd=admin.getMerId()==0;
+        Boolean ifPlatformAdd= admin.getMerId() == 0;
         Merchant merchant;
         if (!ifPlatformAdd) {
             merchant = merchantService.getByIdException(tempProduct.getMerId());
         }else {
-            merchant=null;
+            merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
         }
 
         String cdnUrl = systemAttachmentService.getCdnUrl();
@@ -466,12 +466,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         spd.setProductId(product.getId());
 
         Boolean execute = transactionTemplate.execute(e -> {
-            if (!ifPlatformAdd&&!merchant.getProductSwitch() && product.getAuditStatus().equals(ProductConstants.AUDIT_STATUS_EXEMPTION)) {
+            product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
+            if (ifPlatformAdd){
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
-            } else {
-                product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
+            }else{
+                if (!merchant.getProductSwitch()) {
+                    product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
+                }
             }
-
             product.setIsAudit(false);
             dao.updateById(product);
 
@@ -590,12 +592,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         headers.add(header7);
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
 
+        Integer merId = systemAdmin.getMerId() == 0 ? Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)) : systemAdmin.getMerId();
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
         for (ProductTabsHeaderResponse h : headers) {
             lqw.clear();
             lqw.select(Product::getId);
-            lqw.eq(Product::getMerId, systemAdmin.getMerId());
-            setAdminListWrapperByType(lqw, h.getType(), systemAdmin.getMerId());
+            lqw.eq(Product::getMerId, merId);
+            setAdminListWrapperByType(lqw, h.getType(), merId);
             List<Product> products = dao.selectList(lqw);
             h.setCount(products.size());
         }
