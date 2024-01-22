@@ -78,5 +78,10 @@ public class PlatformProductListResponse implements Serializable {
 
     @ApiModelProperty(value = "是否自营：0-非自营，1-自营")
     private Boolean isShow;
+    @ApiModelProperty(value = "购买限制模版ID")
+    private Long buyLimitTempId;
+
+    @ApiModelProperty(value = "显示限制模版ID")
+    private Long showLimitTempId;
 
 }

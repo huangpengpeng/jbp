@@ -1352,6 +1352,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return dao.selectList(lqw);
     }
 
+    @Override
+    public void tradePassword(String phone, String code, String tradePassword) {
+        if (StrUtil.isBlank(code)) {
+            throw new CrmebException("手机号码验证码不能为空");
+        }
+        //检测验证码
+        checkValidateCode(phone, code);
+        //获取当前用户信息
+        User user    = getInfo();
+        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword,phone));
+        updateById(user);
+
+    }
+
     /**
      * 批量清除用户推广人
      * @param spreadUid 推广人id
