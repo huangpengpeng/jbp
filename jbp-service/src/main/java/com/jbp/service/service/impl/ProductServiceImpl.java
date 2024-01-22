@@ -371,7 +371,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product tempProduct = getById(productRequest.getId());
-        if (ObjectUtil.isNull(tempProduct) || !admin.getMerId().equals(tempProduct.getMerId())) {
+        if (ObjectUtil.isNull(tempProduct)) {
+            throw new CrmebException("商品不存在");
+        }
+        if(admin.getMerId() !=0 && !admin.getMerId().equals(tempProduct.getMerId())){
             throw new CrmebException("商品不存在");
         }
         if (tempProduct.getIsRecycle() || tempProduct.getIsDel()) {
@@ -760,8 +763,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean deleteProduct(ProductDeleteRequest request) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getById(request.getId());
-        if (ObjectUtil.isNull(product) || !admin.getMerId().equals(product.getMerId())) {
+        if (ObjectUtil.isNull(product)) {
             throw new CrmebException("商品不存在");
+        }
+        if(admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())){
+            throw new CrmebException("商品不存在2");
         }
         if (ProductConstants.PRODUCT_DELETE_TYPE_RECYCLE.equals(request.getType()) && product.getIsRecycle()) {
             throw new CrmebException("商品已存在回收站");
@@ -798,7 +804,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         wrapper.eq(Product::getId, productId);
         wrapper.set(Product::getIsRecycle, false);
         wrapper.set(Product::getIsShow, false);
-        wrapper.set(Product::getMerId, admin.getMerId());
+        if (admin.getMerId() != 0) {
+            wrapper.set(Product::getMerId, admin.getMerId());
+        }
         return update(wrapper);
     }
 
@@ -842,8 +850,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean offShelf(Integer id) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getById(id);
-        if (ObjectUtil.isNull(product) || !admin.getMerId().equals(product.getMerId())) {
+        if (ObjectUtil.isNull(product)){
             throw new CrmebException("商品不存在");
+        }
+
+        if(admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())){
+            throw new CrmebException("只能下架自己商户号下的商品");
         }
         if (!product.getIsShow()) {
             return true;
@@ -870,8 +882,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean putOnShelf(Integer id) {
         Product product = getById(id);
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if (ObjectUtil.isNull(product) || !admin.getMerId().equals(product.getMerId())) {
+        if (ObjectUtil.isNull(product)) {
             throw new CrmebException("商品不存在");
+        }
+        if (admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())) {
+            throw new CrmebException("不能上架其他商户商品");
         }
         if (product.getIsShow()) {
             return true;
@@ -883,15 +898,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             throw new CrmebException("商品状态异常无法上架");
         }
         LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
-        Boolean ifPlatformAdd=admin.getMerId()==0;
-        Merchant merchant ;
-        if(!ifPlatformAdd){
+        Boolean ifPlatformAdd = admin.getMerId() == 0;
+        Merchant merchant;
+        if (!ifPlatformAdd) {
             merchant = merchantService.getById(loginUserVo.getUser().getMerId());
-        }else {
-            merchant=null;
+        } else {
+            merchant = null;
         }
 
-        if (!ifPlatformAdd&&!merchant.getIsSwitch()) {
+        if (!ifPlatformAdd && !merchant.getIsSwitch()) {
             throw new CrmebException("打开商户开关后方能上架商品");
         }
         product.setIsShow(true);
@@ -1711,7 +1726,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean submitAudit(Integer id) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getByIdException(id);
-        if (!admin.getMerId().equals(product.getMerId())) {
+        if (admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         if (product.getIsAudit()) {
@@ -1740,8 +1755,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean quickAddStock(ProductAddStockRequest request) {
         Product product = getByIdException(request.getId());
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if (!admin.getMerId().equals(product.getMerId())) {
-            throw new CrmebException("商品不存在");
+        if(admin.getMerId() != 0){
+            if (!admin.getMerId().equals(product.getMerId())) {
+                throw new CrmebException("商品不存在");
+            }
         }
         if (product.getIsAudit()) {
             throw new CrmebException("审核中商品无法编辑");
@@ -1784,8 +1801,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean reviewFreeEdit(ProductReviewFreeEditRequest request) {
         Product product = getByIdException(request.getId());
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if (!admin.getMerId().equals(product.getMerId())) {
-            throw new CrmebException("商品不存在");
+        if(admin.getMerId() != 0){
+            if (!admin.getMerId().equals(product.getMerId())) {
+                throw new CrmebException("商品不存在");
+            }
         }
         if (product.getIsShow()) {
             throw new CrmebException("上架商品无法编辑");
@@ -2006,7 +2025,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (ObjectUtil.isNotNull(request.getIsShow())) {
             map.put("isShow", request.getIsShow() ? 1 : 0);
         }
-        map.put("merId", admin.getMerId());
+        if(admin.getMerId() !=0){
+            map.put("merId", admin.getMerId());
+        }
         if (!activity.getProCategory().equals("0")) {
             map.put("proCateIds", activity.getProCategory());
         }
