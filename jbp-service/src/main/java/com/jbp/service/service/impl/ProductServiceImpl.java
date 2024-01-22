@@ -244,7 +244,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
         product.setId(null);
-        product.setMerId(admin.getMerId());
+        product.setMerId(merchant.getId());
 
         String cdnUrl = systemAttachmentService.getCdnUrl();
         //主图

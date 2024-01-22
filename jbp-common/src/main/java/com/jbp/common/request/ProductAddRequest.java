@@ -67,7 +67,6 @@ public class ProductAddRequest implements Serializable {
     private String keyword;
 
     @ApiModelProperty(value = "商户商品分类id|逗号分隔", required = true)
-    @NotBlank(message = "商户商品分类不能为空")
     @Length(max = 64, message = "商品分类组合长度不能超过64个字符")
     private String cateId;
 
