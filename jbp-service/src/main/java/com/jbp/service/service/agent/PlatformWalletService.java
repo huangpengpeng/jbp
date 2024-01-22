@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 public interface PlatformWalletService extends IService<PlatformWallet> {
 
-    PageInfo<PlatformWallet> pageList(PageParamRequest pageParamRequest);
+    PageInfo<PlatformWallet> pageList(Integer type,PageParamRequest pageParamRequest);
 
     PlatformWallet getType(Integer type);
 

@@ -30,8 +30,8 @@ public class PlatformWalletController {
     @PreAuthorize("hasAuthority('agent:platformWallet:page')")
     @ApiOperation("平台积分列表")
     @GetMapping("/page")
-    public CommonResult<CommonPage<PlatformWallet>> getList(PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(platformWalletService.pageList(pageParamRequest)));
+    public CommonResult<CommonPage<PlatformWallet>> getList(Integer type, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(platformWalletService.pageList(type,pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:platformWallet:increase')")

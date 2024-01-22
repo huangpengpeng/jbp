@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -41,9 +42,11 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     private PlatformWalletFlowService platformWalletFlowService;
 
     @Override
-    public PageInfo<PlatformWallet> pageList(PageParamRequest pageParamRequest) {
+    public PageInfo<PlatformWallet> pageList(Integer type,PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<PlatformWallet> platformWalletLambdaQueryWrapper=new LambdaQueryWrapper<PlatformWallet>()
+                .eq(!ObjectUtil.isNull(type),PlatformWallet::getType,type   );
         Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<PlatformWallet> list = list();
+        List<PlatformWallet> list = list(platformWalletLambdaQueryWrapper);
         list.forEach(e -> {
             e.setTypeName(walletConfigService.getByType(e.getType()).getName());
         });

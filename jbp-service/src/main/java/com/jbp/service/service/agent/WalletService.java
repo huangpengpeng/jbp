@@ -10,7 +10,7 @@ import com.jbp.common.request.WalletRequest;
 import java.math.BigDecimal;
 
 public interface WalletService extends IService<Wallet> {
-    PageInfo<Wallet> pageList(PageParamRequest pageParamRequest);
+    PageInfo<Wallet> pageList(Integer uid,Integer type, PageParamRequest pageParamRequest);
     Wallet add(Integer uid, Integer type);
 
     Wallet getByUser(Integer uid, Integer type);

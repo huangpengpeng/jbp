@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -109,9 +110,12 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
 
     @Override
-    public PageInfo<Wallet> pageList(PageParamRequest pageParamRequest) {
+    public PageInfo<Wallet> pageList(Integer uid,Integer type, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<Wallet> walletLambdaQueryWrapper=new LambdaQueryWrapper<Wallet>()
+                .eq(!ObjectUtil.isNull(uid),Wallet::getUId,uid)
+                .eq(!ObjectUtil.isNull(type),Wallet::getType,type);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<Wallet> list = list();
+        List<Wallet> list = list(walletLambdaQueryWrapper);
         list.forEach(e -> {
             e.setTypeName(walletConfigService.getByType(e.getType()).getName());
             e.setAccount(userService.getById(e.getUId()).getAccount());

@@ -1,10 +1,12 @@
 package com.jbp.admin.controller.agent;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.request.agent.WalletformEditRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
@@ -21,7 +23,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("api/admin/agent/user/wallet")
 @Api(tags = "用户积分")
-public class WalletflowController {
+public class WalletController {
     @Resource
     WalletService walletService;
     @Resource
@@ -30,8 +32,16 @@ public class WalletflowController {
     @PreAuthorize("hasAuthority('agent:user:wallet:page')")
     @ApiOperation("用户积分列表")
     @GetMapping("/page")
-    public CommonResult<CommonPage<Wallet>> getList(PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(walletService.pageList(pageParamRequest)));
+    public CommonResult<CommonPage<Wallet>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
+        User user = userService.getByAccount(request.getAccount());
+        if (ObjectUtil.isNull(user)) {
+            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
+                user = new User();
+            } else {
+                return CommonResult.failed("账户信息错误");
+            }
+        }
+        return CommonResult.success(CommonPage.restPage(walletService.pageList(user.getId(),request.getType(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:increase')")

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
@@ -15,11 +16,23 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@NoArgsConstructor
 @TableName("eb_platform_wallet_flow")
-@Builder
 @ApiModel(value="PlatformWalletFlow对象", description="平台钱包")
 public class PlatformWalletFlow extends BaseModel {
     private static final long serialVersionUID = 1L;
+
+    public PlatformWalletFlow(Integer walletType, String action, String operate, String uniqueNo, String externalNo, String postscript, BigDecimal amt, BigDecimal orgBalance, BigDecimal tagBalance) {
+        this.walletType = walletType;
+        this.action = action;
+        this.operate = operate;
+        this.uniqueNo = uniqueNo;
+        this.externalNo = externalNo;
+        this.postscript = postscript;
+        this.amt = amt;
+        this.orgBalance = orgBalance;
+        this.tagBalance = tagBalance;
+    }
 
     public static enum OperateEnum {
         调账, 分佣
@@ -64,4 +77,7 @@ public class PlatformWalletFlow extends BaseModel {
     @ApiModelProperty("变动后余额")
     @TableField("tag_balance")
     private BigDecimal tagBalance;
+    @ApiModelProperty("钱包名称")
+    @TableField(exist = false)
+    private String typeName;
 }
