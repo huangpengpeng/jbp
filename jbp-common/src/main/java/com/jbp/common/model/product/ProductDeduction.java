@@ -1,11 +1,7 @@
 package com.jbp.common.model.product;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,4 +20,7 @@ public class ProductDeduction implements Serializable {
 
     @ApiModelProperty(value = "抵扣比例")
     private BigDecimal scale;
+
+    @ApiModelProperty(value = "是否计算业绩")
+    private Boolean hasPv;
 }
