@@ -119,7 +119,7 @@ public class DirectInvitationHandler implements AbstractProductCommHandler {
             if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                 CommCalculateResult result = new CommCalculateResult(getType(), ProductCommEnum.直推佣金.getName(),
                         productId, orderDetail.getProductName(), orderDetail.getPayPrice(),
-                        orderDetail.getPayNum(), pv, productComm.getScale(), ratio, amt);
+                        orderDetail.getPayNum(), BigDecimal.ZERO, productComm.getScale(), ratio, amt);
 
                 resultList.add(result);
             }
