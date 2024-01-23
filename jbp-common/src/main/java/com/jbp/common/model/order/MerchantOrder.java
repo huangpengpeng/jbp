@@ -82,10 +82,10 @@ public class MerchantOrder implements Serializable {
     @ApiModelProperty(value = "优惠券金额")
     private BigDecimal couponPrice;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue")
+    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet")
     private String payType;
 
-    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App")
+    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App, wallet-钱包支付")
     private String payChannel;
 
     @ApiModelProperty(value = "赠送积分")

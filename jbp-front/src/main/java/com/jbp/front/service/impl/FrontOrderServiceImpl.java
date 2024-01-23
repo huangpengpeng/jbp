@@ -2173,6 +2173,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         }
         preOrderInfoVo.setMerchantOrderVoList(merchantOrderVoList);
+
+
         logger.info("预下单检查调用:结果preOrderInfoVo:{}", JSON.toJSONString(preOrderInfoVo));
         return preOrderInfoVo;
     }
@@ -2285,11 +2287,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merchantOrderVoList.add(merchantOrderVo);
             }
         });
-        // 检查支付方式  购买权限
+        // 检查支付方式
         Set<Integer> payTypeSet = Sets.newHashSet();
         for (PreOrderDetailRequest orderDetail : request.getOrderDetails()) {
             Product product = productService.getById(orderDetail.getProductId());
-            productBuyLimitTempService.validBuy( null,  null,  null,  null,  null,  null,  product);
             payTypeSet.add(product.getPayType());
         }
         if(payTypeSet.isEmpty() || payTypeSet.size() > 1){

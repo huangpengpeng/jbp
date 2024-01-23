@@ -569,6 +569,7 @@ public class SeckillServiceImpl implements SeckillService {
             throw new CrmebException("商户已关闭，请重新选择商品");
         }
 
+
         PreMerchantOrderVo merchantOrderVo = new PreMerchantOrderVo();
         merchantOrderVo.setMerId(merchant.getId());
         merchantOrderVo.setMerName(merchant.getName());
