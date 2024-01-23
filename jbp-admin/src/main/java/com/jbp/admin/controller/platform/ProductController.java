@@ -87,6 +87,16 @@ public class ProductController {
         }
         return CommonResult.failed();
     }
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "强制下架商品")
+    @PreAuthorize("hasAuthority('platform:product:force:down')")
+    @ApiOperation(value = "强制上架架商品")
+    @RequestMapping(value = "/force/up", method = RequestMethod.POST)
+    public CommonResult<String> forceUp(@RequestBody @Validated ProductForceDownRequest request) {
+        if (productService.forceUp(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台端商品编辑")
     @PreAuthorize("hasAuthority('platform:product:update')")
