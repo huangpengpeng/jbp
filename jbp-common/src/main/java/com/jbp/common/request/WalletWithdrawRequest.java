@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "WalletEmbodyRequest对象", description = "用户提现请求对象")
-public class WalletEmbodyRequest {
+@ApiModel(value = "WalletWithdrawRequest对象", description = "用户提现请求对象")
+public class WalletWithdrawRequest {
     @NotNull(message = "资金不能为空")
     @ApiModelProperty("资金")
     private BigDecimal amt;

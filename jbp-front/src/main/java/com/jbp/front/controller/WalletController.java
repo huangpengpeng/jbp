@@ -7,9 +7,9 @@ import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.WalletChangeRequest;
-import com.jbp.common.request.WalletEmbodyRequest;
 import com.jbp.common.request.WalletTradePasswordRequest;
 import com.jbp.common.request.WalletVirementRequest;
+import com.jbp.common.request.WalletWithdrawRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
@@ -74,9 +74,9 @@ public class WalletController {
     // 4.提现   验证密码  验证配置
     // 4.1 直接扣用户明细
     // 4.2 增加提现记录【待定】
-    @PostMapping("/embody")
+    @PostMapping("/withdraw/initiate")
     @ApiOperation("用户提现")
-    public CommonResult embody(@RequestBody WalletEmbodyRequest request) {
+    public CommonResult embody(@RequestBody WalletWithdrawRequest request) {
         User user = userService.getInfo();
         if (ObjectUtil.isNull(user.getPayPwd())) {
             throw new CrmebException("请设置交易密码");
@@ -99,7 +99,7 @@ public class WalletController {
         if (!CrmebUtil.encryptPassword(request.getTradePassword(), user.getPhone()).equals(user.getPayPwd())) {
             throw new CrmebException("交易密码不正确");
         }
-     return CommonResult.success();
+        return CommonResult.success();
     }
 
     // 6.转账  自己 转 其他人   其他人的账户【自己不能转给自己】、
@@ -119,7 +119,7 @@ public class WalletController {
         if (ObjectUtil.isNull(virementUser)) {
             throw new CrmebException("账号不存在");
         }
-        walletService.virement(user.getId(),virementUser.getId(),request.getAmt(),request.getType(),request.getPostscript(), WalletFlow.OperateEnum.转账.name(),request.getExternalNo());
+        walletService.virement(user.getId(), virementUser.getId(), request.getAmt(), request.getType(), request.getPostscript(), WalletFlow.OperateEnum.转账.name(), request.getExternalNo());
         return CommonResult.success();
     }
 }
