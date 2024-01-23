@@ -59,5 +59,4 @@ public class WalletConfig {
     @ApiModelProperty("兑换比例 ")
     @TableField("change_scale")
     private int changeScale;
-
 }
