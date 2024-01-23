@@ -23,7 +23,7 @@ public class ProductCommConfig extends BaseModel {
     }
 
     @ApiModelProperty(value = "佣金类型")
-    private Integer type;g
+    private Integer type;
 
     @ApiModelProperty(value = "佣金名称")
     private String name;
