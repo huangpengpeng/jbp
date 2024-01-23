@@ -666,3 +666,67 @@ Caused by: com.alibaba.druid.pool.DataSourceClosedException: dataSource already 
 2024-01-23 15:00:21.198 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
 2024-01-23 15:00:21.450 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
 2024-01-23 15:00:21.924 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-23 16:33:36.592 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-23 16:33:36.683 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-23 16:33:36.881 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-23 16:33:37.162 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'productCommConfigServiceImpl': Invocation of init method failed; nested exception is org.springframework.jdbc.BadSqlGrammarException: 
+### Error updating database.  Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'desc,
+gmt_created,
+gmt_modify )  VALUES  ( 1,
+'直推佣金',
+0,
+'自己达到' at line 4
+### The error may exist in com/jbp/service/dao/agent/ProductCommConfigDao.java (best guess)
+### The error may involve com.jbp.service.dao.agent.ProductCommConfigDao.insert-Inline
+### The error occurred while setting parameters
+### SQL: INSERT INTO eb_product_comm_config  ( type, name, if_open, desc, gmt_created, gmt_modify )  VALUES  ( ?, ?, ?, ?, ?, ? )
+### Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'desc,
+gmt_created,
+gmt_modify )  VALUES  ( 1,
+'直推佣金',
+0,
+'自己达到' at line 4
+; bad SQL grammar []; nested exception is java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'desc,
+gmt_created,
+gmt_modify )  VALUES  ( 1,
+'直推佣金',
+0,
+'自己达到' at line 4
+2024-01-23 16:33:37.196 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-1] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:33:37.198 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-2] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:33:37.200 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-3] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:33:37.201 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-6] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:33:37.201 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-0] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:33:37.201 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-7] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:33:37.202 [main] WARN  org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [ForkJoinPool.commonPool-worker-5] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ sun.misc.Unsafe.park(Native Method)
+ java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1824)
+ java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1693)
+ java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+2024-01-23 16:35:47.815 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-23 16:35:48.401 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-23 16:35:48.751 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}

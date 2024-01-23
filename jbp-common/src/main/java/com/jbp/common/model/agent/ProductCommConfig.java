@@ -8,7 +8,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 @Data
-@Builder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -20,7 +19,7 @@ public class ProductCommConfig extends BaseModel {
         this.type = type;
         this.name = name;
         this.ifOpen = false;
-        this.desc = desc;
+        this.description = desc;
     }
 
     @ApiModelProperty(value = "佣金类型")
@@ -33,5 +32,5 @@ public class ProductCommConfig extends BaseModel {
     private Boolean ifOpen;
 
     @ApiModelProperty(value = "说明")
-    private String desc;
+    private String description;
 }
