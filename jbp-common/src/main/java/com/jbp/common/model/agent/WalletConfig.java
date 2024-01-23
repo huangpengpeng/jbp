@@ -19,30 +19,45 @@ public class WalletConfig {
     @ApiModelProperty(value = "记录id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
     @ApiModelProperty("类型编号")
     @TableField("type")
     private Integer type;
+
     @ApiModelProperty("名称")
     @TableField("name")
     private String name;
+
     @ApiModelProperty("状态")
     @TableField("status")
     private int status;
 
-    @ApiModelProperty("可体现 类型： 0禁用 1：启用 ")
+    @ApiModelProperty("可抵扣")
+    @TableField("can_deduction")
+    private Boolean canDeduction;
+
+    @ApiModelProperty("可支付商品")
+    @TableField("canPay")
+    private Boolean canPay;
+
+    @ApiModelProperty("可体现")
     @TableField("can_withdraw")
     private Boolean canWithdraw;
-    @ApiModelProperty("可充值 类型： 0禁用 1：启用 ")
+
+    @ApiModelProperty("可充值")
     @TableField("recharge")
     private Boolean recharge;
 
-    @ApiModelProperty("转账")
+    @ApiModelProperty("可转账")
     @TableField("can_transfer")
     private Boolean canTransfer;
+
     @ApiModelProperty("兑换目标积分 ")
     @TableField("change_type")
     private int changeType;
+
     @ApiModelProperty("兑换比例 ")
     @TableField("change_scale")
     private int changeScale;
+
 }
