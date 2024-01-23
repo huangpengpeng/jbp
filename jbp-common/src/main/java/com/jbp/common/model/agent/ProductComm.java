@@ -58,4 +58,7 @@ public class ProductComm extends BaseModel {
 
     @ApiModelProperty(value = "规则 json对象或者jsonArray 由规则自己解析")
     private String rule;
+
+    @ApiModelProperty(value = "状态 true开启 false 关闭")
+    private Boolean status;
 }
