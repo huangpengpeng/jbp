@@ -106,6 +106,16 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         return true;
     }
 
+    @Override
+    public Boolean virement(Integer uid, Integer virementid, BigDecimal amt, Integer type, String postscript, String operate,String externalNo) {
+        reduce(uid,type,amt,operate,externalNo,postscript);
+        platformWalletService.increase(type, amt, operate, externalNo, postscript);
+        //平台转用户
+        increase(virementid,type,amt,operate,externalNo,postscript);
+        platformWalletService.reduce(type,amt,operate,externalNo,postscript);
+        return true;
+    }
+
 
     @Override
     public PageInfo<Wallet> pageList(Integer uid, Integer type, PageParamRequest pageParamRequest) {
