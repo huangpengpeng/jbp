@@ -480,4 +480,7 @@ public interface ProductService extends IService<Product> {
      * @param keyword 关键字
      */
     List<Integer> findProductCategoryIdByKeyword(String keyword);
+
+    Boolean forceUp(ProductForceDownRequest request);
+
 }

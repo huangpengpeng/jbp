@@ -60,7 +60,7 @@ public class WalletController {
 
     // 3.（配置是否启用 没启用直接报错） 钱包明细 获取walletFlow   倒序   操作类型+方向+关键词：externalNo  or postscript
     @GetMapping("/details")
-    @ApiOperation("账单明细")
+    @ApiOperation("账单明细")git
     public CommonResult<List<WalletFlow>> details(String action, Integer type) {
         WalletConfig walletConfig = walletConfigService.getByType(type);
         if (walletConfig.getStatus() == 0) {

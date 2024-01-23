@@ -152,8 +152,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         //带 Product 类的多条件查询
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(Product::getMerId, admin.getMerId());
-        setAdminListWrapperByType(lqw, request.getType(), admin.getMerId());
+        Merchant merchant = merchantService.getById(admin.getMerId());
+        if (admin.getMerId() == 0) {
+            merchant =  merchantService.getById(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID));
+        }
+        lqw.eq(Product::getMerId, merchant.getId());
+
+        setAdminListWrapperByType(lqw, request.getType(), merchant.getId());
         //关键字搜索
         if (StrUtil.isNotBlank(request.getKeywords())) {
             String keywords = URLUtil.decode(request.getKeywords());
@@ -1375,7 +1380,24 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         return update;
     }
-
+    @Override
+    public Boolean forceUp(ProductForceDownRequest request) {
+        String ids = request.getIds();
+        List<Integer> idList = Stream.of(ids.split(",")).map(Integer::valueOf).collect(Collectors.toList());
+        LambdaUpdateWrapper<Product> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(Product::getIsShow, true);
+        wrapper.set(Product::getIsAudit, true);
+        wrapper.set(Product::getAuditStatus, ProductConstants.AUDIT_STATUS_EXEMPTION);
+        wrapper.in(Product::getId, idList);
+        boolean update = update(wrapper);
+        if (update) {
+            idList.forEach(id -> {
+                // 修改购物车状态
+                cartService.productStatusNotEnable(id);
+            });
+        }
+        return update;
+    }
     /**
      * 是否有商品使用对应的商户商品分类
      *
