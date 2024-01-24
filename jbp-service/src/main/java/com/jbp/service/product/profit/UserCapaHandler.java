@@ -6,12 +6,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.ProductProfit;
+import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.Product;
 import com.jbp.service.service.OrderProductProfitService;
 import com.jbp.service.service.ProductService;
+import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
 import com.jbp.service.service.agent.UserCapaService;
 import lombok.AllArgsConstructor;
@@ -39,6 +41,8 @@ public class UserCapaHandler implements ProductProfitHandler {
     private OrderProductProfitService orderProductProfitService;
     @Resource
     private ProductService productService;
+    @Resource
+    private ProductProfitConfigService configService;
 
 
     @Override
@@ -69,6 +73,10 @@ public class UserCapaHandler implements ProductProfitHandler {
 
     @Override
     public void orderSuccess(Order order, List<OrderDetail> orderDetailList, List<ProductProfit> productProfitList) {
+        ProductProfitConfig profitConfig = configService.getByType(getType());
+        if(profitConfig == null || !BooleanUtil.isTrue(profitConfig.getIfOpen())){
+            return;
+        }
         productProfitList = ListUtils.emptyIfNull(productProfitList).stream().filter(p -> p.getType() == getType() && BooleanUtil.isTrue(p.getStatus())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(productProfitList)) {
             return;
