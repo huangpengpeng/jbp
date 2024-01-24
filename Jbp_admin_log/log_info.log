@@ -2311,3 +2311,816 @@
 2024-01-24 15:36:18.241 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
 2024-01-24 15:36:18.268 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
 2024-01-24 15:36:18.277 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-01-24 15:56:28.411 [main] INFO  com.jbp.admin.JbpAdminApplication - Starting JbpAdminApplication on MECHREV with PID 26520 (E:\杭州公司\新建文件夹\t\jbp\jbp-admin\target\classes started by 30831 in E:\杭州公司\新建文件夹\t\jbp)
+2024-01-24 15:56:28.413 [main] INFO  com.jbp.admin.JbpAdminApplication - The following profiles are active: dev
+2024-01-24 15:56:30.521 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-01-24 15:56:30.527 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-01-24 15:56:30.586 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 38ms. Found 0 Redis repository interfaces.
+2024-01-24 15:56:30.854 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  ******************* init miniDao config [ begin ] *********************** 
+2024-01-24 15:56:30.855 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  ------ minidao.base-package ------- org.jeecg.modules.jmreport.*
+2024-01-24 15:56:30.856 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  *******************  init miniDao config  [ end ] *********************** 
+2024-01-24 15:56:30.958 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDao }
+2024-01-24 15:56:30.959 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDataSourceDao }
+2024-01-24 15:56:30.959 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbDao }
+2024-01-24 15:56:30.959 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbFieldDao }
+2024-01-24 15:56:30.959 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbParamDao }
+2024-01-24 15:56:30.959 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDictDao }
+2024-01-24 15:56:30.960 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDictItemDao }
+2024-01-24 15:56:30.960 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportLinkDao }
+2024-01-24 15:56:30.960 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportMapDao }
+2024-01-24 15:56:30.960 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportShareDao }
+2024-01-24 15:56:31.593 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#9' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.597 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportShareDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.598 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#8' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.598 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportMapDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.599 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#7' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.599 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportLinkDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.600 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#6' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.601 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDictItemDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.602 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#5' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.603 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDictDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.604 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#4' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.605 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbParamDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.605 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#3' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.606 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbFieldDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.607 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#2' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.607 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.608 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178#1' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.609 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDataSourceDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.609 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#49986178' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.610 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.896 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.904 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.908 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@15914bb5' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.912 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:31.923 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-01-24 15:56:32.441 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2024-01-24 15:56:32.459 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2024-01-24 15:56:32.459 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-24 15:56:32.460 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-01-24 15:56:32.990 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-01-24 15:56:32.997 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-01-24 15:56:32.997 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4524 ms
+2024-01-24 15:56:38.312 [main] INFO  o.j.m.jmreport.config.init.JimuReportConfiguration -  Init JimuReport Config [ Token Interceptor & Resource Locations ] 
+2024-01-24 15:56:49.526 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-01-24 15:56:55.988 [main] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
+2024-01-24 15:56:55.990 [main] INFO  org.quartz.simpl.SimpleThreadPool - Job execution threads will use class loader of thread: main
+2024-01-24 15:56:56.003 [main] INFO  org.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2024-01-24 15:56:56.003 [main] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v.2.3.2 created.
+2024-01-24 15:56:56.009 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Using db table-based data access locking (synchronization).
+2024-01-24 15:56:56.011 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - JobStoreCMT initialized.
+2024-01-24 15:56:56.012 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2024-01-24 15:56:56.013 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2024-01-24 15:56:56.013 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.3.2
+2024-01-24 15:56:56.013 [main] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@759c8393
+2024-01-24 15:57:03.572 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-01-24 15:57:03.779 [main] INFO  o.j.modules.jmreport.config.JmReportExecutorConfig -  Init JimuReport Config [ 线程池 ] 
+2024-01-24 15:57:03.873 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-01-24 15:57:03.905 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-01-24 15:57:03.907 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-01-24 15:57:04.070 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@4d8f917f, org.springframework.security.web.context.SecurityContextPersistenceFilter@1ff02deb, org.springframework.security.web.header.HeaderWriterFilter@3fde6c3b, org.springframework.web.filter.CorsFilter@219ec4b6, org.springframework.web.filter.CorsFilter@219ec4b6, org.springframework.web.filter.CorsFilter@219ec4b6, org.springframework.security.web.authentication.logout.LogoutFilter@1531fbc8, com.jbp.admin.filter.JwtAuthenticationTokenFilter@49dacc93, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2ee4c028, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@12f12982, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@125a6446, org.springframework.security.web.session.SessionManagementFilter@3cc0efa2, org.springframework.security.web.access.ExceptionTranslationFilter@fff33b4, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@336c4e3a]
+2024-01-24 15:57:04.450 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-01-24 15:57:04.450 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'jmReportTaskExecutor'
+2024-01-24 15:57:05.269 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-01-24 15:57:05.280 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 4 custom documentation plugin(s)
+2024-01-24 15:57:05.339 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-24 15:57:05.505 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-01-24 15:57:05.511 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingPOST_1
+2024-01-24 15:57:05.513 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_1
+2024-01-24 15:57:05.516 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_1
+2024-01-24 15:57:05.522 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_1
+2024-01-24 15:57:05.529 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_2
+2024-01-24 15:57:05.582 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-01-24 15:57:05.591 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-01-24 15:57:05.593 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_2
+2024-01-24 15:57:05.596 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: closeUsingGET_1
+2024-01-24 15:57:05.603 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-01-24 15:57:05.604 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: openUsingGET_1
+2024-01-24 15:57:05.609 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_2
+2024-01-24 15:57:05.612 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_3
+2024-01-24 15:57:05.619 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-01-24 15:57:05.622 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_3
+2024-01-24 15:57:05.624 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_1
+2024-01-24 15:57:05.631 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-01-24 15:57:05.634 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_4
+2024-01-24 15:57:05.640 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-01-24 15:57:05.648 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-01-24 15:57:05.651 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_5
+2024-01-24 15:57:05.656 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-01-24 15:57:05.663 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-01-24 15:57:05.673 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_2
+2024-01-24 15:57:05.674 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingGET_1
+2024-01-24 15:57:05.681 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_3
+2024-01-24 15:57:05.689 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_4
+2024-01-24 15:57:05.695 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageListUsingGET_1
+2024-01-24 15:57:05.697 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_2
+2024-01-24 15:57:05.704 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-01-24 15:57:05.707 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: increaseUsingPOST_1
+2024-01-24 15:57:05.708 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: reduceUsingPOST_1
+2024-01-24 15:57:05.709 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: transferUsingPOST_1
+2024-01-24 15:57:05.717 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-01-24 15:57:05.720 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_1
+2024-01-24 15:57:05.725 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_12
+2024-01-24 15:57:05.727 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_5
+2024-01-24 15:57:05.746 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_13
+2024-01-24 15:57:05.772 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-24 15:57:05.782 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_2
+2024-01-24 15:57:05.788 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_14
+2024-01-24 15:57:05.792 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_3
+2024-01-24 15:57:05.797 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_3
+2024-01-24 15:57:05.804 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_15
+2024-01-24 15:57:05.814 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_1
+2024-01-24 15:57:05.817 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_4
+2024-01-24 15:57:05.826 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_16
+2024-01-24 15:57:05.830 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-01-24 15:57:05.841 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_17
+2024-01-24 15:57:05.849 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-01-24 15:57:05.853 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_2
+2024-01-24 15:57:05.858 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_5
+2024-01-24 15:57:05.880 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-01-24 15:57:05.889 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_18
+2024-01-24 15:57:05.897 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-01-24 15:57:05.900 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_3
+2024-01-24 15:57:05.908 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_19
+2024-01-24 15:57:05.959 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_3
+2024-01-24 15:57:05.995 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_20
+2024-01-24 15:57:06.019 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-01-24 15:57:06.036 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_21
+2024-01-24 15:57:06.054 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_4
+2024-01-24 15:57:06.064 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_4
+2024-01-24 15:57:06.068 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_22
+2024-01-24 15:57:06.070 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_5
+2024-01-24 15:57:06.073 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_4
+2024-01-24 15:57:06.073 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_6
+2024-01-24 15:57:06.075 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_1
+2024-01-24 15:57:06.078 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_6
+2024-01-24 15:57:06.078 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_4
+2024-01-24 15:57:06.084 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_23
+2024-01-24 15:57:06.085 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_7
+2024-01-24 15:57:06.093 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_5
+2024-01-24 15:57:06.112 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_24
+2024-01-24 15:57:06.131 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_6
+2024-01-24 15:57:06.147 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_5
+2024-01-24 15:57:06.149 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_8
+2024-01-24 15:57:06.152 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_7
+2024-01-24 15:57:06.153 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_6
+2024-01-24 15:57:06.154 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_3
+2024-01-24 15:57:06.157 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_6
+2024-01-24 15:57:06.161 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_7
+2024-01-24 15:57:06.168 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_25
+2024-01-24 15:57:06.172 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_8
+2024-01-24 15:57:06.178 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_26
+2024-01-24 15:57:06.180 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_7
+2024-01-24 15:57:06.182 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_6
+2024-01-24 15:57:06.183 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_9
+2024-01-24 15:57:06.184 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_9
+2024-01-24 15:57:06.191 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_27
+2024-01-24 15:57:06.194 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_8
+2024-01-24 15:57:06.196 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_7
+2024-01-24 15:57:06.197 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_10
+2024-01-24 15:57:06.199 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_2
+2024-01-24 15:57:06.251 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_1
+2024-01-24 15:57:06.260 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_28
+2024-01-24 15:57:06.262 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_5
+2024-01-24 15:57:06.266 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_29
+2024-01-24 15:57:06.268 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_9
+2024-01-24 15:57:06.270 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_8
+2024-01-24 15:57:06.271 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_11
+2024-01-24 15:57:06.274 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_6
+2024-01-24 15:57:06.280 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_30
+2024-01-24 15:57:06.282 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_10
+2024-01-24 15:57:06.285 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_9
+2024-01-24 15:57:06.288 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_12
+2024-01-24 15:57:06.308 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveGoodsOnSaleUsingPOST_1
+2024-01-24 15:57:06.344 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_31
+2024-01-24 15:57:06.347 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_32
+2024-01-24 15:57:06.352 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_8
+2024-01-24 15:57:06.353 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_7
+2024-01-24 15:57:06.369 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_13
+2024-01-24 15:57:06.370 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_8
+2024-01-24 15:57:06.384 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_33
+2024-01-24 15:57:06.410 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_34
+2024-01-24 15:57:06.414 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_35
+2024-01-24 15:57:06.433 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_36
+2024-01-24 15:57:06.436 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getOrderStatusNumUsingGET_1
+2024-01-24 15:57:06.438 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: markUsingPOST_1
+2024-01-24 15:57:06.442 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_10
+2024-01-24 15:57:06.448 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_37
+2024-01-24 15:57:06.453 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_11
+2024-01-24 15:57:06.458 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_10
+2024-01-24 15:57:06.459 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_14
+2024-01-24 15:57:06.468 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-24 15:57:06.480 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_9
+2024-01-24 15:57:06.487 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_38
+2024-01-24 15:57:06.489 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_11
+2024-01-24 15:57:06.490 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_15
+2024-01-24 15:57:06.491 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_3
+2024-01-24 15:57:06.505 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_9
+2024-01-24 15:57:06.506 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_11
+2024-01-24 15:57:06.508 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_39
+2024-01-24 15:57:06.509 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_16
+2024-01-24 15:57:06.511 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_12
+2024-01-24 15:57:06.517 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_40
+2024-01-24 15:57:06.520 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_12
+2024-01-24 15:57:06.522 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_12
+2024-01-24 15:57:06.523 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_17
+2024-01-24 15:57:06.526 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_10
+2024-01-24 15:57:06.527 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_13
+2024-01-24 15:57:06.529 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_4
+2024-01-24 15:57:06.531 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListTreeUsingGET_1
+2024-01-24 15:57:06.534 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_11
+2024-01-24 15:57:06.539 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_18
+2024-01-24 15:57:06.540 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_19
+2024-01-24 15:57:06.545 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_1
+2024-01-24 15:57:06.547 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_14
+2024-01-24 15:57:06.550 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_2
+2024-01-24 15:57:06.556 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: findPageListUsingGET_1
+2024-01-24 15:57:06.561 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_2
+2024-01-24 15:57:06.561 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_15
+2024-01-24 15:57:06.570 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: findPageListUsingGET_2
+2024-01-24 15:57:06.572 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_12
+2024-01-24 15:57:06.577 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: findPageListUsingGET_3
+2024-01-24 15:57:06.578 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_20
+2024-01-24 15:57:06.579 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_21
+2024-01-24 15:57:06.583 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInfoUsingGET_1
+2024-01-24 15:57:06.592 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_41
+2024-01-24 15:57:06.594 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_13
+2024-01-24 15:57:06.596 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_22
+2024-01-24 15:57:06.599 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_23
+2024-01-24 15:57:06.607 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDailyStatementListUsingGET_1
+2024-01-24 15:57:06.611 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getFundsFlowUsingGET_1
+2024-01-24 15:57:06.618 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMerchantClosingDetailUsingGET_1
+2024-01-24 15:57:06.622 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMerchantClosingPageListUsingGET_1
+2024-01-24 15:57:06.623 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMonthStatementListUsingGET_1
+2024-01-24 15:57:06.650 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: indexDateUsingGET_1
+2024-01-24 15:57:06.652 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: operatingDataUsingGET_1
+2024-01-24 15:57:06.661 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getConfigUsingGET_1
+2024-01-24 15:57:06.663 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateConfigUsingPOST_1
+2024-01-24 15:57:06.675 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_3
+2024-01-24 15:57:06.686 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_13
+2024-01-24 15:57:06.688 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_16
+2024-01-24 15:57:06.690 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_42
+2024-01-24 15:57:06.691 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_24
+2024-01-24 15:57:06.696 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_14
+2024-01-24 15:57:06.700 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-01-24 15:57:06.709 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getPageListUsingGET_1
+2024-01-24 15:57:06.720 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: recommendSwitchUsingPOST_1
+2024-01-24 15:57:06.724 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_25
+2024-01-24 15:57:06.728 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_15
+2024-01-24 15:57:06.730 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: allListUsingGET_1
+2024-01-24 15:57:06.731 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_17
+2024-01-24 15:57:06.733 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_43
+2024-01-24 15:57:06.734 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_26
+2024-01-24 15:57:06.744 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInfoUsingGET_2
+2024-01-24 15:57:06.763 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updatePhoneUsingPOST_1
+2024-01-24 15:57:06.764 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updatePhoneUsingPOST_2
+2024-01-24 15:57:06.772 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_10
+2024-01-24 15:57:06.779 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_44
+2024-01-24 15:57:06.781 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_14
+2024-01-24 15:57:06.782 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_13
+2024-01-24 15:57:06.784 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_27
+2024-01-24 15:57:06.786 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_11
+2024-01-24 15:57:06.793 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_45
+2024-01-24 15:57:06.798 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_15
+2024-01-24 15:57:06.803 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_14
+2024-01-24 15:57:06.805 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_28
+2024-01-24 15:57:06.806 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_29
+2024-01-24 15:57:06.824 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_12
+2024-01-24 15:57:06.831 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_46
+2024-01-24 15:57:06.833 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_16
+2024-01-24 15:57:06.835 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_15
+2024-01-24 15:57:06.836 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_30
+2024-01-24 15:57:06.837 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getUsingGET_1
+2024-01-24 15:57:06.843 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_47
+2024-01-24 15:57:06.846 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: sendUserCodeUsingGET_1
+2024-01-24 15:57:06.848 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getUsingGET_2
+2024-01-24 15:57:06.850 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_48
+2024-01-24 15:57:06.855 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_16
+2024-01-24 15:57:06.856 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_13
+2024-01-24 15:57:06.862 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDraftInfoUsingGET_1
+2024-01-24 15:57:06.865 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDraftListUsingGET_1
+2024-01-24 15:57:06.866 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: reviewUsingPOST_1
+2024-01-24 15:57:06.867 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_31
+2024-01-24 15:57:06.869 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_18
+2024-01-24 15:57:06.875 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInfoUsingGET_3
+2024-01-24 15:57:06.895 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopRegisterFinishAccessInfoUsingPOST_1
+2024-01-24 15:57:06.915 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopBrandListUsingGET_1
+2024-01-24 15:57:06.918 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopCatGetUsingPOST_1
+2024-01-24 15:57:06.920 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopImgUploadUsingPOST_1
+2024-01-24 15:57:06.922 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopUsableBrandListUsingGET_1
+2024-01-24 15:57:06.960 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_14
+2024-01-24 15:57:06.965 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_49
+2024-01-24 15:57:06.968 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_17
+2024-01-24 15:57:06.970 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_16
+2024-01-24 15:57:06.971 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_32
+2024-01-24 15:57:06.972 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingGET_1
+2024-01-24 15:57:06.973 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_19
+2024-01-24 15:57:06.977 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_50
+2024-01-24 15:57:06.978 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateAttrIdUsingPOST_1
+2024-01-24 15:57:06.980 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_20
+2024-01-24 15:57:06.983 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getByIdsUsingGET_1
+2024-01-24 15:57:06.984 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getByIdsUsingPOST_1
+2024-01-24 15:57:06.987 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_51
+2024-01-24 15:57:06.990 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListTreeUsingGET_2
+2024-01-24 15:57:06.992 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_18
+2024-01-24 15:57:06.994 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_17
+2024-01-24 15:57:06.995 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_33
+2024-01-24 15:57:06.999 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_17
+2024-01-24 15:57:07.007 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_21
+2024-01-24 15:57:07.013 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_2
+2024-01-24 15:57:07.018 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_52
+2024-01-24 15:57:07.023 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_53
+2024-01-24 15:57:07.026 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_34
+2024-01-24 15:57:07.029 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: exportOrderUsingGET_1
+2024-01-24 15:57:07.034 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_54
+2024-01-24 15:57:07.038 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getAdminInfoUsingGET_1
+2024-01-24 15:57:07.040 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getLoginPicUsingGET_1
+2024-01-24 15:57:07.043 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMenusUsingGET_1
+2024-01-24 15:57:07.045 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: loginAdminUpdateUsingPOST_1
+2024-01-24 15:57:07.051 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_18
+2024-01-24 15:57:07.052 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_22
+2024-01-24 15:57:07.058 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_55
+2024-01-24 15:57:07.062 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_19
+2024-01-24 15:57:07.063 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_35
+2024-01-24 15:57:07.064 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_1
+2024-01-24 15:57:07.066 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_19
+2024-01-24 15:57:07.066 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_23
+2024-01-24 15:57:07.067 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_56
+2024-01-24 15:57:07.069 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_20
+2024-01-24 15:57:07.069 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_36
+2024-01-24 15:57:07.070 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_2
+2024-01-24 15:57:07.074 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInvoiceListUsingGET_1
+2024-01-24 15:57:07.079 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_57
+2024-01-24 15:57:07.083 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getLogisticsInfoUsingGET_1
+2024-01-24 15:57:07.085 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getOrderStatusNumUsingGET_2
+2024-01-24 15:57:07.097 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_21
+2024-01-24 15:57:07.106 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_3
+2024-01-24 15:57:07.110 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_58
+2024-01-24 15:57:07.112 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getOrderStatusNumUsingGET_3
+2024-01-24 15:57:07.114 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: markUsingPOST_2
+2024-01-24 15:57:07.116 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_24
+2024-01-24 15:57:07.118 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_59
+2024-01-24 15:57:07.122 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_22
+2024-01-24 15:57:07.122 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_18
+2024-01-24 15:57:07.123 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_37
+2024-01-24 15:57:07.125 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_4
+2024-01-24 15:57:07.126 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: fileUsingPOST_1
+2024-01-24 15:57:07.128 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: imageUsingPOST_1
+2024-01-24 15:57:07.135 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_3
+2024-01-24 15:57:07.141 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: foundsUsingGET_1
+2024-01-24 15:57:07.148 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_60
+2024-01-24 15:57:07.152 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_38
+2024-01-24 15:57:07.153 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_25
+2024-01-24 15:57:07.157 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_61
+2024-01-24 15:57:07.158 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_19
+2024-01-24 15:57:07.159 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_39
+2024-01-24 15:57:07.160 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_15
+2024-01-24 15:57:07.165 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_62
+2024-01-24 15:57:07.166 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_23
+2024-01-24 15:57:07.168 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_20
+2024-01-24 15:57:07.169 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: sortUsingGET_1
+2024-01-24 15:57:07.171 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveDeleteGoodsInRoomUsingGET_1
+2024-01-24 15:57:07.172 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveDeleteRoomUsingGET_1
+2024-01-24 15:57:07.183 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveListRoomUsingPOST_1
+2024-01-24 15:57:07.185 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveRoomGetShareCodeUsingGET_1
+2024-01-24 15:57:07.189 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveRoomGoodsListUsingGET_1
+2024-01-24 15:57:07.192 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveUpdateCommentUsingGET_1
+2024-01-24 15:57:07.193 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveUpdateFeedPublicUsingGET_1
+2024-01-24 15:57:07.194 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveUpdateReplayUsingGET_1
+2024-01-24 15:57:07.197 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_20
+2024-01-24 15:57:07.198 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_26
+2024-01-24 15:57:07.200 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getCacheAllListUsingGET_1
+2024-01-24 15:57:07.204 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_63
+2024-01-24 15:57:07.205 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_40
+2024-01-24 15:57:07.207 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_3
+2024-01-24 15:57:07.209 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_21
+2024-01-24 15:57:07.210 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_27
+2024-01-24 15:57:07.213 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_64
+2024-01-24 15:57:07.216 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_41
+2024-01-24 15:57:07.217 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_4
+2024-01-24 15:57:07.220 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_4
+2024-01-24 15:57:07.230 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getActivitySearchPageUsingGET_1
+2024-01-24 15:57:07.236 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_65
+2024-01-24 15:57:07.239 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getTabsHeaderUsingGET_1
+2024-01-24 15:57:07.247 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_24
+2024-01-24 15:57:07.252 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_22
+2024-01-24 15:57:07.253 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_28
+2024-01-24 15:57:07.256 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_66
+2024-01-24 15:57:07.257 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_42
+2024-01-24 15:57:07.258 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_5
+2024-01-24 15:57:07.259 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_16
+2024-01-24 15:57:07.264 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_67
+2024-01-24 15:57:07.266 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_17
+2024-01-24 15:57:07.274 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_68
+2024-01-24 15:57:07.276 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_25
+2024-01-24 15:57:07.277 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_26
+2024-01-24 15:57:07.279 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_21
+2024-01-24 15:57:07.281 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_43
+2024-01-24 15:57:07.287 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_69
+2024-01-24 15:57:07.317 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_23
+2024-01-24 15:57:07.318 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_29
+2024-01-24 15:57:07.323 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_70
+2024-01-24 15:57:07.332 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_44
+2024-01-24 15:57:07.341 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: activityDetailUsingGET_1
+2024-01-24 15:57:07.345 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: activityPageUsingGET_1
+2024-01-24 15:57:07.347 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addProductUsingPOST_1
+2024-01-24 15:57:07.353 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteProductUsingPOST_1
+2024-01-24 15:57:07.355 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: downProductUsingPOST_1
+2024-01-24 15:57:07.361 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getSeckillProductPageUsingGET_1
+2024-01-24 15:57:07.367 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: setProductPriceUsingPOST_1
+2024-01-24 15:57:07.372 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_30
+2024-01-24 15:57:07.373 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editBaseConfigUsingPOST_1
+2024-01-24 15:57:07.376 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getConfigUsingGET_2
+2024-01-24 15:57:07.385 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_27
+2024-01-24 15:57:07.385 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: justGetUniqUsingGET_1
+2024-01-24 15:57:07.393 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_71
+2024-01-24 15:57:07.394 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_28
+2024-01-24 15:57:07.395 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: nameInfoUsingGET_1
+2024-01-24 15:57:07.397 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_22
+2024-01-24 15:57:07.397 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_45
+2024-01-24 15:57:07.399 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_18
+2024-01-24 15:57:07.403 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_72
+2024-01-24 15:57:07.405 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_29
+2024-01-24 15:57:07.407 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_23
+2024-01-24 15:57:07.408 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_46
+2024-01-24 15:57:07.409 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_19
+2024-01-24 15:57:07.414 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_73
+2024-01-24 15:57:07.415 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_30
+2024-01-24 15:57:07.417 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_24
+2024-01-24 15:57:07.418 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_47
+2024-01-24 15:57:07.423 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_74
+2024-01-24 15:57:07.427 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_31
+2024-01-24 15:57:07.430 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_48
+2024-01-24 15:57:07.432 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_31
+2024-01-24 15:57:07.433 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getConfigUsingGET_3
+2024-01-24 15:57:07.435 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_75
+2024-01-24 15:57:07.437 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_25
+2024-01-24 15:57:07.438 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_49
+2024-01-24 15:57:07.439 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateConfigUsingPOST_2
+2024-01-24 15:57:07.453 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_76
+2024-01-24 15:57:07.454 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_20
+2024-01-24 15:57:07.460 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_77
+2024-01-24 15:57:07.461 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_32
+2024-01-24 15:57:07.464 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_26
+2024-01-24 15:57:07.465 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_50
+2024-01-24 15:57:07.466 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_51
+2024-01-24 15:57:07.476 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-01-24 15:57:07.484 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getUsingGET_3
+2024-01-24 15:57:07.487 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: webHookUsingGET_1
+2024-01-24 15:57:07.487 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: webHookUsingPOST_1
+2024-01-24 15:57:07.488 [main] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
+2024-01-24 15:57:07.606 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Freed 0 triggers from 'acquired' / 'blocked' state.
+2024-01-24 15:57:07.665 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Recovering 0 jobs that were in-progress at the time of the last shut-down.
+2024-01-24 15:57:07.665 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Recovery complete.
+2024-01-24 15:57:07.693 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Removed 0 'complete' triggers.
+2024-01-24 15:57:07.723 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Removed 0 stale fired job entries.
+2024-01-24 15:57:07.783 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2024-01-24 15:57:07.796 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2024-01-24 15:57:07.838 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2024-01-24 15:57:07.842 [main] INFO  com.jbp.admin.JbpAdminApplication - Started JbpAdminApplication in 40.167 seconds (JVM running for 41.186)
+2024-01-24 15:57:08.617 [RMI TCP Connection(20)-26.26.26.1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-01-24 15:57:08.617 [RMI TCP Connection(20)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-01-24 15:57:08.640 [RMI TCP Connection(20)-26.26.26.1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 23 ms
+2024-01-24 15:58:00.430 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 15:58:00.432 [task-executor-1] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 15:58:00 CST 2024
+2024-01-24 15:58:00.678 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：249毫秒
+2024-01-24 15:58:01.132 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 15:58:01.132 [task-executor-2] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 15:58:01 CST 2024
+2024-01-24 15:58:01.133 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 15:58:01.133 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：2毫秒
+2024-01-24 15:58:01.786 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-01-24 15:58:01.787 [task-executor-3] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 15:58:01 CST 2024
+2024-01-24 15:58:01.787 [task-executor-3] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-01-24 15:58:01.787 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：1毫秒
+2024-01-24 15:59:00.374 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 15:59:00.378 [task-executor-4] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 15:59:00
+2024-01-24 15:59:00.419 [task-executor-4] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 15:59:00
+2024-01-24 15:59:00.419 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：45毫秒
+2024-01-24 15:59:01.008 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 15:59:01.008 [task-executor-5] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 15:59:01 CST 2024
+2024-01-24 15:59:01.009 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 15:59:01.009 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 15:59:01.653 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 15:59:01.653 [task-executor-6] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 15:59:01 CST 2024
+2024-01-24 15:59:01.654 [task-executor-6] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 15:59:01.654 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：2毫秒
+2024-01-24 16:00:00.375 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:00:00.375 [task-executor-7] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:00:00
+2024-01-24 16:00:00.409 [task-executor-7] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:00:00
+2024-01-24 16:00:00.409 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：33毫秒
+2024-01-24 16:00:01.051 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:00:01.051 [task-executor-8] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:00:01 CST 2024
+2024-01-24 16:00:01.083 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：32毫秒
+2024-01-24 16:00:01.696 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：6
+2024-01-24 16:00:01.697 [task-executor-9] INFO  com.jbp.admin.task.order.OrderAutoCompleteTask - ---OrderAutoCompleteTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:00:01
+2024-01-24 16:00:01.781 [task-executor-9] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoComplete | size:0
+2024-01-24 16:00:01.781 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：6  总共耗时：84毫秒
+2024-01-24 16:00:02.359 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-01-24 16:00:02.359 [task-executor-10] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:00:02 CST 2024
+2024-01-24 16:00:02.359 [task-executor-10] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-01-24 16:00:02.359 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：0毫秒
+2024-01-24 16:01:00.372 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:01:00.372 [task-executor-11] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:01:00
+2024-01-24 16:01:00.405 [task-executor-11] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:01:00
+2024-01-24 16:01:00.405 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：33毫秒
+2024-01-24 16:01:01.012 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:01:01.012 [task-executor-12] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:01:01 CST 2024
+2024-01-24 16:01:01.012 [task-executor-12] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:01:01.012 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-24 16:01:01.654 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:01:01.655 [task-executor-13] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:01:01 CST 2024
+2024-01-24 16:01:01.655 [task-executor-13] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:01:01.655 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:02:00.370 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:02:00.370 [task-executor-14] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:02:00 CST 2024
+2024-01-24 16:02:00.402 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：32毫秒
+2024-01-24 16:02:01.012 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:02:01.013 [task-executor-15] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:02:01 CST 2024
+2024-01-24 16:02:01.013 [task-executor-15] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:02:01.013 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:02:01.656 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:02:01.656 [task-executor-16] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:02:01 CST 2024
+2024-01-24 16:02:01.656 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:02:01.656 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:03:00.375 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:03:00.375 [task-executor-17] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:03:00
+2024-01-24 16:03:00.406 [task-executor-17] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:03:00
+2024-01-24 16:03:00.406 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-24 16:03:01.006 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:03:01.006 [task-executor-18] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:03:01 CST 2024
+2024-01-24 16:03:01.007 [task-executor-18] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:03:01.007 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:03:01.649 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:03:01.650 [task-executor-19] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:03:01 CST 2024
+2024-01-24 16:03:01.651 [task-executor-19] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:03:01.651 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：2毫秒
+2024-01-24 16:04:00.391 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:04:00.391 [task-executor-20] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:04:00
+2024-01-24 16:04:00.423 [task-executor-20] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:04:00
+2024-01-24 16:04:00.423 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：33毫秒
+2024-01-24 16:04:01.022 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:04:01.022 [task-executor-1] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:04:01 CST 2024
+2024-01-24 16:04:01.022 [task-executor-1] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:04:01.023 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:04:01.662 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:04:01.662 [task-executor-2] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:04:01 CST 2024
+2024-01-24 16:04:01.662 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:04:01.662 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:05:00.368 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:05:00.368 [task-executor-3] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:05:00 CST 2024
+2024-01-24 16:05:00.399 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：32毫秒
+2024-01-24 16:05:01.006 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:05:01.007 [task-executor-4] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:05:01 CST 2024
+2024-01-24 16:05:01.007 [task-executor-4] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:05:01.007 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-24 16:05:01.649 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:05:01.649 [task-executor-5] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:05:01 CST 2024
+2024-01-24 16:05:01.650 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:05:01.650 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:05:02.301 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：32
+2024-01-24 16:05:02.301 [task-executor-6] INFO  c.j.admin.task.wechat.live.AsyncWechatLiveRoomTask - ---AsyncWechatLiveRoomTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:05:02 CST 2024
+2024-01-24 16:05:02.306 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 START
+2024-01-24 16:05:02.682 [task-executor-6] INFO  c.b.wx.miniapp.api.impl.BaseWxMaServiceImpl - resultContent: {"access_token":"76_4TgznZ7MhYE9X_7-zewV2CIzXC23X2q5inXVcGAF3hXkMGMhMXZXvEurKnkTeo8N_fGNWZCpF_s3e8uCWvi1VhZoaE0DAhmIH1I5IMrFdJ1qoKsRejTRfodf9VEFEBgAJAKJG","expires_in":7200}
+2024-01-24 16:05:03.109 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 微信侧待更新直播间数据:[{"anchorName":"比尔·盖茨","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1704185313,"feedsImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":[{"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0","goodsId":2,"name":"炬宝鹏系统","price":9999,"price2":0,"priceType":1,"url":"pages/goods/goods_details/index?id=92"}],"isFeedsPublic":0,"liveStatus":103,"name":"好久不见","roomId":5,"shareImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","startTime":1704184682,"type":0},{"anchorName":"测试","closeComment":0,"closeGoods":0,"closeKf":1,"closeLike":0,"closeReplay":0,"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1602595476,"feedsImg":"","goods":[],"isFeedsPublic":1,"liveStatus":103,"name":"测试测试","roomId":1,"shareImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","startTime":1594435215,"type":0}]
+2024-01-24 16:05:03.516 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 同步直播间数据:{"liveReplay":[{"createTime":"2024-01-02T08:48:14Z","expireTime":"2025-01-01T08:48:14Z","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4"},{"createTime":"2024-01-02T08:42:41Z","expireTime":"2025-01-01T08:42:40Z","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4"},{"createTime":"2106-02-07T14:28:15","expireTime":"2116-02-05T14:28:15","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8"}],"roomInfos":[],"total":1}
+2024-01-24 16:05:04.025 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 同步直播间数据:{"liveReplay":[],"roomInfos":[],"total":1}
+2024-01-24 16:05:04.086 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 待更新的直播间有:[{"anchorName":"比尔·盖茨","anchorWechat":"fyq9wyyrmb","assistant":"","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"closeShare":1,"coverImg":"q9V2a81fuC1-HWuzWNO3kyGFAMTvudJ0BpVCi45BaJTv2eQ_dbzAleHsQjzyoALo","coverImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createTime":1706067302000,"createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","createrWechat":"","endTime":1704185313000,"feedsImg":"q9V2a81fuC1-HWuzWNO3k9kSwzqsFtoM0hRE4__PkRZSJVff37fC1GuwPvGKVICq","feedsImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":"2","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","id":9,"isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"merId":3,"merName":"炬宝鹏","merType":3,"reviewReason":"","reviewStatus":3,"roomId":5,"roomName":"好久不见","shareImg":"q9V2a81fuC1-HWuzWNO3k-tnKxOVN7Hbp_TUL7sCYrWwUv68TGxMxJ-AE4Hd_pS5","shareImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","sort":0,"star":0,"startTime":1704184682000,"storeShow":1,"subAnchorWechat":"","type":0}]
+2024-01-24 16:05:04.086 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - roomID 对比:{"anchorName":"比尔·盖茨","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1704185313000,"feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"roomId":5,"roomName":"好久不见","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","startTime":1704184682000,"type":0}
+2024-01-24 16:05:04.087 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 找到本地对应的数据:[{"anchorName":"比尔·盖茨","anchorWechat":"fyq9wyyrmb","assistant":"","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"closeShare":1,"coverImg":"q9V2a81fuC1-HWuzWNO3kyGFAMTvudJ0BpVCi45BaJTv2eQ_dbzAleHsQjzyoALo","coverImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createTime":1706067302000,"createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","createrWechat":"","endTime":1704185313000,"feedsImg":"q9V2a81fuC1-HWuzWNO3k9kSwzqsFtoM0hRE4__PkRZSJVff37fC1GuwPvGKVICq","feedsImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":"2","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","id":9,"isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"merId":3,"merName":"炬宝鹏","merType":3,"reviewReason":"","reviewStatus":3,"roomId":5,"roomName":"好久不见","shareImg":"q9V2a81fuC1-HWuzWNO3k-tnKxOVN7Hbp_TUL7sCYrWwUv68TGxMxJ-AE4Hd_pS5","shareImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","sort":0,"star":0,"startTime":1704184682000,"storeShow":1,"subAnchorWechat":"","type":0}]
+2024-01-24 16:05:04.087 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - roomID 对比:{"anchorName":"测试","closeComment":0,"closeGoods":0,"closeKf":1,"closeLike":0,"closeReplay":0,"coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1602595476000,"feedsImgWx":"","isFeedsPublic":1,"liveStatus":103,"roomId":1,"roomName":"测试测试","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","startTime":1594435215000,"type":0}
+2024-01-24 16:05:04.087 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 找到本地对应的数据:[]
+2024-01-24 16:05:04.087 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 本地未找到roomId为:1的数据
+2024-01-24 16:05:04.222 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 批量更新直播间结果:true
+2024-01-24 16:05:04.222 [task-executor-6] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 END
+2024-01-24 16:05:04.222 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：32  总共耗时：1921毫秒
+2024-01-24 16:06:00.374 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:06:00.374 [task-executor-7] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:06:00
+2024-01-24 16:06:00.405 [task-executor-7] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:06:00
+2024-01-24 16:06:00.405 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-24 16:06:01.025 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:06:01.025 [task-executor-8] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:06:01 CST 2024
+2024-01-24 16:06:01.025 [task-executor-8] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:06:01.025 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:06:01.677 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:06:01.678 [task-executor-9] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:06:01 CST 2024
+2024-01-24 16:06:01.678 [task-executor-9] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:06:01.678 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：2毫秒
+2024-01-24 16:07:00.367 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:07:00.367 [task-executor-10] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:07:00 CST 2024
+2024-01-24 16:07:00.397 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：30毫秒
+2024-01-24 16:07:01.008 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:07:01.008 [task-executor-11] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:07:01 CST 2024
+2024-01-24 16:07:01.009 [task-executor-11] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:07:01.009 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：2毫秒
+2024-01-24 16:07:01.652 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:07:01.652 [task-executor-12] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:07:01 CST 2024
+2024-01-24 16:07:01.653 [task-executor-12] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:07:01.653 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:08:00.381 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:08:00.382 [task-executor-13] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:08:00
+2024-01-24 16:08:00.413 [task-executor-13] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:08:00
+2024-01-24 16:08:00.413 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-24 16:08:01.019 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:08:01.020 [task-executor-14] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:08:01 CST 2024
+2024-01-24 16:08:01.020 [task-executor-14] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:08:01.020 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:08:01.666 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:08:01.666 [task-executor-15] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:08:01 CST 2024
+2024-01-24 16:08:01.666 [task-executor-15] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:08:01.666 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:09:00.377 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:09:00.378 [task-executor-16] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:09:00 CST 2024
+2024-01-24 16:09:00.410 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：30毫秒
+2024-01-24 16:09:01.020 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:09:01.020 [task-executor-17] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:09:01 CST 2024
+2024-01-24 16:09:01.021 [task-executor-17] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:09:01.021 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:09:01.668 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:09:01.668 [task-executor-18] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:09:01 CST 2024
+2024-01-24 16:09:01.669 [task-executor-18] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:09:01.669 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:10:00.370 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:10:00.371 [task-executor-19] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:10:00
+2024-01-24 16:10:00.400 [task-executor-19] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:10:00
+2024-01-24 16:10:00.400 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：30毫秒
+2024-01-24 16:10:01.013 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:10:01.013 [task-executor-20] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:10:01 CST 2024
+2024-01-24 16:10:01.014 [task-executor-20] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:10:01.014 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-24 16:10:01.662 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:10:01.662 [task-executor-1] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:10:01 CST 2024
+2024-01-24 16:10:01.662 [task-executor-1] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:10:01.663 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:10:02.316 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：32
+2024-01-24 16:10:02.316 [task-executor-2] INFO  c.j.admin.task.wechat.live.AsyncWechatLiveRoomTask - ---AsyncWechatLiveRoomTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:10:02 CST 2024
+2024-01-24 16:10:02.316 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 START
+2024-01-24 16:10:02.834 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 微信侧待更新直播间数据:[{"anchorName":"比尔·盖茨","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1704185313,"feedsImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":[{"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0","goodsId":2,"name":"炬宝鹏系统","price":9999,"price2":0,"priceType":1,"url":"pages/goods/goods_details/index?id=92"}],"isFeedsPublic":0,"liveStatus":103,"name":"好久不见","roomId":5,"shareImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","startTime":1704184682,"type":0},{"anchorName":"测试","closeComment":0,"closeGoods":0,"closeKf":1,"closeLike":0,"closeReplay":0,"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1602595476,"feedsImg":"","goods":[],"isFeedsPublic":1,"liveStatus":103,"name":"测试测试","roomId":1,"shareImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","startTime":1594435215,"type":0}]
+2024-01-24 16:10:03.180 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 同步直播间数据:{"liveReplay":[{"createTime":"2024-01-02T08:48:14Z","expireTime":"2025-01-01T08:48:14Z","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4"},{"createTime":"2024-01-02T08:42:41Z","expireTime":"2025-01-01T08:42:40Z","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4"},{"createTime":"2106-02-07T14:28:15","expireTime":"2116-02-05T14:28:15","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8"}],"roomInfos":[],"total":1}
+2024-01-24 16:10:03.753 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 同步直播间数据:{"liveReplay":[],"roomInfos":[],"total":1}
+2024-01-24 16:10:05.098 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 待更新的直播间有:[{"anchorName":"比尔·盖茨","anchorWechat":"fyq9wyyrmb","assistant":"","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"closeShare":1,"coverImg":"q9V2a81fuC1-HWuzWNO3kyGFAMTvudJ0BpVCi45BaJTv2eQ_dbzAleHsQjzyoALo","coverImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createTime":1706067302000,"createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","createrWechat":"","endTime":1704185313000,"feedsImg":"q9V2a81fuC1-HWuzWNO3k9kSwzqsFtoM0hRE4__PkRZSJVff37fC1GuwPvGKVICq","feedsImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":"2","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","id":9,"isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"merId":3,"merName":"炬宝鹏","merType":3,"reviewReason":"","reviewStatus":3,"roomId":5,"roomName":"好久不见","shareImg":"q9V2a81fuC1-HWuzWNO3k-tnKxOVN7Hbp_TUL7sCYrWwUv68TGxMxJ-AE4Hd_pS5","shareImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","sort":0,"star":0,"startTime":1704184682000,"storeShow":1,"subAnchorWechat":"","type":0}]
+2024-01-24 16:10:05.098 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - roomID 对比:{"anchorName":"比尔·盖茨","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1704185313000,"feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"roomId":5,"roomName":"好久不见","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","startTime":1704184682000,"type":0}
+2024-01-24 16:10:05.098 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 找到本地对应的数据:[{"anchorName":"比尔·盖茨","anchorWechat":"fyq9wyyrmb","assistant":"","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"closeShare":1,"coverImg":"q9V2a81fuC1-HWuzWNO3kyGFAMTvudJ0BpVCi45BaJTv2eQ_dbzAleHsQjzyoALo","coverImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createTime":1706067302000,"createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","createrWechat":"","endTime":1704185313000,"feedsImg":"q9V2a81fuC1-HWuzWNO3k9kSwzqsFtoM0hRE4__PkRZSJVff37fC1GuwPvGKVICq","feedsImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":"2","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","id":9,"isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"merId":3,"merName":"炬宝鹏","merType":3,"reviewReason":"","reviewStatus":3,"roomId":5,"roomName":"好久不见","shareImg":"q9V2a81fuC1-HWuzWNO3k-tnKxOVN7Hbp_TUL7sCYrWwUv68TGxMxJ-AE4Hd_pS5","shareImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","sort":0,"star":0,"startTime":1704184682000,"storeShow":1,"subAnchorWechat":"","type":0}]
+2024-01-24 16:10:05.098 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - roomID 对比:{"anchorName":"测试","closeComment":0,"closeGoods":0,"closeKf":1,"closeLike":0,"closeReplay":0,"coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1602595476000,"feedsImgWx":"","isFeedsPublic":1,"liveStatus":103,"roomId":1,"roomName":"测试测试","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","startTime":1594435215000,"type":0}
+2024-01-24 16:10:05.099 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 找到本地对应的数据:[]
+2024-01-24 16:10:05.099 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 本地未找到roomId为:1的数据
+2024-01-24 16:10:05.201 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 批量更新直播间结果:true
+2024-01-24 16:10:05.201 [task-executor-2] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 END
+2024-01-24 16:10:05.201 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：32  总共耗时：2885毫秒
+2024-01-24 16:11:00.368 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:11:00.369 [task-executor-3] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:11:00 CST 2024
+2024-01-24 16:11:00.398 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：30毫秒
+2024-01-24 16:11:00.993 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:11:00.993 [task-executor-4] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:11:00 CST 2024
+2024-01-24 16:11:00.994 [task-executor-4] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:11:00.994 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:11:01.631 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:11:01.631 [task-executor-5] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:11:01 CST 2024
+2024-01-24 16:11:01.632 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:11:01.632 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:12:00.366 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:12:00.366 [task-executor-6] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:12:00
+2024-01-24 16:12:00.397 [task-executor-6] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:12:00
+2024-01-24 16:12:00.397 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：30毫秒
+2024-01-24 16:12:01.007 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:12:01.007 [task-executor-7] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:12:01 CST 2024
+2024-01-24 16:12:01.008 [task-executor-7] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:12:01.008 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:12:01.650 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:12:01.650 [task-executor-8] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:12:01 CST 2024
+2024-01-24 16:12:01.650 [task-executor-8] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:12:01.650 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:13:00.363 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:13:00.363 [task-executor-9] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:13:00 CST 2024
+2024-01-24 16:13:00.394 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：32毫秒
+2024-01-24 16:13:01.002 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:13:01.002 [task-executor-10] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:13:01 CST 2024
+2024-01-24 16:13:01.003 [task-executor-10] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:13:01.003 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:13:01.638 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:13:01.638 [task-executor-11] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:13:01 CST 2024
+2024-01-24 16:13:01.638 [task-executor-11] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:13:01.638 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:14:00.382 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:14:00.382 [task-executor-12] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:14:00 CST 2024
+2024-01-24 16:14:00.413 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：30毫秒
+2024-01-24 16:14:01.016 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:14:01.017 [task-executor-13] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:14:01 CST 2024
+2024-01-24 16:14:01.017 [task-executor-13] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:14:01.017 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：15毫秒
+2024-01-24 16:14:01.672 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:14:01.672 [task-executor-14] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:14:01 CST 2024
+2024-01-24 16:14:01.672 [task-executor-14] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:14:01.672 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:15:00.383 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:15:00.383 [task-executor-15] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:15:00
+2024-01-24 16:15:00.415 [task-executor-15] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:15:00
+2024-01-24 16:15:00.415 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-24 16:15:01.020 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:15:01.020 [task-executor-16] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:15:01 CST 2024
+2024-01-24 16:15:01.020 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:15:01.021 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-24 16:15:01.655 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:15:01.655 [task-executor-17] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:15:01 CST 2024
+2024-01-24 16:15:01.656 [task-executor-17] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:15:01.656 [task-executor-17] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:16:00.372 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:16:00.372 [task-executor-18] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:16:00
+2024-01-24 16:16:00.402 [task-executor-18] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:16:00
+2024-01-24 16:16:00.403 [task-executor-18] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-24 16:16:01.010 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:16:01.010 [task-executor-19] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:16:01 CST 2024
+2024-01-24 16:16:01.010 [task-executor-19] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:16:01.010 [task-executor-19] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:16:01.649 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:16:01.649 [task-executor-20] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:16:01 CST 2024
+2024-01-24 16:16:01.650 [task-executor-20] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:16:01.650 [task-executor-20] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：2毫秒
+2024-01-24 16:17:00.383 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:17:00.383 [task-executor-1] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:17:00 CST 2024
+2024-01-24 16:17:00.425 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：42毫秒
+2024-01-24 16:17:01.033 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:17:01.034 [task-executor-2] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:17:01 CST 2024
+2024-01-24 16:17:01.034 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:17:01.034 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：2毫秒
+2024-01-24 16:17:01.673 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:17:01.673 [task-executor-3] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:17:01 CST 2024
+2024-01-24 16:17:01.673 [task-executor-3] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:17:01.673 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:18:00.367 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:18:00.367 [task-executor-4] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:18:00
+2024-01-24 16:18:00.397 [task-executor-4] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:18:00
+2024-01-24 16:18:00.397 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：30毫秒
+2024-01-24 16:18:00.994 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:18:00.994 [task-executor-5] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:18:00 CST 2024
+2024-01-24 16:18:00.995 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:18:00.995 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：1毫秒
+2024-01-24 16:18:01.629 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:18:01.629 [task-executor-6] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:18:01 CST 2024
+2024-01-24 16:18:01.629 [task-executor-6] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:18:01.629 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:19:00.374 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:19:00.374 [task-executor-7] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:19:00 CST 2024
+2024-01-24 16:19:00.404 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：31毫秒
+2024-01-24 16:19:01.007 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:19:01.007 [task-executor-8] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:19:01 CST 2024
+2024-01-24 16:19:01.007 [task-executor-8] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:19:01.007 [task-executor-8] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:19:01.644 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:19:01.644 [task-executor-9] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:19:01 CST 2024
+2024-01-24 16:19:01.645 [task-executor-9] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:19:01.645 [task-executor-9] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:20:00.380 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-01-24 16:20:00.380 [task-executor-10] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-01-24 16:20:00
+2024-01-24 16:20:00.416 [task-executor-10] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-01-24 16:20:00
+2024-01-24 16:20:00.416 [task-executor-10] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：31毫秒
+2024-01-24 16:20:01.031 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:20:01.031 [task-executor-11] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:20:01 CST 2024
+2024-01-24 16:20:01.031 [task-executor-11] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:20:01.031 [task-executor-11] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:20:01.669 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:20:01.669 [task-executor-12] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:20:01 CST 2024
+2024-01-24 16:20:01.669 [task-executor-12] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:20:01.669 [task-executor-12] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：0毫秒
+2024-01-24 16:20:02.323 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：32
+2024-01-24 16:20:02.323 [task-executor-13] INFO  c.j.admin.task.wechat.live.AsyncWechatLiveRoomTask - ---AsyncWechatLiveRoomTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:20:02 CST 2024
+2024-01-24 16:20:02.323 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 START
+2024-01-24 16:20:02.835 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 微信侧待更新直播间数据:[{"anchorName":"比尔·盖茨","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1704185313,"feedsImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":[{"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0","goodsId":2,"name":"炬宝鹏系统","price":9999,"price2":0,"priceType":1,"url":"pages/goods/goods_details/index?id=92"}],"isFeedsPublic":0,"liveStatus":103,"name":"好久不见","roomId":5,"shareImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","startTime":1704184682,"type":0},{"anchorName":"测试","closeComment":0,"closeGoods":0,"closeKf":1,"closeLike":0,"closeReplay":0,"coverImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1602595476,"feedsImg":"","goods":[],"isFeedsPublic":1,"liveStatus":103,"name":"测试测试","roomId":1,"shareImg":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","startTime":1594435215,"type":0}]
+2024-01-24 16:20:03.125 [task-executor-13] INFO  c.b.wx.miniapp.api.impl.BaseWxMaServiceImpl - resultContent: {"access_token":"76_5AFfyTkh1yGimUipIf00H8BiNsDiFdCW-qQwkFTuUwNfqXo_AT9DEuTApkiE-lGpvzKLe9dkhRGowEylaYmnCAD0IjjrzNq5ndQOxY9RDIymfE_McDjXCID1mLoUQVcAJAYUZ","expires_in":7200}
+2024-01-24 16:20:03.536 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 同步直播间数据:{"liveReplay":[{"createTime":"2024-01-02T08:48:14Z","expireTime":"2025-01-01T08:48:14Z","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4"},{"createTime":"2024-01-02T08:42:41Z","expireTime":"2025-01-01T08:42:40Z","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4"},{"createTime":"2106-02-07T14:28:15","expireTime":"2116-02-05T14:28:15","mediaUrl":"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8"}],"roomInfos":[],"total":1}
+2024-01-24 16:20:06.106 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 同步直播间数据:{"liveReplay":[],"roomInfos":[],"total":1}
+2024-01-24 16:20:13.612 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 待更新的直播间有:[{"anchorName":"比尔·盖茨","anchorWechat":"fyq9wyyrmb","assistant":"","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"closeShare":1,"coverImg":"q9V2a81fuC1-HWuzWNO3kyGFAMTvudJ0BpVCi45BaJTv2eQ_dbzAleHsQjzyoALo","coverImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createTime":1706067302000,"createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","createrWechat":"","endTime":1704185313000,"feedsImg":"q9V2a81fuC1-HWuzWNO3k9kSwzqsFtoM0hRE4__PkRZSJVff37fC1GuwPvGKVICq","feedsImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":"2","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","id":9,"isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"merId":3,"merName":"炬宝鹏","merType":3,"reviewReason":"","reviewStatus":3,"roomId":5,"roomName":"好久不见","shareImg":"q9V2a81fuC1-HWuzWNO3k-tnKxOVN7Hbp_TUL7sCYrWwUv68TGxMxJ-AE4Hd_pS5","shareImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","sort":0,"star":0,"startTime":1704184682000,"storeShow":1,"subAnchorWechat":"","type":0}]
+2024-01-24 16:20:13.613 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - roomID 对比:{"anchorName":"比尔·盖茨","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1704185313000,"feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"roomId":5,"roomName":"好久不见","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","startTime":1704184682000,"type":0}
+2024-01-24 16:20:13.613 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 找到本地对应的数据:[{"anchorName":"比尔·盖茨","anchorWechat":"fyq9wyyrmb","assistant":"","closeComment":0,"closeGoods":1,"closeKf":0,"closeLike":1,"closeReplay":1,"closeShare":1,"coverImg":"q9V2a81fuC1-HWuzWNO3kyGFAMTvudJ0BpVCi45BaJTv2eQ_dbzAleHsQjzyoALo","coverImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","createTime":1706067302000,"createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","createrWechat":"","endTime":1704185313000,"feedsImg":"q9V2a81fuC1-HWuzWNO3k9kSwzqsFtoM0hRE4__PkRZSJVff37fC1GuwPvGKVICq","feedsImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","feedsImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","goods":"2","goodsJson":"[{\"coverImg\":\"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEicnHM9c0yFgsH80kYfEygOibKkhxTiaUTPehNx25zP758MysNpd5Hsib9A/0\",\"goodsId\":2,\"name\":\"炬宝鹏系统\",\"price\":9999,\"price2\":0,\"priceType\":1,\"url\":\"pages/goods/goods_details/index?id=92\"}]","id":9,"isFeedsPublic":0,"liveReplay":"[{\"createTime\":\"2024-01-02T08:48:14Z\",\"expireTime\":\"2025-01-01T08:48:14Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e05d81c23270835014528815546/f0.mp4\"},{\"createTime\":\"2024-01-02T08:42:41Z\",\"expireTime\":\"2025-01-01T08:42:40Z\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/e29a35a23270835014606849074/f0.mp4\"},{\"createTime\":\"2106-02-07T14:28:15\",\"expireTime\":\"2116-02-05T14:28:15\",\"mediaUrl\":\"http://1258344707.vod2.myqcloud.com/1b87576bvodcq1258344707/a91d538a3270835014548194849/playlist.f3.m3u8\"}]","liveStatus":103,"merId":3,"merName":"炬宝鹏","merType":3,"reviewReason":"","reviewStatus":3,"roomId":5,"roomName":"好久不见","shareImg":"q9V2a81fuC1-HWuzWNO3k-tnKxOVN7Hbp_TUL7sCYrWwUv68TGxMxJ-AE4Hd_pS5","shareImgLocal":"crmebimage/public/content/2023/12/27/45b85a72c17943e28ec21a26d496c19138psky7nme.png","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib5Qh5xRSXcDJE0jDAAVPOibEmdfLCUPtUT5ocYYR20fYUjxibCM0Edub4DE81FCXZ5kGpNtF4DQ49Qg/0","sort":0,"star":0,"startTime":1704184682000,"storeShow":1,"subAnchorWechat":"","type":0}]
+2024-01-24 16:20:13.613 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - roomID 对比:{"anchorName":"测试","closeComment":0,"closeGoods":0,"closeKf":1,"closeLike":0,"closeReplay":0,"coverImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","createrOpenid":"oqnxa5C7LFoI7Q4lUloLGL6MXUjI","endTime":1602595476000,"feedsImgWx":"","isFeedsPublic":1,"liveStatus":103,"roomId":1,"roomName":"测试测试","shareImgWx":"http://mmbiz.qpic.cn/mmbiz_png/Epx1jFzZNib6fRW2mntlWKtO5EPhYvLzZXibbrCGBnsfbckOhECsdGuE4d4tnGZpY7cr3ztu8ZbRg7pUHcfmyicPw/0","startTime":1594435215000,"type":0}
+2024-01-24 16:20:13.613 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 找到本地对应的数据:[]
+2024-01-24 16:20:13.613 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 本地未找到roomId为:1的数据
+2024-01-24 16:20:13.713 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 批量更新直播间结果:true
+2024-01-24 16:20:13.713 [task-executor-13] INFO  c.j.service.service.impl.WechatLiveRoomServiceImpl - 直播间 - 更新状态 END
+2024-01-24 16:20:13.713 [task-executor-13] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：32  总共耗时：11402毫秒
+2024-01-24 16:21:00.382 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：4
+2024-01-24 16:21:00.382 [task-executor-14] INFO  com.jbp.admin.task.integral.IntegralFrozenTask - ---IntegralFrozenTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:21:00 CST 2024
+2024-01-24 16:21:00.416 [task-executor-14] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：4  总共耗时：33毫秒
+2024-01-24 16:21:01.025 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：5
+2024-01-24 16:21:01.025 [task-executor-15] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:21:01 CST 2024
+2024-01-24 16:21:01.026 [task-executor-15] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
+2024-01-24 16:21:01.026 [task-executor-15] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：0毫秒
+2024-01-24 16:21:01.671 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：9
+2024-01-24 16:21:01.671 [task-executor-16] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - Wed Jan 24 16:21:01 CST 2024
+2024-01-24 16:21:01.672 [task-executor-16] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderPaySuccessAfter | size:0
+2024-01-24 16:21:01.672 [task-executor-16] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：9  总共耗时：1毫秒
+2024-01-24 16:21:35.789 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-01-24 16:21:35.800 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'jmReportTaskExecutor'
+2024-01-24 16:21:35.802 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-01-24 16:21:35.808 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
+2024-01-24 16:21:35.808 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2024-01-24 16:21:35.808 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-01-24 16:21:35.809 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2024-01-24 16:21:35.827 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-01-24 16:21:35.833 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
