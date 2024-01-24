@@ -48,10 +48,5 @@ public class ProductCommConfigController {
     }
 
 
-    @GetMapping("/list")
-    @ApiOperation("商品佣金列表")
-    public CommonResult<List<ProductCommConfig>> list() {
-        return CommonResult.success( service.list(new QueryWrapper<ProductCommConfig>().lambda().eq(ProductCommConfig::getIfOpen, true)));
-    }
 
 }

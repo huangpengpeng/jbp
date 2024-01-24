@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ProductCommConfig;
+import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.ProductCommConfigDao;
@@ -76,5 +77,10 @@ public class ProductCommConfigServiceImpl extends ServiceImpl<ProductCommConfigD
         UpdateWrapper<ProductCommConfig> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(ProductCommConfig::getIfOpen, false).eq(ProductCommConfig::getType, type);
         return update(updateWrapper);
+    }
+
+    @Override
+    public List<ProductCommConfig> getOpenList() {
+        return list(new QueryWrapper<ProductCommConfig>().lambda().eq(ProductCommConfig::getIfOpen, true));
     }
 }

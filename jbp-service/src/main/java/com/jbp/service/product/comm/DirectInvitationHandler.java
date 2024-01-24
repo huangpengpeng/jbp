@@ -1,6 +1,7 @@
 package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.UserCapa;
@@ -63,11 +64,13 @@ public class DirectInvitationHandler implements AbstractProductCommHandler {
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
         List<Rule> rule = getRule(productComm);
         Set<Integer> set = rule.stream().map(Rule::getCapaId).collect(Collectors.toSet());
-        if(set.size() != rule.size()){
+        if (set.size() != rule.size()) {
             throw new CrmebException("等级配置不能重复");
         }
         // 删除数据库的信息
-        productCommService.deleteByProduct(productComm.getProductId(), productComm.getType());
+        productCommService.remove(new LambdaQueryWrapper<ProductComm>()
+                .eq(ProductComm::getProductId, productComm.getProductId())
+                .eq(ProductComm::getType, productComm.getType()));
         // 保存最新的信息
         productCommService.save(productComm);
         return true;

@@ -4,14 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.agent.ProductComm;
-import com.jbp.common.model.agent.TeamUser;
 import com.jbp.service.dao.agent.ProductCommDao;
+import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.agent.ProductCommService;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -22,6 +22,13 @@ import java.util.List;
 @Service
 public class ProductCommServiceImpl extends ServiceImpl<ProductCommDao, ProductComm>implements ProductCommService {
 
+    @Resource
+    private ProductCommChain productCommChain;
+
+    @Override
+    public void edit(ProductComm productComm) {
+        productCommChain.saveOrUpdate(productComm);
+    }
 
     @Override
     public ProductComm getByProduct(Integer productId, Integer type) {
@@ -34,20 +41,7 @@ public class ProductCommServiceImpl extends ServiceImpl<ProductCommDao, ProductC
     }
 
     @Override
-    public void deleteByProduct(Integer productId) {
-        remove(new LambdaQueryWrapper<ProductComm>().eq(ProductComm::getProductId, productId));
-    }
-
-    @Override
     public void deleteByProduct(Integer productId, Integer type) {
         remove(new LambdaQueryWrapper<ProductComm>().eq(ProductComm::getProductId, productId).eq(ProductComm::getType, type));
-    }
-
-    @Override
-    public Boolean save(Integer productId, Integer type, String name, BigDecimal scale, String rule) {
-
-
-
-        return null;
     }
 }

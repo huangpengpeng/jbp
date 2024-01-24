@@ -29,12 +29,13 @@ public class ProductComm extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    public ProductComm(Integer productId, Integer type, String name, BigDecimal scale, String rule) {
+    public ProductComm(Integer productId, Integer type, String name, BigDecimal scale, String rule, Boolean  status) {
         this.productId = productId;
         this.type = type;
         this.name = name;
         this.scale = scale;
         this.rule = rule;
+        this.status = status;
     }
 
     public Boolean hasError() {
