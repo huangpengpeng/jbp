@@ -13,10 +13,10 @@ public interface LimitTempService extends IService<LimitTemp> {
 
     LimitTemp add(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList, String description);
 
-    void validBuy(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId, Product product);
-
     List<Long> hasLimits(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId);
 
+    void validBuy(Long capaId, Long capaXsId, List<Long> whiteIdList,
+                         List<Long> teamIdList, Integer pId, Integer rId, List<Product> productList);
 
     PageInfo<LimitTemp> pageList(String name, String type, PageParamRequest pageParamRequest);
 
@@ -25,4 +25,6 @@ public interface LimitTempService extends IService<LimitTemp> {
     void update(Long id, String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList, String description);
 
     LimitTempResponse details(Integer id);
+
+
 }

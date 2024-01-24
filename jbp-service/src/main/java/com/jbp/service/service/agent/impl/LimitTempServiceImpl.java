@@ -27,11 +27,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -85,20 +87,6 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
         return temp;
     }
 
-
-    @Override
-    public void validBuy(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId, Product product) {
-        if (product.getBuyLimitTempId() == null) {
-            return;
-        }
-        final List<Long> limits = hasLimits(capaId, capaXsId, whiteIdList, teamIdList, pId, rId);
-        if (limits != null && limits.contains(product.getBuyLimitTempId())) {
-            return;
-        }
-        throw new CrmebException("无购买权限");
-    }
-
-
     @Override
     public List<Long> hasLimits(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId) {
         Long pCapaId, pCapaXsId, rCapaId, rCapaXsId;
@@ -140,6 +128,50 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
             }
         });
         return list;
+    }
+
+    @Override
+    public void validBuy(Long capaId, Long capaXsId, List<Long> whiteIdList,
+                         List<Long> teamIdList, Integer pId, Integer rId, List<Product> productList) {
+        if (CollectionUtils.isEmpty(productList)) {
+            return;
+        }
+        productList = productList.stream().filter(p -> p.getBuyLimitTempId() != null).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(productList)) {
+            return;
+        }
+        Long pCapaId, pCapaXsId, rCapaId, rCapaXsId;
+        if (pId != null) {
+            UserCapa pUserCapa = userCapaService.getByUser(pId);
+            pCapaId = pUserCapa == null ? null : pUserCapa.getCapaId();
+            UserCapaXs pUserCapaXs = userCapaXsService.getByUser(pId);
+            pCapaXsId = pUserCapaXs == null ? null : pUserCapaXs.getCapaId();
+        } else {
+            pCapaXsId = null;
+            pCapaId = null;
+        }
+        if (rId != null) {
+            UserCapa rUserCapa = userCapaService.getByUser(rId);
+            rCapaId = rUserCapa == null ? null : rUserCapa.getCapaId();
+            UserCapaXs rUserCapaXs = userCapaXsService.getByUser(rId);
+            rCapaXsId = rUserCapaXs == null ? null : rUserCapaXs.getCapaId();
+        } else {
+            rCapaXsId = null;
+            rCapaId = null;
+        }
+        Map<Object, Object> hmget = redisUtil.hmget(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST);
+        if (hmget == null || hmget.size() == 0) {
+            loadingTempCache();
+        }
+        for (Product product : productList) {
+            Object o = redisUtil.hmget(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST).get(product.getId().toString());
+            if (o != null) {
+                LimitTemp temp = (LimitTemp) o;
+                if (!temp.check(capaId, capaXsId, whiteIdList, teamIdList, pId, pCapaId, pCapaXsId, rId, rCapaId, rCapaXsId)) {
+                    throw new CrmebException(product.getName() + ":无购买权限");
+                }
+            }
+        }
     }
 
     @Override
@@ -210,6 +242,7 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
         }
         limitTempRequest.setDescription(limitTemp.getDescription());
         return limitTempRequest;
-
     }
+
+
 }

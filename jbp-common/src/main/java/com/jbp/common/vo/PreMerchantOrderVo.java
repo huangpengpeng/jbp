@@ -45,6 +45,12 @@ public class PreMerchantOrderVo implements Serializable {
     @ApiModelProperty(value = "运费金额")
     private BigDecimal freightFee;
 
+    @ApiModelProperty(value = "钱包积分抵扣金额")
+    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "钱包积分抵扣")
+    private List<WalletDeductionVo> walletDeductionList;
+
     @ApiModelProperty(value = "优惠券编号（选择优惠券时有值,不选时为0")
     private Integer userCouponId = 0;
 

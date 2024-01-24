@@ -126,7 +126,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Autowired
     private ProductTagService productTagService;
     @Autowired
-    private LimitTempService productLimitTempService;
+    private LimitTempService limitTempService;
     @Autowired
     private UserCapaService userCapaService;
     @Autowired
@@ -1041,7 +1041,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             pId = userInvitationService.getPid(request.getUId());
             rId = userRelationService.getPid(request.getUId());
         }
-        List<Long> tempIds = productLimitTempService.hasLimits(request.getCapaId(), request.getCapaXsId(), whiteIdList, teamIdList, pId, rId);
+        List<Long> tempIds = limitTempService.hasLimits(request.getCapaId(), request.getCapaXsId(), whiteIdList, teamIdList, pId, rId);
         if (tempIds != null) {
             if (tempIds.isEmpty()) {
                 tempIds.add(-1L);

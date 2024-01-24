@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 订单详情Vo对象
@@ -88,4 +89,10 @@ public class PreOrderInfoDetailVo {
 
     @ApiModelProperty(value = "商户优惠券优惠金额")
     private BigDecimal merCouponPrice = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "钱包积分抵扣金额")
+    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "钱包积分抵扣")
+    private List<WalletDeductionVo> walletDeductionList;
 }

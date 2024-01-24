@@ -26,13 +26,6 @@ import java.util.List;
 public interface FrontOrderService {
 
     /**
-     * 订单预下单
-     * @param request 预下单请求参数
-     * @return PreOrderResponse
-     */
-    OrderNoResponse preOrder(PreOrderRequest request);
-
-    /**
      * 订单预下单V1.3
      * @param request 预下单请求参数
      * @return PreOrderResponse

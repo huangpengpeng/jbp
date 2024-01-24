@@ -9,12 +9,14 @@ import com.jbp.common.request.PasswordRequest;
 import com.jbp.common.request.UserBindingPhoneUpdateRequest;
 import com.jbp.common.request.UserEditInfoRequest;
 import com.jbp.common.request.UserHelpRegisterRequest;
+import com.jbp.common.response.HelpRegisterResponse;
 import com.jbp.common.response.UserInfoResponse;
 import com.jbp.common.response.UserLogoffBeforeResponse;
 import com.jbp.common.response.UserRelationInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 
+import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserRelationService;
 import io.swagger.annotations.Api;
@@ -58,6 +60,8 @@ public class UserController {
     private UserRelationService relationService;
     @Autowired
     private UserInvitationService invitationService;
+    @Autowired
+    private CapaService capaService;
 
     @ApiOperation(value = "手机号修改密码")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -212,17 +216,9 @@ public class UserController {
     @ApiOperation(value = "上级帮忙注册")
     @RequestMapping(value = "/help/register", method = RequestMethod.POST)
     public CommonResult<User> register(@RequestBody @Validated UserHelpRegisterRequest request) {
-        User pUser = userService.getByAccount(request.getPAccount());
-        if (pUser == null) {
-            throw new CrmebException("邀请账号错误");
-        }
-        Integer pId = pUser.getId();
-        User rUser = userService.getByAccount(request.getRAccount());
-        if (rUser == null) {
-            throw new CrmebException("服务账号错误");
-        }
-        Integer rId = rUser.getId();
-        User user = userService.helpRegister(request.getUsername(), request.getPhone(), pId, rId, request.getNode());
+        HelpRegisterResponse response = userService.helpRegisterValid(request.getUsername(), request.getPhone(), request.getPAccount(),
+                request.getRAccount(), request.getNode(), capaService.getMinCapa().getId());
+        User user = userService.helpRegister(request.getUsername(), request.getPhone(), response.getPId(), response.getRId(), request.getNode());
         return CommonResult.success(user);
     }
 

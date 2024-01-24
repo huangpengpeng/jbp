@@ -97,11 +97,11 @@ public class OrderConstants {
 
     /** 订单下单类型-购物车 */
     public static final String PLACE_ORDER_TYPE_CART = "shoppingCart";
-    /** 订单下单类型-购物车 */
+    /** 订单下单类型-立即购买 */
     public static final String PLACE_ORDER_TYPE_BUY_NOW = "buyNow";
-    /** 订单下单类型-购物车 */
+    /** 订单下单类型-视屏号 */
     public static final String PLACE_ORDER_TYPE_VIDEO = "video";
-    /** 订单下单类型-购物车 */
+    /** 订单下单类型-秒杀 */
     public static final String PLACE_ORDER_TYPE_SECKILL = "seckill";
 
 

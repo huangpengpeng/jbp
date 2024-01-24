@@ -12,6 +12,15 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.util.NumberUtil;
+import com.beust.jcommander.internal.Lists;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.request.*;
+import com.jbp.common.response.*;
+import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.agent.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -60,34 +69,6 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.model.wechat.video.PayComponentProductSku;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.CommonSearchRequest;
-import com.jbp.common.request.CreateOrderRequest;
-import com.jbp.common.request.OrderAfterSalesSearchRequest;
-import com.jbp.common.request.OrderComputedPriceRequest;
-import com.jbp.common.request.OrderFrontListRequest;
-import com.jbp.common.request.OrderMerchantRequest;
-import com.jbp.common.request.OrderProductReplyRequest;
-import com.jbp.common.request.OrderRefundApplyRequest;
-import com.jbp.common.request.OrderRefundReturningGoodsRequest;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.PreOrderDetailRequest;
-import com.jbp.common.request.PreOrderRequest;
-import com.jbp.common.response.ComputedMerchantOrderResponse;
-import com.jbp.common.response.ComputedOrderPriceResponse;
-import com.jbp.common.response.InfoReplyResponse;
-import com.jbp.common.response.MerchantOrderFrontDetailResponse;
-import com.jbp.common.response.OrderCenterNumResponse;
-import com.jbp.common.response.OrderFrontDataResponse;
-import com.jbp.common.response.OrderFrontDetailResponse;
-import com.jbp.common.response.OrderInfoFrontDataResponse;
-import com.jbp.common.response.OrderInvoiceFrontResponse;
-import com.jbp.common.response.OrderInvoiceResponse;
-import com.jbp.common.response.OrderNoResponse;
-import com.jbp.common.response.PreOrderMerchantInfoResponse;
-import com.jbp.common.response.PreOrderResponse;
-import com.jbp.common.response.RefundOrderInfoResponse;
-import com.jbp.common.response.RefundOrderResponse;
-import com.jbp.common.response.UserInfoResponse;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
@@ -128,9 +109,6 @@ import com.jbp.service.service.UserAddressService;
 import com.jbp.service.service.UserIntegralRecordService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WhiteUserService;
-import com.jbp.service.service.agent.LimitTempService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserCapaXsService;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateField;
@@ -221,7 +199,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private CrmebConfig crmebConfig;
     @Autowired
-    private LimitTempService productBuyLimitTempService;
+    private LimitTempService limitTempService;
     @Autowired
     private UserCapaService userCapaService;
     @Autowired
@@ -230,62 +208,13 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private TeamUserService teamUserService;
     @Autowired
     private WhiteUserService whiteUserService;
+    @Autowired
+    private CapaService capaService;
+    @Autowired
+    private UserInvitationService invitationService;
+    @Autowired
+    private UserRelationService relationService;
 
-
-    /**
-     * 订单预下单
-     *
-     * @param request 预下单请求参数
-     * @return PreOrderResponse
-     */
-    @Override
-    public OrderNoResponse preOrder(PreOrderRequest request) {
-        User user = userService.getInfo();
-        // 校验预下单商品信息
-        PreOrderInfoVo preOrderInfoVo = validatePreOrderRequest(request, user);
-        List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
-        for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
-            orderInfoList.addAll(merchantOrderVo.getOrderInfoList());
-            BigDecimal merTotalPrice = merchantOrderVo.getOrderInfoList().stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
-            merchantOrderVo.setProTotalFee(merTotalPrice);
-            merchantOrderVo.setProTotalNum(merchantOrderVo.getOrderInfoList().stream().mapToInt(PreOrderInfoDetailVo::getPayNum).sum());
-        }
-        // 商品总计金额
-        BigDecimal totalPrice = orderInfoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
-        preOrderInfoVo.setProTotalFee(totalPrice);
-        // 购买商品总数量
-        int orderProNum = orderInfoList.stream().mapToInt(PreOrderInfoDetailVo::getPayNum).sum();
-        preOrderInfoVo.setOrderProNum(orderProNum);
-        // 获取默认地址
-        UserAddress userAddress = userAddressService.getDefaultByUid(user.getId());
-        if (ObjectUtil.isNotNull(userAddress)) {
-            // 计算运费
-            getFreightFee(preOrderInfoVo, userAddress);
-            preOrderInfoVo.setAddressId(userAddress.getId());
-        } else {
-            preOrderInfoVo.setFreightFee(BigDecimal.ZERO);
-            preOrderInfoVo.setAddressId(0);
-        }
-        // 实际支付金额
-        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()));
-        preOrderInfoVo.setUserIntegral(user.getIntegral());
-        preOrderInfoVo.setUserBalance(user.getNowMoney());
-        preOrderInfoVo.setIntegralDeductionSwitch(false);
-        preOrderInfoVo.setIsUseIntegral(false);
-        String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
-        String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
-        if ("true".equals(integralDeductionSwitch) && preOrderInfoVo.getProTotalFee().compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
-            preOrderInfoVo.setIntegralDeductionSwitch(true);
-        }
-        // 缓存订单
-        String key = user.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
-        redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
-        OrderNoResponse response = new OrderNoResponse();
-        response.setOrderNo(key);
-        response.setOrderType(preOrderInfoVo.getType());
-        logger.info("preOrder response:{}", JSON.toJSONString(response));
-        return response;
-    }
 
     /**
      * 订单预下单V1.3
@@ -295,9 +224,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public OrderNoResponse preOrder_V1_3(PreOrderRequest request) {
-        User user = userService.getInfo();
+        // 付款用户
+        User payUser = userService.getInfo();
         // 校验预下单商品信息
-        PreOrderInfoVo preOrderInfoVo = validatePreOrderRequest(request, user);
+        PreOrderInfoVo preOrderInfoVo = validatePreOrderRequest(request, payUser);
+
         List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
         for (PreMerchantOrderVo merchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
             orderInfoList.addAll(merchantOrderVo.getOrderInfoList());
@@ -312,7 +243,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         int orderProNum = orderInfoList.stream().mapToInt(PreOrderInfoDetailVo::getPayNum).sum();
         preOrderInfoVo.setOrderProNum(orderProNum);
         // 获取默认地址
-        UserAddress userAddress = userAddressService.getDefaultByUid(user.getId());
+        UserAddress userAddress = userAddressService.getDefaultByUid(payUser.getId());
         if (ObjectUtil.isNotNull(userAddress)) {
             // 计算运费
             getFreightFee(preOrderInfoVo, userAddress);
@@ -323,15 +254,15 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         // 实际支付金额
         preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()));
-        preOrderInfoVo.setUserIntegral(user.getIntegral());
-        preOrderInfoVo.setUserBalance(user.getNowMoney());
+        preOrderInfoVo.setUserIntegral(payUser.getIntegral());
+        preOrderInfoVo.setUserBalance(payUser.getNowMoney());
         preOrderInfoVo.setIntegralDeductionSwitch(false);
         preOrderInfoVo.setIsUseIntegral(false);
 
         if (request.getPreOrderType().equals("video") || request.getPreOrderType().equals("seckill")) {
             // 活动商品不使用优惠券
             // 缓存订单
-            String key = user.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
+            String key = payUser.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
             redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
             OrderNoResponse response = new OrderNoResponse();
             response.setOrderNo(key);
@@ -339,15 +270,20 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             logger.info("preOrder response:{}", JSON.toJSONString(response));
             return response;
         }
-        preOrderSetCouponPrice(preOrderInfoVo, orderInfoList, user);
-        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()).subtract(preOrderInfoVo.getCouponFee()));
+        preOrderSetCouponPrice(preOrderInfoVo, orderInfoList, payUser);
+        // todo 计算钱包抵扣 平台抵扣总金额  计算业绩总金额
+
+
+
+        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()).subtract(preOrderInfoVo.getCouponFee()).subtract(preOrderInfoVo.getWalletDeductionFee()));
+
         String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
         String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
         if ("true".equals(integralDeductionSwitch) && preOrderInfoVo.getProTotalFee().subtract(preOrderInfoVo.getCouponFee()).compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
             preOrderInfoVo.setIntegralDeductionSwitch(true);
         }
         // 缓存订单
-        String key = user.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
+        String key = payUser.getId() + CrmebDateUtil.getNowTime().toString() + CrmebUtil.getUuid();
         redisUtil.set(OrderConstants.PRE_ORDER_CACHE_PREFIX + key, JSONObject.toJSONString(preOrderInfoVo), OrderConstants.PRE_ORDER_CACHE_TIME, TimeUnit.MINUTES);
         OrderNoResponse response = new OrderNoResponse();
         response.setOrderNo(key);
@@ -2146,13 +2082,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      * @param request 预下单请求参数
      * @return OrderInfoVo
      */
-    private PreOrderInfoVo validatePreOrderRequest(PreOrderRequest request, User user) {
+    private PreOrderInfoVo validatePreOrderRequest(PreOrderRequest request, User payUser) {
         PreOrderInfoVo preOrderInfoVo = new PreOrderInfoVo();
         List<PreMerchantOrderVo> merchantOrderVoList = CollUtil.newArrayList();
 
         switch (request.getPreOrderType()) {
             case OrderConstants.PLACE_ORDER_TYPE_CART:
-                merchantOrderVoList = validatePreOrderShopping(request, user);
+                // 购物车结算一个或者多个商品
+                merchantOrderVoList = validatePreOrderShopping(request, payUser);
                 List<Integer> cartIdList = request.getOrderDetails().stream().map(PreOrderDetailRequest::getShoppingCartId).distinct().collect(Collectors.toList());
                 preOrderInfoVo.setCartIdList(cartIdList);
                 break;
@@ -2170,11 +2107,89 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merchantOrderVoList.add(seckillService.validatePreOrderSeckill(request.getOrderDetails().get(0)));
                 preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_SECKILL);
                 break;
-
         }
         preOrderInfoVo.setMerchantOrderVoList(merchantOrderVoList);
 
-
+        // 验证购买权限
+        List<Integer> proIdList = Lists.newArrayList();
+        for (PreMerchantOrderVo preMerchantOrderVo : merchantOrderVoList) {
+            List<PreOrderInfoDetailVo> orderInfoList = preMerchantOrderVo.getOrderInfoList();
+            for (PreOrderInfoDetailVo preOrderInfoDetailVo : orderInfoList) {
+                Integer productId = preOrderInfoDetailVo.getProductId();
+                proIdList.add(productId);
+            }
+        }
+        List<Product> productList = productService.findByIds(proIdList);
+        RegisterOrderRequest registerInfo = request.getRegisterInfo();
+        RiseOrderRequest riseInfo = request.getRiseInfo();
+        if (registerInfo != null && riseInfo != null) {
+            throw new CrmebException("下单错误不能同时存在注册下单和升级下单");
+        }
+        Long capaId = null, capaXsId = null;
+        List<Long> whiteIdList = Lists.newArrayList();
+        List<Integer> teamIdList = Lists.newArrayList();
+        Integer pId = null, rId = null;
+        // 自己下单
+        if (registerInfo == null && riseInfo == null) {
+            capaId = userCapaService.getByUser(payUser.getId()).getCapaId();
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(payUser.getId());
+            capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
+            whiteIdList = whiteUserService.getByUser(payUser.getId());
+            TeamUser teamUser = teamUserService.getByUser(payUser.getId());
+            if (teamUser != null) {
+                teamIdList.add(teamUser.getTid());
+            }
+            pId = invitationService.getPid(payUser.getId());
+            rId = relationService.getPid(payUser.getId());
+        }
+        // 注册下单
+        if (registerInfo != null) {
+            HelpRegisterResponse response = userService.helpRegisterValid(registerInfo.getUsername(), registerInfo.getPhone(), registerInfo.getPAccount(),
+                    registerInfo.getRAccount(), registerInfo.getNode(), registerInfo.getUserLevel());
+            productList.forEach(p -> {
+                if (p.getPayType() == 0) {
+                    throw new CrmebException("注册下单只能选择积分支付商品");
+                }
+            });
+            capaId = registerInfo.getUserLevel();
+            TeamUser teamUser = teamUserService.getByUser(response.getPId());
+            if (teamUser != null) {
+                teamIdList.add(teamUser.getTid());
+            }
+            pId = invitationService.getPid(response.getPId());
+            rId = relationService.getPid(response.getPId());
+        }
+        // 帮助别人升级下单
+        if (riseInfo != null) {
+            if (StringUtils.isBlank(riseInfo.getAccount()) || riseInfo.getUserLevel() == null) {
+                throw new CrmebException("升级下单升级用户信息错误");
+            }
+            User user = userService.getByAccount(riseInfo.getAccount());
+            if (user == null) {
+                throw new CrmebException("升级账号不存在");
+            }
+            if (capaService.getById(riseInfo.getUserLevel()) == null) {
+                throw new CrmebException("升级等级不存在");
+            }
+            if (NumberUtil.compare(riseInfo.getUserLevel(), userCapaService.getByUser(user.getId()).getCapaId()) <= 0) {
+                throw new CrmebException("等级不能小于当前等级");
+            }
+            capaId = riseInfo.getUserLevel();
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
+            capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
+            whiteIdList = whiteUserService.getByUser(user.getId());
+            TeamUser teamUser = teamUserService.getByUser(user.getId());
+            if (teamUser != null) {
+                teamIdList.add(teamUser.getTid());
+            }
+            pId = invitationService.getPid(user.getId());
+            rId = relationService.getPid(user.getId());
+        }
+        productList = productList.stream().filter(p -> p.getBuyLimitTempId() != null).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(productList)) {
+            limitTempService.validBuy(capaId, capaXsId, whiteIdList,
+                    teamIdList.stream().map(t -> Long.valueOf(t)).collect(Collectors.toList()), pId, rId, productList);
+        }
         logger.info("预下单检查调用:结果preOrderInfoVo:{}", JSON.toJSONString(preOrderInfoVo));
         return preOrderInfoVo;
     }

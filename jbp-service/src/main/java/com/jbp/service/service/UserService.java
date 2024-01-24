@@ -34,6 +34,8 @@ public interface UserService extends IService<User> {
      */
     User registerPhone(String username, String phone, Integer spreadUid);
 
+    HelpRegisterResponse helpRegisterValid(String username, String phone, String pAccount, String rAccount, Integer node, Long userLevel);
+
     User helpRegister(String username, String phone, Integer pid, Integer rId, Integer node);
 
     /**

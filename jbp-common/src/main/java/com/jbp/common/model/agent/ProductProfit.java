@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "eb_Product_Profit", autoResultMap = true)
+@TableName(value = "eb_product_profit", autoResultMap = true)
 @ApiModel(value="ProductProfit对象", description="购买商品收益")
 public class ProductProfit extends BaseModel {
 
@@ -44,6 +44,8 @@ public class ProductProfit extends BaseModel {
     @ApiModelProperty(value = "规则json对象")
     private String rule;
 
+    @ApiModelProperty(value = "状态 true开启 false 关闭")
+    private Boolean status;
 
     public Boolean hasError() {
         if (!ObjectUtils.allNotNull(productId, type, name, rule)) {

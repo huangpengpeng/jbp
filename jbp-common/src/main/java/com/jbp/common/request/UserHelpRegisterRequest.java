@@ -1,5 +1,7 @@
 package com.jbp.common.request;
 
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.utils.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,4 +41,5 @@ public class UserHelpRegisterRequest implements Serializable {
     @Min(0)
     @Max(1)
     private Integer node;
+
 }

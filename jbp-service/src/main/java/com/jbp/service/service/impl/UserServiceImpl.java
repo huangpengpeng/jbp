@@ -36,7 +36,6 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
-
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -175,6 +174,34 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return user;
     }
 
+    @Override
+    public HelpRegisterResponse helpRegisterValid(String username, String phone, String pAccount,
+                                                  String rAccount, Integer node, Long userLevel) {
+        if (com.jbp.common.utils.StringUtils.isAnyBlank(username, phone, pAccount, rAccount)) {
+            throw new CrmebException("注册信息不能为空");
+        }
+        if (node == null || (node != 0 && node != 1)) {
+            throw new CrmebException("注册节点错误");
+        }
+        if (userLevel == null) {
+            throw new CrmebException("注册等级不能为空");
+        }
+        User pUser = getByAccount(pAccount);
+        if (pUser == null) {
+            throw new CrmebException("邀请账号错误");
+        }
+        User rUser = getByAccount(rAccount);
+        if (rUser == null) {
+            throw new CrmebException("服务账号错误");
+        }
+        if (relationService.getByPid(rUser.getId(), node) != null) {
+            throw new CrmebException("服务节点被占用");
+        }
+        if (capaService.getById(userLevel)== null) {
+            throw new CrmebException("等级编号错误");
+        }
+       return new  HelpRegisterResponse(pUser.getId(), rUser.getId(), node);
+    }
 
     @Override
     public User helpRegister(String username, String phone, Integer pid, Integer rId, Integer node) {
@@ -1360,8 +1387,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         //检测验证码
         checkValidateCode(phone, code);
         //获取当前用户信息
-        User user    = getInfo();
-        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword,phone));
+        User user = getInfo();
+        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword, phone));
         updateById(user);
 
     }

@@ -40,4 +40,10 @@ public class PreOrderRequest {
     @NotEmpty(message = "下单详情列表不能为空")
     private List<PreOrderDetailRequest> orderDetails;
 
+    @ApiModelProperty(value = "注册用户信息", required = false)
+    private RegisterOrderRequest registerInfo;
+
+    @ApiModelProperty(value = "晋升用户信息", required = false)
+    private RiseOrderRequest riseInfo;
+
 }

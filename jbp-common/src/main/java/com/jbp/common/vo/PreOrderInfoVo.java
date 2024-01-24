@@ -45,6 +45,9 @@ public class PreOrderInfoVo {
     @ApiModelProperty(value = "平台优惠金额")
     private BigDecimal platCouponFee = BigDecimal.ZERO;
 
+    @ApiModelProperty(value = "钱包积分抵扣金额")
+    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
+
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payFee;
 
@@ -74,4 +77,7 @@ public class PreOrderInfoVo {
 
     @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单")
     private Integer type = 0;
+
+    @ApiModelProperty(value = "钱包积分抵扣")
+    private List<WalletDeductionVo> walletDeductionList;
 }
