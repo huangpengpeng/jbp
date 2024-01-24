@@ -247,3 +247,6 @@ Caused by: java.io.EOFException: Can not read response from server. Expected to 
 2024-01-24 14:26:34.557 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
 2024-01-24 14:26:34.658 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
 2024-01-24 14:26:34.842 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-24 14:41:09.435 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-24 14:41:09.803 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-24 14:41:10.465 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
