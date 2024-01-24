@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
+import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -113,6 +114,19 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         //平台转用户
         increase(virementid,type,amt,operate,externalNo,postscript);
         platformWalletService.reduce(type,amt,operate,externalNo,postscript);
+        return true;
+    }
+
+    @Override
+    public Boolean change(Integer uid, BigDecimal amt, Integer type, Integer changeType, String tradePassword, String externalNo, String postscript, String operate) {
+        //扣除用户
+        WalletConfig walletConfig = walletConfigService.getByType(changeType);
+        reduce(uid, type, amt, operate, externalNo, postscript);
+        //类型兑换比例积分
+        BigDecimal amtIntegral = amt.multiply(walletConfig.getChangeScale());
+        platformWalletService.increase(changeType, amtIntegral, operate, externalNo, postscript);
+        increase(uid,changeType,amtIntegral,operate,externalNo,postscript);
+        platformWalletService.reduce(changeType,amtIntegral,operate,externalNo,postscript);
         return true;
     }
 

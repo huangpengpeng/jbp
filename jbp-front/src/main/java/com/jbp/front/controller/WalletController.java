@@ -19,6 +19,7 @@ import com.jbp.service.service.agent.WalletService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -76,13 +77,17 @@ public class WalletController {
     // 4.2 增加提现记录【待定】
     @PostMapping("/withdraw/initiate")
     @ApiOperation("用户提现")
-    public CommonResult embody(@RequestBody WalletWithdrawRequest request) {
+    public CommonResult embody(@RequestBody @Validated WalletWithdrawRequest request) {
         User user = userService.getInfo();
         if (ObjectUtil.isNull(user.getPayPwd())) {
             throw new CrmebException("请设置交易密码");
         }
         if (!CrmebUtil.encryptPassword(request.getTradePassword(), user.getPhone()).equals(user.getPayPwd())) {
             throw new CrmebException("交易密码不正确");
+        }
+        WalletConfig walletConfig = walletConfigService.getByType(request.getType());
+        if (!walletConfig.getCanWithdraw()) {
+            throw new CrmebException("类型积分不可提现");
         }
         walletService.reduce(user.getId(), request.getType(), request.getAmt(), WalletFlow.OperateEnum.提现.name(), request.getExternalNo(), request.getPostscript());
         return CommonResult.success();
@@ -91,7 +96,7 @@ public class WalletController {
     // 5.兑换  原始积分 转平台   平台在新的积分给用户 自己兑换给自己【type-> type2】 自己减少   目标正价   系数  备注
     @PostMapping("/change")
     @ApiOperation("兑换")
-    public CommonResult change(@RequestBody WalletChangeRequest request) {
+    public CommonResult change(@RequestBody @Validated WalletChangeRequest request) {
         User user = userService.getInfo();
         if (ObjectUtil.isNull(user.getPayPwd())) {
             throw new CrmebException("请设置交易密码");
@@ -99,6 +104,11 @@ public class WalletController {
         if (!CrmebUtil.encryptPassword(request.getTradePassword(), user.getPhone()).equals(user.getPayPwd())) {
             throw new CrmebException("交易密码不正确");
         }
+        WalletConfig walletConfig = walletConfigService.getByType(request.getType());
+        if (walletConfig.getChangeType()!=request.getChangeType()) {
+            throw new CrmebException("类型积分不可兑换");
+        }
+        walletService.change(user.getId(),request.getAmt(),request.getType(), request.getChangeType(),request.getTradePassword(),request.getExternalNo(),request.getPostscript(),WalletFlow.OperateEnum.兑换.name());
         return CommonResult.success();
     }
 
@@ -106,13 +116,17 @@ public class WalletController {
     // 6.1  自己转平台    平台转其他人
     @PostMapping("/virement")
     @ApiOperation("转账")
-    public CommonResult virement(@RequestBody WalletVirementRequest request) {
+    public CommonResult virement(@RequestBody @Validated WalletVirementRequest request) {
         User user = userService.getInfo();
         if (ObjectUtil.isNull(user.getPayPwd())) {
             throw new CrmebException("请设置交易密码");
         }
         if (!CrmebUtil.encryptPassword(request.getTradePassword(), user.getPhone()).equals(user.getPayPwd())) {
             throw new CrmebException("交易密码不正确");
+        }
+        WalletConfig walletConfig = walletConfigService.getByType(request.getType());
+        if (!walletConfig.getCanTransfer()) {
+            throw new CrmebException("类型积分不可转账");
         }
 //        转账用户
         User virementUser = userService.getByAccount(request.getAccount());

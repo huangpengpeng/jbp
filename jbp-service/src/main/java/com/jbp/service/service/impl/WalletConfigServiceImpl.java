@@ -18,6 +18,7 @@ import com.jbp.service.service.WalletConfigService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 @Service
 public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, WalletConfig> implements WalletConfigService {
@@ -42,7 +43,7 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
     }
 
     @Override
-    public void update(Integer id, String name, int status, Boolean canWithdraw, Boolean recharge, int changeType, int changeScale) {
+    public void update(Integer id, String name, int status, Boolean canWithdraw, Boolean recharge, int changeType, BigDecimal changeScale) {
         WalletConfig walletConfig = getByType(id);
         walletConfig.setName(name);
         walletConfig.setStatus(status);
