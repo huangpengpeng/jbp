@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +29,18 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @TableName(value = "eb_product_profit", autoResultMap = true)
 @ApiModel(value="ProductProfit对象", description="购买商品收益")
+@NoArgsConstructor
 public class ProductProfit extends BaseModel {
 
     private static final long serialVersionUID = 1L;
+
+    public ProductProfit(Integer productId, Integer type, String name, String rule, Boolean status) {
+        this.productId = productId;
+        this.type = type;
+        this.name = name;
+        this.rule = rule;
+        this.status = status;
+    }
 
     @ApiModelProperty(value = "商品id")
     private Integer productId;

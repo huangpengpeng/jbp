@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -46,4 +47,13 @@ public class ProductProfitConfig extends BaseModel {
 
     @ApiModelProperty(value = "说明")
     private String description;
+
+    @ApiModelProperty(value = "商品是否开启")
+    @TableField(exist = false)
+    private Boolean status;
+
+    @ApiModelProperty(value = "规则")
+    @TableField(exist = false)
+    private String rule;
+
 }

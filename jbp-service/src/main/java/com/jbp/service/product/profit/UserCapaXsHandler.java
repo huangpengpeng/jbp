@@ -1,8 +1,10 @@
 package com.jbp.service.product.profit;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.service.schema.util.StringUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
@@ -52,6 +54,8 @@ public class UserCapaXsHandler implements ProductProfitHandler {
     @Override
     public void save(ProductProfit productProfit) {
         getRule(productProfit.getRule());
+        productProfitService.remove(new QueryWrapper<ProductProfit>().lambda().eq(ProductProfit::getProductId,
+                productProfit.getProductId()).eq(ProductProfit::getType, productProfit.getType()));
         productProfitService.save(productProfit);
     }
 
@@ -70,32 +74,35 @@ public class UserCapaXsHandler implements ProductProfitHandler {
 
     @Override
     public void orderSuccess(Order order, List<OrderDetail> orderDetailList, List<ProductProfit> productProfitList) {
-        productProfitList = ListUtils.emptyIfNull(productProfitList).stream().filter(p -> p.getType() == getType()).collect(Collectors.toList());
+        productProfitList = ListUtils.emptyIfNull(productProfitList).stream().filter(p -> p.getType() == getType()
+                && BooleanUtil.isTrue(p.getStatus())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(productProfitList)) {
             return;
         }
-        UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
+        // 获取执行等级
         Long capaXsId = -1L;
-        Integer productId = null;
-        String productName = null;
-        String ruleStr = "";
+        ProductProfit exceProductProfit = null;
         for (ProductProfit productProfit : productProfitList) {
             Rule rule = getRule(productProfit.getRule());
             if (NumberUtil.compare(rule.getCapaXsId(), capaXsId) > 0) {
                 capaXsId = rule.getCapaXsId();
-                productId = productProfit.getProductId();
-                productName = rule.getName();
-                ruleStr = productProfit.getRule();
+                exceProductProfit = productProfit;
             }
         }
-        // 产品配置升级信息大于当前用户等级 执行升级
-        if (NumberUtil.compare(capaXsId, userCapaXs == null ? 0L : userCapaXs.getCapaId()) > 0) {
-            userCapaXsService.saveOrUpdateCapa(order.getUid(), capaXsId,
-                    "订单支付成功产品:" + productName + ", 权益设置直升星级", order.getOrderNo());
-            // 订单权益记录
-            orderProductProfitService.save(order.getId(), order.getOrderNo(), productId, getType(),
-                    ProductProfitEnum.星级.getName(), ruleStr);
+
+        // 当前星级级比直升等级大
+        UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
+        if (userCapaXs != null && NumberUtil.compare(userCapaXs.getCapaId(), capaXsId) >= 0) {
+            return;
         }
+        // 产品配置升级信息大于当前用户等级 执行升级
+        Product product = productService.getById(exceProductProfit.getProductId());
+        // 产品配置升级信息大于当前用户等级 执行升级
+        userCapaXsService.saveOrUpdateCapa(order.getUid(), capaXsId,
+                "订单支付成功产品:" + product.getName() + ", 权益设置直升星级", order.getOrderNo());
+        // 订单权益记录
+        orderProductProfitService.save(order.getId(), order.getOrderNo(), product.getId(), getType(),
+                ProductProfitEnum.星级.getName(), exceProductProfit.getRule());
     }
 
     @Override

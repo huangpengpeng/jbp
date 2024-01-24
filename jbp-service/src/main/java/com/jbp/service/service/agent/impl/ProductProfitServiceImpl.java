@@ -25,7 +25,7 @@ public class ProductProfitServiceImpl extends ServiceImpl<ProductProfitDao, Prod
     @Resource
     private ProductProfitChain productProfitChain;
     @Override
-    public void add(ProductProfit productProfit) {
+    public void edit(ProductProfit productProfit) {
         if (productProfit.hasError()) {
             throw new CrmebException("请填写完整的商品收益信息");
         }
@@ -38,5 +38,10 @@ public class ProductProfitServiceImpl extends ServiceImpl<ProductProfitDao, Prod
             return Lists.newArrayList();
         }
         return list(new QueryWrapper<ProductProfit>().lambda().in(ProductProfit::getProductId, productIdList));
+    }
+
+    @Override
+    public List<ProductProfit> getByProduct(Integer productId) {
+        return list(new QueryWrapper<ProductProfit>().lambda().eq(ProductProfit::getProductId, productId));
     }
 }

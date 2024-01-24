@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.request.PageParamRequest;
 
+import java.util.List;
+
 public interface ProductProfitConfigService extends IService<ProductProfitConfig> {
 
     ProductProfitConfig add(Integer type, String name, String description);
@@ -16,6 +18,8 @@ public interface ProductProfitConfigService extends IService<ProductProfitConfig
     Boolean open(Integer type);
 
     Boolean close(Integer type);
+
+    List<ProductProfitConfig> getOpenList();
 
 
 }

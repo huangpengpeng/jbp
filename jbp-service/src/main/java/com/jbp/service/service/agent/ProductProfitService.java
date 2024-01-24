@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ProductProfitService extends IService<ProductProfit> {
 
-    void add(ProductProfit productProfit);
+    void edit(ProductProfit productProfit);
 
     List<ProductProfit> getByProduct(List<Integer> productIdList);
 
-
+    List<ProductProfit> getByProduct(Integer productId);
 }

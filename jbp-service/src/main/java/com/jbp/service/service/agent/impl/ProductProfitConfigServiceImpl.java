@@ -67,4 +67,9 @@ public class ProductProfitConfigServiceImpl extends ServiceImpl<ProductProfitCon
         updateWrapper.lambda().set(ProductProfitConfig::getIfOpen, false).eq(ProductProfitConfig::getType, type);
         return update(updateWrapper);
     }
+
+    @Override
+    public List<ProductProfitConfig> getOpenList() {
+        return list(new QueryWrapper<ProductProfitConfig>().lambda().eq(ProductProfitConfig::getIfOpen, true));
+    }
 }

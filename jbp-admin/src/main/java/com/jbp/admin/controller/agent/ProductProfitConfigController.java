@@ -1,8 +1,6 @@
 package com.jbp.admin.controller.agent;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.agent.PlatformWalletFlow;
 import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/platform/product/profit/config")
@@ -49,10 +46,5 @@ public class ProductProfitConfigController {
     }
 
 
-    @GetMapping("/list")
-    @ApiOperation("商品权益列表")
-    public CommonResult<List<ProductProfitConfig>> list() {
-        return CommonResult.success( service.list(new QueryWrapper<ProductProfitConfig>().lambda().eq(ProductProfitConfig::getIfOpen, true)));
-    }
 
 }
