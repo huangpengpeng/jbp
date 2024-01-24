@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -28,10 +29,19 @@ public class WalletConfigController {
         return CommonResult.success(walletConfigService.list());
     }
 
+    @GetMapping("/deduction/list")
+    @ApiOperation("获取可抵扣可支付商品列表")
+    public CommonResult<List<WalletConfig>> deductionlist() {
+        LambdaQueryWrapper<WalletConfig> lambdaQueryWrapper=new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WalletConfig::getCanDeduction,true);
+        lambdaQueryWrapper.eq(WalletConfig::getCanPay,true);
+        return CommonResult.success(walletConfigService.list(lambdaQueryWrapper));
+    }
     @PreAuthorize("hasAuthority('agent:wallet:config:page')")
     @GetMapping("/page")
     @ApiOperation("分页列表")
     public CommonResult<CommonPage<WalletConfig>> pageList(WalletConfigRequest request, PageParamRequest pageParamRequest) {
+
         return CommonResult.success(CommonPage.restPage(walletConfigService.pageList(request.getName(), request.getStatus(),
                 request.getCanWithdraw(), request.getRecharge(), pageParamRequest)));
     }

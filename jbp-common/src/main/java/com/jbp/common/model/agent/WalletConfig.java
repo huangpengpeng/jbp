@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -37,7 +39,7 @@ public class WalletConfig {
     private Boolean canDeduction;
 
     @ApiModelProperty("可支付商品")
-    @TableField("canPay")
+    @TableField("can_pay")
     private Boolean canPay;
 
     @ApiModelProperty("可体现")
@@ -58,5 +60,5 @@ public class WalletConfig {
 
     @ApiModelProperty("兑换比例 ")
     @TableField("change_scale")
-    private int changeScale;
+    private BigDecimal changeScale;
 }

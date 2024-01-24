@@ -1,6 +1,9 @@
 package com.jbp.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.jbp.common.model.product.ProductAttr;
+import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.mybatis.ProductDeductionListHandler;
 import com.jbp.common.vo.CouponSimpleVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -104,4 +107,10 @@ public class ProductInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "显示限制模版ID")
     private Long showLimitTempId;
+    @ApiModelProperty(value = "付款方式  0 在线支付  1 积分支付")
+    private Integer payType;
+
+    @ApiModelProperty(value = "消费抵扣")
+    @TableField(typeHandler = ProductDeductionListHandler.class)
+    private List<ProductDeduction> deductionList;
 }
