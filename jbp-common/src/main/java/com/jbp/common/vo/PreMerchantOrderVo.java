@@ -1,5 +1,6 @@
 package com.jbp.common.vo;
 
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -46,10 +47,10 @@ public class PreMerchantOrderVo implements Serializable {
     private BigDecimal freightFee;
 
     @ApiModelProperty(value = "钱包积分抵扣金额")
-    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
+    private BigDecimal deductionFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "钱包积分抵扣")
-    private List<WalletDeductionVo> walletDeductionList;
+    private List<ProductDeduction> deductionList;
 
     @ApiModelProperty(value = "优惠券编号（选择优惠券时有值,不选时为0")
     private Integer userCouponId = 0;
@@ -83,6 +84,9 @@ public class PreMerchantOrderVo implements Serializable {
 
     @ApiModelProperty(value = "商户优惠金额")
     private BigDecimal merCouponFee = BigDecimal.ZERO;
+
+    @ApiModelProperty(value = "平台优惠金额")
+    private BigDecimal platCouponFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "是否自营：0-自营，1-非自营")
     private Boolean isSelf;

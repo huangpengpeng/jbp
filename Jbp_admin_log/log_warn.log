@@ -242,3 +242,6 @@ Caused by: com.alibaba.druid.pool.DataSourceClosedException: dataSource already 
 2024-01-24 15:57:02.645 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
 2024-01-24 15:57:02.828 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
 2024-01-24 16:20:02.918 [task-executor-13] WARN  c.b.wx.miniapp.api.impl.BaseWxMaServiceImpl - 即将重新获取新的access_token，错误代码：40001，错误信息：access_token 无效或 AppSecret 错误
+2024-01-24 20:24:07.138 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-24 20:24:07.713 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-24 20:24:22.205 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}

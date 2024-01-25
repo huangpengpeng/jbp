@@ -28,7 +28,7 @@ public class ProductProfitRequest implements Serializable {
     @ApiModelProperty("规则")
     private String rule;
 
-    @NotBlank(message = "状态不能为空")
+    @NotNull(message = "状态不能为空")
     @ApiModelProperty("状态")
     private Boolean status;
 }

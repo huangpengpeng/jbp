@@ -569,15 +569,18 @@ public class SeckillServiceImpl implements SeckillService {
             throw new CrmebException("商户已关闭，请重新选择商品");
         }
 
-
         PreMerchantOrderVo merchantOrderVo = new PreMerchantOrderVo();
         merchantOrderVo.setMerId(merchant.getId());
         merchantOrderVo.setMerName(merchant.getName());
         merchantOrderVo.setFreightFee(BigDecimal.ZERO);
-        merchantOrderVo.setCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setMerCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setPlatCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setCouponFee(merchantOrderVo.getMerCouponFee().add(merchantOrderVo.getPlatCouponFee()));
         merchantOrderVo.setUserCouponId(0);
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
         merchantOrderVo.setIsSelf(merchant.getIsSelf());
+        merchantOrderVo.setDeductionFee(BigDecimal.ZERO);
+
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(seckillProduct.getId());
         detailVo.setProductName(seckillProduct.getName());
@@ -590,6 +593,10 @@ public class SeckillServiceImpl implements SeckillService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(seckillProduct.getTempId());
+        detailVo.setDeductionFee(BigDecimal.ZERO);
+        detailVo.setMerCouponPrice(BigDecimal.ZERO);
+        detailVo.setPlatCouponPrice(BigDecimal.ZERO);
+        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
         detailVo.setSubBrokerageType(0);// 秒杀不参与分佣
         detailVo.setBrokerage(0);
         detailVo.setBrokerageTwo(0);

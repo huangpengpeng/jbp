@@ -1,5 +1,6 @@
 package com.jbp.common.model.product;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -23,4 +24,9 @@ public class ProductDeduction implements Serializable {
 
     @ApiModelProperty(value = "是否计算业绩")
     private Boolean hasPv;
+
+    @ApiModelProperty(value = "抵扣金额")
+    @TableField(exist = false)
+    private BigDecimal deductionFee;
+
 }

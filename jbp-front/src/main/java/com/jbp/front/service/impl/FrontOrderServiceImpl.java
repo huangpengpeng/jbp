@@ -16,9 +16,10 @@ import cn.hutool.core.util.NumberUtil;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.product.*;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
-import com.jbp.common.utils.StringUtils;
+import com.jbp.common.utils.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -58,10 +59,6 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.order.RefundOrderInfo;
-import com.jbp.common.model.product.Product;
-import com.jbp.common.model.product.ProductAttrValue;
-import com.jbp.common.model.product.ProductCategory;
-import com.jbp.common.model.product.ProductReply;
 import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserAddress;
@@ -69,9 +66,6 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.model.wechat.video.PayComponentProductSku;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.CrmebUtil;
-import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.PreMerchantOrderVo;
@@ -270,13 +264,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             logger.info("preOrder response:{}", JSON.toJSONString(response));
             return response;
         }
+        // 计算优惠券
         preOrderSetCouponPrice(preOrderInfoVo, orderInfoList, payUser);
-        // todo 计算钱包抵扣 平台抵扣总金额  计算业绩总金额
 
-
-
-        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()).subtract(preOrderInfoVo.getCouponFee()).subtract(preOrderInfoVo.getWalletDeductionFee()));
-
+        preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()).subtract(preOrderInfoVo.getCouponFee()).subtract(preOrderInfoVo.getDeductionFee()));
         String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
         String integralDeductionStartMoney = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_START_MONEY);
         if ("true".equals(integralDeductionSwitch) && preOrderInfoVo.getProTotalFee().subtract(preOrderInfoVo.getCouponFee()).compareTo(new BigDecimal(integralDeductionStartMoney)) >= 0) {
@@ -291,6 +282,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         logger.info("preOrder response:{}", JSON.toJSONString(response));
         return response;
     }
+
 
     private void preOrderSetCouponPrice(PreOrderInfoVo preOrderInfoVo, List<PreOrderInfoDetailVo> orderInfoList, User user) {
         // 自动领券计算
@@ -601,12 +593,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             // 使用用户优惠券
             preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponUserList.get(0).getMoney().toString()));
             preOrderInfoVo.setPlatUserCouponId(platCouponUserList.get(0).getId());
+            setPlatProCouponPrice(preOrderInfoVo, null, platCouponUserList.get(0));
         }
         if (CollUtil.isEmpty(platCouponUserList) && CollUtil.isNotEmpty(platCouponList)) {
             // 领取优惠券下单
             preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponList.get(0).getMoney().toString()));
             Integer couponUserId = couponUserService.autoReceiveCoupon(platCouponList.get(0), user.getId());
             preOrderInfoVo.setPlatUserCouponId(couponUserId);
+            setPlatProCouponPrice(preOrderInfoVo, platCouponList.get(0), null);
         }
         if (CollUtil.isNotEmpty(platCouponUserList) && CollUtil.isNotEmpty(platCouponList)) {
             Long platCouponMoney = platCouponList.get(0).getMoney();
@@ -615,15 +609,90 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 // 使用用户优惠券
                 preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponUserList.get(0).getMoney().toString()));
                 preOrderInfoVo.setPlatUserCouponId(platCouponUserList.get(0).getId());
+                setPlatProCouponPrice(preOrderInfoVo, null, platCouponUserList.get(0));
             } else {
                 // 领取优惠券下单
                 preOrderInfoVo.setPlatCouponFee(new BigDecimal(platCouponList.get(0).getMoney().toString()));
                 Integer couponUserId = couponUserService.autoReceiveCoupon(platCouponList.get(0), user.getId());
                 preOrderInfoVo.setPlatUserCouponId(couponUserId);
+                setPlatProCouponPrice(preOrderInfoVo, platCouponList.get(0), null);
             }
         }
         preOrderInfoVo.setCouponFee(preOrderInfoVo.getMerCouponFee().add(preOrderInfoVo.getPlatCouponFee()));
     }
+
+    /**
+     * 计算整个订单的优惠价  【前提是已经计算出了平台优惠价 商户优惠价】
+     */
+    private void setPlatProCouponPrice(PreOrderInfoVo preOrderInfoVo, Coupon coupon, CouponUser couponUser) {
+        if (ObjectUtil.isNull(coupon)) {
+            coupon = couponService.getById(couponUser.getCouponId());
+        }
+        List<PreOrderInfoDetailVo> orderInfoList  = new ArrayList<>();
+        for (PreMerchantOrderVo preMerchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
+            orderInfoList.addAll(preMerchantOrderVo.getOrderInfoList());
+        }
+        // 整个订单的商品
+        List<Integer> proIdsList = orderInfoList.stream().map(PreOrderInfoDetailVo::getProductId).collect(Collectors.toList());
+        List<Product> productList = productService.findByIds(proIdsList);
+        // 产品券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+            List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+            orderInfoList = orderInfoList.stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 类目券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+            List<Integer> cidList = new ArrayList<>();
+            Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+            ProductCategory category = productCategoryService.getById(categoryId);
+            if (category.getLevel().equals(3)) {
+                cidList.add(categoryId);
+            } else {
+                List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                if (category.getLevel().equals(1)) {
+                    productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                }
+                cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+            }
+            List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+            orderInfoList = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 品牌券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+            Integer brandId = Integer.valueOf(coupon.getLinkedData());
+            List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+            orderInfoList = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 商户券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+            List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+            List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+            orderInfoList = orderInfoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 总优惠金额
+        BigDecimal couponPrice = preOrderInfoVo.getPlatCouponFee();
+        // 设置参与当前优惠的产品金额
+        BigDecimal proTotalPrice = orderInfoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getPayNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (int i = 0; i < orderInfoList.size(); i++) {
+            PreOrderInfoDetailVo d = orderInfoList.get(i);
+            if (orderInfoList.size() == (i + 1)) {
+                d.setPlatCouponPrice(couponPrice);
+                break;
+            }
+            BigDecimal proPrice = d.getPrice().multiply(new BigDecimal(d.getPayNum().toString()));
+            BigDecimal ratio = proPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal detailCouponFee = couponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+            couponPrice = couponPrice.subtract(detailCouponFee);
+            d.setPlatCouponPrice(detailCouponFee);
+        }
+        for (PreMerchantOrderVo preMerchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
+            for (PreOrderInfoDetailVo preOrderInfoDetailVo : preMerchantOrderVo.getOrderInfoList()) {
+                preMerchantOrderVo.setPlatCouponFee(preMerchantOrderVo.getPlatCouponFee().add(preOrderInfoDetailVo.getPlatCouponPrice()));
+            }
+            preMerchantOrderVo.setCouponFee(preMerchantOrderVo.getPlatCouponFee().add(preMerchantOrderVo.getMerCouponFee()));
+        }
+    }
+
 
     /**
      * 设置订单商品详情商户优惠价格
@@ -656,6 +725,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
     }
 
+
     /**
      * 加载预下单信息
      *
@@ -673,6 +743,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         String orderVoString = redisUtil.get(key);
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
+        if(userInfo.getId() != orderInfoVo.getPayUserId()){
+            throw new CrmebException("不能操作其他人的订单");
+        }
         PreOrderResponse preOrderResponse = new PreOrderResponse();
         BeanUtils.copyProperties(orderInfoVo, preOrderResponse);
 
@@ -873,7 +946,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderVoString = redisUtil.get(key).toString();
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         User user = userService.getInfo();
-
+        if(user.getId() != orderInfoVo.getPayUserId()){
+            throw new CrmebException("不能操作其他人的订单");
+        }
         return computedPrice(request, orderInfoVo, user);
     }
 
@@ -2084,6 +2159,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     private PreOrderInfoVo validatePreOrderRequest(PreOrderRequest request, User payUser) {
         PreOrderInfoVo preOrderInfoVo = new PreOrderInfoVo();
+        preOrderInfoVo.setPayUserId(payUser.getId());
         List<PreMerchantOrderVo> merchantOrderVoList = CollUtil.newArrayList();
 
         switch (request.getPreOrderType()) {
@@ -2158,6 +2234,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             pId = invitationService.getPid(response.getPId());
             rId = relationService.getPid(response.getPId());
+            preOrderInfoVo.setRegisterInfo(registerInfo);
         }
         // 帮助别人升级下单
         if (riseInfo != null) {
@@ -2184,6 +2261,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             pId = invitationService.getPid(user.getId());
             rId = relationService.getPid(user.getId());
+            preOrderInfoVo.setRiseInfo(riseInfo);
         }
         productList = productList.stream().filter(p -> p.getBuyLimitTempId() != null).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(productList)) {
@@ -2238,10 +2316,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         merchantOrderVo.setMerId(merchant.getId());
         merchantOrderVo.setMerName(merchant.getName());
         merchantOrderVo.setFreightFee(BigDecimal.ZERO);
-        merchantOrderVo.setCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setMerCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setPlatCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setCouponFee(merchantOrderVo.getPlatCouponFee().add(merchantOrderVo.getMerCouponFee()));
         merchantOrderVo.setUserCouponId(0);
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
         merchantOrderVo.setIsSelf(merchant.getIsSelf());
+        merchantOrderVo.setDeductionFee(BigDecimal.ZERO);
+
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(product.getId());
         detailVo.setProductName(product.getName());
@@ -2255,6 +2337,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(product.getTempId());
         detailVo.setSubBrokerageType(product.getIsSub() ? 1 : 2);
+        detailVo.setMerCouponPrice(BigDecimal.ZERO);
+        detailVo.setPlatCouponPrice(BigDecimal.ZERO);
+        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+        detailVo.setDeductionFee(BigDecimal.ZERO);
+        detailVo.setDeductionList(product.getDeductionList());
         detailVo.setBrokerage(attrValue.getBrokerage());
         detailVo.setBrokerageTwo(attrValue.getBrokerageTwo());
         if (detailVo.getSubBrokerageType() == 2) {
@@ -2440,11 +2527,16 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderInfoVo.setPlatCouponFee(BigDecimal.ZERO);
         orderInfoVo.setMerCouponFee(BigDecimal.ZERO);
         priceResponse.setCouponFee(BigDecimal.ZERO);
+        orderInfoVo.setDeductionFee(BigDecimal.ZERO);
         if (!orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) && !orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {
             getCouponFee_V1_3(orderInfoVo, user.getId());
+
+            getDeductionFee_V1_3(orderInfoVo, user.getId());
+
             priceResponse.setCouponFee(orderInfoVo.getCouponFee());
             priceResponse.setPlatCouponFee(orderInfoVo.getPlatCouponFee());
             priceResponse.setMerCouponFee(orderInfoVo.getMerCouponFee());
+            priceResponse.setDeductionFee(orderInfoVo.getDeductionFee());
             priceResponse.setMerOrderResponseList(computedPriceGetMerOrderList(orderInfoVo));
             priceResponse.setPlatCouponUserList(computedPriceGetPlatOrderList(orderInfoVo));
         } else {
@@ -2508,6 +2600,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         return priceResponse;
     }
+
+
 
     private List<CouponUser> computedPriceGetPlatOrderList(PreOrderInfoVo orderInfoVo) {
         Integer userId = userService.getUserId();
@@ -2729,10 +2823,13 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         merchantOrderVo.setMerId(merchant.getId());
         merchantOrderVo.setMerName(merchant.getName());
         merchantOrderVo.setFreightFee(BigDecimal.ZERO);
-        merchantOrderVo.setCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setMerCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setPlatCouponFee(BigDecimal.ZERO);
+        merchantOrderVo.setCouponFee(merchantOrderVo.getMerCouponFee().add(merchantOrderVo.getPlatCouponFee()));
         merchantOrderVo.setUserCouponId(0);
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
         merchantOrderVo.setIsSelf(merchant.getIsSelf());
+        merchantOrderVo.setDeductionFee(BigDecimal.ZERO);
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(product.getId());
         detailVo.setProductName(product.getTitle());
@@ -2745,6 +2842,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(product.getTempId());
+        detailVo.setMerCouponPrice(BigDecimal.ZERO);
+        detailVo.setPlatCouponPrice(BigDecimal.ZERO);
+        detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));
+        detailVo.setDeductionFee(BigDecimal.ZERO);
         detailVo.setSubBrokerageType(product.getIsSub() ? 1 : 2);
         detailVo.setBrokerage(attrValue.getBrokerage());
         detailVo.setBrokerageTwo(attrValue.getBrokerageTwo());
@@ -3221,5 +3322,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             orderInfoVo.setPlatCouponFee(platCouponFee);
         }
         orderInfoVo.setCouponFee(orderInfoVo.getPlatCouponFee().add(orderInfoVo.getMerCouponFee()));
+
+
+
+    }
+
+    private void getDeductionFee_V1_3(PreOrderInfoVo orderInfoVo, Integer id) {
     }
 }

@@ -1,5 +1,8 @@
 package com.jbp.common.vo;
 
+import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.request.RegisterOrderRequest;
+import com.jbp.common.request.RiseOrderRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,6 +30,9 @@ import java.util.List;
 @ApiModel(value = "PreOrderInfoVo对象", description = "预下单Vo对象")
 public class PreOrderInfoVo {
 
+    @ApiModelProperty(value = "付款用户ID")
+    private Integer payUserId;
+
     @ApiModelProperty(value = "商品总计金额")
     private BigDecimal proTotalFee;
 
@@ -46,7 +52,7 @@ public class PreOrderInfoVo {
     private BigDecimal platCouponFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "钱包积分抵扣金额")
-    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
+    private BigDecimal deductionFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payFee;
@@ -79,5 +85,13 @@ public class PreOrderInfoVo {
     private Integer type = 0;
 
     @ApiModelProperty(value = "钱包积分抵扣")
-    private List<WalletDeductionVo> walletDeductionList;
+    private List<ProductDeduction> deductionList;
+
+
+    @ApiModelProperty(value = "注册用户信息")
+    private RegisterOrderRequest registerInfo;
+
+
+    @ApiModelProperty(value = "晋升用户信息")
+    private RiseOrderRequest riseInfo;
 }

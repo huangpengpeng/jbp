@@ -1,5 +1,6 @@
 package com.jbp.common.vo;
 
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -91,8 +92,8 @@ public class PreOrderInfoDetailVo {
     private BigDecimal merCouponPrice = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "钱包积分抵扣金额")
-    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
+    private BigDecimal deductionFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "钱包积分抵扣")
-    private List<WalletDeductionVo> walletDeductionList;
+    private List<ProductDeduction> deductionList;
 }
