@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -25,6 +27,9 @@ public class ProductMaterials extends BaseModel {
 
     @ApiModelProperty(value = "物料数量")
     private Integer materialsQuantity;
+
+    @ApiModelProperty(value = "物料成本价")
+    private BigDecimal materialsPrice;
 
     @ApiModelProperty(value = "物料编码")
     private String materialsCode;
