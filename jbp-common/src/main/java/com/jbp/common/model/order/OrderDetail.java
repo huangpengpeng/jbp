@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -76,6 +77,7 @@ public class OrderDetail implements Serializable {
     private BigDecimal walletDeductionFee;
 
     @ApiModelProperty(value = "钱包抵扣")
+    @TableField(typeHandler = ProductDeductionListHandler.class)
     private List<ProductDeduction> walletDeductionList;
 
     @ApiModelProperty(value = "购买数量")

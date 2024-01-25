@@ -24,6 +24,7 @@ import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
 import com.jbp.common.model.coupon.CouponUser;
@@ -38,6 +39,7 @@ import com.jbp.common.response.*;
 import com.jbp.common.response.productTag.ProductTagsForSearchResponse;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MyRecord;
@@ -140,6 +142,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private UserInvitationService userInvitationService;
     @Autowired
     private UserRelationService userRelationService;
+    @Autowired
+    private WalletConfigService walletConfigService;
 
     /**
      * 获取产品列表Admin
@@ -545,11 +549,24 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (admin.getMerId() > 0 && !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("未找到对应商品信息");
         }
-
         List<ProductDeduction> deductionList = product.getDeductionList();
         if(CollectionUtils.isNotEmpty(deductionList)){
-            product.setDeductionList(deductionList);
+            deductionList = Lists.newArrayList();
         }
+        Map<Integer, ProductDeduction> deductionMap = FunctionUtil.keyValueMap(deductionList, ProductDeduction::getWalletType);
+        List<WalletConfig> canDeductionList = walletConfigService.getCanDeductionList();
+        List<ProductDeduction> newDeductionList = Lists.newArrayList();
+        for (WalletConfig walletConfig : canDeductionList) {
+            if(deductionMap.get(walletConfig.getType()) == null){
+                ProductDeduction deduction = new ProductDeduction();
+                deduction.setWalletName(walletConfig.getName());
+                deduction.setWalletType(walletConfig.getType());
+                deduction.setHasPv(false);
+                newDeductionList.add(deduction);
+            }
+        }
+        deductionList.addAll(newDeductionList);
+        product.setDeductionList(deductionList);
         ProductInfoResponse productInfoResponse = new ProductInfoResponse();
         BeanUtils.copyProperties(product, productInfoResponse);
 

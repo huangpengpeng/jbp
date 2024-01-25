@@ -31,10 +31,8 @@ public class WalletConfigController {
 
     @GetMapping("/deduction/list")
     @ApiOperation("获取可抵扣可支付商品列表")
-    public CommonResult<List<WalletConfig>> deductionlist() {
-        LambdaQueryWrapper<WalletConfig> lambdaQueryWrapper=new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(WalletConfig::getCanDeduction,true);
-        return CommonResult.success(walletConfigService.list(lambdaQueryWrapper));
+    public CommonResult<List<WalletConfig>> deductionList() {
+        return CommonResult.success(walletConfigService.getCanDeductionList());
     }
     @PreAuthorize("hasAuthority('agent:wallet:config:page')")
     @GetMapping("/page")
