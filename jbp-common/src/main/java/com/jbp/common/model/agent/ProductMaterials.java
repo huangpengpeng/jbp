@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -36,4 +37,17 @@ public class ProductMaterials extends BaseModel {
 
     @ApiModelProperty(value = "物料编码")
     private String materialsCode;
+    @ApiModelProperty("商户名称")
+    @TableField(exist = false)
+    private String merName;
+
+    public ProductMaterials(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode) {
+        this.merId = merId;
+        this.barCode = barCode;
+        this.materialsName = materialsName;
+        this.materialsQuantity = materialsQuantity;
+        this.materialsPrice = materialsPrice;
+        this.materialsCode = materialsCode;
+    }
+
 }

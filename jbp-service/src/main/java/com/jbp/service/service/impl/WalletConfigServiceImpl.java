@@ -44,6 +44,13 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
 
     @Override
     public void update(Integer id, String name, int status, Boolean canWithdraw, Boolean recharge, int changeType, BigDecimal changeScale) {
+        // 1.canPay  只能存在一条记录为true  如果更新为true 要检查数据库是否存在有true 并且不是当前 的记录 有就不允许改  canDeduction false
+        LambdaQueryWrapper<WalletConfig> walletConfigLambdaQueryWrapper=new LambdaQueryWrapper<>();
+        // 2.设置canPay  不允许设置  canDeduction  true
+        // 3.设置 canDeduction true 不允许设置  canPay  true
+
+        // 4.canWithdraw == true  有且仅有一条
+
         WalletConfig walletConfig = getByType(id);
         walletConfig.setName(name);
         walletConfig.setStatus(status);

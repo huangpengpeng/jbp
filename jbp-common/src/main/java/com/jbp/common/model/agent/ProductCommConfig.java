@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -34,6 +36,9 @@ public class ProductCommConfig extends BaseModel {
 
     @ApiModelProperty(value = "说明")
     private String description;
+
+    @ApiModelProperty("系数")
+    private BigDecimal scale;
 
     @ApiModelProperty(value = "商品是否开启")
     @TableField(exist = false)

@@ -1227,6 +1227,14 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         return response;
     }
 
+    @Override
+    public Merchant getByName(String name) {
+        LambdaQueryWrapper<Merchant> lqw=new LambdaQueryWrapper<Merchant>()
+                .eq(Merchant::getName,name);
+        return getOne(lqw);
+
+    }
+
     /**
      * 检查商户手机号是否重复
      *

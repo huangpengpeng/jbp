@@ -3,7 +3,6 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.ProductComm;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,27 +21,27 @@ import java.util.Map;
 public class ProductCommChain implements ApplicationContextAware {
 
 
+    private LinkedList<AbstractProductCommHandler> handlers = new LinkedList<>();
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         final Map<String, AbstractProductCommHandler> beans =
                 applicationContext.getBeansOfType(AbstractProductCommHandler.class);
         log.warn("ProductCommChain:{}", JSONObject.toJSONString(beans));
-        beans.values().stream().sorted(Comparator.comparing(s->s.order())).forEach(s -> handlers.add(s));
+        beans.values().stream().sorted(Comparator.comparing(s -> s.order())).forEach(s -> handlers.add(s));
     }
-
-    private LinkedList<AbstractProductCommHandler> handlers = new LinkedList<>();
 
     /**
      * 保存
      */
     public void saveOrUpdate(ProductComm productComm) {
-        handlers.get(productComm.getType()).saveOrUpdate(productComm);
+        for (AbstractProductCommHandler handler : handlers) {
+            if (handler.getType() == productComm.getType()) {
+                handler.saveOrUpdate(productComm);
+            }
+        }
+
     }
-
-
-
-
-
 
 
 }
