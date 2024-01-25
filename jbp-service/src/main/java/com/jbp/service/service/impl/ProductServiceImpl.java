@@ -171,7 +171,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         lqw.orderByDesc(Product::getSort).orderByDesc(Product::getId);
         Page<Product> productPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<Product> products = dao.selectList(lqw);
+        List<Product> products=new ArrayList<>();
+        if (request.getType()==0){
+            products =dao.selectList(new LambdaQueryWrapper<>());
+        }else {
+            products = dao.selectList(lqw);
+        }
         if (CollUtil.isEmpty(products)) {
             return CommonPage.copyPageInfo(productPage, CollUtil.newArrayList());
         }

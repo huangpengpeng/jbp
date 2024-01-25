@@ -42,7 +42,7 @@ public class WalletConfig {
     @TableField("can_pay")
     private Boolean canPay;
 
-    @ApiModelProperty("可体现")
+    @ApiModelProperty("可提现")
     @TableField("can_withdraw")
     private Boolean canWithdraw;
 

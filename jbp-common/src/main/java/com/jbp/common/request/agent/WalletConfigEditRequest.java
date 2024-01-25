@@ -20,14 +20,18 @@ public class WalletConfigEditRequest {
     private String name;
     @ApiModelProperty("状态")
     private int status;
-    @ApiModelProperty("可体现")
+    @ApiModelProperty("可抵扣")
+    private Boolean canDeduction;
+    @ApiModelProperty("可支付商品")
+    private Boolean canPay;
+    @ApiModelProperty("可提现")
     private Boolean canWithdraw;
     @ApiModelProperty("可充值")
     private Boolean recharge;
+    @ApiModelProperty("可转账")
+    private Boolean canTransfer;
     @ApiModelProperty("兑换目标积分 ")
-    @TableField("change_type")
     private int changeType;
     @ApiModelProperty("兑换比例 ")
-    @TableField("change_scale")
     private BigDecimal changeScale;
 }

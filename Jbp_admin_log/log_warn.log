@@ -1,0 +1,12 @@
+2024-01-25 10:56:03.810 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-25 10:56:04.213 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-25 10:56:15.780 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-25 11:08:15.011 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-25 11:08:15.358 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-25 11:08:28.689 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-25 11:09:52.318 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-25 11:09:52.713 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-25 11:10:04.287 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
+2024-01-25 11:11:37.061 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"directInvitationHandler":{"type":1}}
+2024-01-25 11:11:38.539 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2}}
+2024-01-25 11:11:49.604 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"inviteOneLevelHandler":{"name":"直属一阶等级人数","type":0}}
