@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@NoArgsConstructor
 @TableName("eb_product_comm")
 @ApiModel(value="ProductComm对象", description="商品佣金")
 public class ProductComm extends BaseModel {
@@ -42,7 +44,7 @@ public class ProductComm extends BaseModel {
         if (StringUtils.isEmpty(rule)) {
             return true;
         }
-        return ObjectUtils.allNotNull(productId, type, name, scale);
+        return !ObjectUtils.allNotNull(productId, type, name, scale);
     }
 
     @ApiModelProperty(value = "商品id")

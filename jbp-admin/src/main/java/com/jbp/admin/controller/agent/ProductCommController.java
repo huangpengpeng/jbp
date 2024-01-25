@@ -39,6 +39,7 @@ public class ProductCommController {
             ProductComm productComm = map.get(config.getType());
             config.setStatus(productComm != null ? productComm.getStatus() : false);
             config.setRule(productComm != null ? productComm.getRule() : null);
+            config.setScale(productComm != null ? productComm.getScale() : null);
         }
         return CommonResult.success(configList);
     }

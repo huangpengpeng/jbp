@@ -34,7 +34,6 @@ public class WalletConfigController {
     public CommonResult<List<WalletConfig>> deductionlist() {
         LambdaQueryWrapper<WalletConfig> lambdaQueryWrapper=new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WalletConfig::getCanDeduction,true);
-        lambdaQueryWrapper.eq(WalletConfig::getCanPay,true);
         return CommonResult.success(walletConfigService.list(lambdaQueryWrapper));
     }
     @PreAuthorize("hasAuthority('agent:wallet:config:page')")

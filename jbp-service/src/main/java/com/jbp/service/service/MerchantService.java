@@ -339,4 +339,7 @@ public interface MerchantService extends IService<Merchant> {
      * @param merId 商户ID
      */
     MerchantPcIndexResponse getPcIndexByMerId(Integer merId);
+
+    Merchant getByName(String name);
+
 }
