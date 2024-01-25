@@ -579,7 +579,7 @@ public class SeckillServiceImpl implements SeckillService {
         merchantOrderVo.setUserCouponId(0);
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
         merchantOrderVo.setIsSelf(merchant.getIsSelf());
-        merchantOrderVo.setDeductionFee(BigDecimal.ZERO);
+        merchantOrderVo.setWalletDeductionFee(BigDecimal.ZERO);
 
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(seckillProduct.getId());
@@ -593,7 +593,7 @@ public class SeckillServiceImpl implements SeckillService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(seckillProduct.getTempId());
-        detailVo.setDeductionFee(BigDecimal.ZERO);
+        detailVo.setWalletDeductionFee(BigDecimal.ZERO);
         detailVo.setMerCouponPrice(BigDecimal.ZERO);
         detailVo.setPlatCouponPrice(BigDecimal.ZERO);
         detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));

@@ -28,6 +28,8 @@ public interface FrontOrderService {
     /**
      * 订单预下单V1.3
      * @param request 预下单请求参数
+     *                优惠金额=商户+平台
+     *                用户可以选择 平台券+商户券（多商户可以选择多个商户券）
      * @return PreOrderResponse
      */
     OrderNoResponse preOrder_V1_3(PreOrderRequest request);

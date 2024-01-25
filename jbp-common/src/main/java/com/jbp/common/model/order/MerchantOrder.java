@@ -3,15 +3,18 @@ package com.jbp.common.model.order;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -22,9 +25,10 @@ import java.util.Date;
  * @since 2022-09-19
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_merchant_order")
+@TableName(value = "eb_merchant_order", autoResultMap = true)
 @ApiModel(value = "MerchantOrder对象", description = "商户订单表")
 public class MerchantOrder implements Serializable {
 
@@ -81,6 +85,12 @@ public class MerchantOrder implements Serializable {
 
     @ApiModelProperty(value = "优惠券金额")
     private BigDecimal couponPrice;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private BigDecimal walletDeductionFee;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private List<ProductDeduction> walletDeductionList;
 
     @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet")
     private String payType;

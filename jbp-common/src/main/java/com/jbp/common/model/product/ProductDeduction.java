@@ -29,4 +29,8 @@ public class ProductDeduction implements Serializable {
     @TableField(exist = false)
     private BigDecimal deductionFee;
 
+    @ApiModelProperty(value = "PV金额")
+    @TableField(exist = false)
+    private BigDecimal pvFee;
+
 }

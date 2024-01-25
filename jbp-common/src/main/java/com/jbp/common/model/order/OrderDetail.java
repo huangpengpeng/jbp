@@ -4,15 +4,18 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -23,9 +26,10 @@ import java.util.Date;
  * @since 2022-09-19
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_order_detail")
+@TableName(value = "eb_order_detail", autoResultMap = true)
 @ApiModel(value = "OrderDetail对象", description = "订单详情表")
 public class OrderDetail implements Serializable {
 
@@ -67,6 +71,12 @@ public class OrderDetail implements Serializable {
 
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private BigDecimal walletDeductionFee;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private List<ProductDeduction> walletDeductionList;
 
     @ApiModelProperty(value = "购买数量")
     private Integer payNum;

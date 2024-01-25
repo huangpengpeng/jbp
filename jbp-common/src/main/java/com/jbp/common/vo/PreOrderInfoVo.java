@@ -52,7 +52,7 @@ public class PreOrderInfoVo {
     private BigDecimal platCouponFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "钱包积分抵扣金额")
-    private BigDecimal deductionFee = BigDecimal.ZERO;
+    private BigDecimal walletDeductionFee = BigDecimal.ZERO;
 
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payFee;
@@ -85,7 +85,7 @@ public class PreOrderInfoVo {
     private Integer type = 0;
 
     @ApiModelProperty(value = "钱包积分抵扣")
-    private List<ProductDeduction> deductionList;
+    private List<ProductDeduction> wallwtDeductionList;
 
 
     @ApiModelProperty(value = "注册用户信息")

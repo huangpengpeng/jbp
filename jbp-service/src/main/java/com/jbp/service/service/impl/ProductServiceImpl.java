@@ -47,6 +47,7 @@ import com.jbp.service.dao.ProductDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.ProductUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -540,6 +541,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             throw new CrmebException("未找到对应商品信息");
         }
 
+        List<ProductDeduction> deductionList = product.getDeductionList();
+        if(CollectionUtils.isNotEmpty(deductionList)){
+            product.setDeductionList(deductionList);
+        }
         ProductInfoResponse productInfoResponse = new ProductInfoResponse();
         BeanUtils.copyProperties(product, productInfoResponse);
 

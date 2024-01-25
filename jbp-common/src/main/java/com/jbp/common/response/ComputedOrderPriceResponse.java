@@ -39,7 +39,7 @@ public class ComputedOrderPriceResponse implements Serializable {
     private BigDecimal deductionPrice;
 
     @ApiModelProperty(value = "钱包积分抵扣金额")
-    private BigDecimal deductionFee;
+    private BigDecimal walletDeductionFee;
 
     @ApiModelProperty(value = "运费金额")
     private BigDecimal freightFee;
