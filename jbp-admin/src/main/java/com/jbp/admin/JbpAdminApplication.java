@@ -1,10 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.agent.ProductProfitController;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.UserSearchRequest;
-import com.jbp.service.service.UserService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

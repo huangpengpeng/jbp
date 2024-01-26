@@ -550,14 +550,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             throw new CrmebException("未找到对应商品信息");
         }
         List<ProductDeduction> deductionList = product.getDeductionList();
-        if(CollectionUtils.isNotEmpty(deductionList)){
+        if (CollectionUtils.isEmpty(deductionList)) {
             deductionList = Lists.newArrayList();
         }
         Map<Integer, ProductDeduction> deductionMap = FunctionUtil.keyValueMap(deductionList, ProductDeduction::getWalletType);
         List<WalletConfig> canDeductionList = walletConfigService.getCanDeductionList();
         List<ProductDeduction> newDeductionList = Lists.newArrayList();
         for (WalletConfig walletConfig : canDeductionList) {
-            if(deductionMap.get(walletConfig.getType()) == null){
+            if (deductionMap.get(walletConfig.getType()) == null) {
                 ProductDeduction deduction = new ProductDeduction();
                 deduction.setWalletName(walletConfig.getName());
                 deduction.setWalletType(walletConfig.getType());
