@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
@@ -59,5 +60,23 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         walletConfig.setChangeType(changeType);
         walletConfig.setChangeScale(changeScale);
         updateById(walletConfig);
+    }
+
+    @Override
+    public void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale) {
+        WalletConfig walletConfig = getByType(id);
+        if ((canPay && !canDeduction)||(!canPay&&canDeduction)) {
+            LambdaQueryWrapper<WalletConfig> lqw = new LambdaQueryWrapper<WalletConfig>()
+                    .eq(WalletConfig::getCanPay, true);
+            if (list(lqw).size() > 0) {
+                throw new CrmebException("无法同时开启可支付商品");
+            } else {
+                walletConfig.setCanPay(canPay);
+                walletConfig.setCanDeduction(canDeduction);
+            }
+        } else {
+            throw new CrmebException("无法同时启用支付商品和可抵扣功能");
+        }
+
     }
 }
