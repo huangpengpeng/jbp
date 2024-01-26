@@ -54,6 +54,7 @@ public class WalletConfigController {
         // 4.canWithdraw == true  有且仅有一条
         walletConfigService.update(request.getId(), request.getName(), request.getStatus(), request.getCanWithdraw(),
                 request.getRecharge(), request.getChangeType(), request.getChangeScale());
+        walletConfigService.update(request.getId(),request.getName(),request.getStatus(),request.getCanDeduction(),request.getCanPay(),request.getCanWithdraw(),request.getRecharge(),request.getCanTransfer(),request.getChangeScale());
         return CommonResult.success();
     }
 }
