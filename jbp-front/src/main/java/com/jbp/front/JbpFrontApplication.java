@@ -1,5 +1,7 @@
 package com.jbp.front;
 
+import com.jbp.common.constants.RedisConstants;
+import com.jbp.common.utils.RedisUtil;
 import com.jbp.front.service.LoginService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -37,7 +39,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
-//        final LoginService bean = run.getBean(LoginService.class);
-//        bean.getLoginConfig();
+
     }
 }
