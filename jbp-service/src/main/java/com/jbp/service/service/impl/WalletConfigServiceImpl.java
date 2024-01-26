@@ -79,6 +79,21 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         } else {
             throw new CrmebException("无法同时启用支付商品和可抵扣功能");
         }
+        if (canWithdraw){
+            LambdaQueryWrapper<WalletConfig> lqw = new LambdaQueryWrapper<WalletConfig>()
+                    .eq(WalletConfig::getCanWithdraw, true);
+            if (list(lqw).size() > 0) {
+                throw new CrmebException("无法同时开启多个可提现商品");
+            } else {
+                walletConfig.setCanWithdraw(canWithdraw);
+            }
+        }
+        walletConfig.setName(name);
+        walletConfig.setStatus(status);
+        walletConfig.setCanWithdraw(canWithdraw);
+        walletConfig.setRecharge(recharge);
+        walletConfig.setChangeScale(changeScale);
+        updateById(walletConfig);
 
     }
 }
