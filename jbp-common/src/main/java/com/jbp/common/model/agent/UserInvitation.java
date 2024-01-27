@@ -30,26 +30,26 @@ public class UserInvitation implements Serializable {
     private Integer id;
 
     @ApiModelProperty("用户ID")
-    @TableField("uId")
+    @TableField("uid")
     private Integer uId;
 
     @ApiModelProperty("邀请上级")
-    @TableField("pId")
+    @TableField("pid")
     private Integer pId;
 
     @ApiModelProperty("转挂上级")
-    @TableField("mId")
+    @TableField("mid")
     private Integer mId;
 
     @ApiModelProperty("强制绑定")
-    @TableField("ifForce")
+    @TableField("if_force")
     private Boolean ifForce;
 
-    @TableField(value = "gmtCreated", fill = FieldFill.INSERT)
+    @TableField(value = "gmt_created", fill = FieldFill.INSERT)
     private Date gmtCreated;
 
     @JsonIgnore
-    @TableField(value = "gmtModify", fill = FieldFill.INSERT_UPDATE, update = "now()")
+    @TableField(value = "gmt_modify", fill = FieldFill.INSERT_UPDATE, update = "now()")
     private Date gmtModify;
 
 

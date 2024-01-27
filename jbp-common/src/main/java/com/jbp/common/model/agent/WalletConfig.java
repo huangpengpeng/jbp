@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("wallet_config")
+@TableName("eb_wallet_config")
 @ApiModel(value = "WalletConfig对象", description = "积分配置信息")
 public class WalletConfig {
     @ApiModelProperty(value = "记录id")

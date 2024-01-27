@@ -13,9 +13,8 @@ public interface WalletConfigService extends IService<WalletConfig> {
 
     WalletConfig getByType(Integer type);
 
-    void update(Integer id, String name, int status, Boolean canWithdraw, Boolean recharge, int changeType, BigDecimal changeScale);
-
     List<WalletConfig> getCanDeductionList();
-    void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale);
+
+    void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale, Integer changeType);
 
 }

@@ -40,32 +40,18 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
     }
 
     @Override
-    public void update(Integer id, String name, int status, Boolean canWithdraw, Boolean recharge, int changeType, BigDecimal changeScale) {
-        // 1.canPay  只能存在一条记录为true  如果更新为true 要检查数据库是否存在有true 并且不是当前 的记录 有就不允许改  canDeduction false
-        LambdaQueryWrapper<WalletConfig> walletConfigLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        // 2.设置canPay  不允许设置  canDeduction  true
-        // 3.设置 canDeduction true 不允许设置  canPay  true
-
-        // 4.canWithdraw == true  有且仅有一条
-
-        WalletConfig walletConfig = getByType(id);
-        walletConfig.setName(name);
-        walletConfig.setStatus(status);
-        walletConfig.setCanWithdraw(canWithdraw);
-        walletConfig.setRecharge(recharge);
-        walletConfig.setChangeType(changeType);
-        walletConfig.setChangeScale(changeScale);
-        updateById(walletConfig);
-    }
-
-    @Override
     public List<WalletConfig> getCanDeductionList() {
         LambdaQueryWrapper<WalletConfig> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WalletConfig::getCanDeduction, true);
         return list(lambdaQueryWrapper);
     }
-    
-    public void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale) {
+
+    public void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale, Integer changeType) {
+        // 1.canPay  只能存在一条记录为true  如果更新为true 要检查数据库是否存在有true 并且不是当前 的记录 有就不允许改  canDeduction false
+        // 2.设置canPay  不允许设置  canDeduction  true
+        // 3.设置 canDeduction true 不允许设置  canPay  true
+
+        // 4.canWithdraw == true  有且仅有一条
         WalletConfig walletConfig = getByType(id);
         if ((canPay && !canDeduction) || (!canPay && canDeduction)) {
             LambdaQueryWrapper<WalletConfig> lqw = new LambdaQueryWrapper<WalletConfig>()
@@ -79,7 +65,7 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         } else {
             throw new CrmebException("无法同时启用支付商品和可抵扣功能");
         }
-        if (canWithdraw){
+        if (canWithdraw) {
             LambdaQueryWrapper<WalletConfig> lqw = new LambdaQueryWrapper<WalletConfig>()
                     .eq(WalletConfig::getCanWithdraw, true);
             if (list(lqw).size() > 0) {
@@ -92,6 +78,7 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         walletConfig.setStatus(status);
         walletConfig.setCanWithdraw(canWithdraw);
         walletConfig.setRecharge(recharge);
+        walletConfig.setChangeType(changeType);
         walletConfig.setChangeScale(changeScale);
         updateById(walletConfig);
 
