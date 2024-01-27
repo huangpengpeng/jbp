@@ -47,14 +47,7 @@ public class WalletConfigController {
     @PostMapping("/update")
     @ApiOperation("修改")
     public CommonResult update(@RequestBody WalletConfigEditRequest request) {
-        // 1.canPay  只能存在一条记录为true  如果更新为true 要检查数据库是否存在有true 并且不是当前 的记录 有就不允许改  canDeduction false
-        // 2.设置canPay  不允许设置  canDeduction  true
-        // 3.设置 canDeduction true 不允许设置  canPay  true
-
-        // 4.canWithdraw == true  有且仅有一条
-        walletConfigService.update(request.getId(), request.getName(), request.getStatus(), request.getCanWithdraw(),
-                request.getRecharge(), request.getChangeType(), request.getChangeScale());
-        walletConfigService.update(request.getId(),request.getName(),request.getStatus(),request.getCanDeduction(),request.getCanPay(),request.getCanWithdraw(),request.getRecharge(),request.getCanTransfer(),request.getChangeScale());
+        walletConfigService.update(request.getId(),request.getName(),request.getStatus(),request.getCanDeduction(),request.getCanPay(),request.getCanWithdraw(),request.getRecharge(),request.getCanTransfer(),request.getChangeScale(),request.getChangeType());
         return CommonResult.success();
     }
 }

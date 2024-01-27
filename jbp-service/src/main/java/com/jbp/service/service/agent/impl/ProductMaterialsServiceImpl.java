@@ -49,20 +49,12 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
     }
 
     public Boolean addrule(Integer merId, String barCode, String materialsCode) {
-        LambdaQueryWrapper<ProductMaterials> lqwMerId = new LambdaQueryWrapper<ProductMaterials>();
-        lqwMerId.eq(ProductMaterials::getMerId, merId);
-        if (list(lqwMerId).size() > 0) {
-            throw new CrmebException("商户已存在");
-        }
-        LambdaQueryWrapper<ProductMaterials> lqwBarCode = new LambdaQueryWrapper<ProductMaterials>();
-        lqwBarCode.eq(ProductMaterials::getBarCode, barCode);
-        if (list(lqwBarCode).size() > 0) {
-            throw new CrmebException("商品条码已存在");
-        }
-        LambdaQueryWrapper<ProductMaterials> lqwMaterialsCode = new LambdaQueryWrapper<ProductMaterials>();
-        lqwMaterialsCode.eq(ProductMaterials::getMaterialsCode, materialsCode);
-        if (list(lqwMaterialsCode).size() > 0) {
-            throw new CrmebException("物料编码已存在");
+        LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>();
+        lqw.eq(ProductMaterials::getMerId, merId);
+        lqw.eq(ProductMaterials::getBarCode, barCode);
+        lqw.eq(ProductMaterials::getMaterialsCode, materialsCode);
+        if (list(lqw).size() > 0) {
+            throw new CrmebException("已存在");
         }
         return true;
     }
