@@ -1,5 +1,8 @@
 package com.jbp.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -72,6 +75,12 @@ public class MerchantOrderFrontDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "优惠券金额")
     private BigDecimal couponPrice;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private BigDecimal walletDeductionFee;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private List<ProductDeduction> walletDeductionList;
 
     @ApiModelProperty(value = "赠送积分")
     private Integer gainIntegral;

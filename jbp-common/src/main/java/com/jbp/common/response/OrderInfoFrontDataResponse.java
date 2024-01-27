@@ -1,5 +1,6 @@
 package com.jbp.common.response;
 
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 订单详情移动端数据响应对象
@@ -70,4 +72,10 @@ public class OrderInfoFrontDataResponse implements Serializable {
 
     @ApiModelProperty(value = "商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号")
     private Integer productType;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private BigDecimal walletDeductionFee;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private List<ProductDeduction> walletDeductionList;
 }

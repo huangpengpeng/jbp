@@ -90,6 +90,7 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     @Override
     public List<Long> hasLimits(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId) {
         Long pCapaId, pCapaXsId, rCapaId, rCapaXsId;
+        List<Long> list = Lists.newArrayList();
         if (pId != null) {
             UserCapa pUserCapa = userCapaService.getByUser(pId);
             pCapaId = pUserCapa == null ? null : pUserCapa.getCapaId();
@@ -109,17 +110,17 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
             rCapaId = null;
         }
         Map<Object, Object> hmget = redisUtil.hmget(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST);
+        loadingTempCache();
         if (hmget == null || hmget.size() == 0) {
             loadingTempCache();
         }
         hmget = redisUtil.hmget(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST);
         if (hmget == null || hmget.size() == 0) {
-            return null;
+            return list;
         }
         // 遍历返回用户满足的条件
-        List<Long> list = Lists.newArrayList();
         hmget.forEach((k, v) -> {
-            Long tempId = (Long) k;
+            Long tempId = Long.valueOf(k.toString());
             if (v != null) {
                 LimitTemp temp = (LimitTemp) v;
                 if (temp.check(capaId, capaXsId, whiteIdList, teamIdList, pId, pCapaId, pCapaXsId, rId, rCapaId, rCapaXsId)) {
@@ -127,6 +128,7 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
                 }
             }
         });
+        list.add(-1L);
         return list;
     }
 
@@ -164,7 +166,7 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
             loadingTempCache();
         }
         for (Product product : productList) {
-            Object o = redisUtil.hmget(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST).get(product.getId().toString());
+            Object o = redisUtil.hmget(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST).get(product.getBuyLimitTempId().toString());
             if (o != null) {
                 LimitTemp temp = (LimitTemp) o;
                 if (!temp.check(capaId, capaXsId, whiteIdList, teamIdList, pId, pCapaId, pCapaXsId, rId, rCapaId, rCapaXsId)) {

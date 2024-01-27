@@ -1069,13 +1069,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             rId = userRelationService.getPid(request.getUId());
         }
         List<Long> tempIds = limitTempService.hasLimits(request.getCapaId(), request.getCapaXsId(), whiteIdList, teamIdList, pId, rId);
-        if (tempIds != null) {
-            if (tempIds.isEmpty()) {
-                tempIds.add(-1L);
-            }
+        if (CollectionUtils.isNotEmpty(tempIds)) {
             map.put("showLimitTempIds", tempIds.stream().map(Objects::toString).collect(Collectors.joining(",")));
         }
-
         // 排序部分
         if (StrUtil.isNotBlank(request.getSalesOrder())) {
             if (request.getSalesOrder().equals(Constants.SORT_DESC)) {

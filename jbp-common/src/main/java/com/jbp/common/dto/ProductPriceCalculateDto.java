@@ -1,5 +1,6 @@
 package com.jbp.common.dto;
 
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @ClassName ProductPriceCalculateDto
@@ -38,6 +40,15 @@ public class ProductPriceCalculateDto implements Serializable {
 
     @ApiModelProperty("商品金额")
     private BigDecimal price;
+
+    @ApiModelProperty("钱包抵扣金额")
+    private BigDecimal walletDeductionFee;
+
+    @ApiModelProperty(value = "钱包抵扣明细")
+    private List<ProductDeduction> walletDeductionList;
+
+    @ApiModelProperty("商户优惠金额")
+    private BigDecimal couponPrice = BigDecimal.ZERO;
 
     @ApiModelProperty("商户优惠金额")
     private BigDecimal merCouponPrice = BigDecimal.ZERO;

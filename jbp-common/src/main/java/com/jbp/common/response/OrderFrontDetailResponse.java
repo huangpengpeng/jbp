@@ -1,5 +1,8 @@
 package com.jbp.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -55,6 +58,12 @@ public class OrderFrontDetailResponse implements Serializable {
     @ApiModelProperty(value = "订单总价")
     private BigDecimal totalPrice;
 
+    @ApiModelProperty(value = "钱包抵扣")
+    private BigDecimal walletDeductionFee;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private List<ProductDeduction> walletDeductionList;
+
     @ApiModelProperty(value = "优惠券金额")
     private BigDecimal couponPrice;
 
@@ -76,7 +85,7 @@ public class OrderFrontDetailResponse implements Serializable {
     @ApiModelProperty(value = "支付时间")
     private Date payTime;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue")
+    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet")
     private String payType;
 
     @ApiModelProperty(value = "订单状态（0：待支付，1：待发货,2：待收货,3：已收货,4：已完成，5：待核销，9：已取消）")

@@ -2,6 +2,7 @@ package com.jbp.common.model.agent;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,37 +22,25 @@ import java.util.Date;
 @Accessors(chain = true)
 @TableName("eb_user_invitation")
 @ApiModel(value="UserInvitation对象", description="销售上下级关系")
-public class UserInvitation implements Serializable {
+public class UserInvitation extends BaseModel {
 
     private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(value = "记录id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
     @ApiModelProperty("用户ID")
-    @TableField("uid")
+    @TableField("uId")
     private Integer uId;
 
     @ApiModelProperty("邀请上级")
-    @TableField("pid")
+    @TableField("pId")
     private Integer pId;
 
     @ApiModelProperty("转挂上级")
-    @TableField("mid")
+    @TableField("mId")
     private Integer mId;
 
     @ApiModelProperty("强制绑定")
-    @TableField("if_force")
+    @TableField("ifForce")
     private Boolean ifForce;
-
-    @TableField(value = "gmt_created", fill = FieldFill.INSERT)
-    private Date gmtCreated;
-
-    @JsonIgnore
-    @TableField(value = "gmt_modify", fill = FieldFill.INSERT_UPDATE, update = "now()")
-    private Date gmtModify;
-
 
     public Integer getRealPid(){
         return  getMId() != null ? getMId() : getPId();

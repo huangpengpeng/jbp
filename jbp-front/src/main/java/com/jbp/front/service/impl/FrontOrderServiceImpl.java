@@ -3451,6 +3451,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             for (ProductDeduction deduction : deductionList) {
                  ProductDeduction newDeduction = map.get(deduction.getWalletType());
                  if(newDeduction == null){
+                     newDeduction = new ProductDeduction();
                      newDeduction.setWalletType(deduction.getWalletType());
                      newDeduction.setWalletName(deduction.getWalletName());
                      newDeduction.setDeductionFee(deduction.getDeductionFee());
@@ -3465,6 +3466,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             for (ProductDeduction deduction : deductionList) {
                 ProductDeduction newDeduction = totalMap.get(deduction.getWalletType());
                 if(newDeduction == null){
+                    newDeduction = new ProductDeduction();
                     newDeduction.setWalletType(deduction.getWalletType());
                     newDeduction.setWalletName(deduction.getWalletName());
                     newDeduction.setDeductionFee(deduction.getDeductionFee());

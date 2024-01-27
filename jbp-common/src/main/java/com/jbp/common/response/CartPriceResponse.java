@@ -36,6 +36,9 @@ public class CartPriceResponse implements Serializable {
     @ApiModelProperty(value = "店铺优惠金额")
     private BigDecimal merCouponPrice;
 
+    @ApiModelProperty("钱包抵扣金额")
+    private BigDecimal walletDeductionFee;
+
     @ApiModelProperty(value = "平台优惠金额")
     private BigDecimal platCouponPrice;
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +22,7 @@ import java.util.Date;
 @Accessors(chain = true)
 @TableName("eb_user_invitation_flow")
 @ApiModel(value="UserInvitationFlow对象", description="销售上下层级关系")
-public class UserInvitationFlow implements Serializable {
+public class UserInvitationFlow extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,11 +43,4 @@ public class UserInvitationFlow implements Serializable {
     @ApiModelProperty("层级")
     @TableField("level")
     private int level;
-
-    @TableField(value = "gmtCreated", fill = FieldFill.INSERT)
-    private Date gmtCreated;
-
-    @JsonIgnore
-    @TableField(value = "gmtModify", fill = FieldFill.INSERT_UPDATE, update = "now()")
-    private Date gmtModify;
 }

@@ -97,7 +97,7 @@
             and find_in_set(p.mer_id, #{merId})
         </if>
         <if test="showLimitTempIds != null and showLimitTempIds !=''">
-            and (p.showLimitTempId is null or find_in_set(p.showLimitTempId, #{showLimitTempIds}))
+            and (p.show_limit_temp_id is null or find_in_set(p.show_limit_temp_id, #{showLimitTempIds}))
         </if>
         ${lastStr}
     </select>

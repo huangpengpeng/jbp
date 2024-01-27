@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -9,12 +10,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Maps;
 import com.jbp.common.constants.CouponConstants;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.dto.ProductPriceCalculateDto;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.cat.Cart;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponUser;
@@ -22,6 +26,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttrValue;
 import com.jbp.common.model.product.ProductCategory;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.CartNumRequest;
 import com.jbp.common.request.CartRequest;
@@ -29,11 +34,18 @@ import com.jbp.common.request.CartResetRequest;
 import com.jbp.common.response.CartInfoResponse;
 import com.jbp.common.response.CartMerchantResponse;
 import com.jbp.common.response.CartPriceResponse;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.common.vo.PreMerchantOrderVo;
+import com.jbp.common.vo.PreOrderInfoDetailVo;
+import com.jbp.common.vo.PreOrderInfoVo;
 import com.jbp.service.dao.CartDao;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.WalletService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,6 +97,8 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
     private CouponUserService couponUserService;
     @Autowired
     private ProductCategoryService productCategoryService;
+    @Autowired
+    private WalletService walletService;
 
     /**
      * 列表
@@ -515,6 +529,8 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
             dto.setMerchantId(product.getMerId());
             dto.setNum(cart.getCartNum());
             dto.setPrice(attrValue.getPrice());
+            dto.setWalletDeductionFee(BigDecimal.ZERO);
+            dto.setWalletDeductionList(product.getDeductionList());
             dtoList.add(dto);
         }
         // 自动选择最合适的优惠券
@@ -830,9 +846,11 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
         }
         if (CollUtil.isEmpty(platCouponList) && CollUtil.isNotEmpty(platCouponUserList)) {
             platCouponPrice = new BigDecimal(platCouponUserList.get(0).getMoney().toString());
+            setPlatProCouponPrice(dtoList, platCouponPrice, null, platCouponUserList.get(0));
         }
         if (CollUtil.isNotEmpty(platCouponList) && CollUtil.isEmpty(platCouponUserList)) {
             platCouponPrice = new BigDecimal(platCouponList.get(0).getMoney().toString());
+            setPlatProCouponPrice(dtoList, platCouponPrice, platCouponList.get(0), null);
         }
         if (CollUtil.isNotEmpty(platCouponList) && CollUtil.isNotEmpty(platCouponUserList)) {
             Long platCouponMoney = platCouponList.get(0).getMoney();
@@ -840,18 +858,23 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
             if (platCouponUserMoney >= platCouponMoney) {
                 // 使用用户优惠券
                 platCouponPrice = new BigDecimal(platCouponUserMoney.toString());
+                setPlatProCouponPrice(dtoList, platCouponPrice, null, platCouponUserList.get(0));
             } else {
                 // 领取优惠券下单
                 platCouponPrice = new BigDecimal(platCouponMoney.toString());
+                setPlatProCouponPrice(dtoList, platCouponPrice, platCouponList.get(0), null);
             }
         }
+        // 计算钱包积分抵扣
+        setDeductionFee(dtoList, userId);
 
         CartPriceResponse cartPriceResponse = new CartPriceResponse();
         cartPriceResponse.setMerCouponPrice(merCouponPrice);
         cartPriceResponse.setPlatCouponPrice(platCouponPrice);
         cartPriceResponse.setProTotalPrice(proTotalPrice);
         cartPriceResponse.setTotalCouponPrice(platCouponPrice.add(merCouponPrice));
-        cartPriceResponse.setTotalPrice(proTotalPrice.subtract(cartPriceResponse.getTotalCouponPrice()));
+        cartPriceResponse.setWalletDeductionFee(dtoList.stream().map(e -> e.getWalletDeductionFee()).reduce(BigDecimal.ZERO, BigDecimal::add));
+        cartPriceResponse.setTotalPrice(proTotalPrice.subtract(cartPriceResponse.getTotalCouponPrice()).subtract(cartPriceResponse.getWalletDeductionFee()));
         return cartPriceResponse;
     }
 
@@ -883,6 +906,127 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
             BigDecimal detailCouponFee = couponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
             couponPrice = couponPrice.subtract(detailCouponFee);
             d.setMerCouponPrice(detailCouponFee);
+        }
+    }
+
+
+    private void setPlatProCouponPrice(List<ProductPriceCalculateDto> dtoList, BigDecimal platCouponPrice, Coupon coupon, CouponUser couponUser) {
+
+        if (ObjectUtil.isNull(coupon)) {
+            coupon = couponService.getById(couponUser.getCouponId());
+        }
+
+        // 整个订单的商品
+        List<Integer> proIdsList = dtoList.stream().map(ProductPriceCalculateDto::getProductId).collect(Collectors.toList());
+        List<Product> productList = productService.findByIds(proIdsList);
+        // 产品券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT)) {
+            List<Integer> cpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+            dtoList = dtoList.stream().filter(f -> cpIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 类目券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_PRODUCT_CATEGORY)) {
+            List<Integer> cidList = new ArrayList<>();
+            Integer categoryId = Integer.valueOf(coupon.getLinkedData());
+            ProductCategory category = productCategoryService.getById(categoryId);
+            if (category.getLevel().equals(3)) {
+                cidList.add(categoryId);
+            } else {
+                List<ProductCategory> productCategoryList = productCategoryService.findAllChildListByPid(category.getId(), category.getLevel());
+                if (category.getLevel().equals(1)) {
+                    productCategoryList = productCategoryList.stream().filter(f -> f.getLevel().equals(3)).collect(Collectors.toList());
+                }
+                cidList.addAll(productCategoryList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
+            }
+            List<Integer> pIdList = productList.stream().filter(f -> cidList.contains(f.getCategoryId())).map(Product::getId).collect(Collectors.toList());
+            dtoList = dtoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 品牌券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_BRAND)) {
+            Integer brandId = Integer.valueOf(coupon.getLinkedData());
+            List<Integer> pIdList = productList.stream().filter(f -> brandId.equals(f.getBrandId())).map(Product::getId).collect(Collectors.toList());
+            dtoList = dtoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+        // 商户券
+        if (coupon.getCategory().equals(CouponConstants.COUPON_CATEGORY_JOINT_MERCHANT)) {
+            List<Integer> mpIdList = CrmebUtil.stringToArray(coupon.getLinkedData());
+            List<Integer> pIdList = productList.stream().filter(f -> mpIdList.contains(f.getMerId())).map(Product::getId).collect(Collectors.toList());
+            dtoList = dtoList.stream().filter(f -> pIdList.contains(f.getProductId())).collect(Collectors.toList());
+        }
+
+        // 设置参与当前优惠的产品金额
+        BigDecimal proTotalPrice = dtoList.stream().map(e -> e.getPrice().multiply(new BigDecimal(e.getNum().toString()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (int i = 0; i < dtoList.size(); i++) {
+            ProductPriceCalculateDto d = dtoList.get(i);
+            if (dtoList.size() == (i + 1)) {
+                d.setPlatCouponPrice(platCouponPrice);
+                break;
+            }
+            BigDecimal proPrice = d.getPrice().multiply(new BigDecimal(d.getNum().toString()));
+            BigDecimal ratio = proPrice.divide(proTotalPrice, 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal detailCouponFee = platCouponPrice.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+            platCouponPrice = platCouponPrice.subtract(detailCouponFee);
+            d.setPlatCouponPrice(detailCouponFee);
+        }
+
+        // 设置优惠总额
+        for (ProductPriceCalculateDto dto : dtoList) {
+            dto.setCouponPrice(dto.getPlatCouponPrice().add(dto.getMerCouponPrice()));
+        }
+    }
+
+
+    private void setDeductionFee(List<ProductPriceCalculateDto> dtoList, Integer userId) {
+
+        Map<Integer, BigDecimal> walletDeductionMap = Maps.newConcurrentMap();
+        for (ProductPriceCalculateDto dto : dtoList) {
+            BigDecimal detailPrice = dto.getPrice().multiply(new BigDecimal(dto.getNum()));
+            BigDecimal realPrice = detailPrice.subtract(dto.getCouponPrice());
+            if (ArithmeticUtils.lessEquals(realPrice, BigDecimal.ZERO)) {
+                throw new CrmebException("优惠券搭配错误请重新下单");
+            }
+            List<ProductDeduction> walletDeductionList = dto.getWalletDeductionList();
+            if (CollectionUtils.isNotEmpty(walletDeductionList)) {
+                for (ProductDeduction deduction : walletDeductionList) {
+                    deduction.setDeductionFee(BigDecimal.ZERO);
+                    deduction.setPvFee(BigDecimal.ZERO);
+                    if (deduction.getScale() != null && ArithmeticUtils.gt(deduction.getScale(), BigDecimal.ZERO)) {
+                        BigDecimal walletDeductionFee = realPrice.multiply(deduction.getScale());
+                        deduction.setDeductionFee(walletDeductionFee);
+                        if (BooleanUtil.isTrue(deduction.getHasPv())) {
+                            deduction.setPvFee(walletDeductionFee);
+                        }
+                        BigDecimal orgWalletDeductionFee = BigDecimal.valueOf(MapUtils.getDoubleValue(walletDeductionMap, deduction.getWalletType(), 0d));
+                        walletDeductionMap.put(deduction.getWalletType(), orgWalletDeductionFee.add(walletDeductionFee));
+                    }
+                }
+            }
+        }
+
+        // 检测响应的积分是否可以抵扣
+        Map<Integer, Boolean> walletMap = Maps.newConcurrentMap();
+        walletDeductionMap.forEach((k, v) -> {
+            Wallet wallet = walletService.getByUser(userId, k);
+            if (wallet != null && ArithmeticUtils.gte(wallet.getBalance(), v)) {
+                walletMap.put(k, true);
+            } else {
+                walletMap.put(k, false);
+            }
+        });
+
+        for (ProductPriceCalculateDto dto : dtoList) {
+            List<ProductDeduction> walletDeductionList = dto.getWalletDeductionList();
+            if (CollectionUtils.isNotEmpty(walletDeductionList)) {
+                for (ProductDeduction deduction : walletDeductionList) {
+                    if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
+                        if (!walletMap.get(deduction.getWalletType())) {
+                            deduction.setDeductionFee(BigDecimal.ZERO);
+                            deduction.setPvFee(BigDecimal.ZERO);
+                        }
+                    }
+                    dto.setWalletDeductionFee(dto.getWalletDeductionFee().add(deduction.getDeductionFee()));
+                }
+            }
         }
     }
 
