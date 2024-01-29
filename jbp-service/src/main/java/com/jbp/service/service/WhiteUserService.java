@@ -10,9 +10,7 @@ import com.jbp.common.request.WhiteUserRequest;
 import java.util.List;
 
 public interface WhiteUserService extends IService<WhiteUser> {
-    PageInfo<WhiteUser> pageList(WhiteUserRequest request, PageParamRequest pageParamRequest);
-
-    WhiteUser add(WhiteUserRequest userWhiteRequest);
+    PageInfo<WhiteUser> pageList(Integer uid, Long whiteId, PageParamRequest pageParamRequest);
 
     Boolean batchSave(List<UserWhiteDto> userWhiteExpresses);
 
@@ -21,4 +19,6 @@ public interface WhiteUserService extends IService<WhiteUser> {
     WhiteUser getByUser(Integer uid, Long  whiteId);
 
     List<Long> getByUser(Integer uid);
+
+    void add(Integer uid, Long whiteId,String ordersSn);
 }

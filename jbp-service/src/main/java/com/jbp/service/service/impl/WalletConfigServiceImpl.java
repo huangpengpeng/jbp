@@ -54,14 +54,21 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         // 4.canWithdraw == true  有且仅有一条
         WalletConfig walletConfig = getByType(id);
         if ((canPay && !canDeduction) || (!canPay && canDeduction)) {
+
             LambdaQueryWrapper<WalletConfig> lqw = new LambdaQueryWrapper<WalletConfig>()
                     .eq(WalletConfig::getCanPay, true);
-            if (list(lqw).size() > 0) {
-                throw new CrmebException("无法同时开启可支付商品");
-            } else {
+            if (list(lqw).size() > 0&&getOne(lqw).getId()!=id){
+                if (list(lqw).size() > 0) {
+                    throw new CrmebException("无法同时开启可支付商品");
+                } else {
+                    walletConfig.setCanPay(canPay);
+                    walletConfig.setCanDeduction(canDeduction);
+                }
+            }else {
                 walletConfig.setCanPay(canPay);
                 walletConfig.setCanDeduction(canDeduction);
             }
+
         } else {
             throw new CrmebException("无法同时启用支付商品和可抵扣功能");
         }
