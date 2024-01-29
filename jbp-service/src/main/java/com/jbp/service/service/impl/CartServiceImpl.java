@@ -991,13 +991,15 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
                     deduction.setDeductionFee(BigDecimal.ZERO);
                     deduction.setPvFee(BigDecimal.ZERO);
                     if (deduction.getScale() != null && ArithmeticUtils.gt(deduction.getScale(), BigDecimal.ZERO)) {
-                        BigDecimal walletDeductionFee = realPrice.multiply(deduction.getScale());
-                        deduction.setDeductionFee(walletDeductionFee);
-                        if (BooleanUtil.isTrue(deduction.getHasPv())) {
-                            deduction.setPvFee(walletDeductionFee);
+                        BigDecimal walletDeductionFee = realPrice.multiply(deduction.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
+                        if(ArithmeticUtils.gt(walletDeductionFee, BigDecimal.ZERO)){
+                            deduction.setDeductionFee(walletDeductionFee);
+                            if (BooleanUtil.isTrue(deduction.getHasPv())) {
+                                deduction.setPvFee(walletDeductionFee);
+                            }
+                            BigDecimal orgWalletDeductionFee = BigDecimal.valueOf(MapUtils.getDoubleValue(walletDeductionMap, deduction.getWalletType(), 0d));
+                            walletDeductionMap.put(deduction.getWalletType(), orgWalletDeductionFee.add(walletDeductionFee));
                         }
-                        BigDecimal orgWalletDeductionFee = BigDecimal.valueOf(MapUtils.getDoubleValue(walletDeductionMap, deduction.getWalletType(), 0d));
-                        walletDeductionMap.put(deduction.getWalletType(), orgWalletDeductionFee.add(walletDeductionFee));
                     }
                 }
             }
