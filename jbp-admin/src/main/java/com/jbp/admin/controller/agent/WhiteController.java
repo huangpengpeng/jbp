@@ -10,6 +10,7 @@ import com.jbp.service.service.agent.LimitTempService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +25,14 @@ public class WhiteController {
     private WhiteService whiteService;
     @Resource
     private LimitTempService limitTempService;
-
+    @PreAuthorize("hasAuthority('agent:white:page:list')")
     @RequestMapping(value = "/page/list", method = RequestMethod.GET)
     @ApiOperation("白名单列表")
     public CommonResult<CommonPage<White>> getList(@ModelAttribute @Validated WhiteRequest request,
                                                    @ModelAttribute PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(whiteService.pageList(request, pageParamRequest)));
     }
-
+    @PreAuthorize("hasAuthority('agent:white:add')")
     @ApiOperation("新增白名单")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult addWhiten(@RequestBody WhiteRequest white) {
@@ -40,7 +41,7 @@ public class WhiteController {
         }
         return CommonResult.failed();
     }
-
+    @PreAuthorize("hasAuthority('agent:white:delete')")
     @GetMapping(value = "/delete/{id}")
     @ApiOperation("白名单删除")
     public CommonResult delete(@PathVariable("id") Long id) {

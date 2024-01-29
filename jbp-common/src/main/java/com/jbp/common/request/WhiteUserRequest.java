@@ -1,5 +1,6 @@
 package com.jbp.common.request;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.jbp.common.result.CommonResult;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +20,9 @@ public class WhiteUserRequest  implements Serializable {
     @ApiModelProperty(value = "白名单Id ")
     private Long whiteId;
 
-    @ApiModelProperty(value = "用户id")
-    private Integer uid;
+    @ApiModelProperty("用户账户")
+    private String account;
+    @ApiModelProperty("单号")
+    private String ordersSn;
 
 }

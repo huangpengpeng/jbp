@@ -18,4 +18,7 @@ public class UserWhiteDto implements Serializable {
 
     @ApiModelProperty("白名单名称")
     private String whiteName;
+    @ApiModelProperty("单号")
+    private String ordersSn;
+
 }

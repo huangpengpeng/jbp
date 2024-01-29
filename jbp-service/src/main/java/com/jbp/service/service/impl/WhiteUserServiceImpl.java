@@ -12,7 +12,6 @@ import com.jbp.common.model.user.White;
 import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.WhiteUserRequest;
 import com.jbp.service.dao.WhiteUserDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WhiteService;
@@ -24,7 +23,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,10 +41,10 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
     private TransactionTemplate transactionTemplate;
 
     @Override
-    public PageInfo<WhiteUser> pageList(WhiteUserRequest request, PageParamRequest pageParamRequest) {
+    public PageInfo<WhiteUser> pageList(Integer uid, Long whiteId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<WhiteUser> lambdaQueryWrapper = new LambdaQueryWrapper<WhiteUser>()
-                .eq(!Objects.isNull(request.getUid()), WhiteUser::getUid, request.getUid())
-                .eq(!Objects.isNull(request.getWhiteId()), WhiteUser::getWhiteId, request.getWhiteId());
+                .eq(!Objects.isNull(uid), WhiteUser::getUid, uid)
+                .eq(!Objects.isNull(whiteId), WhiteUser::getWhiteId, whiteId);
         Page<WhiteUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WhiteUser> whites = whiteUserDao.selectList(lambdaQueryWrapper);
         whites.forEach(e -> {
@@ -53,12 +55,20 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
     }
 
     @Override
-    public WhiteUser add(WhiteUserRequest userWhiteRequest) {
+    public void add(Integer uid, Long whiteId,String ordersSn) {
+        LambdaQueryWrapper<WhiteUser> lqw=new LambdaQueryWrapper<WhiteUser>()
+                .eq(WhiteUser::getOrdersSn,ordersSn);
+        if (list(lqw).size() > 0) {
+            throw new RuntimeException(String.format("单号已存在"));
+        }
+        if (getByUser(uid,whiteId) != null) {
+            throw new RuntimeException(String.format("用户白名单已存在"));
+        }
         WhiteUser userWhite = new WhiteUser();
-        userWhite.setWhiteId(Long.valueOf(userWhiteRequest.getWhiteId()));
-        userWhite.setUid(userWhiteRequest.getUid());
+        userWhite.setWhiteId(whiteId);
+        userWhite.setUid(uid);
+        userWhite.setOrdersSn(ordersSn);
         save(userWhite);
-        return userWhite;
     }
 
     @Override
@@ -90,6 +100,14 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
                 }
                 whiteMap.put(whiteName, white);
             }
+            String ordersSn=userWhiteExpress.getOrdersSn();
+            if (whiteMap.get(ordersSn) == null) {
+                LambdaQueryWrapper<WhiteUser> lqw=new LambdaQueryWrapper<WhiteUser>()
+                        .eq(WhiteUser::getOrdersSn,ordersSn);
+                if (list(lqw).size() > 0) {
+                    throw new RuntimeException(String.format("第: %s, 单号已存在", i + 1));
+                }
+            }
         }
 
         transactionTemplate.execute(s -> {
@@ -101,7 +119,7 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
                 White white = whiteMap.get(whiteName);
                 User user = userMap.get(account);
                 if (getByUser(user.getId(), white.getId()) == null) {
-                    WhiteUser userWhite = WhiteUser.builder().uid(user.getId()).whiteId(white.getId()).build();
+                    WhiteUser userWhite = WhiteUser.builder().uid(user.getId()).whiteId(white.getId()).ordersSn(userWhiteExpress.getOrdersSn()).build();
                     batchSaveList.add(userWhite);
                 }
             }
