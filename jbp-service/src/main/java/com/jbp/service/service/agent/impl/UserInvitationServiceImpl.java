@@ -1,15 +1,24 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserRegion;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserInvitationDao;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.service.agent.UserInvitationService;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +41,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     private UserInvitationFlowService userInvitationFlowService;
     @Resource
     private TransactionTemplate transactionTemplate;
+    @Resource
+    private UserService userService;
 
     @Override
     public UserInvitation getByUser(Integer uId) {
@@ -124,5 +135,21 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     @Override
     public List<UserInvitation> getNoFlowList() {
         return dao.getNoFlowList();
+    }
+
+    @Override
+    public PageInfo<UserInvitation> pageList(Integer uid, Integer pid, Integer mid, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<UserInvitation> lwq=new LambdaQueryWrapper<UserInvitation>()
+                .eq(!ObjectUtil.isNull(uid),UserInvitation::getUId,uid)
+                .eq(!ObjectUtil.isNull(pid),UserInvitation::getPId,pid)
+                .eq(!ObjectUtil.isNull(mid),UserInvitation::getMId,mid);
+        Page<UserInvitation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<UserInvitation> list = list(lwq);
+        list.forEach(e -> {
+            e.setUAccount(userService.getById(e.getUId()).getAccount());
+            e.setPAccount(userService.getById(e.getMId()).getAccount());
+            e.setMAccount(userService.getById(e.getPId()).getAccount());
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 }

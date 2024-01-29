@@ -1,16 +1,13 @@
 package com.jbp.common.model.agent;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 业务关系网
@@ -21,10 +18,10 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_user_invitation")
-@ApiModel(value="UserInvitation对象", description="销售上下级关系")
+@ApiModel(value = "UserInvitation对象", description = "销售上下级关系")
 public class UserInvitation extends BaseModel {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("用户ID")
     @TableField("uId")
@@ -42,7 +39,19 @@ public class UserInvitation extends BaseModel {
     @TableField("ifForce")
     private Boolean ifForce;
 
-    public Integer getRealPid(){
-        return  getMId() != null ? getMId() : getPId();
+    @ApiModelProperty("用户账户")
+    @TableField(exist = false)
+    private String uAccount;
+
+    @ApiModelProperty("邀请上级账户")
+    @TableField(exist = false)
+    private String pAccount;
+
+    @ApiModelProperty("转挂上级账户")
+    @TableField(exist = false)
+    private String mAccount;
+
+    public Integer getRealPid() {
+        return getMId() != null ? getMId() : getPId();
     }
 }
