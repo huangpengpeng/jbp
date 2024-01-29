@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserRegion;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -33,15 +34,15 @@ public class UserRegionController {
     @ApiOperation(value = "区域用户列表", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/page")
     public CommonResult<CommonPage<UserRegion>> page(UserRegionRequest request, PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(userRegionService.pageList(user.getId(), request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userRegionService.pageList(uid, request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:user:region:add')")
     @ApiOperation(value = "区域用户新增", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,11 +52,11 @@ public class UserRegionController {
             return CommonResult.failed("请填写完整信息");
         }
         User user = userService.getByAccount(account);
-        if (user == null) {
+        if (ObjectUtil.isNull(user)) {
             return CommonResult.success("账户不存在");
         }
         UserRegion userRegion = userRegionService.getByArea(province, city, area, UserRegion.Constants.已开通.toString());
-        if (userRegion != null) {
+        if (!ObjectUtil.isNull(userRegion)) {
             return CommonResult.success("该区域存已经被其他用户开通");
         }
         userRegion = UserRegion.builder().uid(user.getId()).province(province).city(city).area(area).address(address).status(UserRegion.Constants.已开通.toString()).build();

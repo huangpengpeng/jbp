@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCompany;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -35,15 +36,15 @@ public class UserCompanyController {
     @ApiOperation(value = "分公司区域用户列表", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/page")
     public CommonResult<CommonPage<UserCompany>> page(UserCompanyRequest request, PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(userCompanyService.pageList(user.getId(), request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userCompanyService.pageList(uid, request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:user:company:add')")
     @ApiOperation(value = "分公司用户新增", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)

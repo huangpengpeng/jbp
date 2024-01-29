@@ -1,17 +1,23 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.UserInvitationFlow;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserInvitationFlowDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.service.agent.UserInvitationService;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -30,6 +36,8 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
     private TeamUserService teamUserService;
     @Resource
     private UserInvitationService userInvitationService;
+    @Resource
+    private UserService userService;
 
 
     /**
@@ -69,5 +77,20 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         }
         // 保存 list空 mybatis自带剔除
         saveBatch(list);
+    }
+
+    @Override
+    public PageInfo<UserInvitationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<UserInvitationFlow> lqw = new LambdaQueryWrapper<UserInvitationFlow>()
+                .eq(!ObjectUtil.isNull(uid), UserInvitationFlow::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), UserInvitationFlow::getPId, pid)
+                .eq(!ObjectUtil.isNull(level),UserInvitationFlow::getLevel,level);
+        Page<UserInvitationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<UserInvitationFlow> list = list(lqw);
+        list.forEach(e -> {
+            e.setUAccount(userService.getById(e.getUId()).getAccount());
+            e.setPAccount(userService.getById(e.getPId()).getAccount());
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 }

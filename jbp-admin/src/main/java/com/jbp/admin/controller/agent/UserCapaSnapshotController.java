@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -31,14 +32,14 @@ public class UserCapaSnapshotController {
     @GetMapping("/page")
     @ApiOperation("列表分页查询")
     public CommonResult<CommonPage<UserCapaSnapshot>> getList(UserCapaSnapshotRequest request, PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(userCapaSnapshotService.pageList(user.getId(), request.getCapaId(), request.getType(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userCapaSnapshotService.pageList(uid, request.getCapaId(), request.getType(), pageParamRequest)));
     }
 }

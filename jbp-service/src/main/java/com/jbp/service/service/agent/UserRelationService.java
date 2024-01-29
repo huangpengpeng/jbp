@@ -1,8 +1,10 @@
 package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.request.PageParamRequest;
 
 import java.util.List;
 
@@ -33,4 +35,6 @@ public interface UserRelationService extends IService<UserRelation> {
      * 获取最左边的节点
      */
     UserRelation getLeftMost(Integer userId);
+
+    PageInfo<UserRelation> pageList(Integer uid, Integer pid, Integer node, PageParamRequest pageParamRequest);
 }

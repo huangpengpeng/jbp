@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -30,14 +31,14 @@ public class WalletFlowController {
     @GetMapping("/page")
     @ApiOperation("用户积分详情")
     public CommonResult<CommonPage<WalletFlow>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(user.getId(), request.getType(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), pageParamRequest)));
     }
 }

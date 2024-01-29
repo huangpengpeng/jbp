@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -20,13 +21,14 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@NoArgsConstructor
 @TableName("eb_user_invitation_flow")
 @ApiModel(value="UserInvitationFlow对象", description="销售上下层级关系")
 public class UserInvitationFlow extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    public UserInvitationFlow(Integer uId, Integer pId, int level) {
+    public UserInvitationFlow(Integer uId, Integer pId, Integer level) {
         this.uId = uId;
         this.pId = pId;
         this.level = level;
@@ -42,5 +44,13 @@ public class UserInvitationFlow extends BaseModel {
 
     @ApiModelProperty("层级")
     @TableField("level")
-    private int level;
+    private Integer level;
+
+    @ApiModelProperty("用户账户")
+    @TableField(exist = false)
+    private String uAccount;
+
+    @ApiModelProperty("邀请上级账户")
+    @TableField(exist = false)
+    private String pAccount;
 }

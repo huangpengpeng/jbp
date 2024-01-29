@@ -2,6 +2,7 @@ package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.dto.UserWhiteDto;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.page.CommonPage;
@@ -36,15 +37,15 @@ public class WhiteUserController {
     @ApiOperation("用户白名单列表")
     public CommonResult<CommonPage<WhiteUser>> getList(@ModelAttribute @Validated WhiteUserRequest request,
                                                        @ModelAttribute PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(whiteUserService.pageList(user.getId(),request.getWhiteId(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(whiteUserService.pageList(uid,request.getWhiteId(), pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:white:user:add')")
     @PostMapping("/add")

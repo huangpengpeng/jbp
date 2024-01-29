@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -31,15 +32,15 @@ public class UserCapaController {
     @GetMapping("/page")
     @ApiOperation("列表分页查询")
     public CommonResult<CommonPage<UserCapa>> getList(UserCapaRequest request, PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(userCapaService.pageList(user.getId(), request.getCapaId(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userCapaService.pageList(uid, request.getCapaId(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:capa:add')")

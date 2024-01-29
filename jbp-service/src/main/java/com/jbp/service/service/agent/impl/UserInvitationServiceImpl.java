@@ -147,8 +147,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         List<UserInvitation> list = list(lwq);
         list.forEach(e -> {
             e.setUAccount(userService.getById(e.getUId()).getAccount());
-            e.setPAccount(userService.getById(e.getMId()).getAccount());
-            e.setMAccount(userService.getById(e.getPId()).getAccount());
+            e.setPAccount(userService.getById(e.getPId()).getAccount());
+            e.setMAccount(userService.getById(e.getMId()).getAccount());
         });
         return CommonPage.copyPageInfo(page, list);
     }
