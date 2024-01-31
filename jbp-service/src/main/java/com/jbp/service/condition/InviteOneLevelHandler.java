@@ -1,14 +1,13 @@
 package com.jbp.service.condition;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.RiseCondition;
-import com.jbp.service.service.agent.CapaRiseConditionService;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 邀请一阶条件
@@ -16,8 +15,6 @@ import javax.annotation.Resource;
 @Component
 public class InviteOneLevelHandler implements ConditionHandler {
 
-    @Resource
-    private CapaRiseConditionService capaRiseConditionService;
 
 
     @Override
@@ -26,15 +23,14 @@ public class InviteOneLevelHandler implements ConditionHandler {
     }
 
     @Override
-    public void save(RiseCondition riseCondition) {
+    public void valid(RiseCondition riseCondition){
         getRule(riseCondition);
-        capaRiseConditionService.save(riseCondition);
     }
 
     @Override
     public InviteOneLevelHandler.Rule getRule(RiseCondition riseCondition) {
         try {
-            Rule rule = riseCondition.getValue().toJavaObject(Rule.class);
+            Rule rule = JSONObject.parseObject(riseCondition.getValue()).toJavaObject(Rule.class);
             if (rule.getNum() == null || rule.getCapaId() == null) {
                 throw new RuntimeException(getName() + ":升级规则格式错误0");
             }

@@ -37,13 +37,13 @@ public class ConditionChain implements ApplicationContextAware {
     /**
      * 保存
      */
-    public void save(RiseCondition riseCondition) {
+    public void valid(RiseCondition riseCondition) {
         validNamePattern(riseCondition.getName());
         ConditionHandler handler = handlers.get(riseCondition.getName());
         if(handler == null){
             throw new CrmebException("当前升级条件不存在");
         }
-        handler.save(riseCondition);
+        handler.valid(riseCondition);
     }
 
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
