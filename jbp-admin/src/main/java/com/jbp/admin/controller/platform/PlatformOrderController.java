@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.platform;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
@@ -11,6 +13,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.service.service.OrderService;
 
+import com.jbp.service.service.PayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -41,6 +45,8 @@ public class PlatformOrderController {
 
     @Autowired
     private OrderService orderService;
+    @Resource
+    private PayService payService;
 
     @PreAuthorize("hasAuthority('platform:order:page:list')")
     @ApiOperation(value = "平台端订单分页列表") //配合swagger使用
@@ -76,17 +82,15 @@ public class PlatformOrderController {
     public CommonResult<LogisticsResultVo> getLogisticsInfo(@PathVariable(value = "invoiceId") Integer invoiceId) {
         return CommonResult.success(orderService.getLogisticsInfo(invoiceId));
     }
-
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台端订单确认付款")
     @PreAuthorize("hasAuthority('platform:order:confirm:pay')")
     @ApiOperation(value = "订单确认付款")
     @RequestMapping(value = "/confirm/pay/{orderNo}", method = RequestMethod.GET)
     public CommonResult<LogisticsResultVo> confirmPay(@PathVariable(value = "orderNo") String orderNo) {
-
-
-
-
+        payService.confirmPay(orderService.getByOrderNo(orderNo));
         return CommonResult.success();
     }
+
 }
 
 

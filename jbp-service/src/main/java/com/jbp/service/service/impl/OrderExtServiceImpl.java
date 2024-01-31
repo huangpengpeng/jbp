@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderExtServiceImpl extends ServiceImpl<OrderExtDao, OrderExt> implements OrderExtService {
     @Override
-    public OrderExt getByOrder(Integer orderId) {
-        return getOne(new QueryWrapper<OrderExt>().lambda().eq(OrderExt::getOrderId, orderId));
+    public OrderExt getByOrder(String orderNo) {
+        return getOne(new QueryWrapper<OrderExt>().lambda().eq(OrderExt::getOrderNo, orderNo));
     }
 }

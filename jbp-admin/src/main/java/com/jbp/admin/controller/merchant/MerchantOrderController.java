@@ -13,6 +13,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.service.service.OrderService;
 
+import com.jbp.service.service.PayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -44,6 +46,8 @@ public class MerchantOrderController {
     @Autowired
     private OrderService orderService;
 
+    @Resource
+    private PayService payService;
     @PreAuthorize("hasAuthority('merchant:order:page:list')")
     @ApiOperation(value = "商户端订单分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -136,7 +140,14 @@ public class MerchantOrderController {
     public CommonResult<Object> verificationOrder(@RequestBody @Validated OrderVerificationRequest request) {
         return CommonResult.success(orderService.verificationOrderByCode(request.getVerifyCode()));
     }
-
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "商户端确认支付")
+    @PreAuthorize("hasAuthority('merchant:order:confirm:pay')")
+    @ApiOperation(value = "确认支付")
+    @GetMapping(value = "/confirm/pay")
+    public CommonResult confirmPay(String orderNo) {
+        payService.confirmPay(orderService.getByOrderNo(orderNo));
+        return CommonResult.success();
+    }
 }
 
 

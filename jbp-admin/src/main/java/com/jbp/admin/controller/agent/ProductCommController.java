@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
@@ -46,6 +48,7 @@ public class ProductCommController {
 
     @PreAuthorize("hasAuthority('agent:platform:product:comm:edit')")
     @PostMapping("/edit")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "商品佣金编辑")
     @ApiOperation("商品佣金编辑")
     public CommonResult<Boolean> edit(@RequestBody @Validated ProductCommRequest request) {
         ProductCommConfig config = configService.getByType(request.getType());

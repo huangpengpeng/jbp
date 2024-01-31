@@ -5,5 +5,5 @@ import com.jbp.common.model.order.OrderExt;
 
 public interface OrderExtService extends IService<OrderExt> {
 
-    OrderExt getByOrder(Integer orderId);
+    OrderExt getByOrder(String orderNo);
 }

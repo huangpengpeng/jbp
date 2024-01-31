@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.PlatformWallet;
 import com.jbp.common.model.agent.PlatformWalletFlow;
 import com.jbp.common.model.user.User;
@@ -36,6 +38,7 @@ public class PlatformWalletController {
 
     @PreAuthorize("hasAuthority('agent:platformWallet:increase')")
     @ApiOperation("增加积分")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated PlatformWalletEditRequest request) {
         platformWalletService.increase(request.getType(), request.getAmt(), PlatformWalletFlow.OperateEnum.调账.name(),
@@ -45,6 +48,7 @@ public class PlatformWalletController {
     }
 
     @PreAuthorize("hasAuthority('agent:platformWallet:reduce')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台减少积分")
     @ApiOperation("减少积分")
     @PostMapping("/reduce")
     public CommonResult reduce(@RequestBody @Validated PlatformWalletEditRequest request) {
@@ -55,6 +59,7 @@ public class PlatformWalletController {
     }
 
     @PreAuthorize("hasAuthority('agent:platformWallet:transfer')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "平台积分转用户积分")
     @ApiOperation("转用户")
     @PostMapping("/transfer")
     public CommonResult transfer(@RequestBody @Validated PlatformWalletTransferRequest request) {

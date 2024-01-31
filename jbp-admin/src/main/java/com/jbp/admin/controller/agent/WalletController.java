@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
@@ -46,6 +48,7 @@ public class WalletController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:increase')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户增加积分")
     @ApiOperation("增加积分")
     @PostMapping("/increase")
     public CommonResult increase(@RequestBody @Validated WalletformEditRequest request) {
@@ -57,6 +60,7 @@ public class WalletController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:reduce')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户减少积分")
     @ApiOperation("减少积分")
     @PostMapping("/reduce")
     public CommonResult reduce(@RequestBody @Validated WalletformEditRequest request) {
@@ -68,6 +72,7 @@ public class WalletController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:transfer')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户积分转平台积分")
     @ApiOperation("转平台")
     @PostMapping("/transfer")
     public CommonResult transfer(@RequestBody @Validated WalletformEditRequest request) {

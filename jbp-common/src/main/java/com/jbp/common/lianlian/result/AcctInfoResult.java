@@ -1,6 +1,5 @@
 package com.jbp.common.lianlian.result;
 
-import com.jbp.common.lianlian.v1.acctmgr.query.AcctInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,5 +18,6 @@ public class AcctInfoResult {
     private String oid_userno;
     private String bank_account;
     private List<AcctInfo> acctinfo_list;
+
 
 }

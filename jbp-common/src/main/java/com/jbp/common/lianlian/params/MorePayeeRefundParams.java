@@ -1,9 +1,4 @@
 package com.jbp.common.lianlian.params;
-
-import com.jbp.common.lianlian.v1.txn.refund.OriginalOrderInfo;
-import com.jbp.common.lianlian.v1.txn.refund.PyeeRefundInfo;
-import com.jbp.common.lianlian.v1.txn.refund.RefundMethod;
-import com.jbp.common.lianlian.v1.txn.refund.RefundOrderInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
