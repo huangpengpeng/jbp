@@ -3,9 +3,10 @@ package com.jbp.service.condition;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.CapaRiseCondition;
+import com.jbp.common.model.agent.RiseCondition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +22,6 @@ import java.util.Map;
 @Slf4j
 public class ConditionChain implements ApplicationContextAware {
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         final Map<String, ConditionHandler> beans =
@@ -30,24 +30,24 @@ public class ConditionChain implements ApplicationContextAware {
         beans.values().stream().forEach(s -> addHandler(s));
     }
 
-    private Table<Integer, String, ConditionHandler> handlers = HashBasedTable.create();
+    private Map<String, ConditionHandler> handlers = Maps.newConcurrentMap();
 
-    public void addHandler(ConditionHandler handler) {handlers.put(handler.getType(), handler.getName(), handler);}
+    public void addHandler(ConditionHandler handler) {handlers.put(handler.getName(), handler);}
 
     /**
      * 保存
      */
-    public void save(CapaRiseCondition riseCondition) {
+    public void save(RiseCondition riseCondition) {
         validNamePattern(riseCondition.getName());
-        ConditionHandler handler = handlers.get(riseCondition.getType(), riseCondition.getName());
+        ConditionHandler handler = handlers.get(riseCondition.getName());
         if(handler == null){
             throw new CrmebException("当前升级条件不存在");
         }
         handler.save(riseCondition);
     }
 
-    public Boolean isOk(Integer uid, CapaRiseCondition riseCondition) {
-        ConditionHandler handler = handlers.get(riseCondition.getType(), riseCondition.getName());
+    public Boolean isOk(Integer uid, RiseCondition riseCondition) {
+        ConditionHandler handler = handlers.get(riseCondition.getName());
         if(handler == null){
             throw new CrmebException("当前升级条件不存在");
         }

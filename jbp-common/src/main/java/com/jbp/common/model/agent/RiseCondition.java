@@ -15,20 +15,14 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "eb_capa_rise_condition", autoResultMap = true)
-@ApiModel(value="CapaRiseCondition对象", description="晋升条件")
-public class CapaRiseCondition extends BaseModel {
+@ApiModel(value="RiseCondition对象", description="晋升条件")
+public class RiseCondition extends BaseModel {
 
-    public CapaRiseCondition(Integer type, String name, String description, JSONObject value) {
-        this.type = type;
+    public RiseCondition(String name, String description, String value) {
         this.name = name;
         this.description = description;
         this.value = value;
     }
-
-    @ApiModelProperty("等级类型  0 等级  1 星级")
-    @TableField("type")
-    private Integer type;
 
     @ApiModelProperty("名称唯一")
     @TableField("name")
@@ -39,6 +33,5 @@ public class CapaRiseCondition extends BaseModel {
     private String description;
 
     @ApiModelProperty("条件值")
-    @TableField(value = "value", typeHandler = JacksonTypeHandler.class)
-    private JSONObject value;
+    private String value;
 }

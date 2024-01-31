@@ -10,18 +10,19 @@ import lombok.Getter;
  */
 public enum ConditionEnum {
 
-    等级_直属一阶等级人数(0, "直属一阶等级人数"),
+    等级_直属一阶等级人数("直属一阶等级人数", "邀请一阶人数升级"),
 
-    星级_直属一阶等级人数(1, "直属一阶等级人数");
+    ;
 
-    @Getter
-    private final Integer type;
 
     @Getter
     private final String name;
 
-    ConditionEnum(Integer type, String name) {
-        this.type = type;
+    @Getter
+    private final String description;
+
+    ConditionEnum(String name, String description) {
         this.name = name;
+        this.description = description;
     }
 }

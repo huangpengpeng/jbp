@@ -1,14 +1,9 @@
 package com.jbp.service.service.agent;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jbp.common.model.agent.CapaRiseCondition;
+import com.jbp.common.model.agent.RiseCondition;
 
-import java.util.List;
+public interface CapaRiseConditionService extends IService<RiseCondition> {
 
-public interface CapaRiseConditionService extends IService<CapaRiseCondition> {
-
-    List<CapaRiseCondition> getByType(Integer type);
-
-    CapaRiseCondition add(Integer type, String name, String description, JSONObject value);
+    RiseCondition add(String name, String description, String value);
 }

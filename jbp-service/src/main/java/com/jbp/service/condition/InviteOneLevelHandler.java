@@ -1,6 +1,6 @@
 package com.jbp.service.condition;
 
-import com.jbp.common.model.agent.CapaRiseCondition;
+import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.service.service.agent.CapaRiseConditionService;
 
 import lombok.AllArgsConstructor;
@@ -19,10 +19,6 @@ public class InviteOneLevelHandler implements ConditionHandler {
     @Resource
     private CapaRiseConditionService capaRiseConditionService;
 
-    @Override
-    public Integer getType() {
-        return ConditionEnum.等级_直属一阶等级人数.getType();
-    }
 
     @Override
     public String getName() {
@@ -30,13 +26,13 @@ public class InviteOneLevelHandler implements ConditionHandler {
     }
 
     @Override
-    public void save(CapaRiseCondition riseCondition) {
+    public void save(RiseCondition riseCondition) {
         getRule(riseCondition);
         capaRiseConditionService.save(riseCondition);
     }
 
     @Override
-    public InviteOneLevelHandler.Rule getRule(CapaRiseCondition riseCondition) {
+    public InviteOneLevelHandler.Rule getRule(RiseCondition riseCondition) {
         try {
             Rule rule = riseCondition.getValue().toJavaObject(Rule.class);
             if (rule.getNum() == null || rule.getCapaId() == null) {
@@ -49,7 +45,7 @@ public class InviteOneLevelHandler implements ConditionHandler {
     }
 
     @Override
-    public Boolean isOk(Integer uid, CapaRiseCondition riseCondition) {
+    public Boolean isOk(Integer uid, RiseCondition riseCondition) {
         // 当前用户是否满足改升级条件  满足返回 true  不满足返回false
         return null;
     }

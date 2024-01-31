@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.mybatis.RiseConditionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -70,6 +71,10 @@ public class Capa extends BaseModel {
     @ApiModelProperty("计算表达式")
     @TableField(value = "parser", updateStrategy = FieldStrategy.IGNORED)
     private String parser;
+
+    @ApiModelProperty("升级条件")
+    @TableField(typeHandler = RiseConditionListHandler.class, updateStrategy = FieldStrategy.IGNORED)
+    private List<RiseCondition> conditionList;
 
 
     public Map<String, Boolean> initParser() {

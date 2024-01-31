@@ -2,11 +2,8 @@ package com.jbp.service.product.profit;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.CapaRiseCondition;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
