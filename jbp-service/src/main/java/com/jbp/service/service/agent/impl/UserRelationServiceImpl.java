@@ -1,23 +1,28 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.UserRelationDao;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserRelationFlowService;
 import com.jbp.service.service.agent.UserRelationService;
-
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -37,6 +42,8 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     private UserRelationFlowService userRelationFlowService;
     @Resource
     private RelationScoreService relationScoreService;
+    @Resource
+    private UserService userService;
 
     @Override
     public UserRelation getByUid(Integer uId) {
@@ -140,5 +147,20 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
                 userId = ArithmeticUtils.gte(leftScore, rightScore) ? left.getUid() : right.getUid();
             }
         } while (true);
+    }
+
+    @Override
+    public PageInfo<UserRelation> pageList(Integer uid, Integer pid, Integer node, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<UserRelation> lqw = new LambdaQueryWrapper<UserRelation>()
+                .eq(!ObjectUtil.isNull(uid), UserRelation::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), UserRelation::getPId, pid)
+                .eq(!ObjectUtil.isNull(node), UserRelation::getNode, node);
+        Page<UserRelation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<UserRelation> list = list(lqw);
+        list.forEach(e -> {
+            e.setUAccount(userService.getById(e.getUId()).getAccount());
+            e.setPAccount(userService.getById(e.getPId()).getAccount());
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 }

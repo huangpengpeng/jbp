@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -33,15 +34,15 @@ public class WalletController {
     @ApiOperation("用户积分列表")
     @GetMapping("/page")
     public CommonResult<CommonPage<Wallet>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
-        User user = userService.getByAccount(request.getAccount());
-        if (ObjectUtil.isNull(user)) {
-            if (ObjectUtil.isNull(request.getAccount()) || request.getAccount().equals("")) {
-                user = new User();
-            } else {
-                return CommonResult.failed("账户信息错误");
+        Integer uid = null;
+        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
+            try {
+                uid = userService.getByAccount(request.getAccount()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(walletService.pageList(user.getId(),request.getType(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletService.pageList(uid,request.getType(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:increase')")
@@ -71,7 +72,7 @@ public class WalletController {
     @PostMapping("/transfer")
     public CommonResult transfer(@RequestBody @Validated WalletformEditRequest request) {
         User user = userService.getByAccount(request.getAccount());
-        if (request == null) {
+        if (ObjectUtil.isNull(user)) {
             return CommonResult.failed("账户信息错误");
         }
         walletService.transferToPlatform(user.getId(), request.getType(), request.getAmt(),

@@ -2,6 +2,7 @@ package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
@@ -36,15 +37,15 @@ public class ProductMaterialsController {
     @GetMapping("/page")
     @ApiOperation("产品物料对应仓库列表")
     public CommonResult<CommonPage<ProductMaterials>> getList(ProductMaterialsRequest request, PageParamRequest pageParamRequest) {
-        Merchant merchant = merchantService.getByName(request.getMerName());
-        if (ObjectUtil.isNull(merchant)) {
-            if (ObjectUtil.isNull(request.getMerName()) || request.getMerName().equals("")) {
-                merchant = new Merchant();
-            } else {
-                return CommonResult.failed("商户信息错误");
+        Integer merchantId = null;
+        if (ObjectUtil.isNull(request.getMerName()) || !request.getMerName().equals("")) {
+            try {
+                merchantId = merchantService.getByName(request.getMerName()).getId();
+            } catch (NullPointerException e) {
+                throw new CrmebException("商户信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchant.getId(), request.getMaterialsName(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(), pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:product:materials:add')")
     @PostMapping("/add")

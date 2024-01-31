@@ -1,7 +1,9 @@
 package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.UserInvitationFlow;
+import com.jbp.common.request.PageParamRequest;
 
 public interface UserInvitationFlowService extends IService<UserInvitationFlow> {
 
@@ -16,4 +18,6 @@ public interface UserInvitationFlowService extends IService<UserInvitationFlow> 
      * 刷新用户关系
      */
     void refreshFlowAndTeam(Integer uId);
+
+    PageInfo<UserInvitationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest);
 }
