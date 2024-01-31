@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -89,5 +90,10 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         walletConfig.setChangeScale(changeScale);
         updateById(walletConfig);
 
+    }
+
+    @Override
+    public WalletConfig getCanPay() {
+        return getOne(new QueryWrapper<WalletConfig>().lambda().eq(WalletConfig::getCanPay, true).eq(WalletConfig::getStatus, 1));
     }
 }

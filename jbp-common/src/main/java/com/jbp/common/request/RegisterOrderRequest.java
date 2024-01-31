@@ -18,7 +18,7 @@ public class RegisterOrderRequest implements Serializable {
     private String username;
 
     @ApiModelProperty(value = "注册手机号", required = false)
-    private String phone;
+    private String mobile;
 
     @ApiModelProperty(value = "销售账户", required = false)
     private String pAccount;
@@ -30,6 +30,9 @@ public class RegisterOrderRequest implements Serializable {
     private Integer node;
 
     @ApiModelProperty(value = "注册等级", required = false)
-    private Long userLevel;
+    private Long capaId;
+
+    @ApiModelProperty(value = "注册星级", required = false)
+    private Long capaXsId;
 
 }

@@ -53,4 +53,7 @@ public class CreateOrderRequest implements Serializable {
     @ApiModelProperty(value = "用户平台优惠券编号（不选时为0）")
     @NotNull(message = "用户平台优惠券编号不能为空")
     private Integer platUserCouponId;
+
+    @ApiModelProperty(value = "分享用户ID")
+    private Integer shardUid;
 }

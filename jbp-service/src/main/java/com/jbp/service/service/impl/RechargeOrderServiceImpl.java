@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,6 +15,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.lianlian.result.CashierPayCreateResult;
+import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.model.agent.Wallet;
+import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.model.user.User;
@@ -34,6 +39,8 @@ import com.jbp.common.vo.*;
 import com.jbp.service.dao.RechargeOrderDao;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.PlatformWalletService;
+import com.jbp.service.service.agent.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +95,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     private AsyncService asyncService;
     @Autowired
     private AliPayService aliPayService;
+    @Autowired
+    private LianLianPayService lianLianPayService;
+    @Autowired
+    private WalletService walletService;
+    @Autowired
+    private PlatformWalletService platformWalletService;
 
     /**
      * 列表
@@ -202,11 +215,20 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             response.setAlipayRequest(result);
             rechargeOrder.setOutTradeNo(rechargeNo);
         }
+        if (request.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+            LianLianPayInfoResult payInfo = lianLianPayService.get();
+            CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), rechargeNo, rechargePrice,
+                    payInfo.getNotify_url(), payInfo.getNotify_url(), "充值", request.getIp());
+            response.setStatus(true);
+            response.setLianLianCashierConfig(cashier);
+            rechargeOrder.setOutTradeNo(cashier.getAccp_txno());
+        }
         rechargeOrder.setUid(user.getId());
         rechargeOrder.setOrderNo(rechargeNo);
         rechargeOrder.setPrice(rechargePrice);
         rechargeOrder.setGivePrice(gainPrice);
         rechargeOrder.setPayType(request.getPayType());
+        rechargeOrder.setType(rechargeOrder.getType());
         rechargeOrder.setPayChannel(request.getPayChannel());
         boolean save = save(rechargeOrder);
         if (!save) {
@@ -390,6 +412,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         return dao.selectOne(lqw);
     }
 
+    @Override
+    public RechargeOrder getByOrderNo(String orderNo) {
+        return getOne(new QueryWrapper<RechargeOrder>().lambda().eq(RechargeOrder::getOrderNo, orderNo));
+    }
+
     /**
      * 支付成功后置处理
      *
@@ -398,18 +425,22 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     @Override
     public Boolean paySuccessAfter(RechargeOrder rechargeOrder) {
         User user = userService.getById(rechargeOrder.getUid());
-
         BigDecimal addPrice = rechargeOrder.getPrice().add(rechargeOrder.getGivePrice());
-        BigDecimal balance = user.getNowMoney().add(addPrice);
-        // 余额变动对象
+        BigDecimal balance = BigDecimal.ZERO;
+        if(rechargeOrder.getType() == 0){
+            balance = user.getNowMoney().add(addPrice);
+        }
         UserBalanceRecord record = new UserBalanceRecord();
-        record.setUid(rechargeOrder.getUid());
-        record.setLinkId(rechargeOrder.getOrderNo());
-        record.setLinkType(BalanceRecordConstants.BALANCE_RECORD_LINK_TYPE_RECHARGE);
-        record.setType(BalanceRecordConstants.BALANCE_RECORD_TYPE_ADD);
-        record.setAmount(addPrice);
-        record.setBalance(balance);
-        record.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_RECHARGE, addPrice));
+        if(rechargeOrder.getType() == 0){
+            // 余额变动对象
+            record.setUid(rechargeOrder.getUid());
+            record.setLinkId(rechargeOrder.getOrderNo());
+            record.setLinkType(BalanceRecordConstants.BALANCE_RECORD_LINK_TYPE_RECHARGE);
+            record.setType(BalanceRecordConstants.BALANCE_RECORD_TYPE_ADD);
+            record.setAmount(addPrice);
+            record.setBalance(balance);
+            record.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_RECHARGE, addPrice));
+        }
 
         Bill bill = new Bill();
         bill.setOrderNo(rechargeOrder.getOrderNo());
@@ -425,10 +456,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
                 logger.warn("充值订单更新支付状态失败，orderNo = {}", rechargeOrder.getOrderNo());
                 e.setRollbackOnly();
             }
-            // 余额变动
-            userService.updateNowMoney(user.getId(), addPrice, Constants.OPERATION_TYPE_ADD);
             // 创建记录
-            userBalanceRecordService.save(record);
+            if (rechargeOrder.getType() == 0) {
+                // 余额变动
+                userService.updateNowMoney(user.getId(), addPrice, Constants.OPERATION_TYPE_ADD);
+                userBalanceRecordService.save(record);
+            } else {
+                platformWalletService.transferToUser(user.getId(), rechargeOrder.getType(), addPrice, WalletFlow.OperateEnum.充值.toString(),
+                        rechargeOrder.getOrderNo(), StrUtil.format("充值订单，用户充值金额{}元", rechargeOrder.getPrice()));
+            }
             billService.save(bill);
             return Boolean.TRUE;
         });

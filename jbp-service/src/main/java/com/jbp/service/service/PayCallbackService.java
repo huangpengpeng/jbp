@@ -1,5 +1,7 @@
 package com.jbp.service.service;
 
+import com.jbp.common.lianlian.result.QueryPaymentResult;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -33,4 +35,6 @@ public interface PayCallbackService {
      * @return String
      */
     String weChatRefund(String request);
+
+    String  lianLianPayCallback(QueryPaymentResult queryPaymentResult);
 }

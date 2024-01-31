@@ -47,7 +47,13 @@ public class RechargeOrder implements Serializable {
     @ApiModelProperty(value = "购买赠送金额")
     private BigDecimal givePrice;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay")
+    @ApiModelProperty(value = "充值类型 0 是余额   1  2  3  代表walletType")
+    private Integer type;
+
+    @ApiModelProperty(value = "支付方法")
+    private String payMethod;
+
+    @ApiModelProperty(value = "支付方式:weixin,alipay, lianlian")
     private String payType;
 
     @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App")

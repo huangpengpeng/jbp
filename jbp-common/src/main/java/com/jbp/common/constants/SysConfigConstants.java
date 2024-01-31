@@ -91,7 +91,13 @@ public class SysConfigConstants {
     public static final String CONFIG_YUE_PAY_STATUS  = "yue_pay_status";
     /** 支付宝支付状态 */
     public static final String CONFIG_ALI_PAY_STATUS = "ali_pay_status";
+    /** 连连支付状态 */
+    public static final String CONFIG_LIANLIAN_PAY_STATUS = "lianlian_pay_status";
+    /** 积分支付状态 */
+    public static final String CONFIG_WALLET_PAY_STATUS = "wallet_pay_status";
 
+    /** 积分支付开启密码 */
+    public static final String CONFIG_WALLET_PAY_OPEN_PASSWORD = "wallet_pay_open_password";
     /** 网站名称 */
     public static final String CONFIG_KEY_SITE_NAME = "site_name";
     

@@ -856,6 +856,8 @@ public class AsyncServiceImpl implements AsyncService {
         newOrder.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
         newOrder.setPlatCouponPrice(merchantOrder.getPlatCouponPrice());
         newOrder.setMerCouponPrice(merchantOrder.getMerCouponPrice());
+        newOrder.setOutTradeNo(order.getOutTradeNo());
+        newOrder.setPayMethod(order.getPayMethod());
         if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP)) {
             newOrder.setStatus(OrderConstants.ORDER_STATUS_AWAIT_VERIFICATION);
         }
@@ -928,6 +930,8 @@ public class AsyncServiceImpl implements AsyncService {
             newOrder.setLevel(OrderConstants.ORDER_LEVEL_MERCHANT);
             newOrder.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             newOrder.setPlatOrderNo(order.getOrderNo());
+            newOrder.setOutTradeNo(order.getOutTradeNo());
+            newOrder.setPayMethod(order.getPayMethod());
             newOrder.setIsDel(false);
             newOrder.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP)) {

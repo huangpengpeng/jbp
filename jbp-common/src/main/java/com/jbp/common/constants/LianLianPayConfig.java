@@ -53,6 +53,25 @@ public class LianLianPayConfig {
 
     }
 
+    public enum TxnStatus {
+
+        交易处理中("交易处理中", "TRADE_WAIT_PAY"),
+        交易成功("交易成功", "TRADE_SUCCESS"),
+        交易失败("交易失败", "TRADE_CLOSE"),
+        ;
+
+        @Getter
+        private String name;
+
+        @Getter
+        private String code;
+
+        TxnStatus(String name, String code) {
+            this.name = name;
+            this.code = code;
+        }
+    }
+
 
 
 

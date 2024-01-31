@@ -144,4 +144,13 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
+    @Override
+    public Wallet getCanPayByUser(Integer uid) {
+        WalletConfig walletConfig = walletConfigService.getCanPay();
+        if (walletConfig == null) {
+            throw new CrmebException("平台未配置可付款积分类型");
+        }
+        return getByUser(uid, walletConfig.getType());
+    }
 }

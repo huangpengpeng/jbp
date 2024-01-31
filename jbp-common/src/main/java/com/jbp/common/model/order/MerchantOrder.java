@@ -163,4 +163,17 @@ public class MerchantOrder implements Serializable {
 
     @ApiModelProperty(value = "平台优惠券金额")
     private BigDecimal platCouponPrice;
+
+    @ApiModelProperty(value = "支付用户ID")
+    private Integer payUid;
+
+    @ApiModelProperty(value = "支付方法")
+    private String payMethod;
+
+    @ApiModelProperty(value = "商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号")
+    private String outTradeNo;
+
+
+
+
 }

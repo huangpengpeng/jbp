@@ -14,6 +14,12 @@ package com.jbp.common.constants;
  */
 public class PayConstants {
 
+    /** 支付方式-连连支付 */
+    public static final String PAY_TYPE_LIANLIAN = "lianlian";
+
+    /** 支付方式-wallet */
+    public static final String PAY_TYPE_WALLET = "lianlian";
+
     /** 支付方式-微信支付 */
     public static final String PAY_TYPE_WE_CHAT = "weixin";
     /** 支付方式-余额支付 */
@@ -31,6 +37,7 @@ public class PayConstants {
     public static final String PAY_CHANNEL_H5 = "h5";
     /** 支付渠道-微信native支付 */
     public static final String PAY_CHANNEL_WECHAT_NATIVE = "native";
+
     /** 支付渠道-余额支付 */
     public static final String PAY_CHANNEL_YUE = "yue";
     /** 支付渠道-微信Ios */
@@ -43,6 +50,12 @@ public class PayConstants {
     public static final String PAY_CHANNEL_ALI_APP_PAY = "alipayApp";
     /** 支付渠道-支付宝App */
     public static final String PAY_CHANNEL_ALI_PC_PAY = "alipayPc";
+
+    /** 支付渠道-连连支付 */
+    public static final String PAY_CHANNEL_LIANLIAN = "lianlian";
+
+    /** 支付渠道-wallet */
+    public static final String PAY_CHANNEL_WALLET = "wallet";
 
     /** 支付服务类型-订单 */
     public static final String PAY_SERVICE_TYPE_ORDER = "order";

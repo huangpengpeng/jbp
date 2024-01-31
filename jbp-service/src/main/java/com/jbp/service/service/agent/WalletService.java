@@ -26,4 +26,6 @@ public interface WalletService extends IService<Wallet> {
     Boolean virement(Integer uid, Integer virementuid, BigDecimal amt, Integer type, String postscript, String operate,String externalNo);
 
     Boolean change(Integer uid, BigDecimal amt, Integer type, Integer changeType, String tradePassword, String externalNo, String postscript, String operate);
+
+    Wallet getCanPayByUser(Integer uid);
 }

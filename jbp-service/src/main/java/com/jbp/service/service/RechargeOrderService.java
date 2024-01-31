@@ -54,6 +54,8 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
      */
     RechargeOrder getByOutTradeNo(String outTradeNo);
 
+    RechargeOrder getByOrderNo(String orderNo);
+
     /**
      * 支付成功后置处理
      * @param rechargeOrder 支付订单

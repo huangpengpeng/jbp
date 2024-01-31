@@ -17,7 +17,10 @@ public class RiseOrderRequest implements Serializable {
     @ApiModelProperty(value = "下单用户", required = false)
     private String account;
 
-    @ApiModelProperty(value = "注册等级", required = false)
-    private Long userLevel;
+    @ApiModelProperty(value = "升级等级", required = false)
+    private Long capaId;
+
+    @ApiModelProperty(value = "升级星级", required = false)
+    private Long capaXsId;
 
 }

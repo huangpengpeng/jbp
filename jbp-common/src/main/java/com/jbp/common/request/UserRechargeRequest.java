@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 
 import com.jbp.common.annotation.StringContains;
@@ -34,19 +35,26 @@ public class UserRechargeRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "充值金额,与充值套餐id二选一")
-//    @DecimalMin(value = "1", message = "充值金额不能小于1") todo 测试完后放开
+    @DecimalMin(value = "1", message = "充值金额不能小于1")
     private BigDecimal price;
 
     @ApiModelProperty(value = "充值套餐id，与充值金额二选一")
     private Integer groupDataId;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay", required = true)
+    @ApiModelProperty(value = "支付方式:weixin,alipay, lianlian", required = true)
     @NotBlank(message = "支付方式不能为空")
-    @StringContains(limitValues = {"weixin", "alipay"}, message = "未知的支付方式")
+    @StringContains(limitValues = {"weixin", "alipay", "lianlian"}, message = "未知的支付方式")
     private String payType;
 
-    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App", required = true)
+    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, lianlian", required = true)
     @NotBlank(message = "支付渠道不能为空")
-    @StringContains(limitValues = {"public", "mini", "h5", "wechatIos", "wechatAndroid", "alipay", "alipayApp"}, message = "未知的支付渠道")
+    @StringContains(limitValues = {"public", "mini", "h5", "wechatIos", "wechatAndroid", "alipay", "alipayApp", "lianlian"}, message = "未知的支付渠道")
     private String payChannel;
+
+    @ApiModelProperty(value = "充值 wallet  yue")
+    @NotBlank(message = "充值类型不能为空")
+    @StringContains(limitValues = {"wallet", "yue"}, message = "未知充值类型")
+    private Integer type;
+
+    private String ip;
 }

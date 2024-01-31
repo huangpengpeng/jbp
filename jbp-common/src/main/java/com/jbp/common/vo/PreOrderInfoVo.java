@@ -1,5 +1,6 @@
 package com.jbp.common.vo;
 
+import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.request.RegisterOrderRequest;
 import com.jbp.common.request.RiseOrderRequest;
@@ -91,7 +92,9 @@ public class PreOrderInfoVo {
     @ApiModelProperty(value = "注册用户信息")
     private RegisterOrderRequest registerInfo;
 
-
     @ApiModelProperty(value = "晋升用户信息")
     private RiseOrderRequest riseInfo;
+
+    @ApiModelProperty(value = "订单扩展信息")
+    private OrderExt orderExt;
 }

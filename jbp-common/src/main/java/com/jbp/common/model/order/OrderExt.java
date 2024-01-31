@@ -8,26 +8,33 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "eb_order_ext", autoResultMap = true)
 @ApiModel(value="OrderExt对象", description="订单扩展信息")
 public class OrderExt extends BaseModel {
 
-    @ApiModelProperty(value = "订单ID")
-    private Integer orderId;
-
-    @ApiModelProperty(value = "付款用户")
-    private Integer payUid;
-
-    @ApiModelProperty(value = "分享用户")
-    private Integer shardUid;
+    public OrderExt(Integer shardUid, String orderNo, Long capaId, Long capaXsId,
+                    Long successCapaId, Long successCapaXsId, OrderRegister orderRegister) {
+        this.shardUid = shardUid;
+        this.orderNo = orderNo;
+        this.capaId = capaId;
+        this.capaXsId = capaXsId;
+        this.successCapaId = successCapaId;
+        this.successCapaXsId = successCapaXsId;
+        this.orderRegister = orderRegister;
+    }
 
     @ApiModelProperty(value = "订单号")
     private String orderNo;
+
+    @ApiModelProperty(value = "分享用户")
+    private Integer shardUid;
 
     @ApiModelProperty(value = "下单前等级")
     private Long capaId;

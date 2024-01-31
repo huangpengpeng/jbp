@@ -18,6 +18,10 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.lianlian.result.CashierPayCreateResult;
+import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.model.agent.Wallet;
+import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.alipay.AliPayInfo;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
@@ -34,15 +38,13 @@ import com.jbp.common.request.OrderPayRequest;
 import com.jbp.common.response.CashierInfoResponse;
 import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.PayConfigResponse;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.CrmebUtil;
-import com.jbp.common.utils.RequestUtil;
-import com.jbp.common.utils.WxPayUtil;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -139,6 +141,10 @@ public class PayServiceImpl implements PayService {
     private MerchantPrintService merchantPrintService;
     @Autowired
     private CrmebConfig crmebConfig;
+    @Autowired
+    private WalletService walletService;
+    @Autowired
+    private LianLianPayService lianLianPayService;
 
     /**
      * 获取支付配置
@@ -148,13 +154,24 @@ public class PayServiceImpl implements PayService {
         String payWxOpen = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WECHAT_OPEN);
         String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);
         String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);
+        String lianlianStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIAN_PAY_STATUS);
+        String walletPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_STATUS);
+        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_OPEN_PASSWORD);
         PayConfigResponse response = new PayConfigResponse();
         response.setYuePayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus));
         response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(payWxOpen));
         response.setAliPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(aliPayStatus));
+        response.setLianLianStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianStatus));
+        response.setWalletStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus));
+        response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
             User user = userService.getInfo();
             response.setUserBalance(user.getNowMoney());
+        }
+        if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus)) {
+            User user = userService.getInfo();
+            Wallet wallet = walletService.getCanPayByUser(user.getId());
+            response.setWalletBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance());
         }
         return response;
     }
@@ -169,6 +186,9 @@ public class PayServiceImpl implements PayService {
     public OrderPayResultResponse payment(OrderPayRequest orderPayRequest) {
         logger.info("订单支付 START orderPayRequest:{}", JSON.toJSONString(orderPayRequest));
         Order order = orderService.getByOrderNo(orderPayRequest.getOrderNo());
+        if (order.getPayPrice().compareTo(BigDecimal.ZERO) < 0) {
+            throw new CrmebException("支付金额不能低于等于0元");
+        }
         logger.info("订单支付 当前操作的订单信息:{}", JSON.toJSONString(order));
         if (order.getCancelStatus() > OrderConstants.ORDER_CANCEL_STATUS_NORMAL) {
             throw new CrmebException("订单已取消");
@@ -189,30 +209,52 @@ public class PayServiceImpl implements PayService {
         if (between > 0) {
             throw new CrmebException("订单已过期");
         }
-
         // 余额支付
         if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
             if (user.getNowMoney().compareTo(order.getPayPrice()) < 0) {
                 throw new CrmebException("用户余额不足");
             }
         }
-
+        // 钱包支付
+        if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {
+            Wallet wallet = walletService.getCanPayByUser(user.getId());
+            if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
+                throw new CrmebException("用户余额不足");
+            }
+        }
         OrderPayResultResponse response = new OrderPayResultResponse();
         response.setOrderNo(order.getOrderNo());
         response.setPayType(order.getPayType());
         response.setPayChannel(order.getPayChannel());
-        // TODO 0元付 再思考
-        if (order.getPayPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new CrmebException("支付金额不能低于等于0元");
+        // 0元付
+        if (order.getPayPrice().compareTo(BigDecimal.ZERO) == 0) {
+            zeroPay(order);
+            response.setStatus(true);
+            logger.info("0元付 response : {}", JSON.toJSONString(response));
+            return response;
         }
         // 余额支付
-        if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+        if (order.getPayChannel().equals(PayConstants.PAY_TYPE_YUE)) {
             Boolean yueBoolean = yuePay(order, user);
             response.setStatus(yueBoolean);
             logger.info("余额支付 response : {}", JSON.toJSONString(response));
             return response;
         }
-
+        // 钱包支付
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WALLET)) {
+            Boolean walletPay = walletPay(order);
+            response.setStatus(walletPay);
+            logger.info("钱包支付 response : {}", JSON.toJSONString(response));
+            return response;
+        }
+        // 连连支付
+        if (order.getPayChannel().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+            CashierPayCreateResult result = lianLianCashierPay(order);
+            response.setStatus("0000".equals(result.getRet_code()));
+            response.setLianLianCashierConfig(result);
+            logger.info("连连支付 response : {}", JSON.toJSONString(response));
+            return response;
+        }
         // 微信视频号下单 需要额外调用支付参数
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_MINI_VIDEO)) {
             WxPayJsResultVo vo = new WxPayJsResultVo();
@@ -324,6 +366,8 @@ public class PayServiceImpl implements PayService {
             logger.info("订单支付 支付宝 response :{}", JSON.toJSONString(response));
             return response;
         }
+
+
         response.setStatus(false);
         logger.info("订单支付 END response:{}", JSON.toJSONString(response));
         return response;
@@ -708,6 +752,78 @@ public class PayServiceImpl implements PayService {
         DateTime cancelDate = DateUtil.offsetMinute(order.getCreateTime(), crmebConfig.getOrderCancelTime());
         response.setCancelDateTime(cancelDate.getTime());
         return response;
+    }
+
+    @Override
+    public Boolean zeroPay(Order order) {
+        if (ArithmeticUtils.equals(order.getPayPrice(), BigDecimal.ZERO)) {
+            throw new CrmebException("支付金额不等于0 不支持0元付:" + order.getOrderNo());
+        }
+        // 用户余额扣除
+        Boolean execute = transactionTemplate.execute(e -> {
+            // 订单修改
+            order.setPaid(true);
+            order.setPayTime(DateUtil.date());
+            order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+            orderService.updateById(order);
+            return true;
+        });
+        if (!execute) {
+            throw new CrmebException("余额支付订单失败");
+        }
+        asyncService.orderPaySuccessSplit(order.getOrderNo());
+        return true;
+    }
+
+    @Override
+    public Boolean walletPay(Order order) {
+        // 用户余额扣除
+        Boolean execute = transactionTemplate.execute(e -> {
+            Boolean update = Boolean.TRUE;
+            // 订单修改
+            order.setPaid(true);
+            order.setPayTime(DateUtil.date());
+            order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+            orderService.updateById(order);
+            Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
+            if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
+                logger.error("钱包支付，扣除用户余额失败，orderNo = {}", order.getOrderNo());
+            }
+            // 这里只扣除金额，账单记录在task中处理
+            if (order.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
+                String postscript = String.format("单号:%s,金额:%s", order.getOrderNo(), order.getPayPrice());
+                update = walletService.transferToPlatform(order.getPayUid(), wallet.getType(), order.getPayPrice(),
+                        WalletFlow.OperateEnum.付款.toString(), order.getOrderNo(), postscript);
+                if (!update) {
+                    logger.error("钱包支付，扣除用户余额失败，orderNo = {}", order.getOrderNo());
+                    e.setRollbackOnly();
+                    return update;
+                }
+            }
+            return update;
+        });
+        if (!execute) throw new CrmebException("余额支付订单失败");
+        asyncService.orderPaySuccessSplit(order.getOrderNo());
+        return true;
+    }
+
+    @Override
+    public Boolean confirmPay(Order order) {
+        // 用户余额扣除
+        Boolean execute = transactionTemplate.execute(e -> {
+            Boolean update = Boolean.TRUE;
+            // 订单修改
+            order.setPaid(true);
+            order.setPayTime(DateUtil.date());
+            order.setPayMethod("人工确认");
+            order.setOutTradeNo("000000");
+            order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+            orderService.updateById(order);
+            return update;
+        });
+        if (!execute) throw new CrmebException("人工确认支付订单失败");
+        asyncService.orderPaySuccessSplit(order.getOrderNo());
+        return true;
     }
 
     /**
@@ -1537,6 +1653,22 @@ public class PayServiceImpl implements PayService {
         // 更新商户订单号
         order.setOutTradeNo(unifiedorder.get("outTradeNo"));
         return vo;
+    }
+
+    /**
+     * 连连支付
+     * @param order
+     * @return
+     */
+    private CashierPayCreateResult lianLianCashierPay(Order order) {
+        User user = userService.getById(order.getPayUid());
+        LianLianPayInfoResult payInfo = lianLianPayService.get();
+        List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
+        CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), order.getOrderNo(), order.getPayPrice(),
+                payInfo.getNotify_url(), payInfo.getReturn_url() + "/" + order.getOrderNo(), details.get(0).getProductName(), order.getIp());
+        // 更新商户订单号
+        order.setOutTradeNo(cashier.getAccp_txno());
+        return cashier;
     }
 
     /**

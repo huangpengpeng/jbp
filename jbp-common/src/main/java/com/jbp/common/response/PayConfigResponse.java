@@ -40,6 +40,18 @@ public class PayConfigResponse implements Serializable {
     @ApiModelProperty(value = "支付宝支付")
     private Boolean aliPayStatus;
 
+    @ApiModelProperty(value = "连连支付")
+    private Boolean lianLianStatus;
+
+    @ApiModelProperty(value = "积分支付")
+    private Boolean walletStatus;
+
+    @ApiModelProperty(value = "积分支付开启密码")
+    private Boolean walletPayOpenPassword;
+
     @ApiModelProperty(value = "用户余额")
     private BigDecimal userBalance;
+
+    @ApiModelProperty(value = "用户积分")
+    private BigDecimal walletBalance;
 }

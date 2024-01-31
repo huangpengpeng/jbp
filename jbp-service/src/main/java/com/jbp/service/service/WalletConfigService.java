@@ -17,4 +17,5 @@ public interface WalletConfigService extends IService<WalletConfig> {
 
     void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale, Integer changeType);
 
+    WalletConfig getCanPay();
 }

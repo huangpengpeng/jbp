@@ -46,4 +46,7 @@ public class PreOrderRequest {
     @ApiModelProperty(value = "晋升用户信息", required = false)
     private RiseOrderRequest riseInfo;
 
+    @ApiModelProperty(value = "分享用户ID", required = false)
+    private Integer shardUid;
+
 }

@@ -10,9 +10,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.order.MerchantOrder;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttr;
 import com.jbp.common.model.product.ProductAttrValue;
@@ -87,6 +85,8 @@ public class SeckillServiceImpl implements SeckillService {
     @Autowired
     private OrderService orderService;
     @Autowired
+    private OrderExtService orderExtService;
+    @Autowired
     private MerchantOrderService merchantOrderService;
     @Autowired
     private OrderDetailService orderDetailService;
@@ -106,6 +106,7 @@ public class SeckillServiceImpl implements SeckillService {
     private FrontOrderService frontOrderService;
     @Autowired
     private ProductRelationService productRelationService;
+
 
     /**
      * 获取首页秒杀信息
@@ -744,6 +745,7 @@ public class SeckillServiceImpl implements SeckillService {
         order.setOrderNo(orderNo);
         order.setMerId(0);
         order.setUid(user.getId());
+        order.setPayUid(user.getId());
         order.setTotalNum(orderInfoVo.getOrderProNum());
         order.setProTotalPrice(orderInfoVo.getProTotalFee());
         order.setTotalPostage(orderInfoVo.getFreightFee());
@@ -757,6 +759,10 @@ public class SeckillServiceImpl implements SeckillService {
         order.setCancelStatus(OrderConstants.ORDER_CANCEL_STATUS_NORMAL);
         order.setLevel(OrderConstants.ORDER_LEVEL_PLATFORM);
         order.setType(orderInfoVo.getType());// 默认普通订单
+
+        // 订单扩展信息
+        OrderExt orderExt = orderInfoVo.getOrderExt();
+        orderExt.setOrderNo(order.getOrderNo());
 
         // 商户订单
         List<Integer> couponIdList = CollUtil.newArrayList();
@@ -847,6 +853,7 @@ public class SeckillServiceImpl implements SeckillService {
                         subStock(skuRecord);
                     }
                     orderService.save(order);
+                    orderExtService.save(orderExt);
                     merchantOrderService.save(merchantOrder);
                     orderDetailService.save(orderDetail);
                     // 扣除用户积分

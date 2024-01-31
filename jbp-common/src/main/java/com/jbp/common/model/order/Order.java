@@ -89,10 +89,13 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "支付时间")
     private Date payTime;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue")
+    @ApiModelProperty(value = "支付方法")
+    private String payMethod;
+
+    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet, lianlian")
     private String payType;
 
-    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App")
+    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App, wallet, lianlian")
     private String payChannel;
 
     @ApiModelProperty(value = "订单状态（0：待支付，1：待发货,2：部分发货， 3：待核销，4：待收货,5：已收货,6：已完成，9：已取消）")
@@ -149,6 +152,10 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "平台优惠券id")
     private Integer platCouponId;
 
+    @ApiModelProperty(value = "支付用户ID")
+    private Integer payUid;
 
+    @ApiModelProperty(value = "下单用户IP")
+    private String ip;
 
 }

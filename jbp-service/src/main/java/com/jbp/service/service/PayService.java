@@ -1,5 +1,6 @@
 package com.jbp.service.service;
 
+import com.jbp.common.model.order.Order;
 import com.jbp.common.request.OrderPayRequest;
 import com.jbp.common.response.CashierInfoResponse;
 import com.jbp.common.response.OrderPayResultResponse;
@@ -61,4 +62,11 @@ public interface PayService {
      * @param orderNo 订单号
      */
     CashierInfoResponse getCashierIno(String orderNo);
+
+
+    Boolean zeroPay(Order order);
+
+    Boolean walletPay(Order order);
+
+    Boolean confirmPay(Order order);
 }

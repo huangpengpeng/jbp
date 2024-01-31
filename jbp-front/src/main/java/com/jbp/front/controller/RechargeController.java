@@ -4,17 +4,22 @@ import com.jbp.common.request.UserRechargeRequest;
 import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.RechargePackageResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.IPUtil;
 import com.jbp.service.service.RechargeOrderService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 充值控制器
@@ -45,7 +50,8 @@ public class RechargeController {
 
     @ApiOperation(value = "生成用户充值订单")
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
-    public CommonResult<OrderPayResultResponse> userRechargeOrderCreate(@RequestBody @Validated UserRechargeRequest request) {
+    public CommonResult<OrderPayResultResponse> userRechargeOrderCreate(@RequestBody @Validated UserRechargeRequest request, HttpServletRequest httpRequest) {
+        request.setIp(IPUtil.getIpAddress(httpRequest));
         return CommonResult.success(rechargeOrderService.userRechargeOrderCreate(request));
     }
 

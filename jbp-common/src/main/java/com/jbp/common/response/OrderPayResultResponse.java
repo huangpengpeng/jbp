@@ -1,5 +1,6 @@
 package com.jbp.common.response;
 
+import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.vo.AliPayJsResultVo;
 import com.jbp.common.vo.WxPayJsResultVo;
 
@@ -49,4 +50,8 @@ public class OrderPayResultResponse {
 
     @ApiModelProperty(value = "支付宝调起支付参数对象（app支付专用）")
     private AliPayJsResultVo aliPayConfig;
+
+    @ApiModelProperty(value = "连连收银台")
+    private CashierPayCreateResult lianLianCashierConfig;
+
 }

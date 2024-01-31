@@ -76,6 +76,17 @@ public class PlatformOrderController {
     public CommonResult<LogisticsResultVo> getLogisticsInfo(@PathVariable(value = "invoiceId") Integer invoiceId) {
         return CommonResult.success(orderService.getLogisticsInfo(invoiceId));
     }
+
+    @PreAuthorize("hasAuthority('platform:order:confirm:pay')")
+    @ApiOperation(value = "订单确认付款")
+    @RequestMapping(value = "/confirm/pay/{orderNo}", method = RequestMethod.GET)
+    public CommonResult<LogisticsResultVo> confirmPay(@PathVariable(value = "orderNo") String orderNo) {
+
+
+
+
+        return CommonResult.success();
+    }
 }
 
 

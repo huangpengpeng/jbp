@@ -25,6 +25,7 @@ public class BillConstants {
     public static final String BILL_TYPE_REFUND_ORDER = "refund_order";
     /** 帐单类型-用户充值 */
     public static final String BILL_TYPE_RECHARGE_USER = "recharge_user";
+
     /** 帐单类型-余额支付 */
     public static final String BILL_TYPE_YUE_PAY = "yue_pay";
     /** 帐单类型-商户分账 */
