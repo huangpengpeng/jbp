@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -32,6 +34,7 @@ public class ProductProfitConfigController {
     }
 
     @PreAuthorize("hasAuthority('agent:platform:product:profit:config:open')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "商品权益开启")
     @GetMapping("/open")
     @ApiOperation("商品权益开启")
     public CommonResult<Boolean> open(Integer type) {
@@ -40,6 +43,7 @@ public class ProductProfitConfigController {
 
     @PreAuthorize("hasAuthority('agent:platform:product:profit:config:close')")
     @GetMapping("/close")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "商品权益关闭")
     @ApiOperation("商品权益关闭")
     public CommonResult<Boolean> close(Integer type) {
         return CommonResult.success(service.close(type));

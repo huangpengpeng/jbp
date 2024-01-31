@@ -1,7 +1,6 @@
 package com.jbp.common.lianlian.params;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.lianlian.v1.cashier.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -53,6 +52,7 @@ public class CashierPayCreateParams {
 
     /**
      * 风险控制参数
+     *
      * @see RiskItemInfo
      */
     private String risk_item;

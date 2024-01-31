@@ -1,6 +1,8 @@
 package com.jbp.front.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
@@ -40,6 +42,7 @@ public class WalletController {
     private WalletConfigService walletConfigService;
 
     // 1、设置交易密码  【手机号+验证码】->  setPayPwd();
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "设置交易密码")
     @GetMapping("/trade/password")
     @ApiOperation("设置交易密码")
     public CommonResult tradePassword(WalletTradePasswordRequest request) {
@@ -76,6 +79,7 @@ public class WalletController {
     // 4.1 直接扣用户明细
     // 4.2 增加提现记录【待定】
     @PostMapping("/withdraw/initiate")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户提现")
     @ApiOperation("用户提现")
     public CommonResult embody(@RequestBody @Validated WalletWithdrawRequest request) {
         User user = userService.getInfo();
@@ -95,6 +99,7 @@ public class WalletController {
 
     // 5.兑换  原始积分 转平台   平台在新的积分给用户 自己兑换给自己【type-> type2】 自己减少   目标正价   系数  备注
     @PostMapping("/change")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "兑换积分")
     @ApiOperation("兑换")
     public CommonResult change(@RequestBody @Validated WalletChangeRequest request) {
         User user = userService.getInfo();
@@ -115,6 +120,7 @@ public class WalletController {
     // 6.转账  自己 转 其他人   其他人的账户【自己不能转给自己】、
     // 6.1  自己转平台    平台转其他人
     @PostMapping("/virement")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户积分转账")
     @ApiOperation("转账")
     public CommonResult virement(@RequestBody @Validated WalletVirementRequest request) {
         User user = userService.getInfo();

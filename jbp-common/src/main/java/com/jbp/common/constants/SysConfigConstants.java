@@ -1,6 +1,5 @@
 package com.jbp.common.constants;
 
-import com.jbp.common.vo.MyRecord;
 
 /**
  *  系统设置常量类
