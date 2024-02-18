@@ -383,8 +383,9 @@ public class LoginServiceImpl implements LoginService {
                     finalUser.setSpreadTime(CrmebDateUtil.nowDateTime());
                     userService.updateSpreadCountByUid(registerThirdUserRequest.getSpreadPid(), Constants.OPERATION_TYPE_ADD);
                 }
-                userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType()+":注册");
                 userService.save(finalUser);
+                userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType()+":注册");
+
             } else {
                 userService.updateById(finalUser);
                 if (finalUser.getSpreadUid().equals(0) && spreadPid > 0) {
