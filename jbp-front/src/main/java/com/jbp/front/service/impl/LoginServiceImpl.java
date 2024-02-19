@@ -356,6 +356,8 @@ public class LoginServiceImpl implements LoginService {
             user.setSex(0);
             user.setAddress("");
             user.setLevel(1);
+            // 设置活跃时间
+            userService.setActiveTime(user);
         }
         switch (request.getType()) {
             case UserConstants.REGISTER_TYPE_WECHAT:
@@ -628,6 +630,9 @@ public class LoginServiceImpl implements LoginService {
         user.setIsBindingIos(true);
         user.setLastLoginTime(CrmebDateUtil.nowDateTime());
         user.setLevel(1);
+        // 设置活跃时间
+        userService.setActiveTime(user);
+
         Boolean execute = transactionTemplate.execute(e -> {
             userService.save(user);
             userTokenService.bind(loginRequest.getOpenId(), UserConstants.USER_TOKEN_TYPE_IOS, user.getId());

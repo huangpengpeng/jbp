@@ -74,7 +74,7 @@ public class UserCapaHandler implements ProductProfitHandler {
     @Override
     public void orderSuccess(Order order, List<OrderDetail> orderDetailList, List<ProductProfit> productProfitList) {
         ProductProfitConfig profitConfig = configService.getByType(getType());
-        if(profitConfig == null || !BooleanUtil.isTrue(profitConfig.getIfOpen())){
+        if (profitConfig == null || !BooleanUtil.isTrue(profitConfig.getIfOpen())) {
             return;
         }
         productProfitList = ListUtils.emptyIfNull(productProfitList).stream().filter(p -> p.getType() == getType() && BooleanUtil.isTrue(p.getStatus())).collect(Collectors.toList());
@@ -96,6 +96,8 @@ public class UserCapaHandler implements ProductProfitHandler {
         if (userCapa != null && NumberUtil.compare(userCapa.getCapaId(), capaId) >= 0) {
             return;
         }
+        String oldCapa = userCapa.getCapaName();
+
         // 产品配置升级信息大于当前用户等级 执行升级
         Product product = productService.getById(exceProductProfit.getProductId());
         userCapaService.saveOrUpdateCapa(order.getUid(), capaId,
@@ -107,40 +109,7 @@ public class UserCapaHandler implements ProductProfitHandler {
 
     @Override
     public void orderRefund(Order order) {
-//        List<OrderProductProfit> orderProductProfits = orderProductProfitService.getByOrder(order.getId(), getType(),
-//                OrderProductProfit.Constants.成功.name());
-//        if (CollectionUtils.isEmpty(orderProductProfits)) {
-//            return;
-//        }
-//        OrderProductProfit profit = orderProductProfits.get(0);
-//        Rule rule = getRule(profit.getRule());
-//        OrderExt orderExt = orderExtService.getByOrder(order.getId());
-//        UserCapa userCapa = userCapaService.getByUser(order.getUid());
-//        // 没有等级退出
-//        if (userCapa == null) {
-//            return;
-//        }
-//        // 下单后没有等级退出
-//        if (orderExt.getSuccessCapaId() == null) {
-//            return;
-//        }
-//        // 下单前后等级一样退出
-//        if (orderExt.getCapaId() != null && NumberUtil.compare(orderExt.getCapaId(), orderExt.getSuccessCapaId()) == 0) {
-//            return;
-//        }
-//        // 下单成功后等级不是规则等级
-//        if (NumberUtil.compare(orderExt.getSuccessCapaId(), rule.getCapaId()) != 0) {
-//            return;
-//        }
-//        // 当前等级不是规则等级，说明其他订单动了等级退出不处理
-//        if (NumberUtil.compare(userCapa.getCapaId(), rule.getCapaId()) != 0) {
-//            return;
-//        }
-//        Product product = productService.getById(profit.getProductId());
-//        userCapaService.saveOrUpdateCapa(order.getUid(), orderExt.getCapaId(),
-//                "订单退款成功产品:" + product.getName() + ", 权益直升等级回退", order.getOrderNo());
-//        profit.setStatus(OrderProductProfit.Constants.退回.name());
-//        orderProductProfitService.updateById(profit);
+        // 退款不处理等级 连续下单的情况
     }
 
     /**

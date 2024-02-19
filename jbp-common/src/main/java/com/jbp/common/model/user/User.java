@@ -168,4 +168,7 @@ public class User implements Serializable {
     
     @ApiModelProperty(value = "用户最后一次登录验证码")
     private String lastCheckCode;
+
+    @ApiModelProperty(value = "活跃时间")
+    private Date activeTime;
 }

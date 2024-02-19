@@ -27,7 +27,7 @@ public class Wallet extends VersionModel {
         this.uId = uId;
         this.type = type;
         this.balance = BigDecimal.ZERO;
-        this.freeze=BigDecimal.ZERO;
+        this.freeze = BigDecimal.ZERO;
     }
 
     public boolean hasError() {

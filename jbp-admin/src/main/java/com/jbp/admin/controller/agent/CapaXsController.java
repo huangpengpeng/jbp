@@ -1,11 +1,15 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.NumberUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaXsRequest;
+import com.jbp.common.request.agent.RiseConditionRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaXsService;
 import io.swagger.annotations.Api;
@@ -31,7 +35,7 @@ public class CapaXsController {
 
 
     @PreAuthorize("hasAuthority('capa:xs:list')")
-    @ApiOperation(value = "用户等级列表")
+    @ApiOperation(value = "星级分页")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<CapaXs>> page(@ModelAttribute PageParamRequest pageParamRequest) {
         CommonPage<CapaXs> result = CommonPage.restPage(capaXsService.page(pageParamRequest));
@@ -39,7 +43,7 @@ public class CapaXsController {
     }
 
     @PreAuthorize("hasAuthority('capa:xs:add')")
-    @ApiOperation(value = "用户等级新增")
+    @ApiOperation(value = "星级新增")
     @PostMapping(value = "/add")
     public CommonResult<Object> add(@RequestBody @Validated CapaXsRequest capaRequest) {
         capaXsService.save(capaRequest.getName(), capaRequest.getPCapaId(),
@@ -49,7 +53,7 @@ public class CapaXsController {
     }
 
     @PreAuthorize("hasAuthority('capa:xs:edit')")
-    @ApiOperation(value = "用户等级编辑")
+    @ApiOperation(value = "星级编辑")
     @PostMapping(value = "/edit")
     public CommonResult<Object> edit(@RequestBody @Validated CapaXsRequest capaRequest) {
         if (capaRequest.getId() == null) {
@@ -76,15 +80,29 @@ public class CapaXsController {
     }
 
     @PreAuthorize("hasAuthority('capa:xs:detail')")
-    @ApiOperation(value = "用户等级编辑")
+    @ApiOperation(value = "星级详情")
     @PostMapping(value = "/detail/{id}")
     public CommonResult<CapaXs> detail(@PathVariable(value = "id") Long id) {
         return CommonResult.success(capaXsService.getById(id));
     }
 
-    @ApiOperation(value = "等级列表")
+    @ApiOperation(value = "星级列表")
     @GetMapping(value = "/list")
     public CommonResult<List<CapaXs>> list() {
         return CommonResult.success(capaXsService.list());
+    }
+
+    @ApiOperation(value = "星级升级条件")
+    @GetMapping(value = "/condition/list")
+    public CommonResult<List<ConditionEnum>> conditionList() {
+        return CommonResult.success(ConditionEnum.getCapaList());
+    }
+    @PreAuthorize("hasAuthority('capa:xs:condition:save')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "星级升级条件保存")
+    @ApiOperation(value = "星级升级条件保存")
+    @PostMapping(value = "/condition/save")
+    public CommonResult conditionSave(@RequestBody @Validated RiseConditionRequest request) {
+        capaXsService.saveRiseCondition(request);
+        return CommonResult.success();
     }
 }

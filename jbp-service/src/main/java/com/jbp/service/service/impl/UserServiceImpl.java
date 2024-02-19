@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
@@ -15,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -34,10 +36,12 @@ import com.jbp.common.response.*;
 import com.jbp.common.token.FrontTokenComponent;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -149,6 +153,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
         user.setLevel(1);
+        // 设置活跃时间
+        setActiveTime(user);
         // 推广人
         user.setSpreadUid(0);
         if (spreadUid != null && spreadUid > 0) {
@@ -172,6 +178,35 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("创建用户失败!");
         }
         return user;
+    }
+
+    @Override
+    public void setActiveTime(User user) {
+        // 注册新增活跃
+        List<String> activeKeyList = Lists.newArrayList(SysConfigConstants.CONFIG_REGISTER_ACTIVE_OPEN,
+                SysConfigConstants.CONFIG_REGISTER_ACTIVE_TYPE,
+                SysConfigConstants.CONFIG_REGISTER_ACTIVE_VALUE);
+        MyRecord myRecord = systemConfigService.getValuesByKeyList(activeKeyList);
+
+        int ifOpen = myRecord.getInt(SysConfigConstants.CONFIG_REGISTER_ACTIVE_OPEN);
+        if (1 == ifOpen) {
+            user.setActiveTime(DateTimeUtils.getNow());
+        } else {
+            String activeType = myRecord.getStr(SysConfigConstants.CONFIG_REGISTER_ACTIVE_TYPE);
+            Integer activeValue = myRecord.getInt(SysConfigConstants.CONFIG_REGISTER_ACTIVE_VALUE);
+            activeValue = activeValue - 1;
+            if ("month".equals(activeType)) {
+                user.setActiveTime(DateTimeUtils.getMonthEnd(DateTimeUtils.getNow()));
+                if (activeValue > 0) {
+                    user.setActiveTime(DateTimeUtils.getMonthEnd(DateTimeUtils.addMonths(DateTimeUtils.getNow(), activeValue)));
+                }
+            } else {
+                user.setActiveTime(DateTimeUtils.getFinallyDate(DateTimeUtils.getNow()));
+                if (activeValue > 0) {
+                    user.setActiveTime(DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(DateTimeUtils.getNow(), activeValue)));
+                }
+            }
+        }
     }
 
     @Override

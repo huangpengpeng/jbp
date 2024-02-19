@@ -1,11 +1,15 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.NumberUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaRequest;
+import com.jbp.common.request.agent.RiseConditionRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaService;
 import io.swagger.annotations.Api;
@@ -85,6 +89,20 @@ public class CapaController {
     @GetMapping(value = "/list")
     public CommonResult<List<Capa>> list() {
         return CommonResult.success(capaService.list());
+    }
+
+    @ApiOperation(value = "升级条件")
+    @GetMapping(value = "/condition/list")
+    public CommonResult<List<ConditionEnum>> conditionList() {
+        return CommonResult.success(ConditionEnum.getCapaList());
+    }
+    @PreAuthorize("hasAuthority('capa:condition:save')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "等级升级条件保存")
+    @ApiOperation(value = "升级条件保存")
+    @PostMapping(value = "/condition/save")
+    public CommonResult conditionSave(@RequestBody @Validated RiseConditionRequest request) {
+        capaService.saveRiseCondition(request);
+        return CommonResult.success();
     }
 
 }
