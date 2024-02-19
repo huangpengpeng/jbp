@@ -2225,7 +2225,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         Integer pId = null, rId = null;
         // 自己下单
         if (registerInfo == null && riseInfo == null) {
-            capaId = userCapaService.getByUser(payUser.getId()).getCapaId();
+            UserCapa userCapa = userCapaService.getByUser(payUser.getId());
+            capaId = userCapa == null ? null : userCapa.getCapaId();
             UserCapaXs userCapaXs = userCapaXsService.getByUser(payUser.getId());
             capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
             whiteIdList = whiteUserService.getByUser(payUser.getId());

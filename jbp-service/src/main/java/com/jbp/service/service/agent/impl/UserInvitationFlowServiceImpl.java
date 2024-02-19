@@ -38,7 +38,18 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
     private UserInvitationService userInvitationService;
     @Resource
     private UserService userService;
+    @Resource
+    private UserInvitationFlowDao dao;
 
+    @Override
+    public List<UserInvitationFlow> getUnderList(Integer pId, Long minCapaId) {
+        return dao.getUnderCapaList(pId, minCapaId);
+    }
+
+    @Override
+    public List<UserInvitationFlow> getXsUnderList(Integer pId, Long minXsCapaId) {
+        return dao.getUnderXsCapaList(pId, minXsCapaId);
+    }
 
     /**
      * 用户关系如果变更需要将更当前用户有关的的记录全部删除重新生成

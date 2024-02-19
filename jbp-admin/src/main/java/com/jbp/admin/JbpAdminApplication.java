@@ -18,10 +18,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Configuration
 @EnableTransactionManagement
-@SpringBootApplication(exclude = {WxMaAutoConfiguration.class}) 
+@SpringBootApplication(exclude = {WxMaAutoConfiguration.class, MongoAutoConfiguration.class})
 @ComponentScan(basePackages = {"com.jbp"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
-@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})
 public class JbpAdminApplication {
 
     public static void main(String[] args) {

@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
  * 邀请一阶条件
  */
@@ -19,7 +17,7 @@ public class InviteOneLevelHandler implements ConditionHandler {
 
     @Override
     public String getName() {
-        return ConditionEnum.等级_直属一阶等级人数.getName();
+        return ConditionEnum.一阶等级人数.getName();
     }
 
     @Override
@@ -63,6 +61,11 @@ public class InviteOneLevelHandler implements ConditionHandler {
          * 等级要求
          */
         private Long capaId;
+
+        /**
+         * 等级要求
+         */
+        private String capaName;
 
     }
 }

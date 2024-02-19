@@ -53,4 +53,12 @@ public class UserInvitationFlow extends BaseModel {
     @ApiModelProperty("邀请上级账户")
     @TableField(exist = false)
     private String pAccount;
+
+    @ApiModelProperty("等级ID")
+    @TableField(exist = false)
+    private Long capaId;
+
+    @ApiModelProperty("星级ID")
+    @TableField(exist = false)
+    private Long xsCapaId;
 }

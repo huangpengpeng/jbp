@@ -2,6 +2,10 @@ package com.jbp.service.service.agent.impl;
 
 import javax.annotation.Resource;
 
+import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.mybatis.RiseConditionListHandler;
+import com.jbp.common.request.agent.RiseConditionRequest;
+import com.jbp.service.condition.ConditionChain;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +23,17 @@ import com.jbp.service.dao.agent.CapaXsDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaXsService;
 
+import java.util.List;
+
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements CapaXsService {
     @Resource
     private SystemAttachmentService systemAttachmentService;
+    @Resource
+    private ConditionChain conditionChain;
+
 
     @Override
     public PageInfo<CapaXs> page(PageParamRequest pageParamRequest) {
@@ -43,6 +52,19 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
         String cdnUrl = systemAttachmentService.getCdnUrl();
         CapaXs capaXs = new CapaXs(name, pCapaId, rankNum, systemAttachmentService.clearPrefix(iconUrl, cdnUrl), systemAttachmentService.clearPrefix(riseImgUrl, cdnUrl), systemAttachmentService.clearPrefix(shareImgUrl, cdnUrl));
         save(capaXs);
+        return capaXs;
+    }
+
+    @Override
+    public CapaXs saveRiseCondition(RiseConditionRequest request) {
+        List<RiseCondition> conditionList = request.getConditionList();
+        for (RiseCondition riseCondition : conditionList) {
+            conditionChain.valid(riseCondition);
+        }
+        CapaXs capaXs = getById(request.getCapaId());
+        capaXs.setConditionList(conditionList);
+        capaXs.setParser(request.getParser());
+        updateById(capaXs);
         return capaXs;
     }
 

@@ -1,11 +1,5 @@
 package com.jbp.service.service.agent.impl;
 
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -13,17 +7,28 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.RiseConditionRequest;
+import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaService {
     @Resource
     private SystemAttachmentService systemAttachmentService;
+    @Resource
+    private ConditionChain conditionChain;
 
     @Override
     public PageInfo<Capa> page(PageParamRequest pageParamRequest) {
@@ -42,6 +47,19 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         String cdnUrl = systemAttachmentService.getCdnUrl();
         Capa capa = new Capa(name, pCapaId, rankNum, systemAttachmentService.clearPrefix(iconUrl, cdnUrl), systemAttachmentService.clearPrefix(riseImgUrl, cdnUrl), systemAttachmentService.clearPrefix(shareImgUrl, cdnUrl));
         save(capa);
+        return capa;
+    }
+
+    @Override
+    public Capa saveRiseCondition(RiseConditionRequest request) {
+        List<RiseCondition> conditionList = request.getConditionList();
+        for (RiseCondition riseCondition : conditionList) {
+            conditionChain.valid(riseCondition);
+        }
+        Capa capa = getById(request.getCapaId());
+        capa.setConditionList(conditionList);
+        capa.setParser(request.getParser());
+        updateById(capa);
         return capa;
     }
 
