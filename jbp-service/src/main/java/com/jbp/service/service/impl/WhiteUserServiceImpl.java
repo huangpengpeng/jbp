@@ -145,4 +145,10 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
         List<WhiteUser> list = list(new LambdaQueryWrapper<WhiteUser>().eq(WhiteUser::getUid, uid));
         return ListUtils.emptyIfNull(list).stream().map(WhiteUser::getId).collect(Collectors.toList());
     }
+
+    @Override
+    public List<WhiteUser> getByUserList(Integer uid) {
+        List<WhiteUser> list = list(new LambdaQueryWrapper<WhiteUser>().eq(WhiteUser::getUid, uid));
+        return list;
+    }
 }

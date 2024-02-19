@@ -13,10 +13,7 @@ import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantBalanceRecord;
-import com.jbp.common.model.order.MerchantOrder;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.order.RechargeOrder;
+import com.jbp.common.model.order.*;
 import com.jbp.common.model.record.BrowseRecord;
 import com.jbp.common.model.record.UserVisitRecord;
 import com.jbp.common.model.system.SystemNotification;
@@ -24,6 +21,7 @@ import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.*;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
 
 import org.slf4j.Logger;
@@ -112,6 +110,11 @@ public class AsyncServiceImpl implements AsyncService {
     private MerchantBalanceRecordService merchantBalanceRecordService;
     @Autowired
     private MerchantService merchantService;
+    @Autowired
+    private OrderExtService orderExtService;
+    @Autowired
+    private ProductProfitChain productProfitChain;
+
 
     /**
      * 商品详情统计
@@ -185,6 +188,22 @@ public class AsyncServiceImpl implements AsyncService {
             logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
             return;
         }
+        // 处理注册逻辑
+        OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
+        if (orderExt != null) {
+            OrderRegister orderRegister = orderExt.getOrderRegister();
+            if (orderRegister != null) {
+                User pUser = userService.getByAccount(orderRegister.getPAccount());
+                User rUser = userService.getByAccount(orderRegister.getRAccount());
+                User user = userService.helpRegister(orderRegister.getUsername(), orderRegister.getMobile(), pUser.getId(), rUser.getId(), orderRegister.getNode());
+                order.setUid(user.getId());
+                orderService.updateById(order);
+                order = orderService.getByOrderNo(orderNo);
+            }
+        }
+        // 处理下单赠送平台级别单号处理
+        productProfitChain.orderSuccess(order);
+
 
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
         if (CollUtil.isEmpty(merchantOrderList)) {
@@ -839,8 +858,9 @@ public class AsyncServiceImpl implements AsyncService {
      * @param merchantOrder 商户订单
      */
     private Boolean oneMerchantOrderProcessing(Order order, MerchantOrder merchantOrder) {
-        // 赠送积分积分处理：1.下单赠送积分
+        // 0.订单详情列表
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+        // 1.下单赠送积分
         presentIntegral(merchantOrder, orderDetailList, order);
 
         // 生成新的商户订单
@@ -858,6 +878,14 @@ public class AsyncServiceImpl implements AsyncService {
         newOrder.setMerCouponPrice(merchantOrder.getMerCouponPrice());
         newOrder.setOutTradeNo(order.getOutTradeNo());
         newOrder.setPayMethod(order.getPayMethod());
+
+        // 订单扩展信息
+        OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
+        OrderExt newOrderExt = new OrderExt();
+        BeanUtils.copyProperties(orderExt, newOrderExt);
+        newOrderExt.setId(null);
+        newOrderExt.setOrderNo(newOrder.getOrderNo());
+
         if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP)) {
             newOrder.setStatus(OrderConstants.ORDER_STATUS_AWAIT_VERIFICATION);
         }
@@ -887,6 +915,7 @@ public class AsyncServiceImpl implements AsyncService {
             orderService.save(newOrder);
             merchantOrderService.save(newMerOrder);
             orderDetailService.saveBatch(newOrderDetailList);
+            orderExtService.save(newOrderExt);
             //订单日志
             orderStatusService.createLog(order.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, order.getOrderNo()));
             return Boolean.TRUE;
@@ -907,6 +936,7 @@ public class AsyncServiceImpl implements AsyncService {
         List<Order> newOrderList = CollUtil.newArrayList();
         List<MerchantOrder> newMerchantOrderList = CollUtil.newArrayList();
         List<OrderDetail> newOrderDetailList = CollUtil.newArrayList();
+        List<OrderExt> newOrderExtList = CollUtil.newArrayList();
 
         order.setIsDel(true);
         for (MerchantOrder merchantOrder : merchantOrderList) {
@@ -949,6 +979,14 @@ public class AsyncServiceImpl implements AsyncService {
             newOrderList.add(newOrder);
             newMerchantOrderList.add(newMerchantOrder);
             newOrderDetailList.addAll(tempDetailList);
+
+            // 订单扩展信息
+            OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
+            OrderExt newOrderExt = new OrderExt();
+            BeanUtils.copyProperties(orderExt, newOrderExt);
+            newOrderExt.setId(null);
+            newOrderExt.setOrderNo(newOrder.getOrderNo());
+            newOrderExtList.add(newOrderExt);
         }
 
         return transactionTemplate.execute(e -> {
@@ -963,6 +1001,7 @@ public class AsyncServiceImpl implements AsyncService {
             orderService.saveBatch(newOrderList);
             merchantOrderService.saveBatch(newMerchantOrderList);
             orderDetailService.saveBatch(newOrderDetailList);
+            orderExtService.saveBatch(newOrderExtList);
             // 订单日志
             orderStatusService.createLog(order.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, order.getOrderNo()));
             return Boolean.TRUE;

@@ -1,21 +1,21 @@
 package com.jbp.service.product.profit;
 
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.NumberUtil;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONArray;
 import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.ProductProfitConfig;
-import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.product.Product;
+import com.jbp.common.model.order.OrderProductProfit;
+import com.jbp.common.model.user.WhiteUser;
 import com.jbp.service.service.OrderProductProfitService;
-import com.jbp.service.service.ProductService;
+import com.jbp.service.service.WhiteUserService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
-import com.jbp.service.service.agent.UserCapaXsService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,29 +25,27 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 星级处理器
+ * 赠送白名单处理器
  */
 @Component
-public class UserCapaXsHandler implements ProductProfitHandler {
+public class UserWhiteHandler implements ProductProfitHandler {
 
     @Resource
     private ProductProfitService productProfitService;
     @Resource
-    private UserCapaXsService userCapaXsService;
+    private WhiteUserService  whiteUserService;
     @Resource
     private OrderProductProfitService orderProductProfitService;
     @Resource
-    private ProductService productService;
-    @Resource
     private ProductProfitConfigService configService;
-
 
     @Override
     public Integer getType() {
-        return ProductProfitEnum.星级.getType();
+        return ProductProfitEnum.白名单.getType();
     }
 
     @Override
@@ -59,16 +57,22 @@ public class UserCapaXsHandler implements ProductProfitHandler {
     }
 
     @Override
-    public Rule getRule(String ruleStr) {
+    public List<Rule> getRule(String ruleStr) {
         try {
-            Rule rule = JSONObject.parseObject(ruleStr).toJavaObject(Rule.class);
-            if (StringUtil.isEmpty(rule.getName()) || rule.getCapaXsId() == null) {
-                throw new RuntimeException(ProductProfitEnum.星级.getName() + ":商品权益格式错误0");
+            List<Rule> rules = JSONArray.parseArray(ruleStr, Rule.class);
+            if (CollectionUtils.isEmpty(rules)) {
+                throw new RuntimeException(ProductProfitEnum.白名单.getName() + ":商品权益格式错误0");
             }
-            return rule;
+            for (Rule rule : rules) {
+                if (StringUtil.isEmpty(rule.getWhiteName()) || rule.getWhiteId() == null) {
+                    throw new RuntimeException(ProductProfitEnum.白名单.getName() + ":商品权益格式错误00");
+                }
+            }
+            return rules;
         } catch (Exception e) {
-            throw new RuntimeException(ProductProfitEnum.星级.getName() + ":商品权益格式错误1");
+            throw new RuntimeException(ProductProfitEnum.白名单.getName() + ":商品权益格式错误1");
         }
+
     }
 
     @Override
@@ -82,36 +86,32 @@ public class UserCapaXsHandler implements ProductProfitHandler {
         if (CollectionUtils.isEmpty(productProfitList)) {
             return;
         }
-        // 获取执行等级
-        Long capaXsId = -1L;
-        ProductProfit exceProductProfit = null;
         for (ProductProfit productProfit : productProfitList) {
-            Rule rule = getRule(productProfit.getRule());
-            if (NumberUtil.compare(rule.getCapaXsId(), capaXsId) > 0) {
-                capaXsId = rule.getCapaXsId();
-                exceProductProfit = productProfit;
+            List<Rule> rules = getRule(productProfit.getRule());
+            for (Rule rule : rules) {
+                if (whiteUserService.getByUser(order.getUid(), rule.getWhiteId()) == null) {
+                    whiteUserService.add(order.getUid(), rule.getWhiteId(), order.getOrderNo());
+                }
             }
+            // 订单权益记录
+            orderProductProfitService.save(order.getId(), order.getOrderNo(), productProfit.getProductId(), getType(),
+                    ProductProfitEnum.白名单.getName(), JSONArray.toJSONString(rules));
         }
-
-        // 当前星级级比直升等级大
-        UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
-        if (userCapaXs != null && NumberUtil.compare(userCapaXs.getCapaId(), capaXsId) >= 0) {
-            return;
-        }
-        // 产品配置升级信息大于当前用户等级 执行升级
-        Product product = productService.getById(exceProductProfit.getProductId());
-        // 产品配置升级信息大于当前用户等级 执行升级
-        userCapaXsService.saveOrUpdateCapa(order.getUid(), capaXsId,
-                "订单支付成功产品:" + product.getName() + ", 权益设置直升星级", order.getOrderNo());
-        // 订单权益记录
-        orderProductProfitService.save(order.getId(), order.getOrderNo(), product.getId(), getType(),
-                ProductProfitEnum.星级.getName(), exceProductProfit.getRule());
     }
 
     @Override
     public void orderRefund(Order order) {
-        // 退款不处理星级退回
+        // 删除白名单
+        whiteUserService.remove(new QueryWrapper<WhiteUser>().lambda().eq(WhiteUser::getUid, order.getUid()).eq(WhiteUser::getOrdersSn, order.getOrderNo()));
+        // 回退收益
+        List<OrderProductProfit> productProfits = orderProductProfitService.getByOrder(order.getId(),
+                getType(), OrderProductProfit.Constants.成功.name());
+        for (OrderProductProfit productProfit : productProfits) {
+            productProfit.setStatus(OrderProductProfit.Constants.退回.name());
+            orderProductProfitService.updateById(productProfit);
+        }
     }
+
 
     /**
      * 当前权益对象
@@ -120,14 +120,16 @@ public class UserCapaXsHandler implements ProductProfitHandler {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
-        /**
-         * 升级星级名称
-         */
-        private String name;
 
         /**
-         * 升级星级
+         * 白名单ID
          */
-        private Long capaXsId;
+        private Long whiteId;
+
+        /**
+         * 白名单名称
+         */
+        private String whiteName;
+
     }
 }

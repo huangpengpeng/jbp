@@ -71,7 +71,7 @@ public class WalletFlow extends BaseModel {
     }
 
     public static enum OperateEnum {
-        调账, 付款, 兑换, 转账, 提现, 充值
+        调账, 付款, 兑换, 转账, 提现, 充值, 奖励
     }
     public static enum ActionEnum {
         收入, 支出

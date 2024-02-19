@@ -377,4 +377,11 @@ public class SysConfigConstants {
     /** 系统手机号是否唯一 */
     public static final String CONFIG_REGISTER_PHONE_IS_UNIQUE = "system_phone_is_unique";
 
+    /** 注册赠送活跃开关 */
+    public static final String CONFIG_REGISTER_ACTIVE_OPEN = "system_register_active_open";
+    /** 注册赠送活跃类型  day 天  month 月 */
+    public static final String CONFIG_REGISTER_ACTIVE_TYPE = "system_register_active_type";
+    /** 注册赠送活跃数值  day 天  month 月 */
+    public static final String CONFIG_REGISTER_ACTIVE_VALUE = "system_register_active_value";
+
 }
