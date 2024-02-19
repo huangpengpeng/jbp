@@ -86,7 +86,7 @@ public class UserActiveHandler implements ProductProfitHandler {
             Date activeTime = DateTimeUtils.getFinallyDate(DateTimeUtils.getNow());
             int value = rule.getValue() - 1;
             if (value > 0) {
-                activeTime = "month".equals(rule.getUnit()) ? DateTimeUtils.addMonths(activeTime, value) : DateTimeUtils.addDays(activeTime, value);
+                activeTime = "月".equals(rule.getUnit()) ? DateTimeUtils.addMonths(activeTime, value) : DateTimeUtils.addDays(activeTime, value);
                 activeTime = DateTimeUtils.getFinallyDate(activeTime);
             }
             if (activeTime.after(newActiveTime)) {
