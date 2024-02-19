@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.NumberUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -94,7 +96,8 @@ public class CapaController {
     public CommonResult<List<ConditionEnum>> conditionList() {
         return CommonResult.success(ConditionEnum.getCapaList());
     }
-
+    @PreAuthorize("hasAuthority('capa:condition:save')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "等级升级条件保存")
     @ApiOperation(value = "升级条件保存")
     @PostMapping(value = "/condition/save")
     public CommonResult conditionSave(@RequestBody @Validated RiseConditionRequest request) {

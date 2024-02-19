@@ -97,6 +97,7 @@ public class CapaXsController {
     public CommonResult<List<ConditionEnum>> conditionList() {
         return CommonResult.success(ConditionEnum.getCapaList());
     }
+    @PreAuthorize("hasAuthority('capa:xs:condition:save')")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "星级升级条件保存")
     @ApiOperation(value = "星级升级条件保存")
     @PostMapping(value = "/condition/save")
