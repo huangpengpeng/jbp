@@ -4,10 +4,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -18,15 +21,17 @@ import com.jayway.jsonpath.JsonPath;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.page.PageDiy;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.page.PageDiyEditNameRequest;
 import com.jbp.common.response.page.PageDiyResponse;
 import com.jbp.service.dao.page.PageDiyDao;
-import com.jbp.service.service.PageDiyService;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemConfigService;
-
+import com.jbp.service.service.*;
+import com.jbp.service.service.agent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -53,8 +58,22 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
 
     @Autowired
     private SystemConfigService systemConfigService;
-
-
+    @Autowired
+    private TeamUserService teamUserService;
+    @Autowired
+    private WhiteUserService whiteUserService;
+    @Autowired
+    private UserInvitationService userInvitationService;
+    @Autowired
+    private UserRelationService userRelationService;
+    @Autowired
+    private LimitTempService limitTempService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
     /**
     * 列表
     * @author dazongzi
@@ -225,7 +244,42 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
         PageDiyResponse response = new PageDiyResponse();
         BeanUtils.copyProperties(pageDiy, response);
         String modifiedJsonString = getModifiedJsonString(jsonContext.jsonString());
-        response.setValue(JSON.parseObject(modifiedJsonString));
+
+
+
+        // 显示权益
+        Integer pId = null, rId = null;
+        List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
+        User currentUser = userService.getInfo();
+        JSONObject jsonValue =   JSON.parseObject(modifiedJsonString);
+        if (currentUser != null) {
+            whiteIdList = whiteUserService.getByUser(currentUser.getId());
+            TeamUser teamUser = teamUserService.getByUser(currentUser.getId());
+            if (teamUser != null) {
+                teamIdList.add(Long.valueOf(teamUser.getTid()));
+            }
+            pId = userInvitationService.getPid(currentUser.getId());
+            rId = userRelationService.getPid(currentUser.getId());
+
+            UserCapa userCapa = userCapaService.getByUser(currentUser.getId());
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser.getId());
+            List<Long> tempIds = limitTempService.hasLimits(userCapa == null ? null : userCapa.getCapaId(), userCapaXs == null ? null : userCapaXs.getCapaId(), whiteIdList, teamIdList, pId, rId);
+            JSONObject jsonObject = JSON.parseObject(modifiedJsonString);
+
+            jsonObject.forEach((key, value) -> {
+                JSONObject jsonObject2 =  jsonObject.getJSONObject(key);
+                JSONObject jsonObject1 =  jsonObject2.getJSONObject("showLimitTemp");
+                if(jsonObject1 != null){
+                   if(!tempIds.contains(jsonObject1.getString("activeValue")) && StringUtils.isNotBlank(jsonObject1.getString("activeValue"))){
+                       jsonValue.remove(key);
+                   }
+
+                }
+            });
+
+        }
+
+        response.setValue(jsonValue);
         return response;
     }
 
