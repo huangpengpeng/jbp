@@ -9,6 +9,8 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
@@ -24,6 +26,8 @@ import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -114,6 +118,10 @@ public class AsyncServiceImpl implements AsyncService {
     private OrderExtService orderExtService;
     @Autowired
     private ProductProfitChain productProfitChain;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
 
 
     /**
@@ -188,7 +196,7 @@ public class AsyncServiceImpl implements AsyncService {
             logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
             return;
         }
-        // 处理注册逻辑
+        // 1. 处理注册
         OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
         if (orderExt != null) {
             OrderRegister orderRegister = orderExt.getOrderRegister();
@@ -201,9 +209,20 @@ public class AsyncServiceImpl implements AsyncService {
                 order = orderService.getByOrderNo(orderNo);
             }
         }
-        // 处理下单赠送平台级别单号处理
+        // 2. 处理收益【等级  星级 活跃 白名单 积分】
         productProfitChain.orderSuccess(order);
-
+        // 3.更新扩展信息
+        if (orderExt != null) {
+            UserCapa userCapa = userCapaService.getByUser(order.getUid());
+            if (userCapa != null) {
+                orderExt.setSuccessCapaId(userCapa.getCapaId());
+            }
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
+            if (userCapaXs != null) {
+                orderExt.setSuccessCapaXsId(userCapaXs.getCapaId());
+            }
+            orderExtService.updateById(orderExt);
+        }
 
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
         if (CollUtil.isEmpty(merchantOrderList)) {

@@ -96,8 +96,6 @@ public class UserCapaHandler implements ProductProfitHandler {
         if (userCapa != null && NumberUtil.compare(userCapa.getCapaId(), capaId) >= 0) {
             return;
         }
-        String oldCapa = userCapa.getCapaName();
-
         // 产品配置升级信息大于当前用户等级 执行升级
         Product product = productService.getById(exceProductProfit.getProductId());
         userCapaService.saveOrUpdateCapa(order.getUid(), capaId,
