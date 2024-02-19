@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import javax.annotation.Resource;
 
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.mybatis.RiseConditionListHandler;
 import com.jbp.common.request.agent.RiseConditionRequest;
@@ -57,13 +58,18 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
 
     @Override
     public CapaXs saveRiseCondition(RiseConditionRequest request) {
-        List<RiseCondition> conditionList = request.getConditionList();
-        for (RiseCondition riseCondition : conditionList) {
-            conditionChain.valid(riseCondition);
-        }
         CapaXs capaXs = getById(request.getCapaId());
-        capaXs.setConditionList(conditionList);
         capaXs.setParser(request.getParser());
+        List<String> conditionNames = capaXs.getConditionNames();
+        List<RiseCondition> conditionList = request.getConditionList();
+        List<RiseCondition> saveConditionList = Lists.newArrayList();
+        for (RiseCondition riseCondition : conditionList) {
+            if(conditionNames.contains(riseCondition.getName())){
+                conditionChain.valid(riseCondition);
+                saveConditionList.add(riseCondition);
+            }
+        }
+        capaXs.setConditionList(saveConditionList);
         updateById(capaXs);
         return capaXs;
     }

@@ -2,11 +2,13 @@ package com.jbp.service.service.agent.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -52,13 +54,18 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
 
     @Override
     public Capa saveRiseCondition(RiseConditionRequest request) {
-        List<RiseCondition> conditionList = request.getConditionList();
-        for (RiseCondition riseCondition : conditionList) {
-            conditionChain.valid(riseCondition);
-        }
         Capa capa = getById(request.getCapaId());
-        capa.setConditionList(conditionList);
         capa.setParser(request.getParser());
+        List<String> conditionNames = capa.getConditionNames();
+        List<RiseCondition> conditionList = request.getConditionList();
+        List<RiseCondition> saveConditionList = Lists.newArrayList();
+        for (RiseCondition riseCondition : conditionList) {
+            if(conditionNames.contains(riseCondition.getName())){
+                conditionChain.valid(riseCondition);
+                saveConditionList.add(riseCondition);
+            }
+        }
+        capa.setConditionList(saveConditionList);
         updateById(capa);
         return capa;
     }
