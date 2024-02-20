@@ -42,14 +42,14 @@ public class SelfScoreGroup extends BaseModel {
     private String action;
 
     @ApiModelProperty("分组名称")
-    @TableField("groupName")
+    @TableField("group_name")
     private String groupName;
 
     @ApiModelProperty("开始时间")
-    @TableField("startTime")
+    @TableField("start_time")
     private String startTime;
 
     @ApiModelProperty("结束时间")
-    @TableField("endTime")
+    @TableField("end_time")
     private String endTime;
 }
