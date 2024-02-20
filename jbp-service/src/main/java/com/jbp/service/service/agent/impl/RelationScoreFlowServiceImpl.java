@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -25,6 +24,7 @@ import java.util.List;
 public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowDao, RelationScoreFlow> implements RelationScoreFlowService {
     @Resource
     private UserService userService;
+
     @Override
     public PageInfo<RelationScoreFlow> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()

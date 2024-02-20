@@ -2,12 +2,10 @@ package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.RelationScoreFlowRequest;
-import com.jbp.common.request.agent.RelationScoreRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;

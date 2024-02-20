@@ -13,7 +13,6 @@ import com.jbp.service.dao.agent.InvitationScoreGroupDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreGroupService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.List;
 public class InvitationScoreGroupServiceImpl extends ServiceImpl<InvitationScoreGroupDao, InvitationScoreGroup> implements InvitationScoreGroupService {
     @Resource
     private UserService userService;
+
     @Override
     public PageInfo<InvitationScoreGroup> pageList(Integer uid, String groupName, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScoreGroup> lqw = new LambdaQueryWrapper<InvitationScoreGroup>()

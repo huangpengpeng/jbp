@@ -9,7 +9,6 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.result.CommonResult;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreService;
@@ -25,11 +24,11 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
     @Override
     public PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<InvitationScore> lqw=new LambdaQueryWrapper<InvitationScore>()
-                .eq(!ObjectUtil.isNull(uid),InvitationScore::getUid,uid);
+        LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
+                .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
-        list.forEach(e->{
+        list.forEach(e -> {
             e.setAccount(userService.getById(e.getUid()).getAccount());
         });
         return CommonPage.copyPageInfo(page, list);

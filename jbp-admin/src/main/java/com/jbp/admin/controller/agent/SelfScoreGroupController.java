@@ -10,7 +10,6 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.SelfScoreGroupService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("api/admin/agent/self/score/group")
-@Api(tags ="个人业绩分组")
+@Api(tags = "个人业绩分组")
 public class SelfScoreGroupController {
     @Resource
     private SelfScoreGroupService selfScoreGroupService;
@@ -38,6 +37,6 @@ public class SelfScoreGroupController {
                 throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreGroupService.pageList(uid,request.getGroupName(),request.getAction(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreGroupService.pageList(uid, request.getGroupName(), request.getAction(), pageParamRequest)));
     }
 }

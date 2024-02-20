@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.model.agent.RelationScoreGroup;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -22,11 +21,12 @@ import java.util.List;
 public class RelationScoreGroupServiceImpl extends ServiceImpl<RelationScoreGroupDao, RelationScoreGroup> implements RelationScoreGroupService {
     @Resource
     private UserService userService;
+
     @Override
-    public PageInfo<RelationScoreGroup> pageList(Integer uid,  String groupName, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreGroup> pageList(Integer uid, String groupName, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreGroup> lqw = new LambdaQueryWrapper<RelationScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreGroup::getUid, uid)
-                .like(!ObjectUtil.isNull(groupName)&&!groupName.equals(""),RelationScoreGroup::getGroupName,groupName);
+                .like(!ObjectUtil.isNull(groupName) && !groupName.equals(""), RelationScoreGroup::getGroupName, groupName);
         Page<RelationScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScoreGroup> list = list(lqw);
         list.forEach(e -> {

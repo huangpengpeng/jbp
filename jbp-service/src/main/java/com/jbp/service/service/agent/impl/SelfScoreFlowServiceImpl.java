@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, SelfScoreFlow> implements SelfScoreFlowService {
     @Resource
     private UserService userService;
+
     @Override
     public PageInfo<SelfScoreFlow> pageList(Integer uid, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()

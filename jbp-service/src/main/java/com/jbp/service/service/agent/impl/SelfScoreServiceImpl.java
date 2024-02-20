@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScore;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -22,6 +21,7 @@ import java.util.List;
 public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> implements SelfScoreService {
     @Resource
     private UserService userService;
+
     @Override
     public PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScore> lqw = new LambdaQueryWrapper<SelfScore>()

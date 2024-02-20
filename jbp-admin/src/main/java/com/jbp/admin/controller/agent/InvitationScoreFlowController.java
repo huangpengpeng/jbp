@@ -6,7 +6,6 @@ import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.InvitationScoreFlowRequest;
-import com.jbp.common.request.agent.InvitationScoreRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
@@ -20,7 +19,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("api/admin/agent/invitation/score/flow")
-@Api(tags ="销售业绩明细")
+@Api(tags = "销售业绩明细")
 public class InvitationScoreFlowController {
     @Resource
     private InvitationScoreFlowService invitationScoreFlowService;
@@ -46,7 +45,7 @@ public class InvitationScoreFlowController {
                 throw new CrmebException("下单用户账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(invitationScoreFlowService.pageList(uid,orderuid,request.getAction(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(invitationScoreFlowService.pageList(uid, orderuid, request.getAction(), pageParamRequest)));
     }
 
 
