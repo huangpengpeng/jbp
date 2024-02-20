@@ -10,12 +10,12 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "SelfScoreFlowRequest对象", description = "个人业绩明细请求对象")
-public class SelfScoreFlowRequest {
+@ApiModel(value = "RelationScoreGroupRequest对象", description = "服务业绩明细请求对象")
+public class RelationScoreGroupRequest {
 
-    @ApiModelProperty("账户")
+    @ApiModelProperty("用户账户")
     private String account;
 
-    @ApiModelProperty("方向")
-    private String action;
+    @ApiModelProperty("分组名称")
+    private String groupName;
 }
