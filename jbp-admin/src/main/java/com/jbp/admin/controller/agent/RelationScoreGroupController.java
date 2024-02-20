@@ -2,11 +2,9 @@ package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.model.agent.RelationScoreGroup;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.agent.RelationScoreFlowRequest;
 import com.jbp.common.request.agent.RelationScoreGroupRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
@@ -39,6 +37,6 @@ public class RelationScoreGroupController {
                 throw new CrmebException("账号信息错误");
             }
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreGroupService.pageList(uid,request.getGroupName(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreGroupService.pageList(uid, request.getGroupName(), pageParamRequest)));
     }
 }
