@@ -41,5 +41,5 @@ public class SelfScoreFlowController {
         return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(), pageParamRequest)));
     }
 
-   
+
 }
