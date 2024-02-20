@@ -22,7 +22,7 @@ import java.util.List;
  * 小区业绩独立线星级人数
  */
 @Component
-public class XsIsolateLineHandler implements ConditionHandler {
+public class CapaXsIsolateLineHandler implements ConditionHandler {
 
     @Autowired
     private RelationScoreService relationScoreService;
@@ -37,7 +37,7 @@ public class XsIsolateLineHandler implements ConditionHandler {
 
     @Override
     public String getName() {
-        return ConditionEnum.小区业绩独立线星级人数.getName();
+        return ConditionEnum.业绩独立线升星.getName();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class XsIsolateLineHandler implements ConditionHandler {
     }
 
     @Override
-    public XsIsolateLineHandler.Rule getRule(RiseCondition riseCondition) {
+    public CapaXsIsolateLineHandler.Rule getRule(RiseCondition riseCondition) {
         try {
             Rule rule = JSONObject.parseObject(riseCondition.getValue()).toJavaObject(Rule.class);
             if (rule.getIndeCount() == null || rule.getIndeCapaXsId() == null

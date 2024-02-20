@@ -22,6 +22,7 @@ public class RelationScore extends BaseModel {
         this.uid = uid;
         this.usableScore = BigDecimal.ZERO;
         this.usedScore = BigDecimal.ZERO;
+        this.fakeScore = BigDecimal.ZERO;
         this.node = node;
     }
 
@@ -35,6 +36,10 @@ public class RelationScore extends BaseModel {
     @ApiModelProperty("对碰积分")
     @TableField("usedScore")
     private BigDecimal usedScore;
+
+    @ApiModelProperty("虚假业绩")
+    @TableField("fakeScore")
+    private BigDecimal fakeScore;
 
     @ApiModelProperty("点位")
     @TableField("node")

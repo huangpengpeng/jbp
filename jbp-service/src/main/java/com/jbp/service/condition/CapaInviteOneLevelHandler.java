@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
  * 邀请一阶条件
  */
 @Component
-public class InviteOneLevelHandler implements ConditionHandler {
+public class CapaInviteOneLevelHandler implements ConditionHandler {
 
 
 
     @Override
     public String getName() {
-        return ConditionEnum.一阶等级人数.getName();
+        return ConditionEnum.一阶人数升级.getName();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class InviteOneLevelHandler implements ConditionHandler {
     }
 
     @Override
-    public InviteOneLevelHandler.Rule getRule(RiseCondition riseCondition) {
+    public CapaInviteOneLevelHandler.Rule getRule(RiseCondition riseCondition) {
         try {
             Rule rule = JSONObject.parseObject(riseCondition.getValue()).toJavaObject(Rule.class);
             if (rule.getNum() == null || rule.getCapaId() == null) {

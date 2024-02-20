@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -94,7 +95,7 @@ public class CapaController {
     @ApiOperation(value = "升级条件")
     @GetMapping(value = "/condition/list")
     public CommonResult<List<ConditionEnum>> conditionList() {
-        return CommonResult.success(ConditionEnum.getCapaList());
+        return CommonResult.success(ConditionEnum.getCapaList().stream().filter(s->s.getType().equals("等级")).collect(Collectors.toList()));
     }
     @PreAuthorize("hasAuthority('capa:condition:save')")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "等级升级条件保存")
