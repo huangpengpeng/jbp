@@ -12,17 +12,26 @@ import java.math.BigDecimal;
  * 佣金发放商品信息
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class FundClearingProduct implements Serializable {
 
+    public FundClearingProduct(Integer productId, String productName, BigDecimal price,
+                               Integer quantity, BigDecimal ratio, BigDecimal commAmt) {
+        this.productId = productId;
+        this.productName = productName;
+        this.price = price;
+        this.quantity = quantity;
+        this.ratio = ratio;
+        this.commAmt = commAmt;
+    }
+
     @ApiModelProperty("商品ID")
-    private Long goodsId;
+    private Integer productId;
 
     @ApiModelProperty("商品名称")
-    private String goodsName;
+    private String productName;
 
-    @ApiModelProperty("单价")
+    @ApiModelProperty("总价")
     private BigDecimal price;
 
     @ApiModelProperty("数量")

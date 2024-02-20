@@ -2,10 +2,14 @@ package com.jbp.service.product.comm;
 
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.LinkedList;
 
 public interface ProductCommHandler {
+
+    BigDecimal getWalletDeductionListPv(OrderDetail orderDetail);
 
     Integer getType();
 
@@ -24,5 +28,5 @@ public interface ProductCommHandler {
      * @param order  订单信息
      * @param resultList  佣金集合【佣金存在依赖关系所以计算结果要在各个佣金中流转】
      */
-     void orderSuccessCalculateAmt(Order order, List<CommCalculateResult> resultList);
+     void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList);
 }

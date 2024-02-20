@@ -1,58 +1,54 @@
 package com.jbp.service.product.comm;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.beust.jcommander.internal.Lists;
-import com.google.common.collect.Maps;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 渠道佣金
  */
 @Component
-public class CollisionCommHandler implements AbstractProductCommHandler {
+public class CollisionCommHandler extends AbstractProductCommHandler {
 
     @Resource
     private ProductCommService productCommService;
     @Resource
     private OrderDetailService orderDetailService;
     @Resource
-    private UserInvitationService invitationService;
+    private UserService userService;
     @Resource
     private UserCapaService userCapaService;
-    @Resource
-    private CapaService capaService;
     @Resource
     private RelationScoreService relationScoreService;
     @Resource
     private UserRelationService userRelationService;
     @Resource
-    private SystemConfigService systemConfigService;
-    @Resource
     private ProductCommConfigService productCommConfigService;
+    @Resource
+    private FundClearingService fundClearingService;
 
     @Override
     public Integer getType() {
@@ -93,8 +89,11 @@ public class CollisionCommHandler implements AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, List<CommCalculateResult> resultList) {
-        Map<Integer, ProductComm> commMap = Maps.newConcurrentMap();
+    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
+        if(!productCommConfig.getStatus()){
+            return;
+        }
         // 增加对碰积分业绩
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         // 订单总PV
@@ -102,32 +101,23 @@ public class CollisionCommHandler implements AbstractProductCommHandler {
         List<ProductInfoDto> productInfoList = Lists.newArrayList();
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
-            Integer payNum = orderDetail.getPayNum();
-            BigDecimal payPrice = orderDetail.getPayPrice(); // 商品总价
-            // 钱包抵扣PV  业绩计算金额 = payPrice + PV
-            BigDecimal totalPv = payPrice;
-            List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
-            if (CollectionUtils.isNotEmpty(walletDeductionList)) {
-                for (ProductDeduction deduction : walletDeductionList) {
-                    BigDecimal pv = deduction.getPvFee() == null ? BigDecimal.ZERO : deduction.getPvFee();
-                    totalPv = pv.add(totalPv);
-                }
-            }
             ProductComm productComm = productCommService.getByProduct(productId, getType());
             // 佣金不存在或者关闭直接忽略
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
-            commMap.put(productComm.getProductId(), productComm);
+            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
+            // 总PV
+            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));// 钱包抵扣PV
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
             // 明细商品
-            ProductInfoDto productInfo = new ProductInfoDto(productId, orderDetail.getProductName(), payNum, payPrice, totalPv);
+            ProductInfoDto productInfo = new ProductInfoDto(productId, orderDetail.getProductName(), orderDetail.getPayNum(), payPrice, totalPv);
             productInfoList.add(productInfo);
             // 订单总PV
             score = score.add(totalPv);
         }
         // 没有积分退出
-        if(!ArithmeticUtils.gt(score, BigDecimal.ZERO)){
+        if (!ArithmeticUtils.gt(score, BigDecimal.ZERO)) {
             return;
         }
         // 服务积分明细
@@ -142,6 +132,7 @@ public class CollisionCommHandler implements AbstractProductCommHandler {
                     upperDto.getNode(), order.getOrderNo(), order.getPayTime(), productInfoList, upperDto.getLevel());
             relationScoreFlowList.add(flow);
         }
+
         // 等级比例
         Rule rule = getRule(null);
         Map<Integer, CapaRatio> capaRatioMap = FunctionUtil.keyValueMap(rule.getCapaRatioList(), CapaRatio::getCapaId);
@@ -191,13 +182,17 @@ public class CollisionCommHandler implements AbstractProductCommHandler {
                     flow.getPayTime(), level, amt, ratio);
             // 增加奖励
             if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-
-
+                User orderUser = userService.getById(flow.getOrderUid());
+                fundClearingService.create(uid, flow.getOrdersSn(), ProductCommEnum.渠道佣金.getName(), amt,
+                        null, null, orderUser.getAccount() + "下单获得" + ProductCommEnum.渠道佣金.getName(), "");
+                // 将奖金透传出去
+                int sort =  resultList.size() + 1;
+                CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.渠道佣金.getName(),
+                        null, null, frontScore,
+                        1, minScore, BigDecimal.ONE, ratio, amt, sort);
+                resultList.add(calculateResult);
             }
-
-
         }
-
     }
 
 

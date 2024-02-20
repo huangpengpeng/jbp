@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
-import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
@@ -15,10 +15,14 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.*;
+import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.ProductCommConfigService;
+import com.jbp.service.service.agent.ProductCommService;
+import com.jbp.service.service.agent.UserInvitationService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 
@@ -31,31 +35,28 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 直接推荐佣金
+ * 推三返一
  */
 @Component
-public class DirectInvitationHandler extends AbstractProductCommHandler {
+public class ThreeRetOneHandler extends AbstractProductCommHandler {
 
+    @Resource
+    private FundClearingService fundClearingService;
     @Resource
     private ProductCommService productCommService;
     @Resource
     private OrderDetailService orderDetailService;
     @Resource
-    private UserInvitationService invitationService;
-    @Resource
-    private UserCapaService userCapaService;
-    @Resource
-    private CapaService capaService;
+    private UserService userService;
     @Resource
     private ProductCommConfigService productCommConfigService;
     @Resource
-    private FundClearingService fundClearingService;
-    @Resource
-    private UserService userService;
+    private UserInvitationService invitationService;
+
 
     @Override
     public Integer getType() {
-        return ProductCommEnum.直推佣金.getType();
+        return ProductCommEnum.推三返一.getType();
     }
 
     @Override
@@ -67,13 +68,13 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     public Boolean saveOrUpdate(ProductComm productComm) {
         // 检查是否存在存在直接更新
         if (productComm.hasError()) {
-            throw new CrmebException(ProductCommEnum.直推佣金.getName() + "参数不完整");
+            throw new CrmebException(ProductCommEnum.推三返一.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
         List<Rule> rule = getRule(productComm);
-        Set<Integer> set = rule.stream().map(Rule::getCapaId).collect(Collectors.toSet());
+        Set<Integer> set = rule.stream().map(Rule::getLevel).collect(Collectors.toSet());
         if (set.size() != rule.size()) {
-            throw new CrmebException("等级配置不能重复");
+            throw new CrmebException("单数不能重复");
         }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
@@ -99,18 +100,17 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
         if (!productCommConfig.getStatus()) {
             return;
         }
-        // 没有上级直接返回
         Integer pid = invitationService.getPid(order.getUid());
         if (pid == null) {
             return;
         }
         BigDecimal totalAmt = BigDecimal.ZERO;
-        // 上级等级
-        UserCapa pUserCapa = userCapaService.getByUser(pid);
-        Long capaId = pUserCapa == null ? capaService.getMinCapa().getId() : pUserCapa.getCapaId();
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+        // 历史推三返一单量
+        List<FundClearing> fundClearingList = fundClearingService.getByUser(pid, ProductCommEnum.推三返一.getName(), FundClearing.interceptStatus());
+        // 根据产品算钱
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
@@ -124,46 +124,57 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);
-            Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
-            Rule rule = ruleMap.get(capaId);
-            BigDecimal ratio = BigDecimal.ZERO;
+            int i = 1;
+            if (CollectionUtils.isNotEmpty(fundClearingList)) {
+                i = fundClearingList.size() % rules.size();
+                i = i == 0 ? rules.size() : i;
+            }
+
+            Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getLevel);
+            Rule rule = ruleMap.get(i);
+
+            BigDecimal amt = BigDecimal.ZERO;
             if (rule != null) {
-                ratio = rule.getRatio();
+                if (rule.getType().equals("金额")) {
+                    amt = rule.getValue().multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
+                } else {
+                    amt = rule.getValue().multiply(totalPv);
+                }
             }
             // 计算订单金额
-            BigDecimal amt = ratio.multiply(totalPv);
             totalAmt = totalAmt.add(amt);
             FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
-                    orderDetail.getPayNum(), ratio, amt);
+                    orderDetail.getPayNum(), BigDecimal.valueOf(i), amt);
             productList.add(clearingProduct);
         }
-
         // 按订单保存佣金
         totalAmt = totalAmt.setScale(2, BigDecimal.ROUND_DOWN);
         if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
             User orderUser = userService.getById(order.getUid());
-            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.直推佣金.getName(), totalAmt,
-                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.直推佣金.getName(), "");
+            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推三返一.getName(), totalAmt,
+                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.推三返一.getName(), "");
         }
     }
 
-    /**
-     * 直推佣金规则
-     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
+
         /**
-         * 等级
+         * 单数
          */
-        private Integer capaId;
+        private Integer level;
+
+        /**
+         * 比例  金额
+         */
+        private String type;
 
         /**
          * 比例
          */
-        private BigDecimal ratio;
+        private BigDecimal value;
     }
-
 
 }

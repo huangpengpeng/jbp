@@ -31,10 +31,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 直接推荐佣金
+ * 间推佣金处理器
  */
 @Component
-public class DirectInvitationHandler extends AbstractProductCommHandler {
+public class IndirectCommHandler extends AbstractProductCommHandler{
 
     @Resource
     private ProductCommService productCommService;
@@ -55,7 +55,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
 
     @Override
     public Integer getType() {
-        return ProductCommEnum.直推佣金.getType();
+        return ProductCommEnum.间推佣金.getType();
     }
 
     @Override
@@ -67,7 +67,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     public Boolean saveOrUpdate(ProductComm productComm) {
         // 检查是否存在存在直接更新
         if (productComm.hasError()) {
-            throw new CrmebException(ProductCommEnum.直推佣金.getName() + "参数不完整");
+            throw new CrmebException(ProductCommEnum.间推佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
         List<Rule> rule = getRule(productComm);
@@ -95,12 +95,17 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
         if (!productCommConfig.getStatus()) {
             return;
         }
         // 没有上级直接返回
         Integer pid = invitationService.getPid(order.getUid());
+        if (pid == null) {
+            return;
+        }
+        pid = invitationService.getPid(pid);
         if (pid == null) {
             return;
         }
@@ -137,18 +142,17 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
                     orderDetail.getPayNum(), ratio, amt);
             productList.add(clearingProduct);
         }
-
         // 按订单保存佣金
         totalAmt = totalAmt.setScale(2, BigDecimal.ROUND_DOWN);
         if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
             User orderUser = userService.getById(order.getUid());
-            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.直推佣金.getName(), totalAmt,
-                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.直推佣金.getName(), "");
+            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.间推佣金.getName(), totalAmt,
+                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.间推佣金.getName(), "");
         }
     }
 
     /**
-     * 直推佣金规则
+     * 间接佣金规则
      */
     @Data
     @NoArgsConstructor
@@ -164,6 +168,4 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
          */
         private BigDecimal ratio;
     }
-
-
 }

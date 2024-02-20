@@ -3,9 +3,12 @@ package com.jbp.common.model.agent;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.VersionModel;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
@@ -13,7 +16,10 @@ import java.math.BigDecimal;
  * 订单资金汇总
  */
 @Data
-@TableName("OrdersFundSummary")
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@TableName(value = "eb_orders_fund_summary", autoResultMap = true)
+@ApiModel(value="OrdersFundSummary对象", description="订单资金汇总")
 @NoArgsConstructor
 public class OrdersFundSummary extends VersionModel {
 
