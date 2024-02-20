@@ -34,5 +34,5 @@ public class SelfScore extends BaseModel {
 
     @ApiModelProperty("账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 }

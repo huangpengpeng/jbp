@@ -52,4 +52,9 @@ public class SelfScoreGroup extends BaseModel {
     @ApiModelProperty("结束时间")
     @TableField("end_time")
     private String endTime;
+
+    @ApiModelProperty("账户")
+    @TableField(exist = false)
+    private String account;
+
 }

@@ -31,6 +31,7 @@ public class InvitationScoreGroup extends BaseModel {
     @ApiModelProperty("用户id")
     private Integer uid;
 
+
     @ApiModelProperty("积分")
     @TableField("score")
     private BigDecimal score;
@@ -50,4 +51,9 @@ public class InvitationScoreGroup extends BaseModel {
     @ApiModelProperty("结束时间")
     @TableField("endTime")
     private String endTime;
+
+    @ApiModelProperty("用户账户")
+    @TableField(exist = false)
+    private String account;
+
 }

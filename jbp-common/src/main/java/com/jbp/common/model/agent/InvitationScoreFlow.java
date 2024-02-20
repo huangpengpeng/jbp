@@ -39,7 +39,7 @@ public class InvitationScoreFlow extends BaseModel {
     private Integer uid;
 
     @ApiModelProperty("下单用户id")
-    @TableField("orderUid")
+    @TableField("order_uid")
     private Integer orderUid;
 
     @ApiModelProperty("积分")
@@ -55,15 +55,15 @@ public class InvitationScoreFlow extends BaseModel {
     private String operate;
 
     @ApiModelProperty("单号")
-    @TableField("ordersSn")
+    @TableField("orders_sn")
     private String ordersSn;
 
     @ApiModelProperty("付款时间")
-    @TableField("payTime")
+    @TableField("pay_time")
     private Date payTime;
 
     @ApiModelProperty("商品信息")
-    @TableField(value = "productInfo", typeHandler = ProductInfoListHandler.class)
+    @TableField(value = "product_info", typeHandler = ProductInfoListHandler.class)
     private List<ProductInfoDto> productInfo;
 
     @ApiModelProperty("备注")
@@ -72,9 +72,9 @@ public class InvitationScoreFlow extends BaseModel {
 
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 
     @ApiModelProperty("下单用户账户")
     @TableField(exist = false)
-    private String orderAccountNo;
+    private String orderAccount;
 }
