@@ -2,11 +2,14 @@ package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.model.agent.RelationScore;
+import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.request.PageParamRequest;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 public interface RelationScoreService extends IService<RelationScore> {
     RelationScore getByUser(Integer uId, Integer node);
@@ -15,5 +18,13 @@ public interface RelationScoreService extends IService<RelationScore> {
 
     Boolean save(Integer uid, int node);
 
-    Boolean edit(Long id,BigDecimal usableScore, BigDecimal usedScore, int node);
+    Boolean edit(Long id, BigDecimal usableScore, BigDecimal usedScore, int node);
+
+    RelationScoreFlow orderSuccessIncrease(Integer uid, Integer orderUid, BigDecimal score, int node, String ordersSn,
+                                    Date payTime, List<ProductInfoDto> productInfo, Integer level);
+
+    RelationScoreFlow orderSuccessReduce(Integer uid, Integer orderUid, BigDecimal score, int node,
+                                         String ordersSn, Date payTime, Integer level, BigDecimal amt, BigDecimal ratio);
+
+
 }

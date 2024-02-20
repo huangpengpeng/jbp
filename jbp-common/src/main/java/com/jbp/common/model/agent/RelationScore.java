@@ -2,7 +2,8 @@ package com.jbp.common.model.agent;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.jbp.common.model.BaseModel;
+import com.jbp.common.model.VersionModel;
+import com.jbp.common.utils.ArithmeticUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @TableName(value = "eb_relation_score", autoResultMap = true)
 @ApiModel(value="RelationScore对象", description="服务业绩汇总")
-public class RelationScore extends BaseModel {
+public class RelationScore extends VersionModel {
 
     public RelationScore(Integer uid, int node) {
         this.uid = uid;
@@ -26,6 +27,13 @@ public class RelationScore extends BaseModel {
         this.usedScore = BigDecimal.ZERO;
         this.fakeScore = BigDecimal.ZERO;
         this.node = node;
+    }
+
+    public Boolean hasError(){
+        if(ArithmeticUtils.less(usableScore, BigDecimal.ZERO)|| ArithmeticUtils.less(usedScore, BigDecimal.ZERO)){
+            return true;
+        }
+        return false;
     }
 
     @ApiModelProperty("用户id")

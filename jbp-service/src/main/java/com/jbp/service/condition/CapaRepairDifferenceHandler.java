@@ -6,12 +6,14 @@ import com.jbp.common.utils.ArithmeticUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 /**
  * 补差升级条件
  */
+@Component
 public class CapaRepairDifferenceHandler implements ConditionHandler {
     @Override
     public String getName() {

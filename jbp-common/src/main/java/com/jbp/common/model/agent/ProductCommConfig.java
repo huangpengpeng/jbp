@@ -40,6 +40,10 @@ public class ProductCommConfig extends BaseModel {
     @ApiModelProperty("系数")
     private BigDecimal scale;
 
+    @ApiModelProperty("比例json")
+    private String ratioJson;
+
+
     @ApiModelProperty(value = "商品是否开启")
     @TableField(exist = false)
     private Boolean status;

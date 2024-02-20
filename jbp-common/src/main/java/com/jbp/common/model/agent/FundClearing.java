@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 import com.jbp.common.model.VersionModel;
 import com.jbp.common.mybatis.FundClearingItemListHandler;
 import com.jbp.common.mybatis.FundClearingProductListHandler;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -27,6 +29,24 @@ import java.util.List;
 @ApiModel(value="FundClearing对象", description="佣金发放记录")
 public class FundClearing extends VersionModel {
 
+    public FundClearing(Integer uid, String externalNo, String commName, BigDecimal commAmt, UserInfo userInfo,
+                        List<FundClearingItem> items, List<FundClearingProduct> productList,
+                        String description, String remark) {
+        this.uid = uid;
+        this.uniqueNo = StringUtils.N_TO_10("C_");
+        this.externalNo = externalNo;
+        this.commName = commName;
+        this.commAmt = commAmt;
+        this.sendAmt = commAmt;
+        this.userInfo = userInfo;
+        this.items = items;
+        this.productList = productList;
+        this.description = description;
+        this.status = Constants.已创建.toString();
+        this.remark = remark;
+        this.createTime = DateTimeUtils.getNow();
+    }
+
     /**
      * 1.初始化数据就是 已创建
      * 2.待审核   发货已确认后 变为待审核
@@ -34,10 +54,10 @@ public class FundClearing extends VersionModel {
      * 4.财务审核通过后 已出款 【用户可见】
      */
     public static enum Constants {
-        已创建,  待审核,  待出款,  已出款,  已取消,  已拦截
+        已创建, 待审核, 待出款, 已出款, 已取消, 已拦截
     }
 
-    public static List<String> interceptStatus(){
+    public static List<String> interceptStatus() {
         return Lists.newArrayList(Constants.已创建.toString(), Constants.待审核.toString(), Constants.待出款.toString());
     }
 

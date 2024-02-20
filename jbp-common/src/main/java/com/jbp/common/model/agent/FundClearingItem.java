@@ -19,8 +19,8 @@ public class FundClearingItem implements Serializable {
     @ApiModelProperty("出款名称")
     private String name;
 
-    @ApiModelProperty("类型")
-    private Integer type;
+    @ApiModelProperty("钱包类型")
+    private Integer walletType;
 
     @ApiModelProperty("出款金额")
     private BigDecimal amt;

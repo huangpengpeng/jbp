@@ -13,8 +13,7 @@ import java.math.BigDecimal;
 @ApiModel(value="ProductInfoDto对象", description="产品信息")
 public class ProductInfoDto implements Serializable {
 
-    public ProductInfoDto(Integer productId, String productName, int quantity,
-                          BigDecimal price, BigDecimal pv) {
+    public ProductInfoDto(Integer productId, String productName, int quantity, BigDecimal price, BigDecimal pv) {
         this.productId = productId;
         this.productName = productName;
         this.quantity = quantity;
@@ -31,7 +30,7 @@ public class ProductInfoDto implements Serializable {
     @ApiModelProperty("数量")
     private int quantity;
 
-    @ApiModelProperty("单价")
+    @ApiModelProperty("实际总价  单价*数量=总价   < pv  ")
     private BigDecimal price;
 
     @ApiModelProperty("pv系数")

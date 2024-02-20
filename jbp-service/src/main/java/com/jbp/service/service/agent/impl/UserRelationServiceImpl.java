@@ -66,6 +66,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         return getOne(new LambdaQueryWrapper<UserRelation>().eq(UserRelation::getPId, pId).eq(UserRelation::getNode, node));
     }
 
+    /**
+     * 第一条记录是自己
+     */
     @Override
     public List<UserUpperDto> getAllUpper(Integer uId) {
         return dao.getAllUpper(uId);
