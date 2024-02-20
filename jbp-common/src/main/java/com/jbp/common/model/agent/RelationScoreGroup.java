@@ -47,18 +47,18 @@ public class RelationScoreGroup extends BaseModel {
     private int node;
 
     @ApiModelProperty("分组名称")
-    @TableField("groupName")
+    @TableField("group_name")
     private String groupName;
 
     @ApiModelProperty("开始时间")
-    @TableField("startTime")
+    @TableField("start_time")
     private String startTime;
 
     @ApiModelProperty("结束时间")
-    @TableField("endTime")
+    @TableField("end_time")
     private String endTime;
 
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 }
