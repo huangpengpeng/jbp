@@ -39,32 +39,4 @@ public class RelationScoreController {
         }
         return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, pageParamRequest)));
     }
-
-    @ApiOperation("新增")
-    @PostMapping("/add")
-    public CommonResult add(RelationScoreAddRequest request) {
-        Integer uid = null;
-        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getAccount()).getId();
-            } catch (NullPointerException e) {
-                throw new CrmebException("账号信息错误");
-            }
-        }
-        relationScoreService.save(uid,request.getNode());
-        return CommonResult.success();
-    }
-
-    @ApiOperation("编辑")
-    @PostMapping("/edit")
-    public CommonResult edit(RelationScoreEditRequest request) {
-        relationScoreService.edit(request.getId(),request.getUsableScore(),request.getUsedScore(),request.getNode());
-        return CommonResult.success();
-    }
-    @ApiOperation("删除")
-    @GetMapping("/delete/{id}")
-    public CommonResult delete(@PathVariable("id")Integer id) {
-        relationScoreService.removeById(id);
-        return CommonResult.success();
-    }
 }

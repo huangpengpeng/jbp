@@ -66,27 +66,27 @@ public class FundClearing extends VersionModel {
     private Integer uid;
 
     @ApiModelProperty("流水单号")
-    @TableField("uniqueNo")
+    @TableField("unique_no")
     private String uniqueNo;
 
     @ApiModelProperty("外部单号")
-    @TableField("externalNo")
+    @TableField("external_no")
     private String externalNo;
 
     @ApiModelProperty("佣金名称")
-    @TableField("commName")
+    @TableField("comm_name")
     private String commName;
 
     @ApiModelProperty("佣金")
-    @TableField("commAmt")
+    @TableField("comm_amt")
     private BigDecimal commAmt;
 
     @ApiModelProperty("实发金额")
-    @TableField("sendAmt")
+    @TableField("send_amt")
     private BigDecimal sendAmt;
 
     @ApiModelProperty("用户信息")
-    @TableField(value = "userInfo", typeHandler = JacksonTypeHandler.class)
+    @TableField(value = "user_info", typeHandler = JacksonTypeHandler.class)
     private UserInfo userInfo;
 
     @ApiModelProperty("实际出款明细【根据系统配置 积分钱包占比  手续费  管理费】")
@@ -94,7 +94,7 @@ public class FundClearing extends VersionModel {
     private List<FundClearingItem> items;
 
     @ApiModelProperty("商品信息")
-    @TableField(value = "productList", typeHandler = FundClearingProductListHandler.class)
+    @TableField(value = "product_list", typeHandler = FundClearingProductListHandler.class)
     private List<FundClearingProduct> productList;
 
     @ApiModelProperty("描述")
@@ -102,7 +102,7 @@ public class FundClearing extends VersionModel {
     private String description;
 
     @ApiModelProperty("结算时间")
-    @TableField("clearingTime")
+    @TableField("clearing_time")
     private Date clearingTime;
 
     @ApiModelProperty("结算状态  已创建  待审核  待出款  已出款  已取消  已拦截")
@@ -114,6 +114,11 @@ public class FundClearing extends VersionModel {
     private String remark;
 
     @ApiModelProperty("创建时间")
-    @TableField("createTime")
+    @TableField("create_time")
     private Date createTime;
+
+    @ApiModelProperty("得奖用户账户")
+    @TableField(exist = false)
+    private String account;
+
 }

@@ -16,10 +16,6 @@ public interface RelationScoreService extends IService<RelationScore> {
 
     PageInfo<RelationScore> pageList(Integer uid, PageParamRequest pageParamRequest);
 
-    Boolean save(Integer uid, int node);
-
-    Boolean edit(Long id, BigDecimal usableScore, BigDecimal usedScore, int node);
-
     RelationScoreFlow orderSuccessIncrease(Integer uid, Integer orderUid, BigDecimal score, int node, String ordersSn,
                                     Date payTime, List<ProductInfoDto> productInfo, Integer level);
 
