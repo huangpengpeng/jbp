@@ -35,6 +35,7 @@ import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.OrderDao;
 import com.jbp.service.service.*;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1014,7 +1015,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private Order getByOrderNoAndMerId(String orderNo, Integer merId) {
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.eq(Order::getOrderNo, orderNo);
-        lqw.eq(Order::getMerId, merId);
+        Boolean ifPlatform = 0 == merId;
+        if(BooleanUtils.isNotTrue(ifPlatform)){
+            lqw.eq(Order::getMerId, merId);
+        }
         lqw.last(" limit 1");
         Order order = dao.selectOne(lqw);
         if (ObjectUtil.isNull(order)) {

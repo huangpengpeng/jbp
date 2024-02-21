@@ -862,6 +862,7 @@ public class PayServiceImpl implements PayService {
             order.setPayMethod("人工确认");
             order.setOutTradeNo("000000");
             order.setPayChannel("confirmPay");
+            order.setPayType("confirmPay");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             orderService.updateById(order);
             return update;
