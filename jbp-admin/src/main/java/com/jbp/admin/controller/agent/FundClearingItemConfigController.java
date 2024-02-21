@@ -3,8 +3,11 @@ package com.jbp.admin.controller.agent;
 import cn.hutool.core.util.ObjectUtil;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
+import com.jbp.common.model.agent.FundClearingItemConfig;
 import com.jbp.common.model.agent.LimitTemp;
 import com.jbp.common.model.agent.WalletConfig;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
 import com.jbp.common.request.agent.LimitTempAddRequest;
 import com.jbp.common.result.CommonResult;
@@ -18,10 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -42,6 +42,11 @@ public class FundClearingItemConfigController {
     private FundClearingItemConfigService fundClearingItemConfigService;
 
     // todo 查询方法  佣金名称 为查询条件
+    @GetMapping("/page/{commName}")
+    @ApiOperation("佣金发放配置列表")
+    public CommonResult<CommonPage<FundClearingItemConfig>> getList(@PathVariable("commName") String commName, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(fundClearingItemConfigService.pageList(commName,pageParamRequest)));
+    }
 
     @ApiOperation("发放类型")
     @PostMapping("/type/list")

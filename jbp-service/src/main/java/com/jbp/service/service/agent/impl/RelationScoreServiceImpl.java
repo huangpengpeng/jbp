@@ -53,30 +53,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     }
 
     @Override
-    public Boolean edit(Long id, BigDecimal usableScore, BigDecimal usedScore, int node) {
-        RelationScore relationScore = getById(id);
-        relationScore.setUsableScore(usableScore);
-        relationScore.setUsedScore(usedScore);
-        relationScore.setNode(node);
-        updateById(relationScore);
-        return true;
-    }
-
-    @Override
-    public Boolean save(Integer uid, int node) {
-        LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(RelationScore::getUid, uid);
-        lqw.eq(RelationScore::getNode, node);
-        List<RelationScore> relationScoreList = list(lqw);
-        if (relationScoreList.size() > 0) {
-            throw new CrmebException("服务业绩汇总已存在");
-        }
-        RelationScore relationScore = new RelationScore(uid, node);
-        save(relationScore);
-        return true;
-    }
-
-    @Override
     public RelationScoreFlow orderSuccessIncrease(Integer uid, Integer orderUid, BigDecimal score, int node,
                                                   String ordersSn, Date payTime, List<ProductInfoDto> productInfo, Integer level) {
         RelationScore relationScore = getByUser(uid, node);

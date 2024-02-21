@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 
 @Data
-@Builder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -27,7 +26,7 @@ public class FundClearingItemConfig extends BaseModel {
     }
 
     @ApiModelProperty("佣金名称")
-    @TableField("commName")
+    @TableField("comm_name")
     private String commName;
 
     @ApiModelProperty("出款名称")
@@ -40,4 +39,9 @@ public class FundClearingItemConfig extends BaseModel {
 
     @ApiModelProperty("钱包类型")
     private Integer walletType;
+
+    @ApiModelProperty(value = "钱包类型名称")
+    @TableField(exist = false)
+    private String walletTypeName;
+
 }
