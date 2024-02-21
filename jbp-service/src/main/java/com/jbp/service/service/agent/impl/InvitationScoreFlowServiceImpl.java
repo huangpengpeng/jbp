@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -13,10 +14,15 @@ import com.jbp.service.dao.agent.InvitationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreFlowDao, InvitationScoreFlow> implements InvitationScoreFlowService {
     @Resource
@@ -35,5 +41,12 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
             e.setOrderAccount(userService.getById(e.getOrderUid()).getAccount());
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public InvitationScoreFlow add(Integer uid, Integer orderUid, BigDecimal score, String action, String operate, String ordersSn, Date payTime, List<ProductInfoDto> productInfo, String remark) {
+        InvitationScoreFlow flow = new InvitationScoreFlow(uid, orderUid, score, action, operate, ordersSn, payTime, productInfo, remark);
+        save(flow);
+        return flow;
     }
 }

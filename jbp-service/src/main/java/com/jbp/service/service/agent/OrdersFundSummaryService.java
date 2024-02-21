@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 public interface OrdersFundSummaryService extends IService<OrdersFundSummary> {
 
-    OrdersFundSummary create(Long ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv);
+    OrdersFundSummary create(Integer ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv);
 
     OrdersFundSummary getByOrdersSn(String ordersSn);
     OrdersFundSummary increaseCommAmt(String ordersSn, BigDecimal commAmt);

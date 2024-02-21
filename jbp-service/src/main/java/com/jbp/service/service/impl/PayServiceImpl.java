@@ -15,8 +15,10 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.google.common.collect.Lists;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
+import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
@@ -30,6 +32,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantBalanceRecord;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.ProductCoupon;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.*;
 import com.jbp.common.model.wechat.WechatPayInfo;
@@ -46,6 +49,9 @@ import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.InvitationScoreService;
+import com.jbp.service.service.agent.OrdersFundSummaryService;
+import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,6 +155,12 @@ public class PayServiceImpl implements PayService {
     private LianLianPayService lianLianPayService;
     @Autowired
     private ProductCommChain productCommChain;
+    @Autowired
+    private SelfScoreService selfScoreService;
+    @Autowired
+    private InvitationScoreService invitationScoreService;
+    @Autowired
+    private OrdersFundSummaryService ordersFundSummaryService;
 
     /**
      * 获取支付配置
@@ -602,10 +614,24 @@ public class PayServiceImpl implements PayService {
             throw new CrmebException("订单不存在，orderNo: " + orderNo);
         }
         User user = userService.getById(platOrder.getUid());
-        // 1.处理订单佣金
-        LinkedList<CommCalculateResult> commList = new LinkedList<>();
-        productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+
         // 2.增加业绩
+        BigDecimal score = BigDecimal.ZERO;
+        List<ProductInfoDto> productInfoList = Lists.newArrayList();
+        List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(platOrder.getOrderNo());
+        for (OrderDetail orderDetail : platOrderDetailList) {
+            BigDecimal productScore = orderDetail.getPayPrice();
+            List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
+            for (ProductDeduction deduction : walletDeductionList) {
+                productScore = productScore.add(deduction.getPvFee());
+            }
+            score = score.add(productScore);
+            ProductInfoDto productInfo = new ProductInfoDto(orderDetail.getProductId(), orderDetail.getProductName(),
+                    orderDetail.getPayNum(), orderDetail.getPayPrice(), productScore);
+            productInfoList.add(productInfo);
+        }
+
+        // 3.增加团队业绩
 
 
         // 获取拆单后订单
@@ -679,7 +705,19 @@ public class PayServiceImpl implements PayService {
         } else {
             user.setIsPromoter(false);
         }
+        BigDecimal finalScore = score;
         Boolean execute = transactionTemplate.execute(e -> {
+            // 1.分销佣金
+            LinkedList<CommCalculateResult> commList = new LinkedList<>();
+            productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+            // 2.自有业绩
+            selfScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
+            // 3.团队业绩
+            invitationScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
+            // 4.资金概况
+            ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
+                    platOrder.getPayPrice().subtract(platOrder.getPayPostage()), finalScore);
+
             // 订单、佣金
             if (CollUtil.isNotEmpty(brokerageRecordList)) {
                 merchantOrderService.updateBatchById(merchantOrderList);

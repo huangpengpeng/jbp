@@ -13,10 +13,13 @@ import com.jbp.service.dao.agent.RelationScoreGroupDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreGroupService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
 
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class RelationScoreGroupServiceImpl extends ServiceImpl<RelationScoreGroupDao, RelationScoreGroup> implements RelationScoreGroupService {
     @Resource

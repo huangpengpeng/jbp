@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryDao, OrdersFundSummary> implements OrdersFundSummaryService {
 
     @Override
-    public OrdersFundSummary create(Long ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv) {
+    public OrdersFundSummary create(Integer ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv) {
         OrdersFundSummary summary = new OrdersFundSummary(ordersId, ordersSn, payPrice, pv);
         save(summary);
         return summary;

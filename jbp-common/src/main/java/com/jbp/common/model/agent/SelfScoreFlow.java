@@ -27,8 +27,7 @@ import java.util.List;
 public class SelfScoreFlow extends BaseModel {
 
     public SelfScoreFlow(Integer uid, BigDecimal score, String action, String operate,
-                         String ordersSn, Date payTime,  List<ProductInfoDto> productInfo
-            , String remark) {
+                         String ordersSn, Date payTime,  List<ProductInfoDto> productInfo, String remark) {
         this.uid = uid;
         this.score = score;
         this.action = action;
@@ -46,11 +45,11 @@ public class SelfScoreFlow extends BaseModel {
     @TableField("score")
     private BigDecimal score;
 
-    @ApiModelProperty("方向")
+    @ApiModelProperty("方向  增加|减少")
     @TableField("action")
     private String action;
 
-    @ApiModelProperty("操作")
+    @ApiModelProperty("操作  下单|人工")
     @TableField("operate")
     private String operate;
 

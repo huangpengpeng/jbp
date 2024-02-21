@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OrdersFundSummary extends VersionModel {
 
-    public OrdersFundSummary(Long ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv) {
+    public OrdersFundSummary(Integer ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv) {
         this.ordersId = ordersId;
         this.ordersSn = ordersSn;
         this.payPrice = payPrice;
@@ -33,7 +33,7 @@ public class OrdersFundSummary extends VersionModel {
 
     @ApiModelProperty("单号")
     @TableField("ordersId")
-    private Long ordersId;
+    private Integer ordersId;
 
     @ApiModelProperty("单号")
     @TableField("ordersSn")
