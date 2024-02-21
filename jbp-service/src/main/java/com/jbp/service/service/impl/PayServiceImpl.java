@@ -614,7 +614,6 @@ public class PayServiceImpl implements PayService {
             throw new CrmebException("订单不存在，orderNo: " + orderNo);
         }
         User user = userService.getById(platOrder.getUid());
-
         // 2.增加业绩
         BigDecimal score = BigDecimal.ZERO;
         List<ProductInfoDto> productInfoList = Lists.newArrayList();
@@ -630,9 +629,6 @@ public class PayServiceImpl implements PayService {
                     orderDetail.getPayNum(), orderDetail.getPayPrice(), productScore);
             productInfoList.add(productInfo);
         }
-
-        // 3.增加团队业绩
-
 
         // 获取拆单后订单
         List<Order> orderList = orderService.getByPlatOrderNo(platOrder.getOrderNo());
