@@ -32,15 +32,15 @@ public class OrdersFundSummary extends VersionModel {
     }
 
     @ApiModelProperty("单号")
-    @TableField("ordersId")
+    @TableField("orders_id")
     private Integer ordersId;
 
     @ApiModelProperty("单号")
-    @TableField("ordersSn")
+    @TableField("orders_sn")
     private String ordersSn;
 
     @ApiModelProperty("支付金额")
-    @TableField("payPrice")
+    @TableField("pay_price")
     private BigDecimal payPrice;
 
     @ApiModelProperty("总PV")
@@ -48,6 +48,6 @@ public class OrdersFundSummary extends VersionModel {
     private BigDecimal pv;
 
     @ApiModelProperty("支出佣金")
-    @TableField("commAmt")
+    @TableField("comm_amt")
     private BigDecimal commAmt;
 }
