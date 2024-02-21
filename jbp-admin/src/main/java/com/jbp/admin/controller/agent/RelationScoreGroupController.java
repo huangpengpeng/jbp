@@ -11,6 +11,7 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreGroupService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ public class RelationScoreGroupController {
     @Resource
     private UserService userService;
 
+    @PreAuthorize("hasAuthority('agent:relation:score:group:page')")
     @ApiOperation("服务业绩明细列表")
     @GetMapping("/page")
     public CommonResult<CommonPage<RelationScoreGroup>> getList(RelationScoreGroupRequest request, PageParamRequest pageParamRequest) {

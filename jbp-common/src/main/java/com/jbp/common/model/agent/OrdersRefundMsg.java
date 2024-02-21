@@ -29,11 +29,11 @@ public class OrdersRefundMsg extends BaseModel {
     }
 
     @ApiModelProperty("订单编号")
-    @TableField("ordersSn")
+    @TableField("orders_sn")
     private String ordersSn;
 
     @ApiModelProperty("退款单号")
-    @TableField("refundSn")
+    @TableField("refund_sn")
     private String refundSn;
 
     @ApiModelProperty("事件内容")
@@ -45,7 +45,7 @@ public class OrdersRefundMsg extends BaseModel {
     private String remark;
 
     @ApiModelProperty("是否已读")
-    @TableField("ifRead")
+    @TableField("if_read")
     private Boolean ifRead;
 }
 

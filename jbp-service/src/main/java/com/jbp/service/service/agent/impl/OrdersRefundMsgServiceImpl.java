@@ -1,8 +1,15 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.OrdersRefundMsg;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.OrdersRefundMsgDao;
 import com.jbp.service.service.agent.OrdersRefundMsgService;
 import org.springframework.stereotype.Service;
@@ -28,5 +35,15 @@ public class OrdersRefundMsgServiceImpl extends ServiceImpl<OrdersRefundMsgDao, 
                 .set(OrdersRefundMsg::getRemark, remark)
                 .in(OrdersRefundMsg::getId, ids);
         update(updateWrapper);
+    }
+
+    @Override
+    public PageInfo<OrdersRefundMsg> pageList(String ordersSn, String refundSn, Boolean ifRead, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<OrdersRefundMsg> lqw=new LambdaQueryWrapper<OrdersRefundMsg>()
+                .like(!ObjectUtil.isNull(ordersSn)&&!ordersSn.equals(""),OrdersRefundMsg::getOrdersSn,ordersSn)
+                .like(!ObjectUtil.isNull(refundSn)&&!refundSn.equals(""),OrdersRefundMsg::getRefundSn,refundSn)
+                .eq(!ObjectUtil.isNull(ifRead),OrdersRefundMsg::getIfRead,ifRead);
+        Page<OrdersRefundMsg> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        return CommonPage.copyPageInfo(page, list(lqw));
     }
 }

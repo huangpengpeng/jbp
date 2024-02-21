@@ -11,6 +11,7 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ public class InvitationScoreController {
     @Resource
     private UserService userService;
 
+    @PreAuthorize("hasAuthority('agent:invitation:score:page')")
     @GetMapping("/page")
     @ApiOperation("销售业绩汇总列表")
     public CommonResult<CommonPage<InvitationScore>> getList(InvitationScoreRequest request, PageParamRequest pageParamRequest) {
