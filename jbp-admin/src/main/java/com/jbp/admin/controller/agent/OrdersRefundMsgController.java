@@ -3,6 +3,7 @@ package com.jbp.admin.controller.agent;
 import com.jbp.common.model.agent.OrdersRefundMsg;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.OrdersRefundMsgReadRequest;
 import com.jbp.common.request.agent.OrdersRefundMsgRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.OrdersRefundMsgService;
@@ -29,8 +30,8 @@ public class OrdersRefundMsgController {
     @PreAuthorize("hasAuthority('agent:orders:refund:msg:read')")
     @PostMapping("/read")
     @ApiOperation("批量已读")
-    public CommonResult read(@RequestBody List<Long> ids) {
-        ordersRefundMsgService.read(ids);
+    public CommonResult read(@RequestBody OrdersRefundMsgReadRequest request) {
+        ordersRefundMsgService.read(request.getIds(),request.getRemark());
         return CommonResult.success();
     }
 
