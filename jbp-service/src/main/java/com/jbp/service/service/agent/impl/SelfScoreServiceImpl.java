@@ -16,6 +16,7 @@ import com.jbp.service.dao.agent.SelfScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.SelfScoreFlowService;
 import com.jbp.service.service.agent.SelfScoreService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,9 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
                 .eq(!ObjectUtil.isNull(uid), SelfScore::getUid, uid);
         Page<SelfScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScore> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
         List<Integer> uIdList = list.stream().map(SelfScore::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {

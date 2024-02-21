@@ -8,14 +8,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.RelationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;
 import com.jbp.service.service.agent.RelationScoreService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -46,8 +51,13 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid);
         Page<RelationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScore> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(RelationScore::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
+            e.setAccount(uidMapList.get(e.getUid()).getAccount());
         });
         return CommonPage.copyPageInfo(page, list);
     }

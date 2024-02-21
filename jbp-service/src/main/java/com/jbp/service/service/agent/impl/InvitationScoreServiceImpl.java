@@ -48,6 +48,9 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
         List<Integer> uIdList = list.stream().map(InvitationScore::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {

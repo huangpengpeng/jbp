@@ -366,9 +366,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             validateExpressSend(request);
         }
         Order order = getByOrderNo(request.getOrderNo());
-        if (!order.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("订单不存在");
-        }
+//        if (!order.getMerId().equals(systemAdmin.getMerId())) {
+//            throw new CrmebException("订单不存在");
+//        }
         if (order.getIsUserDel() || order.getIsMerchantDel()) {
             throw new CrmebException("订单已删除");
         }
