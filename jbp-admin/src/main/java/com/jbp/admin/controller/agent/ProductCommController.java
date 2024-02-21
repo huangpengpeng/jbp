@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/admin/agent/platform/product/comm")
@@ -35,6 +36,7 @@ public class ProductCommController {
     @ApiOperation("商品佣金详情")
     public CommonResult<List<ProductCommConfig>> detail(Integer productId) {
         List<ProductCommConfig> configList = configService.getOpenList();
+        configList = configList.stream().filter(c->BooleanUtils.isNotTrue(c.getIfWhole())).collect(Collectors.toList());
         List<ProductComm> list = service.getByProduct(productId);
         Map<Integer, ProductComm> map = FunctionUtil.keyValueMap(list, ProductComm::getType);
         for (ProductCommConfig config : configList) {

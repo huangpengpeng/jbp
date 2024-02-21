@@ -22,9 +22,11 @@ public class OrdersRefundMsgServiceImpl extends ServiceImpl<OrdersRefundMsgDao, 
     }
 
     @Override
-    public void read(List<Long> ids) {
+    public void read(List<Long> ids, String remark) {
         UpdateWrapper<OrdersRefundMsg> updateWrapper = new UpdateWrapper();
-        updateWrapper.lambda().set(OrdersRefundMsg::getIfRead, true).in(OrdersRefundMsg::getId, ids);
+        updateWrapper.lambda().set(OrdersRefundMsg::getIfRead, true)
+                .set(OrdersRefundMsg::getRemark, remark)
+                .in(OrdersRefundMsg::getId, ids);
         update(updateWrapper);
     }
 }

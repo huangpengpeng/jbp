@@ -7,4 +7,6 @@ import com.jbp.common.request.PageParamRequest;
 
 public interface SelfScoreService extends IService<SelfScore> {
   PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest);
+
+
 }

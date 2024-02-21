@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductCommConfigService extends IService<ProductCommConfig> {
 
-    ProductCommConfig add(Integer type, String name, String desc);
+    ProductCommConfig add(Integer type, String name, Boolean ifWhole, String desc);
 
     ProductCommConfig getByType(Integer type);
 

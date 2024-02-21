@@ -8,6 +8,6 @@ import java.util.List;
 public interface OrdersRefundMsgService extends IService<OrdersRefundMsg> {
     OrdersRefundMsg create(String ordersSn, String refundSn, String context);
 
-    void read(List<Long> ids);
+    void read(List<Long> ids, String remark);
 
 }

@@ -42,6 +42,8 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
+import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 
 import com.jbp.service.service.agent.WalletService;
@@ -145,6 +147,8 @@ public class PayServiceImpl implements PayService {
     private WalletService walletService;
     @Autowired
     private LianLianPayService lianLianPayService;
+    @Autowired
+    private ProductCommChain productCommChain;
 
     /**
      * 获取支付配置
@@ -598,6 +602,12 @@ public class PayServiceImpl implements PayService {
             throw new CrmebException("订单不存在，orderNo: " + orderNo);
         }
         User user = userService.getById(platOrder.getUid());
+        // 1.处理订单佣金
+        LinkedList<CommCalculateResult> commList = new LinkedList<>();
+        productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+        // 2.增加业绩
+
+
         // 获取拆单后订单
         List<Order> orderList = orderService.getByPlatOrderNo(platOrder.getOrderNo());
         if (CollUtil.isEmpty(orderList)) {
@@ -1426,7 +1436,7 @@ public class PayServiceImpl implements PayService {
         Merchant merchant = merchantService.getByIdException(merchantOrder.getMerId());
         // 分账计算
         // 商户收入 = 订单应付 - 商户优惠 -平台手续费 - 佣金
-        BigDecimal orderPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice()).add(merchantOrder.getPlatCouponPrice()).subtract(merchantOrder.getPayPostage());
+        BigDecimal orderPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice()).add(merchantOrder.getPlatCouponPrice()).subtract(merchantOrder.getPayPostage()).subtract(merchantOrder.getWalletDeductionFee());
         // 平台手续费
         BigDecimal platFee = orderPrice.multiply(new BigDecimal(merchant.getHandlingFee())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_UP);
         // 商户收入金额

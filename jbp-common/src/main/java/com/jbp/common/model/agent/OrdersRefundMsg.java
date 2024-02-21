@@ -40,6 +40,10 @@ public class OrdersRefundMsg extends BaseModel {
     @TableField("context")
     private String context;
 
+    @ApiModelProperty("备注")
+    @TableField("remark")
+    private String remark;
+
     @ApiModelProperty("是否已读")
     @TableField("ifRead")
     private Boolean ifRead;
