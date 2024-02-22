@@ -31,7 +31,7 @@ public class WalletConfigEditRequest {
     @ApiModelProperty("可转账")
     private Boolean canTransfer;
     @ApiModelProperty("兑换目标积分 ")
-    private int changeType;
+    private Integer changeType;
     @ApiModelProperty("兑换比例 ")
     private BigDecimal changeScale;
 }

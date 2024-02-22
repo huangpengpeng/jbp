@@ -36,4 +36,7 @@ public class FundClearingController {
     public CommonResult<Object> statusList() {
         return CommonResult.success(FundClearing.Constants.values());
     }
+
+
+
 }

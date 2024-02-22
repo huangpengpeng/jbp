@@ -12,9 +12,14 @@ import java.math.BigDecimal;
  * 出款备注
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class FundClearingItem implements Serializable {
+
+    public FundClearingItem(String name, Integer walletType, BigDecimal amt) {
+        this.name = name;
+        this.walletType = walletType;
+        this.amt = amt;
+    }
 
     @ApiModelProperty("出款名称")
     private String name;

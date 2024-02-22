@@ -22,5 +22,13 @@ public interface RelationScoreService extends IService<RelationScore> {
     RelationScoreFlow orderSuccessReduce(Integer uid, Integer orderUid, BigDecimal score, int node,
                                          String ordersSn, Date payTime, Integer level, BigDecimal amt, BigDecimal ratio);
 
+    void operateIncreaseUsable(Integer uid, int score, int node, String ordersSn, Date payTime, String remark);
+
+
+
+    void operateReduceUsable(Integer uid, BigDecimal score, int node, String ordersSn,
+                         Date payTime, String remark, Boolean ifUpdateUsed);
+
+
 
 }

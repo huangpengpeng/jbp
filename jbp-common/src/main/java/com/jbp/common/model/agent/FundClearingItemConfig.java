@@ -40,8 +40,4 @@ public class FundClearingItemConfig extends BaseModel {
     @ApiModelProperty("钱包类型")
     private Integer walletType;
 
-    @ApiModelProperty(value = "钱包类型名称")
-    @TableField(exist = false)
-    private String walletTypeName;
-
 }

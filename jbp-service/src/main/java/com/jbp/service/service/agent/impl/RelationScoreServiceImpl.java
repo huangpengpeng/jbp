@@ -14,11 +14,13 @@ import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.dao.agent.RelationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;
 import com.jbp.service.service.agent.RelationScoreService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,5 +100,45 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 "对碰", "减少", ordersSn, payTime, null, "", level, amt, ratio);
         relationScoreFlowService.save(flow);
         return flow;
+    }
+
+    @Override
+    public void operateIncreaseUsable(Integer uid, int score, int node, String ordersSn, Date payTime, String remark) {
+        int backNode = node == 0 ? 1 : 0;
+        final RelationScore backRelationScore = getByUser(uid, backNode);
+        if (backRelationScore != null && ArithmeticUtils.gt(backRelationScore.getUsableScore(), BigDecimal.ZERO)) {
+            throw new CrmebException("反方向存在可用积分不允许新增");
+        }
+
+        RelationScore relationScore = getByUser(uid, node);
+        if (relationScore == null) {
+            relationScore = new RelationScore(uid, node);
+            save(relationScore);
+        }
+        // 更新可用
+        relationScore.setUsableScore(relationScore.getUsableScore().add(BigDecimal.valueOf(score)));
+        updateById(relationScore);
+        // 增加明细
+        RelationScoreFlow flow = new RelationScoreFlow(uid, null, BigDecimal.valueOf(score), node,
+                "调分", "增加", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+        relationScoreFlowService.save(flow);
+    }
+
+    @Override
+    public void operateReduceUsable(Integer uid,  BigDecimal score, int node, String ordersSn, Date payTime, String remark, Boolean ifUpdateUsed) {
+        RelationScore relationScore = getByUser(uid, node);
+        if (relationScore == null || ArithmeticUtils.less(relationScore.getUsableScore(), score)) {
+            throw new CrmebException("积分不足");
+        }
+        // 更新可用
+        relationScore.setUsableScore(relationScore.getUsableScore().subtract(score));
+        if(BooleanUtils.isTrue(ifUpdateUsed)){
+            relationScore.setUsedScore(relationScore.getUsedScore().add(score));
+        }
+        updateById(relationScore);
+        // 增加明细
+        RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
+                BooleanUtils.isTrue(ifUpdateUsed) ? "调分" : "调分2", "减少", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+        relationScoreFlowService.save(flow);
     }
 }
