@@ -6,6 +6,7 @@ import com.jbp.common.model.agent.FundClearingItemConfig;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.FundClearingItemConfigPageRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
@@ -41,8 +42,8 @@ public class FundClearingItemConfigController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:page')")
     @GetMapping("/page/{commName}")
     @ApiOperation("佣金发放配置列表")
-    public CommonResult<CommonPage<FundClearingItemConfig>> getList(@PathVariable("commName") String commName, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(fundClearingItemConfigService.pageList(commName, pageParamRequest)));
+    public CommonResult<CommonPage<FundClearingItemConfig>> getList(FundClearingItemConfigPageRequest request, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(fundClearingItemConfigService.pageList(request.getCommName(), pageParamRequest)));
     }
 
     @ApiOperation("发放类型")
