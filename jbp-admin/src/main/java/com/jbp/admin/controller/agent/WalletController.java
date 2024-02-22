@@ -55,7 +55,6 @@ public class WalletController {
         User user = userService.getByAccount(request.getAccount());
         walletService.increase(user.getId(), request.getType(), request.getAmt(), WalletFlow.OperateEnum.调账.name(),
                 request.getExternalNo(), request.getPostscript());
-        // todo 操作记录
         return CommonResult.success();
     }
 
@@ -67,7 +66,6 @@ public class WalletController {
         User user = userService.getByAccount(request.getAccount());
         walletService.reduce(user.getId(), request.getType(), request.getAmt(), WalletFlow.OperateEnum.调账.name(),
                 request.getExternalNo(), request.getPostscript());
-        // todo 操作记录
         return CommonResult.success();
     }
 
@@ -82,7 +80,6 @@ public class WalletController {
         }
         walletService.transferToPlatform(user.getId(), request.getType(), request.getAmt(),
                 WalletFlow.OperateEnum.调账.name(), request.getExternalNo(), request.getPostscript());
-        // todo 操作记录
         return CommonResult.success();
     }
 

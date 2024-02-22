@@ -1,6 +1,5 @@
 package com.jbp.common.request.agent;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,4 +20,5 @@ public class UserInvitationRequest {
 
     @ApiModelProperty("转挂上级账号")
     private String mAccount;
+
 }

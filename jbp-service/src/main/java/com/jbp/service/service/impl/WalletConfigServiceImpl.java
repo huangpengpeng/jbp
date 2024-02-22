@@ -79,6 +79,7 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         walletConfig.setCanPay(canPay);
         walletConfig.setCanDeduction(canDeduction);
         walletConfig.setCanWithdraw(canWithdraw);
+        walletConfig.setCanTransfer(canTransfer);
         walletConfig.setRecharge(recharge);
         walletConfig.setChangeType(changeType);
         walletConfig.setChangeScale(changeScale);

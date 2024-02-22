@@ -93,9 +93,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
             if (!userInvitationService.hasChild(pId, operateId)) {
                 throw new RuntimeException("接受人不是当前操作用户的下级, 接受人:" + pId + "操作人:" + operateId);
             }
-        }
-        if (!userInvitationService.hasChild(uId, operateId)) {
-            throw new RuntimeException("被安置人不是当前操作用户的下级, 被安置人:" + uId + "操作人:" + operateId);
+            if (!userInvitationService.hasChild(uId, operateId)) {
+                throw new RuntimeException("被安置人不是当前操作用户的下级, 被安置人:" + uId + "操作人:" + operateId);
+            }
         }
     }
 
