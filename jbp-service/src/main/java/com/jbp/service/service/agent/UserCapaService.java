@@ -23,4 +23,6 @@ public interface UserCapaService extends IService<UserCapa> {
     List<UserCapa> getUpperList(Integer uid, List<Long> capaIds, Integer num);
 
     PageInfo<UserCapa> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest);
+
+    void riseCapa(Integer uid);
 }

@@ -14,11 +14,17 @@ import java.util.List;
 
 public interface FundClearingService extends IService<FundClearing> {
 
+    PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status, PageParamRequest pageParamRequest);
+
     FundClearing create(Integer uid, String externalNo, String commName, BigDecimal commAmt,
                      List<FundClearingItem> items, List<FundClearingProduct> productList,
                      String description, String remark);
 
     List<FundClearing> getByUser(Integer uid, String commName, List<String> statusList);
 
-     PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status, PageParamRequest pageParamRequest);
+    /**
+     * 更新为待审核
+     */
+    void updateWaitAudit(String externalNo, String remark);
+
 }

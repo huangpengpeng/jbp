@@ -51,7 +51,7 @@ public class UserCapaXsController {
         if (ObjectUtil.isNull(user)) {
             return CommonResult.failed("账户信息错误");
         }
-        userCapaXsService.saveOrUpdateCapa(user.getId(), request.getCapaId(), request.getRemark(), request.getDescription());
+        userCapaXsService.saveOrUpdateCapa(user.getId(), request.getCapaId(), request.getIfFake(), request.getRemark(), request.getDescription());
         return CommonResult.success();
     }
 

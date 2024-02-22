@@ -30,6 +30,7 @@ import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.FundClearingService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     private AsyncService asyncService;
     @Autowired
     private CrmebConfig crmebConfig;
+    @Autowired
+    private FundClearingService fundClearingService;
 
 
     /**
@@ -746,7 +749,12 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         nodeKeyList.add(SysConfigConstants.CONFIG_KEY_STORE_INTEGRAL_FREEZE_NODE);
         MyRecord nodeRecord = systemConfigService.getValuesByKeyList(nodeKeyList);
 
+        // 平台单号
+        String platOrderNo = order.getPlatOrderNo();
         Boolean execute = transactionTemplate.execute(e -> {
+            // 佣金发放待审核
+            fundClearingService.updateWaitAudit(platOrderNo, "订单收货");
+            fundClearingService.updateWaitAudit(orderNo, "订单收货");
             String merchantShareNode = nodeRecord.getStr(SysConfigConstants.MERCHANT_SHARE_NODE);
             if (StrUtil.isNotBlank(merchantShareNode) && "pay".equals(merchantShareNode)) {
                 String merchantShareNodeFreezeDayStr = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME);

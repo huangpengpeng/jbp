@@ -3,6 +3,7 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -89,4 +90,17 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         return list(queryWrapper);
     }
 
+    @Override
+    public void updateWaitAudit(String externalNo, String remark) {
+        QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(FundClearing::getExternalNo, externalNo)
+                .eq(FundClearing::getStatus, FundClearing.Constants.已创建.toString());
+        List<FundClearing> list = list(queryWrapper);
+        for (FundClearing fundClearing : list) {
+            fundClearing.setStatus(FundClearing.Constants.待审核.toString());
+            fundClearing.setRemark(remark);
+        }
+        updateBatchById(list);
+    }
 }

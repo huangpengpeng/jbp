@@ -9,27 +9,29 @@ import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.Capa;
-import com.jbp.common.model.agent.PlatformWallet;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaSnapshot;
+import com.jbp.common.model.agent.*;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.UserCapaDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -42,9 +44,9 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     @Resource
     private UserCapaSnapshotService snapshotService;
     @Resource
-    private TransactionTemplate transactionTemplate;
-    @Resource
     private UserService userService;
+    @Resource
+    private ConditionChain conditionChain;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -112,13 +114,57 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(capaId), UserCapa::getCapaId, capaId);
         Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapa> list = list(userCapaLambdaQueryWrapper);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
+        Map<Integer, User> userMap = userService.getUidMapList(list.stream().map(UserCapa::getUid).collect(Collectors.toList()));
+        Map<Long, Capa> capaMap = capaService.getCapaMap();
         list.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
-            Capa capa = capaService.getById(e.getCapaId());
+            e.setAccount(userMap.get(e.getUid()).getAccount());
+            Capa capa = capaMap.get(e.getCapaId());
             e.setCapaName(capa.getName());
             e.setCapaUrl(capa.getIconUrl());
         });
         return CommonPage.copyPageInfo(page, list);
+
+    }
+
+    @Override
+    public void riseCapa(Integer uid) {
+        UserCapa userCapa = getByUser(uid);// 用户等级
+        Map<Long, Capa> capaMap = capaService.getCapaMap();
+        Long capaId = userCapa == null ? capaService.getMinCapa().getId() : userCapa.getCapaId();
+        Long riseCapaId = null;
+        do {
+            // 检查当前等级满足
+            Capa capa = capaMap.get(capaId);
+            // 升级条件
+            List<RiseCondition> conditionList = capa.getConditionList();
+            Map<String, Boolean> map = Maps.newConcurrentMap();
+            for (RiseCondition riseCondition : conditionList) {
+                Boolean ok = conditionChain.isOk(uid, riseCondition);
+                map.put(riseCondition.getName(), ok);
+            }
+            // 是否满足升级条件
+            Boolean ifRise = capa.parser(map);
+            if (BooleanUtils.isNotTrue(ifRise)) {
+                break;
+            }
+            riseCapaId = capa.getId();
+            capaId = capa.getPCapaId();
+            if (capaId == null) {
+                break;
+            }
+        } while (true);
+
+        // 如果有满足的等级
+        if (riseCapaId == null) {
+            return;
+        }
+        // 升级
+        if (userCapa == null || riseCapaId.compareTo(userCapa.getCapaId()) > 0) {
+            saveOrUpdateCapa(uid, riseCapaId, "", "满足升级条件升级");
+        }
 
     }
 }

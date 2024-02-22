@@ -15,8 +15,9 @@ public class UserCapaXsAddRequest {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("等级ID")
-    @TableField("capa_id")
     private Long capaId;
+    @ApiModelProperty("虚拟等级")
+    private Boolean ifFake;
     @ApiModelProperty("备注")
     private String remark;
     @ApiModelProperty("系统描述")

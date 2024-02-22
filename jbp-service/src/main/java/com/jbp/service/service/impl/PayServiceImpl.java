@@ -49,10 +49,7 @@ import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 
-import com.jbp.service.service.agent.InvitationScoreService;
-import com.jbp.service.service.agent.OrdersFundSummaryService;
-import com.jbp.service.service.agent.SelfScoreService;
-import com.jbp.service.service.agent.WalletService;
+import com.jbp.service.service.agent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -161,6 +158,10 @@ public class PayServiceImpl implements PayService {
     private InvitationScoreService invitationScoreService;
     @Autowired
     private OrdersFundSummaryService ordersFundSummaryService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
 
     /**
      * 获取支付配置
@@ -713,7 +714,9 @@ public class PayServiceImpl implements PayService {
             // 4.资金概况
             ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
                     platOrder.getPayPrice().subtract(platOrder.getPayPostage()), finalScore);
-
+            // 5.个人升级
+            userCapaService.riseCapa(platOrder.getUid());
+            userCapaXsService.riseCapaXs(platOrder.getUid());
             // 订单、佣金
             if (CollUtil.isNotEmpty(brokerageRecordList)) {
                 merchantOrderService.updateBatchById(merchantOrderList);

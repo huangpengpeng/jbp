@@ -1088,13 +1088,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         });
         if (!execute) throw new CrmebException("快递拆单发货失败！");
         List<OrderDetail> detailList = orderDetailService.getByOrderNo(order.getOrderNo());
-//        long count = detailList.stream().filter(e -> e.getPayNum() - e.getDeliveryNum() > 0).count();
         long count = detailList.stream().filter(e -> e.getPayNum() > (e.getDeliveryNum() + e.getRefundNum())).count();
         if (count <= 0) {
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_RECEIPT);
             updateById(order);
         }
-
 
         SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.DELIVER_GOODS_MARK);
         // 发送消息通知

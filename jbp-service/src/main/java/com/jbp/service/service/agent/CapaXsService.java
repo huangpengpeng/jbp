@@ -6,6 +6,8 @@ import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.RiseConditionRequest;
 
+import java.util.Map;
+
 public interface CapaXsService extends IService<CapaXs> {
 
     PageInfo<CapaXs> page(PageParamRequest pageParamRequest);
@@ -21,4 +23,6 @@ public interface CapaXsService extends IService<CapaXs> {
     CapaXs getByName(String name);
 
     CapaXs getByRankNum(Integer rankNum);
+
+    Map<Long, CapaXs> getCapaXsMap();
 }

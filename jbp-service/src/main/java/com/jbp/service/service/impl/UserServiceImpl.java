@@ -1428,6 +1428,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     }
 
+    @Override
+    public List<User> getNoChild() {
+        return dao.getNoChild();
+    }
+
     /**
      * 批量清除用户推广人
      * @param spreadUid 推广人id

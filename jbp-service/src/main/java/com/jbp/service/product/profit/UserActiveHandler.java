@@ -79,24 +79,34 @@ public class UserActiveHandler implements ProductProfitHandler {
             return;
         }
         User user = userService.getById(order.getUid());
-        Date newActiveTime = DateTimeUtils.getFinallyDate(DateTimeUtils.getNow());
+        Date now = DateTimeUtils.getNow();
+        Date newActiveTime = DateTimeUtils.getNow();
         ProductProfit exceProductProfit = null;
         for (ProductProfit productProfit : productProfitList) {
             Rule rule = getRule(productProfit.getRule());
-            Date activeTime = DateTimeUtils.getFinallyDate(DateTimeUtils.getNow());
-            int value = rule.getValue() - 1;
-            if (value > 0) {
-                activeTime = "月".equals(rule.getUnit()) ? DateTimeUtils.addMonths(activeTime, value) : DateTimeUtils.addDays(activeTime, value);
-                activeTime = DateTimeUtils.getFinallyDate(activeTime);
-            }
+            int value = rule.getValue();
+            Date activeTime = "月".equals(rule.getUnit()) ? DateTimeUtils.getMonthEnd(DateTimeUtils.addMonths(now, value)) : DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(now, value));
             if (activeTime.after(newActiveTime)) {
                 newActiveTime = activeTime;
                 exceProductProfit = productProfit;
             }
         }
+        // 活跃规则
+        Rule rule = getRule(exceProductProfit.getRule());
+        // 不活跃 当前月份活跃
         Date activeTime = user.getActiveTime();
-        if (user.getActiveTime() != null && user.getActiveTime().after(newActiveTime)) {
-            return;
+        if (user.getActiveTime() == null || user.getActiveTime().before(DateTimeUtils.getNow())) {
+            if ("月".equals(rule.getUnit())) {
+                newActiveTime = DateTimeUtils.getMonthEnd(DateTimeUtils.addMonths(DateTimeUtils.getNow(), rule.getValue() - 1));
+            } else {
+                newActiveTime = DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(DateTimeUtils.getNow(), rule.getValue() - 1));
+            }
+        } else {
+            if ("月".equals(rule.getUnit())) {
+                newActiveTime = DateTimeUtils.getMonthEnd(DateTimeUtils.addMonths(user.getActiveTime(), rule.getValue() - 1));
+            } else {
+                newActiveTime = DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(user.getActiveTime(), rule.getValue() - 1));
+            }
         }
         user.setActiveTime(newActiveTime);
         userService.updateById(user);

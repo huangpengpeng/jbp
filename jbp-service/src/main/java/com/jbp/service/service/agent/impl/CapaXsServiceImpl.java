@@ -6,6 +6,7 @@ import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.mybatis.RiseConditionListHandler;
 import com.jbp.common.request.agent.RiseConditionRequest;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,6 +26,7 @@ import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaXsService;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -99,5 +101,11 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
     @Override
     public CapaXs getByRankNum(Integer rankNum) {
         return getOne(new QueryWrapper<CapaXs>().lambda().eq(CapaXs::getRankNum, rankNum));
+    }
+
+    @Override
+    public Map<Long, CapaXs> getCapaXsMap() {
+        List<CapaXs> capaXsList = list();
+        return FunctionUtil.keyValueMap(capaXsList, CapaXs::getId);
     }
 }

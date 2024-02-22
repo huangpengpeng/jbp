@@ -13,6 +13,7 @@ import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.RiseConditionRequest;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.SystemAttachmentService;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -97,4 +99,9 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         return getOne(new QueryWrapper<Capa>().lambda().eq(Capa::getRankNum, rankNum));
     }
 
+    @Override
+    public Map<Long, Capa> getCapaMap() {
+        List<Capa> list = list();
+        return FunctionUtil.keyValueMap(list, Capa::getId);
+    }
 }
