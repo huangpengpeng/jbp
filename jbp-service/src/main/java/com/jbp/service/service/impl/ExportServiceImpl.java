@@ -2,23 +2,28 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.product.ProductAttrValue;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.*;
-
+import com.jbp.service.service.agent.ProductMaterialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +54,14 @@ public class ExportServiceImpl implements ExportService {
     private OrderDetailService orderDetailService;
     @Autowired
     private CrmebConfig crmebConfig;
+    @Resource
+    private ProductService productService;
+    @Resource
+    private ProductAttrValueService productAttrValueService;
+    @Resource
+    private ProductMaterialsService productMaterialsService;
+    @Resource
+    private MerchantOrderService merchantOrderService;
 
     /**
      * 订单导出
@@ -75,20 +88,46 @@ public class ExportServiceImpl implements ExportService {
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
         List<OrderExcelVo> voList = CollUtil.newArrayList();
         for (Order order : orderList) {
-            OrderExcelVo vo = new OrderExcelVo();
-            vo.setType(getOrderType(order.getType()));
-            vo.setOrderNo(order.getOrderNo());
-            vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
-            vo.setUserNickname(userMap.get(order.getUid()).getNickname() + "|" + order.getUid());
-            vo.setPayPrice(order.getPayPrice().toString());
-            vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
-            vo.setPayType(getOrderPayType(order.getPayType()));
-            vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
-            vo.setStatus(getOrderStatus(order.getStatus()));
-            vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
-            vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-            vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
-            voList.add(vo);
+            //
+            List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+            for (int i = 0; i < orderDetails.size(); i++) {
+//                订单详情表
+                OrderDetail orderDetail = orderDetails.get(i);
+                BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
+                ProductAttrValue productAttrValue = productAttrValueService.getById(orderDetail.getAttrValueId());
+//                产品物料对应仓库的编码
+                List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(productAttrValue.getBarCode());
+                BigDecimal totalPrice = BigDecimal.ZERO;
+                for (ProductMaterials productMaterials : productMaterialsList) {
+                    totalPrice =  totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
+                }
+                for (ProductMaterials productMaterials : productMaterialsList) {
+                    BigDecimal price = productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity()));
+                    BigDecimal realPrice = payPrice.multiply(price.divide(totalPrice, 10, BigDecimal.ROUND_DOWN));
+                    OrderExcelVo vo = new OrderExcelVo();
+                    vo.setType(getOrderType(order.getType()));
+                    vo.setOrderNo(order.getOrderNo());
+                    vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
+                    vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                    vo.setUid(order.getUid());
+                    vo.setPayPrice(order.getPayPrice().toString());
+                    vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
+                    vo.setPayType(getOrderPayType(order.getPayType()));
+                    vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
+                    vo.setStatus(getOrderStatus(order.getStatus()));
+                    vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
+                    vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+                    vo.setProductName(productMaterials.getMaterialsName());
+                    vo.setWarehouseCoding(productMaterials.getMaterialsCode());
+                    vo.setProductPrice(realPrice);
+                    vo.setRealName(merchantOrder.getRealName());
+                    vo.setMaterialsQuantity(productMaterialsList.size()*productMaterials.getMaterialsQuantity());
+                    vo.setUserAddress(merchantOrder.getUserAddress());
+                    voList.add(vo);
+                }
+            }
+
         }
 
         /*
@@ -107,7 +146,8 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("type", "订单类型");
         aliasMap.put("orderNo", "订单号");
         aliasMap.put("merName", "商户名称");
-        aliasMap.put("userNickname", "用户昵称");
+        aliasMap.put("uid","用户id");
+        aliasMap.put("userAccount", "用户账号");
         aliasMap.put("payPrice", "实际支付金额");
         aliasMap.put("paidStr", "支付状态");
         aliasMap.put("payType", "支付方式");
@@ -115,7 +155,13 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("status", "订单状态");
         aliasMap.put("refundStatus", "退款状态");
         aliasMap.put("createTime", "创建时间");
-        aliasMap.put("productInfo", "商品信息");
+        aliasMap.put("productName", "商品名称");
+        aliasMap.put("warehouseCoding", "仓库编码");
+        aliasMap.put("materialsQuantity","数量");
+        aliasMap.put("productPrice","商品单价");
+        aliasMap.put("realName","收货人");
+        aliasMap.put("userAddress","收货详情地址");
+
 
         return ExportUtil.exportExcel(fileName, "订单导出", voList, aliasMap);
     }

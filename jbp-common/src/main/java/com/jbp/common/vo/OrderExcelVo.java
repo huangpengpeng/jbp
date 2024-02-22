@@ -34,8 +34,11 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
-    @ApiModelProperty(value = "用户昵称")
-    private String userNickname;
+    @ApiModelProperty(value = "用户id")
+    private Integer uid;
+
+    @ApiModelProperty(value = "用户账号")
+    private String userAccount;
 
     @ApiModelProperty(value = "实际支付金额")
     private String payPrice;
@@ -58,6 +61,23 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "创建时间")
     private String createTime;
 
-    @ApiModelProperty(value = "商品信息")
-    private String productInfo;
+    @ApiModelProperty(value = "商品名称")
+    private String productName;
+
+    @ApiModelProperty(value = "仓库编码")
+    private String warehouseCoding;
+
+    @ApiModelProperty(value = "数量")
+    private Integer materialsQuantity;;
+
+    @ApiModelProperty(value = "商品单价")
+    private BigDecimal productPrice;
+
+    @ApiModelProperty(value = "收货人")
+    private String realName;
+
+    @ApiModelProperty(value = "收货详情地址")
+    private String userAddress;
+
+
 }

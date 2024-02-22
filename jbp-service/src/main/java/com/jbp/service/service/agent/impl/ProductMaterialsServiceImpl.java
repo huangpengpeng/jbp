@@ -48,6 +48,13 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
         return true;
     }
 
+    @Override
+    public List<ProductMaterials> getByBarCode(String barCode) {
+        LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>()
+                .eq(!ObjectUtil.isNull(barCode), ProductMaterials::getBarCode, barCode);
+        return list(lqw);
+    }
+
     public Boolean addrule(Integer merId, String barCode, String materialsCode) {
         LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>();
         lqw.eq(ProductMaterials::getMerId, merId);
