@@ -14,4 +14,6 @@ public interface ProductMaterialsService extends IService<ProductMaterials> {
     PageInfo<ProductMaterials> pageList(Integer merId, String materialsName, PageParamRequest pageParamRequest);
 
     Boolean add(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode);
+
+    List<ProductMaterials> getByBarCode(String barCode);
 }

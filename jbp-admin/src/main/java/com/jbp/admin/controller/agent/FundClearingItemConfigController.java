@@ -40,7 +40,7 @@ public class FundClearingItemConfigController {
     private FundClearingItemConfigService fundClearingItemConfigService;
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:page')")
-    @GetMapping("/page/{commName}")
+    @GetMapping("/page")
     @ApiOperation("佣金发放配置列表")
     public CommonResult<CommonPage<FundClearingItemConfig>> getList(FundClearingItemConfigPageRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(fundClearingItemConfigService.pageList(request.getCommName(), pageParamRequest)));
