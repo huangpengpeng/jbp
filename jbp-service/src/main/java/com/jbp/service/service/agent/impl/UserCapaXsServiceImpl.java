@@ -97,7 +97,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         LambdaQueryWrapper<UserCapaXs> userCapaXsLambdaQueryWrapper = new LambdaQueryWrapper<UserCapaXs>();
         userCapaXsLambdaQueryWrapper.eq(!ObjectUtil.isNull(uid), UserCapaXs::getUid, uid);
         userCapaXsLambdaQueryWrapper.eq(!ObjectUtil.isNull(capaId), UserCapaXs::getCapaId, capaId);
-        Page<WalletConfig> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        Page<UserCapaXs> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapaXs> list = list(userCapaXsLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);

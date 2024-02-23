@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.OrdersFundSummaryDao;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +49,10 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
         OrdersFundSummary summary = getByOrdersSn(ordersSn);
         if (summary != null) {
             summary.setCommAmt(summary.getCommAmt().add(commAmt));
-            updateById(summary);
+            Boolean ifSuccess = updateById(summary);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
         }
         return summary;
     }
@@ -57,7 +62,10 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
         OrdersFundSummary summary = getByOrdersSn(ordersSn);
         if (summary != null) {
             summary.setCommAmt(summary.getCommAmt().subtract(commAmt));
-            updateById(summary);
+            Boolean ifSuccess = updateById(summary);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
         }
         return summary;
     }

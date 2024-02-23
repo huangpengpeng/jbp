@@ -7,11 +7,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "SelfScoreGroupRequest对象", description = "个人业绩分组请求对象")
-public class SelfScoreGroupRequest {
+public class SelfScoreGroupRequest implements Serializable {
     @ApiModelProperty("账户")
     private String account;
 

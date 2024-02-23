@@ -21,7 +21,9 @@ import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,9 +56,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<FundClearing>()
-                .like(!ObjectUtil.isNull(uniqueNo) && !uniqueNo.equals(""), FundClearing::getUniqueNo, uniqueNo)
-                .like(!ObjectUtil.isNull(externalNo) && !externalNo.equals(""), FundClearing::getExternalNo, externalNo)
-                .eq(!ObjectUtil.isNull(status) && !status.equals(""), FundClearing::getStatus, status)
+                .like(StringUtils.isNotEmpty(uniqueNo), FundClearing::getUniqueNo, uniqueNo)
+                .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
+                .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
                 .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
                 .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -113,7 +115,11 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         BigDecimal orgSendAmt = fundClearing.getSendAmt();
         fundClearing.setSendAmt(sendAmt);
         fundClearing.setRemark(remark);
-        updateById(fundClearing);
+        Boolean ifSuccess = updateById(fundClearing);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
+
         if (ArithmeticUtils.gt(sendAmt, orgSendAmt)) {
             ordersFundSummaryService.increaseCommAmt(fundClearing.getExternalNo(), sendAmt.subtract(orgSendAmt));
         }
@@ -133,7 +139,10 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             fundClearing.setStatus(FundClearing.Constants.待审核.toString());
             fundClearing.setRemark(remark);
         }
-        updateBatchById(list);
+        Boolean ifSuccess = updateBatchById(list);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
     }
 
     @Override
@@ -151,7 +160,10 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 fundClearing.setStatus(FundClearing.Constants.待审核.toString());
                 fundClearing.setRemark(remark);
             }
-            updateBatchById(fundClearingList);
+            Boolean ifSuccess = updateBatchById(fundClearingList);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
         }
     }
 

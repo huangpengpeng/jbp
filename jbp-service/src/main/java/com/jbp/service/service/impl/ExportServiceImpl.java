@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,10 +96,10 @@ public class ExportServiceImpl implements ExportService {
                 BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
                 ProductAttrValue productAttrValue = productAttrValueService.getById(orderDetail.getAttrValueId());
 //                产品物料对应仓库的编码
-                List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(productAttrValue.getBarCode());
+                List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(productAttrValue != null ? productAttrValue.getBarCode() : null);
                 BigDecimal totalPrice = BigDecimal.ZERO;
                 for (ProductMaterials productMaterials : productMaterialsList) {
-                    totalPrice =  totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
+                    totalPrice = totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
                 }
                 for (ProductMaterials productMaterials : productMaterialsList) {
                     BigDecimal price = productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity()));
@@ -122,7 +121,7 @@ public class ExportServiceImpl implements ExportService {
                     vo.setWarehouseCoding(productMaterials.getMaterialsCode());
                     vo.setProductPrice(realPrice);
                     vo.setRealName(merchantOrder.getRealName());
-                    vo.setMaterialsQuantity(productMaterialsList.size()*productMaterials.getMaterialsQuantity());
+                    vo.setMaterialsQuantity(productMaterialsList.size() * productMaterials.getMaterialsQuantity());
                     vo.setUserAddress(merchantOrder.getUserAddress());
                     voList.add(vo);
                 }
@@ -146,7 +145,7 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("type", "订单类型");
         aliasMap.put("orderNo", "订单号");
         aliasMap.put("merName", "商户名称");
-        aliasMap.put("uid","用户id");
+        aliasMap.put("uid", "用户id");
         aliasMap.put("userAccount", "用户账号");
         aliasMap.put("payPrice", "实际支付金额");
         aliasMap.put("paidStr", "支付状态");
@@ -157,10 +156,10 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("createTime", "创建时间");
         aliasMap.put("productName", "商品名称");
         aliasMap.put("warehouseCoding", "仓库编码");
-        aliasMap.put("materialsQuantity","数量");
-        aliasMap.put("productPrice","商品单价");
-        aliasMap.put("realName","收货人");
-        aliasMap.put("userAddress","收货详情地址");
+        aliasMap.put("materialsQuantity", "数量");
+        aliasMap.put("productPrice", "商品单价");
+        aliasMap.put("realName", "收货人");
+        aliasMap.put("userAddress", "收货详情地址");
 
 
         return ExportUtil.exportExcel(fileName, "订单导出", voList, aliasMap);

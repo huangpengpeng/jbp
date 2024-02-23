@@ -9,13 +9,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "FundClearingRequest对象", description = "佣金发放记录请求对象")
-public class FundClearingRequest {
+public class FundClearingRequest implements Serializable {
     @ApiModelProperty("流水单号")
     private String uniqueNo;
 

@@ -16,6 +16,7 @@ import com.jbp.service.dao.agent.WalletWithdrawDao;
 import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,9 +80,9 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         }
         List<List<WalletWithdraw>> partition = com.google.common.collect.Lists.partition(list, 100);
         for (List<WalletWithdraw> walletWithdraws : partition) {
-            final boolean b = updateBatchById(walletWithdraws);
-            if(!b){
-               throw  new CrmebUpdateException();
+            boolean ifSuccess = updateBatchById(walletWithdraws);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
             }
         }
     }
@@ -117,7 +118,10 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
                 walletService.increase(walletWithdraw.getUid(), walletWithdraw.getWalletType(),
                         walletWithdraw.getAmt(), WalletFlow.OperateEnum.提现取消.toString(), walletWithdraw.getUniqueNo(), walletWithdraw.getPostscript());
             }
-            updateBatchById(walletWithdraws);
+            Boolean ifSuccess = updateBatchById(walletWithdraws);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
         }
     }
 }

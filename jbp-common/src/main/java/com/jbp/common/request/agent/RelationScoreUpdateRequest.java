@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -17,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "RelationScoreUpdateRequest对象", description = "服务业绩汇总更新对象")
-public class RelationScoreUpdateRequest {
+public class RelationScoreUpdateRequest implements Serializable {
 
     @NotBlank(message = "账户不能为空")
     @ApiModelProperty("用户账号")

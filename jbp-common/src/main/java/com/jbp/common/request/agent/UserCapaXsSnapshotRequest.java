@@ -7,11 +7,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "UserCapaXsSnapshotRequest对象", description = "用户星级快照请求对象")
-public class UserCapaXsSnapshotRequest {
+public class UserCapaXsSnapshotRequest implements Serializable {
     @ApiModelProperty("类型")
     private String type;
 

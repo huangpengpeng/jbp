@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.UserCapaXsSnapshot;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserCapaXsSnapshotDao;
@@ -18,9 +19,12 @@ import com.jbp.service.service.agent.UserCapaXsSnapshotService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -44,9 +48,16 @@ public class UserCapaXsSnapshotServiceImpl extends ServiceImpl<UserCapaXsSnapsho
                 .eq(!ObjectUtil.isNull(type) && !type.equals(""), UserCapaXsSnapshot::getType, type);
         Page<UserCapaXsSnapshot> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapaXsSnapshot> list = list(userCapaXsSnapshotLambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(UserCapaXsSnapshot::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        Map<Long, CapaXs> capaXsMap = capaXsService.getCapaXsMap();
         list.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
-            CapaXs capaXs = capaXsService.getById(e.getCapaId());
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user!=null?user.getAccount():"");
+            CapaXs capaXs = capaXsMap.get(e.getCapaId());
             e.setCapaName(capaXs.getName());
             e.setCapaUrl(capaXs.getIconUrl());
         });

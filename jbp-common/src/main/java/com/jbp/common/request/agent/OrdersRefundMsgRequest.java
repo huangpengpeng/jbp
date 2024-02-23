@@ -7,11 +7,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "OrdersRefundMsgRequest对象", description = "订单退款消息请求对象")
-public class OrdersRefundMsgRequest {
+public class OrdersRefundMsgRequest implements Serializable {
 
     @ApiModelProperty("订单编号")
     private String ordersSn;

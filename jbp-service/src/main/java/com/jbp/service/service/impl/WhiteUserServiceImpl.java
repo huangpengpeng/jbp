@@ -47,21 +47,28 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
                 .eq(!Objects.isNull(whiteId), WhiteUser::getWhiteId, whiteId);
         Page<WhiteUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WhiteUser> whites = whiteUserDao.selectList(lambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list())) {
+            return CommonPage.copyPageInfo(page, whites);
+        }
+        List<Integer> uIdList = list().stream().map(WhiteUser::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         whites.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
-            e.setWhiteName(whiteService.getById(e.getWhiteId()).getName());
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user != null ? user.getAccount() : "");
+            White white = whiteService.getById(e.getWhiteId());
+            e.setWhiteName(white != null ? white.getName() : "");
         });
         return CommonPage.copyPageInfo(page, whites);
     }
 
     @Override
-    public void add(Integer uid, Long whiteId,String ordersSn) {
-        LambdaQueryWrapper<WhiteUser> lqw=new LambdaQueryWrapper<WhiteUser>()
-                .eq(WhiteUser::getOrdersSn,ordersSn);
+    public void add(Integer uid, Long whiteId, String ordersSn) {
+        LambdaQueryWrapper<WhiteUser> lqw = new LambdaQueryWrapper<WhiteUser>()
+                .eq(WhiteUser::getOrdersSn, ordersSn);
         if (list(lqw).size() > 0) {
             throw new RuntimeException(String.format("单号已存在"));
         }
-        if (getByUser(uid,whiteId) != null) {
+        if (getByUser(uid, whiteId) != null) {
             throw new RuntimeException(String.format("用户白名单已存在"));
         }
         WhiteUser userWhite = new WhiteUser();
@@ -100,10 +107,10 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
                 }
                 whiteMap.put(whiteName, white);
             }
-            String ordersSn=userWhiteExpress.getOrdersSn();
+            String ordersSn = userWhiteExpress.getOrdersSn();
             if (whiteMap.get(ordersSn) == null) {
-                LambdaQueryWrapper<WhiteUser> lqw=new LambdaQueryWrapper<WhiteUser>()
-                        .eq(WhiteUser::getOrdersSn,ordersSn);
+                LambdaQueryWrapper<WhiteUser> lqw = new LambdaQueryWrapper<WhiteUser>()
+                        .eq(WhiteUser::getOrdersSn, ordersSn);
                 if (list(lqw).size() > 0) {
                     throw new RuntimeException(String.format("第: %s, 单号已存在", i + 1));
                 }

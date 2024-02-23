@@ -14,6 +14,7 @@ import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -39,7 +40,7 @@ public class TeamController {
     @PreAuthorize("hasAuthority('agent:team:add')")
     @PostMapping("/add")
     @ApiOperation("新增")
-    public CommonResult add(@RequestBody TeamRequest request) {
+    public CommonResult add(@RequestBody @Validated TeamRequest request) {
         User user = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNull(user)) {
             return CommonResult.failed("账户信息错误");
@@ -51,7 +52,7 @@ public class TeamController {
     @PreAuthorize("hasAuthority('agent:team:update')")
     @PostMapping("/update")
     @ApiOperation("修改")
-    public CommonResult update(@RequestBody TeamEditRequest request) {
+    public CommonResult update(@RequestBody @Validated TeamEditRequest request) {
         teamService.editName(request.getId(), request.getName());
         return CommonResult.success();
     }

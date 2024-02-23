@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -39,7 +40,7 @@ public class LimitTempController {
     @PreAuthorize("hasAuthority('agent:limit:temp:add')")
     @ApiOperation("添加")
     @PostMapping("/add")
-    public CommonResult add(@RequestBody LimitTempAddRequest request) {
+    public CommonResult add(@RequestBody @Validated LimitTempAddRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
@@ -51,7 +52,7 @@ public class LimitTempController {
     @PreAuthorize("hasAuthority('agent:limit:temp:update')")
     @ApiOperation("修改")
     @PostMapping("/update")
-    public CommonResult update(@RequestBody LimitTempEditRequest request) {
+    public CommonResult update(@RequestBody @Validated LimitTempEditRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
         if (!request.getId().equals(limitTemp.getId())){
         if (!ObjectUtil.isNull(limitTemp)) {

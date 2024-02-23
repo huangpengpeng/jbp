@@ -15,6 +15,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.InvitationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -38,7 +39,7 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
         LambdaQueryWrapper<InvitationScoreFlow> lqw = new LambdaQueryWrapper<InvitationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), InvitationScoreFlow::getOrderUid, orderuid)
-                .eq(!ObjectUtil.isNull(action) && !action.equals(""), InvitationScoreFlow::getAction, action);
+                .eq(StringUtils.isNotEmpty(action), InvitationScoreFlow::getAction, action);
         Page<InvitationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreFlow> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

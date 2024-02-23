@@ -6,16 +6,19 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "LimitTempEditRequest对象", description = "限制模版编辑对象")
-public class LimitTempEditRequest {
+public class LimitTempEditRequest implements Serializable {
     @ApiModelProperty(value = "编号")
     private Long id;
 
+    @NotBlank(message = "模版名称不能为空")
     @ApiModelProperty(value = "模版名称")
     private String name;
 

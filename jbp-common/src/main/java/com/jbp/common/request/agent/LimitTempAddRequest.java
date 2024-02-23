@@ -1,21 +1,22 @@
 package com.jbp.common.request.agent;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.jbp.common.mybatis.LongListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "LimitTempRequest对象", description = "限制模版添加对象")
-public class LimitTempAddRequest {
+public class LimitTempAddRequest implements Serializable {
 
+    @NotBlank(message = "模版名称不能为空")
     @ApiModelProperty(value = "模版名称")
     private String name;
 
@@ -34,8 +35,9 @@ public class LimitTempAddRequest {
     @ApiModelProperty(value = "团队ID")
     private List<Long> teamIdList;
 
+    @NotBlank(message = "要求必须有上级")
     @ApiModelProperty(value = "要求必须有上级")
-    private Boolean  hasPartner;
+    private Boolean hasPartner;
 
     @ApiModelProperty(value = "上级等级")
     private List<Long> pCapaIdList;
@@ -44,7 +46,7 @@ public class LimitTempAddRequest {
     private List<Long> pCapaXsIdList;
 
     @ApiModelProperty(value = "要求必须有服务上级")
-    private Boolean  hasRelation;
+    private Boolean hasRelation;
 
     @ApiModelProperty(value = "服务上级等级")
     private List<Long> rCapaIdList;
@@ -53,5 +55,5 @@ public class LimitTempAddRequest {
     private List<Long> rCapaXsIdList;
 
     @ApiModelProperty(value = "说明")
-    private String  description;
+    private String description;
 }

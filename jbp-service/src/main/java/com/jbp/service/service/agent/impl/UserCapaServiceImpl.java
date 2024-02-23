@@ -11,7 +11,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -59,31 +62,31 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         return userCapa;
     }
 
-	@Override
-	public UserCapa saveOrUpdateCapa(Integer uid, Long capaId, String remark, String description) {
-		UserCapa userCapa = getByUser(uid);
-		// 等级相同无须处理
-		if (userCapa != null && NumberUtil.compare(capaId, userCapa.getCapaId()) == 0) {
-			return userCapa;
-		}
-		// 新增等级
-		String type = "";
-		if (userCapa == null) {
-			userCapa = UserCapa.builder().uid(uid).capaId(capaId).build();
-			type = UserCapaSnapshot.Constants.升级.toString();
-		} else {
-			type = NumberUtil.compare(userCapa.getCapaId(), capaId) > 0 ? UserCapaSnapshot.Constants.降级.toString()
-					: UserCapaSnapshot.Constants.升级.toString();
-			userCapa.setCapaId(capaId);
-		}
-		saveOrUpdate(userCapa);
-		// 记录快照
-		UserCapaSnapshot snapshot = UserCapaSnapshot.builder().uid(uid).capaId(capaId).type(type).remark(remark)
-				.description(description).build();
-		snapshotService.save(snapshot);
+    @Override
+    public UserCapa saveOrUpdateCapa(Integer uid, Long capaId, String remark, String description) {
+        UserCapa userCapa = getByUser(uid);
+        // 等级相同无须处理
+        if (userCapa != null && NumberUtil.compare(capaId, userCapa.getCapaId()) == 0) {
+            return userCapa;
+        }
+        // 新增等级
+        String type = "";
+        if (userCapa == null) {
+            userCapa = UserCapa.builder().uid(uid).capaId(capaId).build();
+            type = UserCapaSnapshot.Constants.升级.toString();
+        } else {
+            type = NumberUtil.compare(userCapa.getCapaId(), capaId) > 0 ? UserCapaSnapshot.Constants.降级.toString()
+                    : UserCapaSnapshot.Constants.升级.toString();
+            userCapa.setCapaId(capaId);
+        }
+        saveOrUpdate(userCapa);
+        // 记录快照
+        UserCapaSnapshot snapshot = UserCapaSnapshot.builder().uid(uid).capaId(capaId).type(type).remark(remark)
+                .description(description).build();
+        snapshotService.save(snapshot);
 
-		return getByUser(uid);
-	}
+        return getByUser(uid);
+    }
 
     @Override
     public List<UserCapa> getUpperList(Integer uid, List<Long> capaIds, Integer num) {
@@ -112,9 +115,9 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         LambdaQueryWrapper<UserCapa> userCapaLambdaQueryWrapper = new LambdaQueryWrapper<UserCapa>();
         userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(uid), UserCapa::getUid, uid);
         userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(capaId), UserCapa::getCapaId, capaId);
-        Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        Page<UserCapa> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapa> list = list(userCapaLambdaQueryWrapper);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         Map<Integer, User> userMap = userService.getUidMapList(list.stream().map(UserCapa::getUid).collect(Collectors.toList()));

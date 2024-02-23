@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -43,7 +44,7 @@ public class ProductMaterialsController {
         if (StringUtils.isNotEmpty(request.getMerName())) {
             Merchant merchant = merchantService.getByName(request.getMerName());
             if (merchant == null) {
-                throw new CrmebException("账号信息错误");
+                throw new CrmebException("商户名称信息错误");
             }
             merchantId = merchant.getId();
         }
@@ -52,7 +53,7 @@ public class ProductMaterialsController {
     @PreAuthorize("hasAuthority('agent:product:materials:add')")
     @PostMapping("/add")
     @ApiOperation("新增")
-    public CommonResult add(@RequestBody ProductMaterialsAddRequest request) {
+    public CommonResult add(@RequestBody @Validated ProductMaterialsAddRequest request) {
         SystemAdmin user = SecurityUtil.getLoginUserVo().getUser();
         Boolean ifPlatformAdd = user.getMerId()==0;
         Merchant merchant ;

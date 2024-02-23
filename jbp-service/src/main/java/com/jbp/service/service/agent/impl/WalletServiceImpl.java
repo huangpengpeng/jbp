@@ -10,6 +10,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
@@ -20,6 +21,7 @@ import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.service.agent.WalletService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -28,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -135,11 +139,18 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         LambdaQueryWrapper<Wallet> walletLambdaQueryWrapper = new LambdaQueryWrapper<Wallet>()
                 .eq(!ObjectUtil.isNull(uid), Wallet::getUId, uid)
                 .eq(!ObjectUtil.isNull(type), Wallet::getType, type);
-        Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        Page<Wallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<Wallet> list = list(walletLambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(Wallet::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
-            e.setTypeName(walletConfigService.getByType(e.getType()).getName());
-            e.setAccount(userService.getById(e.getUId()).getAccount());
+            WalletConfig walletConfig = walletConfigService.getByType(e.getType());
+            e.setTypeName(walletConfig != null ? walletConfig.getName() : "");
+            User user = uidMapList.get(e.getUId());
+            e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
