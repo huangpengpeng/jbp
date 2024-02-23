@@ -12,9 +12,13 @@ import java.math.BigDecimal;
  * 用户信息
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserInfo {
+
+    public UserInfo(String username, String account) {
+        this.username = username;
+        this.account = account;
+    }
 
     @ApiModelProperty("会员名")
     private String username;

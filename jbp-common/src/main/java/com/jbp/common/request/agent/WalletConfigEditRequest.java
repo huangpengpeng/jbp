@@ -7,13 +7,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "WalletConfigEditRequest对象", description = "积分修改请求对象")
-public class WalletConfigEditRequest {
+public class WalletConfigEditRequest implements Serializable {
     @ApiModelProperty("记录Id")
     private Integer id;
     @ApiModelProperty("名称")
@@ -31,7 +32,7 @@ public class WalletConfigEditRequest {
     @ApiModelProperty("可转账")
     private Boolean canTransfer;
     @ApiModelProperty("兑换目标积分 ")
-    private int changeType;
+    private Integer changeType;
     @ApiModelProperty("兑换比例 ")
     private BigDecimal changeScale;
 }

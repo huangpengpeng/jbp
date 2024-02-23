@@ -7,11 +7,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "UserCapaRequest对象", description = "用户等级请求对象")
-public class UserCapaRequest {
+public class UserCapaRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("等级ID")

@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "RelationScoreAddRequest对象", description = "服务业绩汇总添加对象")
-public class RelationScoreAddRequest {
+public class RelationScoreAddRequest implements Serializable {
 
     @ApiModelProperty("用户账号")
     private String account;

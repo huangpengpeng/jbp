@@ -2,19 +2,20 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.agent.CapaService;
-import com.jbp.service.service.agent.ProductCommService;
-
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
  * 直接推荐佣金
  */
 @Component
-public class DirectInvitationHandler implements AbstractProductCommHandler {
+public class DirectInvitationHandler extends AbstractProductCommHandler {
 
     @Resource
     private ProductCommService productCommService;
@@ -44,6 +46,12 @@ public class DirectInvitationHandler implements AbstractProductCommHandler {
     private UserCapaService userCapaService;
     @Resource
     private CapaService capaService;
+    @Resource
+    private ProductCommConfigService productCommConfigService;
+    @Resource
+    private FundClearingService fundClearingService;
+    @Resource
+    private UserService userService;
 
     @Override
     public Integer getType() {
@@ -77,7 +85,7 @@ public class DirectInvitationHandler implements AbstractProductCommHandler {
     }
 
     @Override
-    public List<DirectInvitationHandler.Rule> getRule(ProductComm productComm) {
+    public List<Rule> getRule(ProductComm productComm) {
         try {
             return JSONArray.parseArray(productComm.getRule(), Rule.class);
         } catch (Exception e) {
@@ -86,44 +94,56 @@ public class DirectInvitationHandler implements AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, List<CommCalculateResult> resultList) {
+    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
+        if (!productCommConfig.getStatus()) {
+            return;
+        }
         // 没有上级直接返回
         Integer pid = invitationService.getPid(order.getUid());
         if (pid == null) {
             return;
         }
+        BigDecimal totalAmt = BigDecimal.ZERO;
         // 上级等级
         UserCapa pUserCapa = userCapaService.getByUser(pid);
         Long capaId = pUserCapa == null ? capaService.getMinCapa().getId() : pUserCapa.getCapaId();
         // 获取订单产品
+        List<FundClearingProduct> productList = Lists.newArrayList();
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
-            ProductComm productComm = productCommService.getByProduct(productId, getType());
+            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
             // 佣金不存在或者关闭直接忽略
+            ProductComm productComm = productCommService.getByProduct(productId, getType());
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
+            // 钱包抵扣PV
+            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));
+            totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);
             Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
             Rule rule = ruleMap.get(capaId);
-            if (rule == null) {
-                continue;
+            BigDecimal ratio = BigDecimal.ZERO;
+            if (rule != null) {
+                ratio = rule.getRatio();
             }
-            // 获得佣金比例
-            BigDecimal ratio = rule.getRatio();
             // 计算订单金额
-            BigDecimal amt = BigDecimal.ZERO;
+            BigDecimal amt = ratio.multiply(totalPv);
+            totalAmt = totalAmt.add(amt);
+            FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
+                    orderDetail.getPayNum(), ratio, amt);
+            productList.add(clearingProduct);
+        }
 
-
-            if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                CommCalculateResult result = new CommCalculateResult(getType(), ProductCommEnum.直推佣金.getName(),
-                        productId, orderDetail.getProductName(), orderDetail.getPayPrice(),
-                        orderDetail.getPayNum(), BigDecimal.ZERO, productComm.getScale(), ratio, amt);
-
-                resultList.add(result);
-            }
+        // 按订单保存佣金
+        totalAmt = totalAmt.setScale(2, BigDecimal.ROUND_DOWN);
+        if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
+            User orderUser = userService.getById(order.getUid());
+            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.直推佣金.getName(), totalAmt,
+                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.直推佣金.getName(), "");
         }
     }
 

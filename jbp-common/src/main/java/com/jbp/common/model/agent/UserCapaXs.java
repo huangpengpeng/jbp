@@ -30,6 +30,10 @@ public class UserCapaXs extends BaseModel {
     @TableField("capa_id")
     private Long capaId;
 
+    @ApiModelProperty("假星级")
+    private Boolean ifFake;
+
+
     @ApiModelProperty("账户")
     @TableField(exist = false)
     private String account;

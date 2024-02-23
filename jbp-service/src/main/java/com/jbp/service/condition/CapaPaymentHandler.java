@@ -1,13 +1,18 @@
 package com.jbp.service.condition;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.service.service.OrderService;
+import com.jbp.service.service.agent.UserCapaService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 
 /**
@@ -15,6 +20,13 @@ import java.math.BigDecimal;
  */
 @Component
 public class CapaPaymentHandler implements ConditionHandler {
+
+    @Resource
+    private OrderService orderService;
+    @Resource
+    private UserCapaService userCapaService;
+
+
     @Override
     public String getName() {
         return ConditionEnum.单笔金额升级.getName();
@@ -24,6 +36,7 @@ public class CapaPaymentHandler implements ConditionHandler {
     public void valid(RiseCondition riseCondition) {
         getRule(riseCondition);
     }
+
 
     @Override
     public Rule getRule(RiseCondition riseCondition) {
@@ -40,7 +53,17 @@ public class CapaPaymentHandler implements ConditionHandler {
 
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
-        return null;
+        // 找最近的一笔平台订单
+        Order order = orderService.getOne(new QueryWrapper<Order>().lambda()
+                .eq(Order::getUid, uid).eq(Order::getPaid, true)
+                .eq(Order::getLevel, 0)
+                .orderByDesc(Order::getId)
+                .last(" limit 1"));
+        if (order == null) {
+            return false;
+        }
+        Rule rule = getRule(riseCondition);
+        return ArithmeticUtils.gte(order.getProTotalPrice(), rule.getAmt());
     }
 
     @Data
@@ -51,6 +74,5 @@ public class CapaPaymentHandler implements ConditionHandler {
          * 订货金额
          */
         private BigDecimal amt;
-
     }
 }

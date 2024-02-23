@@ -3,12 +3,14 @@ package com.jbp.admin.controller.agent;
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserRelationFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserRelationFlowRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserRelationFlowService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,20 +33,20 @@ public class UserRelationFlowController {
     @ApiOperation("服务关系上下层级关系列表")
     public CommonResult<CommonPage<UserRelationFlow>> pageList(UserRelationFlowRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getUAccount()) || !request.getUAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getUAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getUAccount())) {
+            User user = userService.getByAccount(request.getUAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
         Integer pid = null;
-        if (ObjectUtil.isNull(request.getPAccount()) || !request.getPAccount().equals("")) {
-            try {
-                pid = userService.getByAccount(request.getPAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getPAccount())) {
+            User user = userService.getByAccount(request.getPAccount());
+            if (user == null) {
                 throw new CrmebException("邀请上级账号错误");
             }
+            pid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(userRelationFlowService.pageList(uid, pid, request.getLevel(), pageParamRequest)));
 

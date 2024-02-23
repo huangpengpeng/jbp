@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "eb_product_materials", autoResultMap = true)
-@ApiModel(value="ProductMaterials对象  merId+barCode+materialsCode 唯一", description="产品物料对应仓库的编码")
+@ApiModel(value = "ProductMaterials对象  merId+barCode+materialsCode 唯一", description = "产品物料对应仓库的编码")
 public class ProductMaterials extends BaseModel {
 
     @ApiModelProperty(value = "商户")
@@ -37,6 +37,7 @@ public class ProductMaterials extends BaseModel {
 
     @ApiModelProperty(value = "物料编码")
     private String materialsCode;
+
     @ApiModelProperty("商户名称")
     @TableField(exist = false)
     private String merName;

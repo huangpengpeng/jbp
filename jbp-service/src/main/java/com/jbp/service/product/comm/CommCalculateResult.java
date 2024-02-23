@@ -9,8 +9,9 @@ import java.math.BigDecimal;
 @Data
 public class CommCalculateResult implements Serializable {
 
-    public CommCalculateResult(Integer type, String name, Integer productId, String productName, BigDecimal price,
-                               Integer quantity, BigDecimal pv, BigDecimal scale, BigDecimal ratio, BigDecimal amt) {
+    public CommCalculateResult(Integer uid, Integer type, String name, Integer productId, String productName, BigDecimal price,
+                               Integer quantity, BigDecimal pv, BigDecimal scale, BigDecimal ratio, BigDecimal amt, Integer sort) {
+        this.uid = uid;
         this.type = type;
         this.name = name;
         this.productId = productId;
@@ -21,7 +22,11 @@ public class CommCalculateResult implements Serializable {
         this.scale = scale;
         this.ratio = ratio;
         this.amt = amt;
+        this.sort = sort;
     }
+
+    @ApiModelProperty(value = "佣金类型")
+    private Integer uid;
 
     @ApiModelProperty(value = "佣金类型")
     private Integer type;
@@ -52,5 +57,8 @@ public class CommCalculateResult implements Serializable {
 
     @ApiModelProperty(value = "得奖金额")
     private BigDecimal amt;
+
+    @ApiModelProperty(value = "顺序")
+    private int sort;
 
 }

@@ -1,17 +1,24 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.FundClearingItemConfig;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
 import com.jbp.service.dao.agent.FundClearingItemConfigDao;
 import com.jbp.service.service.agent.FundClearingItemConfigService;
+import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -30,6 +37,12 @@ public class FundClearingItemConfigServiceImpl extends ServiceImpl<FundClearingI
         saveBatch(saveList);
     }
 
-
-
+    @Override
+    public PageInfo<FundClearingItemConfig> pageList(String commName, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<FundClearingItemConfig> lqw = new LambdaQueryWrapper<FundClearingItemConfig>()
+                .like(StringUtils.isNotEmpty(commName), FundClearingItemConfig::getCommName, commName);
+        Page<FundClearingItemConfig> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<FundClearingItemConfig> list = list(lqw);
+        return CommonPage.copyPageInfo(page, list);
+    }
 }

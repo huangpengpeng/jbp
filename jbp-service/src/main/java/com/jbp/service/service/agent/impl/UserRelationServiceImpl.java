@@ -8,7 +8,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.RelationScore;
+import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
@@ -19,6 +21,7 @@ import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserRelationFlowService;
 import com.jbp.service.service.agent.UserRelationService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -93,9 +96,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
             if (!userInvitationService.hasChild(pId, operateId)) {
                 throw new RuntimeException("接受人不是当前操作用户的下级, 接受人:" + pId + "操作人:" + operateId);
             }
-        }
-        if (!userInvitationService.hasChild(uId, operateId)) {
-            throw new RuntimeException("被安置人不是当前操作用户的下级, 被安置人:" + uId + "操作人:" + operateId);
+            if (!userInvitationService.hasChild(uId, operateId)) {
+                throw new RuntimeException("被安置人不是当前操作用户的下级, 被安置人:" + uId + "操作人:" + operateId);
+            }
         }
     }
 
@@ -160,9 +163,18 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
                 .eq(!ObjectUtil.isNull(node), UserRelation::getNode, node);
         Page<UserRelation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelation> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(UserRelation::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Integer> pIdList = list.stream().map(UserRelation::getPId).collect(Collectors.toList());
+        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
         list.forEach(e -> {
-            e.setUAccount(userService.getById(e.getUId()).getAccount());
-            e.setPAccount(userService.getById(e.getPId()).getAccount());
+            User uUser = uidMapList.get(e.getUId());
+            e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            User pUser = pidMapList.get(e.getPId());
+            e.setPAccount(pUser != null ? pUser.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

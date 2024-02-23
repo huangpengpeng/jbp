@@ -8,17 +8,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserInvitation;
-import com.jbp.common.model.agent.UserRegion;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserInvitationDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.service.agent.UserInvitationService;
-
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +25,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +47,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     @Override
     public UserInvitation getByUser(Integer uId) {
         LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
-        wrapper.and((w)-> {
+        wrapper.and((w) -> {
             w.eq(UserInvitation::getPId, uId)
                     .or()
                     .eq(UserInvitation::getMId, uId);
@@ -123,7 +123,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
 
         // 执行更新
         UserInvitation finalUserInvitation = userInvitation;
-        transactionTemplate.execute(s->{
+        transactionTemplate.execute(s -> {
             saveOrUpdate(finalUserInvitation);
             // 删除关系留影
             userInvitationFlowService.clear(uId);
@@ -139,16 +139,28 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
 
     @Override
     public PageInfo<UserInvitation> pageList(Integer uid, Integer pid, Integer mid, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<UserInvitation> lwq=new LambdaQueryWrapper<UserInvitation>()
-                .eq(!ObjectUtil.isNull(uid),UserInvitation::getUId,uid)
-                .eq(!ObjectUtil.isNull(pid),UserInvitation::getPId,pid)
-                .eq(!ObjectUtil.isNull(mid),UserInvitation::getMId,mid);
+        LambdaQueryWrapper<UserInvitation> lwq = new LambdaQueryWrapper<UserInvitation>()
+                .eq(!ObjectUtil.isNull(uid), UserInvitation::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), UserInvitation::getPId, pid)
+                .eq(!ObjectUtil.isNull(mid), UserInvitation::getMId, mid);
         Page<UserInvitation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserInvitation> list = list(lwq);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(UserInvitation::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Integer> pIdList = list.stream().map(UserInvitation::getPId).collect(Collectors.toList());
+        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        List<Integer> mIdList = list.stream().map(UserInvitation::getMId).collect(Collectors.toList());
+        Map<Integer, User> midMapList = userService.getUidMapList(mIdList);
         list.forEach(e -> {
-            e.setUAccount(userService.getById(e.getUId()).getAccount());
-            e.setPAccount(userService.getById(e.getPId()).getAccount());
-            e.setMAccount(userService.getById(e.getMId()).getAccount());
+            User uUser = uidMapList.get(e.getUId());
+            e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            User pUser = pidMapList.get(e.getPId());
+            e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            User mUser = midMapList.get(e.getMId());
+            e.setMAccount(mUser != null ? mUser.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -25,7 +25,6 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
-
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import org.slf4j.Logger;

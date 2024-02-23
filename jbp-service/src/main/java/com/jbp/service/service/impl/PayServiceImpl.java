@@ -15,8 +15,10 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.google.common.collect.Lists;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
+import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
@@ -30,6 +32,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantBalanceRecord;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.ProductCoupon;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.*;
 import com.jbp.common.model.wechat.WechatPayInfo;
@@ -42,9 +45,11 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
+import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 
-import com.jbp.service.service.agent.WalletService;
+import com.jbp.service.service.agent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -145,6 +150,18 @@ public class PayServiceImpl implements PayService {
     private WalletService walletService;
     @Autowired
     private LianLianPayService lianLianPayService;
+    @Autowired
+    private ProductCommChain productCommChain;
+    @Autowired
+    private SelfScoreService selfScoreService;
+    @Autowired
+    private InvitationScoreService invitationScoreService;
+    @Autowired
+    private OrdersFundSummaryService ordersFundSummaryService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
 
     /**
      * 获取支付配置
@@ -598,6 +615,22 @@ public class PayServiceImpl implements PayService {
             throw new CrmebException("订单不存在，orderNo: " + orderNo);
         }
         User user = userService.getById(platOrder.getUid());
+        // 2.增加业绩
+        BigDecimal score = BigDecimal.ZERO;
+        List<ProductInfoDto> productInfoList = Lists.newArrayList();
+        List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(platOrder.getOrderNo());
+        for (OrderDetail orderDetail : platOrderDetailList) {
+            BigDecimal productScore = orderDetail.getPayPrice();
+            List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
+            for (ProductDeduction deduction : walletDeductionList) {
+                productScore = productScore.add(deduction.getPvFee());
+            }
+            score = score.add(productScore);
+            ProductInfoDto productInfo = new ProductInfoDto(orderDetail.getProductId(), orderDetail.getProductName(),
+                    orderDetail.getPayNum(), orderDetail.getPayPrice(), productScore);
+            productInfoList.add(productInfo);
+        }
+
         // 获取拆单后订单
         List<Order> orderList = orderService.getByPlatOrderNo(platOrder.getOrderNo());
         if (CollUtil.isEmpty(orderList)) {
@@ -669,7 +702,21 @@ public class PayServiceImpl implements PayService {
         } else {
             user.setIsPromoter(false);
         }
+        BigDecimal finalScore = score;
         Boolean execute = transactionTemplate.execute(e -> {
+            // 1.分销佣金
+            LinkedList<CommCalculateResult> commList = new LinkedList<>();
+            productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+            // 2.自有业绩
+            selfScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
+            // 3.团队业绩
+            invitationScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
+            // 4.资金概况
+            ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
+                    platOrder.getPayPrice().subtract(platOrder.getPayPostage()), finalScore);
+            // 5.个人升级
+            userCapaService.riseCapa(platOrder.getUid());
+            userCapaXsService.riseCapaXs(platOrder.getUid());
             // 订单、佣金
             if (CollUtil.isNotEmpty(brokerageRecordList)) {
                 merchantOrderService.updateBatchById(merchantOrderList);
@@ -817,6 +864,8 @@ public class PayServiceImpl implements PayService {
             order.setPayTime(DateUtil.date());
             order.setPayMethod("人工确认");
             order.setOutTradeNo("000000");
+            order.setPayChannel("confirmPay");
+            order.setPayType("confirmPay");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             orderService.updateById(order);
             return update;
@@ -1426,7 +1475,7 @@ public class PayServiceImpl implements PayService {
         Merchant merchant = merchantService.getByIdException(merchantOrder.getMerId());
         // 分账计算
         // 商户收入 = 订单应付 - 商户优惠 -平台手续费 - 佣金
-        BigDecimal orderPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice()).add(merchantOrder.getPlatCouponPrice()).subtract(merchantOrder.getPayPostage());
+        BigDecimal orderPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice()).add(merchantOrder.getPlatCouponPrice()).subtract(merchantOrder.getPayPostage()).subtract(merchantOrder.getWalletDeductionFee());
         // 平台手续费
         BigDecimal platFee = orderPrice.multiply(new BigDecimal(merchant.getHandlingFee())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_UP);
         // 商户收入金额

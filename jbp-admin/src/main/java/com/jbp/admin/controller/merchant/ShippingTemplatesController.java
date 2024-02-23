@@ -82,7 +82,6 @@ public class ShippingTemplatesController {
         return CommonResult.failed();
     }
 
-    @PreAuthorize("hasAuthority('merchant:shipping:templates:info')")
     @ApiOperation(value = "运费模板详情")
     @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     public CommonResult<ShippingTemplatesInfoResponse> info(@PathVariable(value = "id") Integer id) {

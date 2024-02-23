@@ -7,6 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.PlatformWalletFlow;
+import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.PlatformWalletFlowDao;
@@ -16,6 +17,7 @@ import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -41,8 +43,12 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
                 .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type);
         Page<PlatformWalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<PlatformWalletFlow> list = list(walletLambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
         list.forEach(e -> {
-            e.setTypeName(walletConfigService.getByType(e.getWalletType()).getName());
+            WalletConfig walletConfig = walletConfigService.getByType(e.getWalletType());
+            e.setTypeName(walletConfig != null ? walletConfig.getName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

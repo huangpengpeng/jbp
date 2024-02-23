@@ -7,6 +7,7 @@ import com.jbp.common.request.PageParamRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface WalletConfigService extends IService<WalletConfig> {
     PageInfo<WalletConfig> pageList(String name, Integer status, Boolean canWithdraw, Boolean recharge, PageParamRequest pageParamRequest);
@@ -18,4 +19,8 @@ public interface WalletConfigService extends IService<WalletConfig> {
     void update(Integer id, String name, int status, Boolean canDeduction, Boolean canPay, Boolean canWithdraw, Boolean recharge, Boolean canTransfer, BigDecimal changeScale, Integer changeType);
 
     WalletConfig getCanPay();
+
+    WalletConfig getCanWithdraw();
+
+    Map<Integer, WalletConfig> getWalletMap();
 }

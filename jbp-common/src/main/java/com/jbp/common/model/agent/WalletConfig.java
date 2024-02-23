@@ -1,9 +1,6 @@
 package com.jbp.common.model.agent;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -55,10 +52,10 @@ public class WalletConfig {
     private Boolean canTransfer;
 
     @ApiModelProperty("兑换目标积分 ")
-    @TableField("change_type")
-    private int changeType;
+    @TableField(value = "change_type", updateStrategy = FieldStrategy.IGNORED)
+    private Integer changeType;
 
     @ApiModelProperty("兑换比例 ")
-    @TableField("change_scale")
+    @TableField(value = "change_scale", updateStrategy = FieldStrategy.IGNORED)
     private BigDecimal changeScale;
 }

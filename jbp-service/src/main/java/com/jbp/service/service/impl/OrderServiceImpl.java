@@ -35,6 +35,7 @@ import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.OrderDao;
 import com.jbp.service.service.*;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -365,9 +366,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             validateExpressSend(request);
         }
         Order order = getByOrderNo(request.getOrderNo());
-        if (!order.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("订单不存在");
-        }
+//        if (!order.getMerId().equals(systemAdmin.getMerId())) {
+//            throw new CrmebException("订单不存在");
+//        }
         if (order.getIsUserDel() || order.getIsMerchantDel()) {
             throw new CrmebException("订单已删除");
         }
@@ -1014,7 +1015,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private Order getByOrderNoAndMerId(String orderNo, Integer merId) {
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.eq(Order::getOrderNo, orderNo);
-        lqw.eq(Order::getMerId, merId);
+        Boolean ifPlatform = 0 == merId;
+        if(BooleanUtils.isNotTrue(ifPlatform)){
+            lqw.eq(Order::getMerId, merId);
+        }
         lqw.last(" limit 1");
         Order order = dao.selectOne(lqw);
         if (ObjectUtil.isNull(order)) {
@@ -1084,13 +1088,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         });
         if (!execute) throw new CrmebException("快递拆单发货失败！");
         List<OrderDetail> detailList = orderDetailService.getByOrderNo(order.getOrderNo());
-//        long count = detailList.stream().filter(e -> e.getPayNum() - e.getDeliveryNum() > 0).count();
         long count = detailList.stream().filter(e -> e.getPayNum() > (e.getDeliveryNum() + e.getRefundNum())).count();
         if (count <= 0) {
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_RECEIPT);
             updateById(order);
         }
-
 
         SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.DELIVER_GOODS_MARK);
         // 发送消息通知

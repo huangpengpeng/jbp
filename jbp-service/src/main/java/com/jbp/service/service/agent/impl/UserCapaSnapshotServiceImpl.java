@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapaSnapshot;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserCapaSnapshotDao;
@@ -18,9 +19,12 @@ import com.jbp.service.service.agent.UserCapaSnapshotService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -44,9 +48,16 @@ public class UserCapaSnapshotServiceImpl extends ServiceImpl<UserCapaSnapshotDao
                 .eq(!ObjectUtil.isNull(type) && !type.equals(""), UserCapaSnapshot::getType, type);
         Page<UserCapaSnapshot> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapaSnapshot> list = list(userCapaSnapshotLambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(UserCapaSnapshot::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        Map<Long, Capa> capaMap = capaService.getCapaMap();
         list.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
-            Capa capa = capaService.getById(e.getCapaId());
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user != null ? user.getAccount() : "");
+            Capa capa = capaMap.get(e.getCapaId());
             e.setCapaName(capa.getName());
             e.setCapaUrl(capa.getIconUrl());
         });

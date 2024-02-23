@@ -101,7 +101,7 @@ public class UserCapaXsHandler implements ProductProfitHandler {
         // 产品配置升级信息大于当前用户等级 执行升级
         Product product = productService.getById(exceProductProfit.getProductId());
         // 产品配置升级信息大于当前用户等级 执行升级
-        userCapaXsService.saveOrUpdateCapa(order.getUid(), capaXsId,
+        userCapaXsService.saveOrUpdateCapa(order.getUid(), capaXsId, false,
                 "订单支付成功产品:" + product.getName() + ", 权益设置直升星级", order.getOrderNo());
         // 订单权益记录
         orderProductProfitService.save(order.getId(), order.getOrderNo(), product.getId(), getType(),

@@ -3,11 +3,14 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.order.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -16,8 +19,10 @@ import java.util.Map;
 /**
  * 商品佣金处理链
  */
-@Component
+
 @Slf4j
+@Component
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 public class ProductCommChain implements ApplicationContextAware {
 
 
@@ -40,7 +45,15 @@ public class ProductCommChain implements ApplicationContextAware {
                 handler.saveOrUpdate(productComm);
             }
         }
+    }
 
+    /**
+     * 订单成功计算佣金
+     */
+    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+        for (AbstractProductCommHandler handler : handlers) {
+            handler.orderSuccessCalculateAmt(order, resultList);
+        }
     }
 
 

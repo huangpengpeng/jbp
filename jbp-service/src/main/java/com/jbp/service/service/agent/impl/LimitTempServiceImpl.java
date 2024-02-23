@@ -22,6 +22,7 @@ import com.jbp.service.dao.agent.LimitTempDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.WhiteService;
 import com.jbp.service.service.agent.*;
+import com.jbp.service.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -179,8 +180,8 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     @Override
     public PageInfo<LimitTemp> pageList(String name, String type, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LimitTemp> limitTempLambdaQueryWrapper = new LambdaQueryWrapper<LimitTemp>()
-                .like(!ObjectUtil.isNull(name) && !name.equals(""), LimitTemp::getName, name)
-                .like(!ObjectUtil.isNull(type) && !type.equals(""), LimitTemp::getType, type);
+                .like(StringUtils.isNotEmpty(name), LimitTemp::getName, name)
+                .like(StringUtils.isNotEmpty(type), LimitTemp::getType, type);
         Page<LimitTemp> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(limitTempLambdaQueryWrapper));
     }

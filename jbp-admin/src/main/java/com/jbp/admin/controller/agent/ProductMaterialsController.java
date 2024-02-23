@@ -6,6 +6,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ProductMaterialsAddRequest;
@@ -15,10 +16,12 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.ProductMaterialsService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -38,19 +41,19 @@ public class ProductMaterialsController {
     @ApiOperation("产品物料对应仓库列表")
     public CommonResult<CommonPage<ProductMaterials>> getList(ProductMaterialsRequest request, PageParamRequest pageParamRequest) {
         Integer merchantId = null;
-        if (ObjectUtil.isNull(request.getMerName()) || !request.getMerName().equals("")) {
-            try {
-                merchantId = merchantService.getByName(request.getMerName()).getId();
-            } catch (NullPointerException e) {
-                throw new CrmebException("商户信息错误");
+        if (StringUtils.isNotEmpty(request.getMerName())) {
+            Merchant merchant = merchantService.getByName(request.getMerName());
+            if (merchant == null) {
+                throw new CrmebException("商户名称信息错误");
             }
+            merchantId = merchant.getId();
         }
         return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(), pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:product:materials:add')")
     @PostMapping("/add")
     @ApiOperation("新增")
-    public CommonResult add(@RequestBody ProductMaterialsAddRequest request) {
+    public CommonResult add(@RequestBody @Validated ProductMaterialsAddRequest request) {
         SystemAdmin user = SecurityUtil.getLoginUserVo().getUser();
         Boolean ifPlatformAdd = user.getMerId()==0;
         Merchant merchant ;

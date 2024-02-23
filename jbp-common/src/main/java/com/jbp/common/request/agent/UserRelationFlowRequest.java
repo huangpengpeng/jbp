@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "UserRelationFlowRequest对象", description = "销售上下层级关系请求对象")
-public class UserRelationFlowRequest {
+public class UserRelationFlowRequest implements Serializable {
     @ApiModelProperty("用户ID账号")
     private String uAccount;
 

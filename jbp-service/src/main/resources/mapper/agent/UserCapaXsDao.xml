@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.UserCapaXsDao">
+    <select id="getRelationUnder" parameterType="java.util.Map" resultType="com.jbp.common.model.agent.UserCapaXs">
+        select id, capa_id as capaId, uid, if_fake as ifFake
+        from eb_user_capa_xs
+        where capa_id >= #{capaId}
+          AND uid in (select uId
+                      from eb_user_relation_flow
+                      where pId = #{uid})
+    </select>
+
+
+
+
+
+</mapper>

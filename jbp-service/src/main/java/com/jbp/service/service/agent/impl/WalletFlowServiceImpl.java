@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.WalletFlowDao;
@@ -17,10 +19,13 @@ import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -45,18 +50,25 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                 .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WalletFlow> list = list(walletLambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(WalletFlow::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
-            e.setTypeName(walletConfigService.getByType(e.getWalletType()).getName());
-            e.setAccount(userService.getById(e.getUid()).getAccount());
+            WalletConfig walletConfig = walletConfigService.getByType(e.getWalletType());
+            e.setTypeName(walletConfig != null ? walletConfig.getName() : "");
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
     public List<WalletFlow> details(Integer uid, String action) {
-        LambdaQueryWrapper<WalletFlow> wrapper=new LambdaQueryWrapper<WalletFlow>()
-                .eq(!ObjectUtil.isNull(action)&&!action.equals(""),WalletFlow::getAction,action )
-                .eq(WalletFlow::getUid,uid)
+        LambdaQueryWrapper<WalletFlow> wrapper = new LambdaQueryWrapper<WalletFlow>()
+                .eq(!ObjectUtil.isNull(action) && !action.equals(""), WalletFlow::getAction, action)
+                .eq(WalletFlow::getUid, uid)
                 .orderByDesc(WalletFlow::getId);
         return list(wrapper);
     }

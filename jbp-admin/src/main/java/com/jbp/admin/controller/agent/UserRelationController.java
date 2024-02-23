@@ -7,10 +7,12 @@ import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.UserInvitationRequest;
 import com.jbp.common.request.agent.UserRelationRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,22 +35,44 @@ public class UserRelationController {
     @ApiOperation("服务关系上下级列表")
     public CommonResult<CommonPage<UserRelation>> pageList(UserRelationRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getUAccount()) || !request.getUAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getUAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getUAccount())) {
+            User user = userService.getByAccount(request.getUAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
 //        邀请上级账号
         Integer pid = null;
-        if (ObjectUtil.isNull(request.getPAccount()) || !request.getPAccount().equals("")) {
-            try {
-                pid = userService.getByAccount(request.getPAccount()).getId();
-            } catch (NullPointerException e) {
-                throw new CrmebException("邀请上级账号错误");
+        if (StringUtils.isNotEmpty(request.getPAccount())) {
+            User user = userService.getByAccount(request.getPAccount());
+            if (user == null) {
+                throw new CrmebException("邀请上级账号信息错误");
             }
+            pid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(userRelationService.pageList(uid ,pid,request.getNode(), pageParamRequest)));
     }
+
+
+    @PreAuthorize("hasAuthority('agent:user:relation:band')")
+    @GetMapping("/band")
+    @ApiOperation("绑定上级")
+    public CommonResult band(UserRelationRequest request) {
+        if (StringUtils.isAnyEmpty(request.getUAccount(), request.getPAccount()) || request.getNode() == null) {
+            throw new CrmebException("账户信息不能为空");
+        }
+        User user = userService.getByAccount(request.getUAccount());
+        if(user == null){
+            throw new CrmebException("账户不存在");
+        }
+        User pUser = userService.getByAccount(request.getPAccount());
+        if(pUser == null){
+            throw new CrmebException("上级账户不存在");
+        }
+        userRelationService.band(user.getId(), pUser.getId(), null, request.getNode());
+        return CommonResult.success();
+    }
+
+
 }

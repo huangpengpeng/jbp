@@ -10,6 +10,7 @@ import com.jbp.common.request.agent.UserCapaXsSnapshotRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsSnapshotService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,12 +35,12 @@ public class UserCapaXsSnapshotController {
     @ApiOperation("列表分页查询")
     public CommonResult<CommonPage<UserCapaXsSnapshot>> getList(UserCapaXsSnapshotRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(userCapaXsSnapshotService.pageList(uid, request.getCapaId(), request.getType(), pageParamRequest)));
     }

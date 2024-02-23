@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "UserCompanyRequest对象", description = "分公司区域请求对象")
-public class UserCompanyRequest {
+public class UserCompanyRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("省份")

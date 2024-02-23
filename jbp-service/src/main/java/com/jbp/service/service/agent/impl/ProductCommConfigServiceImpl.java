@@ -40,14 +40,14 @@ public class ProductCommConfigServiceImpl extends ServiceImpl<ProductCommConfigD
     public void init() {
         for (ProductCommEnum value : ProductCommEnum.values()) {
             if (getByType(value.getType()) == null) {
-                add(value.getType(), value.getName(), value.getDesc());
+                add(value.getType(), value.getName(), value.getIfWhole(), value.getDesc());
             }
         }
     }
 
     @Override
-    public ProductCommConfig add(Integer type, String name, String desc) {
-        ProductCommConfig productCommConfig = new ProductCommConfig(type, name, desc);
+    public ProductCommConfig add(Integer type, String name, Boolean ifWhole, String desc) {
+        ProductCommConfig productCommConfig = new ProductCommConfig(type, name, ifWhole, desc);
         save(productCommConfig);
         return productCommConfig;
     }

@@ -15,6 +15,7 @@ import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
+import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
     @Override
     public PageInfo<Team> pageList(String name, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<Team> lambdaQueryWrapper = new LambdaQueryWrapper<Team>()
-                .eq(!ObjectUtil.isNull(name) && !name.equals(""), Team::getName, name);
+                .eq(StringUtils.isNotEmpty(name), Team::getName, name);
         Page<Team> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(lambdaQueryWrapper));
     }

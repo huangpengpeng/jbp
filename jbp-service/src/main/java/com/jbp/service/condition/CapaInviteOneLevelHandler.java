@@ -2,10 +2,17 @@ package com.jbp.service.condition;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserInvitationService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 邀请一阶条件
@@ -13,6 +20,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CapaInviteOneLevelHandler implements ConditionHandler {
 
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private UserInvitationService userInvitationService;
 
 
     @Override
@@ -21,7 +32,7 @@ public class CapaInviteOneLevelHandler implements ConditionHandler {
     }
 
     @Override
-    public void valid(RiseCondition riseCondition){
+    public void valid(RiseCondition riseCondition) {
         getRule(riseCondition);
     }
 
@@ -41,7 +52,19 @@ public class CapaInviteOneLevelHandler implements ConditionHandler {
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
         // 当前用户是否满足改升级条件  满足返回 true  不满足返回false
-        return null;
+        List<UserInvitation> nextList = userInvitationService.getNextList(uid);
+        int num = 0;
+        Rule rule = getRule(riseCondition);
+        for (UserInvitation userInvitation : nextList) {
+            UserCapa userCapa = userCapaService.getByUser(userInvitation.getUId());
+            if (userCapa != null && userCapa.getCapaId().compareTo(rule.getCapaId()) >= 0) {
+                num++;
+            }
+            if (num >= rule.getNum()) {
+                return true;
+            }
+        }
+        return num >= rule.getNum();
     }
 
     /**

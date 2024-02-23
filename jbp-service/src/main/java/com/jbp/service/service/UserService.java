@@ -379,4 +379,6 @@ public interface UserService extends IService<User> {
 
     void tradePassword(String phone, String code, String tradePassword);
 
+    List<User> getNoChild();
+
 }

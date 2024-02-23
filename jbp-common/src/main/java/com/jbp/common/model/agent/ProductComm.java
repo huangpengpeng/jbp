@@ -47,6 +47,10 @@ public class ProductComm extends BaseModel {
         return !ObjectUtils.allNotNull(productId, type, name, scale);
     }
 
+    public Boolean hasError2() {
+        return !ObjectUtils.allNotNull(productId, type, name, scale);
+    }
+
     @ApiModelProperty(value = "商品id")
     private Integer productId;
 

@@ -26,4 +26,6 @@ public interface UserDao extends BaseMapper<User> {
     List<User> findMerchantList(Map<String, Object> map);
 
     List<UserSpreadPeopleItemResponse> getSpreadPeopleList(Map<String, Object> map);
+
+    List<User> getNoChild();
 }

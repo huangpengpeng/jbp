@@ -49,7 +49,7 @@ public class RelationScoreFlow extends BaseModel {
     private Integer uid;
 
     @ApiModelProperty("下单用户id")
-    @TableField("orderUid")
+    @TableField("order_uid")
     private Integer orderUid;
 
     @ApiModelProperty("积分")
@@ -69,15 +69,15 @@ public class RelationScoreFlow extends BaseModel {
     private String action;
 
     @ApiModelProperty("单号")
-    @TableField("ordersSn")
+    @TableField("orders_sn")
     private String ordersSn;
 
     @ApiModelProperty("付款时间")
-    @TableField("payTime")
+    @TableField("pay_time")
     private Date payTime;
 
     @ApiModelProperty("商品信息【新增积分=产品积分  减少是不相同的根据可用区最小值对碰】")
-    @TableField(value = "productInfo", typeHandler = ProductInfoListHandler.class)
+    @TableField(value = "product_info", typeHandler = ProductInfoListHandler.class)
     private List<ProductInfoDto> productInfo;
 
     @ApiModelProperty("奖金")
@@ -89,7 +89,7 @@ public class RelationScoreFlow extends BaseModel {
     private Integer level;
 
     @ApiModelProperty("层级比例")
-    @TableField("levelRatio")
+    @TableField("level_ratio")
     private BigDecimal levelRatio;
 
     @ApiModelProperty("比例")
@@ -102,9 +102,9 @@ public class RelationScoreFlow extends BaseModel {
 
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
-    private String accountNo;
+    private String account;
 
     @ApiModelProperty("下单用户账户")
     @TableField(exist = false)
-    private String orderAccountNo;
+    private String orderAccount;
 }

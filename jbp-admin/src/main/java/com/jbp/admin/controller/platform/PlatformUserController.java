@@ -1,13 +1,13 @@
 package com.jbp.admin.controller.platform;
 
 
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.UserAdminDetailResponse;
 import com.jbp.common.response.UserResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +92,14 @@ public class PlatformUserController {
         }
         return CommonResult.failed();
     }
+    @PreAuthorize("hasAuthority('platform:user:register:phone')")
+    @PostMapping("/register/phone")
+    @ApiOperation("用户注册")
+    public CommonResult<User> registerPhone(@Validated @RequestBody RegisterPhoneRequest request) {
+        User user = userService.registerPhone(request.getUsername(), request.getPhone(), null);
+        return CommonResult.success(user);
+    }
+
 }
 
 

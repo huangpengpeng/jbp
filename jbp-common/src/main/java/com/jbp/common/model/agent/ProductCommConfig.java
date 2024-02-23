@@ -18,10 +18,11 @@ import java.math.BigDecimal;
 @ApiModel(value="ProductCommConfig对象", description="产品佣金配置")
 public class ProductCommConfig extends BaseModel {
 
-    public ProductCommConfig(Integer type, String name, String desc) {
+    public ProductCommConfig(Integer type, String name, Boolean ifWhole, String desc) {
         this.type = type;
         this.name = name;
         this.ifOpen = false;
+        this.ifWhole = ifWhole;
         this.description = desc;
     }
 
@@ -37,11 +38,17 @@ public class ProductCommConfig extends BaseModel {
     @ApiModelProperty(value = "说明")
     private String description;
 
-    @ApiModelProperty("系数")
-    private BigDecimal scale;
+    @ApiModelProperty(value = "全局配置 非全局是配置在指定产品上的分钱比例")
+    private Boolean ifWhole;
 
     @ApiModelProperty("比例json")
     private String ratioJson;
+
+
+
+    @ApiModelProperty("系数")
+    @TableField(exist = false)
+    private BigDecimal scale;
 
 
     @ApiModelProperty(value = "商品是否开启")

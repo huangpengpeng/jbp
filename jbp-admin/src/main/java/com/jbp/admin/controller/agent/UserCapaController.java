@@ -11,9 +11,11 @@ import com.jbp.common.request.agent.UserCapaRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -33,12 +35,12 @@ public class UserCapaController {
     @ApiOperation("列表分页查询")
     public CommonResult<CommonPage<UserCapa>> getList(UserCapaRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(userCapaService.pageList(uid, request.getCapaId(), pageParamRequest)));
     }
@@ -46,7 +48,7 @@ public class UserCapaController {
     @PreAuthorize("hasAuthority('agent:user:capa:add')")
     @PostMapping("/add")
     @ApiOperation("添加")
-    public CommonResult add(@RequestBody UserCapaAddRequest request) {
+    public CommonResult add(@RequestBody @Validated UserCapaAddRequest request) {
         User user = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNull(user)) {
             return CommonResult.failed("账户信息错误");

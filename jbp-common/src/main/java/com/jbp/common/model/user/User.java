@@ -171,4 +171,7 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "活跃时间")
     private Date activeTime;
+
+    @ApiModelProperty(value = "是否开店")
+    private Boolean openShop;
 }
