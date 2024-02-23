@@ -2251,8 +2251,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         // 注册下单
         if (registerInfo != null) {
-            HelpRegisterResponse response = userService.helpRegisterValid(registerInfo.getUsername(), registerInfo.getMobile(), registerInfo.getPAccount(),
-                    registerInfo.getRAccount(), registerInfo.getNode(), registerInfo.getCapaId());
+            HelpRegisterResponse response = userService.helpRegisterValid(registerInfo.getUsername(), registerInfo.getMobile(), registerInfo.getPaccount(),
+                    registerInfo.getRaccount(), registerInfo.getNode(), registerInfo.getCapaId());
             productList.forEach(p -> {
                 if (p.getPayType() == 0) {
                     throw new CrmebException("注册下单只能选择积分支付商品");

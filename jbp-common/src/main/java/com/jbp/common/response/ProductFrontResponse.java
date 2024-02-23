@@ -1,6 +1,8 @@
 package com.jbp.common.response;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.jbp.common.model.product.ProductAttr;
+import com.jbp.common.model.product.ProductAttrValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -85,4 +87,8 @@ public class ProductFrontResponse {
 
     @ApiModelProperty(value = "商品标签")
     private ProductTagsFrontResponse productTags;
+
+
+    @ApiModelProperty(value = "产品属性")
+    private List<ProductAttrValue> productAttrValue;
 }

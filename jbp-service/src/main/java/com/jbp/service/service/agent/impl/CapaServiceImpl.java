@@ -100,6 +100,10 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     }
 
     @Override
+    public List<Capa> getList() {
+        return list(new QueryWrapper<Capa>().lambda());
+    }
+    @Override
     public Map<Long, Capa> getCapaMap() {
         List<Capa> list = list();
         return FunctionUtil.keyValueMap(list, Capa::getId);

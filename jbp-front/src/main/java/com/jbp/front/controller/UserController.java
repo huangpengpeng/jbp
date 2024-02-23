@@ -179,12 +179,12 @@ public class UserController {
     @ApiOperation(value = "注册校验")
     @RequestMapping(value = "/register/valid", method = RequestMethod.POST)
     public CommonResult<Boolean> valid(@RequestBody @Validated UserHelpRegisterRequest request) {
-        User pUser = userService.getByAccount(request.getPAccount());
+        User pUser = userService.getByAccount(request.getPaccount());
         if (pUser == null) {
             throw new CrmebException("邀请账号错误");
         }
         Integer pId = pUser.getId();
-        User rUser = userService.getByAccount(request.getRAccount());
+        User rUser = userService.getByAccount(request.getRaccount());
         if (rUser == null) {
             throw new CrmebException("服务账号错误");
         }
@@ -213,8 +213,8 @@ public class UserController {
     @ApiOperation(value = "上级帮忙注册")
     @RequestMapping(value = "/help/register", method = RequestMethod.POST)
     public CommonResult<User> register(@RequestBody @Validated UserHelpRegisterRequest request) {
-        HelpRegisterResponse response = userService.helpRegisterValid(request.getUsername(), request.getPhone(), request.getPAccount(),
-                request.getRAccount(), request.getNode(), capaService.getMinCapa().getId());
+        HelpRegisterResponse response = userService.helpRegisterValid(request.getUsername(), request.getPhone(), request.getPaccount(),
+                request.getRaccount(), request.getNode(), capaService.getMinCapa().getId());
         User user = userService.helpRegister(request.getUsername(), request.getPhone(), response.getPId(), response.getRId(), request.getNode());
         return CommonResult.success(user);
     }
