@@ -178,8 +178,10 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
             throw new CrmebException("不包邮，最少需要一条公共区域运费数据");
         }
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
-            throw new CrmebException("不能操作非本商户的数据");
+        if(admin.getMerId() > 0){
+            if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
+                throw new CrmebException("不能操作非本商户的数据");
+            }
         }
         if (!shippingTemplates.getName().equals(request.getName())) {
             if (isExistName(request.getName(), admin.getMerId())) {
@@ -232,8 +234,10 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
     public Boolean remove(Integer id) {
         ShippingTemplates shippingTemplates = getByIdException(id);
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
-            throw new CrmebException("运费模板不存在");
+        if(admin.getMerId() > 0){
+            if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
+                throw new CrmebException("运费模板不存在");
+            }
         }
         if (productService.isUseShippingTemplateId(id)) {
             throw new CrmebException("有商品使用此运费模板，无法删除");
@@ -256,8 +260,10 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
     public ShippingTemplatesInfoResponse getInfo(Integer id) {
         ShippingTemplates shippingTemplates = getByIdException(id);
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
-            throw new CrmebException("运费模板不存在");
+        if(admin.getMerId() > 0){
+            if (!admin.getMerId().equals(shippingTemplates.getMerId())) {
+                throw new CrmebException("运费模板不存在");
+            }
         }
         ShippingTemplatesInfoResponse response = new ShippingTemplatesInfoResponse();
         BeanUtils.copyProperties(shippingTemplates, response);
