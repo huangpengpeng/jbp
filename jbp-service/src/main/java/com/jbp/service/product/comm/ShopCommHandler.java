@@ -2,7 +2,10 @@ package com.jbp.service.product.comm;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.order.Order;
@@ -58,14 +61,25 @@ public class ShopCommHandler extends AbstractProductCommHandler {
 
     @Override
     public Boolean saveOrUpdate(ProductComm productComm) {
-        return null;
+        // 检查是否存在存在直接更新
+        if (productComm.hasError()) {
+            throw new CrmebException(ProductCommEnum.店铺佣金.getName() + "参数不完整");
+        }
+        // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
+        getRule(productComm);
+        // 删除数据库的信息
+        productCommService.remove(new LambdaQueryWrapper<ProductComm>()
+                .eq(ProductComm::getProductId, productComm.getProductId())
+                .eq(ProductComm::getType, productComm.getType()));
+        // 保存最新的信息
+        productCommService.save(productComm);
+        return true;
     }
 
     @Override
     public Rule getRule(ProductComm productComm) {
         try {
-            ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-            return JSONObject.parseObject(productCommConfig.getRatioJson(), Rule.class);
+            return JSONObject.parseObject(productComm.getRule(), Rule.class);
         } catch (Exception e) {
             throw new CrmebException(getType() + ":佣金格式解析失败:" + productComm.getRule());
         }
@@ -77,14 +91,12 @@ public class ShopCommHandler extends AbstractProductCommHandler {
         if (!productCommConfig.getStatus()) {
             return;
         }
-        Rule rule = getRule(null);
-        if (rule == null || !ArithmeticUtils.gt(rule.getRatio(), BigDecimal.ZERO)) {
-            return;
-        }
-        // 增加对碰积分业绩
+
+        List<FundClearingProduct> productList = Lists.newArrayList();
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         // 订单总PV
         BigDecimal score = BigDecimal.ZERO;
+        BigDecimal amt = BigDecimal.ZERO;
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             ProductComm productComm = productCommService.getByProduct(productId, getType());
@@ -92,17 +104,20 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
+            Rule rule = getRule(productComm);
             BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
             // 总PV
             BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));// 钱包抵扣PV
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
-            // 订单总PV
-            score = score.add(totalPv);
-        }
 
-        BigDecimal ratio = rule.getRatio();
-        // 店铺佣金
-        BigDecimal amt = score.multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
+            BigDecimal productAmt = totalPv.multiply(rule.getRatio()).setScale(2, BigDecimal.ROUND_DOWN);
+            FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
+                    orderDetail.getPayNum(), rule.getRatio(), productAmt);
+            productList.add(clearingProduct);
+
+            // 店铺佣金
+            amt = amt.add(productAmt);
+        }
         if (!ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
             return;
         }
@@ -117,7 +132,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             final Boolean openShop = userService.getById(pid).getOpenShop();
             if (openShop != null && BooleanUtils.isTrue(openShop)) {
                 fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
-                        null, null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
+                        null, productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
                 break;
             }
             uid = pid;

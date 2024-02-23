@@ -63,7 +63,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     @Override
     public Boolean saveOrUpdate(ProductComm productComm) {
         // 检查是否存在存在直接更新
-        if (productComm.hasError()) {
+        if (productComm.hasError2()) {
             throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
