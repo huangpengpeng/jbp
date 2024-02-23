@@ -7,12 +7,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
+import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.InvitationScoreFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.InvitationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -36,9 +41,18 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
                 .eq(!ObjectUtil.isNull(action) && !action.equals(""), InvitationScoreFlow::getAction, action);
         Page<InvitationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreFlow> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(InvitationScoreFlow::getUid).collect(Collectors.toList());
+        List<Integer> uIdList2 = list.stream().map(InvitationScoreFlow::getOrderUid).collect(Collectors.toList());
+        uIdList.addAll(uIdList2);
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
-            e.setOrderAccount(userService.getById(e.getOrderUid()).getAccount());
+            User user = uidMapList.get(e.getUid());
+            User user2 = uidMapList.get(e.getOrderUid());
+            e.setAccount(user != null ? user.getAccount() : "");
+            e.setOrderAccount(user2 != null ? user2.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
