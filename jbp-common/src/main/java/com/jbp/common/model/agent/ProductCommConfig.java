@@ -38,14 +38,17 @@ public class ProductCommConfig extends BaseModel {
     @ApiModelProperty(value = "说明")
     private String description;
 
-    @ApiModelProperty("系数")
-    private BigDecimal scale;
-
     @ApiModelProperty(value = "全局配置 非全局是配置在指定产品上的分钱比例")
     private Boolean ifWhole;
 
     @ApiModelProperty("比例json")
     private String ratioJson;
+
+
+
+    @ApiModelProperty("系数")
+    @TableField(exist = false)
+    private BigDecimal scale;
 
 
     @ApiModelProperty(value = "商品是否开启")
