@@ -2186,6 +2186,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         // 检查支付方式
         Set<Integer> payTypeSet = Sets.newHashSet();
         for (PreOrderDetailRequest orderDetail : request.getOrderDetails()) {
+            //购物车下单，没有商品id
+            if(orderDetail.getProductId() == null && orderDetail.getShoppingCartId() != null){
+                Cart cart  = cartService.getById(orderDetail.getShoppingCartId()) ;
+                orderDetail.setProductId(cart.getProductId());
+            }
             Product product = productService.getById(orderDetail.getProductId());
             payTypeSet.add(product.getPayType());
         }
