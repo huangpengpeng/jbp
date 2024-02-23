@@ -3,12 +3,14 @@ package com.jbp.admin.controller.agent;
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.InvitationScoreFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.InvitationScoreFlowRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,20 +34,20 @@ public class InvitationScoreFlowController {
     @ApiOperation("销售业绩明细列表")
     public CommonResult<CommonPage<InvitationScoreFlow>> getList(InvitationScoreFlowRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
         Integer orderuid = null;
-        if (ObjectUtil.isNull(request.getOrderAccount()) || !request.getOrderAccount().equals("")) {
-            try {
-                orderuid = userService.getByAccount(request.getOrderAccount()).getId();
-            } catch (NullPointerException e) {
-                throw new CrmebException("下单用户账号信息错误");
+        if (StringUtils.isNotEmpty(request.getOrderAccount())) {
+            User user = userService.getByAccount(request.getOrderAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
             }
+            orderuid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(invitationScoreFlowService.pageList(uid, orderuid, request.getAction(), pageParamRequest)));
     }
