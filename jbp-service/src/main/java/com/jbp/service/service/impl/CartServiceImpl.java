@@ -304,7 +304,7 @@ public class CartServiceImpl extends ServiceImpl<CartDao, Cart> implements CartS
      * @param uid               uid
      * @return StoreCart
      */
-    private Cart getByUniqueAndUid(Integer productAttrUnique, Integer uid) {
+    public Cart getByUniqueAndUid(Integer productAttrUnique, Integer uid) {
         LambdaQueryWrapper<Cart> lqw = Wrappers.lambdaQuery();
         lqw.eq(Cart::getProductAttrUnique, productAttrUnique);
         lqw.eq(Cart::getUid, uid);

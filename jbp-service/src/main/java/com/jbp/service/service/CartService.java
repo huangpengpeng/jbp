@@ -68,6 +68,7 @@ public interface CartService extends IService<Cart> {
      */
     Boolean productStatusNotEnable(Integer productId);
 
+     Cart getByUniqueAndUid(Integer productAttrUnique, Integer uid);
     /**
      * 购物车重选提交
      * @param resetRequest 重选数据

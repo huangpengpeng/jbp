@@ -97,4 +97,9 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         return getOne(new QueryWrapper<Capa>().lambda().eq(Capa::getRankNum, rankNum));
     }
 
+    @Override
+    public List<Capa> getList() {
+        return list(new QueryWrapper<Capa>().lambda());
+    }
+
 }

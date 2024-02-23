@@ -1,11 +1,14 @@
 package com.jbp.front.controller;
 
+import com.jbp.common.model.cat.Cart;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
 import com.jbp.common.response.CartMerchantResponse;
 import com.jbp.common.response.CartPriceResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.CartService;
 
+import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -40,6 +43,9 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private UserService userService;
+
     @ApiOperation(value = "购物车列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiImplicitParams({
@@ -53,7 +59,9 @@ public class CartController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult<String> add(@RequestBody @Validated CartRequest request) {
         if (cartService.add(request)) {
-            return CommonResult.success();
+            User user = userService.getInfo();
+            Cart forUpdateStoreCart2 = cartService.getByUniqueAndUid(request.getProductAttrUnique(), user.getId());
+            return CommonResult.success(forUpdateStoreCart2.getId().toString());
         }
         return CommonResult.failed();
     }

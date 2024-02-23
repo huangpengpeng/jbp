@@ -6,6 +6,8 @@ import com.jbp.common.model.agent.Capa;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.RiseConditionRequest;
 
+import java.util.List;
+
 
 public interface CapaService extends IService<Capa> {
 
@@ -21,4 +23,6 @@ public interface CapaService extends IService<Capa> {
     Capa getByName(String name);
 
     Capa getByRankNum(Integer rankNum);
+
+    List<Capa> getList();
 }

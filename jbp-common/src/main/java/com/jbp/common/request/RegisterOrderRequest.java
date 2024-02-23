@@ -21,10 +21,10 @@ public class RegisterOrderRequest implements Serializable {
     private String mobile;
 
     @ApiModelProperty(value = "销售账户", required = false)
-    private String pAccount;
+    private String paccount;
 
     @ApiModelProperty(value = "服务账户", required = false)
-    private String rAccount;
+    private String raccount;
 
     @ApiModelProperty(value = "服务位置", required = false)
     private Integer node;

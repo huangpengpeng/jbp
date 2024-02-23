@@ -144,6 +144,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private UserRelationService userRelationService;
     @Autowired
     private WalletConfigService walletConfigService;
+    @Autowired
+    private ProductAttrService productAttrService;
+
 
     /**
      * 获取产品列表Admin
@@ -1109,6 +1112,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             e.setReplyNum(sumCount);
             e.setPositiveRatio(replyChance);
             e.setSales(e.getSales() + e.getFicti());
+
+//            // 获取商品规格
+//            List<ProductAttr> attrList = productAttrService.getListByProductIdAndType(e.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+//            // 根据制式设置attr属性
+//
+//            // 获取商品规格
+           List<ProductAttrValue> productAttrValueList = productAttrValueService.getListByProductIdAndType(e.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+           e.setProductAttrValue(productAttrValueList);
+
         });
 
         // 查询活动边框配置信息, 并赋值给商品response 重复添加的商品数据会根据数据添加持续覆盖后的为准
@@ -1128,6 +1140,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
                 return resProduct;
             }).collect(Collectors.toList());
         });
+
+
+
         return CommonPage.copyPageInfo(page, responseList);
     }
 

@@ -30,11 +30,11 @@ public class UserHelpRegisterRequest implements Serializable {
 
     @ApiModelProperty(value = "邀请上级", required = true)
     @NotBlank(message = "销售上级不能为空")
-    private String pAccount;
+    private String paccount;
 
     @ApiModelProperty(value = "服务上级", required = true)
     @NotBlank(message = "服务上级不能为空")
-    private String rAccount;
+    private String raccount;
 
     @ApiModelProperty(value = "市场位置", required = true)
     @NotNull(message = "市场位置不能为空")
