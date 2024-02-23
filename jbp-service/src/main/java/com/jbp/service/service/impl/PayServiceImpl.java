@@ -167,7 +167,7 @@ public class PayServiceImpl implements PayService {
      * 获取支付配置
      */
     @Override
-    public PayConfigResponse getPayConfig() {
+    public PayConfigResponse getPayConfig(Integer payGateway) {
         String payWxOpen = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WECHAT_OPEN);
         String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);
         String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);
@@ -180,7 +180,8 @@ public class PayServiceImpl implements PayService {
         response.setAliPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(aliPayStatus));
         response.setLianLianStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianStatus));
         response.setWalletStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus));
-        response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
+
+        response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
             User user = userService.getInfo();
             response.setUserBalance(user.getNowMoney());
@@ -189,6 +190,17 @@ public class PayServiceImpl implements PayService {
             User user = userService.getInfo();
             Wallet wallet = walletService.getCanPayByUser(user.getId());
             response.setWalletBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance());
+        }
+        // 在线支付
+        if (0 == payGateway) {
+            response.setWalletStatus(false);
+            response.setYuePayStatus(false);
+        }
+        // 积分支付
+        if (1 == payGateway) {
+            response.setPayWechatOpen(false);
+            response.setAliPayStatus(false);
+            response.setLianLianStatus(false);
         }
         return response;
     }

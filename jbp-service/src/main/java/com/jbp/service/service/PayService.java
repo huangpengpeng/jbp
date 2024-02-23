@@ -23,7 +23,7 @@ public interface PayService {
     /**
      * 获取支付配置
      */
-    PayConfigResponse getPayConfig();
+    PayConfigResponse getPayConfig(Integer payGateway);
 
     /**
      * 订单支付

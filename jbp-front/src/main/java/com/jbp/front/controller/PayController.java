@@ -37,7 +37,7 @@ public class PayController {
 
     @ApiOperation(value = "获取支付配置")
     @RequestMapping(value = "/get/config", method = RequestMethod.GET)
-    public CommonResult<PayConfigResponse> getPayConfig() {
+    public CommonResult<PayConfigResponse> getPayConfig(Integer payGateway) {
         return CommonResult.success(payService.getPayConfig());
     }
 
