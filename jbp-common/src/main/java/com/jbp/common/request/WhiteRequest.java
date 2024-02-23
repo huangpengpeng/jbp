@@ -16,6 +16,6 @@ import java.io.Serializable;
 public class WhiteRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "白名单名称不能为空")
+    @ApiModelProperty("白名单名称")
     private String name;
 }
