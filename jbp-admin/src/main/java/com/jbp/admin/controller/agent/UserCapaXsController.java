@@ -15,6 +15,7 @@ import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -47,7 +48,7 @@ public class UserCapaXsController {
     @PreAuthorize("hasAuthority('agent:user:capa:xs:add')")
     @PostMapping
     @ApiOperation("添加")
-    public CommonResult add(@RequestBody UserCapaXsAddRequest request) {
+    public CommonResult add(@Validated  @RequestBody UserCapaXsAddRequest request) {
         User user = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNull(user)) {
             return CommonResult.failed("账户信息错误");
