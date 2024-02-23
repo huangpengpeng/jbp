@@ -15,6 +15,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletService;
 
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,12 +38,12 @@ public class WalletController {
     @GetMapping("/page")
     public CommonResult<CommonPage<Wallet>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(walletService.pageList(uid,request.getType(),pageParamRequest)));
     }

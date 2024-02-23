@@ -33,28 +33,29 @@ public class UserInvitationController {
     @ApiOperation("销售上下级关系列表")
     public CommonResult<CommonPage<UserInvitation>> getlist(UserInvitationRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getUAccount()) || !request.getUAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getUAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getUAccount())) {
+            User user = userService.getByAccount(request.getUAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
+
         Integer pid = null;
-        if (ObjectUtil.isNull(request.getPAccount()) || !request.getPAccount().equals("")) {
-            try {
-                pid = userService.getByAccount(request.getPAccount()).getId();
-            } catch (NullPointerException e) {
-                throw new CrmebException("邀请上级账号错误");
+        if (StringUtils.isNotEmpty(request.getPAccount())) {
+            User user = userService.getByAccount(request.getPAccount());
+            if (user == null) {
+                throw new CrmebException("邀请上级账号信息错误");
             }
+            pid = user.getId();
         }
         Integer mid = null;
-        if (ObjectUtil.isNull(request.getMAccount()) || !request.getMAccount().equals("")) {
-            try {
-                mid = userService.getByAccount(request.getMAccount()).getId();
-            } catch (NullPointerException e) {
-                throw new CrmebException("转挂上级账号账号错误");
+        if (StringUtils.isNotEmpty(request.getMAccount())) {
+            User user = userService.getByAccount(request.getMAccount());
+            if (user == null) {
+                throw new CrmebException("转挂上级账号信息错误");
             }
+            mid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(userInvitationService.pageList(uid, pid, mid, pageParamRequest)));
     }

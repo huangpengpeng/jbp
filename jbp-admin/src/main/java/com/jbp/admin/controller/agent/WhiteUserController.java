@@ -11,6 +11,7 @@ import com.jbp.common.request.WhiteUserRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WhiteUserService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,12 +39,12 @@ public class WhiteUserController {
     public CommonResult<CommonPage<WhiteUser>> getList(@ModelAttribute @Validated WhiteUserRequest request,
                                                        @ModelAttribute PageParamRequest pageParamRequest) {
         Integer uid = null;
-        if (ObjectUtil.isNull(request.getAccount()) || !request.getAccount().equals("")) {
-            try {
-                uid = userService.getByAccount(request.getAccount()).getId();
-            } catch (NullPointerException e) {
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
                 throw new CrmebException("账号信息错误");
             }
+            uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(whiteUserService.pageList(uid,request.getWhiteId(), pageParamRequest)));
     }
