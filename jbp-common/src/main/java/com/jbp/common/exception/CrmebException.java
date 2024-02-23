@@ -49,6 +49,7 @@ public class CrmebException extends RuntimeException {
         this.message = iResultEnum.getMessage();
     }
 
+
     public Integer getCode() {
         return code;
     }

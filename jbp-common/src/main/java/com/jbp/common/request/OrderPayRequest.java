@@ -34,7 +34,7 @@ public class OrderPayRequest {
 
     @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet, lianlian", required = true)
     @NotBlank(message = "支付方式不能为空")
-    @StringContains(limitValues = {"weixin","alipay","yue"}, message = "未知的支付方式")
+    @StringContains(limitValues = {"weixin","alipay","yue", "wallet", "lianlian"}, message = "未知的支付方式")
     private String payType;
 
     @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, video=视频号, native=微信native支付， alipayPc=支付宝PC支付, confirmPay-人工", required = true)

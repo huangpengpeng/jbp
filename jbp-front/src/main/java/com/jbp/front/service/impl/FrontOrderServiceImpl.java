@@ -243,6 +243,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             preOrderInfoVo.setAddressId(0);
         }
         // 实际支付金额
+        preOrderInfoVo.setPayGateway(preOrderInfoVo.getMerchantOrderVoList().get(0).getPayGateway());
         preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()));
         preOrderInfoVo.setUserIntegral(payUser.getIntegral());
         preOrderInfoVo.setUserBalance(payUser.getNowMoney());
@@ -275,6 +276,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         OrderNoResponse response = new OrderNoResponse();
         response.setOrderNo(key);
         response.setOrderType(preOrderInfoVo.getType());
+        response.setPayGateway(preOrderInfoVo.getPayGateway());
         logger.info("preOrder response:{}", JSON.toJSONString(response));
         return response;
     }
@@ -1051,6 +1053,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setMerCouponPrice(orderInfoVo.getMerCouponFee());
         order.setPlatCouponPrice(orderInfoVo.getPlatCouponFee());
         order.setPlatCouponId(orderInfoVo.getPlatUserCouponId());
+        order.setPayGateway(orderInfoVo.getPayGateway());
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
@@ -1228,6 +1231,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         OrderNoResponse response = new OrderNoResponse();
         response.setOrderNo(order.getOrderNo());
         response.setPayPrice(order.getPayPrice());
+        response.setPayGateway(order.getPayGateway());
         return response;
     }
 
@@ -2179,7 +2183,15 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         PreOrderInfoVo preOrderInfoVo = new PreOrderInfoVo();
         preOrderInfoVo.setPayUserId(payUser.getId());
         List<PreMerchantOrderVo> merchantOrderVoList = CollUtil.newArrayList();
-
+        // 检查支付方式
+        Set<Integer> payTypeSet = Sets.newHashSet();
+        for (PreOrderDetailRequest orderDetail : request.getOrderDetails()) {
+            Product product = productService.getById(orderDetail.getProductId());
+            payTypeSet.add(product.getPayType());
+        }
+        if(payTypeSet.isEmpty() || payTypeSet.size() > 1){
+            throw new CrmebException("购物车结算只能选中相同支付方式的产品");
+        }
         switch (request.getPreOrderType()) {
             case OrderConstants.PLACE_ORDER_TYPE_CART:
                 // 购物车结算一个或者多个商品
@@ -2335,6 +2347,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         PreMerchantOrderVo merchantOrderVo = new PreMerchantOrderVo();
         merchantOrderVo.setMerId(merchant.getId());
         merchantOrderVo.setMerName(merchant.getName());
+        merchantOrderVo.setPayGateway(product.getPayType());
         merchantOrderVo.setFreightFee(BigDecimal.ZERO);
         merchantOrderVo.setMerCouponFee(BigDecimal.ZERO);
         merchantOrderVo.setPlatCouponFee(BigDecimal.ZERO);
@@ -2347,6 +2360,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(product.getId());
         detailVo.setProductName(product.getName());
+        detailVo.setPayGateway(product.getPayType());
         detailVo.setAttrValueId(attrValue.getId());
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());
@@ -2409,15 +2423,6 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merchantOrderVoList.add(merchantOrderVo);
             }
         });
-        // 检查支付方式
-        Set<Integer> payTypeSet = Sets.newHashSet();
-        for (PreOrderDetailRequest orderDetail : request.getOrderDetails()) {
-            Product product = productService.getById(orderDetail.getProductId());
-            payTypeSet.add(product.getPayType());
-        }
-        if(payTypeSet.isEmpty() || payTypeSet.size() > 1){
-            throw new CrmebException("购物车结算只能选中相同支付方式的产品");
-        }
         return merchantOrderVoList;
     }
 
@@ -2526,6 +2531,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         // 计算各种价格
         ComputedOrderPriceResponse priceResponse = new ComputedOrderPriceResponse();
+        priceResponse.setPayGateway(orderInfoVo.getPayGateway());
         List<OrderMerchantRequest> orderMerchantRequestList = request.getOrderMerchantRequestList();
         Map<Integer, OrderMerchantRequest> orderMerchantRequestMap = FunctionUtil.keyValueMap(orderMerchantRequestList, OrderMerchantRequest::getMerId);
 

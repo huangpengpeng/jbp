@@ -379,7 +379,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         //检测验证码
         checkValidateCode(user.getPhone(), request.getValidateCode());
         //密码
-        user.setPwd(CrmebUtil.encryptPassword(request.getPassword(), user.getPhone()));
+        user.setPwd(CrmebUtil.encryptPassword(request.getPassword(), user.getAccount()));
         return updateById(user);
     }
 
@@ -1423,7 +1423,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         checkValidateCode(phone, code);
         //获取当前用户信息
         User user = getInfo();
-        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword, phone));
+        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword, user.getAccount()));
         updateById(user);
 
     }

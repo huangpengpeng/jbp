@@ -40,6 +40,9 @@ public class PreMerchantOrderVo implements Serializable {
     @ApiModelProperty(value = "商品总数")
     private Integer proTotalNum;
 
+    @ApiModelProperty(value = "支付方式 -1 统一支付 0 在线支付 1 积分支付")
+    private Integer payGateway;
+
     @ApiModelProperty(value = "商品总计金额")
     private BigDecimal proTotalFee;
 

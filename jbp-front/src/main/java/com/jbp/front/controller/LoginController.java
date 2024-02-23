@@ -41,8 +41,6 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
-    @Autowired
-    private UserService userService;
 
     @ApiOperation(value = "获取登录配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)

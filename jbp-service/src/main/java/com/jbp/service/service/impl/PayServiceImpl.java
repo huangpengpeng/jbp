@@ -206,6 +206,7 @@ public class PayServiceImpl implements PayService {
         if (order.getPayPrice().compareTo(BigDecimal.ZERO) < 0) {
             throw new CrmebException("支付金额不能低于等于0元");
         }
+
         logger.info("订单支付 当前操作的订单信息:{}", JSON.toJSONString(order));
         if (order.getCancelStatus() > OrderConstants.ORDER_CANCEL_STATUS_NORMAL) {
             throw new CrmebException("订单已取消");
@@ -226,19 +227,22 @@ public class PayServiceImpl implements PayService {
         if (between > 0) {
             throw new CrmebException("订单已过期");
         }
-        // 余额支付
-        if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
-            if (user.getNowMoney().compareTo(order.getPayPrice()) < 0) {
-                throw new CrmebException("用户余额不足");
+        if (order.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
+            // 余额支付
+            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+                if (user.getNowMoney().compareTo(order.getPayPrice()) < 0) {
+                    throw new CrmebException("用户余额不足");
+                }
+            }
+            // 钱包支付
+            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {
+                Wallet wallet = walletService.getCanPayByUser(user.getId());
+                if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
+                    throw new CrmebException("用户余额不足");
+                }
             }
         }
-        // 钱包支付
-        if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {
-            Wallet wallet = walletService.getCanPayByUser(user.getId());
-            if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
-                throw new CrmebException("用户余额不足");
-            }
-        }
+
         OrderPayResultResponse response = new OrderPayResultResponse();
         response.setOrderNo(order.getOrderNo());
         response.setPayType(order.getPayType());

@@ -85,7 +85,7 @@ public class OrderFrontDetailResponse implements Serializable {
     @ApiModelProperty(value = "支付时间")
     private Date payTime;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet")
+    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet,lianlian")
     private String payType;
 
     @ApiModelProperty(value = "订单状态（0：待支付，1：待发货,2：待收货,3：已收货,4：已完成，5：待核销，9：已取消）")
@@ -108,4 +108,7 @@ public class OrderFrontDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "过期时间")
     private Long cancelTime;
+
+    @ApiModelProperty(value = "支付网关 -1 统一支付 0 在线支付 1 积分支付")
+    private Integer payGateway;
 }

@@ -519,6 +519,7 @@ public class SeckillServiceImpl implements SeckillService {
         }
         SeckillProductInfoCacheVo seckillProductInfoCacheVo = redisUtil.get(seckillProductInfoKey);
         SeckillProduct seckillProduct = seckillProductInfoCacheVo.getSeckillProduct();
+        Product product = productService.getById(seckillProduct.getProductId());
         if (ObjectUtil.isNull(seckillProduct) || seckillProduct.getIsDel()) {
             throw new CrmebException("商品信息不存在，请刷新后重新选择");
         }
@@ -581,10 +582,12 @@ public class SeckillServiceImpl implements SeckillService {
         merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
         merchantOrderVo.setIsSelf(merchant.getIsSelf());
         merchantOrderVo.setWalletDeductionFee(BigDecimal.ZERO);
+        merchantOrderVo.setPayGateway(product.getPayType());
 
         PreOrderInfoDetailVo detailVo = new PreOrderInfoDetailVo();
         detailVo.setProductId(seckillProduct.getId());
         detailVo.setProductName(seckillProduct.getName());
+        detailVo.setPayGateway(product.getPayType());
         detailVo.setAttrValueId(attrValue.getId());
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());

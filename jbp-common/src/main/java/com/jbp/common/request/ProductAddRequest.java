@@ -120,7 +120,7 @@ public class ProductAddRequest implements Serializable {
     @ApiModelProperty(value = "优惠券id集合")
     private List<Integer> couponIds;
 
-    @ApiModelProperty(value = "付款方式  0 在线支付  1 积分支付")
+    @ApiModelProperty(value = "付款方式 -1 统一支付 0 在线支付  1 积分支付 ")
     private Integer payType;
 
     @ApiModelProperty(value = "消费抵扣")

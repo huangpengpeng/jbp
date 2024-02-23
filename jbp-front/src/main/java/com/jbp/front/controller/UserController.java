@@ -5,10 +5,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
-import com.jbp.common.request.PasswordRequest;
-import com.jbp.common.request.UserBindingPhoneUpdateRequest;
-import com.jbp.common.request.UserEditInfoRequest;
-import com.jbp.common.request.UserHelpRegisterRequest;
+import com.jbp.common.request.*;
 import com.jbp.common.response.HelpRegisterResponse;
 import com.jbp.common.response.UserInfoResponse;
 import com.jbp.common.response.UserLogoffBeforeResponse;
@@ -63,7 +60,7 @@ public class UserController {
     @Autowired
     private CapaService capaService;
 
-    @ApiOperation(value = "手机号修改密码")
+    @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
     public CommonResult<Boolean> password(@RequestBody @Validated PasswordRequest request) {
         return CommonResult.success(userService.password(request));

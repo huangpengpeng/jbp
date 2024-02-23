@@ -13,6 +13,7 @@ import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.WalletDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
@@ -108,25 +109,23 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     }
 
     @Override
-    public Boolean virement(Integer uid, Integer virementid, BigDecimal amt, Integer type, String postscript, String operate,String externalNo) {
-        reduce(uid,type,amt,operate,externalNo,postscript);
-        platformWalletService.increase(type, amt, operate, externalNo, postscript);
-        //平台转用户
-        increase(virementid,type,amt,operate,externalNo,postscript);
-        platformWalletService.reduce(type,amt,operate,externalNo,postscript);
+    public Boolean transfer(Integer uid, Integer receiveUserId, BigDecimal amt, Integer type, String postscript) {
+        String externalNo = StringUtils.N_TO_10("ZZ_");
+        reduce(uid, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript);
+        increase(receiveUserId, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript);
         return true;
     }
 
     @Override
-    public Boolean change(Integer uid, BigDecimal amt, Integer type, Integer changeType, String tradePassword, String externalNo, String postscript, String operate) {
+    public Boolean change(Integer uid, BigDecimal amt, Integer type, Integer changeType, String postscript) {
         //扣除用户
+        String externalNo = StringUtils.N_TO_10("DH_");
         WalletConfig walletConfig = walletConfigService.getByType(changeType);
-        reduce(uid, type, amt, operate, externalNo, postscript);
+        reduce(uid, type, amt, WalletFlow.OperateEnum.兑换.name(), externalNo, postscript);
+
         //类型兑换比例积分
         BigDecimal amtIntegral = amt.multiply(walletConfig.getChangeScale());
-        platformWalletService.increase(changeType, amtIntegral, operate, externalNo, postscript);
-        increase(uid,changeType,amtIntegral,operate,externalNo,postscript);
-        platformWalletService.reduce(changeType,amtIntegral,operate,externalNo,postscript);
+        increase(uid, changeType, amtIntegral, WalletFlow.OperateEnum.兑换.name(), externalNo, postscript);
         return true;
     }
 

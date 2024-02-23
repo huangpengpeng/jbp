@@ -58,6 +58,9 @@ public class PreOrderInfoVo {
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payFee;
 
+    @ApiModelProperty(value = "支付方式: -1 统一支付 0 在线支付 1 积分支付")
+    private Integer payGateway;
+
     @ApiModelProperty(value = "平台优惠券编号（选择优惠券时有值,不选时为0")
     private Integer platUserCouponId = 0;
 

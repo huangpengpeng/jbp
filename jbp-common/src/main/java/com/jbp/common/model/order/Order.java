@@ -98,6 +98,9 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App, wallet, lianlian")
     private String payChannel;
 
+    @ApiModelProperty(value = "支付网关 -1 统一支付 0 在线支付 1 积分支付")
+    private Integer payGateway;
+
     @ApiModelProperty(value = "订单状态（0：待支付，1：待发货,2：部分发货， 3：待核销，4：待收货,5：已收货,6：已完成，9：已取消）")
     private Integer status;
 

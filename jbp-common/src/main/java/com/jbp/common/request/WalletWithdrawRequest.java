@@ -8,25 +8,29 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "WalletWithdrawRequest对象", description = "用户提现请求对象")
-public class WalletWithdrawRequest {
+public class WalletWithdrawRequest implements Serializable {
+
+    private static final long serialVersionUID=1L;
+
     @NotNull(message = "资金不能为空")
     @ApiModelProperty("资金")
     private BigDecimal amt;
+
     @NotNull(message = "钱包类型不能为空")
     @ApiModelProperty("钱包类型")
-    private Integer type;
+    private Integer walletType;
+
     @ApiModelProperty("交易密码")
     @NotNull(message = "交易密码不能为空")
-    private String tradePassword;
-    @NotBlank(message = "外部单号不能为空")
-    @ApiModelProperty("外部单号")
-    private String externalNo;
+    private String pwd;
+
 
     @NotBlank(message = "附言不能为空")
     @ApiModelProperty("附言")

@@ -83,4 +83,7 @@ public class PreOrderResponse implements Serializable {
 
     @ApiModelProperty(value = "订单平台优惠券列表")
     private List<CouponUser> platCouponUserList;
+
+    @ApiModelProperty(value = "支付网关 -1 统一支付 0 在线支付 1 积分支付")
+    private Integer payGateway;
 }
