@@ -7,13 +7,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "RelationScoreEditRequest对象", description = "服务业绩汇总编辑对象")
-public class RelationScoreEditRequest {
+public class RelationScoreEditRequest implements Serializable {
     @ApiModelProperty("编号")
     private Long id;
     @ApiModelProperty("可用积分")

@@ -14,6 +14,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.InvitationScoreGroupDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreGroupService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -34,8 +35,8 @@ public class InvitationScoreGroupServiceImpl extends ServiceImpl<InvitationScore
     public PageInfo<InvitationScoreGroup> pageList(Integer uid, String groupName, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScoreGroup> lqw = new LambdaQueryWrapper<InvitationScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreGroup::getUid, uid)
-                .like(!ObjectUtil.isNull(groupName) && !groupName.equals(""), InvitationScoreGroup::getGroupName, groupName)
-                .eq(!ObjectUtil.isNull(action) && !action.equals(""), InvitationScoreGroup::getAction, action);
+                .like(StringUtils.isNotEmpty(groupName), InvitationScoreGroup::getGroupName, groupName)
+                .eq(StringUtils.isNotEmpty(action), InvitationScoreGroup::getAction, action);
         Page<InvitationScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

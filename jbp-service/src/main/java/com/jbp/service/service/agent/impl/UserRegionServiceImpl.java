@@ -7,19 +7,22 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.agent.UserRegion;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserRegionMapper;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserRegionService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -50,11 +53,16 @@ public class UserRegionServiceImpl extends ServiceImpl<UserRegionMapper, UserReg
                 .eq(!ObjectUtil.isNull(city) && !city.equals(""), UserRegion::getCity, city)
                 .eq(!ObjectUtil.isNull(area) && !area.equals(""), UserRegion::getArea, area)
                 .orderByDesc(UserRegion::getUid);
-
         Page<UserRegion> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRegion> list = list(userRegionLambdaQueryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(UserRegion::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
-            e.setAccount(userService.getById(e.getUid()).getAccount());
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

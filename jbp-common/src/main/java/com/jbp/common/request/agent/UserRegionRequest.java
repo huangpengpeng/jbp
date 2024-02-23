@@ -8,13 +8,15 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(value = "UserRegionRequest对象", description = "用户区域请求对象")
-public class UserRegionRequest {
+public class UserRegionRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("省份")

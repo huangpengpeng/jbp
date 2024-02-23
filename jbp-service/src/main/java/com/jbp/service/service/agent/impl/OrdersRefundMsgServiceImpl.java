@@ -12,6 +12,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.OrdersRefundMsgDao;
 import com.jbp.service.service.agent.OrdersRefundMsgService;
+import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +41,8 @@ public class OrdersRefundMsgServiceImpl extends ServiceImpl<OrdersRefundMsgDao, 
     @Override
     public PageInfo<OrdersRefundMsg> pageList(String ordersSn, String refundSn, Boolean ifRead, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<OrdersRefundMsg> lqw=new LambdaQueryWrapper<OrdersRefundMsg>()
-                .like(!ObjectUtil.isNull(ordersSn)&&!ordersSn.equals(""),OrdersRefundMsg::getOrdersSn,ordersSn)
-                .like(!ObjectUtil.isNull(refundSn)&&!refundSn.equals(""),OrdersRefundMsg::getRefundSn,refundSn)
+                .like(StringUtils.isNotEmpty(ordersSn),OrdersRefundMsg::getOrdersSn,ordersSn)
+                .like(StringUtils.isNotEmpty(refundSn),OrdersRefundMsg::getRefundSn,refundSn)
                 .eq(!ObjectUtil.isNull(ifRead),OrdersRefundMsg::getIfRead,ifRead);
         Page<OrdersRefundMsg> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(lqw));

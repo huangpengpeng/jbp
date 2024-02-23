@@ -10,7 +10,9 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.PlatformWallet;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.agent.UserRelationFlow;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserRelationFlowDao;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -71,9 +75,18 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                 .eq(!ObjectUtil.isNull(level),UserRelationFlow::getLevel,level);
         Page<UserRelationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelationFlow> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Integer> pIdList = list.stream().map(UserRelationFlow::getPId).collect(Collectors.toList());
+        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
         list.forEach(e->{
-            e.setUAccount(userService.getById(e.getUId()).getAccount());
-            e.setPAccount(userService.getById(e.getPId()).getAccount());
+            User uUser = uidMapList.get(e.getUId());
+            e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            User pUser = pidMapList.get(e.getPId());
+            e.setPAccount(pUser != null ? pUser.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "LimitTempRequest对象", description = "限制模版对象")
-public class LimitTempRequest {
+public class LimitTempRequest implements Serializable {
     @ApiModelProperty(value = "名称")
     private String name;
     @ApiModelProperty(value = "商品显示  商品购买  装修显示")

@@ -14,6 +14,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
 import com.jbp.service.dao.agent.FundClearingItemConfigDao;
 import com.jbp.service.service.agent.FundClearingItemConfigService;
+import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ public class FundClearingItemConfigServiceImpl extends ServiceImpl<FundClearingI
     @Override
     public PageInfo<FundClearingItemConfig> pageList(String commName, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<FundClearingItemConfig> lqw = new LambdaQueryWrapper<FundClearingItemConfig>()
-                .like(!ObjectUtil.isNull(commName) && !commName.equals(""), FundClearingItemConfig::getCommName, commName);
+                .like(StringUtils.isNotEmpty(commName), FundClearingItemConfig::getCommName, commName);
         Page<FundClearingItemConfig> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearingItemConfig> list = list(lqw);
         return CommonPage.copyPageInfo(page, list);
