@@ -46,7 +46,7 @@ public class UserCapaXsController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:capa:xs:add')")
-    @PostMapping
+    @PostMapping("/add")
     @ApiOperation("添加")
     public CommonResult add(@Validated  @RequestBody UserCapaXsAddRequest request) {
         User user = userService.getByAccount(request.getAccount());
