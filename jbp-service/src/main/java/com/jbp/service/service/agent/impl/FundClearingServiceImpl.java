@@ -16,7 +16,6 @@ import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.agent.FundClearingRequest;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
@@ -24,7 +23,6 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.BeanUtils;
@@ -285,32 +283,31 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
     @Override
     public String exportOrder(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status) {
-        LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<FundClearing>()
-                .like(StringUtils.isNotEmpty(uniqueNo), FundClearing::getUniqueNo, uniqueNo)
-                .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
-                .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
-                .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
-                .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime);
-
-        List<FundClearing> list = list(lqw);
-        lqw.last("LIMIT 1000");
-        if (CollUtil.isEmpty(list)) {
-            new CrmebException("没有可导出的数据！");
-        }
-        Boolean hasNext = true;
-        while (hasNext) {
-//            List<FundClearing> list = list(lqw);
-        }
-        List<Integer> uIdList = list.stream().map(FundClearing::getUid).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
-        List<FundClearingVo> voList = CollUtil.newArrayList();
-        list.forEach(e -> {
-            User user = uidMapList.get(e.getUid());
-            e.setAccount(user != null ? user.getAccount() : "");
-            FundClearingVo fundClearingVo = new FundClearingVo();
-            BeanUtils.copyProperties(e, fundClearingVo);
-            voList.add(fundClearingVo);
-        });
+        Long id = 0L;
+        List<FundClearingVo> result = Lists.newArrayList();
+        do {
+            LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<FundClearing>()
+                    .like(StringUtils.isNotEmpty(uniqueNo), FundClearing::getUniqueNo, uniqueNo)
+                    .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
+                    .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
+                    .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
+                    .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
+                    .gt(FundClearing::getId, id).last("LIMIT 1000");
+            List<FundClearing> fundClearingList = list(lqw);
+            if(CollectionUtils.isEmpty(fundClearingList)){
+                break;
+            }
+            List<Integer> uIdList = fundClearingList.stream().map(FundClearing::getUid).collect(Collectors.toList());
+            Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+            fundClearingList.forEach(e -> {
+                User user = uidMapList.get(e.getUid());
+                e.setAccount(user != null ? user.getAccount() : "");
+                FundClearingVo fundClearingVo = new FundClearingVo();
+                BeanUtils.copyProperties(e, fundClearingVo);
+                result.add(fundClearingVo);
+            });
+            id = fundClearingList.get(fundClearingList.size()-1).getId();
+        }while (true);
 
 //       以下为存储部分
         //上传设置
@@ -330,6 +327,6 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         aliasMap.put("remark", "备注");
         aliasMap.put("clearingTime", "结算时间");
         aliasMap.put("createTime", "创建时间");
-        return ExportUtil.exportExcel(fileName, "佣金发放记录导出", voList, aliasMap);
+        return ExportUtil.exportExcel(fileName, "佣金发放记录导出", result, aliasMap);
     }
 }
