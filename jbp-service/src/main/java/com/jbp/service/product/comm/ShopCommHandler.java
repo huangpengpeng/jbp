@@ -95,7 +95,6 @@ public class ShopCommHandler extends AbstractProductCommHandler {
         List<FundClearingProduct> productList = Lists.newArrayList();
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         // 订单总PV
-        BigDecimal score = BigDecimal.ZERO;
         BigDecimal amt = BigDecimal.ZERO;
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();

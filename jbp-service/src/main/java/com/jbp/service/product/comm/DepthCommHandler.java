@@ -1,7 +1,8 @@
 package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
@@ -13,6 +14,7 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.ProductCommConfigService;
+import com.jbp.service.service.agent.ProductCommService;
 import com.jbp.service.service.agent.UserCapaService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,6 +43,8 @@ public class DepthCommHandler extends AbstractProductCommHandler {
     @Resource
     private FundClearingService fundClearingService;
     @Resource
+    private ProductCommService productCommService;
+    @Resource
     private ProductCommConfigService productCommConfigService;
 
     @Override
@@ -55,7 +59,19 @@ public class DepthCommHandler extends AbstractProductCommHandler {
 
     @Override
     public Boolean saveOrUpdate(ProductComm productComm) {
-        return null;
+        // 检查是否存在存在直接更新
+        if (productComm.hasError2()) {
+            throw new CrmebException(ProductCommEnum.深度佣金.getName() + "参数不完整");
+        }
+        // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
+        getRule(productComm);
+        // 删除数据库的信息
+        productCommService.remove(new LambdaQueryWrapper<ProductComm>()
+                .eq(ProductComm::getProductId, productComm.getProductId())
+                .eq(ProductComm::getType, productComm.getType()));
+        // 保存最新的信息
+        productCommService.save(productComm);
+        return true;
     }
 
     @Override
@@ -105,6 +121,16 @@ public class DepthCommHandler extends AbstractProductCommHandler {
                 break;
             }
         }
+    }
+
+    public static void main(String[] args) {
+        List<Rule> list = Lists.newArrayList();
+        for (int i = 10; i <= 16 ; i++) {
+            Rule rule = new Rule(i, BigDecimal.valueOf(0.1));
+            list.add(rule);
+        }
+        System.out.println(JSONArray.toJSONString(list));
+
     }
 
 

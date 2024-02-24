@@ -29,7 +29,6 @@ public class ProductCommRequest implements Serializable {
     @ApiModelProperty("系数")
     private BigDecimal scale;
 
-    @NotBlank(message = "佣金规则不能为空")
     @ApiModelProperty("规则")
     private String rule;
 

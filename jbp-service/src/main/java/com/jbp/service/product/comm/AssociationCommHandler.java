@@ -2,6 +2,7 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
@@ -156,6 +157,15 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
         } while (true);
 
 
+    }
+
+    public static void main(String[] args) {
+        List<Rule> list = Lists.newArrayList();
+        for (int i = 6; i <= 8 ; i++) {
+            Rule rule = new Rule(i, BigDecimal.valueOf(i-5).divide(BigDecimal.valueOf(100)));
+            list.add(rule);
+        }
+        System.out.println(JSONArray.toJSONString(list));
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.jbp.service.product.comm;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.beust.jcommander.internal.Lists;
@@ -193,6 +194,25 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
                 resultList.add(calculateResult);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        List<CapaRatio> capaRatioList = Lists.newArrayList();
+        for (int i = 10; i <= 16 ; i++) {
+            CapaRatio capaRatio = new CapaRatio(i, BigDecimal.valueOf(0.1));
+            capaRatioList.add(capaRatio);
+        }
+
+        List<LevelRatio> levelRatioList = Lists.newArrayList();
+        for (int i = 1; i <= 8 ; i++) {
+            LevelRatio levelRatio = new LevelRatio(i, BigDecimal.valueOf(0.1));
+            levelRatioList.add(levelRatio);
+        }
+        rule.setCapaRatioList(capaRatioList);
+        rule.setLevelRatioList(levelRatioList);
+        System.out.println(JSONObject.toJSONString(rule));
+
     }
 
 
