@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Wallet;
-import com.jbp.common.model.agent.WalletConfig;
-import com.jbp.common.model.agent.WalletFlow;
-import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.WalletChangeRequest;
 import com.jbp.common.request.WalletTradePasswordRequest;
@@ -19,6 +16,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
+import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
@@ -39,6 +37,10 @@ import java.util.List;
 @Api(tags = "用户积分")
 public class WalletController {
     @Resource
+    private ChannelCardService channelCardService;
+    @Resource
+    private ChannelIdentity
+    @Resource
     private WalletService walletService;
     @Resource
     private WalletFlowService walletFlowService;
@@ -48,6 +50,15 @@ public class WalletController {
     private WalletConfigService walletConfigService;
     @Resource
     private WalletWithdrawService walletWithdrawService;
+
+
+    @GetMapping("/trade/password")
+    @ApiOperation("设置交易密码")
+    public CommonResult tradePassword(WalletTradePasswordRequest request) {
+        userService.tradePassword(request.getPhone(), request.getCode(), request.getTradePassword());
+        return CommonResult.success();
+    }
+
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "设置交易密码")
     @GetMapping("/trade/password")
