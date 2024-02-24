@@ -16,4 +16,9 @@ public class LianLianPayInfoResult implements Serializable {
     private String notify_url;
     private String return_url;
     private String status;
+
+    // 来账通
+    private String lzt_priKey;
+    private String lzt_oid_partner;
+
 }
