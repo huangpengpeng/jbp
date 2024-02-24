@@ -1,13 +1,18 @@
 package com.jbp.service.service.agent.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.exception.CrmebUpdateException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
@@ -30,8 +35,18 @@ import java.util.List;
 @Service
 public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, WalletWithdraw> implements WalletWithdrawService {
 
-   @Resource
-   private WalletService walletService;
+    @Resource
+    private WalletService walletService;
+
+    @Override
+    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
+                .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
+                .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
+                .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status);
+        Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        return CommonPage.copyPageInfo(page, list(lqw));
+    }
 
     @Override
     public WalletWithdraw create(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, String postscript) {
@@ -124,4 +139,5 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
             }
         }
     }
+
 }

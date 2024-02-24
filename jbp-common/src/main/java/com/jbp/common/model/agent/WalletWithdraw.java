@@ -50,15 +50,15 @@ public class WalletWithdraw extends VersionModel {
     private String account;
 
     @ApiModelProperty("钱包类型")
-    @TableField("walletType")
+    @TableField("wallet_type")
     private Integer walletType;
 
     @ApiModelProperty("钱包名称")
-    @TableField("walletName")
+    @TableField("wallet_name")
     private String walletName;
 
     @ApiModelProperty("流水单号")
-    @TableField("uniqueNo")
+    @TableField("unique_no")
     private String uniqueNo;
 
     @ApiModelProperty("提现金额")
@@ -73,11 +73,11 @@ public class WalletWithdraw extends VersionModel {
     private String postscript;
 
     @ApiModelProperty("创建时间")
-    @TableField("createTime")
+    @TableField("create_time")
     private Date createTime;
 
     @ApiModelProperty("成功时间")
-    @TableField("successTime")
+    @TableField("success_time")
     private Date successTime;
 
     @ApiModelProperty("备注")
