@@ -37,7 +37,7 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "团队ID")
     private List<Long> teamIdList;
 
-    @NotNull(message = "请选择是或否")
+    @NotNull(message = "销售请选择是或否")
     @ApiModelProperty(value = "要求必须有上级")
     private Boolean hasPartner;
 
@@ -47,7 +47,7 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "上级星级")
     private List<Long> pCapaXsIdList;
 
-    @NotNull(message = "请选择是或否")
+    @NotNull(message = "服务上级请选择是或否")
     @ApiModelProperty(value = "要求必须有服务上级")
     private Boolean hasRelation;
 

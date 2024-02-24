@@ -44,4 +44,10 @@ public class WalletWithdrawController {
         walletWithdrawService.cancel(requests);
         return CommonResult.success();
     }
+
+    @GetMapping("/status/enum")
+    @ApiOperation("钱包提现状态")
+    public CommonResult<Object> getStatusEnum() {
+        return CommonResult.success(WalletWithdraw.StatusEnum.values());
+    }
 }
