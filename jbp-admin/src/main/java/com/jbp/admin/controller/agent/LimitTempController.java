@@ -45,7 +45,7 @@ public class LimitTempController {
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
         }
-        if (!CollectionUtils.isEmpty(request.getCapaIdList())|| !CollectionUtils.isEmpty(request.getCapaXsIdList())||!CollectionUtils.isEmpty(request.getTeamIdList())||!request.getHasPartner()||!request.getHasRelation()) {
+        if (CollectionUtils.isEmpty(request.getCapaIdList())&& CollectionUtils.isEmpty(request.getCapaXsIdList())&&CollectionUtils.isEmpty(request.getTeamIdList())&&!request.getHasPartner()&&!request.getHasRelation()) {
             throw new CrmebException("等级、星级、团队、销售上级、服务上级必须选填一个否则无法提交");
         }
         if (request.getHasPartner()&&CollectionUtils.isEmpty(request.getPCapaIdList())&&CollectionUtils.isEmpty(request.getPCapaXsIdList())){
