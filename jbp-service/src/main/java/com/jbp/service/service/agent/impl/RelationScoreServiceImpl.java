@@ -136,7 +136,10 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         if(BooleanUtils.isTrue(ifUpdateUsed)){
             relationScore.setUsedScore(relationScore.getUsedScore().add(score));
         }
-        updateById(relationScore);
+        Boolean ifSuccess = updateById(relationScore);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
         // 增加明细
         RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
                 BooleanUtils.isTrue(ifUpdateUsed) ? "调分" : "调分2", "减少", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);

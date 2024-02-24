@@ -1,7 +1,10 @@
 package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 
 import java.math.BigDecimal;
@@ -17,4 +20,5 @@ public interface WalletWithdrawService extends IService<WalletWithdraw> {
 
     void cancel(List<WalletWithdrawRequest> walletWithdrawList);
 
+    PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, PageParamRequest pageParamRequest);
 }

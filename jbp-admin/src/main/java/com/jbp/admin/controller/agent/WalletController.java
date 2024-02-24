@@ -14,7 +14,6 @@ import com.jbp.common.request.agent.WalletformEditRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletService;
-
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +28,7 @@ import javax.annotation.Resource;
 @Api(tags = "用户积分")
 public class WalletController {
     @Resource
-    WalletService walletService;
+    private WalletService walletService;
     @Resource
     private UserService userService;
 
@@ -45,7 +44,7 @@ public class WalletController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletService.pageList(uid,request.getType(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletService.pageList(uid, request.getType(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:increase')")
