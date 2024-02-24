@@ -1,6 +1,8 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

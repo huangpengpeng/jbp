@@ -136,7 +136,6 @@ public class RestTemplateUtil {
         return restTemplate.exchange( url, HttpMethod.GET, requestEntity, JSONObject.class).getBody();
     }
 
-
     /**
      * 发送POST-JSON请求
      *
