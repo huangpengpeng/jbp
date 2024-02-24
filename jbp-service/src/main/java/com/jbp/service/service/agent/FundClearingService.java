@@ -7,6 +7,7 @@ import com.jbp.common.model.agent.FundClearingItem;
 import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.UserInfo;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.FundClearingRequest;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -72,4 +73,10 @@ public interface FundClearingService extends IService<FundClearing> {
      */
     void updateIntercept(List<Long> ids, String remark);
 
+    /**
+     * 佣金发放导出
+     * @return
+     */
+
+    String exportOrder(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status);
 }
