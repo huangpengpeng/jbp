@@ -42,7 +42,6 @@ public class FundClearingController {
         return CommonResult.success(FundClearing.Constants.values());
     }
 
-    @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
     @ApiOperation(value = "佣金发放记录导出Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
     public CommonResult<HashMap<String, String>> exportOrder(FundClearingRequest request){
