@@ -20,6 +20,7 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "模版名称")
     private String name;
 
+    @NotBlank(message = "类型不能为空")
     @ApiModelProperty(value = "商品显示  商品购买  装修显示")
     private String type;
 
