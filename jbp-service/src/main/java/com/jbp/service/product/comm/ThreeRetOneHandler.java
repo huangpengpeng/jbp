@@ -13,6 +13,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
@@ -71,9 +72,17 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.推三返一.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        List<Rule> rule = getRule(productComm);
-        Set<Integer> set = rule.stream().map(Rule::getLevel).collect(Collectors.toSet());
-        if (set.size() != rule.size()) {
+        List<Rule> rules = getRule(productComm);
+        if (CollectionUtils.isEmpty(rules)) {
+            throw new CrmebException(ProductCommEnum.推三返一.getName() + "参数不完整");
+        }
+        for (Rule rule : rules) {
+            if (rule.getLevel() == null || StringUtils.isEmpty(rule.getType()) || rule.getValue() == null || ArithmeticUtils.lessEquals(rule.getValue(), BigDecimal.ZERO)) {
+                throw new CrmebException(ProductCommEnum.推三返一.getName() + "参数不完整");
+            }
+        }
+        Set<Integer> set = rules.stream().map(Rule::getLevel).collect(Collectors.toSet());
+        if (set.size() != rules.size()) {
             throw new CrmebException("单数不能重复");
         }
         // 删除数据库的信息
@@ -88,7 +97,8 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
     @Override
     public List<Rule> getRule(ProductComm productComm) {
         try {
-            return JSONArray.parseArray(productComm.getRule(), Rule.class);
+            List<Rule> rules = JSONArray.parseArray(productComm.getRule(), Rule.class);
+            return rules;
         } catch (Exception e) {
             throw new CrmebException(getType() + ":佣金格式解析失败:" + productComm.getRule());
         }

@@ -19,6 +19,7 @@ import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +69,23 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        getRule(productComm);
+        Rule rule = getRule(productComm);
+        if (rule == null) {
+            throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
+        }
+        if (CollectionUtils.isEmpty(rule.getCapaRatioList()) || CollectionUtils.isEmpty(rule.getLevelRatioList())) {
+            throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
+        }
+        for (CapaRatio capaRatio : rule.getCapaRatioList()) {
+            if (capaRatio.getCapaId() == null || capaRatio.getRatio() == null || ArithmeticUtils.lessEquals(capaRatio.getRatio(), BigDecimal.ZERO)) {
+                throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
+            }
+        }
+        for (LevelRatio levelRatio : rule.getLevelRatioList()) {
+            if (levelRatio.getLevel() == null || levelRatio.getRatio() == null || ArithmeticUtils.lessEquals(levelRatio.getRatio(), BigDecimal.ZERO)) {
+                throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
+            }
+        }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
                 .eq(ProductComm::getProductId, productComm.getProductId())

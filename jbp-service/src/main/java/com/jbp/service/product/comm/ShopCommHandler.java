@@ -66,7 +66,10 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.店铺佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        getRule(productComm);
+        Rule rule = getRule(productComm);
+        if(rule == null || rule.getRatio() == null){
+            throw new CrmebException(ProductCommEnum.店铺佣金.getName() + "参数不完整");
+        }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
                 .eq(ProductComm::getProductId, productComm.getProductId())

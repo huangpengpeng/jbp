@@ -18,6 +18,7 @@ import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +67,15 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.社群佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        getRule(productComm);
+        List<Rule> rules = getRule(productComm);
+        if (CollectionUtils.isEmpty(rules)) {
+            throw new CrmebException(ProductCommEnum.社群佣金.getName() + "参数不完整");
+        }
+        for (Rule rule : rules) {
+            if (rule.getCapaXsId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
+                throw new CrmebException(ProductCommEnum.社群佣金.getName() + "参数不完整");
+            }
+        }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
                 .eq(ProductComm::getProductId, productComm.getProductId())
