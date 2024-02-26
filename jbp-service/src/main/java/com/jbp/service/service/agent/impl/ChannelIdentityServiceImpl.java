@@ -56,6 +56,9 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
                 .like(StringUtils.isNotEmpty(channel), ChannelIdentity::getChannel, channel);
         Page<ChannelIdentity> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelIdentity> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
         List<Integer> uIdList = list.stream().map(ChannelIdentity::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {

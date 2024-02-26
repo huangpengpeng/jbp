@@ -1,6 +1,5 @@
 package com.jbp.service.service.agent.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -361,7 +360,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public void updateRemark(Long id, String remark) {
         LambdaUpdateWrapper<FundClearing> luw = new LambdaUpdateWrapper<FundClearing>()
-                .eq(FundClearing::getId,id)
+                .eq(FundClearing::getId, id)
                 .set(FundClearing::getRemark, remark);
         update(luw);
     }

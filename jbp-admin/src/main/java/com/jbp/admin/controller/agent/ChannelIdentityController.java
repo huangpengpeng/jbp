@@ -1,14 +1,11 @@
 package com.jbp.admin.controller.agent;
 
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ChannelCard;
 import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.agent.ChannelCardRequest;
 import com.jbp.common.request.agent.ChannelIdentityPageRequest;
-import com.jbp.common.request.agent.ChannelIdentityRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelIdentityService;
@@ -30,6 +27,7 @@ public class ChannelIdentityController {
     private ChannelIdentityService channelIdentityService;
     @Resource
     private UserService userService;
+
     @PreAuthorize("hasAuthority('agent:channel:identity:page')")
     @GetMapping("/page")
     @ApiOperation("渠道身份信息列表")
@@ -42,6 +40,6 @@ public class ChannelIdentityController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(channelIdentityService.pageList(uid,request.getIdCardNo(),request.getRealName(),request.getChannel(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(channelIdentityService.pageList(uid, request.getIdCardNo(), request.getRealName(), request.getChannel(), pageParamRequest)));
     }
 }

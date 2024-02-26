@@ -50,7 +50,7 @@ public class ChannelCard extends BaseModel {
     private String bankId;
 
     @ApiModelProperty("银行卡号")
-    @TableField("bank_cardNo")
+    @TableField("bank_card_no")
     private String bankCardNo;
 
     @ApiModelProperty("银行名称")
