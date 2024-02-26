@@ -81,7 +81,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:remark')")
     @PostMapping("/update/remark")
     @ApiOperation("修改备注")
-    public CommonResult updateRemark(FundClearingUpdateRemarkRequest request) {
+    public CommonResult updateRemark(@RequestBody FundClearingUpdateRemarkRequest request) {
         fundClearingService.updateRemark(request.getId(),request.getRemark());
         return CommonResult.success();
     }
