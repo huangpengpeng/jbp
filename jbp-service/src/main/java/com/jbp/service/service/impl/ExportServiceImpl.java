@@ -1,7 +1,6 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.DateConstants;
@@ -29,7 +28,6 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -57,8 +55,6 @@ public class ExportServiceImpl implements ExportService {
     private OrderDetailService orderDetailService;
     @Autowired
     private CrmebConfig crmebConfig;
-    @Resource
-    private ProductService productService;
     @Resource
     private ProductAttrValueService productAttrValueService;
     @Resource
@@ -232,19 +228,6 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("merchantRemark", "商家备注");
         return ExportUtil.exportExcel(fileName, "订单导出", voList, aliasMap);
     }
-
-    private String getOrderProductInfo(List<OrderDetail> orderDetails) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < orderDetails.size(); i++) {
-            OrderDetail orderDetail = orderDetails.get(i);
-            stringBuilder.append(StrUtil.format("{}  {} * {}", orderDetail.getProductName(), orderDetail.getPayPrice(), orderDetail.getPayNum()));
-            if ((i + 1) < orderDetails.size()) {
-                stringBuilder.append("\r\n");
-            }
-        }
-        return stringBuilder.toString();
-    }
-
 
 }
 
