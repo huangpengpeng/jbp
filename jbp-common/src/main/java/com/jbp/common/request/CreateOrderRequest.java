@@ -56,4 +56,9 @@ public class CreateOrderRequest implements Serializable {
 
     @ApiModelProperty(value = "分享用户ID")
     private Integer shardUid;
+
+
+    @ApiModelProperty(value = "下单场景（报单，换购）", required = false)
+    private String platform;
+
 }

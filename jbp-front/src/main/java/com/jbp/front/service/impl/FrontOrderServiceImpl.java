@@ -1054,6 +1054,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setPlatCouponPrice(orderInfoVo.getPlatCouponFee());
         order.setPlatCouponId(orderInfoVo.getPlatUserCouponId());
         order.setPayGateway(orderInfoVo.getPayGateway());
+        order.setPlatform(orderRequest.getPlatform());
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
@@ -1232,6 +1233,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         response.setOrderNo(order.getOrderNo());
         response.setPayPrice(order.getPayPrice());
         response.setPayGateway(order.getPayGateway());
+        response.setPlatform(order.getPlatform());
         return response;
     }
 

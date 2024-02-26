@@ -41,4 +41,8 @@ public class OrderNoResponse implements Serializable {
 
     @ApiModelProperty(value = "支付网关 -1 统一支付 0 在线支付 1 积分支付")
     private Integer payGateway;
+
+    @ApiModelProperty(value = "下单场景")
+    private String platform;
+
 }

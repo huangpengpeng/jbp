@@ -161,4 +161,6 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "下单用户IP")
     private String ip;
 
+    @ApiModelProperty(value = "下单场景（报单，换购）")
+    private String platform;
 }
