@@ -163,4 +163,134 @@ public class Order implements Serializable {
 
     @ApiModelProperty(value = "下单场景（报单，换购）")
     private String platform;
+
+    public String getOrderType() {
+        String typeStr = "";
+        switch (this.getType()) {
+            case 0:
+                typeStr = "普通";
+                break;
+            case 1:
+                typeStr = "视频号";
+                break;
+            case 2:
+                typeStr = "秒杀";
+                break;
+        }
+        return typeStr;
+    }
+
+    public String getOrderRefundStatus() {
+        String refundStatusStr = "";
+        switch (this.getRefundStatus()) {
+            case 0:
+                refundStatusStr = "未退款";
+                break;
+            case 1:
+                refundStatusStr = "申请中";
+                break;
+            case 2:
+                refundStatusStr = "部分退款";
+                break;
+            case 3:
+                refundStatusStr = "已退款";
+                break;
+        }
+        return refundStatusStr;
+    }
+
+    public String getOrderStatus() {
+        String statusStr = "";
+        switch (this.getStatus()) {
+            case 0:
+                statusStr = "待支付";
+                break;
+            case 1:
+                statusStr = "待发货";
+                break;
+            case 2:
+                statusStr = "部分发货";
+                break;
+            case 3:
+                statusStr = "待核销";
+                break;
+            case 4:
+                statusStr = "待收货";
+                break;
+            case 5:
+                statusStr = "已收货";
+                break;
+            case 6:
+                statusStr = "已完成";
+                break;
+            case 9:
+                statusStr = "已取消";
+                break;
+        }
+        return statusStr;
+    }
+
+    public String getOrderPayChannel() {
+        String payChannelStr = "";
+        switch (this.getPayChannel()) {
+            case "public":
+                payChannelStr = "公众号";
+                break;
+            case "mini":
+                payChannelStr = "小程序";
+                break;
+            case "h5":
+                payChannelStr = "微信网页支付";
+                break;
+            case "yue":
+                payChannelStr = "余额";
+                break;
+            case "wechatIos":
+                payChannelStr = "微信Ios";
+                break;
+            case "wechatAndroid":
+                payChannelStr = "微信Android";
+                break;
+            case "alipay":
+                payChannelStr = "支付宝";
+                break;
+            case "alipayApp":
+                payChannelStr = "支付宝App";
+                break;
+            case "wallet":
+                payChannelStr = "积分";
+                break;
+            case "lianlian":
+                payChannelStr = "连连";
+                break;
+        }
+        return payChannelStr;
+    }
+
+    public String getOrderPayType() {
+        String payTypeStr = "";
+        switch (this.getPayType()) {
+            case "weixin":
+                payTypeStr = "微信支付";
+                break;
+            case "alipay":
+                payTypeStr = "支付宝支付";
+                break;
+            case "yue":
+                payTypeStr = "余额支付";
+                break;
+            case "wallet":
+                payTypeStr = "积分支付";
+                break;
+            case "lianlian":
+                payTypeStr = "连连支付";
+                break;
+            case "confirmPay":
+                payTypeStr = "人工确认";
+                break;
+        }
+        return payTypeStr;
+    }
+
+
 }

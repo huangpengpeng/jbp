@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -328,5 +329,13 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         aliasMap.put("clearingTime", "结算时间");
         aliasMap.put("createTime", "创建时间");
         return ExportUtil.exportExcel(fileName, "佣金发放记录导出", result, aliasMap);
+    }
+
+    @Override
+    public void updateRemark(Long id, String remark) {
+        LambdaUpdateWrapper<FundClearing> luw = new LambdaUpdateWrapper<FundClearing>()
+                .eq(FundClearing::getId,id)
+                .set(FundClearing::getRemark, remark);
+        update(luw);
     }
 }
