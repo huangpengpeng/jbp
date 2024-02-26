@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.mybatis.MaterialsListHandler;
 import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -176,4 +177,12 @@ public class OrderDetail implements Serializable {
 
     @ApiModelProperty(value = "退运费金额")
     private BigDecimal refundFreightFee;
+
+    @ApiModelProperty(value = "商品条码")
+    private String barCode;
+
+    @ApiModelProperty(value = "商品条码")
+    @TableField(value = "materialsList", typeHandler = MaterialsListHandler.class)
+    private List<Materials> materialsList;
+
 }

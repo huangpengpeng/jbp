@@ -1,7 +1,12 @@
 package com.jbp.admin.controller.merchant;
 
+import cn.hutool.core.collection.CollUtil;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Maps;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.express.Express;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
@@ -10,20 +15,29 @@ import com.jbp.common.response.OrderAdminDetailResponse;
 import com.jbp.common.response.OrderCountItemResponse;
 import com.jbp.common.response.OrderInvoiceResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.LogisticsResultVo;
+import com.jbp.common.vo.OrderShippingExcelVo;
+import com.jbp.service.service.ExpressService;
 import com.jbp.service.service.OrderService;
 
 import com.jbp.service.service.PayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 商户侧订单控制器
@@ -45,6 +59,8 @@ public class MerchantOrderController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private ExpressService expressService;
 
     @Resource
     private PayService payService;
@@ -146,6 +162,65 @@ public class MerchantOrderController {
     @GetMapping(value = "/confirm/pay")
     public CommonResult confirmPay(String orderNo) {
         payService.confirmPay(orderService.getByOrderNo(orderNo));
+        return CommonResult.success();
+    }
+
+    @PreAuthorize("hasAuthority('platform:export:order:import')")
+    @ApiOperation(value = "导入发货订单Excel")
+    @PostMapping(value = "/order/importSend")
+    public CommonResult importSend(@RequestBody @Validated List<OrderShippingExcelVo> request){
+        if(CollUtil.isEmpty(request)){
+            return CommonResult.failed("导入发货数据不能为空");
+        }
+        Set<Integer> orderDetailIdSet = request.stream().map(OrderShippingExcelVo::getOrderDetailId).collect(Collectors.toSet());
+        if (orderDetailIdSet.size() != request.size()) {
+            return CommonResult.failed("导入发货数据重复");
+        }
+        // 按订单归档统一
+        Map<String, List<OrderShippingExcelVo>> shippingListMap = FunctionUtil.valueMap(request, OrderShippingExcelVo::getOrderNo);
+        Set<String> orderNoSet = shippingListMap.keySet();
+        for (OrderShippingExcelVo vo : request) {
+            if("虚拟发货".equals(vo.getDeliveryTypeName()) && !"0000".equals(vo.getExpressNumber())){
+                return CommonResult.failed("虚拟发货单号请固定填写:0000");
+            }
+        }
+
+        Map<String, Express> expressMap = Maps.newConcurrentMap();
+        List<OrderSendRequest> sendRequestList = Lists.newArrayList();
+        for (String s : orderNoSet) {
+            // 单号分组
+            List<OrderShippingExcelVo> shippingVos = shippingListMap.get(s);
+            // 物流单号分组
+            Map<String, List<OrderShippingExcelVo>> shippingNoListMap = FunctionUtil.valueMap(shippingVos, OrderShippingExcelVo::getExpressNumber);
+            shippingNoListMap.forEach((k, v) -> {
+                List<SplitOrderSendDetailRequest> detailList = Lists.newArrayList();
+                for (OrderShippingExcelVo shippingVo : v) {
+                    SplitOrderSendDetailRequest splitDetail = new SplitOrderSendDetailRequest(shippingVo.getOrderDetailId(), shippingVo.getNum());
+                    detailList.add(splitDetail);
+                }
+                OrderShippingExcelVo vo = v.get(0);
+                OrderSendRequest orderSend = new OrderSendRequest();
+                orderSend.setOrderNo(s);
+                orderSend.setDeliveryType(vo.getDeliveryTypeName().equals("快递") ? "express" : "fictitious");
+                if (StringUtils.equals("express", orderSend.getDeliveryType())) {
+                    Express express = expressMap.get(vo.getExpressName());
+                    if (express == null) {
+                        express = expressService.getByName(vo.getExpressName());
+                        expressMap.put(vo.getExpressName(), express);
+                    }
+                    if (express == null) {
+                        throw new CrmebException("快递名称不存在");
+                    }
+                    orderSend.setExpressCode(express.getCode());
+                }
+                orderSend.setExpressNumber(k);
+                orderSend.setExpressRecordType(1);
+                orderSend.setIsSplit(true);
+                orderSend.setDetailList(detailList);
+                sendRequestList.add(orderSend);
+            });
+        }
+        orderService.batchSend(sendRequestList);
         return CommonResult.success();
     }
 }

@@ -174,6 +174,13 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
         return dao.selectOne(lqw);
     }
 
+    @Override
+    public Express getByName(String name) {
+        LambdaQueryWrapper<Express> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Express::getName, name);
+        return dao.selectOne(lqw);
+    }
+
     /**
      * 获取快递公司详情
      *

@@ -14,12 +14,14 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.RestTemplateUtil;
 import com.jbp.service.dao.agent.ChannelCardDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,9 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
                 .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone);
         Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelCard> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
         List<Integer> uIdList = list.stream().map(ChannelCard::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
@@ -86,5 +91,14 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
     @Override
     public ChannelCard getByUser(Integer uid, String channel) {
         return getOne(new QueryWrapper<ChannelCard>().lambda().eq(ChannelCard::getUid, uid).eq(ChannelCard::getChannel, channel));
+    }
+
+    @Override
+    public Map<Integer, ChannelCard> getChannelCardMap(List<Integer> uidList, String channel) {
+        QueryWrapper<ChannelCard> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().in(ChannelCard::getUid, uidList).eq(ChannelCard::getChannel, channel);
+        List<ChannelCard> list = list(queryWrapper);
+        return FunctionUtil.keyValueMap(list, ChannelCard::getUid);
+
     }
 }

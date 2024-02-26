@@ -1,6 +1,5 @@
 package com.jbp.service.service.agent.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,6 +19,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
@@ -59,6 +59,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private WalletConfigService walletConfigService;
     @Resource
     private CrmebConfig crmebConfig;
+    @Resource
+    private SystemConfigService systemConfigService;
+    @Resource
+    private ChannelIdentityService channelIdentityService;
+    @Resource
+    private ChannelCardService channelCardService;
 
     @Override
     public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, PageParamRequest pageParamRequest) {
@@ -283,7 +289,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public String exportOrder(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status) {
+    public String exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status) {
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Long id = 0L;
         List<FundClearingVo> result = Lists.newArrayList();
         do {
@@ -292,23 +299,37 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                     .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
                     .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
                     .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
-                    .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
+                    .between(!ObjectUtil.isNull(startCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, startCreateTime, endCreateTime)
                     .gt(FundClearing::getId, id).last("LIMIT 1000");
             List<FundClearing> fundClearingList = list(lqw);
-            if(CollectionUtils.isEmpty(fundClearingList)){
+            if (CollectionUtils.isEmpty(fundClearingList)) {
                 break;
             }
             List<Integer> uIdList = fundClearingList.stream().map(FundClearing::getUid).collect(Collectors.toList());
+
+            Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
+            Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
             Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
             fundClearingList.forEach(e -> {
                 User user = uidMapList.get(e.getUid());
                 e.setAccount(user != null ? user.getAccount() : "");
                 FundClearingVo fundClearingVo = new FundClearingVo();
                 BeanUtils.copyProperties(e, fundClearingVo);
+                ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
+                if(channelIdentity != null){
+                    fundClearingVo.setRealName(channelIdentity.getRealName());
+                    fundClearingVo.setIdCardNo(channelIdentity.getIdCardNo());
+                }
+                ChannelCard channelCard = channelCardMap.get(e.getUid());
+                if(channelCard != null){
+                    fundClearingVo.setPhone(channelCard.getPhone());
+                    fundClearingVo.setBankName(channelCard.getBankName());
+                    fundClearingVo.setBankCode(channelCard.getBankCardNo());
+                }
                 result.add(fundClearingVo);
             });
-            id = fundClearingList.get(fundClearingList.size()-1).getId();
-        }while (true);
+            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+        } while (true);
 
 //       以下为存储部分
         //上传设置
@@ -317,11 +338,16 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         String fileName = "佣金发放记录导出".concat(CrmebDateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
         //自定义标题别名
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
-        aliasMap.put("account", "得奖用户账户");
+        aliasMap.put("account", "用户账户");
+        aliasMap.put("realName", "真实姓名");
+        aliasMap.put("idCardNo", "身份证号");
+        aliasMap.put("bankName", "银行名称");
+        aliasMap.put("bankCode", "银行卡号");
+        aliasMap.put("phone", "预留手机");
         aliasMap.put("uniqueNo", "流水单号");
         aliasMap.put("externalNo", "外部单号");
         aliasMap.put("commName", "佣金名称");
-        aliasMap.put("commAmt", "佣金");
+        aliasMap.put("commAmt", "结算佣金");
         aliasMap.put("sendAmt", "实发金额");
         aliasMap.put("description", "描述");
         aliasMap.put("status", "结算状态");
@@ -334,7 +360,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public void updateRemark(Long id, String remark) {
         LambdaUpdateWrapper<FundClearing> luw = new LambdaUpdateWrapper<FundClearing>()
-                .eq(FundClearing::getId,id)
+                .eq(FundClearing::getId, id)
                 .set(FundClearing::getRemark, remark);
         update(luw);
     }

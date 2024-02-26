@@ -3,8 +3,12 @@ package com.jbp.service.service.agent;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ChannelCard;
+import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.AliBankcardResponse;
+
+import java.util.List;
+import java.util.Map;
 
 public interface ChannelCardService extends IService<ChannelCard> {
     PageInfo<ChannelCard> pageList(Integer uid, String bankCardNo, String type, String phone, PageParamRequest pageParamRequest);
@@ -17,4 +21,6 @@ public interface ChannelCardService extends IService<ChannelCard> {
                     String province, String city, String phone, String channel);
 
     ChannelCard getByUser(Integer uid, String channel);
+
+    Map<Integer, ChannelCard> getChannelCardMap(List<Integer> uidList, String channel);
 }

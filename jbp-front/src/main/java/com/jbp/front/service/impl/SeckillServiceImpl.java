@@ -597,6 +597,7 @@ public class SeckillServiceImpl implements SeckillService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(seckillProduct.getTempId());
+        detailVo.setBarCode(attrValue.getBarCode());
         detailVo.setWalletDeductionFee(BigDecimal.ZERO);
         detailVo.setMerCouponPrice(BigDecimal.ZERO);
         detailVo.setPlatCouponPrice(BigDecimal.ZERO);
@@ -816,6 +817,7 @@ public class SeckillServiceImpl implements SeckillService {
         orderDetail.setPrice(detailVo.getPrice());
         orderDetail.setPayNum(detailVo.getPayNum());
         orderDetail.setWeight(detailVo.getWeight());
+        orderDetail.setBarCode(detailVo.getBarCode());
         orderDetail.setVolume(detailVo.getVolume());
         orderDetail.setProductType(detailVo.getProductType());
         orderDetail.setSubBrokerageType(detailVo.getSubBrokerageType());

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
@@ -22,12 +23,18 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "SplitOrderSendDetailRequest对象", description = "拆单发货详情请求对象")
 public class SplitOrderSendDetailRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    public SplitOrderSendDetailRequest(Integer orderDetailId, Integer num) {
+        this.orderDetailId = orderDetailId;
+        this.num = num;
+    }
 
     @ApiModelProperty(value = "订单详情id")
     @NotNull(message = "订单详情id不能为空")

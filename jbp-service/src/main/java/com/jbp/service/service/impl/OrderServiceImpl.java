@@ -354,11 +354,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      *
      * @param request 发货参数
      * @return Boolean
-     * TODO 虚拟发货待确定逻辑
      */
     @Override
     public Boolean send(OrderSendRequest request) {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         if (request.getDeliveryType().equals(OrderConstants.ORDER_DELIVERY_TYPE_EXPRESS)) {
             if (ObjectUtil.isNull(request.getExpressRecordType())) {
                 throw new CrmebException("请选择发货记录类型");
@@ -366,9 +364,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             validateExpressSend(request);
         }
         Order order = getByOrderNo(request.getOrderNo());
-//        if (!order.getMerId().equals(systemAdmin.getMerId())) {
-//            throw new CrmebException("订单不存在");
-//        }
         if (order.getIsUserDel() || order.getIsMerchantDel()) {
             throw new CrmebException("订单已删除");
         }
@@ -413,13 +408,58 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             if (orderDetail.getPayNum() - orderDetail.getDeliveryNum() - detailRequest.getNum() < 0) {
                 throw new CrmebException("超出可发货数量,请重新选择数量");
             }
-//            if (orderDetail.getPayNum() - orderDetail.getRefundNum() - detailRequest.getNum() < 0) {
-//                throw new CrmebException("超出可发货数量,请重新选择数量");
-//            }
         });
 
         // 拆单发货
         return splitSendExpress(request, order, merchantOrder, orderDetailList);
+    }
+
+    /**
+     * 批量发放
+     * @param sendRequestList
+     * @return
+     */
+    @Override
+    public Boolean batchSend(List<OrderSendRequest> sendRequestList) {
+        for (OrderSendRequest vo : sendRequestList) {
+            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(vo.getOrderNo());
+            Order order = getByOrderNo(vo.getOrderNo());
+            List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(vo.getOrderNo());
+            if (order.getIsUserDel() || order.getIsMerchantDel()) {
+                throw new CrmebException("订单已删除");
+            }
+            if (!order.getLevel().equals(OrderConstants.ORDER_LEVEL_MERCHANT)) {
+                throw new CrmebException("订单等级异常，不是商户订单");
+            }
+            if (!(order.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING) || order.getStatus().equals(OrderConstants.ORDER_STATUS_PART_SHIPPING))) {
+                throw new CrmebException("订单不处于待发货状态");
+            }
+            if (order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_ALL)) {
+                throw new CrmebException("订单已退款无法发货");
+            }
+            if (!merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS)) {
+                throw new CrmebException("订单非发货类型订单");
+            }
+            if (CollUtil.isEmpty(vo.getDetailList())) {
+                throw new CrmebException("拆单发货详情不能为空");
+            }
+
+            List<SplitOrderSendDetailRequest> detailRequestList = vo.getDetailList();
+            detailRequestList.forEach(detailRequest -> {
+                if (detailRequest.getNum() < 1) {
+                    throw new CrmebException("订单详情发货数量不能小于1");
+                }
+                OrderDetail orderDetail = orderDetailList.stream().filter(e -> e.getId().equals(detailRequest.getOrderDetailId())).findAny().orElse(null);
+                if (ObjectUtil.isNull(orderDetail)) {
+                    throw new CrmebException("订单详情ID不对应");
+                }
+                if (orderDetail.getPayNum() - orderDetail.getDeliveryNum() - detailRequest.getNum() < 0) {
+                    throw new CrmebException("超出可发货数量,请重新选择数量");
+                }
+            });
+            splitSendExpress(vo, order, merchantOrder, orderDetailList);
+        }
+        return true;
     }
 
     /**
@@ -1086,7 +1126,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             orderStatusService.createLog(order.getOrderNo(), OrderStatusConstants.ORDER_STATUS_EXPRESS_SPLIT_OLD, message);
             return Boolean.TRUE;
         });
-        if (!execute) throw new CrmebException("快递拆单发货失败！");
+        if (!execute) throw new CrmebException("快递拆单发货失败！"+ order.getOrderNo());
         List<OrderDetail> detailList = orderDetailService.getByOrderNo(order.getOrderNo());
         long count = detailList.stream().filter(e -> e.getPayNum() > (e.getDeliveryNum() + e.getRefundNum())).count();
         if (count <= 0) {
@@ -1099,6 +1139,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         pushMessageOrder(order, payNotification, invoice);
         return execute;
     }
+
+
 
     /**
      * 快递发货

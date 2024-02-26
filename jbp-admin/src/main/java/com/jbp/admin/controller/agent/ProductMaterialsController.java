@@ -1,12 +1,10 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ProductMaterialsAddRequest;
@@ -36,6 +34,7 @@ public class ProductMaterialsController {
     private MerchantService merchantService;
     @Autowired
     private SystemConfigService systemConfigService;
+
     @PreAuthorize("hasAuthority('agent:product:materials:page')")
     @GetMapping("/page")
     @ApiOperation("产品物料对应仓库列表")
@@ -50,21 +49,23 @@ public class ProductMaterialsController {
         }
         return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:product:materials:add')")
     @PostMapping("/add")
     @ApiOperation("新增")
     public CommonResult add(@RequestBody @Validated ProductMaterialsAddRequest request) {
         SystemAdmin user = SecurityUtil.getLoginUserVo().getUser();
-        Boolean ifPlatformAdd = user.getMerId()==0;
-        Merchant merchant ;
-        if(!ifPlatformAdd){
+        Boolean ifPlatformAdd = user.getMerId() == 0;
+        Merchant merchant;
+        if (!ifPlatformAdd) {
             merchant = merchantService.getByIdException(user.getMerId());
         } else {
             merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
         }
-        productMaterialsService.add(merchant.getId(),request.getBarCode(),request.getMaterialsName(),request.getMaterialsQuantity(),request.getMaterialsPrice(),request.getMaterialsCode());
+        productMaterialsService.add(merchant.getId(), request.getBarCode(), request.getMaterialsName(), request.getMaterialsQuantity(), request.getMaterialsPrice(), request.getMaterialsCode());
         return CommonResult.success();
     }
+
     @PreAuthorize("hasAuthority('agent:product:materials:delete')")
     @GetMapping("/delete")
     @ApiOperation("删除")

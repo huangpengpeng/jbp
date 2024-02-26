@@ -1124,12 +1124,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 orderDetail.setPayNum(detailVo.getPayNum());
                 orderDetail.setWeight(detailVo.getWeight());
                 orderDetail.setVolume(detailVo.getVolume());
+                orderDetail.setBarCode(detailVo.getBarCode());
                 orderDetail.setProductType(detailVo.getProductType());
                 orderDetail.setSubBrokerageType(detailVo.getSubBrokerageType());
                 orderDetail.setBrokerage(detailVo.getBrokerage());
                 orderDetail.setBrokerageTwo(detailVo.getBrokerageTwo());
                 orderDetail.setFreightFee(detailVo.getFreightFee());
-
                 orderDetail.setUseIntegral(detailVo.getUseIntegral());
                 orderDetail.setIntegralPrice(detailVo.getIntegralPrice());
                 orderDetail.setPayPrice(BigDecimal.ZERO);
@@ -2258,11 +2258,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         if (registerInfo != null) {
             HelpRegisterResponse response = userService.helpRegisterValid(registerInfo.getUsername(), registerInfo.getMobile(), registerInfo.getPaccount(),
                     registerInfo.getRaccount(), registerInfo.getNode(), registerInfo.getCapaId());
-            productList.forEach(p -> {
-                if (p.getPayType() == 0) {
-                    throw new CrmebException("注册下单只能选择积分支付商品");
-                }
-            });
+//            productList.forEach(p -> {
+//                if (p.getPayType() == 0) {
+//                    throw new CrmebException("注册下单只能选择积分支付商品");
+//                }
+//            });
             capaId = registerInfo.getCapaId();
             capaXsId = registerInfo.getCapaXsId();
             TeamUser teamUser = teamUserService.getByUser(response.getPId());
@@ -2376,6 +2376,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(product.getTempId());
+        detailVo.setBarCode(attrValue.getBarCode());
         detailVo.setSubBrokerageType(product.getIsSub() ? 1 : 2);
         detailVo.setMerCouponPrice(BigDecimal.ZERO);
         detailVo.setPlatCouponPrice(BigDecimal.ZERO);
@@ -2887,6 +2888,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(product.getTempId());
+        detailVo.setBarCode(attrValue.getBarCode());
         detailVo.setMerCouponPrice(BigDecimal.ZERO);
         detailVo.setPlatCouponPrice(BigDecimal.ZERO);
         detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));

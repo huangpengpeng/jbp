@@ -90,7 +90,7 @@ public class FundClearingController {
     @ApiOperation(value = "佣金发放记录导出Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
     public CommonResult<HashMap<String, String>> exportOrder(FundClearingRequest request) {
-        String fileName = fundClearingService.exportOrder(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus());
+        String fileName = fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus());
         HashMap<String, String> map = CollUtil.newHashMap();
         map.put("fileName", fileName);
         return CommonResult.success(map);
