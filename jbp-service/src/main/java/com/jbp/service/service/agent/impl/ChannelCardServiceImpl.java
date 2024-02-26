@@ -10,6 +10,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ChannelCard;
+import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -20,6 +21,7 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,9 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
                 .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone);
         Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelCard> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
         List<Integer> uIdList = list.stream().map(ChannelCard::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {

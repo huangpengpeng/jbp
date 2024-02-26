@@ -22,6 +22,7 @@ import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.ChannelWalletService;
 import com.jbp.service.util.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,9 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
                 .like(StringUtils.isNotEmpty(channel), ChannelIdentity::getChannel, channel);
         Page<ChannelIdentity> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelIdentity> list = list(lqw);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
         List<Integer> uIdList = list.stream().map(ChannelIdentity::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
