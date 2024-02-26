@@ -18,7 +18,7 @@ public class PayConstants {
     public static final String PAY_TYPE_LIANLIAN = "lianlian";
 
     /** 支付方式-wallet */
-    public static final String PAY_TYPE_WALLET = "lianlian";
+    public static final String PAY_TYPE_WALLET = "wallet";
 
     /** 支付方式-微信支付 */
     public static final String PAY_TYPE_WE_CHAT = "weixin";
