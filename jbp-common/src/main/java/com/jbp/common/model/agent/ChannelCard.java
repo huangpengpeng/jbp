@@ -13,7 +13,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -23,14 +22,25 @@ public class ChannelCard extends BaseModel {
 
     private static final long serialVersionUID = 4856535195748963537L;
 
+    public ChannelCard(Integer uid, String bankId, String bankCardNo,
+                       String bankName, String branchId, String branchName, String type,
+                       String province, String city, String phone, String channel) {
+        this.uid = uid;
+        this.bankId = bankId;
+        this.bankCardNo = bankCardNo;
+        this.bankName = bankName;
+        this.branchId = branchId;
+        this.branchName = branchName;
+        this.type = type;
+        this.province = province;
+        this.city = city;
+        this.phone = phone;
+        this.channel = channel;
+    }
 
     @ApiModelProperty("用户ID")
     @TableField("uid")
     private Integer uid;
-
-    @ApiModelProperty("渠道商编")
-    @TableField("channelCode")
-    private String channelCode;
 
     @ApiModelProperty("银行编码  总行编号")
     @TableField("bankId")

@@ -14,14 +14,14 @@ import com.jbp.common.request.WalletChangeRequest;
 import com.jbp.common.request.WalletTradePasswordRequest;
 import com.jbp.common.request.WalletTransferRequest;
 import com.jbp.common.request.WalletWithdrawRequest;
+import com.jbp.common.request.agent.ChannelIdentityRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
-import com.jbp.service.service.agent.WalletFlowService;
-import com.jbp.service.service.agent.WalletService;
-import com.jbp.service.service.agent.WalletWithdrawService;
+import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +39,10 @@ import java.util.List;
 @Api(tags = "用户积分")
 public class WalletController {
     @Resource
+    private ChannelCardService channelCardService;
+    @Resource
+    private ChannelIdentityService channelIdentityService;
+    @Resource
     private WalletService walletService;
     @Resource
     private WalletFlowService walletFlowService;
@@ -48,6 +52,30 @@ public class WalletController {
     private WalletConfigService walletConfigService;
     @Resource
     private WalletWithdrawService walletWithdrawService;
+    @Resource
+    private SystemConfigService systemConfigService;
+
+
+    @PostMapping("/identity")
+    @ApiOperation("认证")
+    public CommonResult identity(@Validated @RequestBody ChannelIdentityRequest request) {
+        User info = userService.getInfo();
+        channelIdentityService.identity(info.getId(), request);
+        return CommonResult.success();
+    }
+
+    @PostMapping("/identity/get")
+    @ApiOperation("认证")
+    public CommonResult<JSONObject> identityGet() {
+        User info = userService.getInfo();
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        channelName = StringUtils.isEmpty(channelName) ? "平台" : channelName;
+        JSONObject json = new JSONObject();
+        json.put("card", channelCardService.getByUser(info.getId(), channelName));
+        json.put("identity", channelIdentityService.getByUser(info.getId(), channelName));
+        return CommonResult.success(json);
+    }
+
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "设置交易密码")
     @GetMapping("/trade/password")

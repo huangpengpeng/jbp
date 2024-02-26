@@ -76,4 +76,26 @@ public class LianLianPayConfig {
 
 
 
+
+    public enum TxnPurpose {
+        贷款("贷款"),
+        服务费("服务费"),
+        信息费("信息费"),
+        修理费("修理费"),
+        佣金支付("佣金支付"),
+        其他("其他"),
+        ;
+
+        @Getter
+        private String name;
+
+        TxnPurpose(String name) {
+            this.name = name;
+        }
+    }
+
+
+
+
+
 }

@@ -10,11 +10,11 @@ import java.util.List;
 public interface UserRelationDao extends BaseMapper<UserRelation> {
     @Select(" select t1.*, t2.node " +
             "        from( " +
-            "                select @r as uId,  (select @r := pId  from eb_user_relation where uId = uId) as pId, @I := @I + 1 as level " +
+            "                select @r as userId,  (select @r := pId  from eb_user_relation where uId = userId) as pId, @I := @I + 1 as level " +
             "        from (select @r := #{uId} ,@I := 0) vars, eb_user_relation h " +
             "            ) t1 " +
             "            join eb_user_relation t2 " +
-            "        on t1.uId = t2.uId " +
+            "        on t1.userId = t2.uId " +
             "        ORDER BY level ")
     List<UserUpperDto> getAllUpper(Integer uId);
 

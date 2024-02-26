@@ -1,22 +1,23 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.jbp.common.config.CrmebConfig;
+import com.jbp.common.constants.DateConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.*;
+import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
@@ -24,6 +25,7 @@ import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -52,6 +56,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private PlatformWalletService platformWalletService;
     @Resource
     private WalletConfigService walletConfigService;
+    @Resource
+    private CrmebConfig crmebConfig;
 
     @Override
     public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, PageParamRequest pageParamRequest) {
@@ -187,7 +193,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 List<FundClearingItem> items = Lists.newArrayList();
                 List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
                 if (CollectionUtils.isEmpty(configList)) {
-                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则"+ fundClearing.getUniqueNo());
+                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
                 }
                 for (FundClearingItemConfig clearingItemConfig : configList) {
                     BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
@@ -220,8 +226,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 fundClearing.setClearingTime(now);
                 fundClearing.setRemark(remark);
                 List<FundClearingItem> items = fundClearing.getItems();
-                if(CollectionUtils.isEmpty(items)){
-                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则"+ fundClearing.getUniqueNo());
+                if (CollectionUtils.isEmpty(items)) {
+                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
                 }
                 for (FundClearingItem item : items) {
                     WalletConfig walletConfig = walletMap.get(item.getWalletType());
@@ -273,5 +279,54 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             }
             updateBatchById(fundClearingList);
         }
+    }
+
+    @Override
+    public String exportOrder(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status) {
+        Long id = 0L;
+        List<FundClearingVo> result = Lists.newArrayList();
+        do {
+            LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<FundClearing>()
+                    .like(StringUtils.isNotEmpty(uniqueNo), FundClearing::getUniqueNo, uniqueNo)
+                    .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
+                    .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
+                    .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
+                    .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
+                    .gt(FundClearing::getId, id).last("LIMIT 1000");
+            List<FundClearing> fundClearingList = list(lqw);
+            if(CollectionUtils.isEmpty(fundClearingList)){
+                break;
+            }
+            List<Integer> uIdList = fundClearingList.stream().map(FundClearing::getUid).collect(Collectors.toList());
+            Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+            fundClearingList.forEach(e -> {
+                User user = uidMapList.get(e.getUid());
+                e.setAccount(user != null ? user.getAccount() : "");
+                FundClearingVo fundClearingVo = new FundClearingVo();
+                BeanUtils.copyProperties(e, fundClearingVo);
+                result.add(fundClearingVo);
+            });
+            id = fundClearingList.get(fundClearingList.size()-1).getId();
+        }while (true);
+
+//       以下为存储部分
+        //上传设置
+        UploadUtil.setHzwServerPath((crmebConfig.getImagePath() + "/").replace(" ", "").replace("//", "/"));
+        //文件名
+        String fileName = "佣金发放记录导出".concat(CrmebDateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
+        //自定义标题别名
+        LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
+        aliasMap.put("account", "得奖用户账户");
+        aliasMap.put("uniqueNo", "流水单号");
+        aliasMap.put("externalNo", "外部单号");
+        aliasMap.put("commName", "佣金名称");
+        aliasMap.put("commAmt", "佣金");
+        aliasMap.put("sendAmt", "实发金额");
+        aliasMap.put("description", "描述");
+        aliasMap.put("status", "结算状态");
+        aliasMap.put("remark", "备注");
+        aliasMap.put("clearingTime", "结算时间");
+        aliasMap.put("createTime", "创建时间");
+        return ExportUtil.exportExcel(fileName, "佣金发放记录导出", result, aliasMap);
     }
 }

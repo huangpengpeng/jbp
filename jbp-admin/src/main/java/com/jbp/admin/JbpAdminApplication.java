@@ -1,6 +1,9 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.service.service.agent.ChannelCardService;
+import com.jbp.service.service.agent.UserInvitationService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,6 +28,9 @@ public class JbpAdminApplication {
 
     public static void main(String[] args) {
         final ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
+
+//        final UserInvitationService bean = run.getBean(UserInvitationService.class);
+//        bean.band(109, 99, false, true);
         System.out.println("ok");
 
     }

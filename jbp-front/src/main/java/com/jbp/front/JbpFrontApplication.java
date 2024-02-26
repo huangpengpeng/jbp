@@ -40,5 +40,6 @@ public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
+
     }
 }

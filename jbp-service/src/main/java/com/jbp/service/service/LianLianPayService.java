@@ -2,6 +2,7 @@ package com.jbp.service.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.lianlian.params.MorePayeeRefundResult;
+import com.jbp.common.lianlian.params.TransferMorepyeeParams;
 import com.jbp.common.lianlian.result.*;
 
 import java.math.BigDecimal;
@@ -28,4 +29,12 @@ public interface LianLianPayService {
     AcctInfoResult queryAcctInfo(String userId);
 
     WithDrawalResult withdrawal(String drawNo, BigDecimal amt, String postscript, String password, String random_key);
+
+
+    /**
+     * 内部代发申请
+     * https://accpapi.lianlianpay.com/v1/txn/transfer-morepyee
+     */
+    TransferMorepyeeResult transferMorepyee(String payerId, String orderNo, Double amt, String txnPurpose, String pwd, String  randomKey, String payeeId, String ip);
+
 }

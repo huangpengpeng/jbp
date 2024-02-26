@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "模版名称")
     private String name;
 
+    @NotBlank(message = "类型不能为空")
     @ApiModelProperty(value = "商品显示  商品购买  装修显示")
     private String type;
 
@@ -35,7 +37,7 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "团队ID")
     private List<Long> teamIdList;
 
-    @NotBlank(message = "要求必须有上级")
+    @NotNull(message = "销售请选择是或否")
     @ApiModelProperty(value = "要求必须有上级")
     private Boolean hasPartner;
 
@@ -45,6 +47,7 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "上级星级")
     private List<Long> pCapaXsIdList;
 
+    @NotNull(message = "服务上级请选择是或否")
     @ApiModelProperty(value = "要求必须有服务上级")
     private Boolean hasRelation;
 
