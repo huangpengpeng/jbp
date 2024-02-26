@@ -166,6 +166,9 @@ public class Order implements Serializable {
 
     public String getOrderType() {
         String typeStr = "";
+        if (this.getType() == null) {
+            return typeStr;
+        }
         switch (this.getType()) {
             case 0:
                 typeStr = "普通";
@@ -182,6 +185,9 @@ public class Order implements Serializable {
 
     public String getOrderRefundStatus() {
         String refundStatusStr = "";
+        if (this.getRefundStatus() == null) {
+            return refundStatusStr;
+        }
         switch (this.getRefundStatus()) {
             case 0:
                 refundStatusStr = "未退款";
@@ -201,6 +207,9 @@ public class Order implements Serializable {
 
     public String getOrderStatus() {
         String statusStr = "";
+        if (this.getStatus() == null) {
+            return statusStr;
+        }
         switch (this.getStatus()) {
             case 0:
                 statusStr = "待支付";
@@ -232,6 +241,9 @@ public class Order implements Serializable {
 
     public String getOrderPayChannel() {
         String payChannelStr = "";
+        if (this.getPayChannel() == null) {
+            return payChannelStr;
+        }
         switch (this.getPayChannel()) {
             case "public":
                 payChannelStr = "公众号";
@@ -269,6 +281,9 @@ public class Order implements Serializable {
 
     public String getOrderPayType() {
         String payTypeStr = "";
+        if (this.getPayType() == null) {
+            return payTypeStr;
+        }
         switch (this.getPayType()) {
             case "weixin":
                 payTypeStr = "微信支付";
