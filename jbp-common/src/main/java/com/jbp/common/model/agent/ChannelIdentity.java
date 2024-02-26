@@ -10,7 +10,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 @Data
-@Builder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -34,26 +33,30 @@ public class ChannelIdentity extends BaseModel {
     private Integer uid;
 
     @ApiModelProperty("身份证号码")
-    @TableField("idCardNo")
+    @TableField("id_card_no")
     private String idCardNo;
 
     @ApiModelProperty("真实姓名")
-    @TableField("realName")
+    @TableField("real_Name")
     private String realName;
 
     @ApiModelProperty("身份证正面照片")
-    @TableField("idCardNoFrontImg")
+    @TableField("id_card_no_front_img")
     private String idCardNoFrontImg;
 
     @ApiModelProperty("身份证反面照片")
-    @TableField("idCardNoBackImg")
+    @TableField("id_card_no_back_img")
     private String idCardNoBackImg;
 
     @ApiModelProperty("其他信息")
-    @TableField("otherJSON")
+    @TableField("other_json")
     private String otherJSON;
 
     @ApiModelProperty("渠道名称")
     @TableField("channel")
     private String channel;
+
+    @ApiModelProperty("账户")
+    @TableField(exist = false)
+    private String account;
 }
