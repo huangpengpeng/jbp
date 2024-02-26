@@ -18,6 +18,6 @@ public class FundClearingUpdateRequest implements Serializable {
     @ApiModelProperty("编号")
     private List<Long> ids;
 
-    @ApiModelProperty("用户账户")
+    @ApiModelProperty("备注")
     private String remark;
 }
