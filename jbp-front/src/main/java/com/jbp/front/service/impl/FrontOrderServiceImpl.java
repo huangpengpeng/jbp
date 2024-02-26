@@ -18,6 +18,7 @@ import com.jbp.common.model.product.*;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.*;
+import com.jbp.common.vo.*;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -61,11 +62,6 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.model.wechat.video.PayComponentProductSku;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.vo.LogisticsResultVo;
-import com.jbp.common.vo.MyRecord;
-import com.jbp.common.vo.PreMerchantOrderVo;
-import com.jbp.common.vo.PreOrderInfoDetailVo;
-import com.jbp.common.vo.PreOrderInfoVo;
 import com.jbp.front.service.FrontOrderService;
 import com.jbp.front.service.SeckillService;
 
@@ -1510,7 +1506,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public OrderFrontDetailResponse frontDetail(String orderNo) {
         User currentUser = userService.getInfo();
         Order order = orderService.getByOrderNo(orderNo);
-        if (order.getIsUserDel() || order.getIsMerchantDel() || !order.getUid().equals(currentUser.getId())) {
+        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId())  && !order.getUid().equals(currentUser.getId())  )) {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();

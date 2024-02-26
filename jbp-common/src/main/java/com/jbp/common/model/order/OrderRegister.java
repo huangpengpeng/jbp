@@ -18,11 +18,11 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class OrderRegister implements Serializable {
 
-    public OrderRegister(String username, String mobile, String pAccount, String rAccount, Integer node, Long capaId, Long capaXsId) {
+    public OrderRegister(String username, String mobile, String paccount, String raccount, Integer node, Long capaId, Long capaXsId) {
         this.username = username;
         this.mobile = mobile;
-        this.pAccount = pAccount;
-        this.rAccount = rAccount;
+        this.paccount = paccount;
+        this.raccount = raccount;
         this.node = node;
         this.capaId = capaId;
         this.capaXsId = capaXsId;
@@ -35,10 +35,10 @@ public class OrderRegister implements Serializable {
     private String mobile;
 
     @ApiModelProperty(value = "销售上级")
-    private String pAccount;
+    private String paccount;
 
     @ApiModelProperty(value = "安置上级")
-    private String rAccount;
+    private String raccount;
 
     @ApiModelProperty(value = "安置点位")
     private Integer node;

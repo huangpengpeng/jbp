@@ -3,6 +3,7 @@ package com.jbp.common.response;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.mybatis.ProductDeductionListHandler;
+import com.jbp.common.vo.DeclUserInfoResultVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -111,4 +112,7 @@ public class OrderFrontDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "支付网关 -1 统一支付 0 在线支付 1 积分支付")
     private Integer payGateway;
+
+    @ApiModelProperty(value = "下单场景")
+    private String platform;
 }

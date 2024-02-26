@@ -23,8 +23,12 @@ import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.UserBill;
+import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderExt;
+import com.jbp.common.model.order.OrderRegister;
 import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
@@ -36,6 +40,7 @@ import com.jbp.common.response.*;
 import com.jbp.common.token.FrontTokenComponent;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.common.vo.DeclUserInfoResultVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
@@ -128,6 +133,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private UserInvitationService invitationService;
     @Resource
     private UserRelationService relationService;
+    @Resource
+    private OrderExtService orderExtService;
+
+
 
 
     /**
@@ -241,7 +250,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public User helpRegister(String username, String phone, Integer pid, Integer rId, Integer node) {
         // 开启事务
-        AtomicReference<User> result = null;
+        AtomicReference<User> result = new AtomicReference<>();
         Boolean execute = transactionTemplate.execute(e -> {
             // 注册用户
             User user = registerPhone(username, phone, 0);
@@ -1431,6 +1440,29 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public List<User> getNoChild() {
         return dao.getNoChild();
+    }
+
+    @Override
+    public DeclUserInfoResultVo getOrderDealUser(String  orderNo) {
+
+        DeclUserInfoResultVo declUserInfoResultVo = new DeclUserInfoResultVo();
+        OrderExt orderExt = orderExtService.getByOrder(orderNo);
+
+        Order order = orderService.getOne(new QueryWrapper<Order>().lambda()
+                .eq(Order::getOrderNo, orderNo));
+        if (orderExt != null) {
+            OrderRegister orderRegister = orderExt.getOrderRegister();
+            User user = dao.selectOne(new QueryWrapper<User>().lambda()
+                    .eq(User::getId, order.getUid()));
+
+            declUserInfoResultVo.setUserUame(orderRegister.getUsername());
+            declUserInfoResultVo.setAccount(user.getAccount());
+            declUserInfoResultVo.setCapa(capaService.getById(orderRegister.getCapaId()).getName());
+            declUserInfoResultVo.setNode(orderRegister.getNode());
+            declUserInfoResultVo.setRaccount(orderRegister.getRaccount());
+        }
+
+        return  declUserInfoResultVo;
     }
 
     /**

@@ -97,6 +97,13 @@ public interface OrderService extends IService<Order> {
     Boolean send(OrderSendRequest request);
 
     /**
+     * 批量发货
+     * @param sendRequestList
+     * @return
+     */
+    Boolean batchSend(List<OrderSendRequest> sendRequestList);
+
+    /**
      * 小票打印
      * @param orderNo 订单编号
      * @return 打印结果
