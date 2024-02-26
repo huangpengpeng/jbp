@@ -43,23 +43,23 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "付款账号")
     private String payUserAccount;
 
-    @ApiModelProperty(value = "实际支付金额")
-    private String payPrice;
+    @ApiModelProperty(value = "整单货款")
+    private BigDecimal payPrice;
 
     @ApiModelProperty(value = "整单运费")
-    private String payPostage;
+    private BigDecimal payPostage;
 
     @ApiModelProperty(value = "整单优惠")
-    private String couponPrice;
+    private BigDecimal couponPrice;
 
     @ApiModelProperty(value = "整单抵扣")
-    private String walletDeductionFee;
+    private BigDecimal walletDeductionFee;
 
     @ApiModelProperty(value = "支付状态")
     private String paidStr;
 
     @ApiModelProperty(value = "支付方式:weixin==微信支付,alipay==支付宝支付,yue==余额支付，wallet==积分支付, lianlian==连连支付, confirmPay==人工确认")
-    private String payTypeStr;
+    private String orderPayType;
 
     @ApiModelProperty(value = "支付方法")
     private String payMethod;
@@ -82,30 +82,30 @@ public class OrderExcelVo implements Serializable {
     private String productBarCode;
 
     @ApiModelProperty(value = "商品数量")
-    private String productQuantity;
+    private Integer productQuantity;
 
     @ApiModelProperty(value = "商品总价")
-    private String productPrice;
+    private BigDecimal productPrice;
 
-    @ApiModelProperty(value = "产品总价")
-    private String productPostage;
+    @ApiModelProperty(value = "商品运费")
+    private BigDecimal productPostage;
 
-    @ApiModelProperty(value = "产品优惠")
-    private String productCouponPrice;
+    @ApiModelProperty(value = "商品优惠")
+    private BigDecimal productCouponPrice;
 
-    @ApiModelProperty(value = "产品抵扣")
-    private String productWalletDeductionFee;
+    @ApiModelProperty(value = "商品抵扣")
+    private BigDecimal productWalletDeductionFee;
 
-    @ApiModelProperty(value = "产品抵扣明细")
+    @ApiModelProperty(value = "商品抵扣明细")
     private String productWalletDeductionFeeStr;
 
-    
+
 
     @ApiModelProperty(value = "物料名称")
     private String materialsName;
 
     @ApiModelProperty(value = "物料编码")
-    private String warehouseCoding;
+    private String materialsCode;
 
     @ApiModelProperty(value = "物料数量")
     private Integer materialsQuantity;;
@@ -118,8 +118,20 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "收货人")
     private String realName;
 
+    @ApiModelProperty(value = "收货人手机")
+    private String userPhone;
+
+    @ApiModelProperty(value = "配送方式  1=快递 ，2=门店自提")
+    private String shippingType;
+
     @ApiModelProperty(value = "收货详情地址")
     private String userAddress;
+
+    @ApiModelProperty(value = "用户备注")
+    private String userRemark;
+
+    @ApiModelProperty(value = "商户备注")
+    private String merchantRemark;
 
     @ApiModelProperty(value = "创建时间")
     private String createTime;
