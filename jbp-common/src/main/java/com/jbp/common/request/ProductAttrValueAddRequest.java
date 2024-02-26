@@ -84,5 +84,6 @@ public class ProductAttrValueAddRequest implements Serializable {
     private String attrValue;
 
     @ApiModelProperty(value = "商品条码")
+    @NotBlank(message = "商品条码不能为空")
     private String barCode;
 }

@@ -73,7 +73,8 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "退款状态：0 未退款 1 申请中 2 部分退款 3 已退款")
     private String refundStatus;
 
-
+    @ApiModelProperty(value = "订单详情ID")
+    private Integer orderDetailId;
 
     @ApiModelProperty(value = "商品名称")
     private String productName;

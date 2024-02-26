@@ -10,10 +10,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ChannelCard;
+import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.RestTemplateUtil;
 import com.jbp.service.dao.agent.ChannelCardDao;
 import com.jbp.service.service.UserService;
@@ -86,5 +88,14 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
     @Override
     public ChannelCard getByUser(Integer uid, String channel) {
         return getOne(new QueryWrapper<ChannelCard>().lambda().eq(ChannelCard::getUid, uid).eq(ChannelCard::getChannel, channel));
+    }
+
+    @Override
+    public Map<Integer, ChannelCard> getChannelCardMap(List<Integer> uidList, String channel) {
+        QueryWrapper<ChannelCard> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().in(ChannelCard::getUid, uidList).eq(ChannelCard::getChannel, channel);
+        List<ChannelCard> list = list(queryWrapper);
+        return FunctionUtil.keyValueMap(list, ChannelCard::getUid);
+
     }
 }

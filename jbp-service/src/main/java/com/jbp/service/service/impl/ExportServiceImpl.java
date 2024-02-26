@@ -8,6 +8,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.order.Materials;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -90,9 +91,6 @@ public class ExportServiceImpl implements ExportService {
         Map<Integer, User> userMap = userService.getUidMapList(userIdList);
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
 
-        // 物流对象
-        Map<String, List<ProductMaterials>> materialsMap = Maps.newConcurrentMap();
-
         // 导出对象
         List<OrderExcelVo> voList = CollUtil.newArrayList();
         for (Order order : orderList) {
@@ -103,20 +101,19 @@ public class ExportServiceImpl implements ExportService {
             // 循环设置
             for (OrderDetail orderDetail : orderDetailsList) {
                 BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
-                Integer attrValueId = orderDetail.getAttrValueId();
-                ProductAttrValue attr = productAttrValueService.getById(attrValueId);
-                List<ProductMaterials> materialsList = materialsMap.get(attr.getBarCode());
+                List<Materials> materialsList = orderDetail.getMaterialsList();
+                // 没有设置物料 默认原始商品信息即可
                 if (CollectionUtils.isEmpty(materialsList)) {
-                    materialsList = productMaterialsService.getByBarCode(attr.getBarCode());
-                    materialsMap.put(attr.getBarCode(), materialsList);
+                    Materials materials = new Materials(orderDetail.getProductName(), 1, payPrice, orderDetail.getBarCode(), payPrice);
+                    materialsList.add(materials);
                 }
                 // 物料总价
                 BigDecimal materialsTotalPrice = BigDecimal.ZERO;
-                for (ProductMaterials materials : materialsList) {
-                    materialsTotalPrice = materialsTotalPrice.add(materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity())));
+                for (Materials materials : materialsList) {
+                    materialsTotalPrice = materialsTotalPrice.add(materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity())));
                 }
                 // 物料信息
-                for (ProductMaterials materials : materialsList) {
+                for (Materials materials : materialsList) {
                     // 组装订单
                     OrderExcelVo vo = new OrderExcelVo();
                     vo.setType(order.getOrderType());
@@ -136,8 +133,9 @@ public class ExportServiceImpl implements ExportService {
                     vo.setStatus(order.getOrderStatus());
                     vo.setRefundStatus(order.getOrderRefundStatus());
                     // 原始产品
+                    vo.setOrderDetailId(orderDetail.getId());
                     vo.setProductName(orderDetail.getProductName());
-                    vo.setProductBarCode(attr.getBarCode());
+                    vo.setProductBarCode(orderDetail.getBarCode());
                     vo.setProductQuantity(orderDetail.getPayNum());
                     vo.setProductPrice(payPrice);
                     vo.setProductPostage(orderDetail.getFreightFee());
@@ -154,11 +152,11 @@ public class ExportServiceImpl implements ExportService {
                         vo.setProductWalletDeductionFeeStr(walletDeductionStr.toString());
                     }
                     // 物料信息
-                    BigDecimal price = materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity()));
+                    BigDecimal price = materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity()));
                     BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
-                    vo.setMaterialsName(materials.getMaterialsName());
-                    vo.setMaterialsCode(materials.getMaterialsCode());
-                    vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getMaterialsQuantity());
+                    vo.setMaterialsName(materials.getName());
+                    vo.setMaterialsCode(materials.getCode());
+                    vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getQuantity());
                     vo.setMaterialsPrice(materialsPrice);
 
                     // 收货人
@@ -208,6 +206,7 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("orderPayType", "支付方式");
         aliasMap.put("payMethod", "支付方法");
         aliasMap.put("payChannel", "支付渠道");
+        aliasMap.put("orderDetailId", "订单详情ID");
         aliasMap.put("productName", "商品名称");
         aliasMap.put("productBarCode", "商品编码");
         aliasMap.put("productQuantity", "商品数量");

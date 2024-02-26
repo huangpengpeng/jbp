@@ -48,4 +48,19 @@ public class FundClearingVo implements Serializable {
 
     @ApiModelProperty("得奖用户账户")
     private String account;
+
+    @ApiModelProperty("真实姓名")
+    private String realName;
+
+    @ApiModelProperty("身份证")
+    private String idCardNo;
+
+    @ApiModelProperty("手机号")
+    private String phone;
+
+    @ApiModelProperty("银行名称")
+    private String bankName;
+
+    @ApiModelProperty("卡号")
+    private String bankCode;
 }
