@@ -1,15 +1,23 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelCard;
 import com.jbp.common.model.agent.ChannelIdentity;
-import com.jbp.common.model.agent.ChannelWallet;
+import com.jbp.common.model.user.User;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ChannelIdentityRequest;
 import com.jbp.common.response.AliBankcardResponse;
 import com.jbp.service.dao.agent.ChannelIdentityDao;
 import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.ChannelWalletService;
@@ -19,6 +27,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -26,10 +37,30 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
 
     @Resource
     private ChannelWalletService channelWalletService;
-   @Resource
-   private ChannelCardService channelCardService;
-   @Resource
-   private SystemConfigService systemConfigService;
+    @Resource
+    private ChannelCardService channelCardService;
+    @Resource
+    private SystemConfigService systemConfigService;
+    @Resource
+    private UserService userService;
+
+    @Override
+    public PageInfo<ChannelIdentity> pageList(Integer uid, String idCardNo, String realName, String channel, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<ChannelIdentity> lqw = new LambdaQueryWrapper<ChannelIdentity>()
+                .eq(!ObjectUtil.isNull(uid), ChannelIdentity::getUid, uid)
+                .like(StringUtils.isNotEmpty(idCardNo), ChannelIdentity::getIdCardNo, idCardNo)
+                .like(StringUtils.isNotEmpty(realName), ChannelIdentity::getRealName, realName)
+                .like(StringUtils.isNotEmpty(channel), ChannelIdentity::getChannel, channel);
+        Page<ChannelIdentity> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ChannelIdentity> list = list(lqw);
+        List<Integer> uIdList = list.stream().map(ChannelIdentity::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        list.forEach(e -> {
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user != null ? user.getAccount() : "");
+        });
+        return CommonPage.copyPageInfo(page, list);
+    }
 
     @Override
     public ChannelIdentity add(Integer uid, String idCardNo, String realName,
