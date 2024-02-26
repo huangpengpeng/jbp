@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.exception.CrmebException;
@@ -18,6 +19,7 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.ProductMaterialsService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -81,11 +84,17 @@ public class ExportServiceImpl implements ExportService {
         // 商户 用户 订单 数据准备
         List<Integer> merIdList = orderList.stream().filter(e -> e.getMerId() > 0).map(Order::getMerId).distinct().collect(Collectors.toList());
         List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
-        List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
+        List<Integer> payUserIdList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
+        userIdList.addAll(payUserIdList);
+        userIdList = userIdList.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
 
+        List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
         Map<Integer, User> userMap = userService.getUidMapList(userIdList);
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+
+        // 物流对象
+        Map<String, List<ProductMaterials>> materialsMap = Maps.newConcurrentMap();
 
         // 导出对象
         List<OrderExcelVo> voList = CollUtil.newArrayList();
@@ -100,9 +109,38 @@ public class ExportServiceImpl implements ExportService {
             List<OrderDetail> orderDetailsList = orderDetailMap.get(order.getOrderNo());
             // 循环设置
             for (OrderDetail orderDetail : orderDetailsList) {
+                BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
+                Integer attrValueId = orderDetail.getAttrValueId();
+                ProductAttrValue attr = productAttrValueService.getById(attrValueId);
+                List<ProductMaterials> materialsList = materialsMap.get(attr.getBarCode());
+                if(CollectionUtils.isEmpty(materialsList)){
+                    materialsList = productMaterialsService.getByBarCode(attr.getBarCode());
+                    materialsMap.put(attr.getBarCode(), materialsList);
+                }
+                // 物料总价
+                BigDecimal materialsTotalPrice = BigDecimal.ZERO;
+                for (ProductMaterials materials : materialsList) {
+                    materialsTotalPrice = materialsTotalPrice.add(materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity())));
+                }
+                // 物料信息
+                for (ProductMaterials materials : materialsList) {
+                    BigDecimal price = materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity()));
+                    BigDecimal realPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
+                    // 组装
+                    OrderExcelVo vo = new OrderExcelVo();
+                    vo.setType(getOrderType(order.getType()));
+                    vo.setOrderNo(order.getOrderNo());
+                    vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "平台商");
+                    vo.setUid(order.getUid());
+                    vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                    vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                    vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()).toPlainString());
+                    vo.setPayPostage(order.getPayPostage().toPlainString());
 
 
 
+
+                }
             }
 
 
@@ -124,18 +162,19 @@ public class ExportServiceImpl implements ExportService {
                     vo.setType(getOrderType(order.getType()));
                     vo.setOrderNo(order.getOrderNo());
                     vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
+
                     vo.setUserAccount(userMap.get(order.getUid()).getAccount());
                     vo.setUid(order.getUid());
                     vo.setPayPrice(order.getPayPrice().toString());
                     vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
-                    vo.setPayType(getOrderPayType(order.getPayType()));
+//                    vo.setPayType(getOrderPayType(order.getPayType()));
                     vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
                     vo.setStatus(getOrderStatus(order.getStatus()));
                     vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
                     vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
                     vo.setProductName(productMaterials.getMaterialsName());
                     vo.setWarehouseCoding(productMaterials.getMaterialsCode());
-                    vo.setProductPrice(realPrice);
+//                    vo.setProductPrice(realPrice);
                     vo.setRealName(merchantOrder.getRealName());
                     vo.setMaterialsQuantity(productMaterialsList.size() * productMaterials.getMaterialsQuantity());
                     vo.setUserAddress(merchantOrder.getUserAddress());

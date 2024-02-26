@@ -1033,7 +1033,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderNo = CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_PLATFORM);
         order.setOrderNo(orderNo);
         order.setMerId(0);
-        order.setUid(payUser.getId());
+        order.setUid(orderInfoVo.getUid());
+        order.setPayUid(payUser.getId());
         order.setTotalNum(orderInfoVo.getOrderProNum());
         order.setProTotalPrice(orderInfoVo.getProTotalFee());
         order.setTotalPostage(orderInfoVo.getFreightFee());
@@ -2255,6 +2256,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             pId = invitationService.getPid(payUser.getId());
             rId = relationService.getPid(payUser.getId());
+            preOrderInfoVo.setUid(payUser.getId());
         }
         // 注册下单
         if (registerInfo != null) {
@@ -2301,6 +2303,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             pId = invitationService.getPid(user.getId());
             rId = relationService.getPid(user.getId());
             preOrderInfoVo.setRiseInfo(riseInfo);
+            preOrderInfoVo.setUid(user.getId());
         }
         productList = productList.stream().filter(p -> p.getBuyLimitTempId() != null).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(productList)) {

@@ -233,7 +233,6 @@ public class PayServiceImpl implements PayService {
         // 根据支付类型进行校验,更换支付类型
         order.setPayType(orderPayRequest.getPayType());
         order.setPayChannel(orderPayRequest.getPayChannel());
-        order.setPayUid(user.getId());
         // 获取过期时间
         DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
         long between = DateUtil.between(cancelTime, DateUtil.date(), DateUnit.SECOND, false);
