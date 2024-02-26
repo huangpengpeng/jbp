@@ -79,4 +79,6 @@ public interface FundClearingService extends IService<FundClearing> {
      */
 
     String exportOrder(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status);
+
+    void updateRemark(Long id, String remark);
 }

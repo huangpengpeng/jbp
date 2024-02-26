@@ -5,6 +5,7 @@ import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingRequest;
+import com.jbp.common.request.agent.FundClearingUpdateRemarkRequest;
 import com.jbp.common.request.agent.FundClearingUpdateRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.FundClearingService;
@@ -75,6 +76,13 @@ public class FundClearingController {
     @ApiOperation("更新已拦截")
     public CommonResult updateIntercept(@RequestBody FundClearingUpdateRequest request) {
         fundClearingService.updateIntercept(request.getIds(), request.getRemark());
+        return CommonResult.success();
+    }
+
+    @PostMapping("/update/remark")
+    @ApiOperation("修改备注")
+    public CommonResult updateRemark(FundClearingUpdateRemarkRequest request) {
+        fundClearingService.updateRemark(request.getId(),request.getRemark());
         return CommonResult.success();
     }
 
