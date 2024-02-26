@@ -1,6 +1,5 @@
 package com.jbp.service.service.agent.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -295,7 +294,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                     .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
                     .gt(FundClearing::getId, id).last("LIMIT 1000");
             List<FundClearing> fundClearingList = list(lqw);
-            if(CollectionUtils.isEmpty(fundClearingList)){
+            if (CollectionUtils.isEmpty(fundClearingList)) {
                 break;
             }
             List<Integer> uIdList = fundClearingList.stream().map(FundClearing::getUid).collect(Collectors.toList());
@@ -307,8 +306,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 BeanUtils.copyProperties(e, fundClearingVo);
                 result.add(fundClearingVo);
             });
-            id = fundClearingList.get(fundClearingList.size()-1).getId();
-        }while (true);
+            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+        } while (true);
 
 //       以下为存储部分
         //上传设置
@@ -334,7 +333,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public void updateRemark(Long id, String remark) {
         LambdaUpdateWrapper<FundClearing> luw = new LambdaUpdateWrapper<FundClearing>()
-                .eq(FundClearing::getId,id)
+                .eq(FundClearing::getId, id)
                 .set(FundClearing::getRemark, remark);
         update(luw);
     }
