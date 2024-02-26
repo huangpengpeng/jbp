@@ -220,11 +220,6 @@ public class MerchantOrderController {
                 sendRequestList.add(orderSend);
             });
         }
-
-
-
-
-
         orderService.batchSend(sendRequestList);
         return CommonResult.success();
     }
