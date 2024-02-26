@@ -2,6 +2,8 @@ package com.jbp.admin.controller.publicly;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.service.service.LianLianPayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -95,10 +97,7 @@ public class PayCallbackController {
             if (lianLianPayService.checkSign(stringBuilder.toString(), signature)) {
                 // 验签通过，处理系统业务逻辑
                 log.info("验签通过！！！");
-
-
-
-
+                callbackService.lianLianPayCallback(JSONObject.toJavaObject(JSONObject.parseObject(stringBuilder.toString()), QueryPaymentResult.class));
                 // 返回Success，响应本次异步通知已经成功
                 return "Success";
             } else {

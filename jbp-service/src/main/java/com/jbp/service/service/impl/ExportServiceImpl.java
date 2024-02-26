@@ -78,24 +78,40 @@ public class ExportServiceImpl implements ExportService {
         if (CollUtil.isEmpty(orderList)) {
             throw new CrmebException("没有可导出的数据！");
         }
-
+        // 商户 用户 订单 数据准备
         List<Integer> merIdList = orderList.stream().filter(e -> e.getMerId() > 0).map(Order::getMerId).distinct().collect(Collectors.toList());
         List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
         List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
+
         Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
         Map<Integer, User> userMap = userService.getUidMapList(userIdList);
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+
+        // 导出对象
         List<OrderExcelVo> voList = CollUtil.newArrayList();
         for (Order order : orderList) {
-            //
+            // 商品详情
             List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+            // 商户详情
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+            // 用户详情
+            User user = userMap.get(order.getId());
+            // 订单商品
+            List<OrderDetail> orderDetailsList = orderDetailMap.get(order.getOrderNo());
+            // 循环设置
+            for (OrderDetail orderDetail : orderDetailsList) {
+
+
+
+            }
+
+
             for (int i = 0; i < orderDetails.size(); i++) {
-//                订单详情表
+                // 订单详情表
                 OrderDetail orderDetail = orderDetails.get(i);
                 BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
                 ProductAttrValue productAttrValue = productAttrValueService.getById(orderDetail.getAttrValueId());
-//                产品物料对应仓库的编码
+                // 产品物料对应仓库的编码
                 List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(productAttrValue != null ? productAttrValue.getBarCode() : null);
                 BigDecimal totalPrice = BigDecimal.ZERO;
                 for (ProductMaterials productMaterials : productMaterialsList) {
@@ -126,6 +142,8 @@ public class ExportServiceImpl implements ExportService {
                     voList.add(vo);
                 }
             }
+
+
 
         }
 

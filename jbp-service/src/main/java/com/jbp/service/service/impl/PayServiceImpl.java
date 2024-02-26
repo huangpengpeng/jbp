@@ -846,6 +846,8 @@ public class PayServiceImpl implements PayService {
             // 订单修改
             order.setPaid(true);
             order.setPayTime(DateUtil.date());
+            order.setPayMethod("积分支付");
+            order.setPayType("wallet");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             orderService.updateById(order);
             Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
@@ -1748,6 +1750,8 @@ public class PayServiceImpl implements PayService {
             Boolean update = Boolean.TRUE;
             // 订单修改
             order.setPaid(true);
+            order.setPayMethod("余额支付");
+            order.setPayType("yue");
             order.setPayTime(DateUtil.date());
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             orderService.updateById(order);

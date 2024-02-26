@@ -46,8 +46,12 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "支付状态")
     private String paidStr;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue")
-    private String payType;
+
+    @ApiModelProperty(value = "支付方式:weixin==微信支付,alipay==支付宝支付,yue==余额支付，wallet==积分支付, lianlian==连连支付, confirmPay==人工确认")
+    private String payTypeStr;
+
+    @ApiModelProperty(value = "支付方法")
+    private String payMethod;
 
     @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App")
     private String payChannel;
