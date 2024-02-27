@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
@@ -1453,10 +1454,17 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             OrderRegister orderRegister = orderExt.getOrderRegister();
             User user = dao.selectOne(new QueryWrapper<User>().lambda()
                     .eq(User::getId, order.getUid()));
+            //升级下单后重新赋值
+            if(orderRegister == null){
+                orderRegister  =new OrderRegister();
+                UserCapa userCapa = userCapaService.getByUser(user.getId());
+                orderRegister.setUsername(user.getNickname());
+                orderRegister.setCapaId(userCapa.getCapaId());
+            }
 
-            declUserInfoResultVo.setUserUame(orderRegister.getUsername());
+            declUserInfoResultVo.setUserUame( orderRegister.getUsername());
             declUserInfoResultVo.setAccount(user.getAccount());
-            declUserInfoResultVo.setCapa(capaService.getById(orderRegister.getCapaId()).getName());
+            declUserInfoResultVo.setCapa( capaService.getById(orderRegister.getCapaId()).getName());
             declUserInfoResultVo.setNode(orderRegister.getNode());
             declUserInfoResultVo.setRaccount(orderRegister.getRaccount());
         }
