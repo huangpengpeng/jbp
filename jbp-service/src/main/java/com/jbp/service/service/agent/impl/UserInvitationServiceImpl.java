@@ -155,10 +155,13 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            e.setURealName(uUser != null ? uUser.getRealName() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            e.setPRealName(pUser != null ? pUser.getRealName() : "");
             User mUser = midMapList.get(e.getMId());
             e.setMAccount(mUser != null ? mUser.getAccount() : "");
+            e.setMRealName(mUser != null ? mUser.getRealName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -1466,9 +1466,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public void updateUser(Integer id, String pwd, Integer sex, String birthday, String realName, String phone, String country, String province, String city, String district, String address) {
+        User user  = getById(id);
         LambdaUpdateWrapper<User> lqw = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, id)
-                .set(!ObjectUtil.isNotEmpty(pwd) && !pwd.equals(""), User::getPwd, pwd)
+                .set(!ObjectUtil.isNotEmpty(pwd) && !pwd.equals(""), User::getPwd, CrmebUtil.encryptPassword(pwd, user.getAccount()))
                 .set(!ObjectUtil.isNotEmpty(sex), User::getSex, sex)
                 .set(!ObjectUtil.isNotEmpty(birthday) && !birthday.equals(""), User::getBirthday, birthday)
                 .set(!ObjectUtil.isNotEmpty(realName) && !realName.equals(""), User::getRealName, realName)

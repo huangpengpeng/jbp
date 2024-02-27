@@ -101,9 +101,10 @@ public class PlatformUserController {
         return CommonResult.success(user);
     }
 
+    @PreAuthorize("hasAuthority('platform:user:update:user')")
     @PostMapping("/update/user")
     @ApiOperation("修改用户基本信息")
-    public CommonResult updateUser(PlatformUpdateUserRequest request) {
+    public CommonResult updateUser(@RequestBody @Validated PlatformUpdateUserRequest request) {
         userService.updateUser(request.getId(), request.getPwd(), request.getSex(), request.getBirthday(), request.getRealName(), request.getPhone(), request.getCountry(), request.getProvince(), request.getCity(), request.getDistrict(), request.getAddress());
         return CommonResult.success();
     }

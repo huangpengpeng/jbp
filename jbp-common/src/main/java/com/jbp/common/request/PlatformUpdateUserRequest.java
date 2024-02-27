@@ -1,7 +1,5 @@
 package com.jbp.common.request;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,7 +14,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "PasswordRequest对象", description = "修改密码请求对象")
+@ApiModel(value = "PlatformUpdateUserRequest对象", description = "修改密码请求对象")
 public class PlatformUpdateUserRequest implements Serializable {
     @NotNull(message = "用户编号不能为空")
     @ApiModelProperty(value = "用户id")

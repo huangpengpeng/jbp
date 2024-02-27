@@ -9,7 +9,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.Team;
-import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -99,7 +98,7 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         LambdaQueryWrapper<UserInvitationFlow> lqw = new LambdaQueryWrapper<UserInvitationFlow>()
                 .eq(!ObjectUtil.isNull(uid), UserInvitationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserInvitationFlow::getPId, pid)
-                .eq(!ObjectUtil.isNull(level),UserInvitationFlow::getLevel,level);
+                .eq(!ObjectUtil.isNull(level), UserInvitationFlow::getLevel, level);
         Page<UserInvitationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserInvitationFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -112,8 +111,10 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            e.setURealName(uUser != null ? uUser.getRealName() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            e.setPRealName(pUser != null ? pUser.getRealName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
