@@ -17,7 +17,19 @@
         from (select @r := #{uId} ,@I := 0) vars, eb_user_invitation h) t1 join eb_user_invitation t2 on t1.userId = t2.uId
         order by level asc
     </select>
+    <select id="getUserNextList"  parameterType="java.util.Map" resultType="com.jbp.common.response.UserInviteResponse">
+        select eu.nickname  ,eu.account,c.name as capa_name,ec.capa_id,eu.phone from   eb_user_invitation ei
+         left join eb_user eu on eu.id = ei.uId
+         left join eb_user_capa ec on ec.uid = eu.id
+         left join eb_capa c on c.id = ec.capa_id
 
+         where ei.pId = #{uId}
+
+        <if test="account!='' and account!= null ">
+            and eu.account = #{account}
+        </if>
+
+    </select>
 
 
 </mapper>

@@ -20,10 +20,7 @@ import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
-import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.UserBill;
 import com.jbp.common.model.order.Order;
@@ -33,6 +30,7 @@ import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
+import com.jbp.common.model.user.UserTag;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.request.merchant.MerchantUserSearchRequest;
@@ -137,8 +135,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private OrderExtService orderExtService;
 
 
-
-
     /**
      * 手机号注册用户
      *
@@ -241,10 +237,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (relationService.getByPid(rUser.getId(), node) != null) {
             throw new CrmebException("服务节点被占用");
         }
-        if (capaService.getById(userLevel)== null) {
+        if (capaService.getById(userLevel) == null) {
             throw new CrmebException("等级编号错误");
         }
-       return new  HelpRegisterResponse(pUser.getId(), rUser.getId(), node);
+        return new HelpRegisterResponse(pUser.getId(), rUser.getId(), node);
     }
 
     @Override
@@ -289,16 +285,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public String  getAccount() {
+    public String getAccount() {
         String accountPrefix = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_PREFIX);
         String accountNum = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_NUM);
         String account = StringUtils.EMPTY;
         do {
             account = CrmebUtil.getAccount(accountPrefix, accountNum); // 默认是A 开头 8为数字
             if (getByAccount(account) == null) {
-               return account;
+                return account;
             }
-        }while (true);
+        } while (true);
     }
 
     @Override
@@ -444,11 +440,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         BeanUtils.copyProperties(currentUser, userInfoResponse);
         userInfoResponse.setPhone(CrmebUtil.maskMobile(userInfoResponse.getPhone()));
         UserCapa userCapa = userCapaService.getByUser(currentUser.getId());
-        if(userCapa != null){
+        if (userCapa != null) {
             userInfoResponse.setCapa(capaService.getById(userCapa.getCapaId()));
         }
         UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser.getId());
-        if(userCapaXs != null){
+        if (userCapaXs != null) {
             userInfoResponse.setCapaXs(capaXsService.getById(userCapaXs.getCapaId()));
         }
         return userInfoResponse;
@@ -600,16 +596,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
             //获取等级名称
             UserCapa userCapa = userCapaService.getByUser(user.getId());
-            if (!ObjectUtil.isNull(userCapa)){
+            if (!ObjectUtil.isNull(userCapa)) {
                 userResponse.setCapaName(capaService.getById(userCapa.getCapaId()).getName());
             }
             //获取星级名称
-            UserCapaXs userCapaXs=userCapaXsService.getByUser(user.getId());
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
             if (!ObjectUtil.isNull(userCapaXs)) {
                 userResponse.setCapaXsName(capaXsService.getById(userCapaXs.getCapaId()).getName());
             }
             //获取团队名称
-            TeamUser teamUser=teamUserService.getByUser(user.getId());
+            TeamUser teamUser = teamUserService.getByUser(user.getId());
             if (!ObjectUtil.isNull(teamUser)) {
                 userResponse.setTeamName(teamService.getById(teamUser.getTid()).getName());
             }
@@ -789,7 +785,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Map<Integer, User> getUidMapList(List<Integer> uidList) {
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.select(User::getId,User::getAccount, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel);
+        lqw.select(User::getId, User::getAccount, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel);
         lqw.in(User::getId, uidList);
         List<User> userList = dao.selectList(lqw);
         Map<Integer, User> userMap = new HashMap<>();
@@ -1043,8 +1039,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     /**
      * 支付成功，用户信息变更
      *
-     * @param id           用户id
-     * @param isPromoter   是否成为推广员
+     * @param id         用户id
+     * @param isPromoter 是否成为推广员
      */
     @Override
     public Boolean paySuccessChange(Integer id, Boolean isPromoter) {
@@ -1274,8 +1270,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     /**
      * 更新用户连续签到天数
+     *
      * @param day 连续签到天数
-     * @param id 用户ID
+     * @param id  用户ID
      * @return Boolean
      */
     @Override
@@ -1367,6 +1364,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     /**
      * 管理端用户详情
+     *
      * @param id 用户ID
      */
     @Override
@@ -1397,8 +1395,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     /**
      * 更新用户等级
+     *
      * @param userId 用户ID
-     * @param level 用户等级
+     * @param level  用户等级
      */
     @Override
     public Boolean updateUserLevel(Integer userId, Integer level) {
@@ -1410,6 +1409,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     /**
      * 通过生日获取用户列表
+     *
      * @param birthday 生日日期
      */
     @Override
@@ -1443,7 +1443,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public DeclUserInfoResultVo getOrderDealUser(String  orderNo) {
+    public DeclUserInfoResultVo getOrderDealUser(String orderNo) {
 
         DeclUserInfoResultVo declUserInfoResultVo = new DeclUserInfoResultVo();
         OrderExt orderExt = orderExtService.getByOrder(orderNo);
@@ -1462,11 +1462,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             declUserInfoResultVo.setRaccount(orderRegister.getRaccount());
         }
 
-        return  declUserInfoResultVo;
+        return declUserInfoResultVo;
+    }
+
+    @Override
+    public PageInfo<UserInviteResponse> getUserInvite(UserInviteRequest request) {
+        User currentUser = getInfo();
+        List<UserInviteResponse> userInviteResponseList = invitationService.getUserNextList(currentUser.getId(),request.getKeywords());
+        Page<Object> page = PageHelper.startPage(request.getPage(), request.getLimit());
+        return CommonPage.copyPageInfo(page, userInviteResponseList);
     }
 
     /**
      * 批量清除用户推广人
+     *
      * @param spreadUid 推广人id
      */
     private Boolean batchRemoveSpreadUid(Integer spreadUid) {
