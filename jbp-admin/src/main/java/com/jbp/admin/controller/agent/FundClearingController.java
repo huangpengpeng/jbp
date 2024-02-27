@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -42,7 +43,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:wait:audit')")
     @PostMapping("/update/wait/audit")
     @ApiOperation("更新待审核")
-    public CommonResult updateWaitAudit(@RequestBody FundClearingUpdateRequest request) {
+    public CommonResult updateWaitAudit(@RequestBody  @Validated FundClearingUpdateRequest request) {
         fundClearingService.updateWaitAudit(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
@@ -50,7 +51,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:wait:send')")
     @PostMapping("/update/wait/send")
     @ApiOperation("更新待出款")
-    public CommonResult updateWaitSend(@RequestBody FundClearingUpdateRequest request) {
+    public CommonResult updateWaitSend(@RequestBody @Validated FundClearingUpdateRequest request) {
         fundClearingService.updateWaitSend(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
@@ -58,7 +59,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:send')")
     @PostMapping("/update/send")
     @ApiOperation("更新已出款")
-    public CommonResult updateSend(@RequestBody FundClearingUpdateRequest request) {
+    public CommonResult updateSend(@RequestBody @Validated FundClearingUpdateRequest request) {
         fundClearingService.updateSend(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
@@ -66,7 +67,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:cancel')")
     @PostMapping("/update/cancel")
     @ApiOperation("更新已取消")
-    public CommonResult updateCancel(@RequestBody FundClearingUpdateRequest request) {
+    public CommonResult updateCancel(@RequestBody @Validated FundClearingUpdateRequest request) {
         fundClearingService.updateCancel(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
@@ -74,14 +75,14 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:intercept')")
     @PostMapping("/update/intercept")
     @ApiOperation("更新已拦截")
-    public CommonResult updateIntercept(@RequestBody FundClearingUpdateRequest request) {
+    public CommonResult updateIntercept(@RequestBody @Validated FundClearingUpdateRequest request) {
         fundClearingService.updateIntercept(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:remark')")
     @PostMapping("/update/remark")
     @ApiOperation("修改备注")
-    public CommonResult updateRemark(@RequestBody FundClearingUpdateRemarkRequest request) {
+    public CommonResult updateRemark(@RequestBody @Validated FundClearingUpdateRemarkRequest request) {
         fundClearingService.updateRemark(request.getId(),request.getRemark());
         return CommonResult.success();
     }
