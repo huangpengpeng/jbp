@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.agent.UserRelation;
@@ -57,6 +59,7 @@ public class UserRelationController {
 
     @PreAuthorize("hasAuthority('agent:user:relation:band')")
     @GetMapping("/band")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "服务关系上下级绑定上级")
     @ApiOperation("绑定上级")
     public CommonResult band(UserRelationRequest request) {
         if (StringUtils.isAnyEmpty(request.getUAccount(), request.getPAccount()) || request.getNode() == null) {
