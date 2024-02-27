@@ -48,9 +48,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     public UserInvitation getByUser(Integer uId) {
         LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
         wrapper.and((w) -> {
-            w.eq(UserInvitation::getPId, uId)
-                    .or()
-                    .eq(UserInvitation::getMId, uId);
+            w.eq(UserInvitation::getUId, uId);
         });
         return getOne(wrapper);
     }
