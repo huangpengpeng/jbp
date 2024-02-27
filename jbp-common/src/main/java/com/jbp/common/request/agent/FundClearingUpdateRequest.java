@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class FundClearingUpdateRequest implements Serializable {
 
     @ApiModelProperty("编号")
+    @NotEmpty(message = "编号不能为空")
     private List<Long> ids;
 
     @ApiModelProperty("备注")
