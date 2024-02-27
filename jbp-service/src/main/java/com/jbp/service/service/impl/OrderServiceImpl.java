@@ -34,7 +34,6 @@ import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.OrderDao;
 import com.jbp.service.service.*;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,7 +179,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取用户订单列表V1.4
-     * @param userId 用户id
+     *
+     * @param userId  用户id
      * @param request 搜索参数
      * @return PageInfo
      */
@@ -416,6 +416,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 批量发放
+     *
      * @param sendRequestList
      * @return
      */
@@ -477,7 +478,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         }
         List<MerchantOrder> orders = new ArrayList<>();
         orders.add(merchantOrder);
-        merchantPrintService.printReceipt(orders, 1);;
+        merchantPrintService.printReceipt(orders, 1);
+        ;
     }
 
     /**
@@ -569,8 +571,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             pageResponse.setShippingType(merchantOrder.getShippingType());
             pageResponse.setUserRemark(merchantOrder.getUserRemark());
             pageResponse.setMerRemark(merchantOrder.getMerchantRemark());
-            pageResponse.setNickName(userMap.get(e.getUid()).getNickname());
-            pageResponse.setIsLogoff(userMap.get(e.getUid()).getIsLogoff());
+            pageResponse.setNickName(userMap.get(e.getUid()) != null ? userMap.get(e.getUid()).getNickname() : "");
+            pageResponse.setIsLogoff(userMap.get(e.getUid()) != null ? userMap.get(e.getUid()).getIsLogoff() : null);
             if (e.getMerId() > 0) {
                 pageResponse.setMerName(merchantMap.get(e.getMerId()).getName());
             }
@@ -809,6 +811,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取订单发货单列表(商户端)
+     *
      * @param orderNo 订单号
      * @return 发货单列表
      */
@@ -863,13 +866,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取订单数量（订单状态， 用户id）
+     *
      * @param status 订单状态（0：待支付，1：待发货,2：部分发货， 3：待核销，4：待收货,5：已收货,6：已完成，9：已取消）
      * @param userId 用户ID
      * @return 订单数量
      */
     @Override
     public Integer getCountByStatusAndUid(Integer status, Integer userId) {
-        if (status < 0 ) {
+        if (status < 0) {
             return 0;
         }
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
@@ -886,6 +890,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 通过日期获取支付订单数量
+     *
      * @param date 日期，yyyy-MM-dd格式
      * @return Integer
      */
@@ -901,6 +906,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取推广订单总金额
+     *
      * @param orderNoList 订单编号列表
      * @return BigDecimal
      */
@@ -915,6 +921,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 订单拆单删除
+     *
      * @param orderNo 订单号
      */
     @Override
@@ -928,6 +935,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 通过原始单号获取订单列表
+     *
      * @param orderNo 原始单号
      * @return 订单列表
      */
@@ -941,6 +949,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     /**
      * 判断用户是否存在待处理订单
      * 待发货、部分发货、待核销
+     *
      * @param uid 用户id
      */
     @Override
@@ -958,6 +967,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取待收货订单
+     *
      * @param sendTime 发货时间
      * @return List
      */
@@ -973,6 +983,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取待发货订单数量
+     *
      * @return Integer
      */
     @Override
@@ -982,6 +993,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取待核销订单数量
+     *
      * @return Integer
      */
     @Override
@@ -991,8 +1003,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取用户购买的商品数量
-     * @param uid 用户ID
-     * @param proId 商品ID
+     *
+     * @param uid         用户ID
+     * @param proId       商品ID
      * @param productType 商品类型
      */
     @Override
@@ -1002,8 +1015,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取某一天的所有数据
+     *
      * @param merId 商户id，0为所有商户
-     * @param date 日期：年-月-日
+     * @param date  日期：年-月-日
      * @return List
      */
     @Override
@@ -1021,6 +1035,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     /**
      * 获取导出订单列表
+     *
      * @param request 请求参数
      */
     @Override
@@ -1056,7 +1071,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.eq(Order::getOrderNo, orderNo);
         Boolean ifPlatform = 0 == merId;
-        if(BooleanUtils.isNotTrue(ifPlatform)){
+        if (BooleanUtils.isNotTrue(ifPlatform)) {
             lqw.eq(Order::getMerId, merId);
         }
         lqw.last(" limit 1");
@@ -1126,7 +1141,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             orderStatusService.createLog(order.getOrderNo(), OrderStatusConstants.ORDER_STATUS_EXPRESS_SPLIT_OLD, message);
             return Boolean.TRUE;
         });
-        if (!execute) throw new CrmebException("快递拆单发货失败！"+ order.getOrderNo());
+        if (!execute) throw new CrmebException("快递拆单发货失败！" + order.getOrderNo());
         List<OrderDetail> detailList = orderDetailService.getByOrderNo(order.getOrderNo());
         long count = detailList.stream().filter(e -> e.getPayNum() > (e.getDeliveryNum() + e.getRefundNum())).count();
         if (count <= 0) {
@@ -1139,7 +1154,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         pushMessageOrder(order, payNotification, invoice);
         return execute;
     }
-
 
 
     /**
@@ -1416,7 +1430,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_PUBLIC) && notification.getIsWechat().equals(1)) {
             userToken = userTokenService.getTokenByUserId(order.getUid(), UserConstants.USER_TOKEN_TYPE_WECHAT);
             if (ObjectUtil.isNull(userToken)) {
-                return ;
+                return;
             }
             /**
              * {{first.DATA}}
@@ -1438,7 +1452,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             // 小程序发送订阅消息
             userToken = userTokenService.getTokenByUserId(order.getUid(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
             if (ObjectUtil.isNull(userToken)) {
-                return ;
+                return;
             }
             // 组装数据
             // 注释部分为丰享汇小程序

@@ -2,7 +2,6 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
@@ -20,7 +19,9 @@ import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.UserBill;
 import com.jbp.common.model.order.Order;
@@ -30,7 +31,6 @@ import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
-import com.jbp.common.model.user.UserTag;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.request.merchant.MerchantUserSearchRequest;
@@ -44,7 +44,6 @@ import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1468,9 +1467,27 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public PageInfo<UserInviteResponse> getUserInvite(UserInviteRequest request) {
         User currentUser = getInfo();
-        List<UserInviteResponse> userInviteResponseList = invitationService.getUserNextList(currentUser.getId(),request.getKeywords());
+        List<UserInviteResponse> userInviteResponseList = invitationService.getUserNextList(currentUser.getId(), request.getKeywords());
         Page<Object> page = PageHelper.startPage(request.getPage(), request.getLimit());
         return CommonPage.copyPageInfo(page, userInviteResponseList);
+    }
+
+    public void updateUser(Integer id, String pwd, Integer sex, String birthday, String realName, String phone, String country, String province, String city, String district, String address) {
+        User user  = getById(id);
+        LambdaUpdateWrapper<User> lqw = new LambdaUpdateWrapper<User>()
+                .eq(User::getId, id)
+                .set(!ObjectUtil.isNotEmpty(pwd) && !pwd.equals(""), User::getPwd, CrmebUtil.encryptPassword(pwd, user.getAccount()))
+                .set(!ObjectUtil.isNotEmpty(sex), User::getSex, sex)
+                .set(!ObjectUtil.isNotEmpty(birthday) && !birthday.equals(""), User::getBirthday, birthday)
+                .set(!ObjectUtil.isNotEmpty(realName) && !realName.equals(""), User::getRealName, realName)
+                .set(!ObjectUtil.isNotEmpty(phone) && !phone.equals(""), User::getPhone, phone)
+                .set(!ObjectUtil.isNotEmpty(country) && !country.equals(""), User::getCountry, country)
+                .set(!ObjectUtil.isNotEmpty(province) && !province.equals(""), User::getProvince, province)
+                .set(!ObjectUtil.isNotEmpty(city) && !city.equals(""), User::getCity, city)
+                .set(!ObjectUtil.isNotEmpty(district) && !district.equals(""), User::getDistrict, district)
+                .set(!ObjectUtil.isNotEmpty(address) && !address.equals(""), User::getAddress, address);
+        update(lqw);
+
     }
 
     /**
