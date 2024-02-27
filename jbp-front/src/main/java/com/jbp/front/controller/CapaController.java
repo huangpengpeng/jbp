@@ -70,6 +70,15 @@ public class CapaController {
     }
 
 
+
+    @ApiOperation(value = "默认等级")
+    @RequestMapping(value = "/defaultCapa", method = RequestMethod.GET)
+    public CommonResult<Capa> defaultCapa() {
+        return CommonResult.success(capaService.getMinCapa());
+    }
+
+
+
 }
 
 
