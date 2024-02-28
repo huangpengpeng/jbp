@@ -9,6 +9,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
 
 import com.jbp.service.service.agent.CapaService;
@@ -223,6 +224,14 @@ public class UserController {
         return CommonResult.success(CommonPage.restPage(userService.getUserInvite(request)));
     }
 
+
+    @ApiOperation(value = "校验交易密码")
+    @RequestMapping(value = "/verifyPayPwd", method = RequestMethod.GET)
+    public CommonResult<Boolean> verifyPayPwd(String payPwd) throws Exception {
+
+
+        return CommonResult.success(userService.verifyPayPwd(payPwd));
+    }
 
 }
 

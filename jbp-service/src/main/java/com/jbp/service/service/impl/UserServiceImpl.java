@@ -1498,6 +1498,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     }
 
+    @Override
+    public Boolean verifyPayPwd(String payPwd) throws Exception {
+        User user = getInfo();
+        if(user.getPayPwd() == null){
+            throw new CrmebException("用户没有设置交易密码");
+        }
+
+        return CrmebUtil.decryptPassowrd(user.getPayPwd(), user.getAccount()).equals(payPwd);
+    }
+
     /**
      * 批量清除用户推广人
      *
