@@ -17,6 +17,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
@@ -34,6 +35,7 @@ import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.OrderDao;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.CapaService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +103,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private SystemNotificationServiceImpl systemNotificationService;
     @Autowired
     private MerchantPrintService merchantPrintService;
+    @Resource
+    private OrderExtService orderExtService;
+
+    @Resource
+    private CapaService capaService;
 
     /**
      * 根据订单编号获取订单
@@ -564,6 +571,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
         List<Integer> merIdList = orderList.stream().map(Order::getMerId).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = merchantService.getMerIdMapByIdList(merIdList);
+        List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
+        Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
         List<PlatformOrderPageResponse> pageResponses = orderList.stream().map(e -> {
             PlatformOrderPageResponse pageResponse = new PlatformOrderPageResponse();
             BeanUtils.copyProperties(e, pageResponse);
@@ -573,6 +582,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             pageResponse.setMerRemark(merchantOrder.getMerchantRemark());
             pageResponse.setNickName(userMap.get(e.getUid()) != null ? userMap.get(e.getUid()).getNickname() : "");
             pageResponse.setIsLogoff(userMap.get(e.getUid()) != null ? userMap.get(e.getUid()).getIsLogoff() : null);
+            OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+            //设置下单前等级
+            if (ObjectUtil.isNotEmpty(orderExt) && ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
+                Capa capa = capaService.getById(orderExt.getCapaId());
+                pageResponse.setCapaName(capa != null ? capa.getName() :"");
+            }
+            //设置成功后等级
+            if (ObjectUtil.isNotEmpty(orderExt) && ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
+                Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
+                pageResponse.setSuccessCapaName(successCapa != null ? successCapa.getName() :"");
+            }
             if (e.getMerId() > 0) {
                 pageResponse.setMerName(merchantMap.get(e.getMerId()).getName());
             }
