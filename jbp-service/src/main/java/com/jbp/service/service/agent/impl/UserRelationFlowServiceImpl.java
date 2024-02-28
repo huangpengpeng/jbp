@@ -8,19 +8,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.PlatformWallet;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.agent.UserRelationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserRelationFlowDao;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserRelationFlowService;
 import com.jbp.service.service.agent.UserRelationService;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -69,10 +64,10 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
 
     @Override
     public PageInfo<UserRelationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<UserRelationFlow> lqw=new LambdaQueryWrapper<UserRelationFlow>()
-                .eq(!ObjectUtil.isNull(uid),UserRelationFlow::getUId,uid)
-                .eq(!ObjectUtil.isNull(pid),UserRelationFlow::getPId,pid)
-                .eq(!ObjectUtil.isNull(level),UserRelationFlow::getLevel,level);
+        LambdaQueryWrapper<UserRelationFlow> lqw = new LambdaQueryWrapper<UserRelationFlow>()
+                .eq(!ObjectUtil.isNull(uid), UserRelationFlow::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), UserRelationFlow::getPId, pid)
+                .eq(!ObjectUtil.isNull(level), UserRelationFlow::getLevel, level);
         Page<UserRelationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelationFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -82,11 +77,13 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(UserRelationFlow::getPId).collect(Collectors.toList());
         Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
-        list.forEach(e->{
+        list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            e.setURealName(uUser != null ? uUser.getRealName() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            e.setPRealName(pUser != null ? pUser.getRealName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

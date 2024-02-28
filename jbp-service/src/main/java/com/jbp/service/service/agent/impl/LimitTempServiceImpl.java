@@ -179,7 +179,8 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     public PageInfo<LimitTemp> pageList(String name, String type, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LimitTemp> limitTempLambdaQueryWrapper = new LambdaQueryWrapper<LimitTemp>()
                 .like(StringUtils.isNotEmpty(name), LimitTemp::getName, name)
-                .like(StringUtils.isNotEmpty(type), LimitTemp::getType, type);
+                .like(StringUtils.isNotEmpty(type), LimitTemp::getType, type)
+                .orderByDesc(LimitTemp::getGmtModify);
         Page<LimitTemp> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(limitTempLambdaQueryWrapper));
     }

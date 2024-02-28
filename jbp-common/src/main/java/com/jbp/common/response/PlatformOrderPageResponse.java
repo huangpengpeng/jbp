@@ -80,4 +80,10 @@ public class PlatformOrderPageResponse implements Serializable {
 
     @ApiModelProperty(value = "商户名称")
     private String merName;
+
+    @ApiModelProperty(value = "下单前等级名称")
+    private String capaName;
+
+    @ApiModelProperty(value = "成功后等级")
+    private String successCapaName;
 }

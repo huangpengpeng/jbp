@@ -44,4 +44,9 @@ public class ProductProfitServiceImpl extends ServiceImpl<ProductProfitDao, Prod
     public List<ProductProfit> getByProduct(Integer productId) {
         return list(new QueryWrapper<ProductProfit>().lambda().eq(ProductProfit::getProductId, productId));
     }
+
+    @Override
+    public ProductProfit getByProductName(Integer productId, String name) {
+        return getOne(new QueryWrapper<ProductProfit>().lambda().eq(ProductProfit::getProductId , productId).eq(ProductProfit::getName,name));
+    }
 }

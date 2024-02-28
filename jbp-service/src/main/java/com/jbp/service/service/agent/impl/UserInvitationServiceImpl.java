@@ -11,6 +11,7 @@ import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserInviteResponse;
 import com.jbp.service.dao.agent.UserInvitationDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
@@ -48,9 +49,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     public UserInvitation getByUser(Integer uId) {
         LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
         wrapper.and((w) -> {
-            w.eq(UserInvitation::getPId, uId)
-                    .or()
-                    .eq(UserInvitation::getMId, uId);
+            w.eq(UserInvitation::getUId, uId);
         });
         return getOne(wrapper);
     }
@@ -157,11 +156,19 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            e.setURealName(uUser != null ? uUser.getRealName() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            e.setPRealName(pUser != null ? pUser.getRealName() : "");
             User mUser = midMapList.get(e.getMId());
             e.setMAccount(mUser != null ? mUser.getAccount() : "");
+            e.setMRealName(mUser != null ? mUser.getRealName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public List<UserInviteResponse> getUserNextList(Integer uid, String account) {
+        return dao.getUserNextList(uid,account);
     }
 }

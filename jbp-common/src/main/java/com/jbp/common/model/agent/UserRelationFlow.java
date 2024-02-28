@@ -50,9 +50,17 @@ public class UserRelationFlow extends BaseModel {
     @TableField(exist = false)
     private String uAccount;
 
-    @ApiModelProperty("邀请上级账户")
+    @ApiModelProperty("用户真实姓名")
+    @TableField(exist = false)
+    private String uRealName;
+
+    @ApiModelProperty("上级用户账户")
     @TableField(exist = false)
     private String pAccount;
+
+    @ApiModelProperty("上级用户真实姓名")
+    @TableField(exist = false)
+    private String pRealName;
 
 }
 

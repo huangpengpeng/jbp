@@ -9,6 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.CapaXs;
+import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -62,7 +63,7 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         List<RiseCondition> conditionList = request.getConditionList();
         List<RiseCondition> saveConditionList = Lists.newArrayList();
         for (RiseCondition riseCondition : conditionList) {
-            if(conditionNames.contains(riseCondition.getName())){
+            if (conditionNames.contains(riseCondition.getName())) {
                 conditionChain.valid(riseCondition);
                 saveConditionList.add(riseCondition);
             }
@@ -103,9 +104,16 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     public List<Capa> getList() {
         return list(new QueryWrapper<Capa>().lambda());
     }
+
     @Override
     public Map<Long, Capa> getCapaMap() {
         List<Capa> list = list();
         return FunctionUtil.keyValueMap(list, Capa::getId);
+    }
+
+    @Override
+    public List<Capa> getMaxCapaList(Long capaId) {
+        Capa capa = getOne(new QueryWrapper<Capa>().lambda().eq(Capa::getId, capaId));
+        return list(new QueryWrapper<Capa>().lambda().ge(Capa::getRankNum, capa.getRankNum()));
     }
 }

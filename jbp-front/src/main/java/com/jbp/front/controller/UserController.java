@@ -5,12 +5,11 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
-import com.jbp.common.response.HelpRegisterResponse;
-import com.jbp.common.response.UserInfoResponse;
-import com.jbp.common.response.UserLogoffBeforeResponse;
-import com.jbp.common.response.UserRelationInfoResponse;
+import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
 
 import com.jbp.service.service.agent.CapaService;
@@ -23,10 +22,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -221,6 +217,21 @@ public class UserController {
 
 
 
+
+    @ApiOperation(value = "获取用户的邀请关系")
+    @RequestMapping(value = "/getInvite", method = RequestMethod.GET)
+    public CommonResult<CommonPage<UserInviteResponse>> getInvite(@ModelAttribute @Validated UserInviteRequest request) {
+        return CommonResult.success(CommonPage.restPage(userService.getUserInvite(request)));
+    }
+
+
+    @ApiOperation(value = "校验交易密码")
+    @RequestMapping(value = "/verifyPayPwd", method = RequestMethod.GET)
+    public CommonResult<Boolean> verifyPayPwd(String payPwd) throws Exception {
+
+
+        return CommonResult.success(userService.verifyPayPwd(payPwd));
+    }
 
 }
 

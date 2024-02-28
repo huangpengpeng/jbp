@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.user.User;
@@ -28,6 +29,7 @@ public class UserInvitationFlowController {
     private UserInvitationFlowService userInvitationFlowService;
     @Resource
     private UserService userService;
+
     @PreAuthorize("hasAuthority('agent:user:invitation:flow:page')")
     @GetMapping("/page")
     @ApiOperation("销售上下层级关系列表")

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @ApiModel(value = "FundClearingUpdateRemarkRequest对象", description = "佣金发放记录请求对象")
 public class FundClearingUpdateRemarkRequest implements Serializable {
     @ApiModelProperty("编号")
+    @NotNull( message = "编号不能为空")
     private Long id;
     @ApiModelProperty("备注")
     private String remark;
