@@ -14,4 +14,7 @@ public class ApplyPasswordElementResult {
     private String oid_partner;
     // 用于唤起密码控件的token
     private String password_element_token;
+    private String passwordScene;
+    private String payCode;
+
 }

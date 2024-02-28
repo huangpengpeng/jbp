@@ -1,22 +1,27 @@
 package com.jbp.admin.controller.publicly;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.service.service.LianLianPayService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.annotation.CustomResponseAnnotation;
+import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.encryptapi.EncryptIgnore;
+import com.jbp.common.lianlian.result.QueryPaymentResult;
+import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
+import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.PayCallbackService;
-
+import com.jbp.service.service.agent.LztAcctApplyService;
+import com.jbp.service.service.agent.LztTransferMorepyeeService;
+import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +51,12 @@ public class PayCallbackController {
     private PayCallbackService callbackService;
     @Autowired
     private LianLianPayService lianLianPayService;
+    @Resource
+    private LztAcctApplyService lztAcctApplyService;
+    @Resource
+    private LztTransferMorepyeeService lztTransferMorepyeeService;
+    @Resource
+    private LztWithdrawalService lztWithdrawalService;
 
     @ApiOperation(value = "微信支付回调")
     @RequestMapping(value = "/wechat", method = RequestMethod.POST)
@@ -119,6 +130,32 @@ public class PayCallbackController {
         }
         // 没有其他意义，异步通知响应连连这边只认"Success"，返回非"Success"，连连会进行重发
         return "error";
+    }
+
+
+
+    @ApiOperation(value = "来账通回调")
+    @RequestMapping(value = "/lianlian/lzt/{txnSeqno}")
+    public String lzt(@PathVariable("txnSeqno") String txnSeqno) {
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix())) {
+            LztAcctApply lztAcctApply = lztAcctApplyService.getByTxnSeqno(txnSeqno);
+            if (lztAcctApply != null) {
+                lztAcctApplyService.refresh(lztAcctApply.getLianLianAcct());
+            }
+        }
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix())) {
+            LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(txnSeqno);
+            if (lztTransferMorepyee != null) {
+                lztTransferMorepyeeService.refresh(lztTransferMorepyee.getAccpTxno());
+            }
+        }
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix())) {
+            LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(txnSeqno);
+            if (lztWithdrawal != null) {
+                lztWithdrawalService.refresh(lztWithdrawal.getAccpTxno());
+            }
+        }
+        return "SUCCESS";
     }
 }
 
