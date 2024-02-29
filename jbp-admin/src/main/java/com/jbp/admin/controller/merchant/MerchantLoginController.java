@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jbp.admin.service.AdminLoginService;
 import com.jbp.common.request.LoginAdminUpdateRequest;
+import com.jbp.common.request.SendCodeRequest;
 import com.jbp.common.request.SystemAdminLoginRequest;
+import com.jbp.common.request.merchant.MerchantSendCodeRequest;
 import com.jbp.common.response.AdminLoginInfoResponse;
 import com.jbp.common.response.LoginAdminResponse;
 import com.jbp.common.response.MenusResponse;
@@ -49,11 +51,12 @@ public class MerchantLoginController {
 
     @ApiOperation(value="登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public CommonResult<SystemLoginResponse> SystemAdminLogin(@RequestBody @Validated SystemAdminLoginRequest systemAdminLoginRequest, HttpServletRequest request) {
+    public CommonResult<SystemLoginResponse> login(@RequestBody @Validated SystemAdminLoginRequest systemAdminLoginRequest, HttpServletRequest request) {
         String ip = CrmebUtil.getClientIp(request);
         SystemLoginResponse systemAdminResponse = loginService.merchantLogin(systemAdminLoginRequest, ip);
         return CommonResult.success(systemAdminResponse);
     }
+    
 
     @PreAuthorize("hasAuthority('merchant:logout')")
     @ApiOperation(value="登出")
@@ -83,6 +86,15 @@ public class MerchantLoginController {
         return CommonResult.success(loginService.getMenus());
     }
 
+    @ApiOperation(value = "发送短信登录验证码")
+    @RequestMapping(value = "/sendCode", method = RequestMethod.POST)
+    public CommonResult<String> sendCode(@RequestBody @Validated MerchantSendCodeRequest request) {
+        if (loginService.sendLoginCode(request.getPhone())) {
+            return CommonResult.success("发送成功");
+        }
+        return CommonResult.failed("发送失败");
+    }
+    
     @PreAuthorize("hasAuthority('merchant:login:admin:update')")
     @ApiOperation(value="修改登录用户信息")
     @RequestMapping(value = "/login/admin/update", method = RequestMethod.POST)
