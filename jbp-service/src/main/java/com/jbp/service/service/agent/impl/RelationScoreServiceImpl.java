@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -11,14 +12,17 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.RelationScoreResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.dao.agent.RelationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;
 import com.jbp.service.service.agent.RelationScoreService;
+import com.jbp.service.service.agent.UserRelationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -39,6 +43,8 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     private UserService userService;
     @Resource
     private RelationScoreFlowService relationScoreFlowService;
+    @Resource
+    private UserRelationService userRelationService;
 
     @Override
     public RelationScore getByUser(Integer uId, Integer node) {
@@ -144,5 +150,34 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
                 BooleanUtils.isTrue(ifUpdateUsed) ? "调分" : "调分2", "减少", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
         relationScoreFlowService.save(flow);
+    }
+
+    @Override
+    public RelationScoreResponse getUserResult() {
+        RelationScoreResponse relationScoreResponse =new RelationScoreResponse();
+        User user = userService.getInfo();
+        UserRelation userRelation =  userRelationService.getByPid(user.getId(),0);
+        UserRelation  userRelation2 =  userRelationService.getByPid(user.getId(),1);
+
+        if(userRelation != null){
+            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()));
+            User zorouser = userService.getById(userRelation.getUId());
+            relationScoreResponse.setNickname(zorouser.getNickname());
+            relationScoreResponse.setAccount(zorouser.getAccount());
+            relationScoreResponse.setTotalScore(relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore().add(relationScore.getUsedScore()));
+            relationScoreResponse.setUsableScore( relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore());
+        }
+
+        if(userRelation2 != null){
+            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()));
+            User zorouser = userService.getById(userRelation2.getUId());
+            relationScoreResponse.setNickname2(zorouser.getNickname());
+            relationScoreResponse.setAccount2(zorouser.getAccount());
+            relationScoreResponse.setTotalScore2( relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore().add(relationScore.getUsedScore()));
+            relationScoreResponse.setUsableScore2( relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore());
+        }
+
+
+        return relationScoreResponse;
     }
 }

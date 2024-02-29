@@ -2,6 +2,7 @@ package com.jbp.front.controller;
 
 
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
@@ -13,6 +14,7 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
 
 import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserRelationService;
 import io.swagger.annotations.Api;
@@ -55,6 +57,8 @@ public class UserController {
     private UserInvitationService invitationService;
     @Autowired
     private CapaService capaService;
+    @Autowired
+    private RelationScoreService relationScoreService;
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -239,6 +243,14 @@ public class UserController {
     public CommonResult<CommonPage<UserInviteInfoResponse>> getInviteInfo(@ModelAttribute @Validated UserInviteRequest request) {
         return CommonResult.success(CommonPage.restPage(userService.getUserInviteInfo(request)));
     }
+
+    @ApiOperation(value = "用户左右区业绩")
+    @RequestMapping(value = "/getPerformance", method = RequestMethod.GET)
+    public CommonResult<RelationScoreResponse> getPerformance() {
+
+        return CommonResult.success(relationScoreService.getUserResult());
+    }
+
 
 
 }

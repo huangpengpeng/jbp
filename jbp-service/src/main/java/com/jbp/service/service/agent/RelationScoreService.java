@@ -6,6 +6,7 @@ import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.RelationScoreResponse;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,5 +31,6 @@ public interface RelationScoreService extends IService<RelationScore> {
                          Date payTime, String remark, Boolean ifUpdateUsed);
 
 
+    RelationScoreResponse getUserResult();
 
 }
