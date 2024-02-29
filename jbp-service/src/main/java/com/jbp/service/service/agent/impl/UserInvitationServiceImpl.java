@@ -11,6 +11,7 @@ import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 import com.jbp.service.dao.agent.UserInvitationDao;
 import com.jbp.service.service.UserService;
@@ -170,5 +171,19 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     @Override
     public List<UserInviteResponse> getUserNextList(Integer uid, String account) {
         return dao.getUserNextList(uid,account);
+    }
+
+    @Override
+    public List<UserInviteInfoResponse> getUserNextInfoList(Integer uid, String account) {
+        return dao.getUserNextInfoList(uid,account);
+    }
+
+    @Override
+    public Integer getInviteNumber(Integer pId) {
+        LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
+        wrapper.and((w) -> {
+            w.eq(UserInvitation::getPId, pId);
+        });
+        return  list(wrapper).size();
     }
 }

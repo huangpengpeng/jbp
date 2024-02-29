@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 
 import java.util.List;
@@ -36,4 +37,11 @@ public interface UserInvitationService extends IService<UserInvitation> {
     PageInfo<UserInvitation> pageList(Integer uid, Integer pid, Integer mid, PageParamRequest pageParamRequest);
 
     List<UserInviteResponse> getUserNextList(Integer uid, String account);
+
+
+    List<UserInviteInfoResponse> getUserNextInfoList(Integer uid, String account);
+
+
+    //获取邀请关系数量
+    Integer getInviteNumber(Integer pId);
 }

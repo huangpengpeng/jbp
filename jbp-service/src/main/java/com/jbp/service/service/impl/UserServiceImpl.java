@@ -1508,6 +1508,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return CrmebUtil.decryptPassowrd(user.getPayPwd(), user.getAccount()).equals(payPwd);
     }
 
+    @Override
+    public PageInfo<UserInviteInfoResponse> getUserInviteInfo(UserInviteRequest request) {
+        User currentUser = getInfo();
+        List<UserInviteInfoResponse> userInviteResponseList = invitationService.getUserNextInfoList(currentUser.getId(), request.getKeywords());
+
+        userInviteResponseList.forEach(e ->{
+            e.setOneCount(invitationService.getInviteNumber(e.getUid()));
+        });
+
+        Page<Object> page = PageHelper.startPage(request.getPage(), request.getLimit());
+        return CommonPage.copyPageInfo(page, userInviteResponseList);
+
+
+    }
+
     /**
      * 批量清除用户推广人
      *

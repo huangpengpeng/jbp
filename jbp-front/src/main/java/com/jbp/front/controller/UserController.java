@@ -233,6 +233,14 @@ public class UserController {
         return CommonResult.success(userService.verifyPayPwd(payPwd));
     }
 
+
+    @ApiOperation(value = "获取用户的邀请关系详细信息")
+    @RequestMapping(value = "/getInviteInfo", method = RequestMethod.GET)
+    public CommonResult<CommonPage<UserInviteInfoResponse>> getInviteInfo(@ModelAttribute @Validated UserInviteRequest request) {
+        return CommonResult.success(CommonPage.restPage(userService.getUserInviteInfo(request)));
+    }
+
+
 }
 
 

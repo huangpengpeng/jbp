@@ -392,4 +392,6 @@ public interface UserService extends IService<User> {
 
     Boolean verifyPayPwd(String payPwd) throws Exception;
 
+    PageInfo<UserInviteInfoResponse> getUserInviteInfo(UserInviteRequest request);
+
 }
