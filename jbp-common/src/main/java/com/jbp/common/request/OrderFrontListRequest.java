@@ -36,4 +36,8 @@ public class OrderFrontListRequest extends PageParamRequest implements Serializa
     @ApiModelProperty(value = "搜索关键字")
     private String keywords;
 
+    @ApiModelProperty(value = "是否代购订单")
+    private Boolean agent;
+
+
 }

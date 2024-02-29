@@ -12,4 +12,7 @@ public interface ProductProfitService extends IService<ProductProfit> {
     List<ProductProfit> getByProduct(List<Integer> productIdList);
 
     List<ProductProfit> getByProduct(Integer productId);
+
+
+    ProductProfit getByProductName(Integer productId,String name);
 }

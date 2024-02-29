@@ -1,12 +1,17 @@
 package com.jbp.front.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.DeclUserInfoResultVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.front.service.FrontOrderService;
 
+import com.jbp.service.service.OrderService;
+import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -39,6 +44,8 @@ public class OrderController {
 
     @Autowired
     private FrontOrderService orderService;
+    @Autowired
+    private UserService userService;
 
     @ApiOperation(value = "预下单")
     @RequestMapping(value = "/pre/order", method = RequestMethod.POST)
@@ -74,6 +81,12 @@ public class OrderController {
     @RequestMapping(value = "/detail/{orderNo}", method = RequestMethod.GET)
     public CommonResult<OrderFrontDetailResponse> orderDetail(@PathVariable String orderNo) {
         return CommonResult.success(orderService.frontDetail(orderNo));
+    }
+
+    @ApiOperation(value = "报单订单用户详情")
+    @RequestMapping(value = "/declDetail/{orderNo}", method = RequestMethod.GET)
+    public CommonResult<DeclUserInfoResultVo> declDetail(@PathVariable String orderNo) {
+        return CommonResult.success(userService.getOrderDealUser(orderNo));
     }
 
     @ApiOperation(value = "订单取消")

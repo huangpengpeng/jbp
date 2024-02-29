@@ -23,6 +23,7 @@ import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.coupon.Coupon;
@@ -46,6 +47,7 @@ import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.OnePassUserInfoVo;
 import com.jbp.common.vo.SimpleProductVo;
 import com.jbp.service.dao.ProductDao;
+import com.jbp.service.product.profit.ProductProfitEnum;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.ProductUtils;
@@ -145,7 +147,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Autowired
     private WalletConfigService walletConfigService;
     @Autowired
-    private ProductAttrService productAttrService;
+    private ProductProfitService productProfitService;
 
 
     /**
@@ -1022,6 +1024,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             String keyword = URLUtil.decode(request.getKeyword());
             map.put("keywords", keyword);
         }
+        if (StrUtil.isNotEmpty(request.getRiseCapaId())) {
+            map.put("riseCapaId", request.getRiseCapaId());
+        }
         if (ObjectUtil.isNotNull(request.getMaxPrice())) {
             map.put("maxPrice", request.getMaxPrice());
         }
@@ -1113,11 +1118,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             e.setPositiveRatio(replyChance);
             e.setSales(e.getSales() + e.getFicti());
 
-//            // 获取商品规格
-//            List<ProductAttr> attrList = productAttrService.getListByProductIdAndType(e.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
-//            // 根据制式设置attr属性
-//
-//            // 获取商品规格
+           // 获取商品规格
            List<ProductAttrValue> productAttrValueList = productAttrValueService.getListByProductIdAndType(e.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
            e.setProductAttrValue(productAttrValueList);
 
@@ -1129,6 +1130,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             Product product = new Product();
             BeanUtils.copyProperties(response, product);
             products.add(product);
+
+            //获取直升等级的信息
+            ProductProfit productProfit = productProfitService.getByProductName(response.getId(), ProductProfitEnum.等级.getName());
+            if(productProfit!= null){
+                JSONObject jsonObject =JSONObject.parseObject( productProfit.getRule());
+                response.setRiseCapaName(jsonObject.getString("name"));
+            }
+
         });
         List<Product> makeProductList = activityStyleService.makeActivityBorderStyle(products);
 

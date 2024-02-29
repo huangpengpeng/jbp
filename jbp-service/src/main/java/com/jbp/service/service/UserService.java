@@ -3,9 +3,11 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.user.User;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.request.merchant.MerchantUserSearchRequest;
 import com.jbp.common.response.*;
+import com.jbp.common.vo.DeclUserInfoResultVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -380,5 +382,14 @@ public interface UserService extends IService<User> {
     void tradePassword(String phone, String code, String tradePassword);
 
     List<User> getNoChild();
+
+    DeclUserInfoResultVo getOrderDealUser(String orderNo);
+
+    PageInfo<UserInviteResponse> getUserInvite(UserInviteRequest request);
+
+
+    void updateUser(Integer id, String pwd, Integer sex, String birthday, String realName, String phone, String country, String province, String city, String district, String address);
+
+    Boolean verifyPayPwd(String payPwd) throws Exception;
 
 }

@@ -18,6 +18,7 @@ import com.jbp.common.model.product.*;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.*;
+import com.jbp.common.vo.*;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -61,11 +62,6 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.model.wechat.video.PayComponentProductSku;
 import com.jbp.common.page.CommonPage;
-import com.jbp.common.vo.LogisticsResultVo;
-import com.jbp.common.vo.MyRecord;
-import com.jbp.common.vo.PreMerchantOrderVo;
-import com.jbp.common.vo.PreOrderInfoDetailVo;
-import com.jbp.common.vo.PreOrderInfoVo;
 import com.jbp.front.service.FrontOrderService;
 import com.jbp.front.service.SeckillService;
 
@@ -1033,7 +1029,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderNo = CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_PLATFORM);
         order.setOrderNo(orderNo);
         order.setMerId(0);
-        order.setUid(payUser.getId());
+        order.setUid(orderInfoVo.getUid());
+        order.setPayUid(payUser.getId());
         order.setTotalNum(orderInfoVo.getOrderProNum());
         order.setProTotalPrice(orderInfoVo.getProTotalFee());
         order.setTotalPostage(orderInfoVo.getFreightFee());
@@ -1054,6 +1051,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setPlatCouponPrice(orderInfoVo.getPlatCouponFee());
         order.setPlatCouponId(orderInfoVo.getPlatUserCouponId());
         order.setPayGateway(orderInfoVo.getPayGateway());
+        order.setPlatform(orderRequest.getPlatform());
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
@@ -1126,12 +1124,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 orderDetail.setPayNum(detailVo.getPayNum());
                 orderDetail.setWeight(detailVo.getWeight());
                 orderDetail.setVolume(detailVo.getVolume());
+                orderDetail.setBarCode(detailVo.getBarCode());
                 orderDetail.setProductType(detailVo.getProductType());
                 orderDetail.setSubBrokerageType(detailVo.getSubBrokerageType());
                 orderDetail.setBrokerage(detailVo.getBrokerage());
                 orderDetail.setBrokerageTwo(detailVo.getBrokerageTwo());
                 orderDetail.setFreightFee(detailVo.getFreightFee());
-
                 orderDetail.setUseIntegral(detailVo.getUseIntegral());
                 orderDetail.setIntegralPrice(detailVo.getIntegralPrice());
                 orderDetail.setPayPrice(BigDecimal.ZERO);
@@ -1232,6 +1230,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         response.setOrderNo(order.getOrderNo());
         response.setPayPrice(order.getPayPrice());
         response.setPayGateway(order.getPayGateway());
+        response.setPlatform(order.getPlatform());
         return response;
     }
 
@@ -1507,7 +1506,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public OrderFrontDetailResponse frontDetail(String orderNo) {
         User currentUser = userService.getInfo();
         Order order = orderService.getByOrderNo(orderNo);
-        if (order.getIsUserDel() || order.getIsMerchantDel() || !order.getUid().equals(currentUser.getId())) {
+        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId())  && !order.getUid().equals(currentUser.getId())  )) {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
@@ -2253,16 +2252,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             pId = invitationService.getPid(payUser.getId());
             rId = relationService.getPid(payUser.getId());
+            preOrderInfoVo.setUid(payUser.getId());
         }
         // 注册下单
         if (registerInfo != null) {
             HelpRegisterResponse response = userService.helpRegisterValid(registerInfo.getUsername(), registerInfo.getMobile(), registerInfo.getPaccount(),
                     registerInfo.getRaccount(), registerInfo.getNode(), registerInfo.getCapaId());
-            productList.forEach(p -> {
-                if (p.getPayType() == 0) {
-                    throw new CrmebException("注册下单只能选择积分支付商品");
-                }
-            });
+//            productList.forEach(p -> {
+//                if (p.getPayType() == 0) {
+//                    throw new CrmebException("注册下单只能选择积分支付商品");
+//                }
+//            });
             capaId = registerInfo.getCapaId();
             capaXsId = registerInfo.getCapaXsId();
             TeamUser teamUser = teamUserService.getByUser(response.getPId());
@@ -2299,6 +2299,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             pId = invitationService.getPid(user.getId());
             rId = relationService.getPid(user.getId());
             preOrderInfoVo.setRiseInfo(riseInfo);
+            preOrderInfoVo.setUid(user.getId());
         }
         productList = productList.stream().filter(p -> p.getBuyLimitTempId() != null).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(productList)) {
@@ -2375,6 +2376,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(product.getTempId());
+        detailVo.setBarCode(attrValue.getBarCode());
         detailVo.setSubBrokerageType(product.getIsSub() ? 1 : 2);
         detailVo.setMerCouponPrice(BigDecimal.ZERO);
         detailVo.setPlatCouponPrice(BigDecimal.ZERO);
@@ -2886,6 +2888,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setVolume(attrValue.getVolume());
         detailVo.setWeight(attrValue.getWeight());
         detailVo.setTempId(product.getTempId());
+        detailVo.setBarCode(attrValue.getBarCode());
         detailVo.setMerCouponPrice(BigDecimal.ZERO);
         detailVo.setPlatCouponPrice(BigDecimal.ZERO);
         detailVo.setCouponPrice(detailVo.getMerCouponPrice().add(detailVo.getPlatCouponPrice()));

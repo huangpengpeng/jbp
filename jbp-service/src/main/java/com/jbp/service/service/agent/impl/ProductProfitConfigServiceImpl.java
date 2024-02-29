@@ -49,6 +49,7 @@ public class ProductProfitConfigServiceImpl extends ServiceImpl<ProductProfitCon
     @Override
     public PageInfo<ProductProfitConfig> pageList(PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<ProductProfitConfig> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(ProductProfitConfig::getGmtModify);
         Page<ProductProfitConfig> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ProductProfitConfig> list = list(wrapper);
         return CommonPage.copyPageInfo(page, list);

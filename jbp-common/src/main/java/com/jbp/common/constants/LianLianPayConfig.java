@@ -57,7 +57,12 @@ public class LianLianPayConfig {
 
         交易处理中("交易处理中", "TRADE_WAIT_PAY"),
         交易成功("交易成功", "TRADE_SUCCESS"),
-        交易失败("交易失败", "TRADE_CLOSE"),
+        交易关闭("交易关闭", "TRADE_CLOSE"),
+        交易失败("交易失败", "TRADE_FAILURE"),
+        退汇("退汇", "TRADE_CANCEL"),
+        预付完成("预付完成", "TRADE_PREPAID"),
+
+
         ;
 
         @Getter
@@ -70,11 +75,16 @@ public class LianLianPayConfig {
             this.name = name;
             this.code = code;
         }
+
+        public static String getName(String code){
+            for (TxnStatus value : TxnStatus.values()) {
+                if(value.getCode().equals(code)){
+                    return value.getName();
+                }
+            }
+            return "";
+        }
     }
-
-
-
-
 
 
     public enum TxnPurpose {
@@ -95,7 +105,79 @@ public class LianLianPayConfig {
     }
 
 
+    public enum AcctType {
 
+        用户自有待结算账户("用户自有待结算账户", "USEROWN_PSETTLE"),
+        用户自有可用账户("用户自有可用账户", "USEROWN_AVAILABLE"),
+        平台商户自有待结算账户("平台商户自有待结算账户", "MCHOWN_PSETTLE"),
+        平台商户自有可用账户("平台商户自有可用账户", "MCHOWN_AVAILABLE"),
+        平台商户担保待结算账户("平台商户担保待结算账户", "MCHASSURE_PSETTLE"),
+        平台商户担保可用账户("平台商户担保可用账户", "MCHASSURE_AVAILABLE"),
+        平台商户优惠券待结算账户("平台商户优惠券待结算账户", "MCHCOUPON_PSETTLE"),
+        平台商户优惠券可用账户("平台商户优惠券可用账户", "MCHCOUPON_AVAILABLE"),
+        平台商户手续费结算账户("平台商户手续费结算账户", "MCHFEE_PSETTLE"),
+        平台商户手续费可用账户("平台商户手续费可用账户", "MCHFEE_AVAILABLE"),
+        银行账户_借记卡("银行账户_借记卡", "BANKCARD_DEBIT"),
+        银行卡账户_信用卡("银行卡账户_信用卡", "BANKCARD_CREDIT"),
+        银行账户_对公("银行账户_对公", "BANKCARD_ENTERPRISE"),
+        第三方账户("第三方账户", "THIRD_PARTY"),
+        ;
+
+        @Getter
+        private String name;
+        @Getter
+        private String code;
+
+        AcctType(String name, String code) {
+            this.name = name;
+            this.code = code;
+        }
+
+        public static String getName(String code) {
+            for (AcctType value : AcctType.values()) {
+                if (value.code.equals(code)) {
+                    return value.getName();
+                }
+            }
+            return "";
+        }
+    }
+
+
+    public enum AcctState {
+
+        NORMAL("正常"),
+        CANCEL("注销"),
+        PENDING("待开户"),
+        WAIT_SIGN("待开户意愿确认"),
+        FAIL("失败"),
+        ;
+
+        @Getter
+        private String name;
+
+
+        AcctState(String name) {
+            this.name = name;
+        }
+    }
+
+
+    public enum TxnSeqnoPrefix {
+
+        来账通开通银行虚拟户("LZT_KH_"),
+        来账通划拨资金("LZT_FT_"),
+        来账通内部代发("LZT_NDF_"),
+        来账通提现("LZT_DW_"),
+        ;
+
+        @Getter
+        private String prefix;
+
+        TxnSeqnoPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+    }
 
 
 }

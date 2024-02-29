@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
@@ -28,6 +29,7 @@ public class UserInvitationController {
     private UserInvitationService userInvitationService;
     @Resource
     private UserService userService;
+
     @PreAuthorize("hasAuthority('agent:user:invitation:page')")
     @GetMapping("/page")
     @ApiOperation("销售上下级关系列表")
@@ -62,6 +64,7 @@ public class UserInvitationController {
 
 
     @PreAuthorize("hasAuthority('agent:user:invitation:band')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "销售关系上下级绑定上级")
     @GetMapping("/band")
     @ApiOperation("绑定上级")
     public CommonResult band(UserInvitationRequest request) {
@@ -69,11 +72,11 @@ public class UserInvitationController {
             throw new CrmebException("账户信息不能为空");
         }
         User user = userService.getByAccount(request.getUAccount());
-        if(user == null){
+        if (user == null) {
             throw new CrmebException("账户不存在");
         }
         User pUser = userService.getByAccount(request.getPAccount());
-        if(pUser == null){
+        if (pUser == null) {
             throw new CrmebException("上级账户不存在");
         }
         userInvitationService.band(user.getId(), pUser.getId(), false, true);
@@ -81,6 +84,7 @@ public class UserInvitationController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:invitation:mount')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "销售关系上下级转挂上级")
     @GetMapping("/mount")
     @ApiOperation("转挂上级")
     public CommonResult mount(UserInvitationRequest request) {

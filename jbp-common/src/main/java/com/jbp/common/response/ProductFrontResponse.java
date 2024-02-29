@@ -91,4 +91,7 @@ public class ProductFrontResponse {
 
     @ApiModelProperty(value = "产品属性")
     private List<ProductAttrValue> productAttrValue;
+
+    @ApiModelProperty(value = "升级等级名称")
+    private String riseCapaName;
 }

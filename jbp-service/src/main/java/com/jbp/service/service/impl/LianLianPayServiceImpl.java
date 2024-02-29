@@ -2,12 +2,14 @@ package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,6 @@ public class LianLianPayServiceImpl implements LianLianPayService {
     @Autowired
     private SystemConfigService systemConfigService;
 
-
-
     @Override
     public LianLianPayInfoResult get() {
         String pubKey = systemConfigService.getValueByKey("lianlian_pub_key");
@@ -36,6 +36,9 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String status = systemConfigService.getValueByKey("lianlian_pay_status");
         String notify_url = systemConfigService.getValueByKey("lianlian_notify_url");
         String return_url = systemConfigService.getValueByKey("lianlian_return_url");
+        String lzt_oid_partner = systemConfigService.getValueByKey("lianlian_lzt_oid_partner");
+        String lzt_pri_key = systemConfigService.getValueByKey("lianlian_lzt_pri_key");
+
         LianLianPayInfoResult result = new LianLianPayInfoResult();
         result.setPubKey(pubKey);
         result.setPriKey(priKey);
@@ -47,8 +50,8 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         result.setReturn_url(return_url);
 
         // 来账通产品信息
-        result.setLzt_priKey("MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAPD+malK2W3UJXfX5rO79gRUbLe+kwCskw7VzETXA4Qf/5VWlPxOb16SlflkE4zyInhGwehjUTvXPvebNtZJJpKS+Q/7oWw6hMQ1cIC99DWmV6Orjtz61Tmi5A/4QnYqUm2GRScfrnyILQw9/qikkvyjo0pPsIMT2rhmu31LSySNAgMBAAECgYEAokaubeKq2lu6ByLohCqTFINM2cWH8zJBrAGnFMu74GIzlfnBRMwEDiiiuFX9HDGHqHns5HDMKIFeMxjfKhgD0exp3S06xpSbmkIbvWLM+xBl70/+SLG7wztZ4KtdKu7PR26xJht6zM/KDrovuRzFYNB6ZbyO3My9CJXaZS6GU/kCQQD+/wsf0M7Byp+sPzy3SEn8katFopVOz8oESBBuSNNXl1rgyWfgVXBUKRDAus8oa/Nhx2zWNqpuchrHerPp5McHAkEA8fFyidW4nMkL3x4ULQmbsZBqsNEXoKv3fDDvHWRljX0AElel+XaVuxrtpYiDxwqFSM0s92nCBj2ZXt4O+d2eywJAS5mFzMr1YZMXP9QHxjcSaGUvqBeJuLH2LMrIxEmnDuL6uIY928643NrH8rvvywYmRCkB5YiTgucldVq1mHSRZQJAYny8+WrsqbYVhQ/DesnsfQ2iwLN9AMTAC+gHjlluFXiK7OyM/c3OCcpebwHxUrbvpsEOyvBcMRomMr4GLqSOnQJAcDKoXpkYFGakejn6LQj57EBtMgfVNatTipBnQxPaHMGGO9V9SzedbkgNg0NBSzsNsauKnFOy+yFwFqf6oGHm0A==");
-        result.setOid_partner("2020042200284052");
+        result.setLzt_priKey(lzt_pri_key);
+        result.setLzt_oid_partner(lzt_oid_partner);
         return result;
     }
 
@@ -276,8 +279,6 @@ public class LianLianPayServiceImpl implements LianLianPayService {
     @Override
     public UserInfoResult queryUserInfo(String userId) {
         LianLianPayInfoResult lianLianInfo = get();
-
-
         UserInfoParams params = new UserInfoParams();
         params.setTimestamp(LLianPayDateUtils.getTimestamp());
         params.setOid_partner(lianLianInfo.getOid_partner());
@@ -308,7 +309,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
     }
 
     @Override
-    public WithDrawalResult withdrawal(String drawNo, BigDecimal amt, String postscript, String password, String random_key) {
+    public WithdrawalResult withdrawal(String drawNo, BigDecimal amt, String postscript, String password, String random_key) {
         LianLianPayInfoResult lianLianInfo = get();
 
         WithDrawalParams params = new WithDrawalParams();
@@ -339,17 +340,193 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String url = "https://accpapi.lianlianpay.com/v1/txn/withdrawal";
         LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
         String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        WithDrawalResult drawalResult = JSON.parseObject(resultJsonStr, WithDrawalResult.class);
+        WithdrawalResult drawalResult = JSON.parseObject(resultJsonStr, WithdrawalResult.class);
         return drawalResult;
     }
 
+    /* ######################################## 来账通接口 ##################################### */
+
+
+    /**
+     * 来账通开户申请
+     *
+     * @param params
+     * @return
+     */
+    @Override
+    public LztOpenacctApplyResult lztOpenacctApply(LztOpenacctApplyParams params) {
+        LianLianPayInfoResult lianLianInfo = get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setUser_type("USER");
+        params.setAcct_type("USEROWN");
+        params.setTxn_time(timestamp);
+        params.setNotify_url(lianLianInfo.getNotify_url()+params.getNotify_url());
+
+        String url = "https://accpgw.lianlianpay.com/v1/acctmgr/lzt-openacct-apply";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("请求开户异常");
+        }
+        try {
+            LztOpenacctApplyResult result = JSON.parseObject(s, LztOpenacctApplyResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("请求开户异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("请求开户异常:" + s);
+        }
+    }
+
+
+    @Override
+    public LztQueryAcctInfoResult lztQueryAcctInfo(String user_id) {
+        LianLianPayInfoResult lianLianInfo = get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        LztQueryAcctInfoParams params = new LztQueryAcctInfoParams(timestamp, lianLianInfo.getLzt_oid_partner(),
+                user_id, "USER", "USEROWN");
+
+        String url = "https://accpquery.lianlianpay.com/v1/lzt/query-acctinfo";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("查询开户异常");
+        }
+        try {
+            LztQueryAcctInfoResult result = JSON.parseObject(s, LztQueryAcctInfoResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("查询开户异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("查询开户异常:" + s);
+        }
+    }
+
+    @Override
+    public LztFundTransferResult lztFundTransfer(LztFundTransferParams params) {
+        LianLianPayInfoResult lianLianInfo = get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setTxn_time(timestamp);
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/lzt-fund-transfer";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("划拨资金异常");
+        }
+        try {
+            LztFundTransferResult result = JSON.parseObject(s, LztFundTransferResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("划拨资金异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("划拨资金异常:" + s);
+        }
+    }
+
+    @Override
+    public LztQueryFundTransferResult lztQueryFundTransfer(String userId, String accpTxno) {
+        LztQueryFundTransferParams params = new LztQueryFundTransferParams();
+        LianLianPayInfoResult lianLianInfo = get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setUser_id(userId);
+        params.setAccp_txno(accpTxno);
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-lzt-fund-transfer";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("划拨资金查询异常:" + accpTxno);
+        }
+        try {
+            LztQueryFundTransferResult result = JSON.parseObject(s, LztQueryFundTransferResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("划拨资金查询异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("划拨资金查询异常:" + s);
+        }
+    }
+
+    /**
+     * 来账通查询连连账户信息
+     */
+    @Override
+    public AcctInfoResult lztLianLianQueryAcctInfo(String userId) {
+        LianLianPayInfoResult lianLianInfo = get();
+        AcctInfoParams params = new AcctInfoParams();
+        params.setTimestamp(LLianPayDateUtils.getTimestamp());
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setUser_id(userId);
+        params.setUser_type("INNERCOMPANY");
+
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctinfo";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        AcctInfoResult result = JSON.parseObject(resultJsonStr, AcctInfoResult.class);
+        return result;
+    }
+
+    @Override
+    public UserInfoResult lztQueryUserInfo(String userId) {
+        LianLianPayInfoResult lianLianInfo = get();
+        UserInfoParams params = new UserInfoParams();
+        params.setTimestamp(LLianPayDateUtils.getTimestamp());
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setUser_id(userId);
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-userinfo";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        UserInfoResult userInfoResult = JSON.parseObject(resultJsonStr, UserInfoResult.class);
+        return userInfoResult;
+    }
+
+    @Override
+    public ApplyPasswordElementResult getLztPasswordElementToken(String userId, String payCode,
+                                                                 String pyee_name, BigDecimal amount, String scan) {
+        LianLianPayInfoResult lianLianInfo = get();
+        ApplyPasswordElementParams params = new ApplyPasswordElementParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setUser_id(userId);
+        params.setTxn_seqno(payCode);
+        params.setPyee_name(pyee_name);
+        params.setAmount(amount.doubleValue());
+        params.setEncrypt_algorithm("SM2");
+        params.setPassword_scene(scan);
+        params.setFlag_chnl("PCH5");
+        String url = "https://accpgw.lianlianpay.com/v1/acctmgr/apply-password-element";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("获取密码控件失败" + pyee_name);
+        }
+        try {
+            ApplyPasswordElementResult result = JSON.parseObject(s, ApplyPasswordElementResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("获取密码控件失败：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("获取密码控件失败:" + s);
+        }
+    }
 
     /**
      * 内部代发申请
-     * https://accpapi.lianlianpay.com/v1/txn/transfer-morepyee
      */
     @Override
-    public TransferMorepyeeResult transferMorepyee(String payerId, String orderNo, Double amt, String txnPurpose, String pwd, String  randomKey, String payeeId, String ip) {
+    public TransferMorepyeeResult lztTransferMorepyee(String payerId, String orderNo, Double amt,
+                                                      String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url) {
         LianLianPayInfoResult lianLianInfo = get();
         TransferMorepyeeParams params = new TransferMorepyeeParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -358,7 +535,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setFunds_flag("N");
         params.setDirectionalpay_flag("N");
         params.setContinuously_flag("N");
-        params.setNotify_url(lianLianInfo.getNotify_url());
+        params.setNotify_url(lianLianInfo.getNotify_url()+notify_url);
 
         // 商户订单信息
         TransferMorepyeeOrderInfo orderInfo = new TransferMorepyeeOrderInfo();
@@ -382,20 +559,120 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         payeeInfo.setPayee_id(payeeId);
         payeeInfo.setPayee_amount(String.valueOf(amt));
         params.setPayeeInfo(Arrays.asList(payeeInfo));
-
         // 测试风控参数
         String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("4009", payeeId, "", registerTime, "");
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeId, "", registerTime, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
-        riskItemInfo.setFrms_client_chnl("H5");
+        riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
-        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
 
-        // https://accpapi.lianlianpay.com/v1/txn/transfer-morepyee    正式地址
-        String url = "https://accpapi-ste.lianlianpay-inc.com/v1/txn/transfer-morepyee";// 测试环境请求地址
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+        String url = "https://accpapi.lianlianpay.com/v1/txn/transfer-morepyee";
         LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("内部转账异常");
+        }
+        try {
+            TransferMorepyeeResult result = JSON.parseObject(s, TransferMorepyeeResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("内部转账异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("内部转账异常:" + s);
+        }
+    }
+
+    /**
+     * 内部代发结果查询
+     */
+    @Override
+    public QueryPaymentResult lztQueryTransferMorepyee(String accpTxno) {
+        LianLianPayInfoResult lianLianInfo = get();
+        QueryPaymentParams params = new QueryPaymentParams();
+        params.setTimestamp(LLianPayDateUtils.getTimestamp());
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setAccp_txno(accpTxno);
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String url = "https://accpapi.lianlianpay.com/v1/txn/query-payment";
         String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        TransferMorepyeeResult result = JSON.parseObject(resultJsonStr, TransferMorepyeeResult.class);
+        QueryPaymentResult result = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
         return result;
+    }
+
+    @Override
+    public WithdrawalResult lztWithdrawal(String payeeNo, String drawNo, BigDecimal amt, String postscript, String password, String random_key, String ip, String notifyUrl) {
+        LianLianPayInfoResult lianLianInfo = get();
+
+        WithDrawalParams params = new WithDrawalParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setNotify_url(lianLianInfo.getNotify_url()+notifyUrl);
+
+        // 设置商户订单信息
+        WithDrawalOrderInfo orderInfo = new WithDrawalOrderInfo();
+        orderInfo.setTxn_seqno(drawNo);
+        orderInfo.setTxn_time(timestamp);
+        orderInfo.setTotal_amount(amt.doubleValue());
+        orderInfo.setPostscript(postscript);
+        params.setOrderInfo(orderInfo);
+
+        // 设置付款方信息
+        WithDrawalPayerInfo payerInfo = new WithDrawalPayerInfo();
+        payerInfo.setPayer_type("USER");
+        payerInfo.setPayer_id(payeeNo);
+        payerInfo.setPassword(password);
+        payerInfo.setRandom_key(random_key);
+        params.setPayerInfo(payerInfo);
+
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeNo, "", registerTime, "提现");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setFrms_client_chnl("13");
+        riskItemInfo.setUser_auth_flag("1");
+
+        String url = "https://accpapi.lianlianpay.com/v1/txn/withdrawal";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("提现异常");
+        }
+        try {
+            WithdrawalResult result = JSON.parseObject(s, WithdrawalResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("提现异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("提现异常:" + s);
+        }
+    }
+
+    @Override
+    public QueryWithdrawalResult lztQueryWithdrawal(String accpTxno) {
+        LianLianPayInfoResult lianLianInfo = get();
+        QueryWithdrawalParams params = new QueryWithdrawalParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getLzt_oid_partner());
+        params.setAccp_txno(accpTxno);
+
+        String url = "https://accpapi.lianlianpay.com/v1/txn/query-withdrawal";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getLzt_priKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("提现查询异常:" + accpTxno);
+        }
+        try {
+            QueryWithdrawalResult result = JSON.parseObject(s, QueryWithdrawalResult.class);
+            if (result == null || "0000".equals(result.getRet_code())) {
+                throw new CrmebException("提现查询异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("提现查询异常:" + s);
+        }
     }
 }

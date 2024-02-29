@@ -22,6 +22,7 @@ import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.alipay.AliPayInfo;
@@ -162,6 +163,8 @@ public class PayServiceImpl implements PayService {
     private UserCapaService userCapaService;
     @Autowired
     private UserCapaXsService userCapaXsService;
+    @Autowired
+    private ProductMaterialsService productMaterialsService;
 
     /**
      * 获取支付配置
@@ -281,7 +284,7 @@ public class PayServiceImpl implements PayService {
             return response;
         }
         // 连连支付
-        if (order.getPayChannel().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_LIANLIAN)) {
             CashierPayCreateResult result = lianLianCashierPay(order);
             response.setStatus("0000".equals(result.getRet_code()));
             response.setLianLianCashierConfig(result);
@@ -676,6 +679,28 @@ public class PayServiceImpl implements PayService {
                 integralList.add(integralRecord);
             }
             List<OrderDetail> merOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+            // 处理ERP商品转换
+            for (OrderDetail orderDetail : merOrderDetailList) {
+                BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee());
+                List<Materials> materialsList = Lists.newArrayList();
+                if (StringUtils.isNotEmpty(orderDetail.getBarCode())) {
+                    List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(orderDetail.getMerId(), orderDetail.getBarCode());
+                    BigDecimal totalPrice = BigDecimal.ZERO;
+                    for (ProductMaterials productMaterials : productMaterialsList) {
+                        totalPrice = totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
+                    }
+                    for (ProductMaterials productMaterials : productMaterialsList) {
+                        BigDecimal price = productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity()));
+                        Materials materials = new Materials(productMaterials.getMaterialsName(),
+                                productMaterials.getMaterialsQuantity() * orderDetail.getPayNum(),
+                                productMaterials.getMaterialsPrice(), productMaterials.getMaterialsCode(),
+                                payPrice.multiply(price.divide(totalPrice)).setScale(2, BigDecimal.ROUND_DOWN));
+                        materialsList.add(materials);
+                    }
+                    orderDetail.setMaterialsList(materialsList);
+                }
+            }
+
             // 佣金处理
             List<UserBrokerageRecord> broRecordList = assignCommission(merchantOrder, merOrderDetailList);
             if (CollUtil.isNotEmpty(broRecordList)) {
@@ -683,6 +708,7 @@ public class PayServiceImpl implements PayService {
                 merchantOrderList.add(merchantOrder);
                 orderDetailList.addAll(merOrderDetailList);
             }
+
             // 商户帐单流水、分账
             OrderProfitSharing orderProfitSharing = initOrderProfitSharing(merchantOrder);
             MerchantBill merchantBill = initPayMerchantBill(merchantOrder, orderProfitSharing.getProfitSharingMerPrice());
@@ -736,9 +762,10 @@ public class PayServiceImpl implements PayService {
             // 订单、佣金
             if (CollUtil.isNotEmpty(brokerageRecordList)) {
                 merchantOrderService.updateBatchById(merchantOrderList);
-                orderDetailService.updateBatchById(orderDetailList);
                 userBrokerageRecordService.saveBatch(brokerageRecordList);
             }
+            // 订单信息
+            orderDetailService.updateBatchById(orderDetailList);
             // 订单日志
             orderList.forEach(o -> orderStatusService.createLog(o.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, platOrder.getOrderNo())));
             // 用户信息变更
@@ -846,6 +873,8 @@ public class PayServiceImpl implements PayService {
             // 订单修改
             order.setPaid(true);
             order.setPayTime(DateUtil.date());
+            order.setPayMethod("积分支付");
+            order.setPayType("wallet");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             orderService.updateById(order);
             Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
@@ -1748,6 +1777,8 @@ public class PayServiceImpl implements PayService {
             Boolean update = Boolean.TRUE;
             // 订单修改
             order.setPaid(true);
+            order.setPayMethod("余额支付");
+            order.setPayType("yue");
             order.setPayTime(DateUtil.date());
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             orderService.updateById(order);

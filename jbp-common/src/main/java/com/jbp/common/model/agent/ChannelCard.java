@@ -12,7 +12,6 @@ import lombok.experimental.Accessors;
  * 四要素认证卡【线下打款的银行卡和三方支付无关】
  */
 @Data
-@Builder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -42,24 +41,28 @@ public class ChannelCard extends BaseModel {
     @TableField("uid")
     private Integer uid;
 
+    @ApiModelProperty("渠道商编")
+    @TableField("channel_code")
+    private String channelCode;
+
     @ApiModelProperty("银行编码  总行编号")
-    @TableField("bankId")
+    @TableField("bank_id")
     private String bankId;
 
     @ApiModelProperty("银行卡号")
-    @TableField("bankCardNo")
+    @TableField("bank_card_no")
     private String bankCardNo;
 
     @ApiModelProperty("银行名称")
-    @TableField("bankName")
+    @TableField("bank_name")
     private String bankName;
 
     @ApiModelProperty("开户行支行编码  联行卡号")
-    @TableField("branchId")
+    @TableField("branch_id")
     private String branchId;
 
     @ApiModelProperty("开户行支行名字")
-    @TableField("branchName")
+    @TableField("branch_name")
     private String branchName;
 
     @ApiModelProperty("银行卡类型")
@@ -81,4 +84,8 @@ public class ChannelCard extends BaseModel {
     @ApiModelProperty("渠道名称")
     @TableField("channel")
     private String channel;
+
+    @ApiModelProperty("账户")
+    @TableField(exist = false)
+    private String account;
 }

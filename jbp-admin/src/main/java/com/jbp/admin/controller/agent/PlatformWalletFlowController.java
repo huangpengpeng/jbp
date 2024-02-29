@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 @Api(tags = "平台积分详情")
 public class PlatformWalletFlowController {
     @Resource
-    PlatformWalletFlowService platformWalletFlowService;
+    private PlatformWalletFlowService platformWalletFlowService;
     @PreAuthorize("hasAuthority('agent:platform:wallet:flow')")
     @GetMapping("/page")
     @ApiOperation("平台积分详情列表")

@@ -20,6 +20,16 @@ import java.math.BigDecimal;
 @ApiModel(value = "ProductMaterials对象  merId+barCode+materialsCode 唯一", description = "产品物料对应仓库的编码")
 public class ProductMaterials extends BaseModel {
 
+    public ProductMaterials(Integer merId, String barCode, String materialsName,
+                            Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode) {
+        this.merId = merId;
+        this.barCode = barCode;
+        this.materialsName = materialsName;
+        this.materialsQuantity = materialsQuantity;
+        this.materialsPrice = materialsPrice;
+        this.materialsCode = materialsCode;
+    }
+
     @ApiModelProperty(value = "商户")
     private Integer merId;
 
@@ -42,13 +52,6 @@ public class ProductMaterials extends BaseModel {
     @TableField(exist = false)
     private String merName;
 
-    public ProductMaterials(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode) {
-        this.merId = merId;
-        this.barCode = barCode;
-        this.materialsName = materialsName;
-        this.materialsQuantity = materialsQuantity;
-        this.materialsPrice = materialsPrice;
-        this.materialsCode = materialsCode;
-    }
+
 
 }

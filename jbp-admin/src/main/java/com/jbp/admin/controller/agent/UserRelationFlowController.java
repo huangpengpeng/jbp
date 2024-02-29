@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserRelationFlow;
 import com.jbp.common.model.user.User;
@@ -28,6 +27,7 @@ public class UserRelationFlowController {
     private UserRelationFlowService userRelationFlowService;
     @Resource
     private UserService userService;
+
     @PreAuthorize("hasAuthority('agent:user:relation:flow:page')")
     @GetMapping("/page")
     @ApiOperation("服务关系上下层级关系列表")

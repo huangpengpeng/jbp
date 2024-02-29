@@ -1,6 +1,5 @@
 package com.jbp.service.service.agent.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,7 +23,6 @@ import com.jbp.service.service.WhiteService;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -181,7 +179,8 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     public PageInfo<LimitTemp> pageList(String name, String type, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LimitTemp> limitTempLambdaQueryWrapper = new LambdaQueryWrapper<LimitTemp>()
                 .like(StringUtils.isNotEmpty(name), LimitTemp::getName, name)
-                .like(StringUtils.isNotEmpty(type), LimitTemp::getType, type);
+                .like(StringUtils.isNotEmpty(type), LimitTemp::getType, type)
+                .orderByDesc(LimitTemp::getGmtModify);
         Page<LimitTemp> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(limitTempLambdaQueryWrapper));
     }

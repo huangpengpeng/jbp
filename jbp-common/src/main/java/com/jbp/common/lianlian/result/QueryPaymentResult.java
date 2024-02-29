@@ -34,7 +34,7 @@ public class QueryPaymentResult {
     // 支付完成时间
     private String finish_time;
     // ACCP系统交易单号
-    private Double accp_txno;
+    private String accp_txno;
     // 渠道交易单号
     private String chnl_txno;
     /*

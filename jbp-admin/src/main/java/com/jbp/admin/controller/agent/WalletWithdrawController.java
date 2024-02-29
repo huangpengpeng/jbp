@@ -10,10 +10,7 @@ import com.jbp.service.service.agent.WalletWithdrawService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -33,14 +30,14 @@ public class WalletWithdrawController {
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
     @PostMapping("/send")
     @ApiOperation("钱包提现批量出款")
-    public CommonResult send(List<WalletWithdrawRequest> requests) {
+    public CommonResult send(@RequestBody List<WalletWithdrawRequest> requests) {
         walletWithdrawService.send(requests);
         return CommonResult.success();
     }
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:cancel')")
     @PostMapping("/cancel")
     @ApiOperation("钱包提现批量取消")
-    public CommonResult cancel(List<WalletWithdrawRequest> requests) {
+    public CommonResult cancel(@RequestBody List<WalletWithdrawRequest> requests) {
         walletWithdrawService.cancel(requests);
         return CommonResult.success();
     }

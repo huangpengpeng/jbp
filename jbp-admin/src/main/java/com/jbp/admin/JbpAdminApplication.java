@@ -28,9 +28,6 @@ public class JbpAdminApplication {
 
     public static void main(String[] args) {
         final ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
-
-//        final UserInvitationService bean = run.getBean(UserInvitationService.class);
-//        bean.band(109, 99, false, true);
         System.out.println("ok");
 
     }

@@ -54,9 +54,10 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
     }
 
     @Override
-    public List<ProductMaterials> getByBarCode(String barCode) {
+    public List<ProductMaterials> getByBarCode(Integer merId, String barCode) {
         LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>()
-                .eq(!ObjectUtil.isNull(barCode), ProductMaterials::getBarCode, barCode);
+                .eq(ProductMaterials::getMerId, merId)
+                .eq(ProductMaterials::getBarCode, barCode);
         return list(lqw);
     }
 

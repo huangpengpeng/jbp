@@ -31,6 +31,9 @@ import java.util.List;
 @ApiModel(value = "PreOrderInfoVo对象", description = "预下单Vo对象")
 public class PreOrderInfoVo {
 
+    @ApiModelProperty(value = "下单用户ID")
+    private Integer uid;
+
     @ApiModelProperty(value = "付款用户ID")
     private Integer payUserId;
 

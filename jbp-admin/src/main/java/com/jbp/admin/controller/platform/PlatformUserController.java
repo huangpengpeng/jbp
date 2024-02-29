@@ -92,12 +92,21 @@ public class PlatformUserController {
         }
         return CommonResult.failed();
     }
+
     @PreAuthorize("hasAuthority('platform:user:register:phone')")
     @PostMapping("/register/phone")
     @ApiOperation("用户注册")
     public CommonResult<User> registerPhone(@Validated @RequestBody RegisterPhoneRequest request) {
         User user = userService.registerPhone(request.getUsername(), request.getPhone(), null);
         return CommonResult.success(user);
+    }
+
+    @PreAuthorize("hasAuthority('platform:user:update:user')")
+    @PostMapping("/update/user")
+    @ApiOperation("修改用户基本信息")
+    public CommonResult updateUser(@RequestBody @Validated PlatformUpdateUserRequest request) {
+        userService.updateUser(request.getId(), request.getPwd(), request.getSex(), request.getBirthday(), request.getRealName(), request.getPhone(), request.getCountry(), request.getProvince(), request.getCity(), request.getDistrict(), request.getAddress());
+        return CommonResult.success();
     }
 
 }

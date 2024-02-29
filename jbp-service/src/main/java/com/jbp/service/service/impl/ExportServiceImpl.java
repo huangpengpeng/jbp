@@ -1,23 +1,26 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.DateConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.order.Materials;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.ProductMaterialsService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,8 +57,6 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private CrmebConfig crmebConfig;
     @Resource
-    private ProductService productService;
-    @Resource
     private ProductAttrValueService productAttrValueService;
     @Resource
     private ProductMaterialsService productMaterialsService;
@@ -78,55 +79,103 @@ public class ExportServiceImpl implements ExportService {
         if (CollUtil.isEmpty(orderList)) {
             throw new CrmebException("没有可导出的数据！");
         }
-
+        // 商户 用户 订单 数据准备
         List<Integer> merIdList = orderList.stream().filter(e -> e.getMerId() > 0).map(Order::getMerId).distinct().collect(Collectors.toList());
         List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
+        List<Integer> payUserIdList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
+        userIdList.addAll(payUserIdList);
+        userIdList = userIdList.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
+
         List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
         Map<Integer, User> userMap = userService.getUidMapList(userIdList);
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+
+        // 导出对象
         List<OrderExcelVo> voList = CollUtil.newArrayList();
         for (Order order : orderList) {
-            //
-            List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+            // 商户详情
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
-            for (int i = 0; i < orderDetails.size(); i++) {
-//                订单详情表
-                OrderDetail orderDetail = orderDetails.get(i);
+            // 订单商品
+            List<OrderDetail> orderDetailsList = orderDetailMap.get(order.getOrderNo());
+            // 循环设置
+            for (OrderDetail orderDetail : orderDetailsList) {
                 BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
-                ProductAttrValue productAttrValue = productAttrValueService.getById(orderDetail.getAttrValueId());
-//                产品物料对应仓库的编码
-                List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(productAttrValue != null ? productAttrValue.getBarCode() : null);
-                BigDecimal totalPrice = BigDecimal.ZERO;
-                for (ProductMaterials productMaterials : productMaterialsList) {
-                    totalPrice = totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
+                List<Materials> materialsList = orderDetail.getMaterialsList();
+                // 没有设置物料 默认原始商品信息即可
+                if (CollectionUtils.isEmpty(materialsList)) {
+                    Materials materials = new Materials(orderDetail.getProductName(), 1, payPrice, orderDetail.getBarCode(), payPrice);
+                    materialsList.add(materials);
                 }
-                for (ProductMaterials productMaterials : productMaterialsList) {
-                    BigDecimal price = productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity()));
-                    BigDecimal realPrice = payPrice.multiply(price.divide(totalPrice, 10, BigDecimal.ROUND_DOWN));
+                // 物料总价
+                BigDecimal materialsTotalPrice = BigDecimal.ZERO;
+                for (Materials materials : materialsList) {
+                    materialsTotalPrice = materialsTotalPrice.add(materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity())));
+                }
+                // 物料信息
+                for (Materials materials : materialsList) {
+                    // 组装订单
                     OrderExcelVo vo = new OrderExcelVo();
-                    vo.setType(getOrderType(order.getType()));
+                    vo.setType(order.getOrderType());
                     vo.setOrderNo(order.getOrderNo());
-                    vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
-                    vo.setUserAccount(userMap.get(order.getUid()).getAccount());
-                    vo.setUid(order.getUid());
-                    vo.setPayPrice(order.getPayPrice().toString());
+                    vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "平台商");
+                    if(order.getUid() != null){
+                        vo.setUid(order.getUid());
+                        vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                    }
+                    vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                    vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
+                    vo.setPayPostage(order.getPayPostage());
+                    vo.setCouponPrice(order.getCouponPrice());
+                    vo.setWalletDeductionFee(order.getWalletDeductionFee());
                     vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
-                    vo.setPayType(getOrderPayType(order.getPayType()));
-                    vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
-                    vo.setStatus(getOrderStatus(order.getStatus()));
-                    vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
-                    vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-                    vo.setProductName(productMaterials.getMaterialsName());
-                    vo.setWarehouseCoding(productMaterials.getMaterialsCode());
-                    vo.setProductPrice(realPrice);
+                    vo.setOrderPayType(order.getOrderPayType());
+                    vo.setPayMethod(order.getPayMethod());
+                    vo.setPayChannel(order.getPayChannel());
+                    vo.setStatus(order.getOrderStatus());
+                    vo.setRefundStatus(order.getOrderRefundStatus());
+                    // 原始产品
+                    vo.setOrderDetailId(orderDetail.getId());
+                    vo.setProductName(orderDetail.getProductName());
+                    vo.setProductBarCode(orderDetail.getBarCode());
+                    vo.setProductQuantity(orderDetail.getPayNum());
+                    vo.setProductPrice(payPrice);
+                    vo.setProductPostage(orderDetail.getFreightFee());
+                    vo.setProductCouponPrice(orderDetail.getCouponPrice());
+                    vo.setProductWalletDeductionFee(orderDetail.getWalletDeductionFee());
+                    List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
+                    if (CollectionUtils.isNotEmpty(walletDeductionList)) {
+                        walletDeductionList = walletDeductionList.stream().filter(w -> ArithmeticUtils.gt(w.getDeductionFee(), BigDecimal.ZERO)).collect(Collectors.toList());
+                        StringBuilder walletDeductionStr = new StringBuilder();
+                        for (ProductDeduction deduction : walletDeductionList) {
+                            String format = String.format("积分名称:%s,抵扣金额:%s", deduction.getWalletName(), deduction.getDeductionFee());
+                            walletDeductionStr.append(format);
+                        }
+                        vo.setProductWalletDeductionFeeStr(walletDeductionStr.toString());
+                    }
+                    // 物料信息
+                    BigDecimal price = materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity()));
+                    BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
+                    vo.setMaterialsName(materials.getName());
+                    vo.setMaterialsCode(materials.getCode());
+                    vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getQuantity());
+                    vo.setMaterialsPrice(materialsPrice);
+
+                    // 收货人
                     vo.setRealName(merchantOrder.getRealName());
-                    vo.setMaterialsQuantity(productMaterialsList.size() * productMaterials.getMaterialsQuantity());
+                    vo.setUserPhone(merchantOrder.getUserPhone());
+                    vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
+                    vo.setUserRemark(merchantOrder.getUserRemark());
+                    vo.setMerchantRemark(merchantOrder.getMerchantRemark());
                     vo.setUserAddress(merchantOrder.getUserAddress());
+
+                    // 下单时间
+                    vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+
+                    // 保存
                     voList.add(vo);
                 }
             }
-
         }
 
         /*
@@ -145,149 +194,41 @@ public class ExportServiceImpl implements ExportService {
         aliasMap.put("type", "订单类型");
         aliasMap.put("orderNo", "订单号");
         aliasMap.put("merName", "商户名称");
-        aliasMap.put("uid", "用户id");
-        aliasMap.put("userAccount", "用户账号");
-        aliasMap.put("payPrice", "实际支付金额");
+        aliasMap.put("uid", "用户ID");
+        aliasMap.put("userAccount", "下单账号");
+        aliasMap.put("payUserAccount", "付款账号");
+        aliasMap.put("payPrice", "订单货款");
+        aliasMap.put("payPostage", "订单运费");
+        aliasMap.put("couponPrice", "订单优惠");
+        aliasMap.put("walletDeductionFee", "订单抵扣");
         aliasMap.put("paidStr", "支付状态");
-        aliasMap.put("payType", "支付方式");
-        aliasMap.put("payChannel", "支付渠道");
         aliasMap.put("status", "订单状态");
+        aliasMap.put("createTime", "下单时间");
         aliasMap.put("refundStatus", "退款状态");
-        aliasMap.put("createTime", "创建时间");
+        aliasMap.put("orderPayType", "支付方式");
+        aliasMap.put("payMethod", "支付方法");
+        aliasMap.put("payChannel", "支付渠道");
+        aliasMap.put("orderDetailId", "订单详情ID");
         aliasMap.put("productName", "商品名称");
-        aliasMap.put("warehouseCoding", "仓库编码");
-        aliasMap.put("materialsQuantity", "数量");
-        aliasMap.put("productPrice", "商品单价");
+        aliasMap.put("productBarCode", "商品编码");
+        aliasMap.put("productQuantity", "商品数量");
+        aliasMap.put("productPrice", "商品总价");
+        aliasMap.put("productPostage", "商品运费");
+        aliasMap.put("productCouponPrice", "商品优惠");
+        aliasMap.put("productWalletDeductionFee", "商品抵扣");
+        aliasMap.put("productWalletDeductionFeeStr", "商品抵扣明细");
+        aliasMap.put("materialsName", "物料名称");
+        aliasMap.put("materialsCode", "物料编码");
+        aliasMap.put("materialsQuantity", "物料数量");
+        aliasMap.put("materialsPrice", "物料总价");
         aliasMap.put("realName", "收货人");
-        aliasMap.put("userAddress", "收货详情地址");
-
-
+        aliasMap.put("userPhone", "收货人手机");
+        aliasMap.put("shippingType", "快递方式");
+        aliasMap.put("userAddress", "收货地址");
+        aliasMap.put("userRemark", "用户备注");
+        aliasMap.put("merchantRemark", "商家备注");
         return ExportUtil.exportExcel(fileName, "订单导出", voList, aliasMap);
     }
 
-    private String getOrderProductInfo(List<OrderDetail> orderDetails) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < orderDetails.size(); i++) {
-            OrderDetail orderDetail = orderDetails.get(i);
-            stringBuilder.append(StrUtil.format("{}  {} * {}", orderDetail.getProductName(), orderDetail.getPayPrice(), orderDetail.getPayNum()));
-            if ((i + 1) < orderDetails.size()) {
-                stringBuilder.append("\r\n");
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    private String getOrderType(Integer type) {
-        String typeStr = "";
-        switch (type) {
-            case 0:
-                typeStr = "普通";
-                break;
-            case 1:
-                typeStr = "视频号";
-                break;
-            case 2:
-                typeStr = "秒杀";
-                break;
-        }
-        return typeStr;
-    }
-
-    private String getOrderRefundStatus(Integer refundStatus) {
-        String refundStatusStr = "";
-        switch (refundStatus) {
-            case 0:
-                refundStatusStr = "未退款";
-                break;
-            case 1:
-                refundStatusStr = "申请中";
-                break;
-            case 2:
-                refundStatusStr = "部分退款";
-                break;
-            case 3:
-                refundStatusStr = "已退款";
-                break;
-        }
-        return refundStatusStr;
-    }
-
-    private String getOrderStatus(Integer status) {
-        String statusStr = "";
-        switch (status) {
-            case 0:
-                statusStr = "待支付";
-                break;
-            case 1:
-                statusStr = "待发货";
-                break;
-            case 2:
-                statusStr = "部分发货";
-                break;
-            case 3:
-                statusStr = "待核销";
-                break;
-            case 4:
-                statusStr = "待收货";
-                break;
-            case 5:
-                statusStr = "已收货";
-                break;
-            case 6:
-                statusStr = "已完成";
-                break;
-            case 9:
-                statusStr = "已取消";
-                break;
-        }
-        return statusStr;
-    }
-
-    private String getOrderPayChannel(String payChannel) {
-        String payChannelStr = "";
-        switch (payChannel) {
-            case "public":
-                payChannelStr = "公众号";
-                break;
-            case "mini":
-                payChannelStr = "小程序";
-                break;
-            case "h5":
-                payChannelStr = "微信网页支付";
-                break;
-            case "yue":
-                payChannelStr = "余额";
-                break;
-            case "wechatIos":
-                payChannelStr = "微信Ios";
-                break;
-            case "wechatAndroid":
-                payChannelStr = "微信Android";
-                break;
-            case "alipay":
-                payChannelStr = "支付宝";
-                break;
-            case "alipayApp":
-                payChannelStr = "支付宝App";
-                break;
-        }
-        return payChannelStr;
-    }
-
-    private String getOrderPayType(String payType) {
-        String payTypeStr = "";
-        switch (payType) {
-            case "weixin":
-                payTypeStr = "微信支付";
-                break;
-            case "alipay":
-                payTypeStr = "支付宝支付";
-                break;
-            case "yue":
-                payTypeStr = "余额支付";
-                break;
-        }
-        return payTypeStr;
-    }
 }
 

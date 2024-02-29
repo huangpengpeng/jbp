@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/platform/product/comm/config")
@@ -50,7 +48,6 @@ public class ProductCommConfigController {
     public CommonResult<Boolean> close(Integer type) {
         return CommonResult.success(service.close(type));
     }
-
 
 
 }

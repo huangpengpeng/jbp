@@ -70,6 +70,23 @@ public class CapaController {
     }
 
 
+
+    @ApiOperation(value = "默认等级")
+    @RequestMapping(value = "/defaultCapa", method = RequestMethod.GET)
+    public CommonResult<Capa> defaultCapa() {
+        return CommonResult.success(capaService.getMinCapa());
+    }
+
+
+
+    @ApiOperation(value = "获取大于当前等级的等级")
+    @RequestMapping(value = "/getLevellist", method = RequestMethod.GET)
+    public CommonResult<List<Capa>> getLevellist(Long capaId) {
+        return CommonResult.success(capaService.getMaxCapaList(capaId));
+    }
+
+
+
 }
 
 

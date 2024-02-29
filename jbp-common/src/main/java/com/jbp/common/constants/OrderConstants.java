@@ -149,4 +149,11 @@ public class OrderConstants {
     public static final Integer MERCHANT_REFUND_ORDER_STATUS_AWAIT_RECEIVING = 5;
     /** 商户退款订单状态-撤销 */
     public static final Integer MERCHANT_REFUND_ORDER_STATUS_REVOKE = 6;
+
+
+    /** 订单场景 报单*/
+    public static final String ORDER_PLATFORM_DECL = "报单";
+    /** 订单场景 换购*/
+    public static final String ORDER_PLATFORM_TRADE = "换购";
+
 }

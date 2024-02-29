@@ -449,6 +449,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 Boolean execute = transactionTemplate.execute(e -> {
                     order.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
                     order.setPaid(true);
+                    order.setPayType("lianlian");
                     order.setPayTime(CrmebDateUtil.nowDateTime());
                     order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
                     orderService.updateById(order);

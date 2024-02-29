@@ -27,4 +27,6 @@ public interface CapaService extends IService<Capa> {
 
     List<Capa> getList();
     Map<Long, Capa> getCapaMap();
+
+    List<Capa> getMaxCapaList(Long capaId);
 }

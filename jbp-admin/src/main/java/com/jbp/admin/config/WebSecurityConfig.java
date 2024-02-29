@@ -103,6 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 				// 跨域预检请求
 //            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+<<<<<<< HEAD
 				// 对于登录login 验证码captchaImage 和其他放行的目录 允许匿名访问"/citylife/front/**"
 				.antMatchers("/api/publicly/**").permitAll().antMatchers("/api/admin/platform/getLoginPic").permitAll()
 				.antMatchers("/api/admin/platform/login").permitAll().antMatchers("/api/admin/merchant/getLoginPic")
@@ -123,6 +124,44 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.anonymous().antMatchers("/api/public/**").anonymous()
 				// 除上面外的所有请求全部需要鉴权认证
 				.anyRequest().authenticated().and().headers().frameOptions().disable();// 防止iframe 造成跨域
+=======
+                // 对于登录login 验证码captchaImage 和其他放行的目录 允许匿名访问"/citylife/front/**"
+                .antMatchers("/api/publicly/**").permitAll()
+                .antMatchers("/api/admin/platform/getLoginPic").permitAll()
+                .antMatchers("/api/admin/platform/login").permitAll()
+                .antMatchers("/api/admin/merchant/getLoginPic").permitAll()
+                .antMatchers("/api/admin/merchant/login").permitAll()
+                .antMatchers("/jmreport/desreport_/cdn/iview/fonts/**").permitAll()
+                // 放行资源路径
+                .antMatchers("/" + UploadConstants.UPLOAD_FILE_KEYWORD + "/**").permitAll()
+                .antMatchers("/" + UploadConstants.DOWNLOAD_FILE_KEYWORD + "/**").permitAll()
+                .antMatchers("/" + UploadConstants.UPLOAD_AFTER_FILE_KEYWORD + "/**").permitAll()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/*.html",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js"
+                ).permitAll()
+                .antMatchers("/profile/**").anonymous()
+                .antMatchers("/common/download**").anonymous()
+                .antMatchers("/common/download/resource**").anonymous()
+                .antMatchers("/doc.html").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/webjars/**").permitAll()
+                .antMatchers("/v2/**").permitAll()
+                .antMatchers("/swagger-ui.html/**").permitAll()
+                .antMatchers("/*/api-docs").anonymous()
+                .antMatchers("/druid/**").anonymous()
+                .antMatchers("/captcha/get", "/captcha/check").anonymous()
+                .antMatchers("/api/admin/payment/callback/**").anonymous()
+                .antMatchers("/api/public/**").anonymous()
+                .antMatchers("/api/admin/agent/lzt/**").anonymous()
+                // 除上面外的所有请求全部需要鉴权认证
+                .anyRequest().authenticated()
+                .and()
+                .headers().frameOptions().disable();// 防止iframe 造成跨域
+>>>>>>> main-b2b
 //        http.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
 		// 添加JWT filter
 		// 开启登录认证流程过滤器

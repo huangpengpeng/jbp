@@ -200,8 +200,8 @@ public class AsyncServiceImpl implements AsyncService {
         if (orderExt != null) {
             OrderRegister orderRegister = orderExt.getOrderRegister();
             if (orderRegister != null) {
-                User pUser = userService.getByAccount(orderRegister.getPAccount());
-                User rUser = userService.getByAccount(orderRegister.getRAccount());
+                User pUser = userService.getByAccount(orderRegister.getPaccount());
+                User rUser = userService.getByAccount(orderRegister.getRaccount());
                 User user = userService.helpRegister(orderRegister.getUsername(), orderRegister.getMobile(), pUser.getId(), rUser.getId(), orderRegister.getNode());
                 order.setUid(user.getId());
                 orderService.updateById(order);
