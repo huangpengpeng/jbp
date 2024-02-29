@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode
-public class WithDrawalResult {
+public class WithdrawalResult {
     private String ret_code;
     private String ret_msg;
     private String oid_partner;

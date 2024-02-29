@@ -30,9 +30,9 @@ public class ProductSearchRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "类型（0:全部   1：出售中（已上架），2：仓库中（未上架），3：已售罄，4：警戒库存，5：回收站,6:待审核，7：审核失败）")
+    @ApiModelProperty(value = "类型（-1:搜素可以加条件 0:全部   1：出售中（已上架），2：仓库中（未上架），3：已售罄，4：警戒库存，5：回收站,6:待审核，7：审核失败）")
     @NotNull(message = "商品类型不能为空")
-    @Range(min = 0, max = 7, message = "未知的商品类型")
+    @Range(min = -1, max = 7, message = "未知的商品类型")
     private int type;
 
     @ApiModelProperty(value = "平台商品分类ID")
