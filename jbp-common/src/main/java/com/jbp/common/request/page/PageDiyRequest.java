@@ -95,5 +95,5 @@ public class PageDiyRequest {
     private Integer isDefault;
 
     @ApiModelProperty(value = "开启密码")
-    private String isCipher;
+    private Integer isCipher;
 }
