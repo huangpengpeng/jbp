@@ -1,23 +1,15 @@
 package com.jbp.front.controller;
 
-import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.Capa;
-import com.jbp.common.model.sgin.UserSignRecord;
-import com.jbp.common.page.CommonPage;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.SignPageInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.condition.CapaPaymentHandler;
-import com.jbp.service.service.SignService;
 import com.jbp.service.service.agent.CapaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -56,19 +48,17 @@ public class CapaController {
     }
 
 
-
     @ApiOperation(value = "获取升级等级购买金额")
     @RequestMapping(value = "/getUpgradesPrice", method = RequestMethod.GET)
-    public CommonResult<Map<String,Object>> getUpgradesPrice(Long capaId) {
+    public CommonResult<Map<String, Object>> getUpgradesPrice(Long capaId) {
 
-        Capa capa =capaService.getById(capaId);
-        CapaPaymentHandler.Rule rule = capaPaymentHandler.getRule(capa.getConditionList().stream().filter(s-> s.getName().equals(capaPaymentHandler.getName())).findFirst().get());
-        Map<String,Object> map =new HashMap<>();
-        map.put("name",capa.getName());
-        map.put("riseOrderPrice",rule.getAmt());
+        Capa capa = capaService.getById(capaId);
+        CapaPaymentHandler.Rule rule = capaPaymentHandler.getRule(capa.getConditionList().stream().filter(s -> s.getName().equals(capaPaymentHandler.getName())).findFirst().get());
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", capa.getName());
+        map.put("riseOrderPrice", rule.getAmt());
         return CommonResult.success(map);
     }
-
 
 
     @ApiOperation(value = "默认等级")
@@ -78,13 +68,11 @@ public class CapaController {
     }
 
 
-
     @ApiOperation(value = "获取大于当前等级的等级")
     @RequestMapping(value = "/getLevellist", method = RequestMethod.GET)
     public CommonResult<List<Capa>> getLevellist(Long capaId) {
         return CommonResult.success(capaService.getMaxCapaList(capaId));
     }
-
 
 
 }

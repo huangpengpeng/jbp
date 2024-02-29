@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -34,6 +33,7 @@ public class WalletConfigController {
     public CommonResult<List<WalletConfig>> deductionList() {
         return CommonResult.success(walletConfigService.getCanDeductionList());
     }
+
     @PreAuthorize("hasAuthority('agent:wallet:config:page')")
     @GetMapping("/page")
     @ApiOperation("分页列表")
@@ -47,7 +47,7 @@ public class WalletConfigController {
     @PostMapping("/update")
     @ApiOperation("修改")
     public CommonResult update(@RequestBody WalletConfigEditRequest request) {
-        walletConfigService.update(request.getId(),request.getName(),request.getStatus(),request.getCanDeduction(),request.getCanPay(),request.getCanWithdraw(),request.getRecharge(),request.getCanTransfer(),request.getChangeScale(),request.getChangeType());
+        walletConfigService.update(request.getId(), request.getName(), request.getStatus(), request.getCanDeduction(), request.getCanPay(), request.getCanWithdraw(), request.getRecharge(), request.getCanTransfer(), request.getChangeScale(), request.getChangeType());
         return CommonResult.success();
     }
 }
