@@ -31,6 +31,12 @@ public class UserResponse {
     @ApiModelProperty(value = "用户id")
     private Integer id;
 
+    @ApiModelProperty(value = "真实姓名")
+    private String realName;
+
+    @ApiModelProperty(value = "详细地址")
+    private String address;
+
     @ApiModelProperty(value = "标签Ids")
     private String tagId;
 

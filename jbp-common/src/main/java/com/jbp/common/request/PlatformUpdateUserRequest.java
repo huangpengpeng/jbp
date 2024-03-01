@@ -1,5 +1,6 @@
 package com.jbp.common.request;
 
+import com.jbp.common.exception.CrmebException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +11,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -26,15 +29,10 @@ public class PlatformUpdateUserRequest implements Serializable {
     @ApiModelProperty(value = "性别，0未知，1男，2女，3保密")
     private Integer sex;
 
-    @ApiModelProperty(value = "生日")
-    private String birthday;
-
     @ApiModelProperty(value = "真实姓名")
     private String realName;
 
     @ApiModelProperty(value = "手机号码")
-    @Length(min = 11, max = 11, message = "手机号只能为11位")
-    @Pattern(regexp = "^[1][3,4,5,6,7,8,9][0-9]{9}$", message = "手机号格式有误")
     private String phone;
 
     @ApiModelProperty(value = "国家，中国CN，其他OTHER")
@@ -51,4 +49,21 @@ public class PlatformUpdateUserRequest implements Serializable {
 
     @ApiModelProperty(value = "详细地址")
     private String address;
+
+    public void setPhone(String phone) {
+        if (phone != null && phone.matches("^1\\d{2}\\*{4}\\d{4}$")) {
+            // 如果是假数据，则将其设置为null
+            this.phone = null;
+        } else if (isValidPhoneNumber(phone)) {
+            // 如果手机号码格式正确，则将其设置为输入的值
+            this.phone = phone;
+        } else {
+            throw new CrmebException("手机号格式错误");
+        }
+    }
+
+    private boolean isValidPhoneNumber(String phone) {
+        // 此处可以编写更复杂的逻辑以验证手机号格式，例如正则表达式等
+        return phone != null && phone.matches("^(?:1[3-9]\\d{9}|)$");
+    }
 }

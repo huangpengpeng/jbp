@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCompany;
 import com.jbp.common.model.user.User;
@@ -32,6 +31,7 @@ public class UserCompanyController {
     private SystemAttachmentService systemAttachmentService;
     @Resource
     private UserService userService;
+
     @PreAuthorize("hasAuthority('agent:user:company:page')")
     @ApiOperation(value = "分公司区域用户列表", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/page")
@@ -46,6 +46,7 @@ public class UserCompanyController {
         }
         return CommonResult.success(CommonPage.restPage(userCompanyService.pageList(uid, request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:user:company:add')")
     @ApiOperation(value = "分公司用户新增", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/add")
@@ -63,11 +64,12 @@ public class UserCompanyController {
             return CommonResult.failed("该市级地址已开通分公司");
         }
         String cdnUrl = systemAttachmentService.getCdnUrl();
-        userCompany = UserCompany.builder().uid(user.getId()).companyName(companyName).licenseNo(systemAttachmentService.clearPrefix(licenseNo,cdnUrl)).licenseUrl(systemAttachmentService.clearPrefix(licenseUrl,cdnUrl))
+        userCompany = UserCompany.builder().uid(user.getId()).companyName(companyName).licenseNo(systemAttachmentService.clearPrefix(licenseNo, cdnUrl)).licenseUrl(systemAttachmentService.clearPrefix(licenseUrl, cdnUrl))
                 .province(province).city(city).area(area).address(address).status(UserCompany.Constants.已开通.toString()).build();
         userCompanyService.save(userCompany);
         return CommonResult.success();
     }
+
     @PreAuthorize("hasAuthority('agent:user:company:del')")
     @ApiOperation(value = "公司用户删除", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/del")

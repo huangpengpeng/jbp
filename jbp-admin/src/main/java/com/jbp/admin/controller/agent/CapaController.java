@@ -80,7 +80,7 @@ public class CapaController {
     }
 
     @PreAuthorize("hasAuthority('capa:detail')")
-    @ApiOperation(value = "用户等级编辑")
+    @ApiOperation(value = "用户等级详情")
     @PostMapping(value = "/detail/{id}")
     public CommonResult<Capa> detail(@PathVariable(value = "id") Long id) {
         return CommonResult.success(capaService.getById(id));
