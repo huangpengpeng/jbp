@@ -105,9 +105,9 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 		// 开启了mfa
 		if (StringUtils.equalsIgnoreCase(adminLoginInfoResponse.getMfaOpen(), "'0'")) {
 			// 客户端传入经过了加密，需要先解密
-//			request.setReqCode(secretKeyConfig.decryptStr(request.getReqCode()));
+			request.setReqCode(secretKeyConfig.decryptStr(request.getReqCode()));
 			// 校验验证码
-//			checkCaptcha(request);
+			checkCaptcha(request);
 			SystemAdmin systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
 			systemAdmin.setLastCheckCode(request.getReqCode());
 			systemAdminService.updateById(systemAdmin);
