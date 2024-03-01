@@ -2,6 +2,7 @@ package com.jbp.admin.controller.platform;
 
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.request.merchant.*;
@@ -158,5 +159,11 @@ public class MerchantController {
     @RequestMapping(value = "/use/category/list", method = RequestMethod.GET)
     public CommonResult<List<CategoryMerchantResponse>> getUseCategoryList() {
         return CommonResult.success(merchantService.getUseCategoryList());
+    }
+
+    @GetMapping("/all")
+    @ApiOperation(" 商户详情列表")
+    public CommonResult<List<Merchant>> getall() {
+        return CommonResult.success(merchantService.all());
     }
 }
