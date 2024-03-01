@@ -48,6 +48,5 @@ public class SystemAdminLoginRequest {
     private String phone;
 
     @ApiModelProperty(value = "手机验证码", required = false)
-    @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
     private String captchaPhone;
 }
