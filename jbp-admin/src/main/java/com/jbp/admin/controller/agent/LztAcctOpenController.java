@@ -1,10 +1,8 @@
 package com.jbp.admin.controller.agent;
 
-import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
@@ -42,10 +40,9 @@ public class LztAcctOpenController {
 
     @ApiOperation(value = "开户记录列表")
     @GetMapping(value = "/page")
-    public CommonResult<PageInfo<LztAcctApply>> page(String userId, String status, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<LztAcctOpen>> page(String userId, String status, PageParamRequest pageParamRequest) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
-        lztAcctOpenService.pageList(merId, userId, status, pageParamRequest);
-        return CommonResult.success();
+        return CommonResult.success(CommonPage.restPage(lztAcctOpenService.pageList(merId, userId, status, pageParamRequest)));
     }
 }
