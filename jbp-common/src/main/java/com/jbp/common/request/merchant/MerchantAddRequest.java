@@ -1,5 +1,6 @@
 package com.jbp.common.request.merchant;
 
+import com.jbp.common.model.merchant.MerchantPayInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -87,6 +88,9 @@ public class MerchantAddRequest implements Serializable {
 
     @ApiModelProperty(value = "备注")
     private String remark;
+
+    @ApiModelProperty(value = "商户支付信息")
+    private MerchantPayInfo payInfo;
 
     @ApiModelProperty(value = "排序", required = true)
     @NotNull(message = "排序不能为空")

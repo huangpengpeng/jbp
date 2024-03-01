@@ -18,6 +18,7 @@ import com.jbp.common.request.SystemAdminRequest;
 import com.jbp.common.request.SystemAdminUpdateRequest;
 import com.jbp.common.response.SystemAdminResponse;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.dao.SystemAdminDao;
 import com.jbp.service.service.SystemAdminService;
@@ -298,6 +299,14 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
             map.put(admin.getId(), admin.getRealName());
         });
         return map;
+    }
+
+    @Override
+    public Map<Integer, SystemAdmin> getMapByMerIdList(List<Integer> idList) {
+        LambdaQueryWrapper<SystemAdmin> lqw = Wrappers.lambdaQuery();
+        lqw.in(SystemAdmin::getMerId, idList);
+        List<SystemAdmin> adminList = dao.selectList(lqw);
+        return FunctionUtil.keyValueMap(adminList, SystemAdmin::getMerId);
     }
 
     /**

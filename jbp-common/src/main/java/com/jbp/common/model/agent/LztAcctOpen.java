@@ -2,6 +2,8 @@ package com.jbp.common.model.agent;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.lianlian.result.AcctInfo;
+import com.jbp.common.lianlian.result.LztQueryAcctInfo;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,23 +12,26 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "eb_lzt_acct_apply", autoResultMap = true)
-@ApiModel(value="LztAcctApply对象", description="来账通账户申请")
+@TableName(value = "eb_lzt_acct_open", autoResultMap = true)
+@ApiModel(value="LztAcctOpen对象", description="来账通账户开通")
 @NoArgsConstructor
-public class LztAcctApply extends BaseModel {
+public class LztAcctOpen extends BaseModel {
 
-    public LztAcctApply(Integer merId, String userId, String userType, String userNo, String username, String txnSeqno, String accpTxno,
-                        String gatewayUrl) {
+    public LztAcctOpen(Integer merId, String userId, String txnSeqno, String accpTxno,
+                       String userType, String flagChnl, Date txnTime, String gatewayUrl) {
         this.merId = merId;
         this.userId = userId;
-        this.userType = userType;
-        this.userNo = userNo;
-        this.username = username;
         this.txnSeqno = txnSeqno;
         this.accpTxno = accpTxno;
+        this.userType = userType;
+        this.flagChnl = flagChnl;
+        this.txnTime = txnTime;
         this.gatewayUrl = gatewayUrl;
         this.status = "待开户";
     }
@@ -37,22 +42,22 @@ public class LztAcctApply extends BaseModel {
     @ApiModelProperty(value = "连连外部用户[本平台默认生成]")
     private String userId;
 
-    @ApiModelProperty(value = "用户类型")
-    private String userType;
-
-    @ApiModelProperty(value = "连连账户编号")
-    private String userNo;
-
-    @ApiModelProperty(value = "连连账户名称")
-    private String username;
-
     @ApiModelProperty(value = "请求流水号")
     private String txnSeqno;
 
     @ApiModelProperty(value = "连连请求流水号")
     private String accpTxno;
 
-    @ApiModelProperty(value = "注册URL")
+    @ApiModelProperty(value = "用户类型")
+    private String userType;
+
+    @ApiModelProperty(value = "申请渠道")
+    private String flagChnl;
+
+    @ApiModelProperty(value = "交易时间")
+    private Date txnTime;
+
+    @ApiModelProperty(value = "开户地址")
     private String gatewayUrl;
 
     @ApiModelProperty(value = "状态")
@@ -64,4 +69,13 @@ public class LztAcctApply extends BaseModel {
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;
+
+
+
+
+
+
+
+
+
 }

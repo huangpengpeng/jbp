@@ -1,20 +1,18 @@
 package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jbp.common.lianlian.result.AcctInfoResult;
-import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
-
-import java.util.List;
+import com.jbp.common.request.PageParamRequest;
 
 public interface LztAcctService extends IService<LztAcct> {
 
-    LztAcct getByLianLianAcct(String lianLianAcct);
+    LztAcct getByUserId(String userId);
 
-    LztAcct create(Integer merId, String lianLianAcct);
+    LztAcct create(Integer merId, String userId, String userType, String userNo, String username, String bankAccount);
 
-    LztAcct queryAcctInfo(String userId);
+    LztAcct details(String userId);
 
-    List<LztAcct> getByMerId(Integer merId);
+    PageInfo<LztAcct> pageList(Integer merId, String userId, String username,  PageParamRequest pageParamRequest);
+
 }

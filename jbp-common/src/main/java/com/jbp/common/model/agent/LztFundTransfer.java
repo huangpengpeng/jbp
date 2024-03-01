@@ -1,6 +1,8 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,23 +22,28 @@ import java.util.Date;
 @NoArgsConstructor
 public class LztFundTransfer extends BaseModel {
 
-    public LztFundTransfer(Integer merId, String lianLianAcct, String txnSeqno, BigDecimal amt, Date txnTime,
+    public LztFundTransfer(Integer merId, String userId, String username, String txnSeqno, BigDecimal amt, Date txnTime,
                            String bankAccountNo, String postscript, String accpTxno) {
         this.merId = merId;
-        this.lianLianAcct = lianLianAcct;
+        this.userId = userId;
+        this.username = username;
         this.txnSeqno = txnSeqno;
         this.amt = amt;
         this.txnTime = txnTime;
         this.bankAccountNo = bankAccountNo;
         this.postscript = postscript;
         this.accpTxno = accpTxno;
+        this.status = LianLianPayConfig.FundTransferStatus.创建.name();
     }
 
     @ApiModelProperty(value = "商户id")
     private Integer merId;
 
     @ApiModelProperty(value = "连连账户")
-    private String lianLianAcct;
+    private String userId;
+
+    @ApiModelProperty(value = "连连账户")
+    private String username;
 
     @ApiModelProperty(value = "划拨单号")
     private String txnSeqno;
@@ -55,5 +62,15 @@ public class LztFundTransfer extends BaseModel {
 
     @ApiModelProperty(value = "受理单号")
     private String accpTxno;
+
+    @ApiModelProperty(value = "状态")
+    private String status;
+
+    @ApiModelProperty(value = "返回消息")
+    private String retMsg;
+
+    @ApiModelProperty(value = "商户名称")
+    @TableField(exist = false)
+    private String merName;
 
 }

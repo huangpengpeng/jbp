@@ -1052,9 +1052,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setPlatCouponId(orderInfoVo.getPlatUserCouponId());
         order.setPayGateway(orderInfoVo.getPayGateway());
         order.setPlatform(orderRequest.getPlatform());
+        order.setIp(orderRequest.getIp());
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
+
         // 商户订单
         List<Integer> couponIdList = CollUtil.newArrayList();
         if (orderRequest.getPlatUserCouponId() > 0) {

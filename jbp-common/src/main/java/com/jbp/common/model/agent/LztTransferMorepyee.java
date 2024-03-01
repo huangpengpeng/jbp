@@ -27,7 +27,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class LztTransferMorepyee extends BaseModel {
 
-    public LztTransferMorepyee(Integer merId, String payerId, String payeeId, String txnSeqno,
+    public LztTransferMorepyee(Integer merId, String payerId, String payerName,  String payeeId, String payeeName, String txnSeqno,
                                BigDecimal amt, String postscript, TransferMorepyeeResult orderRet, String accpTxno) {
         this.merId = merId;
         this.payerId = payerId;
@@ -47,8 +47,14 @@ public class LztTransferMorepyee extends BaseModel {
     @ApiModelProperty(value = "付款人")
     private String payerId;
 
+    @ApiModelProperty(value = "付款人")
+    private String payerName;
+
     @ApiModelProperty(value = "收款人")
     private String payeeId;
+
+    @ApiModelProperty(value = "收款人")
+    private String payeeName;
 
     @ApiModelProperty(value = "单号")
     private String txnSeqno;
@@ -78,4 +84,8 @@ public class LztTransferMorepyee extends BaseModel {
 
     @ApiModelProperty(value = "完成时间")
     private Date finishTime;
+
+    @ApiModelProperty(value = "商户名称")
+    @TableField(exist = false)
+    private String merName;
 }

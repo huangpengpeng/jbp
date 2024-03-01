@@ -94,4 +94,6 @@ public interface SystemAdminService extends IService<SystemAdmin> {
      */
     Map<Integer, String> getNameMapByIdList(List<Integer> idList);
 
+
+    Map<Integer, SystemAdmin> getMapByMerIdList(List<Integer> idList);
 }

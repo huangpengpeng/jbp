@@ -41,6 +41,8 @@ public class CreateOrderRequest implements Serializable {
     @NotNull(message = "请选择收货地址")
     private Integer addressId;
 
+    private String ip;
+
     @ApiModelProperty(value = "订单商户对象", required = true)
     @NotEmpty(message = "订单商户对象不能为空")
     @Valid
@@ -56,7 +58,6 @@ public class CreateOrderRequest implements Serializable {
 
     @ApiModelProperty(value = "分享用户ID")
     private Integer shardUid;
-
 
     @ApiModelProperty(value = "下单场景（报单，换购）", required = false)
     private String platform;

@@ -33,13 +33,25 @@ public class LztFundTransferController {
     @Resource
     private LztAcctService lztAcctService;
 
+    @ApiOperation(value = "分页")
+    @GetMapping(value = "/page")
+    public CommonResult<PageInfo<LztFundTransfer>> page(String userId, String username, String bankAccountNo, String txnSeqno,
+                                                        String accpTxno, PageParamRequest pageParamRequest,
+                                                        @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date startTime,
+                                                        @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date endTime) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        PageInfo<LztFundTransfer> page = lztFundTransferService.pageList(merId, userId, username,bankAccountNo, txnSeqno,
+                accpTxno, startTime, endTime, pageParamRequest);
+        return CommonResult.success(page);
+    }
 
     @ApiOperation(value = "来账通资金划拨")
     @GetMapping(value = "/transfer")
     public CommonResult<LztFundTransfer> transfer(String userId, String bankAccountNo, BigDecimal amt, String postscript) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
-        LztAcct acct = lztAcctService.getByLianLianAcct(userId);
+        LztAcct acct = lztAcctService.getByUserId(userId);
         if (acct == null || acct.getMerId() != merId) {
             throw new CrmebException("收款款账户不存在");
         }
@@ -50,18 +62,7 @@ public class LztFundTransferController {
         return CommonResult.success(lztFundTransfer);
     }
 
-    @ApiOperation(value = "分页")
-    @GetMapping(value = "/page")
-    public CommonResult<PageInfo<LztFundTransfer>> page(String userId, String bankAccountNo, String txnSeqno,
-                                                        String accpTxno, PageParamRequest pageParamRequest,
-                                                        @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date startTime,
-                                                        @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date endTime) {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        Integer merId = systemAdmin.getMerId();
-        PageInfo<LztFundTransfer> page = lztFundTransferService.pageList(merId, userId, bankAccountNo, txnSeqno,
-                accpTxno, startTime, endTime, pageParamRequest);
-        return CommonResult.success(page);
-    }
+
 
 
 }
