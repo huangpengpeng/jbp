@@ -194,13 +194,13 @@ public class PayServiceImpl implements PayService {
             Wallet wallet = walletService.getCanPayByUser(user.getId());
             response.setWalletBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance());
         }
-        // 在线支付
-        if (0 == payGateway) {
+        // 在线支付 ,充值支付
+        if (payGateway != null && 0 == payGateway) {
             response.setWalletStatus(false);
             response.setYuePayStatus(false);
         }
         // 积分支付
-        if (1 == payGateway) {
+        if (payGateway != null && 1 == payGateway) {
             response.setPayWechatOpen(false);
             response.setAliPayStatus(false);
             response.setLianLianStatus(false);

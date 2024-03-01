@@ -35,7 +35,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("api/front/wallet")
+    @RequestMapping("api/front/wallet")
 @Api(tags = "用户积分")
 public class WalletController {
     @Resource
