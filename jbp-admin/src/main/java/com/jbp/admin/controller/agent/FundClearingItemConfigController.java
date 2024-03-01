@@ -69,6 +69,7 @@ public class FundClearingItemConfigController {
         return CommonResult.success(list);
     }
 
+    @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:add')")
     @ApiOperation("头部配置")
     @PostMapping("/add")
     public CommonResult add(@RequestBody @Validated List<FundClearingItemConfigRequest> request) {
