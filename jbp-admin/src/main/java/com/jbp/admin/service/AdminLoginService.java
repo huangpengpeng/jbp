@@ -79,5 +79,10 @@ public interface AdminLoginService {
      */
     Boolean loginAdminUpdate(LoginAdminUpdateRequest request);
 
-
+    /**
+     * 发送短信验证码
+     * @param phone 手机号
+     * @return Boolean
+     */
+    Boolean sendLoginCode(String phone);
 }

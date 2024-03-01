@@ -196,7 +196,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         Page<Order> page = PageHelper.startPage(request.getPage(), request.getLimit());
         if (StrUtil.isBlank(request.getKeywords())) {
             LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
-            lqw.eq(Order::getUid, userId);
+            //代购订单
+            if(request.getAgent()){
+                lqw.eq(Order::getPayUid, userId);
+                lqw.ne(Order::getUid, userId);
+            }else {
+                lqw.eq(Order::getUid, userId);
+            }
             if (request.getStatus() >= 0) {
                 if (request.getStatus() == 1) {
                     lqw.in(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING, OrderConstants.ORDER_STATUS_PART_SHIPPING);

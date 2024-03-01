@@ -105,7 +105,7 @@ public class PlatformUserController {
     @PostMapping("/update/user")
     @ApiOperation("修改用户基本信息")
     public CommonResult updateUser(@RequestBody @Validated PlatformUpdateUserRequest request) {
-        userService.updateUser(request.getId(), request.getPwd(), request.getSex(), request.getBirthday(), request.getRealName(), request.getPhone(), request.getCountry(), request.getProvince(), request.getCity(), request.getDistrict(), request.getAddress());
+        userService.updateUser(request.getId(), request.getPwd(), request.getSex(), request.getRealName(), request.getPhone(), request.getCountry(), request.getProvince(), request.getCity(), request.getDistrict(), request.getAddress());
         return CommonResult.success();
     }
 

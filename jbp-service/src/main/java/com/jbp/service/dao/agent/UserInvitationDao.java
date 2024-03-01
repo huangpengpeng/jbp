@@ -5,6 +5,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -22,5 +23,7 @@ public interface UserInvitationDao extends BaseMapper<UserInvitation> {
     List<UserInvitation> getNoFlowList();
 
     List<UserInviteResponse> getUserNextList(@Param("uId")Integer uId, @Param("account")String account);
+
+    List<UserInviteInfoResponse> getUserNextInfoList(@Param("uId")Integer uId, @Param("account")String account);
 
 }

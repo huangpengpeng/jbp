@@ -31,6 +31,12 @@ public class UserResponse {
     @ApiModelProperty(value = "用户id")
     private Integer id;
 
+    @ApiModelProperty(value = "真实姓名")
+    private String realName;
+
+    @ApiModelProperty(value = "详细地址")
+    private String address;
+
     @ApiModelProperty(value = "标签Ids")
     private String tagId;
 
@@ -51,6 +57,9 @@ public class UserResponse {
 
     @ApiModelProperty(value = "省份")
     private String province;
+
+    @ApiModelProperty(value = "区")
+    private String district;
 
     @ApiModelProperty(value = "城市")
     private String city;
@@ -93,19 +102,20 @@ public class UserResponse {
 
     @ApiModelProperty(value = "上级推广员昵称")
     private String spreadName;
+
     @ApiModelProperty(value = "用户账号")
     private String account;
 
     @ApiModelProperty(value = "是否注销")
     private Boolean isLogoff;
+
     @ApiModelProperty(value = "等级")
-    @TableField(exist = false)
     private String capaName;
+
     @ApiModelProperty(value = "星级")
-    @TableField(exist = false)
     private String capaXsName;
+
     @ApiModelProperty(value = "团队")
-    @TableField(exist = false)
     private String teamName;
 
 }

@@ -4,7 +4,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import com.jbp.common.constants.RegularConstants;
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 /**
  * PC登录请求对象
@@ -38,4 +42,13 @@ public class SystemAdminLoginRequest {
     
     @ApiModelProperty(value = "mfa", required = false)
     private String reqMfa;
+    
+    @ApiModelProperty(value = "手机号", required = false)
+    @NotBlank(message = "手机号不能为空")
+    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
+    private String phone;
+
+    @ApiModelProperty(value = "手机验证码", required = true)
+    @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
+    private String captchaPhone;
 }

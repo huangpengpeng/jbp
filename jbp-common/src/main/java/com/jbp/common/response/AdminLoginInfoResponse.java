@@ -43,4 +43,10 @@ public class AdminLoginInfoResponse implements Serializable {
     
     @ApiModelProperty(value = "开启商户端登录")
     private String merOpen;
+    
+    @ApiModelProperty(value = "开启商户端手机号登录")
+    private String merPhoneLogin;
+    
+    @ApiModelProperty(value = "商户端开启银行数据统计")
+    private String merSiteBankQuery;
 }

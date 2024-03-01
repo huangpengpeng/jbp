@@ -107,5 +107,8 @@ public class PageDiy implements Serializable {
     @ApiModelProperty(value = "标题文本位置")
     private Integer textPosition;
 
+    @ApiModelProperty(value = "开启密码")
+    private Integer isCipher;
+
 
 }

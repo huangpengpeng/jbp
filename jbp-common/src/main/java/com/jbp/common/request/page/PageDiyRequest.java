@@ -93,4 +93,7 @@ public class PageDiyRequest {
 
     @ApiModelProperty(value = "默认模板(1.平台默认 2.商户默认）")
     private Integer isDefault;
+
+    @ApiModelProperty(value = "开启密码")
+    private Integer isCipher;
 }

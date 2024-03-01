@@ -1,4 +1,4 @@
-package com.jbp.common.request;
+package com.jbp.common.request.merchant;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,11 +6,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
+import com.jbp.common.constants.RegularConstants;
+
 import java.io.Serializable;
 
 /**
- * 移动端订单列表请求对象
+ * 获取验证码请求对象
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
@@ -24,20 +28,14 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "OrderProductReplyRequest对象", description = "订单商品评价请求对象")
-public class OrderFrontListRequest extends PageParamRequest implements Serializable {
+@ApiModel(value="SendCodeRequest对象", description="获取验证码请求对象")
+public class MerchantSendCodeRequest implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(value = "订单状态（-1：全部，0：待支付，1：待发货,2：部分发货， 3：待核销，4：待收货,5：已收货,6：已完成，9：已取消）", required = true)
-    @NotNull(message = "订单编号不能为空")
-    private Integer status;
-
-    @ApiModelProperty(value = "搜索关键字")
-    private String keywords;
-
-    @ApiModelProperty(value = "是否代购订单")
-    private Boolean agent;
-
+    @ApiModelProperty(value = "手机号", required = true)
+    @NotBlank(message = "手机号不能为空")
+    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
+    private String phone;
 
 }

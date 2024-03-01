@@ -30,6 +30,30 @@
         </if>
 
     </select>
+    <select id="getUserNextInfoList" parameterType="java.util.Map" resultType="com.jbp.common.response.UserInviteInfoResponse">
+
+        SELECT
+        eu.nickname,
+        eu.account,
+        c.icon_url,
+        eu.phone ,
+        eo.orderCount,
+        eu.create_time,
+        ei.uid,
+        eu.avatar
+        FROM
+        eb_user_invitation ei
+        LEFT JOIN eb_user eu ON eu.id = ei.uId
+        LEFT JOIN eb_user_capa ec ON ec.uid = eu.id
+        LEFT JOIN eb_capa c ON c.id = ec.capa_id
+        left join (select count(1)  as orderCount,uid from eb_order  where status in (1,2,3,4,5,6) GROUP BY uid ) eo on eo.uid = ei.uId
+
+        where ei.pId = #{uId}
+
+        <if test="account!='' and account!= null ">
+            and eu.account = #{account}
+        </if>
+    </select>
 
 
 </mapper>
