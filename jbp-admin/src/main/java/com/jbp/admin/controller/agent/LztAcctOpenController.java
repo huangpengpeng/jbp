@@ -1,9 +1,6 @@
 package com.jbp.admin.controller.agent;
 
-import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
