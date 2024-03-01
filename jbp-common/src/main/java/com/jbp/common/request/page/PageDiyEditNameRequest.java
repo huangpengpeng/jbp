@@ -1,12 +1,10 @@
 package com.jbp.common.request.page;
 
-import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 /**
  * @Auther: 大粽子

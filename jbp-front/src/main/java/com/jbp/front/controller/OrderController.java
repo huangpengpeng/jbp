@@ -1,26 +1,24 @@
 package com.jbp.front.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jbp.common.model.order.Order;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.IPUtil;
 import com.jbp.common.vo.DeclUserInfoResultVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.front.service.FrontOrderService;
-
-import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,7 +65,8 @@ public class OrderController {
 
     @ApiOperation(value = "创建订单")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public CommonResult<OrderNoResponse> createOrder(@Validated @RequestBody CreateOrderRequest orderRequest) {
+    public CommonResult<OrderNoResponse> createOrder(@Validated @RequestBody CreateOrderRequest orderRequest, HttpServletRequest request) {
+        orderRequest.setIp(IPUtil.getIpAddress(request));
         return CommonResult.success(orderService.createOrder(orderRequest));
     }
 

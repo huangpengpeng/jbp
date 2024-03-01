@@ -521,9 +521,9 @@ public class SystemMenuServiceImpl extends ServiceImpl<SystemMenuDao, SystemMenu
      */
     private List<SystemMenu> getCacheList(Integer type) {
         String redisKey = type.equals(RoleEnum.PLATFORM_ADMIN.getValue()) ? RedisConstants.PLATFORM_MENU_CACHE_LIST_KEY : RedisConstants.MERCHANT_MENU_CACHE_LIST_KEY;
-        if (redisUtil.exists(redisKey)) {
-            return redisUtil.get(redisKey);
-        }
+//        if (redisUtil.exists(redisKey)) {
+//            return redisUtil.get(redisKey);
+//        }
         LambdaQueryWrapper<SystemMenu> lqw = Wrappers.lambdaQuery();
         lqw.eq(SystemMenu::getIsDelte, false);
         lqw.eq(SystemMenu::getType, type);

@@ -7,12 +7,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class LztFundTransferParams {
 
-    public LztFundTransferParams(String txn_seqno, String user_id, String bank_account_no, String amt) {
-
+    public LztFundTransferParams(String txn_seqno, String user_id, String bank_account_no, String amt, String notify_url) {
         this.txn_seqno = txn_seqno;
         this.user_id = user_id;
         this.bank_account_no = bank_account_no;
         this.amt = amt;
+        this.notify_url = notify_url;
     }
 
     /**
@@ -29,6 +29,8 @@ public class LztFundTransferParams {
      * 商户系统唯一交易流水号
      */
     private String txn_seqno;
+
+    private String notify_url;
 
     /**
      * 商户系统交易时间格式：yyyyMMddHHmmss

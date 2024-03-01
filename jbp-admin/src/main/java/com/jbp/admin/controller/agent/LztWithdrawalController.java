@@ -42,7 +42,7 @@ public class LztWithdrawalController {
                                              String pwd, BigDecimal amt, String randomKey, String txnPurpose, String postscript) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
-        LztAcct acct = lztAcctService.getByLianLianAcct(payeeId);
+        LztAcct acct = lztAcctService.getByUserId(payeeId);
         if (acct == null || acct.getMerId() != merId) {
             throw new CrmebException("付款用户不存在");
         }

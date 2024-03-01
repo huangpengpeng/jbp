@@ -28,9 +28,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class LztWithdrawal extends BaseModel {
 
-    public LztWithdrawal(Integer merId, String payeeId, String txnSeqno, String accpTxno, BigDecimal amt, BigDecimal feeAmount, String postscript, WithdrawalResult orderRet) {
+    public LztWithdrawal(Integer merId, String userId, String username, String txnSeqno, String accpTxno, BigDecimal amt, BigDecimal feeAmount, String postscript, WithdrawalResult orderRet) {
         this.merId = merId;
-        this.payeeId = payeeId;
+        this.userId = userId;
+        this.username = username;
         this.txnSeqno = txnSeqno;
         this.accpTxno = accpTxno;
         this.amt = amt;
@@ -44,8 +45,11 @@ public class LztWithdrawal extends BaseModel {
     @ApiModelProperty(value = "商户id")
     private Integer merId;
 
-    @ApiModelProperty(value = "付款用户")
-    private String payeeId;
+    @ApiModelProperty(value = "提现人")
+    private String userId;
+
+    @ApiModelProperty(value = "提现人")
+    private String username;
 
     @ApiModelProperty(value = "提现单号")
     private String txnSeqno;
@@ -78,4 +82,8 @@ public class LztWithdrawal extends BaseModel {
 
     @ApiModelProperty(value = "完成时间")
     private Date finishTime;
+
+    @ApiModelProperty(value = "商户名称")
+    @TableField(exist = false)
+    private String merName;
 }

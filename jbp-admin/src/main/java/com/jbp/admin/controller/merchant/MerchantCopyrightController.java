@@ -34,7 +34,7 @@ public class MerchantCopyrightController {
     @Autowired
     private CopyrightService copyrightService;
 
-    @PreAuthorize("hasAuthority('merchant:copyright:get:company:info')")
+//    @PreAuthorize("hasAuthority('merchant:copyright:get:company:info')")
     @ApiOperation(value = "获取商户版权信息")
     @RequestMapping(value = "/get/company/info", method = RequestMethod.GET)
     public CommonResult<Object> getCompanyInfo() {

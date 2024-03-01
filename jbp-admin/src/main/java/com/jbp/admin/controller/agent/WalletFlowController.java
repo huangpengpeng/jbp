@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -28,6 +27,7 @@ public class WalletFlowController {
     private WalletFlowService walletFlowService;
     @Resource
     private UserService userService;
+
     @PreAuthorize("hasAuthority('agent:user:wallet:flow')")
     @GetMapping("/page")
     @ApiOperation("用户积分详情")

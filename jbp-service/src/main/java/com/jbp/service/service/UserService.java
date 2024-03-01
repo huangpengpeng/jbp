@@ -388,7 +388,7 @@ public interface UserService extends IService<User> {
     PageInfo<UserInviteResponse> getUserInvite(UserInviteRequest request);
 
 
-    void updateUser(Integer id, String pwd, Integer sex, String birthday, String realName, String phone, String country, String province, String city, String district, String address);
+    void updateUser(Integer id, String pwd, Integer sex, String realName, String phone, String country, String province, String city, String district, String address);
 
     Boolean verifyPayPwd(String payPwd) throws Exception;
 

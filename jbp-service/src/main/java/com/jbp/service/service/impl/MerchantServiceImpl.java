@@ -273,6 +273,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (StrUtil.isNotBlank(merchant.getQualificationPicture())) {
             merchant.setQualificationPicture(systemAttachmentService.clearPrefix(merchant.getQualificationPicture()));
         }
+        merchant.setPayInfo(request.getPayInfo());
         merchant.setCreateType(createType);
         merchant.setCreateId(createId);
 

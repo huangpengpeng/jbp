@@ -1,12 +1,15 @@
 package com.jbp.common.model.merchant;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.mybatis.MerchantPayInfoHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -24,8 +27,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_merchant")
+@TableName(value = "eb_merchant", autoResultMap = true)
 @ApiModel(value = "Merchant对象", description = "商户表")
+@NoArgsConstructor
 public class Merchant implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -159,4 +163,8 @@ public class Merchant implements Serializable {
 
     @ApiModelProperty(value = "商户PC品牌好店封面图片")
     private String pcGoodStoreCoverImage;
+
+    @ApiModelProperty(value = "商户支付信息")
+    @TableField(value = "payInfo", typeHandler = MerchantPayInfoHandler.class)
+    private MerchantPayInfo payInfo;
 }

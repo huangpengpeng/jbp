@@ -41,11 +41,11 @@ public class LztTransferMorepyeeController {
                                                    String pwd, BigDecimal amt, String randomKey, String txnPurpose, String postscript) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
-        LztAcct acct = lztAcctService.getByLianLianAcct(payerId);
+        LztAcct acct = lztAcctService.getByUserId(payerId);
         if (acct == null || acct.getMerId() != merId) {
             throw new CrmebException("付款用户不存在");
         }
-        LztAcct acct2 = lztAcctService.getByLianLianAcct(payeeId);
+        LztAcct acct2 = lztAcctService.getByUserId(payeeId);
         if (acct2 == null) {
             throw new CrmebException("收款款用户不存在");
         }
@@ -71,8 +71,7 @@ public class LztTransferMorepyeeController {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         PageInfo<LztTransferMorepyee> page = lztTransferMorepyeeService.pageList(merId, payerId, payeeId, txnSeqno,
-                accpTxno, status, startTime, endTime,
-                pageParamRequest);
+                accpTxno, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
     }
 }

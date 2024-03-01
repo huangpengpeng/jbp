@@ -81,39 +81,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(new CustomAuthenticationProvider(new UserDetailServiceImpl()));
     }
 
-    /**
-     * anyRequest          |   匹配所有请求路径
-     * access              |   SpringEl表达式结果为true时可以访问
-     * anonymous           |   匿名可以访问
-     * denyAll             |   用户不能访问
-     * fullyAuthenticated  |   用户完全认证可以访问（非remember-me下自动登录）
-     * hasAnyAuthority     |   如果有参数，参数表示权限，则其中任何一个权限可以访问
-     * hasAnyRole          |   如果有参数，参数表示角色，则其中任何一个角色可以访问
-     * hasAuthority        |   如果有参数，参数表示权限，则其权限可以访问
-     * hasIpAddress        |   如果有参数，参数表示IP地址，如果用户IP和参数匹配，则可以访问
-     * hasRole             |   如果有参数，参数表示角色，则其角色可以访问
-     * permitAll           |   用户可以任意访问
-     * rememberMe          |   允许通过remember-me登录的用户访问
-     * authenticated       |   用户登录后可访问
-     */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+	/**
+	 * anyRequest | 匹配所有请求路径 access | SpringEl表达式结果为true时可以访问 anonymous | 匿名可以访问
+	 * denyAll | 用户不能访问 fullyAuthenticated | 用户完全认证可以访问（非remember-me下自动登录）
+	 * hasAnyAuthority | 如果有参数，参数表示权限，则其中任何一个权限可以访问 hasAnyRole |
+	 * 如果有参数，参数表示角色，则其中任何一个角色可以访问 hasAuthority | 如果有参数，参数表示权限，则其权限可以访问 hasIpAddress
+	 * | 如果有参数，参数表示IP地址，如果用户IP和参数匹配，则可以访问 hasRole | 如果有参数，参数表示角色，则其角色可以访问 permitAll
+	 * | 用户可以任意访问 rememberMe | 允许通过remember-me登录的用户访问 authenticated | 用户登录后可访问
+	 */
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
 
-        // CRSF禁用，因为不使用session
-        http.cors().and().csrf().disable()
-                // 认证失败处理类
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler())
-                .accessDeniedHandler(accessDeniedHandler()).and()
-                // 基于token，所以不需要session
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                // 过滤请求
-                .authorizeRequests()
-                // 跨域预检请求
+		// CRSF禁用，因为不使用session
+		http.cors().and().csrf().disable()
+				// 认证失败处理类
+				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler())
+				.accessDeniedHandler(accessDeniedHandler()).and()
+				// 基于token，所以不需要session
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				// 过滤请求
+				.authorizeRequests()
+				// 跨域预检请求
 //            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 对于登录login 验证码captchaImage 和其他放行的目录 允许匿名访问"/citylife/front/**"
                 .antMatchers("/api/publicly/**").permitAll()
                 .antMatchers("/api/admin/platform/getLoginPic").permitAll()
                 .antMatchers("/api/admin/platform/login").permitAll()
+                .antMatchers("/api/admin/merchant/sendCode").permitAll()
                 .antMatchers("/api/admin/merchant/getLoginPic").permitAll()
                 .antMatchers("/api/admin/merchant/login").permitAll()
                 .antMatchers("/jmreport/desreport_/cdn/iview/fonts/**").permitAll()
@@ -141,18 +135,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/captcha/get", "/captcha/check").anonymous()
                 .antMatchers("/api/admin/payment/callback/**").anonymous()
                 .antMatchers("/api/public/**").anonymous()
-                .antMatchers("/api/admin/agent/lzt/**").anonymous()
+//                .antMatchers("/api/admin/agent/lzt/**").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();// 防止iframe 造成跨域
 //        http.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
-        // 添加JWT filter
-        // 开启登录认证流程过滤器
-        http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        // 添加CORS filter
-        http.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
-        http.addFilterBefore(corsFilter, LogoutFilter.class);
-    }
+		// 添加JWT filter
+		// 开启登录认证流程过滤器
+		http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		// 添加CORS filter
+		http.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
+		http.addFilterBefore(corsFilter, LogoutFilter.class);
+	}
 
 }

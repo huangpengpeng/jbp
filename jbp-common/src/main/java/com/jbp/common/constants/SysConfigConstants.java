@@ -55,6 +55,11 @@ public class SysConfigConstants {
     
     /** 开启商户端 */
     public static final String CONFIG_KEY_ADMIN_MER_OPEN = "mer_open";
+    
+    /** 开启商户端手机号 */
+    public static final String CONFIG_KEY_ADMIN_MER_PHONE_LOGIN = "mer_phone_login";
+    /** 开启商户端银行数据统计 */
+    public static final String CONFIG_KEY_ADMIN_MER_SITE_BANK_QUERY = "mer_site_bank_query";
 
 
     /** 是否启用分销:1-启用，0-禁止 */

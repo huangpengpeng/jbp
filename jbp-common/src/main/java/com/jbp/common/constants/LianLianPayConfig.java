@@ -154,18 +154,18 @@ public class LianLianPayConfig {
         ;
 
         @Getter
-        private String name;
+        private String code;
 
 
-        AcctState(String name) {
-            this.name = name;
+        AcctState(String code) {
+            this.code = code;
         }
     }
 
 
     public enum TxnSeqnoPrefix {
-
-        来账通开通银行虚拟户("LZT_KH_"),
+        来账通开通子商户("LZT_ZSH_"),
+        来账通开通银行虚拟户("LZT_BKH_"),
         来账通划拨资金("LZT_FT_"),
         来账通内部代发("LZT_NDF_"),
         来账通提现("LZT_DW_"),
@@ -179,5 +179,100 @@ public class LianLianPayConfig {
         }
     }
 
+    public enum UserType {
+        商户("INNERMERCHANT"),
+        个人用户("INNERUSER"),
+        企业用户("INNERCOMPANY"),
+        ;
 
+        @Getter
+        private String code;
+
+        UserType(String code) {
+            this.code = code;
+        }
+
+        public static String getCode(String name) {
+            for (UserType value : UserType.values()) {
+                if (value.name().equals(name)) {
+                    return value.getCode();
+                }
+            }
+            return "";
+        }
+    }
+
+    public enum UserStatus {
+
+        待开户("INIT"), // 自定义的
+
+
+        已登记("ACTIVATE_PENDING"),
+        正常("NORMAL"),
+        审核未通过("ACTIVATE_PENDING"),
+        审核中("CHECK_PENDING"),
+        审核通过_待打款验证("REMITTANCE_VALID_PENDING"),
+        销户("CANCEL"),
+        暂停("PAUSE"),
+        待激活("ACTIVATE_PENDING_NEW"),
+        ;
+
+        @Getter
+        private String code;
+
+        UserStatus(String code) {
+            this.code = code;
+        }
+
+        public static String getCode(String name) {
+            for (UserStatus value : UserStatus.values()) {
+                if (value.name().equals(name)) {
+                    return value.getCode();
+                }
+            }
+            return "";
+        }
+        public static String getName(String code) {
+            for (UserStatus value : UserStatus.values()) {
+                if (value.getCode().equals(code)) {
+                    return value.name();
+                }
+            }
+            return "";
+        }
+    }
+
+
+    public enum FundTransferStatus {
+
+        创建("CREATE"), // 自定义的
+        处理中("PROCESS"),
+        成功("SUCCESS"),
+        失败("FAIL"),
+        ;
+
+        @Getter
+        private String code;
+
+        FundTransferStatus(String code) {
+            this.code = code;
+        }
+
+        public static String getCode(String name) {
+            for (FundTransferStatus value : FundTransferStatus.values()) {
+                if (value.name().equals(name)) {
+                    return value.getCode();
+                }
+            }
+            return "";
+        }
+        public static String getName(String code) {
+            for (FundTransferStatus value : FundTransferStatus.values()) {
+                if (value.getCode().equals(code)) {
+                    return value.name();
+                }
+            }
+            return "";
+        }
+    }
 }
