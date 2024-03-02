@@ -82,6 +82,7 @@ public class WebConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/api/front/product/**").excludePathPatterns("/api/front/qrcode/**")
 				.excludePathPatterns("/api/front/login/config").excludePathPatterns("/api/front/login/mobile/captcha")
 				.excludePathPatterns("/api/front/login/mobile/password")
+				.excludePathPatterns("/api/front/login/mobile/account")
 				.excludePathPatterns("/api/front/login/send/code").excludePathPatterns("/api/front/login/wechat/public")
 				.excludePathPatterns("/api/front/login/wechat/routine")
 				.excludePathPatterns("/api/front/login/wechat/register/binding/phone")

@@ -1478,7 +1478,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         productCouponService.save(productCoupon);
         // 5.复制商品描述 ProductDescription
         ProductDescription productDescription = new ProductDescription();
-//        productDescriptionService.getByProductIdAndType(orgProduct.getId());
+        ProductDescription orgProductDescription = productDescriptionService.getByProductId(orgProduct.getId());
+        BeanUtils.copyProperties(orgProductDescription, productDescription, new String[]{"id", "productId"});
         // 6.复制商品佣金 ProductComm
         // 7.复制商品配套 ProductProfit
         //聂孟用

@@ -211,7 +211,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("用户名或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getPhone()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getAccount()).equals(user.getPwd())) {
             throw new CrmebException("用户名或密码不正确");
         }
         if (!user.getStatus()) {
@@ -221,6 +221,25 @@ public class LoginServiceImpl implements LoginService {
         return commonLogin(user, spreadPid);
     }
 
+    @Override
+    public LoginResponse accountLogin(LoginAccountwordRequest loginRequest) {
+        if (StrUtil.isBlank(loginRequest.getPassword())) {
+            throw new CrmebException("密码不能为空");
+        }
+        //查询用户信息
+        User user = userService.getByAccount(loginRequest.getAccount());
+        if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
+            throw new CrmebException("用户名或密码不正确");
+        }
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(),loginRequest.getAccount()).equals(user.getPwd())) {
+            throw new CrmebException("用户名或密码不正确");
+        }
+        if (!user.getStatus()) {
+            throw new CrmebException("当前帐户已禁用，请与管理员联系！");
+        }
+        Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
+        return commonLogin(user, spreadPid);
+    }
     /**
      * 微信公众号授权登录
      * @param request 登录参数

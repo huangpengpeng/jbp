@@ -31,4 +31,11 @@ public interface ProductDescriptionService extends IService<ProductDescription> 
      * @return
      */
     ProductDescription getByProductIdAndType(Integer productId, Integer type);
+
+    /**
+     *
+     * @param productId 商品id
+     * @return
+     */
+    ProductDescription getByProductId(Integer productId);
 }
