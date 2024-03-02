@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -59,9 +61,10 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
      */
     @Override
     public void clear(Integer uId) {
-        LambdaQueryWrapper<UserInvitationFlow> wrapper = new LambdaQueryWrapper();
-        wrapper.eq(UserInvitationFlow::getUId, uId).or().eq(UserInvitationFlow::getPId, uId);
-        remove(wrapper);
+        List<UserInvitationFlow> list = list(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, uId));
+        List<Integer> userIdList = list.stream().map(UserInvitationFlow::getUId).collect(Collectors.toList());
+        userIdList.add(uId);
+        remove(new LambdaQueryWrapper<UserInvitationFlow>().in(UserInvitationFlow::getUId, userIdList));
     }
 
     /**

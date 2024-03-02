@@ -1,10 +1,17 @@
 package com.jbp.front;
 
 import com.jbp.common.constants.RedisConstants;
+import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserInvitationFlow;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.front.service.LoginService;
 import com.jbp.service.service.AsyncService;
 import com.jbp.service.service.PayService;
+import com.jbp.service.service.agent.UserInvitationFlowService;
+import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.UserRelationFlowService;
+import com.jbp.service.service.agent.UserRelationService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,6 +24,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.List;
 
 /**
  * 程序主入口
@@ -46,6 +55,21 @@ public class JbpFrontApplication {
 //        PayService payService = run.getBean(PayService.class);
 //        payService.payAfterProcessingTemp("PT807170910667612573741");
 
+        UserInvitationService userInvitationService = run.getBean(UserInvitationService.class);
+        UserInvitationFlowService userInvitationFlowService = run.getBean(UserInvitationFlowService.class);
+//        List<UserInvitation> noFlowList = userInvitationService.getNoFlowList();
+//        for (UserInvitation userInvitation : noFlowList) {
+//            userInvitationFlowService.refreshFlowAndTeam(userInvitation.getUId());
+//        }
+
+        userInvitationFlowService.clear(95);
+
+//        UserRelationService userRelationService = run.getBean(UserRelationService.class);
+//        UserRelationFlowService userRelationFlowService = run.getBean(UserRelationFlowService.class);
+//        List<UserRelation> noFlowList = userRelationService.getNoFlowList();
+//        for (UserRelation userRelation : noFlowList) {
+//            userRelationFlowService.refresh(userRelation.getUId());
+//        }
 
     }
 }

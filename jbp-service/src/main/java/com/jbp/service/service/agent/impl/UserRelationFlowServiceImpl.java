@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
@@ -37,9 +38,10 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
 
     @Override
     public void clear(Integer uid) {
-        LambdaQueryWrapper<UserRelationFlow> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(UserRelationFlow::getUId, uid).or().eq(UserRelationFlow::getPId, uid);
-        remove(wrapper);
+        List<UserRelationFlow> list = list(new QueryWrapper<UserRelationFlow>().lambda().eq(UserRelationFlow::getPId, uid));
+        List<Integer> userIdList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
+        userIdList.add(uid);
+        remove(new LambdaQueryWrapper<UserRelationFlow>().in(UserRelationFlow::getUId, userIdList));
     }
 
     @Override
