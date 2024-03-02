@@ -43,8 +43,8 @@ public class JbpFrontApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 //        AsyncService bean = run.getBean(AsyncService.class);
 //        bean.orderPaySuccessSplit("PT807170910667612573741");
-        PayService payService = run.getBean(PayService.class);
-        payService.payAfterProcessingTemp("PT807170910667612573741");
+//        PayService payService = run.getBean(PayService.class);
+//        payService.payAfterProcessingTemp("PT807170910667612573741");
 
 
     }
