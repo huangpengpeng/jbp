@@ -85,4 +85,7 @@ public class AttrValueResponse implements Serializable {
 
     @ApiModelProperty(value = "商品条码")
     private String barCode;
+
+    @ApiModelProperty(value = "业绩金额")
+    private BigDecimal scoreValue;
 }
