@@ -1,5 +1,8 @@
 package com.jbp.common.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.jbp.common.model.merchant.MerchantPayInfo;
+import com.jbp.common.mybatis.MerchantPayInfoHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -90,4 +93,7 @@ public class MerchantPlatformDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "商户星级1-5")
     private Integer starLevel;
+
+    @ApiModelProperty(value = "商户支付信息")
+    private MerchantPayInfo payInfo;
 }
