@@ -148,7 +148,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private WalletConfigService walletConfigService;
     @Autowired
     private ProductProfitService productProfitService;
-
+    @Resource
+    private ProductAttrService productAttrService;
 
     /**
      * 获取产品列表Admin
@@ -164,7 +165,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
         Merchant merchant = merchantService.getById(admin.getMerId());
         if (admin.getMerId() == 0) {
-            merchant =  merchantService.getById(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID));
+            merchant = merchantService.getById(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID));
         }
         lqw.eq(Product::getMerId, merchant.getId());
 
@@ -181,10 +182,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         lqw.orderByDesc(Product::getSort).orderByDesc(Product::getId);
         Page<Product> productPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<Product> products=new ArrayList<>();
-        if (request.getType()==0){
-            products =dao.selectList(new LambdaQueryWrapper<>());
-        }else {
+        List<Product> products = new ArrayList<>();
+        if (request.getType() == 0) {
+            products = dao.selectList(new LambdaQueryWrapper<>());
+        } else {
             products = dao.selectList(lqw);
         }
         if (CollUtil.isEmpty(products)) {
@@ -253,10 +254,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
 
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        Boolean ifPlatformAdd = admin.getMerId()==0;// 是否平台新增商品
+        Boolean ifPlatformAdd = admin.getMerId() == 0;// 是否平台新增商品
 
         Merchant merchant;
-        if(!ifPlatformAdd){
+        if (!ifPlatformAdd) {
             merchant = merchantService.getByIdException(admin.getMerId());
         } else {
             merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
@@ -317,7 +318,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         Boolean execute = transactionTemplate.execute(e -> {
             if (!ifPlatformAdd && merchant.getProductSwitch()) {// 开启商品审核
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
-            }else{
+            } else {
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
             }
             save(product);
@@ -394,7 +395,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (ObjectUtil.isNull(tempProduct)) {
             throw new CrmebException("商品不存在");
         }
-        if(admin.getMerId() !=0 && !admin.getMerId().equals(tempProduct.getMerId())){
+        if (admin.getMerId() != 0 && !admin.getMerId().equals(tempProduct.getMerId())) {
             throw new CrmebException("商品不存在");
         }
         if (tempProduct.getIsRecycle() || tempProduct.getIsDel()) {
@@ -417,11 +418,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         Product product = new Product();
         BeanUtils.copyProperties(productRequest, product);
         product.setAuditStatus(tempProduct.getAuditStatus());
-        Boolean ifPlatformAdd= admin.getMerId() == 0;
+        Boolean ifPlatformAdd = admin.getMerId() == 0;
         Merchant merchant;
         if (!ifPlatformAdd) {
             merchant = merchantService.getByIdException(tempProduct.getMerId());
-        }else {
+        } else {
             merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
         }
 
@@ -487,9 +488,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
         Boolean execute = transactionTemplate.execute(e -> {
             product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
-            if (ifPlatformAdd){
+            if (ifPlatformAdd) {
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
-            }else{
+            } else {
                 if (!merchant.getProductSwitch()) {
                     product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
                 }
@@ -806,7 +807,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (ObjectUtil.isNull(product)) {
             throw new CrmebException("商品不存在");
         }
-        if(admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())){
+        if (admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("商品不存在2");
         }
         if (ProductConstants.PRODUCT_DELETE_TYPE_RECYCLE.equals(request.getType()) && product.getIsRecycle()) {
@@ -890,11 +891,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean offShelf(Integer id) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         Product product = getById(id);
-        if (ObjectUtil.isNull(product)){
+        if (ObjectUtil.isNull(product)) {
             throw new CrmebException("商品不存在");
         }
 
-        if(admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())){
+        if (admin.getMerId() != 0 && !admin.getMerId().equals(product.getMerId())) {
             throw new CrmebException("只能下架自己商户号下的商品");
         }
         if (!product.getIsShow()) {
@@ -992,7 +993,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         productList = activityStyleService.makeActivityBorderStyle(productList);
         return CommonPage.copyPageInfo(page, productList);
     }
-
 
     /**
      * 获取出售中商品的Where条件
@@ -1118,9 +1118,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             e.setPositiveRatio(replyChance);
             e.setSales(e.getSales() + e.getFicti());
 
-           // 获取商品规格
-           List<ProductAttrValue> productAttrValueList = productAttrValueService.getListByProductIdAndType(e.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
-           e.setProductAttrValue(productAttrValueList);
+            // 获取商品规格
+            List<ProductAttrValue> productAttrValueList = productAttrValueService.getListByProductIdAndType(e.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+            e.setProductAttrValue(productAttrValueList);
 
         });
 
@@ -1133,8 +1133,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
 
             //获取直升等级的信息
             ProductProfit productProfit = productProfitService.getByProductName(response.getId(), ProductProfitEnum.等级.getName());
-            if(productProfit!= null){
-                JSONObject jsonObject =JSONObject.parseObject( productProfit.getRule());
+            if (productProfit != null) {
+                JSONObject jsonObject = JSONObject.parseObject(productProfit.getRule());
                 response.setRiseCapaName(jsonObject.getString("name"));
             }
 
@@ -1149,7 +1149,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
                 return resProduct;
             }).collect(Collectors.toList());
         });
-
 
 
         return CommonPage.copyPageInfo(page, responseList);
@@ -1327,7 +1326,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         return CommonPage.copyPageInfo(page, proList);
     }
 
-
     /**
      * 根据id集合查询对应商品列表
      *
@@ -1383,16 +1381,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         } else {
             // 审核成功
             product.setAuditStatus(ProductConstants.AUDIT_STATUS_SUCCESS);
-            Boolean ifPlatformAdd=product.getMerId()==0;
+            Boolean ifPlatformAdd = product.getMerId() == 0;
             Merchant merchant;
-            if (!ifPlatformAdd){
+            if (!ifPlatformAdd) {
                 // 免审店铺商品回归免审状态
-                 merchant = merchantService.getByIdException(product.getMerId());
-            }else {
-                merchant=null;
+                merchant = merchantService.getByIdException(product.getMerId());
+            } else {
+                merchant = null;
             }
 
-            if (!ifPlatformAdd&&!merchant.getProductSwitch()) {
+            if (!ifPlatformAdd && !merchant.getProductSwitch()) {
                 product.setAuditStatus(ProductConstants.AUDIT_STATUS_EXEMPTION);
             }
         }
@@ -1427,6 +1425,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         return update;
     }
+
     @Override
     public Boolean forceUp(ProductForceDownRequest request) {
         String ids = request.getIds();
@@ -1446,8 +1445,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         return update;
     }
 
-    @Resource
-    private ProductAttrService productAttrService;
     /**
      * 商品复制
      * 原始: productId
@@ -1455,7 +1452,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     @Override
     public void copy(Integer productId) {
         // 1.复制商品基础信息 product -> productId
-         Product orgProduct = getById(productId);
+        Product orgProduct = getById(productId);
         Product product = new Product();
         BeanUtils.copyProperties(orgProduct, product, new String[]{"id"});
         product.setIsShow(false);
@@ -1467,7 +1464,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             ProductAttr attr = new ProductAttr();
             BeanUtils.copyProperties(productAttr, attr, new String[]{"id", "productId"});
             productAttrService.save(attr);
-             List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(orgProduct.getId(), productAttr.getType());
+            List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(orgProduct.getId(), productAttr.getType());
             for (ProductAttrValue productAttrValue : attrValueList) {
                 ProductAttrValue value = new ProductAttrValue();
                 BeanUtils.copyProperties(productAttrValue, value, new String[]{"id", "productId"});
@@ -1476,10 +1473,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             }
         }
         // 4.复制商品优惠券【待定】 ProductCoupon
+        ProductCoupon productCoupon = new ProductCoupon();
+        productCoupon.setProductId(orgProduct.getId());
+        productCouponService.save(productCoupon);
         // 5.复制商品描述 ProductDescription
+        ProductDescription productDescription = new ProductDescription();
+//        productDescriptionService.getByProductIdAndType(orgProduct.getId());
         // 6.复制商品佣金 ProductComm
         // 7.复制商品配套 ProductProfit
-
+        //聂孟用
     }
 
     /**
@@ -1864,7 +1866,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean quickAddStock(ProductAddStockRequest request) {
         Product product = getByIdException(request.getId());
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if(admin.getMerId() != 0){
+        if (admin.getMerId() != 0) {
             if (!admin.getMerId().equals(product.getMerId())) {
                 throw new CrmebException("商品不存在");
             }
@@ -1910,7 +1912,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     public Boolean reviewFreeEdit(ProductReviewFreeEditRequest request) {
         Product product = getByIdException(request.getId());
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-        if(admin.getMerId() != 0){
+        if (admin.getMerId() != 0) {
             if (!admin.getMerId().equals(product.getMerId())) {
                 throw new CrmebException("商品不存在");
             }
@@ -2134,7 +2136,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         if (ObjectUtil.isNotNull(request.getIsShow())) {
             map.put("isShow", request.getIsShow() ? 1 : 0);
         }
-        if(admin.getMerId() !=0){
+        if (admin.getMerId() != 0) {
             map.put("merId", admin.getMerId());
         }
         if (!activity.getProCategory().equals("0")) {
