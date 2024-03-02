@@ -139,7 +139,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);
             Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
-            Rule rule = ruleMap.get(capaId);
+            Rule rule = ruleMap.get(capaId.intValue());
             BigDecimal ratio = BigDecimal.ZERO;
             if (rule != null) {
                 ratio = rule.getRatio();

@@ -145,7 +145,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
             }
             UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
             if (userCapaXs != null) {
-                Rule rule = ruleMap.get(userCapaXs.getCapaId());
+                Rule rule = ruleMap.get(userCapaXs.getCapaId().intValue());
                 if (rule != null) {
                     BigDecimal ratio = rule.getRatio(); // 自己比例
                     BigDecimal usableRatio = ratio.subtract(usedRatio); // 可分比例
