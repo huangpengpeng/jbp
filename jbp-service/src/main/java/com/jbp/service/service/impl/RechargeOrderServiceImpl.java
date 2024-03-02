@@ -228,7 +228,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         rechargeOrder.setPrice(rechargePrice);
         rechargeOrder.setGivePrice(gainPrice);
         rechargeOrder.setPayType(request.getPayType());
-        rechargeOrder.setType(rechargeOrder.getType());
+        rechargeOrder.setType(request.getType());
         rechargeOrder.setPayChannel(request.getPayChannel());
         boolean save = save(rechargeOrder);
         if (!save) {

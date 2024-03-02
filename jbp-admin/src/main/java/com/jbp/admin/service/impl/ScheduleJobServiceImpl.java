@@ -46,7 +46,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     /**
      * 项目启动时，初始化定时器
      */
-//    @PostConstruct
+    @PostConstruct
     public void init() {
         getAll().forEach(scheduleJob -> {
             CronTrigger trigger = scheduleManager.getCronTrigger(scheduleJob);

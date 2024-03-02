@@ -15,6 +15,7 @@ import com.jbp.common.request.WalletTradePasswordRequest;
 import com.jbp.common.request.WalletTransferRequest;
 import com.jbp.common.request.WalletWithdrawRequest;
 import com.jbp.common.request.agent.ChannelIdentityRequest;
+import com.jbp.common.response.UserWalletInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
@@ -32,10 +33,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("api/front/wallet")
+    @RequestMapping("api/front/wallet")
 @Api(tags = "用户积分")
 public class WalletController {
     @Resource
@@ -54,6 +56,7 @@ public class WalletController {
     private WalletWithdrawService walletWithdrawService;
     @Resource
     private SystemConfigService systemConfigService;
+
 
 
     @PostMapping("/identity")
@@ -195,4 +198,15 @@ public class WalletController {
         walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt(), request.getType(), request.getPostscript());
         return CommonResult.success();
     }
+
+
+
+    @ApiOperation(value = "钱包配置余额明细")
+    @RequestMapping(value = "/walletConfigList", method = RequestMethod.GET)
+    public CommonResult<List<UserWalletInfoResponse>> walletConfigList() {
+        return CommonResult.success(walletConfigService.getUserWalletInfo());
+
+    }
+
+
 }

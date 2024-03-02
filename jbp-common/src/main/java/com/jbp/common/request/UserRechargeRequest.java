@@ -51,9 +51,7 @@ public class UserRechargeRequest implements Serializable {
     @StringContains(limitValues = {"public", "mini", "h5", "wechatIos", "wechatAndroid", "alipay", "alipayApp", "lianlian"}, message = "未知的支付渠道")
     private String payChannel;
 
-    @ApiModelProperty(value = "充值 wallet  yue")
-    @NotBlank(message = "充值类型不能为空")
-    @StringContains(limitValues = {"wallet", "yue"}, message = "未知充值类型")
+    @ApiModelProperty(value = "充值  yue（0） wallet （1 2 3  4  5）")
     private Integer type;
 
     private String ip;

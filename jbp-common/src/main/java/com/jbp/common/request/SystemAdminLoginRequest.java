@@ -44,11 +44,11 @@ public class SystemAdminLoginRequest {
     private String reqMfa;
     
     @ApiModelProperty(value = "手机号", required = false)
-    @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
     private String phone;
 
-    @ApiModelProperty(value = "手机验证码", required = true)
+    @ApiModelProperty(value = "手机验证码", required = false)
     @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
     private String captchaPhone;
+
 }
