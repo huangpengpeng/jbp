@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -169,5 +170,19 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             saveOrUpdateCapa(uid, riseCapaId, "", "满足升级条件升级");
         }
 
+    }
+
+    @Override
+    public Map<Integer, UserCapa> getUidMap(List<Integer> uIdList) {
+        LambdaQueryWrapper<UserCapa> lqw = new LambdaQueryWrapper<>();
+        lqw.in(UserCapa::getUid, uIdList);
+        List<UserCapa> userList = list(lqw);
+        Map<Integer, UserCapa> capaMap = new HashMap<>();
+        userList.forEach(e -> {
+            Capa capa = capaService.getById(e.getId());
+            e.setCapaName(capa != null ? capa.getName() : "");
+            capaMap.put(e.getUid(), e);
+        });
+        return capaMap;
     }
 }

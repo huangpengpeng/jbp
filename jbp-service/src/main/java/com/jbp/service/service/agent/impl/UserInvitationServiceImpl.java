@@ -7,7 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -16,7 +16,10 @@ import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 import com.jbp.service.dao.agent.UserInvitationDao;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.*;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.service.agent.UserInvitationFlowService;
+import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -159,7 +162,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         List<Integer> mIdList = list.stream().map(UserInvitation::getMId).collect(Collectors.toList());
         Map<Integer, User> midMapList = userService.getUidMapList(mIdList);
         //等级
-
+        Map<Integer, UserCapa> capaUidMapList = userCapaService.getUidMap(uIdList);
         //星级
 
 
@@ -168,7 +171,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
             e.setUNickName(uUser != null ? uUser.getNickname() : "");
             //等级
-//            userCapaService.getByUser()
+            UserCapa uUserCapa = capaUidMapList.get(e.getUId());
+            e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
             //星级
 
             User pUser = pidMapList.get(e.getPId());

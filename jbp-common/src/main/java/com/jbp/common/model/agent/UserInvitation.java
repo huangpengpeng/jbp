@@ -65,27 +65,27 @@ public class UserInvitation extends BaseModel {
 
     @ApiModelProperty("等级ID")
     @TableField(exist = false)
-    private Long uCapaName;
+    private String uCapaName;
 
     @ApiModelProperty("星级ID")
     @TableField(exist = false)
-    private Long uCapaXsName;
+    private String uCapaXsName;
 
     @ApiModelProperty("上级等级")
     @TableField(exist = false)
-    private Long pCapaName;
+    private String pCapaName;
 
     @ApiModelProperty("上级星级")
     @TableField(exist = false)
-    private Long pCapaXsName;
+    private String pCapaXsName;
 
     @ApiModelProperty("上级等级")
     @TableField(exist = false)
-    private Long mCapaName;
+    private String mCapaName;
 
     @ApiModelProperty("上级星级")
     @TableField(exist = false)
-    private Long mCapaXsName;
+    private String mCapaXsName;
 
     public Integer getRealPid() {
         return getMId() != null ? getMId() : getPId();
