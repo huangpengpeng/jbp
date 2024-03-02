@@ -1445,6 +1445,43 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         }
         return update;
     }
+
+    @Resource
+    private ProductAttrService productAttrService;
+    /**
+     * 商品复制
+     * 原始: productId
+     */
+    @Override
+    public void copy(Integer productId) {
+        // 1.复制商品基础信息 product -> productId
+         Product orgProduct = getById(productId);
+        Product product = new Product();
+        BeanUtils.copyProperties(orgProduct, product, new String[]{"id"});
+        product.setIsShow(false);
+        save(product);
+        Integer newProductId = product.getId();
+        // 2.复制商品属性  3.复制商品属性值
+        List<ProductAttr> attrList = productAttrService.getListByProduct(orgProduct.getId());
+        for (ProductAttr productAttr : attrList) {
+            ProductAttr attr = new ProductAttr();
+            BeanUtils.copyProperties(productAttr, attr, new String[]{"id", "productId"});
+            productAttrService.save(attr);
+             List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(orgProduct.getId(), productAttr.getType());
+            for (ProductAttrValue productAttrValue : attrValueList) {
+                ProductAttrValue value = new ProductAttrValue();
+                BeanUtils.copyProperties(productAttrValue, value, new String[]{"id", "productId"});
+                value.setProductId(newProductId);
+                productAttrValueService.save(value);
+            }
+        }
+        // 4.复制商品优惠券【待定】 ProductCoupon
+        // 5.复制商品描述 ProductDescription
+        // 6.复制商品佣金 ProductComm
+        // 7.复制商品配套 ProductProfit
+        
+    }
+
     /**
      * 是否有商品使用对应的商户商品分类
      *

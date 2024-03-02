@@ -76,5 +76,13 @@ public class ProductAttrServiceImpl extends ServiceImpl<ProductAttrDao, ProductA
         lqw.eq(ProductAttr::getIsDel, false);
         return dao.selectList(lqw);
     }
+
+    @Override
+    public List<ProductAttr> getListByProduct(Integer productId) {
+        LambdaQueryWrapper<ProductAttr> lqw = Wrappers.lambdaQuery();
+        lqw.eq(ProductAttr::getProductId, productId);
+        lqw.eq(ProductAttr::getIsDel, false);
+        return dao.selectList(lqw);
+    }
 }
 

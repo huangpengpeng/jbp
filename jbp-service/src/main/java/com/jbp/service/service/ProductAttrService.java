@@ -42,4 +42,6 @@ public interface ProductAttrService extends IService<ProductAttr> {
      * @return List
      */
     List<ProductAttr> getListByProductIdAndType(Integer productId, Integer type);
+
+    List<ProductAttr> getListByProduct(Integer productId);
 }
