@@ -96,7 +96,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
         // 对碰奖金

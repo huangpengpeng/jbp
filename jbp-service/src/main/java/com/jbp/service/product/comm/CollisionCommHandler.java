@@ -1,6 +1,5 @@
 package com.jbp.service.product.comm;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.beust.jcommander.internal.Lists;
@@ -109,7 +108,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if(!productCommConfig.getStatus()){
+        if(!productCommConfig.getIfOpen()){
             return;
         }
         // 增加对碰积分业绩
@@ -124,11 +123,12 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
-            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
-            // 总PV
-            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));// 钱包抵扣PV
+            // 业绩金额为0忽略
+            BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
+            // 折算系数
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
             // 明细商品
+            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee());
             ProductInfoDto productInfo = new ProductInfoDto(productId, orderDetail.getProductName(), orderDetail.getPayNum(), payPrice, totalPv);
             productInfoList.add(productInfo);
             // 订单总PV

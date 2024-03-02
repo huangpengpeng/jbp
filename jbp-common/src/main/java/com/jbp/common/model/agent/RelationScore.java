@@ -46,7 +46,6 @@ public class RelationScore extends VersionModel {
     private BigDecimal usedScore;
 
     @ApiModelProperty("虚假业绩")
-    @TableField("fakeScore")
     private BigDecimal fakeScore;
 
     @ApiModelProperty("点位")

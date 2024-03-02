@@ -91,7 +91,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
 
@@ -107,11 +107,9 @@ public class ShopCommHandler extends AbstractProductCommHandler {
                 continue;
             }
             Rule rule = getRule(productComm);
-            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
             // 总PV
-            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));// 钱包抵扣PV
+            BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
-
             BigDecimal productAmt = totalPv.multiply(rule.getRatio()).setScale(2, BigDecimal.ROUND_DOWN);
             FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                     orderDetail.getPayNum(), rule.getRatio(), productAmt);
@@ -120,6 +118,8 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             // 店铺佣金
             amt = amt.add(productAmt);
         }
+
+
         if (!ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
             return;
         }

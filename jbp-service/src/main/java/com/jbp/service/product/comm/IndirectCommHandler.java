@@ -106,7 +106,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
 
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
         // 没有上级直接返回
@@ -134,7 +134,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
                 continue;
             }
             // 钱包抵扣PV
-            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));
+            BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);

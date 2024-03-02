@@ -3,6 +3,8 @@ package com.jbp.front;
 import com.jbp.common.constants.RedisConstants;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.front.service.LoginService;
+import com.jbp.service.service.AsyncService;
+import com.jbp.service.service.PayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,6 +41,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
+//        AsyncService bean = run.getBean(AsyncService.class);
+//        bean.orderPaySuccessSplit("PT807170910667612573741");
+        PayService payService = run.getBean(PayService.class);
+        payService.payAfterProcessingTemp("PT807170910667612573741");
 
 
     }

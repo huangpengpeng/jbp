@@ -106,7 +106,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
         // 没有上级直接返回
@@ -123,14 +123,13 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
-            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
             // 佣金不存在或者关闭直接忽略
             ProductComm productComm = productCommService.getByProduct(productId, getType());
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
             // 钱包抵扣PV
-            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));
+            BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);

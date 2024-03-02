@@ -92,8 +92,8 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
             throw new CrmebException(type + "减少平台积分金额不能小于0:" + amt);
         }
-        if (walletConfigService.getByType(type).getCanWithdraw().equals(0)) {
-            throw new CrmebException(type + "禁用提现或转账");
+        if (walletConfigService.getByType(type).getStatus() == 0) {
+            throw new CrmebException(type + "钱包已禁用");
         }
         PlatformWallet platformWallet = getType(type);
         if (ArithmeticUtils.less(platformWallet.getBalance(), amt)) {

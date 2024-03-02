@@ -639,14 +639,10 @@ public class PayServiceImpl implements PayService {
         List<ProductInfoDto> productInfoList = Lists.newArrayList();
         List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(platOrder.getOrderNo());
         for (OrderDetail orderDetail : platOrderDetailList) {
-            BigDecimal productScore = orderDetail.getPayPrice();
-            List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
-            for (ProductDeduction deduction : walletDeductionList) {
-                productScore = productScore.add(deduction.getPvFee());
-            }
-            score = score.add(productScore);
+            BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
+            score = score.add(realScore);
             ProductInfoDto productInfo = new ProductInfoDto(orderDetail.getProductId(), orderDetail.getProductName(),
-                    orderDetail.getPayNum(), orderDetail.getPayPrice(), productScore);
+                    orderDetail.getPayNum(), orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()), realScore);
             productInfoList.add(productInfo);
         }
 

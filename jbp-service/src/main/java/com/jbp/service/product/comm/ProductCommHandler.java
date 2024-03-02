@@ -2,14 +2,10 @@ package com.jbp.service.product.comm;
 
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
 
-import java.math.BigDecimal;
 import java.util.LinkedList;
 
 public interface ProductCommHandler {
-
-    BigDecimal getWalletDeductionListPv(OrderDetail orderDetail);
 
     Integer getType();
 

@@ -28,12 +28,4 @@ public interface LianLianPayService {
 
     WithdrawalResult withdrawal(String drawNo, BigDecimal amt, String postscript, String password, String random_key);
 
-
-
-
-
-
-
-
-
 }

@@ -1124,6 +1124,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 orderDetail.setSku(detailVo.getSku());
                 orderDetail.setPrice(detailVo.getPrice());
                 orderDetail.setPayNum(detailVo.getPayNum());
+                BigDecimal scoreValue = detailVo.getScoreValue() == null ? BigDecimal.ZERO :  detailVo.getScoreValue();
+                orderDetail.setScoreValue(scoreValue.multiply(BigDecimal.valueOf(orderDetail.getPayNum())));
                 orderDetail.setWeight(detailVo.getWeight());
                 orderDetail.setVolume(detailVo.getVolume());
                 orderDetail.setBarCode(detailVo.getBarCode());
@@ -2373,6 +2375,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());
         detailVo.setPayPrice(attrValue.getPrice());
+        detailVo.setScoreValue(attrValue.getScoreValue() == null ? BigDecimal.ZERO : attrValue.getScoreValue());
         detailVo.setPayNum(detailRequest.getProductNum());
         detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : product.getImage());
         detailVo.setVolume(attrValue.getVolume());
@@ -2885,6 +2888,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());
         detailVo.setPayPrice(attrValue.getPrice());
+        detailVo.setScoreValue(attrValue.getScoreValue() == null ? BigDecimal.ZERO : attrValue.getScoreValue());
         detailVo.setPayNum(detailRequest.getProductNum());
         detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : product.getHeadImg());
         detailVo.setVolume(attrValue.getVolume());

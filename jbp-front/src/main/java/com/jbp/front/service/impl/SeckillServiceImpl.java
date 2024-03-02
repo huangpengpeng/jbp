@@ -592,6 +592,7 @@ public class SeckillServiceImpl implements SeckillService {
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());
         detailVo.setPayPrice(attrValue.getPrice());
+        detailVo.setScoreValue(attrValue.getScoreValue() == null ? BigDecimal.ZERO : attrValue.getScoreValue());
         detailVo.setPayNum(detailRequest.getProductNum());
         detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : seckillProduct.getImage());
         detailVo.setVolume(attrValue.getVolume());

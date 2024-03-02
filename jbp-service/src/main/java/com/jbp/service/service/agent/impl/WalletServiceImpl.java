@@ -66,9 +66,6 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
             throw new CrmebException(type + "增加用户积分金额不能小于0:" + amt);
         }
-        if (walletConfigService.getByType(type).getRecharge().equals(0)) {
-            throw new CrmebException(type + "禁用充值或转账");
-        }
         Wallet wallet = getByUser(uid, type);
         if (wallet == null) {
             wallet = add(uid, type);
@@ -87,9 +84,6 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     public Boolean reduce(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
             throw new CrmebException(type + "减少用户积分金额不能小于0:" + amt);
-        }
-        if (walletConfigService.getByType(type).getCanWithdraw().equals(0)) {
-            throw new CrmebException(type + "禁用提现或转账");
         }
         Wallet wallet = getByUser(uid, type);
         if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), amt)) {

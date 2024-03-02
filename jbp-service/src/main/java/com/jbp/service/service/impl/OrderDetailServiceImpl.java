@@ -12,12 +12,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.CommonSearchRequest;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.dao.OrderDetailDao;
 import com.jbp.service.service.OrderDetailService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -188,6 +191,34 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
             return null;
         }
         return detailList.stream().collect(Collectors.groupingBy(OrderDetail::getOrderNo));
+    }
+
+    @Override
+    public BigDecimal getWalletDeductionPv(OrderDetail orderDetail) {
+        BigDecimal totalPv = BigDecimal.ZERO;
+        List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
+        if (CollectionUtils.isNotEmpty(walletDeductionList)) {
+            for (ProductDeduction deduction : walletDeductionList) {
+                BigDecimal pv = deduction.getPvFee() == null ? BigDecimal.ZERO : deduction.getPvFee();
+                totalPv = pv.add(totalPv);
+            }
+        }
+        return totalPv;
+    }
+
+    @Override
+    public BigDecimal getRealScore(OrderDetail orderDetail) {
+        // 业绩金额为0忽略
+        if (orderDetail.getScoreValue() == null || ArithmeticUtils.lessEquals(orderDetail.getScoreValue(), BigDecimal.ZERO)) {
+            return BigDecimal.ZERO;
+        }
+        // 抵扣金额
+        BigDecimal walletDeductionFee = orderDetail.getWalletDeductionFee() == null ? BigDecimal.ZERO : orderDetail.getWalletDeductionFee();
+        // 抵扣金额算PV
+        BigDecimal walletDeductionFeePv = getWalletDeductionPv(orderDetail);
+        // 实际PV = 总业绩 - 抵扣 + 抵扣PV
+        BigDecimal totalPv = orderDetail.getScoreValue().subtract(walletDeductionFee).add(walletDeductionFeePv);
+        return ArithmeticUtils.lessEquals(totalPv, BigDecimal.ZERO) ? BigDecimal.ZERO : totalPv;
     }
 }
 
