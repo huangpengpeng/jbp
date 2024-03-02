@@ -18,6 +18,7 @@ import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.UserCapaDao;
 import com.jbp.service.service.UserService;
@@ -51,6 +52,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private UserService userService;
     @Resource
     private ConditionChain conditionChain;
+    @Resource
+    private UserCapaDao dao;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -176,13 +179,12 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     public Map<Integer, UserCapa> getUidMap(List<Integer> uIdList) {
         LambdaQueryWrapper<UserCapa> lqw = new LambdaQueryWrapper<>();
         lqw.in(UserCapa::getUid, uIdList);
-        List<UserCapa> userList = list(lqw);
-        Map<Integer, UserCapa> capaMap = new HashMap<>();
+        List<UserCapa> userList = dao.selectList(lqw);
+        Map<Long, Capa> capaMap = capaService.getCapaMap();
+
         userList.forEach(e -> {
-            Capa capa = capaService.getById(e.getId());
-            e.setCapaName(capa != null ? capa.getName() : "");
-            capaMap.put(e.getUid(), e);
+            e.setCapaName(capaMap.get(e.getCapaId()).getName());
         });
-        return capaMap;
+        return FunctionUtil.keyValueMap(userList,UserCapa::getUid );
     }
 }
