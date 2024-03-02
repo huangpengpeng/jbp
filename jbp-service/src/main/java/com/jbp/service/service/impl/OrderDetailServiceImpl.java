@@ -216,8 +216,14 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
         BigDecimal walletDeductionFee = orderDetail.getWalletDeductionFee() == null ? BigDecimal.ZERO : orderDetail.getWalletDeductionFee();
         // 抵扣金额算PV
         BigDecimal walletDeductionFeePv = getWalletDeductionPv(orderDetail);
+        // 积分扣除
+        BigDecimal integralPrice = orderDetail.getIntegralPrice()== null ? BigDecimal.ZERO : orderDetail.getIntegralPrice();
+        // 商户优惠
+        BigDecimal merCouponPrice = orderDetail.getMerCouponPrice()== null ? BigDecimal.ZERO : orderDetail.getMerCouponPrice();
+        // 平台优惠
+        BigDecimal platCouponPrice = orderDetail.getPlatCouponPrice()== null ? BigDecimal.ZERO : orderDetail.getPlatCouponPrice();
         // 实际PV = 总业绩 - 抵扣 + 抵扣PV
-        BigDecimal totalPv = orderDetail.getScoreValue().subtract(walletDeductionFee).add(walletDeductionFeePv);
+        BigDecimal totalPv = orderDetail.getScoreValue().subtract(walletDeductionFee).add(walletDeductionFeePv).subtract(integralPrice).subtract(merCouponPrice).subtract(platCouponPrice);
         return ArithmeticUtils.lessEquals(totalPv, BigDecimal.ZERO) ? BigDecimal.ZERO : totalPv;
     }
 }

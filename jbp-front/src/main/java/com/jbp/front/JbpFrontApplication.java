@@ -62,7 +62,7 @@ public class JbpFrontApplication {
 //            userInvitationFlowService.refreshFlowAndTeam(userInvitation.getUId());
 //        }
 
-        userInvitationFlowService.clear(95);
+//        userInvitationFlowService.clear(95);
 
 //        UserRelationService userRelationService = run.getBean(UserRelationService.class);
 //        UserRelationFlowService userRelationFlowService = run.getBean(UserRelationFlowService.class);
