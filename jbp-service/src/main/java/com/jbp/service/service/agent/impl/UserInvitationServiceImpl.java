@@ -7,6 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -15,8 +16,7 @@ import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 import com.jbp.service.dao.agent.UserInvitationDao;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.UserInvitationFlowService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -45,6 +45,10 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     private TransactionTemplate transactionTemplate;
     @Resource
     private UserService userService;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
 
     @Override
     public UserInvitation getByUser(Integer uId) {
@@ -154,28 +158,37 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
         List<Integer> mIdList = list.stream().map(UserInvitation::getMId).collect(Collectors.toList());
         Map<Integer, User> midMapList = userService.getUidMapList(mIdList);
+        //等级
+
+        //星级
+
+
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            e.setURealName(uUser != null ? uUser.getRealName() : "");
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
+            //等级
+//            userCapaService.getByUser()
+            //星级
+
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setPRealName(pUser != null ? pUser.getRealName() : "");
+            e.setPNickName(pUser != null ? pUser.getNickname() : "");
             User mUser = midMapList.get(e.getMId());
             e.setMAccount(mUser != null ? mUser.getAccount() : "");
-            e.setMRealName(mUser != null ? mUser.getRealName() : "");
+            e.setMNickNamee(mUser != null ? mUser.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
     public List<UserInviteResponse> getUserNextList(Integer uid, String account) {
-        return dao.getUserNextList(uid,account);
+        return dao.getUserNextList(uid, account);
     }
 
     @Override
     public List<UserInviteInfoResponse> getUserNextInfoList(Integer uid, String account) {
-        return dao.getUserNextInfoList(uid,account);
+        return dao.getUserNextInfoList(uid, account);
     }
 
     @Override
@@ -184,6 +197,6 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         wrapper.and((w) -> {
             w.eq(UserInvitation::getPId, pId);
         });
-        return  list(wrapper).size();
+        return list(wrapper).size();
     }
 }

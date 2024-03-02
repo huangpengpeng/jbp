@@ -114,10 +114,10 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            e.setURealName(uUser != null ? uUser.getRealName() : "");
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setPRealName(pUser != null ? pUser.getRealName() : "");
+            e.setUNickName(pUser != null ? pUser.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
