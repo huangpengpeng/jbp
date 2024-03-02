@@ -1479,7 +1479,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         // 5.复制商品描述 ProductDescription
         // 6.复制商品佣金 ProductComm
         // 7.复制商品配套 ProductProfit
-        
+
     }
 
     /**
