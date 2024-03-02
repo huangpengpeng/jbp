@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -42,6 +43,8 @@ public class FundClearingItemConfigServiceImpl extends ServiceImpl<FundClearingI
                 .like(StringUtils.isNotEmpty(commName), FundClearingItemConfig::getCommName, commName);
         Page<FundClearingItemConfig> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearingItemConfig> list = list(lqw);
+        list.forEach(e->{
+        });
         return CommonPage.copyPageInfo(page, list);
     }
 }
