@@ -54,5 +54,12 @@ public class ProductDescriptionServiceImpl extends ServiceImpl<ProductDescriptio
         lqw.eq(ProductDescription::getType,type);
         return dao.selectOne(lqw);
     }
+
+    @Override
+    public ProductDescription getByProductId(Integer productId) {
+        LambdaQueryWrapper<ProductDescription> lqw = Wrappers.lambdaQuery();
+        lqw.eq(ProductDescription::getProductId, productId);
+        return dao.selectOne(lqw);
+    }
 }
 
