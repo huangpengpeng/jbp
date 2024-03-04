@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -163,8 +164,12 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         Map<Integer, User> midMapList = userService.getUidMapList(mIdList);
         //等级
         Map<Integer, UserCapa> capaUidMapList = userCapaService.getUidMap(uIdList);
+        Map<Integer, UserCapa> capaPidMapList = userCapaService.getUidMap(pIdList);
+        Map<Integer, UserCapa> capaMidMapList = userCapaService.getUidMap(mIdList);
         //星级
-
+        Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
+        Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
+        Map<Integer, UserCapaXs> capaXsMidMapList = userCapaXsService.getUidMap(mIdList);
 
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
@@ -173,7 +178,17 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
             //等级
             UserCapa uUserCapa = capaUidMapList.get(e.getUId());
             e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
+            UserCapa pUserCapa = capaPidMapList.get(e.getPId());
+            e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
+            UserCapa mUserCap = capaMidMapList.get(e.getMId());
+            e.setMCapaName(mUserCap != null ? mUserCap.getCapaName() : "");
             //星级
+            UserCapaXs uUserCapaXs = capaXsUidMapList.get(e.getUId());
+            e.setUCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
+            UserCapaXs pUserCapaXs = capaXsPidMapList.get(e.getPId());
+            e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
+            UserCapaXs mUserCapaXs = capaXsMidMapList.get(e.getMId());
+            e.setMCapaXsName(mUserCapaXs!=null?mUserCapaXs.getCapaName():"");
 
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
