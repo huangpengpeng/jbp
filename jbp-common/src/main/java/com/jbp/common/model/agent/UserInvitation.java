@@ -43,25 +43,49 @@ public class UserInvitation extends BaseModel {
     @TableField(exist = false)
     private String uAccount;
 
-    @ApiModelProperty("用户真实姓名")
+    @ApiModelProperty("用户昵称")
     @TableField(exist = false)
-    private String uRealName;
+    private String uNickName;
 
     @ApiModelProperty("邀请上级账户")
     @TableField(exist = false)
     private String pAccount;
 
-    @ApiModelProperty("邀请上级用户真实姓名")
+    @ApiModelProperty("邀请上级用户昵称")
     @TableField(exist = false)
-    private String pRealName;
+    private String pNickName;
 
     @ApiModelProperty("转挂上级账户")
     @TableField(exist = false)
     private String mAccount;
 
-    @ApiModelProperty("转挂用户真实姓名")
+    @ApiModelProperty("转挂用户昵称")
     @TableField(exist = false)
-    private String mRealName;
+    private String mNickNamee;
+
+    @ApiModelProperty("等级ID")
+    @TableField(exist = false)
+    private String uCapaName;
+
+    @ApiModelProperty("星级ID")
+    @TableField(exist = false)
+    private String uCapaXsName;
+
+    @ApiModelProperty("上级等级")
+    @TableField(exist = false)
+    private String pCapaName;
+
+    @ApiModelProperty("上级星级")
+    @TableField(exist = false)
+    private String pCapaXsName;
+
+    @ApiModelProperty("上级等级")
+    @TableField(exist = false)
+    private String mCapaName;
+
+    @ApiModelProperty("上级星级")
+    @TableField(exist = false)
+    private String mCapaXsName;
 
     public Integer getRealPid() {
         return getMId() != null ? getMId() : getPId();

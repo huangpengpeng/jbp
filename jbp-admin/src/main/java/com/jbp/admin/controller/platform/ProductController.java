@@ -123,6 +123,13 @@ public class ProductController {
             @Validated ProductActivitySearchRequest request, @Validated PageParamRequest pageRequest) {
         return CommonResult.success(CommonPage.restPage(productService.getActivitySearchPage(request, pageRequest)));
     }
+    @PreAuthorize("hasAuthority('platform:product:copy')")
+    @ApiOperation(value = "复制")
+    @GetMapping("/copy/{productId}")
+    public CommonResult copy(@PathVariable("productId") Integer productId) {
+        productService.copy(productId);
+        return CommonResult.success();
+    }
 }
 
 

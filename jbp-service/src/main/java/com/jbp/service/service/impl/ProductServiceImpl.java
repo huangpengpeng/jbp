@@ -23,6 +23,7 @@ import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.WalletConfig;
@@ -150,6 +151,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private ProductProfitService productProfitService;
     @Resource
     private ProductAttrService productAttrService;
+    @Resource
+    private ProductCommService productCommService;
 
     /**
      * 获取产品列表Admin
@@ -485,7 +488,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         spd.setDescription(productRequest.getContent().length() > 0 ? systemAttachmentService.clearPrefix(productRequest.getContent(), cdnUrl) : "");
         spd.setType(ProductConstants.PRODUCT_TYPE_NORMAL);
         spd.setProductId(product.getId());
-
+        //tt
         Boolean execute = transactionTemplate.execute(e -> {
             product.setAuditStatus(ProductConstants.AUDIT_STATUS_WAIT);
             if (ifPlatformAdd) {
@@ -1450,8 +1453,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
      * 原始: productId
      */
     @Override
-    public void copy(Integer productId) {
+    public Boolean copy(Integer productId) {
         // 1.复制商品基础信息 product -> productId
+        Boolean execute = transactionTemplate.execute(e -> {
         Product orgProduct = getById(productId);
         Product product = new Product();
         BeanUtils.copyProperties(orgProduct, product, new String[]{"id"});
@@ -1463,6 +1467,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         for (ProductAttr productAttr : attrList) {
             ProductAttr attr = new ProductAttr();
             BeanUtils.copyProperties(productAttr, attr, new String[]{"id", "productId"});
+            attr.setProductId(newProductId);
             productAttrService.save(attr);
             List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(orgProduct.getId(), productAttr.getType());
             for (ProductAttrValue productAttrValue : attrValueList) {
@@ -1480,9 +1485,28 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         ProductDescription productDescription = new ProductDescription();
         ProductDescription orgProductDescription = productDescriptionService.getByProductId(orgProduct.getId());
         BeanUtils.copyProperties(orgProductDescription, productDescription, new String[]{"id", "productId"});
+        productDescription.setProductId(newProductId);
+        productDescriptionService.save(productDescription);
         // 6.复制商品佣金 ProductComm
+        List<ProductComm> productCommList = productCommService.getByProduct(orgProduct.getId());
+        for (ProductComm comm : productCommList) {
+            ProductComm productComm = new ProductComm();
+            BeanUtils.copyProperties(comm, productComm, new String[]{"id", "productId"});
+            productComm.setProductId(newProductId);
+            productCommService.save(productComm);
+        }
         // 7.复制商品配套 ProductProfit
-        //聂孟用
+
+        List<ProductProfit> productProfitList = productProfitService.getByProduct(orgProduct.getId());
+        for (ProductProfit profit : productProfitList) {
+            ProductProfit productProfit = new ProductProfit();
+            BeanUtils.copyProperties(profit, productProfit, new String[]{"id", "productId"});
+            productProfit.setProductId(newProductId);
+            productProfitService.save(productProfit);
+        }
+            return Boolean.TRUE;
+        });
+        return execute;
     }
 
     /**

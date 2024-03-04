@@ -36,19 +36,20 @@ public class UserRelation extends BaseModel {
     @ApiModelProperty("节点")
     @TableField("node")
     private Integer node;
+
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
     private String uAccount;
 
-    @ApiModelProperty("用户真实姓名")
+    @ApiModelProperty("用户昵称")
     @TableField(exist = false)
-    private String uRealName;
+    private String uNickName;
 
     @ApiModelProperty("上级用户账户")
     @TableField(exist = false)
     private String pAccount;
 
-    @ApiModelProperty("上级用户真实姓名")
+    @ApiModelProperty("上级用户昵称")
     @TableField(exist = false)
-    private String pRealName;
+    private String pNickName;
 }

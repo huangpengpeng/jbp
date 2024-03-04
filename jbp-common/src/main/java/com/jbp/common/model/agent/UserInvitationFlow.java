@@ -49,23 +49,31 @@ public class UserInvitationFlow extends BaseModel {
     @TableField(exist = false)
     private String uAccount;
 
-    @ApiModelProperty("用户真实姓名")
+    @ApiModelProperty("用户昵称")
     @TableField(exist = false)
-    private String uRealName;
+    private String uNickName;
 
     @ApiModelProperty("上级用户账户")
     @TableField(exist = false)
     private String pAccount;
 
-    @ApiModelProperty("上级用户真实姓名")
+    @ApiModelProperty("上级用户昵称")
     @TableField(exist = false)
-    private String pRealName;
+    private String pNickName;
 
     @ApiModelProperty("等级ID")
     @TableField(exist = false)
-    private Long capaId;
+    private Long uCapaName;
 
     @ApiModelProperty("星级ID")
     @TableField(exist = false)
-    private Long xsCapaId;
+    private Long uCapaXsName;
+
+    @ApiModelProperty("上级等级")
+    @TableField(exist = false)
+    private Long pCapaName;
+
+    @ApiModelProperty("上级星级")
+    @TableField(exist = false)
+    private Long pCapaXsName;
 }
