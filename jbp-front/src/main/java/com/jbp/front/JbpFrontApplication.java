@@ -1,9 +1,13 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.service.PayService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
+import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.List;
 
 /**
  * 程序主入口
@@ -47,6 +53,9 @@ public class JbpFrontApplication {
 //        bean.pageList(null, null, "", new PageParamRequest());
 //
 
+//        final UserCapaService bean = run.getBean(UserCapaService.class);
+//        final List<UserCapa> list = bean.list();
+//        System.out.println("ok");
 
     }
 

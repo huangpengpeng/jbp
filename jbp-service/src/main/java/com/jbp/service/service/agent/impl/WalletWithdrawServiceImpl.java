@@ -119,7 +119,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
                 throw new CrmebException("提现信息不存在，行号:" + i);
             }
             if (!walletWithdraw.getStatus().equals(WalletWithdraw.StatusEnum.待出款.toString())) {
-                throw new CrmebException("提现状态不是待出库，行号:" + i);
+                throw new CrmebException("提现状态不是待出款，行号:" + i);
             }
             walletWithdraw.setStatus(WalletWithdraw.StatusEnum.已取消.toString());
             walletWithdraw.setRemark(withdrawRequest.getRemark());
