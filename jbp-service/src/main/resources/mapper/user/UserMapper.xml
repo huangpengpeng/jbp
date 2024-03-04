@@ -8,6 +8,12 @@
             <if test="nikename != '' and nikename != null ">
                 and u.nickname like CONCAT('%',#{nikename},'%')
             </if>
+            <if test="account != '' and account !=null ">
+                and u.account like CONCAT('%',#{account},'%')
+            </if>
+            <if test="spreadid !=null ">
+                and u.spread_uid=#{spreadid}
+            </if>
             <if test="phone != '' and phone != null ">
                 and u.phone = #{phone, jdbcType=VARCHAR}
             </if>

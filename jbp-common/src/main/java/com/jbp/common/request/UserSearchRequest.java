@@ -64,4 +64,10 @@ public class UserSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "是否注销,已注销=1，未注销=0")
     private Integer isLogoff;
+
+    @ApiModelProperty(value = "用户账号")
+    private String account;
+
+    @ApiModelProperty(value = "推荐人用户账号")
+    private String spreadAccount;
 }

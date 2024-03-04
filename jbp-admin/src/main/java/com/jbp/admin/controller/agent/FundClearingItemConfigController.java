@@ -8,6 +8,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigPageRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
+import com.jbp.common.request.agent.FundClearingItemConfigUpdateRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.product.comm.ProductCommEnum;
@@ -88,6 +89,36 @@ public class FundClearingItemConfigController {
             return CommonResult.failed("佣金方法的总比例必须等于1");
         }
         fundClearingItemConfigService.save(request);
+        return CommonResult.success();
+    }
+
+    @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:update')")
+    @ApiOperation("修改")
+    @PostMapping("/update")
+    public CommonResult update(@RequestBody @Validated List<FundClearingItemConfigUpdateRequest> request) {
+        if (CollectionUtils.isEmpty(request)) {
+            return CommonResult.failed("发放配置不能为空");
+        }
+        Set<String> set = request.stream().map(FundClearingItemConfigUpdateRequest::getCommName).collect(Collectors.toSet());
+        if (set.size() != 1) {
+            return CommonResult.failed("一次只能配置一类佣金");
+        }
+        BigDecimal scale = BigDecimal.ZERO;
+        for (FundClearingItemConfigUpdateRequest config : request) {
+            scale = scale.add(config.getScale());
+        }
+        if (!ArithmeticUtils.equals(scale, BigDecimal.ONE)) {
+            return CommonResult.failed("佣金方法的总比例必须等于1");
+        }
+        fundClearingItemConfigService.update(request);
+        return CommonResult.success();
+    }
+
+    @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:delect')")
+    @ApiOperation("删除")
+    @GetMapping("/delect/{id}")
+    public CommonResult delect(@PathVariable("id") Integer id) {
+        fundClearingItemConfigService.removeById(id);
         return CommonResult.success();
     }
 

@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,4 +30,8 @@ public class FundClearingItem implements Serializable {
 
     @ApiModelProperty("出款金额")
     private BigDecimal amt;
+
+    @ApiModelProperty("钱包名称")
+    @TableField(exist = false)
+    private String walletName;
 }

@@ -78,6 +78,10 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         List<FundClearing> list = list(lqw);
         list.forEach(e -> {
             e.setAccount(e.getUserInfo().getAccount());
+            for (FundClearingItem item : e.getItems()) {
+                WalletConfig walletConfig = walletConfigService.getByType(item.getWalletType());
+                item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
+            }
         });
         return CommonPage.copyPageInfo(page, list);
     }
@@ -316,12 +320,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 FundClearingVo fundClearingVo = new FundClearingVo();
                 BeanUtils.copyProperties(e, fundClearingVo);
                 ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
-                if(channelIdentity != null){
+                if (channelIdentity != null) {
                     fundClearingVo.setRealName(channelIdentity.getRealName());
                     fundClearingVo.setIdCardNo(channelIdentity.getIdCardNo());
                 }
                 ChannelCard channelCard = channelCardMap.get(e.getUid());
-                if(channelCard != null){
+                if (channelCard != null) {
                     fundClearingVo.setPhone(channelCard.getPhone());
                     fundClearingVo.setBankName(channelCard.getBankName());
                     fundClearingVo.setBankCode(channelCard.getBankCardNo());
