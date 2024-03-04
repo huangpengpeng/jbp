@@ -57,16 +57,4 @@ public class FundClearingItemConfigServiceImpl extends ServiceImpl<FundClearingI
         });
         return CommonPage.copyPageInfo(page, list);
     }
-
-    @Override
-    public void update(List<FundClearingItemConfigUpdateRequest> request) {
-        List<FundClearingItemConfig> updateList = Lists.newArrayList();
-        for (FundClearingItemConfigUpdateRequest configRequest : request) {
-            FundClearingItemConfig clearingItemConfig = new FundClearingItemConfig(configRequest.getCommName(),
-                    configRequest.getName(), configRequest.getScale(), configRequest.getWalletType());
-            updateList.add(clearingItemConfig);
-        }
-        remove(new QueryWrapper<FundClearingItemConfig>().lambda().eq(FundClearingItemConfig::getCommName, request.get(0)));
-        updateBatchById(updateList);
-    }
 }

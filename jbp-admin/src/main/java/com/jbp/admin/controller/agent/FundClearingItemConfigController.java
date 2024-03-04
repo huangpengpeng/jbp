@@ -92,35 +92,5 @@ public class FundClearingItemConfigController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:update')")
-    @ApiOperation("修改")
-    @PostMapping("/update")
-    public CommonResult update(@RequestBody @Validated List<FundClearingItemConfigUpdateRequest> request) {
-        if (CollectionUtils.isEmpty(request)) {
-            return CommonResult.failed("发放配置不能为空");
-        }
-        Set<String> set = request.stream().map(FundClearingItemConfigUpdateRequest::getCommName).collect(Collectors.toSet());
-        if (set.size() != 1) {
-            return CommonResult.failed("一次只能配置一类佣金");
-        }
-        BigDecimal scale = BigDecimal.ZERO;
-        for (FundClearingItemConfigUpdateRequest config : request) {
-            scale = scale.add(config.getScale());
-        }
-        if (!ArithmeticUtils.equals(scale, BigDecimal.ONE)) {
-            return CommonResult.failed("佣金方法的总比例必须等于1");
-        }
-        fundClearingItemConfigService.update(request);
-        return CommonResult.success();
-    }
-
-    @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:delect')")
-    @ApiOperation("删除")
-    @GetMapping("/delect/{id}")
-    public CommonResult delect(@PathVariable("id") Integer id) {
-        fundClearingItemConfigService.removeById(id);
-        return CommonResult.success();
-    }
-
 
 }
