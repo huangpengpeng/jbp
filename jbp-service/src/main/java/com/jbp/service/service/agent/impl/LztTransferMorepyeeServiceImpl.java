@@ -9,6 +9,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.lianlian.result.AcctInfo;
+import com.jbp.common.lianlian.result.LztQueryAcctInfo;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.lianlian.result.TransferMorepyeeResult;
 import com.jbp.common.model.agent.LztAcct;
@@ -179,13 +181,31 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
                 .eq(LztAcctOpen::getStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
                 .apply("TO_DAYS(txn_time) = TO_DAYS(NOW())");
         int todayCount = lztAcctOpenService.count(openLambdaQueryWrapper);
-        openLambdaQueryWrapper.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
+        openLambdaQueryWrapper.apply("TO_DAYS(NOW()) - TO_DAYS(txn_time) = 1");
         int yesterdayTodayCount = lztAcctOpenService.count(openLambdaQueryWrapper);
         map.put("todayCount", todayCount);
         map.put("yesterdayTodayCount", yesterdayTodayCount);
 
         //总金额
-//        lztAcctService.getByUserId()
-        return null;
+        LambdaQueryWrapper<LztAcctOpen> lztAcctOpenLambdaQueryWrapper = new LambdaQueryWrapper<LztAcctOpen>()
+                .eq(ObjectUtil.isNotEmpty(merId), LztAcctOpen::getMerId, merId)
+                .eq(LztAcctOpen::getStatus, LianLianPayConfig.TxnStatus.交易成功.getName());
+        List<String> userIdList = lztAcctOpenService.list(lztAcctOpenLambdaQueryWrapper).stream().map(LztAcctOpen::getUserId).collect(Collectors.toList());
+        BigDecimal totalAmt=new BigDecimal(0);
+        for (String s : userIdList) {
+            LztAcct details = lztAcctService.details(s);
+            List<AcctInfo> acctInfoList = details.getAcctInfoList();
+            for (AcctInfo acctInfo : acctInfoList) {
+                totalAmt.add(new BigDecimal(acctInfo.getAmt_balcur()));
+            }
+            List<LztQueryAcctInfo> bankAcctInfoList = details.getBankAcctInfoList();
+            if (CollectionUtils.isNotEmpty(bankAcctInfoList)) {
+                for (LztQueryAcctInfo lztQueryAcctInfo : bankAcctInfoList) {
+                    totalAmt.add(new BigDecimal(lztQueryAcctInfo.getBank_acct_balance()));
+                }
+            }
+        }
+        map.put("totalAmt",totalAmt);
+        return map;
     }
 }
