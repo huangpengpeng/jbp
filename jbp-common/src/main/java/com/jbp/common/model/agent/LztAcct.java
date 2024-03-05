@@ -55,6 +55,10 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "开通银行虚拟户")
     private Boolean ifOpenBankAcct;
 
+    @ApiModelProperty(value = "银行开户地址")
+    @TableField(exist = false)
+    private String  gatewayUrl;
+
     @ApiModelProperty(value = "连连账户信息")
     @TableField(exist = false)
     private List<AcctInfo> acctInfoList;
