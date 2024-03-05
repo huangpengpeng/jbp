@@ -53,7 +53,8 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
                 .eq(!ObjectUtil.isNull(uid), ChannelIdentity::getUid, uid)
                 .like(StringUtils.isNotEmpty(idCardNo), ChannelIdentity::getIdCardNo, idCardNo)
                 .like(StringUtils.isNotEmpty(realName), ChannelIdentity::getRealName, realName)
-                .like(StringUtils.isNotEmpty(channel), ChannelIdentity::getChannel, channel);
+                .like(StringUtils.isNotEmpty(channel), ChannelIdentity::getChannel, channel)
+                .orderByDesc(ChannelIdentity::getId);
         Page<ChannelIdentity> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelIdentity> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

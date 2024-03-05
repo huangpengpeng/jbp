@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +48,8 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     private LztAcctService lztAcctService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private LztTransferMorepyeeDao dao;
 
     @Override
     public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
@@ -145,5 +148,11 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
             }
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public Map<String, Object> info(Integer merId) {
+        Map<String,Object> map=new HashMap<>();
+        LambdaQueryWrapper<LztTransferMorepyee> lwq=new LambdaQueryWrapper<LztTransferMorepyee>();
     }
 }

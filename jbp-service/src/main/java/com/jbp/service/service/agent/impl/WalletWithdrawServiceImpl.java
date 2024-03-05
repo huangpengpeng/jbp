@@ -43,7 +43,8 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
                 .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
                 .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
-                .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status);
+                .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
+                .orderByDesc(WalletWithdraw::getId);
         Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(lqw));
     }

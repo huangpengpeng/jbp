@@ -37,7 +37,8 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
     public PageInfo<SelfScoreFlow> pageList(Integer uid, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), SelfScoreFlow::getUid, uid)
-                .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action);
+                .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action)
+                .orderByDesc(SelfScoreFlow::getId);
         Page<SelfScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScoreFlow> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

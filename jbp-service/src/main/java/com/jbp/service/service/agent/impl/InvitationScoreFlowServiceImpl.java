@@ -39,7 +39,8 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
         LambdaQueryWrapper<InvitationScoreFlow> lqw = new LambdaQueryWrapper<InvitationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), InvitationScoreFlow::getOrderUid, orderuid)
-                .eq(StringUtils.isNotEmpty(action), InvitationScoreFlow::getAction, action);
+                .eq(StringUtils.isNotEmpty(action), InvitationScoreFlow::getAction, action)
+                .orderByDesc(InvitationScoreFlow::getId);
         Page<InvitationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreFlow> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

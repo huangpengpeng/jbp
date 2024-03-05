@@ -9,6 +9,7 @@ import com.jbp.common.request.PageParamRequest;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee> {
 
@@ -27,4 +28,6 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
     PageInfo<LztTransferMorepyee> pageList(Integer merId, String payerId, String payeeId, String txnSeqno,
                                        String accpTxno, String status, Date startTime, Date endTime,
                                            PageParamRequest pageParamRequest);
+
+    Map<String, Object> info(Integer merId);
 }

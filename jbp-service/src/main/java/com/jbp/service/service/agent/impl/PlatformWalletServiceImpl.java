@@ -45,7 +45,8 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     @Override
     public PageInfo<PlatformWallet> pageList(Integer type, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<PlatformWallet> platformWalletLambdaQueryWrapper = new LambdaQueryWrapper<PlatformWallet>()
-                .eq(!ObjectUtil.isNull(type), PlatformWallet::getType, type);
+                .eq(!ObjectUtil.isNull(type), PlatformWallet::getType, type)
+                .orderByDesc(PlatformWallet::getId);
         Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<PlatformWallet> list = list(platformWalletLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {

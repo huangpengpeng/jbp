@@ -150,7 +150,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         LambdaQueryWrapper<UserInvitation> lwq = new LambdaQueryWrapper<UserInvitation>()
                 .eq(!ObjectUtil.isNull(uid), UserInvitation::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserInvitation::getPId, pid)
-                .eq(!ObjectUtil.isNull(mid), UserInvitation::getMId, mid);
+                .eq(!ObjectUtil.isNull(mid), UserInvitation::getMId, mid)
+                .orderByDesc(UserInvitation::getId);
         Page<UserInvitation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserInvitation> list = list(lwq);
         if (CollectionUtils.isEmpty(list)) {

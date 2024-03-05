@@ -43,7 +43,8 @@ public class OrdersRefundMsgServiceImpl extends ServiceImpl<OrdersRefundMsgDao, 
         LambdaQueryWrapper<OrdersRefundMsg> lqw=new LambdaQueryWrapper<OrdersRefundMsg>()
                 .like(StringUtils.isNotEmpty(ordersSn),OrdersRefundMsg::getOrdersSn,ordersSn)
                 .like(StringUtils.isNotEmpty(refundSn),OrdersRefundMsg::getRefundSn,refundSn)
-                .eq(!ObjectUtil.isNull(ifRead),OrdersRefundMsg::getIfRead,ifRead);
+                .eq(!ObjectUtil.isNull(ifRead),OrdersRefundMsg::getIfRead,ifRead)
+                .orderByDesc(OrdersRefundMsg::getId);
         Page<OrdersRefundMsg> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(lqw));
     }

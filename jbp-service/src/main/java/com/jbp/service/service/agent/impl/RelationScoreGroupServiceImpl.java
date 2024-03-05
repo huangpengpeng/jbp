@@ -34,7 +34,8 @@ public class RelationScoreGroupServiceImpl extends ServiceImpl<RelationScoreGrou
     public PageInfo<RelationScoreGroup> pageList(Integer uid, String groupName, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreGroup> lqw = new LambdaQueryWrapper<RelationScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreGroup::getUid, uid)
-                .like(!ObjectUtil.isNull(groupName) && !groupName.equals(""), RelationScoreGroup::getGroupName, groupName);
+                .like(!ObjectUtil.isNull(groupName) && !groupName.equals(""), RelationScoreGroup::getGroupName, groupName)
+                .orderByDesc(RelationScoreGroup::getId);
         Page<RelationScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
