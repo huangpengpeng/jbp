@@ -78,6 +78,12 @@ public class PlatformOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "配送方式 1=快递 ，2=门店自提")
     private Integer shippingType;
 
+    @ApiModelProperty(value = "用户信息")
+    private String userInfo;
+
+    @ApiModelProperty(value = "付款信息")
+    private String payUserInfo;
+
     @ApiModelProperty(value = "用户昵称")
     private String nickName;
 

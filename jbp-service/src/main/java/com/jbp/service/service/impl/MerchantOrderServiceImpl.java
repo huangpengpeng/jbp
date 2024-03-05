@@ -44,6 +44,13 @@ public class MerchantOrderServiceImpl extends ServiceImpl<MerchantOrderDao, Merc
         return dao.selectList(lqw);
     }
 
+    @Override
+    public List<MerchantOrder> getByOrderNo(List<String> orderNoList) {
+        LambdaQueryWrapper<MerchantOrder> lqw = Wrappers.lambdaQuery();
+        lqw.in(MerchantOrder::getOrderNo, orderNoList);
+        return dao.selectList(lqw);
+    }
+
     /**
      * 根据主订单号获取商户订单（支付完成进行商户拆单后可用）
      * @param orderNo 主订单号
