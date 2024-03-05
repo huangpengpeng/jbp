@@ -35,11 +35,12 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
     private UserService userService;
 
     @Override
-    public PageInfo<InvitationScoreFlow> pageList(Integer uid, Integer orderuid, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScoreFlow> pageList(Integer uid, Integer orderuid, String action,String ordersSn, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScoreFlow> lqw = new LambdaQueryWrapper<InvitationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), InvitationScoreFlow::getOrderUid, orderuid)
                 .eq(StringUtils.isNotEmpty(action), InvitationScoreFlow::getAction, action)
+                .eq(StringUtils.isNotEmpty(ordersSn),InvitationScoreFlow::getOrdersSn,ordersSn)
                 .orderByDesc(InvitationScoreFlow::getId);
         Page<InvitationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreFlow> list = list(lqw);

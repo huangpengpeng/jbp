@@ -161,10 +161,10 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
                 .eq(ObjectUtil.isNotEmpty(merId), LztTransferMorepyee::getPayeeId, merId)
                 .eq(LztTransferMorepyee::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
                 .apply("TO_DAYS(finish_time) = TO_DAYS(NOW())");
-        BigDecimal depositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal todayWepositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
         lwq.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
         BigDecimal yesterdayDepositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        map.put("todayWepositAmount", depositAmount);
+        map.put("todayWepositAmount", todayWepositAmount);
         map.put("yesterdayDepositAmount", yesterdayDepositAmount);
         //出金额
         LambdaQueryWrapper<LztTransferMorepyee> lambdaQueryWrapper = new LambdaQueryWrapper<LztTransferMorepyee>()
