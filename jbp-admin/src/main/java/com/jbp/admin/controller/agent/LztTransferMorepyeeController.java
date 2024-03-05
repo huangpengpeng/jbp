@@ -13,7 +13,6 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.request.PageParamRequest;
 
+import java.util.List;
+
 public interface LztAcctService extends IService<LztAcct> {
 
     LztAcct getByUserId(String userId);
@@ -14,5 +16,4 @@ public interface LztAcctService extends IService<LztAcct> {
     LztAcct details(String userId);
 
     PageInfo<LztAcct> pageList(Integer merId, String userId, String username,  PageParamRequest pageParamRequest);
-
 }
