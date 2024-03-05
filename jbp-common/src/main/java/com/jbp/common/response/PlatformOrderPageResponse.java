@@ -87,6 +87,9 @@ public class PlatformOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "账号")
     private String uAccount;
 
+    @ApiModelProperty(value = "用户手机号")
+    private String uPhone;
+
     @ApiModelProperty(value = "付款用户ID")
     private Integer payUid;
 
@@ -96,6 +99,8 @@ public class PlatformOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "付款账号")
     private String payAccount;
 
+    @ApiModelProperty(value = "付款手机号")
+    private String payPhone;
 
     @ApiModelProperty(value = "用户是否注销")
     private Boolean isLogoff;

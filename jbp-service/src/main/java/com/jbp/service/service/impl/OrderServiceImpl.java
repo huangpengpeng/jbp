@@ -607,12 +607,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 pageResponse.setUAccount(user.getAccount());
                 pageResponse.setNickName(user.getNickname());
                 pageResponse.setIsLogoff(user.getIsLogoff());
+                pageResponse.setUPhone(user.getPhone());
             }
             User payUser = payUserMap.get(e.getPayUid());
             if (payUser != null) {
                 pageResponse.setPayUid(payUser.getId());
                 pageResponse.setPayAccount(payUser.getAccount());
                 pageResponse.setPayNickName(payUser.getNickname());
+                pageResponse.setPayPhone(user.getPhone());
             }
             //设置下单前等级
             OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
