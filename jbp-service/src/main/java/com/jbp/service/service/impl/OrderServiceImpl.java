@@ -603,13 +603,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             pageResponse.setMerRemark(merchantOrder.getMerchantRemark());
             User user = userMap.get(e.getUid());
             if (user != null) {
-                pageResponse.setUserInfo(user.getId() + "|" + user.getAccount() + "|" + user.getNickname() + "|" + user.getPhone());
+                pageResponse.setUid(user.getId());
+                pageResponse.setUAccount(user.getAccount());
                 pageResponse.setNickName(user.getNickname());
                 pageResponse.setIsLogoff(user.getIsLogoff());
             }
             User payUser = payUserMap.get(e.getPayUid());
             if (payUser != null) {
-                pageResponse.setPayUserInfo(payUser.getId() + "|" + payUser.getAccount() + "|" + payUser.getNickname() + "|" + payUser.getPhone());
+                pageResponse.setPayUid(payUser.getId());
+                pageResponse.setPayAccount(payUser.getAccount());
+                pageResponse.setPayNickName(payUser.getNickname());
             }
             //设置下单前等级
             OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
