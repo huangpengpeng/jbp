@@ -742,19 +742,19 @@ public class PayServiceImpl implements PayService {
         }
         BigDecimal finalScore = score;
         Boolean execute = transactionTemplate.execute(e -> {
-            // 1.分销佣金
-            LinkedList<CommCalculateResult> commList = new LinkedList<>();
-            productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+            // 1..资金概况
+            ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
+                    platOrder.getPayPrice().subtract(platOrder.getPayPostage()), finalScore);
             // 2.自有业绩
             selfScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
             // 3.团队业绩
             invitationScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
-            // 4.资金概况
-            ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
-                    platOrder.getPayPrice().subtract(platOrder.getPayPostage()), finalScore);
-            // 5.个人升级
+            // 4.个人升级
             userCapaService.riseCapa(platOrder.getUid());
             userCapaXsService.riseCapaXs(platOrder.getUid());
+            // 5.分销佣金
+            LinkedList<CommCalculateResult> commList = new LinkedList<>();
+            productCommChain.orderSuccessCalculateAmt(platOrder, commList);
             // 订单、佣金
             if (CollUtil.isNotEmpty(brokerageRecordList)) {
                 merchantOrderService.updateBatchById(merchantOrderList);
@@ -773,9 +773,6 @@ public class PayServiceImpl implements PayService {
             billService.saveBatch(billList);
             merchantBillService.saveBatch(merchantBillList);
             orderProfitSharingService.saveBatch(profitSharingList);
-//            profitSharingList.forEach(p -> {
-//                merchantService.operationBalance(p.getMerId(), p.getProfitSharingMerPrice(), Constants.OPERATION_TYPE_ADD);
-//            });
             merchantBalanceRecordService.saveBatch(merchantBalanceRecordList);
             return Boolean.TRUE;
         });

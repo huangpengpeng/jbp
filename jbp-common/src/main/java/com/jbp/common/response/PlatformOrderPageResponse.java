@@ -33,6 +33,12 @@ public class PlatformOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "订单号")
     private String orderNo;
 
+    @ApiModelProperty(value = "平台订单号")
+    private String platOrderNo;
+
+    @ApiModelProperty(value = "下单场景（报单，换购）")
+    private String platform;
+
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
 

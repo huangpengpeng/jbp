@@ -553,13 +553,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     public PageInfo<PlatformOrderPageResponse> getPlatformAdminPage(OrderSearchRequest request, PageParamRequest pageParamRequest) {
         Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
-        lqw.select(Order::getMerId, Order::getOrderNo, Order::getUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
+        lqw.select(Order::getMerId, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
             lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
+        }
+        if (StrUtil.isNotBlank(request.getPlatOrderNo())) {
+            lqw.like(Order::getPlatOrderNo, URLUtil.decode(request.getPlatOrderNo()));
         }
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());

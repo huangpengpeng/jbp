@@ -73,7 +73,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
                 .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
                 .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
-                .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime);
+                .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
+                .orderByDesc(FundClearing::getId);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = list(lqw);
         list.forEach(e -> {
