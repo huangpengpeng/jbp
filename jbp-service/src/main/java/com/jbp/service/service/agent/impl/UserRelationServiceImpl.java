@@ -160,7 +160,8 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
                 .eq(!ObjectUtil.isNull(uid), UserRelation::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserRelation::getPId, pid)
                 .eq(!ObjectUtil.isNull(node), UserRelation::getNode, node)
-                .orderByDesc(UserRelation::getId);
+                .orderByDesc(UserRelation::getId)
+                .orderByAsc(UserRelation::getNode);
         Page<UserRelation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelation> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {

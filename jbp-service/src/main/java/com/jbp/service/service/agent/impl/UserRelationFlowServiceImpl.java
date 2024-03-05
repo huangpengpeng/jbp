@@ -11,6 +11,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.agent.UserRelationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -78,7 +79,8 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                 .eq(!ObjectUtil.isNull(uid), UserRelationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserRelationFlow::getPId, pid)
                 .eq(!ObjectUtil.isNull(level), UserRelationFlow::getLevel, level)
-                .orderByDesc(UserRelationFlow::getId);
+                .orderByDesc(UserRelationFlow::getId)
+                .orderByAsc(UserRelationFlow::getNode);
         Page<UserRelationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelationFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
