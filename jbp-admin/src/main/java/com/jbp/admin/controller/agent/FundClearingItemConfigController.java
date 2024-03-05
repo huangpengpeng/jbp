@@ -8,6 +8,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigPageRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
+import com.jbp.common.request.agent.FundClearingItemConfigUpdateRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.product.comm.ProductCommEnum;

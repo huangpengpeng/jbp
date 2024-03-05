@@ -181,7 +181,6 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         lqw.in(UserCapa::getUid, uIdList);
         List<UserCapa> userList = dao.selectList(lqw);
         Map<Long, Capa> capaMap = capaService.getCapaMap();
-
         userList.forEach(e -> {
             e.setCapaName(capaMap.get(e.getCapaId()).getName());
         });

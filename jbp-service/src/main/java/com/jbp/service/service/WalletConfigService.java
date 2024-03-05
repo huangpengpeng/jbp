@@ -25,6 +25,5 @@ public interface WalletConfigService extends IService<WalletConfig> {
 
     Map<Integer, WalletConfig> getWalletMap();
 
-
     List<UserWalletInfoResponse> getUserWalletInfo();
 }

@@ -9,9 +9,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.FundClearingItemConfig;
 import com.jbp.common.model.agent.WalletConfig;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
+import com.jbp.common.request.agent.FundClearingItemConfigUpdateRequest;
 import com.jbp.service.dao.agent.FundClearingItemConfigDao;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.FundClearingItemConfigService;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
