@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,7 +12,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.lianlian.result.TransferMorepyeeResult;
 import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztFundTransfer;
+import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.agent.LztTransferMorepyee;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
@@ -19,9 +20,9 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztTransferMorepyeeDao;
-import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import com.jbp.service.util.StringUtils;
@@ -49,7 +50,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     @Resource
     private MerchantService merchantService;
     @Resource
-    private LztTransferMorepyeeDao dao;
+    private LztAcctOpenService lztAcctOpenService;
 
     @Override
     public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
@@ -86,7 +87,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(transferMorepyee.getTxnStatus())) {
             return;
         }
-        if(paymentResult.getTxn_status().equals(LianLianPayConfig.TxnStatus.交易成功.getCode())){
+        if (paymentResult.getTxn_status().equals(LianLianPayConfig.TxnStatus.交易成功.getCode())) {
             transferMorepyee.setFinishTime(DateTimeUtils.parseDate(paymentResult.getFinish_time()));
         }
         transferMorepyee.setTxnStatus(LianLianPayConfig.TxnStatus.getName(paymentResult.getTxn_status()));
@@ -152,7 +153,39 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
 
     @Override
     public Map<String, Object> info(Integer merId) {
-        Map<String,Object> map=new HashMap<>();
-        LambdaQueryWrapper<LztTransferMorepyee> lwq=new LambdaQueryWrapper<LztTransferMorepyee>();
+        Map<String, Object> map = new HashMap<>();
+        //入金额
+        LambdaQueryWrapper<LztTransferMorepyee> lwq = new LambdaQueryWrapper<LztTransferMorepyee>()
+                .eq(ObjectUtil.isNotEmpty(merId), LztTransferMorepyee::getPayeeId, merId)
+                .eq(LztTransferMorepyee::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
+                .apply("TO_DAYS(finish_time) = TO_DAYS(NOW())");
+        BigDecimal depositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        lwq.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
+        BigDecimal yesterdayDepositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        map.put("todayWepositAmount", depositAmount);
+        map.put("yesterdayDepositAmount", yesterdayDepositAmount);
+        //出金额
+        LambdaQueryWrapper<LztTransferMorepyee> lambdaQueryWrapper = new LambdaQueryWrapper<LztTransferMorepyee>()
+                .eq(ObjectUtil.isNotEmpty(merId), LztTransferMorepyee::getMerId, merId)
+                .eq(LztTransferMorepyee::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
+                .apply("TO_DAYS(finish_time) = TO_DAYS(NOW())");
+        BigDecimal withdrawalAmount = list(lambdaQueryWrapper).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        lambdaQueryWrapper.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
+        BigDecimal yesterdayWithdrawalAmount = list(lambdaQueryWrapper).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        map.put("todayWithdrawalAmount", withdrawalAmount);
+        map.put("yesterdayWithdrawalAmount", yesterdayWithdrawalAmount);
+        LambdaQueryWrapper<LztAcctOpen> openLambdaQueryWrapper = new LambdaQueryWrapper<LztAcctOpen>()
+                .eq(ObjectUtil.isNotEmpty(merId), LztAcctOpen::getMerId, merId)
+                .eq(LztAcctOpen::getStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
+                .apply("TO_DAYS(txn_time) = TO_DAYS(NOW())");
+        int todayCount = lztAcctOpenService.count(openLambdaQueryWrapper);
+        openLambdaQueryWrapper.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
+        int yesterdayTodayCount = lztAcctOpenService.count(openLambdaQueryWrapper);
+        map.put("todayCount", todayCount);
+        map.put("yesterdayTodayCount", yesterdayTodayCount);
+
+        //总金额
+//        lztAcctService.getByUserId()
+        return null;
     }
 }
