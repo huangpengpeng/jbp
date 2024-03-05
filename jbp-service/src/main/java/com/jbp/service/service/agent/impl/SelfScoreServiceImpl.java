@@ -40,7 +40,8 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     @Override
     public PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScore> lqw = new LambdaQueryWrapper<SelfScore>()
-                .eq(!ObjectUtil.isNull(uid), SelfScore::getUid, uid);
+                .eq(!ObjectUtil.isNull(uid), SelfScore::getUid, uid)
+                .orderByDesc(SelfScore::getId);
         Page<SelfScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScore> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

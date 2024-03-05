@@ -33,7 +33,8 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     @Override
     public PageInfo<RelationScoreFlow> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
-                .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid);
+                .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
+                .orderByDesc(RelationScoreFlow::getId);
         Page<RelationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScoreFlow> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

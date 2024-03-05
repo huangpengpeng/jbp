@@ -27,7 +27,8 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
     @Override
     public PageInfo<OrdersFundSummary> pageList(String ordersSn, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<OrdersFundSummary> lqw = new LambdaQueryWrapper<OrdersFundSummary>()
-                .like(!ObjectUtil.isNull(ordersSn), OrdersFundSummary::getOrdersSn, ordersSn);
+                .like(!ObjectUtil.isNull(ordersSn), OrdersFundSummary::getOrdersSn, ordersSn)
+                .orderByDesc(OrdersFundSummary::getId);
         Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(lqw));
     }

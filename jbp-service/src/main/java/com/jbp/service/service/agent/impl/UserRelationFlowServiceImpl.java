@@ -77,7 +77,8 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         LambdaQueryWrapper<UserRelationFlow> lqw = new LambdaQueryWrapper<UserRelationFlow>()
                 .eq(!ObjectUtil.isNull(uid), UserRelationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserRelationFlow::getPId, pid)
-                .eq(!ObjectUtil.isNull(level), UserRelationFlow::getLevel, level);
+                .eq(!ObjectUtil.isNull(level), UserRelationFlow::getLevel, level)
+                .orderByDesc(UserRelationFlow::getId);
         Page<UserRelationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelationFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {

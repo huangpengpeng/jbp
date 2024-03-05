@@ -36,7 +36,8 @@ public class InvitationScoreGroupServiceImpl extends ServiceImpl<InvitationScore
         LambdaQueryWrapper<InvitationScoreGroup> lqw = new LambdaQueryWrapper<InvitationScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreGroup::getUid, uid)
                 .like(StringUtils.isNotEmpty(groupName), InvitationScoreGroup::getGroupName, groupName)
-                .eq(StringUtils.isNotEmpty(action), InvitationScoreGroup::getAction, action);
+                .eq(StringUtils.isNotEmpty(action), InvitationScoreGroup::getAction, action)
+                .orderByDesc(InvitationScoreGroup::getId);
         Page<InvitationScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

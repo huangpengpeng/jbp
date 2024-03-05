@@ -109,7 +109,8 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         LambdaQueryWrapper<UserInvitationFlow> lqw = new LambdaQueryWrapper<UserInvitationFlow>()
                 .eq(!ObjectUtil.isNull(uid), UserInvitationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserInvitationFlow::getPId, pid)
-                .eq(!ObjectUtil.isNull(level), UserInvitationFlow::getLevel, level);
+                .eq(!ObjectUtil.isNull(level), UserInvitationFlow::getLevel, level)
+                .orderByDesc(UserInvitationFlow::getId);
         Page<UserInvitationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserInvitationFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {

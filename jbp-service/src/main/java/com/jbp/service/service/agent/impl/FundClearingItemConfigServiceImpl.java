@@ -48,7 +48,8 @@ public class FundClearingItemConfigServiceImpl extends ServiceImpl<FundClearingI
     @Override
     public PageInfo<FundClearingItemConfig> pageList(String commName, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<FundClearingItemConfig> lqw = new LambdaQueryWrapper<FundClearingItemConfig>()
-                .like(StringUtils.isNotEmpty(commName), FundClearingItemConfig::getCommName, commName);
+                .like(StringUtils.isNotEmpty(commName), FundClearingItemConfig::getCommName, commName)
+                .orderByDesc(FundClearingItemConfig::getId);
         Page<FundClearingItemConfig> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearingItemConfig> list = list(lqw);
         list.forEach(e -> {

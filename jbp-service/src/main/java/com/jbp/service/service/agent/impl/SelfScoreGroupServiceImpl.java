@@ -35,7 +35,8 @@ public class SelfScoreGroupServiceImpl extends ServiceImpl<SelfScoreGroupDao, Se
         LambdaQueryWrapper<SelfScoreGroup> lqw = new LambdaQueryWrapper<SelfScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), SelfScoreGroup::getUid, uid)
                 .like(!ObjectUtil.isNull(groupName)&&!groupName.equals(""),SelfScoreGroup::getGroupName,groupName)
-                .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreGroup::getAction, action);
+                .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreGroup::getAction, action)
+                .orderByDesc(SelfScoreGroup::getId);
         Page<SelfScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

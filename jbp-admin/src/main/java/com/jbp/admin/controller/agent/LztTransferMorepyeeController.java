@@ -13,6 +13,7 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin/agent/lzt/transfer/morepyee")
@@ -73,5 +75,12 @@ public class LztTransferMorepyeeController {
         PageInfo<LztTransferMorepyee> page = lztTransferMorepyeeService.pageList(merId, payerId, payeeId, txnSeqno,
                 accpTxno, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
+    }
+
+    @GetMapping("/info")
+    @ApiOperation("统计")
+    public CommonResult<Map<String, Object>> info() {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(lztTransferMorepyeeService.info(systemAdmin.getMerId()));
     }
 }
