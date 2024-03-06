@@ -43,14 +43,14 @@ public class JbpAdminApplication {
 //        final LztAcctApply apply = bean.apply(4, "gz0001", "274112473", "凯赞办公用品旗舰店",
 //                "浙江省", "金华市", "义乌市", "江东街道青岩刘C区6栋2单元202");
 
-        final LztAcctService lztAcctService = run.getBean(LztAcctService.class);
-        final MerchantService merchantService = run.getBean(MerchantService.class);
-        final LztService lztService = run.getBean(LztService.class);
-        final LztAcct lztAcct = lztAcctService.getByUserId("gz0002");
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        final LztQueryAcctInfoResult lztQueryAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId());
-
+//        final LztAcctService lztAcctService = run.getBean(LztAcctService.class);
+//        final MerchantService merchantService = run.getBean(MerchantService.class);
+//        final LztService lztService = run.getBean(LztService.class);
+//        final LztAcct lztAcct = lztAcctService.getByUserId("gz0002");
+//        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+//        MerchantPayInfo payInfo = merchant.getPayInfo();
+//        final LztQueryAcctInfoResult lztQueryAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId());
+//
 
         System.out.println("ok");
 
