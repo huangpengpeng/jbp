@@ -13,7 +13,7 @@ public interface LztAcctApplyService extends IService<LztAcctApply> {
     LztAcctApply apply(Integer merId, String userId, String shopId, String shopName,
                        String province, String city, String area, String address);
 
-    LztAcctApply refresh(String userId);
+    LztAcctApply refresh(String userId, String notifyInfo);
 
     LztAcctApply getByUserId(String userId);
 

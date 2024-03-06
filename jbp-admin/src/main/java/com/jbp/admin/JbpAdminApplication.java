@@ -1,10 +1,17 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
+import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.service.service.LztService;
+import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.LztAcctApplyService;
+import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -35,6 +42,14 @@ public class JbpAdminApplication {
 
 //        final LztAcctApply apply = bean.apply(4, "gz0001", "274112473", "凯赞办公用品旗舰店",
 //                "浙江省", "金华市", "义乌市", "江东街道青岩刘C区6栋2单元202");
+
+        final LztAcctService lztAcctService = run.getBean(LztAcctService.class);
+        final MerchantService merchantService = run.getBean(MerchantService.class);
+        final LztService lztService = run.getBean(LztService.class);
+        final LztAcct lztAcct = lztAcctService.getByUserId("gz0002");
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        final LztQueryAcctInfoResult lztQueryAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId());
 
 
         System.out.println("ok");

@@ -61,6 +61,10 @@ public class LztAcctApply extends BaseModel {
     @ApiModelProperty(value = "开户返回消息")
     private String retMsg;
 
+    @ApiModelProperty(value = "通知信息")
+    private String notifyInfo;
+
+
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;

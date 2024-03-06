@@ -73,7 +73,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     }
 
     @Override
-    public LztAcctApply refresh(String userId) {
+    public LztAcctApply refresh(String userId, String notifyInfo) {
         LztAcctApply lztAcctApply = getByUserId(userId);
         Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
@@ -84,6 +84,9 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             lztAcctApply.setStatus(acctState.getCode());
         }
         lztAcctApply.setRetMsg(result.getRet_msg());
+        if(StringUtils.isNotEmpty(notifyInfo)){
+            lztAcctApply.setNotifyInfo(notifyInfo);
+        }
         updateById(lztAcctApply);
         return lztAcctApply;
     }
