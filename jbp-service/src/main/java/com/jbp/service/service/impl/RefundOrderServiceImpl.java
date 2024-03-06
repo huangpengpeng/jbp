@@ -15,6 +15,8 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.WalletConfig;
+import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantAddress;
 import com.jbp.common.model.order.*;
@@ -31,6 +33,7 @@ import com.jbp.common.vo.WxRefundVo;
 import com.jbp.service.dao.RefundOrderDao;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.PlatformWalletService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,12 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private MerchantOrderService merchantOrderService;
     @Autowired
     private SystemAttachmentService systemAttachmentService;
+    @Autowired
+    private PlatformWalletService platformWalletService;
+    @Autowired
+    private LianLianPayService lianLianPayService;
+    @Autowired
+    private WalletConfigService walletConfigService;
 
     /**
      * 商户端退款订单分页列表
@@ -1296,6 +1305,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 throw new CrmebException("支付宝申请退款失败！" + e.getMessage());
             }
         }
+        if (order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                User user = userService.getById(order.getPayUid());
+                lianLianPayService.refund(user.getAccount(), order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CrmebException("连连退款失败！" + e.getMessage());
+            }
+        }
 
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() - refundOrderInfo.getApplyRefundNum());
         orderDetail.setRefundNum(orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum());
@@ -1306,6 +1324,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             orderDetailService.updateById(orderDetail);
             refundOrderInfoService.updateById(refundOrderInfo);
             refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUNDING);
+
             if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
                 if (refundOrder.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
@@ -1321,6 +1340,13 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                     userBalanceRecord.setBalance(user.getNowMoney().add(refundOrder.getRefundPrice()));
                     userBalanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_ORDER_REFUND, refundOrder.getRefundPrice()));
                     userBalanceRecordService.save(userBalanceRecord);
+                }
+            }
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) ) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+                if (refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+                    WalletConfig walletConfig = walletConfigService.getCanPay();
+                    platformWalletService.transferToUser(refundOrder.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                 }
             }
             updateById(refundOrder);
