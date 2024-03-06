@@ -31,6 +31,11 @@ public interface RefundOrderService extends IService<RefundOrder> {
     PageInfo<MerchantRefundOrderPageResponse> getMerchantAdminPage(RefundOrderSearchRequest request);
 
     /**
+     * 退款申请
+     */
+    Boolean refundApply(OrderRefundApplyRequest request);
+
+    /**
      * 获取商户端退款订单各状态数量
      * @param dateLimit 时间参数
      * @return RefundOrderCountItemResponse

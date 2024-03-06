@@ -1787,6 +1787,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrder.setOrderNo(order.getOrderNo());
         refundOrder.setMerId(order.getMerId());
         refundOrder.setUid(order.getUid());
+        refundOrder.setPayUid(merchantOrder.getPayUid());
         refundOrder.setRealName(merchantOrder.getRealName());
         refundOrder.setUserPhone(merchantOrder.getUserPhone());
         refundOrder.setUserAddress(merchantOrder.getUserAddress());
@@ -1799,6 +1800,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrder.setRefundPlatCouponPrice(merchantOrder.getPlatCouponPrice());
         refundOrder.setAfterSalesType(request.getAfterSalesType());
         refundOrder.setReturnGoodsType(request.getReturnGoodsType());
+        refundOrder.setRefundWalletFee(merchantOrder.getWalletDeductionFee());
+        refundOrder.setRefundWalletList(merchantOrder.getWalletDeductionList());
 
         RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
         refundOrderInfo.setRefundOrderNo(refundOrder.getRefundOrderNo());
@@ -1814,17 +1817,29 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrderInfo.setProductType(orderDetail.getProductType());
         refundOrderInfo.setPayPrice(orderDetail.getPayPrice());
         refundOrderInfo.setApplyRefundNum(request.getNum());
+        refundOrderInfo.setRefundWalletFee(orderDetail.getWalletDeductionFee());
+        refundOrderInfo.setRefundWalletList(orderDetail.getWalletDeductionList());
+
         // 临时性计算退款金额、积分
         if (request.getNum().equals(orderDetail.getPayNum())) {
             refundOrderInfo.setRefundPrice(orderDetail.getPayPrice());
             refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral());
             refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral());
             refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
+            refundOrderInfo.getRefundWalletList().forEach(w->{
+                w.setRefundFee(w.getDeductionFee());
+            });
         } else {
             refundOrderInfo.setRefundUseIntegral(0);
             refundOrderInfo.setRefundGainIntegral(0);
+            refundOrderInfo.setRefundWalletFee(BigDecimal.ZERO);
+            refundOrderInfo.getRefundWalletList().forEach(w -> {
+                w.setRefundFee(BigDecimal.ZERO);
+            });
+
             BigDecimal ratio = new BigDecimal(request.getNum().toString()).divide(new BigDecimal(orderDetail.getPayNum().toString()), 10, BigDecimal.ROUND_HALF_UP);
             refundOrderInfo.setRefundPrice(orderDetail.getPayPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+
             if (orderDetail.getUseIntegral() > 0) {
                 refundOrderInfo.setRefundUseIntegral(new BigDecimal(orderDetail.getUseIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             }
@@ -1834,14 +1849,25 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
                 refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
+            if(CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
+                BigDecimal refundWalletFee = BigDecimal.ZERO;
+                for (ProductDeduction deduction : refundOrderInfo.getRefundWalletList()) {
+                    if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
+                        deduction.setRefundFee(deduction.getDeductionFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+                        refundWalletFee = refundWalletFee.add(deduction.getRefundFee());
+                    }
+                }
+                refundOrderInfo.setRefundWalletFee(refundWalletFee);
+            }
             refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
         }
-
         refundOrder.setRefundPrice(refundOrderInfo.getRefundPrice());
         refundOrder.setRefundUseIntegral(refundOrderInfo.getRefundUseIntegral());
         refundOrder.setRefundGainIntegral(refundOrderInfo.getRefundGainIntegral());
         refundOrder.setRefundPlatCouponPrice(refundOrderInfo.getRefundPlatCouponPrice());
         refundOrder.setRefundFreightFee(refundOrderInfo.getRefundFreightFee());
+        refundOrder.setRefundWalletFee(refundOrderInfo.getRefundWalletFee());
+        refundOrder.setRefundWalletList(refundOrderInfo.getRefundWalletList());
 
         order.setRefundStatus(OrderConstants.ORDER_REFUND_STATUS_APPLY);
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());

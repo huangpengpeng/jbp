@@ -181,6 +181,8 @@ public class OrderDetail implements Serializable {
     @ApiModelProperty(value = "退运费金额")
     private BigDecimal refundFreightFee;
 
+
+
     @ApiModelProperty(value = "商品条码")
     private String barCode;
 
