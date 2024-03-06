@@ -940,7 +940,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderVoString = redisUtil.get(key).toString();
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         User user = userService.getInfo();
-        if(user.getId() != orderInfoVo.getPayUserId()){
+        if(!user.getId().equals(orderInfoVo.getPayUserId())){
             throw new CrmebException("不能操作其他人的订单");
         }
         return computedPrice(request, orderInfoVo, user);
