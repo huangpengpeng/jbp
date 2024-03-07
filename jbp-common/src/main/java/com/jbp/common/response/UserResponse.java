@@ -118,4 +118,7 @@ public class UserResponse {
     @ApiModelProperty(value = "团队")
     private String teamName;
 
+    @ApiModelProperty(value = "是否开店")
+    private Boolean openShop;
+
 }

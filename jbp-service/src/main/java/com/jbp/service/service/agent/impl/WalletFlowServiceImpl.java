@@ -67,6 +67,20 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
+    public PageInfo<WalletFlow> pageWalletList(Integer uid, Integer type, String action, PageParamRequest pageParamRequest) {
+
+        LambdaQueryWrapper<WalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<WalletFlow>()
+                .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
+                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
+                .eq(!ObjectUtil.isEmpty(action), WalletFlow::getAction, action)
+                .orderByDesc(WalletFlow::getId);
+        Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<WalletFlow> list = list(walletLambdaQueryWrapper);
+
+        return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
     public List<WalletFlow> details(Integer uid, String action) {
         LambdaQueryWrapper<WalletFlow> wrapper=new LambdaQueryWrapper<WalletFlow>()
                 .eq(StringUtils.isNotEmpty(action),WalletFlow::getAction,action )

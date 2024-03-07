@@ -200,7 +200,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (StrUtil.isBlank(request.getKeywords())) {
             LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
             //代购订单
-            if (request.getAgent()) {
+            if(request.getAgent() != null && request.getAgent()){
                 lqw.eq(Order::getPayUid, userId);
                 lqw.ne(Order::getUid, userId);
             } else {

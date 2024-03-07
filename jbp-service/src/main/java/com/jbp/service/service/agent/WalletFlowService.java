@@ -16,5 +16,8 @@ public interface WalletFlowService extends IService<WalletFlow> {
 
     PageInfo<WalletFlow> pageList(Integer uid, Integer type, PageParamRequest pageParamRequest);
 
+
+    PageInfo<WalletFlow> pageWalletList(Integer uid, Integer type, String action,PageParamRequest pageParamRequest);
+
     List<WalletFlow> details(Integer uid, String action);
 }
