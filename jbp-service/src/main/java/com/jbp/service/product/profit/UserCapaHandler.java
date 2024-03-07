@@ -10,9 +10,14 @@ import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderProductProfit;
+import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.product.Product;
+import com.jbp.common.response.RefundOrderInfoResponse;
 import com.jbp.service.service.OrderProductProfitService;
 import com.jbp.service.service.ProductService;
+import com.jbp.service.service.RefundOrderService;
+import com.jbp.service.service.agent.OrdersRefundMsgService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
 import com.jbp.service.service.agent.UserCapaService;
@@ -43,6 +48,10 @@ public class UserCapaHandler implements ProductProfitHandler {
     private ProductService productService;
     @Resource
     private ProductProfitConfigService configService;
+    @Resource
+    private OrdersRefundMsgService refundMsgService;
+    @Resource
+    private RefundOrderService refundOrderService;
 
 
     @Override
@@ -96,18 +105,33 @@ public class UserCapaHandler implements ProductProfitHandler {
         if (userCapa != null && NumberUtil.compare(userCapa.getCapaId(), capaId) >= 0) {
             return;
         }
+        String oldCapaName = userCapa == null ? "" : userCapa.getCapaName();
         // 产品配置升级信息大于当前用户等级 执行升级
         Product product = productService.getById(exceProductProfit.getProductId());
         userCapaService.saveOrUpdateCapa(order.getUid(), capaId,
                 "订单支付成功产品:" + product.getName() + ", 权益设置直升等级", order.getOrderNo());
+        userCapa = userCapaService.getByUser(order.getUid());
+        String newCapaName = userCapa == null ? "" : userCapa.getCapaName();
         // 订单权益记录
+        StringBuilder profitPostscript  = new StringBuilder();
+        profitPostscript.append("下单前等级【"+oldCapaName+"】").append("下单后等级【"+newCapaName+"】");
         orderProductProfitService.save(order.getId(), order.getOrderNo(), product.getId(), getType(),
-                ProductProfitEnum.等级.getName(), exceProductProfit.getRule());
+                ProductProfitEnum.等级.getName(), exceProductProfit.getRule(), profitPostscript.toString());
     }
 
     @Override
-    public void orderRefund(Order order) {
-        // 退款不处理等级 连续下单的情况
+    public void orderRefund(Order order, RefundOrder refundOrder) {
+        // 平台单号
+        String orderNo = StringUtil.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() : order.getPlatOrderNo();
+        List<OrderProductProfit> list = orderProductProfitService.getByOrder(orderNo, getType(), OrderProductProfit.Constants.成功.name());
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        RefundOrderInfoResponse refundDetail = refundOrderService.getRefundOrderDetailByRefundOrderNo(refundOrder.getRefundOrderNo());
+        for (OrderProductProfit productProfit : list) {
+            String context = "购买订单增加【" + ProductProfitEnum.等级.getName() + "】, 商品名称【" + refundDetail.getProductName() + "】收益名称【" + productProfit.getProfitName() + "】收益说明【" + productProfit.getPostscript() + "】";
+            refundMsgService.create(orderNo, refundOrder.getRefundOrderNo(), context);
+        }
     }
 
     /**

@@ -13,16 +13,16 @@ import java.util.List;
 @Service
 public class OrderProductProfitServiceImpl extends ServiceImpl<OrderProductProfitDao, OrderProductProfit> implements OrderProductProfitService {
     @Override
-    public OrderProductProfit save(Integer orderId, String orderNo, Integer productId, Integer profitType, String profitName, String rule) {
-        OrderProductProfit profit = new OrderProductProfit(orderId, orderNo, productId, profitType, profitName, rule);
+    public OrderProductProfit save(Integer orderId, String orderNo, Integer productId, Integer profitType, String profitName, String rule, String postscript) {
+        OrderProductProfit profit = new OrderProductProfit(orderId, orderNo, productId, profitType, profitName, rule, postscript);
         save(profit);
         return profit;
     }
 
     @Override
-    public List<OrderProductProfit> getByOrder(Integer orderId, Integer profitType, String status) {
+    public List<OrderProductProfit> getByOrder(String orderNo, Integer profitType, String status) {
         return list(new QueryWrapper<OrderProductProfit>().lambda()
-                .eq(OrderProductProfit::getOrderId, orderId)
+                .eq(OrderProductProfit::getOrderNo, orderNo)
                 .eq(OrderProductProfit::getProfitType, profitType)
                 .eq(OrderProductProfit::getStatus, status));
     }

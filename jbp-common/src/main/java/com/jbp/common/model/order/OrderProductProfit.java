@@ -15,13 +15,14 @@ import lombok.experimental.Accessors;
 @ApiModel(value="OrderProductProfit对象", description="订单商品收益")
 public class OrderProductProfit extends BaseModel {
 
-    public OrderProductProfit(Integer orderId, String orderNo, Integer productId, Integer profitType, String profitName, String rule) {
+    public OrderProductProfit(Integer orderId, String orderNo, Integer productId, Integer profitType, String profitName, String rule, String postscript) {
         this.orderId = orderId;
         this.orderNo = orderNo;
         this.productId = productId;
         this.profitType = profitType;
         this.profitName = profitName;
         this.rule = rule;
+        this.postscript = postscript;
         this.status = Constants.成功.name();
     }
 
@@ -47,7 +48,10 @@ public class OrderProductProfit extends BaseModel {
     @ApiModelProperty(value = "收益规则")
     private String rule;
 
-    @ApiModelProperty(value = "状态 成功, 退回, 待定")
+    @ApiModelProperty(value = "收益附言")
+    private String postscript;
+
+    @ApiModelProperty(value = "状态 成功, 退回")
     private String status;
 
     @ApiModelProperty(value = "备注")
