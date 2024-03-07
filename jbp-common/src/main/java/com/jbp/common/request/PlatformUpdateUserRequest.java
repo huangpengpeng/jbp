@@ -25,8 +25,8 @@ public class PlatformUpdateUserRequest implements Serializable {
     @ApiModelProperty(value = "性别，0未知，1男，2女，3保密")
     private Integer sex;
 
-    @ApiModelProperty(value = "真实姓名")
-    private String realName;
+    @ApiModelProperty(value = "用户昵称")
+    private String nickname;
 
     @ApiModelProperty(value = "手机号码")
     private String phone;
