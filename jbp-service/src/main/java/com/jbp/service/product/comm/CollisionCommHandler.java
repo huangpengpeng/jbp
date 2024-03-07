@@ -213,6 +213,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
         }
     }
 
+
     public static void main(String[] args) {
         Rule rule = new Rule();
         List<CapaRatio> capaRatioList = Lists.newArrayList();

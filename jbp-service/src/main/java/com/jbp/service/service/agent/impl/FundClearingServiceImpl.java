@@ -112,6 +112,15 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
+    public List<FundClearing> getByExternalNo(String externalNo, List<String> statusList) {
+        QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(FundClearing::getExternalNo, externalNo)
+                .in(FundClearing::getStatus, statusList);
+        return list(queryWrapper);
+    }
+
+    @Override
     public List<FundClearing> getByUser(Integer uid, String commName, List<String> statusList) {
         QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
@@ -153,6 +162,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 .eq(FundClearing::getExternalNo, externalNo)
                 .eq(FundClearing::getStatus, FundClearing.Constants.已创建.toString());
         List<FundClearing> list = list(queryWrapper);
+        if(CollectionUtils.isEmpty(list)){
+            return;
+        }
         for (FundClearing fundClearing : list) {
             fundClearing.setStatus(FundClearing.Constants.待审核.toString());
             fundClearing.setRemark(remark);

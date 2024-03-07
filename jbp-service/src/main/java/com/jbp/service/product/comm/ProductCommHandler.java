@@ -25,4 +25,5 @@ public interface ProductCommHandler {
      * @param resultList  佣金集合【佣金存在依赖关系所以计算结果要在各个佣金中流转】
      */
      void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList);
+
 }

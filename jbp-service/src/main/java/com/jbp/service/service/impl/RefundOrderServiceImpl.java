@@ -15,6 +15,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.merchant.Merchant;
@@ -31,9 +32,13 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.RefundOrderDetailOrderInfoVo;
 import com.jbp.common.vo.WxRefundVo;
 import com.jbp.service.dao.RefundOrderDao;
+import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.product.profit.ProductProfitChain;
+import com.jbp.service.product.profit.ProductProfitHandler;
 import com.jbp.service.service.*;
 
 import com.jbp.service.service.agent.PlatformWalletService;
+import com.jbp.service.service.agent.ProductProfitService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +105,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private LianLianPayService lianLianPayService;
     @Autowired
     private WalletConfigService walletConfigService;
+    @Autowired
+    private ProductProfitChain productProfitChain;
+    @Autowired
+    private ProductCommChain productCommChain;
 
     /**
      * 商户端退款订单分页列表
@@ -1031,7 +1040,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             throw new CrmebException("退款单状态异常");
         }
         refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REVOKE);
-
+        productCommChain.orderRefundIntercept(orderService.getByOrderNo(refundOrder.getOrderNo()));
         return updateById(refundOrder);
     }
 
@@ -1086,6 +1095,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             Boolean execute =  transactionTemplate.execute(e -> {
                 updateById(refundOrder);
                 refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
+                productCommChain.orderRefundIntercept(order);
                 return Boolean.TRUE;
             });
             return execute;
@@ -1159,6 +1169,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             orderDetailService.updateById(orderDetail);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
+            productCommChain.orderCancelIntercept(order);
             return Boolean.TRUE;
         });
         if (execute) {
@@ -1349,8 +1360,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                     platformWalletService.transferToUser(refundOrder.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                 }
             }
+
             updateById(refundOrder);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
+            productProfitChain.orderRefund(order, refundOrder);
             return Boolean.TRUE;
         });
         if (execute) {

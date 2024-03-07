@@ -19,6 +19,7 @@ import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
+import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -173,6 +174,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private UserRelationService relationService;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private ProductCommChain productCommChain;
 
 
 
@@ -1877,6 +1880,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             refundOrderService.save(refundOrder);
             refundOrderInfoService.save(refundOrderInfo);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_APPLY, "用户发起退款单申请");
+            productCommChain.orderRefundIntercept(order);
             return Boolean.TRUE;
         });
         if (!execute) throw new CrmebException("申请退款失败");

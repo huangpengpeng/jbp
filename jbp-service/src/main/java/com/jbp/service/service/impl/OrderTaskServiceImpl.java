@@ -766,7 +766,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         Boolean execute = transactionTemplate.execute(e -> {
             // 佣金发放待审核
             fundClearingService.updateWaitAudit(platOrderNo, "订单收货");
-            fundClearingService.updateWaitAudit(orderNo, "订单收货");
             String merchantShareNode = nodeRecord.getStr(SysConfigConstants.MERCHANT_SHARE_NODE);
             if (StrUtil.isNotBlank(merchantShareNode) && "pay".equals(merchantShareNode)) {
                 String merchantShareNodeFreezeDayStr = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME);

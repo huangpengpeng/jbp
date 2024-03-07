@@ -19,6 +19,8 @@ public interface FundClearingService extends IService<FundClearing> {
                      List<FundClearingItem> items, List<FundClearingProduct> productList,
                      String description, String remark);
 
+    List<FundClearing> getByExternalNo(String externalNo, List<String> statusList);
+
     List<FundClearing> getByUser(Integer uid, String commName, List<String> statusList);
 
 
