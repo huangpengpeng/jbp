@@ -209,10 +209,10 @@ public class LoginServiceImpl implements LoginService {
         //查询用户信息
         User user = userService.getByAccount(loginRequest.getAccount());
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
-            throw new CrmebException("用户名或密码不正确");
+            throw new CrmebException("账号或密码不正确");
         }
         if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getAccount()).equals(user.getPwd())) {
-            throw new CrmebException("用户名或密码不正确");
+            throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
             throw new CrmebException("当前帐户已禁用，请与管理员联系！");
@@ -229,10 +229,10 @@ public class LoginServiceImpl implements LoginService {
         //查询用户信息
         User user = userService.getByAccount(loginRequest.getAccount());
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
-            throw new CrmebException("用户名或密码不正确");
+            throw new CrmebException("账号或密码不正确");
         }
         if (!CrmebUtil.encryptPassword(loginRequest.getPassword(),loginRequest.getAccount()).equals(user.getPwd())) {
-            throw new CrmebException("用户名或密码不正确");
+            throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
             throw new CrmebException("当前帐户已禁用，请与管理员联系！");
