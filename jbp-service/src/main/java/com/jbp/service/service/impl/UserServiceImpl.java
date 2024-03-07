@@ -1494,12 +1494,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return CommonPage.copyPageInfo(page, userInviteResponseList);
     }
 
-    public void updateUser(Integer id, String pwd, Integer sex, String realName, String phone, String country, String province, String city, String district, String address, String payPwd) {
+    public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province, String city, String district, String address, String payPwd) {
         User user  = getById(id);
         LambdaUpdateWrapper<User> lqw = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, id)
                 .set(ObjectUtil.isNotEmpty(sex), User::getSex, sex)
-                .set(ObjectUtil.isNotEmpty(realName) && !realName.equals(""), User::getRealName, realName)
+                .set(ObjectUtil.isNotEmpty(nickname) && !nickname.equals(""), User::getNickname, nickname)
                 .set(ObjectUtil.isNotEmpty(phone) && !phone.equals(""), User::getPhone, phone)
                 .set(ObjectUtil.isNotEmpty(country) && !country.equals(""), User::getCountry, country)
                 .set(ObjectUtil.isNotEmpty(province) && !province.equals(""), User::getProvince, province)

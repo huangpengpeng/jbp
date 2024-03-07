@@ -203,7 +203,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             if(request.getAgent() != null && request.getAgent()){
                 lqw.eq(Order::getPayUid, userId);
                 lqw.ne(Order::getUid, userId);
-            }else {
+            } else {
                 lqw.eq(Order::getUid, userId);
             }
             if (request.getStatus() >= 0) {
@@ -585,7 +585,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         Map<Integer, User> payUserMap = userService.getUidMapList(payUidList);
         List<Integer> merIdList = orderList.stream().map(Order::getMerId).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = Maps.newConcurrentMap();
-        if(CollectionUtils.isEmpty(merIdList)){
+        if (CollectionUtils.isEmpty(merIdList)) {
             merchantMap = merchantService.getMerIdMapByIdList(merIdList);
         }
         List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
@@ -614,11 +614,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 pageResponse.setPayUid(payUser.getId());
                 pageResponse.setPayAccount(payUser.getAccount());
                 pageResponse.setPayNickName(payUser.getNickname());
-                pageResponse.setPayPhone(user.getPhone());
+                pageResponse.setPayPhone(user != null ? user.getPhone() : "");
             }
             //设置下单前等级
             OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
-            if(orderExt != null) {
+            if (orderExt != null) {
                 if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
                     Capa capa = capaService.getById(orderExt.getCapaId());
                     pageResponse.setCapaName(capa != null ? capa.getName() : "");
@@ -632,7 +632,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             Merchant merchant = finalMerchantMap.get(e.getMerId());
             if (merchant != null) {
                 pageResponse.setMerName(merchant.getName());
-            }else{
+            } else {
                 pageResponse.setMerName("平台");
             }
             return pageResponse;

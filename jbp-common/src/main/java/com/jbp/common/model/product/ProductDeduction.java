@@ -31,4 +31,7 @@ public class ProductDeduction implements Serializable {
     @ApiModelProperty(value = "PV金额")
     private BigDecimal pvFee;
 
+    @ApiModelProperty(value = "退金额")
+    private BigDecimal refundFee;
+
 }

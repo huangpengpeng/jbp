@@ -8,6 +8,7 @@ import com.jbp.common.response.MerchantRefundOrderPageResponse;
 import com.jbp.common.response.RefundOrderAdminDetailResponse;
 import com.jbp.common.response.RefundOrderCountItemResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.RefundOrderService;
 
 import io.swagger.annotations.Api;
@@ -71,27 +72,18 @@ public class RefundOrderController {
         return CommonResult.failed();
     }
 
-//    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单退款")
-//    @PreAuthorize("hasAuthority('merchant:refund:order:refund')")
-//    @ApiOperation(value = "订单退款")
-//    @RequestMapping(value = "/refund", method = RequestMethod.GET)
-//    public CommonResult<String> refund(@ModelAttribute @Validated OrderRefundAuditRequest request) {
-//        if (refundOrderService.refund(request)) {
-//            return CommonResult.success();
-//        }
-//        return CommonResult.failed();
-//    }
-//
-//    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单拒绝退款")
-//    @PreAuthorize("hasAuthority('merchant:refund:order:refund:refuse')")
-//    @ApiOperation(value = "拒绝退款")
-//    @RequestMapping(value = "/refund/refuse", method = RequestMethod.GET)
-//    public CommonResult<String> refundRefuse(@ModelAttribute @Validated OrderRefundAuditRequest request) {
-//        if (refundOrderService.refundRefuse(request)) {
-//            return CommonResult.success();
-//        }
-//        return CommonResult.failed();
-//    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单退款申请")
+    @PreAuthorize("hasAuthority('merchant:refund:order:apply')")
+    @ApiOperation(value = "订单退款申请")
+    @RequestMapping(value = "/apply", method = RequestMethod.POST)
+    public CommonResult<Boolean> refundApply(@RequestBody @Validated OrderRefundApplyRequest request) {
+        if(refundOrderService.refundApply(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
+
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "退款单审核")
     @PreAuthorize("hasAuthority('merchant:refund:order:audit')")
