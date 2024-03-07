@@ -3,6 +3,7 @@ package com.jbp.common.request;
 import com.jbp.common.exception.CrmebException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -48,6 +49,9 @@ public class PlatformUpdateUserRequest implements Serializable {
 
     @ApiModelProperty(value = "详细地址")
     private String address;
+
+    @ApiModelProperty(value = "是否开店")
+    private Boolean openShop;
 
     public void setPhone(String phone) {
         if (phone != null && phone.matches("^1\\d{2}\\*{4}\\d{4}$")) {
