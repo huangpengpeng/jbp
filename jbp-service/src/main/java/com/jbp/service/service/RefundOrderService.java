@@ -159,7 +159,7 @@ public interface RefundOrderService extends IService<RefundOrder> {
      * 待退款订单数量
      * @return Integer
      */
-    Integer getAwaitAuditNum(Integer merId);
+    Integer  getAwaitAuditNum(Integer merId);
 
     /**
      * 撤销退款单

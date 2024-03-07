@@ -163,9 +163,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
      */
     @Override
     public Boolean refundApply(OrderRefundApplyRequest request) {
-        Integer uid = userService.getUserIdException();
         Order order = orderService.getByOrderNo(request.getOrderNo());
-        if (!order.getUid().equals(uid) || order.getIsUserDel()) {
+        if (order.getIsUserDel()) {
             throw new CrmebException("订单不存在");
         }
         if (order.getCancelStatus() > OrderConstants.ORDER_CANCEL_STATUS_NORMAL) {
