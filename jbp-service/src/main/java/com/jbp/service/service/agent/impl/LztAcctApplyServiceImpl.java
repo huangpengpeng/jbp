@@ -136,7 +136,6 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             }
 
         });
-
         return CommonPage.copyPageInfo(page, list);
     }
 }
