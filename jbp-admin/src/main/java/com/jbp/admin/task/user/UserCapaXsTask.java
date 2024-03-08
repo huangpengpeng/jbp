@@ -3,14 +3,17 @@ package com.jbp.admin.task.user;
 import cn.hutool.core.date.DateUtil;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.user.User;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ public class UserCapaXsTask {
     private UserCapaXsService userCapaXsService;
     @Autowired
     private UserService userService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 每天凌晨1点执行
@@ -35,6 +40,10 @@ public class UserCapaXsTask {
     public void refreshUserCapaXs() {
         // cron : 0 0 1 * * ?
         logger.info("---UserCapaXsTask refreshUserCapaXs------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
+        if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapaXs"))){
+            return;
+        }
+        stringRedisTemplate.opsForValue().set("refreshUserCapaXs","1");
         try {
             // 查询没下级的用户
             List<User> list = userService.getNoChild();
@@ -50,6 +59,8 @@ public class UserCapaXsTask {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("UserCapaXsTask.refreshUserCapaXs" + " | msg : " + e.getMessage());
+        }finally {
+            stringRedisTemplate.delete("refreshUserCapaXs");
         }
     }
 }
