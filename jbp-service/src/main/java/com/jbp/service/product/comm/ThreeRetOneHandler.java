@@ -107,7 +107,7 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
         Integer pid = invitationService.getPid(order.getUid());
@@ -123,14 +123,13 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
         // 根据产品算钱
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
-            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
             // 佣金不存在或者关闭直接忽略
             ProductComm productComm = productCommService.getByProduct(productId, getType());
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
             // 钱包抵扣PV
-            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));
+            BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);
@@ -139,10 +138,8 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
                 i = fundClearingList.size() % rules.size();
                 i = i == 0 ? rules.size() : i;
             }
-
             Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getLevel);
             Rule rule = ruleMap.get(i);
-
             BigDecimal amt = BigDecimal.ZERO;
             if (rule != null) {
                 if (rule.getType().equals("金额")) {

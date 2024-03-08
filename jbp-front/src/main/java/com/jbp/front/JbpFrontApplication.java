@@ -1,20 +1,25 @@
 package com.jbp.front;
 
-import com.jbp.common.constants.RedisConstants;
-import com.jbp.common.utils.RedisUtil;
-import com.jbp.front.service.LoginService;
+import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.user.User;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.service.service.PayService;
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.InvitationScoreFlowService;
+import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.List;
 
 /**
  * 程序主入口
@@ -32,14 +37,27 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Configuration
 @EnableTransactionManagement
-//@SpringBootApplication(exclude = DataSourceAutoConfiguration.class) //去掉数据源
-@SpringBootApplication(exclude = {WxMaAutoConfiguration.class}) //去掉数据源
+@SpringBootApplication(exclude = {WxMaAutoConfiguration.class, DataSourceAutoConfiguration.class}) //去掉数据源
 @ComponentScan(basePackages = {"com.jbp", "com.jbp.front"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
 public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
+//        final PayService bean = run.getBean(PayService.class);
+//        bean.payAfterProcessingTemp("PT585170937969665839468");
+
+//        final InvitationScoreFlowService bean = run.getBean(InvitationScoreFlowService.class);
+//
+//
+//        bean.pageList(null, null, "", new PageParamRequest());
+//
+
+//        final UserCapaService bean = run.getBean(UserCapaService.class);
+//        final List<UserCapa> list = bean.list();
+//        System.out.println("ok");
 
     }
+
+
 }

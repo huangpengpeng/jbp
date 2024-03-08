@@ -99,4 +99,18 @@ public interface OrderDetailService extends IService<OrderDetail> {
      * @param orderNoList 订单号列表
      */
     Map<String, List<OrderDetail>> getMapByOrderNoList(List<String> orderNoList);
+
+    /**
+     * 获取抵扣金额计算pv总值
+     * @param orderDetail
+     * @return
+     */
+    BigDecimal getWalletDeductionPv(OrderDetail orderDetail);
+
+    /**
+     * 获取商品实际业绩
+     * @param orderDetail
+     * @return
+     */
+    BigDecimal getRealScore(OrderDetail orderDetail);
 }

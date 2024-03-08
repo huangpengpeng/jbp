@@ -18,6 +18,7 @@ import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.UserCapaDao;
 import com.jbp.service.service.UserService;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +52,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private UserService userService;
     @Resource
     private ConditionChain conditionChain;
+    @Resource
+    private UserCapaDao dao;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -169,5 +173,17 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             saveOrUpdateCapa(uid, riseCapaId, "", "满足升级条件升级");
         }
 
+    }
+
+    @Override
+    public Map<Integer, UserCapa> getUidMap(List<Integer> uIdList) {
+        LambdaQueryWrapper<UserCapa> lqw = new LambdaQueryWrapper<>();
+        lqw.in(UserCapa::getUid, uIdList);
+        List<UserCapa> userList = dao.selectList(lqw);
+        Map<Long, Capa> capaMap = capaService.getCapaMap();
+        userList.forEach(e -> {
+            e.setCapaName(capaMap.get(e.getCapaId()).getName());
+        });
+        return FunctionUtil.keyValueMap(userList,UserCapa::getUid );
     }
 }

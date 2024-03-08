@@ -40,6 +40,14 @@ public class RelationScoreFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid, pageParamRequest)));
+        Integer orderuid = null;
+        if (StringUtils.isNotEmpty(request.getOrderAccount())) {
+            User user = userService.getByAccount(request.getOrderAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            orderuid = user.getId();
+        }
+        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid,orderuid,request.getOrdersSn(), pageParamRequest)));
     }
 }

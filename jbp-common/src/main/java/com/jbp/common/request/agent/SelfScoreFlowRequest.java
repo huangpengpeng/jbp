@@ -1,5 +1,6 @@
 package com.jbp.common.request.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,4 +20,7 @@ public class SelfScoreFlowRequest implements Serializable {
 
     @ApiModelProperty("方向")
     private String action;
+
+    @ApiModelProperty("单号")
+    private String ordersSn;
 }

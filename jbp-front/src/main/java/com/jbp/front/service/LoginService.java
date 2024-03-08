@@ -96,4 +96,6 @@ public interface LoginService {
      * @return true 有效， false 无效
      */
     Boolean tokenIsExist();
+
+    LoginResponse accountLogin(LoginAccountwordRequest loginRequest);
 }

@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
@@ -37,6 +38,8 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
 
     @Override
     public PageInfo<Capa> page(PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<Capa> lqw=new LambdaQueryWrapper<Capa>()
+                .orderByDesc(Capa::getId);
         Page<Capa> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list());
     }

@@ -86,4 +86,9 @@ public class ProductAttrValueAddRequest implements Serializable {
     @ApiModelProperty(value = "商品条码")
     @NotBlank(message = "商品条码不能为空")
     private String barCode;
+
+    @ApiModelProperty(value = "业绩金额", required = true)
+    @NotNull(message = "业绩金额不能为空")
+    @DecimalMin(value = "0", message = "业绩金额不能小于0")
+    private BigDecimal scoreValue;
 }

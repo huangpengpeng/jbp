@@ -13,6 +13,7 @@ import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.UserCapaXsDao;
 import com.jbp.service.service.UserService;
@@ -152,6 +153,18 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         if (userCapaXs == null || riseCapaId.compareTo(userCapaXs.getCapaId()) >= 0) {
             saveOrUpdateCapa(uid, riseCapaId, false, "", "满足升级条件升级");
         }
+    }
+
+    @Override
+    public Map<Integer, UserCapaXs> getUidMap(List<Integer> uIdList) {
+        LambdaQueryWrapper<UserCapaXs> lqw = new LambdaQueryWrapper<>();
+        lqw.in(UserCapaXs::getUid, uIdList);
+        List<UserCapaXs> userList = list(lqw);
+        Map<Long, CapaXs> capaXsMap = capaXsService.getCapaXsMap();
+        userList.forEach(e -> {
+            e.setCapaName(capaXsMap.get(e.getCapaId()).getName());
+        });
+        return FunctionUtil.keyValueMap(userList,UserCapaXs::getUid );
     }
 
     @Override

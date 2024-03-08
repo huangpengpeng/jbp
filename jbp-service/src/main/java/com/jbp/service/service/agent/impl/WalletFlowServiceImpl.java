@@ -48,7 +48,8 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     public PageInfo<WalletFlow> pageList(Integer uid, Integer type, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<WalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<WalletFlow>()
                 .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
-                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type);
+                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
+                .orderByDesc(WalletFlow::getId);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WalletFlow> list = list(walletLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {
@@ -62,6 +63,20 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
         });
+        return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public PageInfo<WalletFlow> pageWalletList(Integer uid, Integer type, String action, PageParamRequest pageParamRequest) {
+
+        LambdaQueryWrapper<WalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<WalletFlow>()
+                .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
+                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
+                .eq(!ObjectUtil.isEmpty(action), WalletFlow::getAction, action)
+                .orderByDesc(WalletFlow::getId);
+        Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<WalletFlow> list = list(walletLambdaQueryWrapper);
+
         return CommonPage.copyPageInfo(page, list);
     }
 

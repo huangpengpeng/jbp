@@ -1,6 +1,7 @@
 package com.jbp.service.product.profit;
 
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,9 +12,13 @@ import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderProductProfit;
+import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.user.WhiteUser;
+import com.jbp.common.response.RefundOrderInfoResponse;
 import com.jbp.service.service.OrderProductProfitService;
+import com.jbp.service.service.RefundOrderService;
 import com.jbp.service.service.WhiteUserService;
+import com.jbp.service.service.agent.OrdersRefundMsgService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
 import lombok.AllArgsConstructor;
@@ -42,6 +47,10 @@ public class UserWhiteHandler implements ProductProfitHandler {
     private OrderProductProfitService orderProductProfitService;
     @Resource
     private ProductProfitConfigService configService;
+    @Resource
+    private RefundOrderService refundOrderService;
+    @Resource
+    private OrdersRefundMsgService refundMsgService;
 
     @Override
     public Integer getType() {
@@ -88,27 +97,36 @@ public class UserWhiteHandler implements ProductProfitHandler {
         }
         for (ProductProfit productProfit : productProfitList) {
             List<Rule> rules = getRule(productProfit.getRule());
+            StringBuilder profitPostscript  = new StringBuilder();
+            profitPostscript.append("增加白名单");
             for (Rule rule : rules) {
                 if (whiteUserService.getByUser(order.getUid(), rule.getWhiteId()) == null) {
                     whiteUserService.add(order.getUid(), rule.getWhiteId(), order.getOrderNo());
+                    profitPostscript.append("【").append(rule.getWhiteName()).append("】");
                 }
             }
             // 订单权益记录
             orderProductProfitService.save(order.getId(), order.getOrderNo(), productProfit.getProductId(), getType(),
-                    ProductProfitEnum.白名单.getName(), JSONArray.toJSONString(rules));
+                    ProductProfitEnum.白名单.getName(), JSONArray.toJSONString(rules), profitPostscript.toString());
         }
     }
 
     @Override
-    public void orderRefund(Order order) {
-        // 删除白名单
-        whiteUserService.remove(new QueryWrapper<WhiteUser>().lambda().eq(WhiteUser::getUid, order.getUid()).eq(WhiteUser::getOrdersSn, order.getOrderNo()));
-        // 回退收益
-        List<OrderProductProfit> productProfits = orderProductProfitService.getByOrder(order.getId(),
-                getType(), OrderProductProfit.Constants.成功.name());
+    public void orderRefund(Order order, RefundOrder refundOrder) {
+        // 平台单号
+        String orderNo = StringUtil.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() : order.getPlatOrderNo();
+        List<OrderProductProfit> list = orderProductProfitService.getByOrder(orderNo, getType(), OrderProductProfit.Constants.成功.name());
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        RefundOrderInfoResponse refundDetail = refundOrderService.getRefundOrderDetailByRefundOrderNo(refundOrder.getRefundOrderNo());
+        List<OrderProductProfit> productProfits = list.stream().filter(o -> o.getProductId().equals(refundDetail.getProductId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(productProfits)) {
+            return;
+        }
         for (OrderProductProfit productProfit : productProfits) {
-            productProfit.setStatus(OrderProductProfit.Constants.退回.name());
-            orderProductProfitService.updateById(productProfit);
+            String context = "购买订单增加【"+ProductProfitEnum.白名单.getName()+"】, 商品名称【" + refundDetail.getProductName() + "】收益名称【" + productProfit.getProfitName() + "】 收益说明【" + productProfit.getPostscript() + "】";
+            refundMsgService.create(orderNo, refundOrder.getRefundOrderNo(), context);
         }
     }
 

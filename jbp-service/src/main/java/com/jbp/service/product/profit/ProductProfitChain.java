@@ -7,6 +7,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.RefundOrder;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.agent.ProductProfitService;
 
@@ -71,9 +72,9 @@ public class ProductProfitChain implements ApplicationContextAware {
     /**
      * 订单退款
      */
-    public void orderRefund(Order order) {
+    public void orderRefund(Order order, RefundOrder refundOrder) {
         handlers.forEach((k, v) -> {
-
+            v.orderRefund(order, refundOrder);
         });
     }
 }

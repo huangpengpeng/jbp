@@ -88,7 +88,7 @@ public class ProductController {
         return CommonResult.failed();
     }
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "强制下架商品")
-    @PreAuthorize("hasAuthority('platform:product:force:down')")
+    @PreAuthorize("hasAuthority('platform:product:force:up')")
     @ApiOperation(value = "强制上架架商品")
     @RequestMapping(value = "/force/up", method = RequestMethod.POST)
     public CommonResult<String> forceUp(@RequestBody @Validated ProductForceDownRequest request) {
@@ -122,6 +122,13 @@ public class ProductController {
     public CommonResult<CommonPage<ProductActivityResponse>> getActivitySearchPage(
             @Validated ProductActivitySearchRequest request, @Validated PageParamRequest pageRequest) {
         return CommonResult.success(CommonPage.restPage(productService.getActivitySearchPage(request, pageRequest)));
+    }
+    @PreAuthorize("hasAuthority('platform:product:copy')")
+    @ApiOperation(value = "复制")
+    @GetMapping("/copy/{productId}")
+    public CommonResult copy(@PathVariable("productId") Integer productId) {
+        productService.copy(productId);
+        return CommonResult.success();
     }
 }
 

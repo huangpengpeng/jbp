@@ -135,6 +135,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Resource
     private OrderExtService orderExtService;
 
+    @Resource
+    private UserService userService;
+
 
     /**
      * 手机号注册用户
@@ -544,6 +547,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public PageInfo<UserResponse> getPlatformPage(UserSearchRequest request, PageParamRequest pageParamRequest) {
         Page<User> pageUser = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         Map<String, Object> map = CollUtil.newHashMap();
+       if (StrUtil.isNotEmpty(request.getAccount())){
+           map.put("account", request.getAccount());
+       }
+        if (StrUtil.isNotEmpty(request.getSpreadAccount())){
+            User user = userService.getByAccount(request.getSpreadAccount());
+            if (user == null) {
+                throw new CrmebException("推荐人用户账号信息错误");
+            }
+            map.put("spreadid",user.getId());
+        }
         if (StrUtil.isNotEmpty(request.getNikename())) {
             String nikeName = URLUtil.decode(request.getNikename());
             map.put("nikename", nikeName);
@@ -1481,20 +1494,24 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return CommonPage.copyPageInfo(page, userInviteResponseList);
     }
 
-    public void updateUser(Integer id, String pwd, Integer sex, String realName, String phone, String country, String province, String city, String district, String address) {
+    public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province, String city, String district, String address, String payPwd, Boolean openShop) {
         User user  = getById(id);
         LambdaUpdateWrapper<User> lqw = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, id)
                 .set(ObjectUtil.isNotEmpty(sex), User::getSex, sex)
-                .set(ObjectUtil.isNotEmpty(realName) && !realName.equals(""), User::getRealName, realName)
+                .set(ObjectUtil.isNotEmpty(nickname) && !nickname.equals(""), User::getNickname, nickname)
                 .set(ObjectUtil.isNotEmpty(phone) && !phone.equals(""), User::getPhone, phone)
                 .set(ObjectUtil.isNotEmpty(country) && !country.equals(""), User::getCountry, country)
                 .set(ObjectUtil.isNotEmpty(province) && !province.equals(""), User::getProvince, province)
                 .set(ObjectUtil.isNotEmpty(city) && !city.equals(""), User::getCity, city)
                 .set(ObjectUtil.isNotEmpty(district) && !district.equals(""), User::getDistrict, district)
-                .set(ObjectUtil.isNotEmpty(address) && !address.equals(""), User::getAddress, address);
+                .set(ObjectUtil.isNotEmpty(address) && !address.equals(""), User::getAddress, address)
+                .set(ObjectUtil.isNotEmpty(openShop),User::getOpenShop,openShop);
         if (ObjectUtils.isNotEmpty(pwd)&&!pwd.equals("")){
             lqw.set( User::getPwd, CrmebUtil.encryptPassword(pwd, user.getAccount()));
+        }
+        if (ObjectUtils.isNotEmpty(payPwd)&&!payPwd.equals("")){
+            lqw.set( User::getPayPwd, CrmebUtil.encryptPassword(payPwd, user.getAccount()));
         }
         update(lqw);
 

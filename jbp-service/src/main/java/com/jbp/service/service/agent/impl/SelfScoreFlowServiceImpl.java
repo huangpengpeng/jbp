@@ -15,6 +15,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.SelfScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.SelfScoreFlowService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -34,10 +35,12 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
     private UserService userService;
 
     @Override
-    public PageInfo<SelfScoreFlow> pageList(Integer uid, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScoreFlow> pageList(Integer uid, String action,String ordersSn, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), SelfScoreFlow::getUid, uid)
-                .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action);
+                .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action)
+                .eq(StringUtils.isNotEmpty(ordersSn),SelfScoreFlow::getOrdersSn,ordersSn)
+                .orderByDesc(SelfScoreFlow::getId);
         Page<SelfScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScoreFlow> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

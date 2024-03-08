@@ -11,9 +11,14 @@ import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderProductProfit;
+import com.jbp.common.model.order.RefundOrder;
+import com.jbp.common.response.RefundOrderInfoResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderProductProfitService;
+import com.jbp.service.service.RefundOrderService;
+import com.jbp.service.service.agent.OrdersRefundMsgService;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
@@ -44,6 +49,10 @@ public class UserWalletHandler implements ProductProfitHandler {
     private OrderProductProfitService orderProductProfitService;
     @Resource
     private ProductProfitConfigService configService;
+    @Resource
+    private RefundOrderService refundOrderService;
+    @Resource
+    private OrdersRefundMsgService refundMsgService;
 
     @Override
     public Integer getType() {
@@ -101,6 +110,7 @@ public class UserWalletHandler implements ProductProfitHandler {
             // 商品支付金额
             BigDecimal payPrice = orderDetail.getPayPrice().multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
             // 奖励金额
+            StringBuilder profitPostscript  = new StringBuilder();
             BigDecimal amt = BigDecimal.ZERO;
             for (Rule rule : ruleList) {
                 if ("金额".equals(rule.getType())) {
@@ -113,19 +123,33 @@ public class UserWalletHandler implements ProductProfitHandler {
                 if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                     platformWalletService.transferToUser(order.getUid(), rule.walletType, amt,
                             WalletFlow.OperateEnum.奖励.toString(), order.getOrderNo(), postscript);
+                    profitPostscript.append(rule.getWalletName() + ":" + amt).append("元").append("/");
                 }
             }
-
             // 订单权益记录
             orderProductProfitService.save(order.getId(), order.getOrderNo(), productProfit.getProductId(), getType(),
-                    ProductProfitEnum.积分.getName(), JSONArray.toJSONString(ruleList));
+                    ProductProfitEnum.积分.getName(), JSONArray.toJSONString(ruleList), profitPostscript.toString());
         }
 
     }
 
     @Override
-    public void orderRefund(Order order) {
-
+    public void orderRefund(Order order, RefundOrder refundOrder) {
+        // 平台单号
+        String orderNo = StringUtil.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() : order.getPlatOrderNo();
+        List<OrderProductProfit> list = orderProductProfitService.getByOrder(orderNo, getType(), OrderProductProfit.Constants.成功.name());
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        RefundOrderInfoResponse refundDetail = refundOrderService.getRefundOrderDetailByRefundOrderNo(refundOrder.getRefundOrderNo());
+        List<OrderProductProfit> productProfits = list.stream().filter(o -> o.getProductId().equals(refundDetail.getProductId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(productProfits)) {
+            return;
+        }
+        for (OrderProductProfit productProfit : productProfits) {
+            String context = "购买订单增加【"+ProductProfitEnum.积分.getName()+"】, 商品名称【" + refundDetail.getProductName() + "】收益名称【" + productProfit.getProfitName() + "】 收益说明【" + productProfit.getPostscript() + "】";
+            refundMsgService.create(orderNo, refundOrder.getRefundOrderNo(), context);
+        }
     }
 
     /**

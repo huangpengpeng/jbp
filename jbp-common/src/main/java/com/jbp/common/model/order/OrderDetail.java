@@ -74,6 +74,9 @@ public class OrderDetail implements Serializable {
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
 
+    @ApiModelProperty(value = "业绩金额")
+    private BigDecimal scoreValue;
+
     @ApiModelProperty(value = "钱包抵扣")
     private BigDecimal walletDeductionFee;
 
@@ -177,6 +180,8 @@ public class OrderDetail implements Serializable {
 
     @ApiModelProperty(value = "退运费金额")
     private BigDecimal refundFreightFee;
+
+
 
     @ApiModelProperty(value = "商品条码")
     private String barCode;

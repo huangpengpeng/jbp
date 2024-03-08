@@ -1,17 +1,22 @@
 package com.jbp.common.model.order;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -22,9 +27,10 @@ import java.util.Date;
  * @since 2022-09-19
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("eb_refund_order_info")
+@TableName(value = "eb_refund_order_info", autoResultMap = true)
 @ApiModel(value="RefundOrderInfo对象", description="退款订单详情表")
 public class RefundOrderInfo implements Serializable {
 
@@ -108,4 +114,11 @@ public class RefundOrderInfo implements Serializable {
 
     @ApiModelProperty(value = "退运费金额")
     private BigDecimal refundFreightFee;
+
+    @ApiModelProperty(value = "退款积分")
+    private BigDecimal refundWalletFee;
+
+    @ApiModelProperty(value = "退款钱包抵扣")
+    @TableField(typeHandler = ProductDeductionListHandler.class)
+    private List<ProductDeduction> refundWalletList;
 }

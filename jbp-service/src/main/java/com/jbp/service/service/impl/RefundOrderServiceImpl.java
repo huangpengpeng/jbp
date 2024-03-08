@@ -15,24 +15,31 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.ProductProfitConfig;
+import com.jbp.common.model.agent.WalletConfig;
+import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantAddress;
 import com.jbp.common.model.order.*;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.RedisUtil;
-import com.jbp.common.utils.SecurityUtil;
-import com.jbp.common.utils.WxPayUtil;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.RefundOrderDetailOrderInfoVo;
 import com.jbp.common.vo.WxRefundVo;
 import com.jbp.service.dao.RefundOrderDao;
+import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.product.profit.ProductProfitChain;
+import com.jbp.service.product.profit.ProductProfitHandler;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.PlatformWalletService;
+import com.jbp.service.service.agent.ProductProfitService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,6 +97,18 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private RefundOrderStatusService refundOrderStatusService;
     @Autowired
     private MerchantOrderService merchantOrderService;
+    @Autowired
+    private SystemAttachmentService systemAttachmentService;
+    @Autowired
+    private PlatformWalletService platformWalletService;
+    @Autowired
+    private LianLianPayService lianLianPayService;
+    @Autowired
+    private WalletConfigService walletConfigService;
+    @Autowired
+    private ProductProfitChain productProfitChain;
+    @Autowired
+    private ProductCommChain productCommChain;
 
     /**
      * 商户端退款订单分页列表
@@ -134,6 +153,141 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
+    }
+
+    /**
+     * 订单退款申请
+     *
+     * @param request 申请参数
+     * @return Boolean
+     */
+    @Override
+    public Boolean refundApply(OrderRefundApplyRequest request) {
+        Order order = orderService.getByOrderNo(request.getOrderNo());
+        if (order.getIsUserDel()) {
+            throw new CrmebException("订单不存在");
+        }
+        if (order.getCancelStatus() > OrderConstants.ORDER_CANCEL_STATUS_NORMAL) {
+            throw new CrmebException("订单已取消");
+        }
+        if (!order.getPaid()) {
+            throw new CrmebException("未支付订单无法申请退款");
+        }
+        if (order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_ALL)) {
+            throw new CrmebException("订单已全部退款");
+        }
+        if (order.getStatus().equals(OrderConstants.ORDER_STATUS_COMPLETE)) {
+            throw new CrmebException("已完成订单无法申请退款");
+        }
+        OrderDetail orderDetail = orderDetailService.getById(request.getOrderDetailId());
+        if (ObjectUtil.isNull(orderDetail) || !orderDetail.getOrderNo().equals(order.getOrderNo())) {
+            throw new CrmebException("订单详情不存在");
+        }
+        int canApplyNum = orderDetail.getPayNum() - orderDetail.getApplyRefundNum() - orderDetail.getRefundNum();
+        if (canApplyNum < request.getNum()) {
+            throw new CrmebException(StrUtil.format("剩余可退款数量为{}", canApplyNum));
+        }
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+
+        RefundOrder refundOrder = new RefundOrder();
+        refundOrder.setRefundOrderNo(CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_REFUND));
+        refundOrder.setOrderNo(order.getOrderNo());
+        refundOrder.setMerId(order.getMerId());
+        refundOrder.setUid(order.getUid());
+        refundOrder.setPayUid(merchantOrder.getPayUid());
+        refundOrder.setRealName(merchantOrder.getRealName());
+        refundOrder.setUserPhone(merchantOrder.getUserPhone());
+        refundOrder.setUserAddress(merchantOrder.getUserAddress());
+        refundOrder.setRefundPrice(order.getPayPrice());
+        refundOrder.setTotalNum(order.getTotalNum());
+        refundOrder.setRefundReasonWap(request.getText());
+        refundOrder.setRefundReasonWapImg(systemAttachmentService.clearPrefix(request.getReasonImage()));
+        refundOrder.setRefundReasonWapExplain(request.getExplain());
+        refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY);
+        refundOrder.setRefundPlatCouponPrice(merchantOrder.getPlatCouponPrice());
+        refundOrder.setAfterSalesType(request.getAfterSalesType());
+        refundOrder.setReturnGoodsType(request.getReturnGoodsType());
+        refundOrder.setRefundWalletFee(merchantOrder.getWalletDeductionFee());
+        refundOrder.setRefundWalletList(merchantOrder.getWalletDeductionList());
+
+        RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
+        refundOrderInfo.setRefundOrderNo(refundOrder.getRefundOrderNo());
+        refundOrderInfo.setMerId(orderDetail.getMerId());
+        refundOrderInfo.setOrderDetailId(orderDetail.getId());
+        refundOrderInfo.setProductId(orderDetail.getProductId());
+        refundOrderInfo.setProductName(orderDetail.getProductName());
+        refundOrderInfo.setImage(orderDetail.getImage());
+        refundOrderInfo.setAttrValueId(orderDetail.getAttrValueId());
+        refundOrderInfo.setSku(orderDetail.getSku());
+        refundOrderInfo.setPrice(orderDetail.getPrice());
+        refundOrderInfo.setPayNum(orderDetail.getPayNum());
+        refundOrderInfo.setProductType(orderDetail.getProductType());
+        refundOrderInfo.setPayPrice(orderDetail.getPayPrice());
+        refundOrderInfo.setApplyRefundNum(request.getNum());
+        refundOrderInfo.setRefundWalletFee(orderDetail.getWalletDeductionFee());
+        refundOrderInfo.setRefundWalletList(orderDetail.getWalletDeductionList());
+
+        // 临时性计算退款金额、积分
+        if (request.getNum().equals(orderDetail.getPayNum())) {
+            refundOrderInfo.setRefundPrice(orderDetail.getPayPrice());
+            refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral());
+            refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral());
+            refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
+            refundOrderInfo.getRefundWalletList().forEach(w->{
+                w.setRefundFee(w.getDeductionFee());
+            });
+        } else {
+            refundOrderInfo.setRefundUseIntegral(0);
+            refundOrderInfo.setRefundGainIntegral(0);
+            refundOrderInfo.setRefundWalletFee(BigDecimal.ZERO);
+            refundOrderInfo.getRefundWalletList().forEach(w -> {
+                w.setRefundFee(BigDecimal.ZERO);
+            });
+
+            BigDecimal ratio = new BigDecimal(request.getNum().toString()).divide(new BigDecimal(orderDetail.getPayNum().toString()), 10, BigDecimal.ROUND_HALF_UP);
+            refundOrderInfo.setRefundPrice(orderDetail.getPayPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+
+            if (orderDetail.getUseIntegral() > 0) {
+                refundOrderInfo.setRefundUseIntegral(new BigDecimal(orderDetail.getUseIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            }
+            if (orderDetail.getGainIntegral() > 0) {
+                refundOrderInfo.setRefundGainIntegral(new BigDecimal(orderDetail.getGainIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            }
+            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
+                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+            }
+            if(CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
+                BigDecimal refundWalletFee = BigDecimal.ZERO;
+                for (ProductDeduction deduction : refundOrderInfo.getRefundWalletList()) {
+                    if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
+                        deduction.setRefundFee(deduction.getDeductionFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+                        refundWalletFee = refundWalletFee.add(deduction.getRefundFee());
+                    }
+                }
+                refundOrderInfo.setRefundWalletFee(refundWalletFee);
+            }
+            refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+        }
+        refundOrder.setRefundPrice(refundOrderInfo.getRefundPrice());
+        refundOrder.setRefundUseIntegral(refundOrderInfo.getRefundUseIntegral());
+        refundOrder.setRefundGainIntegral(refundOrderInfo.getRefundGainIntegral());
+        refundOrder.setRefundPlatCouponPrice(refundOrderInfo.getRefundPlatCouponPrice());
+        refundOrder.setRefundFreightFee(refundOrderInfo.getRefundFreightFee());
+        refundOrder.setRefundWalletFee(refundOrderInfo.getRefundWalletFee());
+        refundOrder.setRefundWalletList(refundOrderInfo.getRefundWalletList());
+
+        order.setRefundStatus(OrderConstants.ORDER_REFUND_STATUS_APPLY);
+        orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
+        Boolean execute = transactionTemplate.execute(e -> {
+            orderService.updateById(order);
+            orderDetailService.updateById(orderDetail);
+            save(refundOrder);
+            refundOrderInfoService.save(refundOrderInfo);
+            refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_APPLY, "用户发起退款单申请");
+            return Boolean.TRUE;
+        });
+        if (!execute) throw new CrmebException("申请退款失败");
+        return execute;
     }
 
     /**
@@ -885,7 +1039,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             throw new CrmebException("退款单状态异常");
         }
         refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REVOKE);
-
+        productCommChain.orderRefundIntercept(orderService.getByOrderNo(refundOrder.getOrderNo()));
         return updateById(refundOrder);
     }
 
@@ -937,12 +1091,13 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             refundOrder.setReceiverPhone(merchantAddress.getReceiverPhone());
             refundOrder.setReceiverAddressDetail(merchantAddress.getDetail());
             refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_RETURN_GOODS);
-
-            return transactionTemplate.execute(e -> {
+            Boolean execute =  transactionTemplate.execute(e -> {
                 updateById(refundOrder);
                 refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
+                productCommChain.orderRefundIntercept(order);
                 return Boolean.TRUE;
             });
+            return execute;
         }
         return refundPrice(refundOrder, order);
     }
@@ -1013,6 +1168,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             orderDetailService.updateById(orderDetail);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
+            productCommChain.orderCancelIntercept(order);
             return Boolean.TRUE;
         });
         if (execute) {
@@ -1159,6 +1315,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 throw new CrmebException("支付宝申请退款失败！" + e.getMessage());
             }
         }
+        if (order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                User user = userService.getById(order.getPayUid());
+                lianLianPayService.refund(user.getAccount(), order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CrmebException("连连退款失败！" + e.getMessage());
+            }
+        }
 
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() - refundOrderInfo.getApplyRefundNum());
         orderDetail.setRefundNum(orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum());
@@ -1169,6 +1334,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             orderDetailService.updateById(orderDetail);
             refundOrderInfoService.updateById(refundOrderInfo);
             refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUNDING);
+
             if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
                 if (refundOrder.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
@@ -1186,8 +1352,17 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                     userBalanceRecordService.save(userBalanceRecord);
                 }
             }
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) ) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+                if (refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+                    WalletConfig walletConfig = walletConfigService.getCanPay();
+                    platformWalletService.transferToUser(refundOrder.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
+                }
+            }
+
             updateById(refundOrder);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
+            productProfitChain.orderRefund(order, refundOrder);
             return Boolean.TRUE;
         });
         if (execute) {

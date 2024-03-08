@@ -55,6 +55,9 @@ public class PreOrderInfoDetailVo {
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
 
+    @ApiModelProperty(value = "业绩金额")
+    private BigDecimal scoreValue;
+
     @ApiModelProperty(value = "购买数量")
     private Integer payNum;
 

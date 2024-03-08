@@ -1,5 +1,6 @@
 package com.jbp.common.request.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,4 +20,7 @@ public class RelationScoreFlowRequest implements Serializable {
 
     @ApiModelProperty("下单用户账户")
     private String orderAccount;
+
+    @ApiModelProperty("单号")
+    private String ordersSn;
 }

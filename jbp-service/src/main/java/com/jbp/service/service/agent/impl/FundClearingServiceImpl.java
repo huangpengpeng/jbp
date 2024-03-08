@@ -73,11 +73,16 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
                 .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
                 .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
-                .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime);
+                .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
+                .orderByDesc(FundClearing::getId);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = list(lqw);
         list.forEach(e -> {
             e.setAccount(e.getUserInfo().getAccount());
+            for (FundClearingItem item : e.getItems()) {
+                WalletConfig walletConfig = walletConfigService.getByType(item.getWalletType());
+                item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
+            }
         });
         return CommonPage.copyPageInfo(page, list);
     }
@@ -104,6 +109,15 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         // 更新概况
         ordersFundSummaryService.increaseCommAmt(externalNo, commAmt);
         return fundClearing;
+    }
+
+    @Override
+    public List<FundClearing> getByExternalNo(String externalNo, List<String> statusList) {
+        QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(FundClearing::getExternalNo, externalNo)
+                .in(FundClearing::getStatus, statusList);
+        return list(queryWrapper);
     }
 
     @Override
@@ -148,6 +162,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 .eq(FundClearing::getExternalNo, externalNo)
                 .eq(FundClearing::getStatus, FundClearing.Constants.已创建.toString());
         List<FundClearing> list = list(queryWrapper);
+        if(CollectionUtils.isEmpty(list)){
+            return;
+        }
         for (FundClearing fundClearing : list) {
             fundClearing.setStatus(FundClearing.Constants.待审核.toString());
             fundClearing.setRemark(remark);
@@ -316,12 +333,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 FundClearingVo fundClearingVo = new FundClearingVo();
                 BeanUtils.copyProperties(e, fundClearingVo);
                 ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
-                if(channelIdentity != null){
+                if (channelIdentity != null) {
                     fundClearingVo.setRealName(channelIdentity.getRealName());
                     fundClearingVo.setIdCardNo(channelIdentity.getIdCardNo());
                 }
                 ChannelCard channelCard = channelCardMap.get(e.getUid());
-                if(channelCard != null){
+                if (channelCard != null) {
                     fundClearingVo.setPhone(channelCard.getPhone());
                     fundClearingVo.setBankName(channelCard.getBankName());
                     fundClearingVo.setBankCode(channelCard.getBankCardNo());

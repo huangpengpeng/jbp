@@ -7,16 +7,12 @@ import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.front.service.LoginService;
-import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -65,6 +61,12 @@ public class LoginController {
     @RequestMapping(value = "/mobile/password", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phonePasswordLogin(@RequestBody @Validated LoginPasswordRequest loginRequest) {
         return CommonResult.success(loginService.phonePasswordLogin(loginRequest));
+    }
+
+    @ApiOperation("账号登录")
+    @PostMapping("/mobile/account")
+    public CommonResult<LoginResponse> accountLogin(@RequestBody @Validated LoginAccountwordRequest loginRequest) {
+        return CommonResult.success(loginService.accountLogin(loginRequest));
     }
 
     @ApiOperation(value = "退出")

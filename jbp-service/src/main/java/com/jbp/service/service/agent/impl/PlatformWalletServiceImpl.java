@@ -45,7 +45,8 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
     @Override
     public PageInfo<PlatformWallet> pageList(Integer type, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<PlatformWallet> platformWalletLambdaQueryWrapper = new LambdaQueryWrapper<PlatformWallet>()
-                .eq(!ObjectUtil.isNull(type), PlatformWallet::getType, type);
+                .eq(!ObjectUtil.isNull(type), PlatformWallet::getType, type)
+                .orderByDesc(PlatformWallet::getId);
         Page<PlatformWallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<PlatformWallet> list = list(platformWalletLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {
@@ -92,8 +93,8 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
         if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
             throw new CrmebException(type + "减少平台积分金额不能小于0:" + amt);
         }
-        if (walletConfigService.getByType(type).getCanWithdraw().equals(0)) {
-            throw new CrmebException(type + "禁用提现或转账");
+        if (walletConfigService.getByType(type).getStatus() == 0) {
+            throw new CrmebException(type + "钱包已禁用");
         }
         PlatformWallet platformWallet = getType(type);
         if (ArithmeticUtils.less(platformWallet.getBalance(), amt)) {

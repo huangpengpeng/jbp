@@ -102,7 +102,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
 
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
         // 增加对碰积分业绩
@@ -116,16 +116,19 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                 continue;
             }
-            BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价
             // 总PV
-            BigDecimal totalPv = payPrice.add(getWalletDeductionListPv(orderDetail));// 钱包抵扣PV
+            BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
-            // 订单总PV
+            if (ArithmeticUtils.lessEquals(totalPv, BigDecimal.ZERO)) {
+                continue;
+            }
             score = score.add(totalPv);
+        }
+        if(ArithmeticUtils.lessEquals(score, BigDecimal.ZERO)){
+            return;
         }
         // 下单用户信息
         User orderUser = userService.getById(order.getUid());
-
         List<Rule> rules = getRule(null);
         Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaXsId);
         Rule maxRule = rules.get(rules.size() - 1);
@@ -142,7 +145,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
             }
             UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
             if (userCapaXs != null) {
-                Rule rule = ruleMap.get(userCapaXs.getCapaId());
+                Rule rule = ruleMap.get(userCapaXs.getCapaId().intValue());
                 if (rule != null) {
                     BigDecimal ratio = rule.getRatio(); // 自己比例
                     BigDecimal usableRatio = ratio.subtract(usedRatio); // 可分比例

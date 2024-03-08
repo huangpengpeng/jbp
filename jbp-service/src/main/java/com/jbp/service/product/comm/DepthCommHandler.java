@@ -96,7 +96,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getStatus()) {
+        if (!productCommConfig.getIfOpen()) {
             return;
         }
         // 对碰奖金
@@ -115,7 +115,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
             BigDecimal minScore = BigDecimal.valueOf(Math.min(totalScore.doubleValue(), score.doubleValue()));
             if (ArithmeticUtils.gt(minScore, BigDecimal.ZERO)) {
                 UserCapa userCapa = userCapaService.getByUser(calculateResult.getUid());
-                Rule rule = userCapa == null ? null : ruleMap.get(userCapa.getCapaId());
+                Rule rule = userCapa == null ? null : ruleMap.get(userCapa.getCapaId().intValue());
                 BigDecimal ratio = rule == null ? BigDecimal.ZERO : rule.getRatio();
                 BigDecimal amt = minScore.multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
                 if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {

@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -28,6 +29,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
@@ -43,6 +45,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -197,10 +200,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (StrUtil.isBlank(request.getKeywords())) {
             LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
             //代购订单
-            if(request.getAgent()){
+            if(request.getAgent() != null && request.getAgent()){
                 lqw.eq(Order::getPayUid, userId);
                 lqw.ne(Order::getUid, userId);
-            }else {
+            } else {
                 lqw.eq(Order::getUid, userId);
             }
             if (request.getStatus() >= 0) {
@@ -553,13 +556,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     public PageInfo<PlatformOrderPageResponse> getPlatformAdminPage(OrderSearchRequest request, PageParamRequest pageParamRequest) {
         Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
-        lqw.select(Order::getMerId, Order::getOrderNo, Order::getUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
+        lqw.select(Order::getMerId, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
             lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
+        }
+        if (StrUtil.isNotBlank(request.getPlatOrderNo())) {
+            lqw.like(Order::getPlatOrderNo, URLUtil.decode(request.getPlatOrderNo()));
         }
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());
@@ -574,33 +580,60 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             return CommonPage.copyPageInfo(startPage, CollUtil.newArrayList());
         }
         List<Integer> uidList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
+        List<Integer> payUidList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
+        Map<Integer, User> payUserMap = userService.getUidMapList(payUidList);
         List<Integer> merIdList = orderList.stream().map(Order::getMerId).distinct().collect(Collectors.toList());
-        Map<Integer, Merchant> merchantMap = merchantService.getMerIdMapByIdList(merIdList);
+        Map<Integer, Merchant> merchantMap = Maps.newConcurrentMap();
+        if (CollectionUtils.isEmpty(merIdList)) {
+            merchantMap = merchantService.getMerIdMapByIdList(merIdList);
+        }
         List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
         Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
+        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNoList);
+        Map<String, List<MerchantOrder>> merchantOrderMap = FunctionUtil.valueMap(merchantOrderList, MerchantOrder::getOrderNo);
+
+        Map<Integer, Merchant> finalMerchantMap = merchantMap;
         List<PlatformOrderPageResponse> pageResponses = orderList.stream().map(e -> {
             PlatformOrderPageResponse pageResponse = new PlatformOrderPageResponse();
             BeanUtils.copyProperties(e, pageResponse);
-            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(e.getOrderNo());
+            MerchantOrder merchantOrder = merchantOrderMap.get(e.getOrderNo()).get(0);
             pageResponse.setShippingType(merchantOrder.getShippingType());
             pageResponse.setUserRemark(merchantOrder.getUserRemark());
             pageResponse.setMerRemark(merchantOrder.getMerchantRemark());
-            pageResponse.setNickName(userMap.get(e.getUid()) != null ? userMap.get(e.getUid()).getNickname() : "");
-            pageResponse.setIsLogoff(userMap.get(e.getUid()) != null ? userMap.get(e.getUid()).getIsLogoff() : null);
-            OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+            User user = userMap.get(e.getUid());
+            if (user != null) {
+                pageResponse.setUid(user.getId());
+                pageResponse.setUAccount(user.getAccount());
+                pageResponse.setNickName(user.getNickname());
+                pageResponse.setIsLogoff(user.getIsLogoff());
+                pageResponse.setUPhone(user.getPhone());
+            }
+            User payUser = payUserMap.get(e.getPayUid());
+            if (payUser != null) {
+                pageResponse.setPayUid(payUser.getId());
+                pageResponse.setPayAccount(payUser.getAccount());
+                pageResponse.setPayNickName(payUser.getNickname());
+                pageResponse.setPayPhone(user != null ? user.getPhone() : "");
+            }
             //设置下单前等级
-            if (ObjectUtil.isNotEmpty(orderExt) && ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
-                Capa capa = capaService.getById(orderExt.getCapaId());
-                pageResponse.setCapaName(capa != null ? capa.getName() :"");
+            OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+            if (orderExt != null) {
+                if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
+                    Capa capa = capaService.getById(orderExt.getCapaId());
+                    pageResponse.setCapaName(capa != null ? capa.getName() : "");
+                }
+                //设置成功后等级
+                if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
+                    Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
+                    pageResponse.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
+                }
             }
-            //设置成功后等级
-            if (ObjectUtil.isNotEmpty(orderExt) && ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
-                Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
-                pageResponse.setSuccessCapaName(successCapa != null ? successCapa.getName() :"");
-            }
-            if (e.getMerId() > 0) {
-                pageResponse.setMerName(merchantMap.get(e.getMerId()).getName());
+            Merchant merchant = finalMerchantMap.get(e.getMerId());
+            if (merchant != null) {
+                pageResponse.setMerName(merchant.getName());
+            } else {
+                pageResponse.setMerName("平台");
             }
             return pageResponse;
         }).collect(Collectors.toList());

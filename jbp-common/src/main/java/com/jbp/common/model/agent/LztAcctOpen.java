@@ -69,13 +69,4 @@ public class LztAcctOpen extends BaseModel {
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;
-
-
-
-
-
-
-
-
-
 }

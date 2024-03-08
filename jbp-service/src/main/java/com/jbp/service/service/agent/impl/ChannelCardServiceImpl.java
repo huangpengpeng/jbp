@@ -48,7 +48,8 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
                 .eq(!ObjectUtil.isNull(uid), ChannelCard::getUid, uid)
                 .like(StringUtils.isNotEmpty(bankCardNo), ChannelCard::getBankCardNo, bankCardNo)
                 .like(StringUtils.isNotEmpty(type), ChannelCard::getType, type)
-                .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone);
+                .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone)
+                .orderByDesc(ChannelCard::getId);
         Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelCard> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

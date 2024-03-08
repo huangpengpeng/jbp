@@ -136,37 +136,68 @@ public class PayCallbackController {
 
     @ApiOperation(value = "来账通回调")
     @RequestMapping(value = "/lianlian/lzt/{txnSeqno}")
-    public String lzt(@PathVariable("txnSeqno") String txnSeqno) {
-        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通子商户.getPrefix())) {
-            LztAcctOpen lztAcctOpen = lztAcctOpenService.getByAccpTxno(txnSeqno);
-            if (lztAcctOpen != null) {
-                lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
+    public String lzt(@PathVariable("txnSeqno") String txnSeqno, HttpServletRequest request) {
+        BufferedReader reader = null;
+        // 从请求体中获取源串
+        try {
+            // 从请求体中获取源串
+            reader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通子商户.getPrefix())) {
+                LztAcctOpen lztAcctOpen = lztAcctOpenService.getByAccpTxno(txnSeqno);
+                if (lztAcctOpen != null) {
+                    lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
+                }
+            }
+            if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix())) {
+                LztAcctApply lztAcctApply = lztAcctApplyService.getByTxnSeqno(txnSeqno);
+                if(stringBuilder != null && stringBuilder.length() > 0){
+                    lztAcctApply.setNotifyInfo(stringBuilder.toString());
+                    lztAcctApplyService.updateById(lztAcctApply);
+                }
+                if (lztAcctApply != null) {
+                    lztAcctApplyService.refresh(lztAcctApply.getUserId(), stringBuilder.toString());
+                }
+            }
+            if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通划拨资金.getPrefix())) {
+                LztFundTransfer lztFundTransfer = lztFundTransferService.getByTxnSeqno(txnSeqno);
+                if (lztFundTransfer != null) {
+                    lztFundTransferService.refresh(lztFundTransfer.getAccpTxno());
+                }
+            }
+            if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix())) {
+                LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(txnSeqno);
+                if (lztTransferMorepyee != null) {
+                    lztTransferMorepyeeService.refresh(lztTransferMorepyee.getAccpTxno());
+                }
+            }
+            if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix())) {
+                LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(txnSeqno);
+                if (lztWithdrawal != null) {
+                    lztWithdrawalService.refresh(lztWithdrawal.getAccpTxno());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
             }
         }
-        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix())) {
-            LztAcctApply lztAcctApply = lztAcctApplyService.getByTxnSeqno(txnSeqno);
-            if (lztAcctApply != null) {
-                lztAcctApplyService.refresh(lztAcctApply.getUserId());
-            }
-        }
-        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通划拨资金.getPrefix())) {
-            LztFundTransfer lztFundTransfer = lztFundTransferService.getByTxnSeqno(txnSeqno);
-            if (lztFundTransfer != null) {
-                lztFundTransferService.refresh(lztFundTransfer.getAccpTxno());
-            }
-        }
-        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix())) {
-            LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(txnSeqno);
-            if (lztTransferMorepyee != null) {
-                lztTransferMorepyeeService.refresh(lztTransferMorepyee.getAccpTxno());
-            }
-        }
-        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix())) {
-            LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(txnSeqno);
-            if (lztWithdrawal != null) {
-                lztWithdrawalService.refresh(lztWithdrawal.getAccpTxno());
-            }
-        }
+
+
+
         return "SUCCESS";
     }
 }

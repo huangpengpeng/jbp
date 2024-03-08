@@ -33,6 +33,12 @@ public class PlatformOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "订单号")
     private String orderNo;
 
+    @ApiModelProperty(value = "平台订单号")
+    private String platOrderNo;
+
+    @ApiModelProperty(value = "下单场景（报单，换购）")
+    private String platform;
+
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
 
@@ -72,8 +78,29 @@ public class PlatformOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "配送方式 1=快递 ，2=门店自提")
     private Integer shippingType;
 
+    @ApiModelProperty(value = "用户ID")
+    private Integer uid;
+
     @ApiModelProperty(value = "用户昵称")
     private String nickName;
+
+    @ApiModelProperty(value = "账号")
+    private String uAccount;
+
+    @ApiModelProperty(value = "用户手机号")
+    private String uPhone;
+
+    @ApiModelProperty(value = "付款用户ID")
+    private Integer payUid;
+
+    @ApiModelProperty(value = "付款用户昵称")
+    private String payNickName;
+
+    @ApiModelProperty(value = "付款账号")
+    private String payAccount;
+
+    @ApiModelProperty(value = "付款手机号")
+    private String payPhone;
 
     @ApiModelProperty(value = "用户是否注销")
     private Boolean isLogoff;

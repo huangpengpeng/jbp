@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserWalletInfoResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,4 +24,6 @@ public interface WalletConfigService extends IService<WalletConfig> {
     WalletConfig getCanWithdraw();
 
     Map<Integer, WalletConfig> getWalletMap();
+
+    List<UserWalletInfoResponse> getUserWalletInfo();
 }

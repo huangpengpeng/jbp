@@ -45,7 +45,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     @Override
     public PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
-                .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid);
+                .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid)
+                .orderByDesc(InvitationScore::getId);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

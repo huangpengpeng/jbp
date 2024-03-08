@@ -61,8 +61,4 @@ public class LztFundTransferController {
         LztFundTransfer lztFundTransfer = lztFundTransferService.fundTransfer(merId, userId, bankAccountNo, amt, postscript);
         return CommonResult.success(lztFundTransfer);
     }
-
-
-
-
 }

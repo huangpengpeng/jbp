@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -252,6 +253,18 @@ public class UserController {
     }
 
 
+
+    @ApiOperation(value = "账号获取用户信息")
+    @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
+    public CommonResult<UserInviteResponse> getAccountUser(String account) {
+        User user =  userService.getByAccount(account);
+        if(user == null){
+            throw new CrmebException("账号不存在");
+        }
+        UserInviteResponse userInviteResponse =new UserInviteResponse();
+        BeanUtils.copyProperties(user , userInviteResponse);
+        return CommonResult.success(userInviteResponse);
+    }
 
 }
 

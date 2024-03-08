@@ -483,4 +483,6 @@ public interface ProductService extends IService<Product> {
 
     Boolean forceUp(ProductForceDownRequest request);
 
+    Boolean copy(Integer productId);
+
 }

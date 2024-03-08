@@ -33,6 +33,9 @@ public class OrderSearchRequest implements Serializable {
     @ApiModelProperty(value = "订单号")
     private String orderNo;
 
+    @ApiModelProperty(value = "平台订单号")
+    private String platOrderNo;
+
     @ApiModelProperty(value = "创建时间区间")
     private String dateLimit;
 

@@ -31,7 +31,8 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
     public PageInfo<ProductMaterials> pageList(Integer merId, String materialsName, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>()
                 .eq(!ObjectUtil.isNull(merId), ProductMaterials::getMerId, merId)
-                .eq(StringUtils.isNotEmpty(materialsName), ProductMaterials::getMaterialsName, materialsName);
+                .eq(StringUtils.isNotEmpty(materialsName), ProductMaterials::getMaterialsName, materialsName)
+                .orderByDesc(ProductMaterials::getId);
         Page<ProductMaterials> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ProductMaterials> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {

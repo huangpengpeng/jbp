@@ -9,10 +9,14 @@ import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderProductProfit;
+import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.user.User;
+import com.jbp.common.response.RefundOrderInfoResponse;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.OrderProductProfitService;
+import com.jbp.service.service.RefundOrderService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.OrdersRefundMsgService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
 import lombok.AllArgsConstructor;
@@ -41,6 +45,10 @@ public class UserActiveHandler implements ProductProfitHandler {
     private ProductProfitConfigService configService;
     @Resource
     private UserService userService;
+    @Resource
+    private OrdersRefundMsgService refundMsgService;
+    @Resource
+    private RefundOrderService refundOrderService;
 
     @Override
     public Integer getType() {
@@ -110,17 +118,28 @@ public class UserActiveHandler implements ProductProfitHandler {
         }
         user.setActiveTime(newActiveTime);
         userService.updateById(user);
+        String oldActiveTimeStr = activeTime == null ? "" : DateTimeUtils.format(activeTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN);
+        String newActiveTimeStr = DateTimeUtils.format(newActiveTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN);
+        StringBuilder profitPostscript  = new StringBuilder();
+        profitPostscript.append("下单前活跃到期【"+oldActiveTimeStr+"】").append("下单后活跃到期【"+newActiveTimeStr+"】");
         // 订单权益记录
-        OrderProductProfit profit = orderProductProfitService.save(order.getId(), order.getOrderNo(), exceProductProfit.getProductId(), getType(),
-                ProductProfitEnum.活跃.getName(), exceProductProfit.getRule());
-        profit.setRemark("下单前活跃到期:" + activeTime == null ? "" : DateTimeUtils.format(activeTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
-        orderProductProfitService.updateById(profit);
+        orderProductProfitService.save(order.getId(), order.getOrderNo(), exceProductProfit.getProductId(), getType(),
+                ProductProfitEnum.活跃.getName(), exceProductProfit.getRule(), profitPostscript.toString());
     }
 
     @Override
-    public void orderRefund(Order order) {
-        // 订单退款不处理活跃  连续下单的情况
-
+    public void orderRefund(Order order, RefundOrder refundOrder) {
+        // 平台单号
+        String orderNo = StringUtil.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() : order.getPlatOrderNo();
+        List<OrderProductProfit> list = orderProductProfitService.getByOrder(orderNo, getType(), OrderProductProfit.Constants.成功.name());
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        RefundOrderInfoResponse refundDetail = refundOrderService.getRefundOrderDetailByRefundOrderNo(refundOrder.getRefundOrderNo());
+        for (OrderProductProfit productProfit : list) {
+            String context = "购买订单增加【" + ProductProfitEnum.活跃.getName() + "】, 商品名称【" + refundDetail.getProductName() + "】收益名称【" + productProfit.getProfitName() + "】收益说明【" + productProfit.getPostscript() + "】";
+            refundMsgService.create(orderNo, refundOrder.getRefundOrderNo(), context);
+        }
     }
 
     @Data

@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.page.CommonPage;
@@ -26,6 +27,10 @@ public class LztAcctOpenController {
     @ApiOperation(value = "开户申请")
     @GetMapping(value = "/apply")
     public CommonResult<LztAcctOpen> apply(Integer merId, String userId, String userType, String returnUrl, String businessScope) {
+        if (ObjectUtil.isEmpty(merId)) {
+            SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+             merId = systemAdmin.getMerId();
+        }
         LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(merId, userId, userType, returnUrl, businessScope);
         return CommonResult.success(lztAcctOpen);
     }

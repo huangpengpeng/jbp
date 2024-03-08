@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
 import com.jbp.common.model.merchant.Merchant;
@@ -25,12 +26,14 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBrokerageRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.user.UserToken;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.service.*;
 
 import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.PlatformWalletService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +121,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     private CrmebConfig crmebConfig;
     @Autowired
     private FundClearingService fundClearingService;
+    @Autowired
+    private PlatformWalletService platformWalletService;
 
 
     /**
@@ -435,6 +440,13 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
             if (CollUtil.isNotEmpty(couponIdList)) {
                 couponUserService.rollbackByIds(couponIdList);
+            }
+            if(CollUtil.isNotEmpty(refundOrder.getRefundWalletList())){
+                refundOrder.getRefundWalletList().forEach(w->{
+                    if(w.getRefundFee() != null && ArithmeticUtils.gt(w.getRefundFee(), BigDecimal.ZERO)){
+                        platformWalletService.transferToUser(refundOrder.getPayUid(), w.getWalletType(), w.getRefundFee(), WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
+                    }
+                });
             }
             return Boolean.TRUE;
         });
@@ -754,7 +766,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         Boolean execute = transactionTemplate.execute(e -> {
             // 佣金发放待审核
             fundClearingService.updateWaitAudit(platOrderNo, "订单收货");
-            fundClearingService.updateWaitAudit(orderNo, "订单收货");
             String merchantShareNode = nodeRecord.getStr(SysConfigConstants.MERCHANT_SHARE_NODE);
             if (StrUtil.isNotBlank(merchantShareNode) && "pay".equals(merchantShareNode)) {
                 String merchantShareNodeFreezeDayStr = systemConfigService.getValueByKey(SysConfigConstants.MERCHANT_SHARE_FREEZE_TIME);

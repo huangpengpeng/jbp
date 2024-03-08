@@ -8,6 +8,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigPageRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigRequest;
+import com.jbp.common.request.agent.FundClearingItemConfigUpdateRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.product.comm.ProductCommEnum;
@@ -84,7 +85,7 @@ public class FundClearingItemConfigController {
         for (FundClearingItemConfigRequest config : request) {
             scale = scale.add(config.getScale());
         }
-        if (ArithmeticUtils.equals(scale, BigDecimal.ONE)) {
+        if (!ArithmeticUtils.equals(scale, BigDecimal.ONE)) {
             return CommonResult.failed("佣金方法的总比例必须等于1");
         }
         fundClearingItemConfigService.save(request);

@@ -7,9 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.RelationScore;
-import com.jbp.common.model.agent.UserInvitationFlow;
-import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -17,10 +15,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.UserRelationDao;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.RelationScoreService;
-import com.jbp.service.service.agent.UserInvitationService;
-import com.jbp.service.service.agent.UserRelationFlowService;
-import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
@@ -47,6 +42,10 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     private RelationScoreService relationScoreService;
     @Resource
     private UserService userService;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
 
     @Override
     public UserRelation getByUid(Integer uId) {
@@ -160,7 +159,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         LambdaQueryWrapper<UserRelation> lqw = new LambdaQueryWrapper<UserRelation>()
                 .eq(!ObjectUtil.isNull(uid), UserRelation::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserRelation::getPId, pid)
-                .eq(!ObjectUtil.isNull(node), UserRelation::getNode, node);
+                .eq(!ObjectUtil.isNull(node), UserRelation::getNode, node)
+                .orderByDesc(UserRelation::getId)
+                .orderByAsc(UserRelation::getNode);
         Page<UserRelation> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserRelation> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -170,13 +171,27 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(UserRelation::getPId).collect(Collectors.toList());
         Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        //等级
+        Map<Integer, UserCapa> capaUidMapList = userCapaService.getUidMap(uIdList);
+        Map<Integer, UserCapa> capaPidMapList = userCapaService.getUidMap(pIdList);
+        //星级
+        Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
+        Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            e.setURealName(uUser != null ? uUser.getRealName() : "");
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
+            UserCapa uUserCapa = capaUidMapList.get(e.getUId());
+            e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
+            UserCapa pUserCapa = capaPidMapList.get(e.getPId());
+            e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setPRealName(pUser != null ?  pUser.getRealName() : "");
+            e.setPNickName(pUser != null ?  pUser.getNickname() : "");
+            UserCapaXs uUserCapaXs = capaXsUidMapList.get(e.getUId());
+            e.setUCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
+            UserCapaXs pUserCapaXs = capaXsPidMapList.get(e.getPId());
+            e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -44,7 +44,6 @@ public class SystemAdminLoginRequest {
     private String reqMfa;
     
     @ApiModelProperty(value = "手机号", required = false)
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
     private String phone;
 
     @ApiModelProperty(value = "手机验证码", required = false)

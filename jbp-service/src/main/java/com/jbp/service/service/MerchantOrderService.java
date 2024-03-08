@@ -26,6 +26,8 @@ public interface MerchantOrderService extends IService<MerchantOrder> {
      */
     List<MerchantOrder> getByOrderNo(String orderNo);
 
+    List<MerchantOrder> getByOrderNo(List<String> orderNoList);
+
     /**
      * 根据主订单号获取商户订单（支付完成进行商户拆单后可用）
      * @param orderNo 主订单号

@@ -19,6 +19,7 @@ import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
+import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -173,6 +174,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private UserRelationService relationService;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private ProductCommChain productCommChain;
 
 
 
@@ -737,7 +740,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         String orderVoString = redisUtil.get(key);
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
-        if(userInfo.getId() != orderInfoVo.getPayUserId()){
+        if(!userInfo.getId().equals(orderInfoVo.getPayUserId())){
             throw new CrmebException("不能操作其他人的订单");
         }
         PreOrderResponse preOrderResponse = new PreOrderResponse();
@@ -940,7 +943,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderVoString = redisUtil.get(key).toString();
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         User user = userService.getInfo();
-        if(user.getId() != orderInfoVo.getPayUserId()){
+        if(!user.getId().equals(orderInfoVo.getPayUserId())){
             throw new CrmebException("不能操作其他人的订单");
         }
         return computedPrice(request, orderInfoVo, user);
@@ -1124,6 +1127,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 orderDetail.setSku(detailVo.getSku());
                 orderDetail.setPrice(detailVo.getPrice());
                 orderDetail.setPayNum(detailVo.getPayNum());
+                BigDecimal scoreValue = detailVo.getScoreValue() == null ? BigDecimal.ZERO :  detailVo.getScoreValue();
+                orderDetail.setScoreValue(scoreValue.multiply(BigDecimal.valueOf(orderDetail.getPayNum())));
                 orderDetail.setWeight(detailVo.getWeight());
                 orderDetail.setVolume(detailVo.getVolume());
                 orderDetail.setBarCode(detailVo.getBarCode());
@@ -1785,6 +1790,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrder.setOrderNo(order.getOrderNo());
         refundOrder.setMerId(order.getMerId());
         refundOrder.setUid(order.getUid());
+        refundOrder.setPayUid(merchantOrder.getPayUid());
         refundOrder.setRealName(merchantOrder.getRealName());
         refundOrder.setUserPhone(merchantOrder.getUserPhone());
         refundOrder.setUserAddress(merchantOrder.getUserAddress());
@@ -1797,6 +1803,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrder.setRefundPlatCouponPrice(merchantOrder.getPlatCouponPrice());
         refundOrder.setAfterSalesType(request.getAfterSalesType());
         refundOrder.setReturnGoodsType(request.getReturnGoodsType());
+        refundOrder.setRefundWalletFee(merchantOrder.getWalletDeductionFee());
+        refundOrder.setRefundWalletList(merchantOrder.getWalletDeductionList());
 
         RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
         refundOrderInfo.setRefundOrderNo(refundOrder.getRefundOrderNo());
@@ -1812,17 +1820,29 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         refundOrderInfo.setProductType(orderDetail.getProductType());
         refundOrderInfo.setPayPrice(orderDetail.getPayPrice());
         refundOrderInfo.setApplyRefundNum(request.getNum());
+        refundOrderInfo.setRefundWalletFee(orderDetail.getWalletDeductionFee());
+        refundOrderInfo.setRefundWalletList(orderDetail.getWalletDeductionList());
+
         // 临时性计算退款金额、积分
         if (request.getNum().equals(orderDetail.getPayNum())) {
             refundOrderInfo.setRefundPrice(orderDetail.getPayPrice());
             refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral());
             refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral());
             refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
+            refundOrderInfo.getRefundWalletList().forEach(w->{
+                w.setRefundFee(w.getDeductionFee());
+            });
         } else {
             refundOrderInfo.setRefundUseIntegral(0);
             refundOrderInfo.setRefundGainIntegral(0);
+            refundOrderInfo.setRefundWalletFee(BigDecimal.ZERO);
+            refundOrderInfo.getRefundWalletList().forEach(w -> {
+                w.setRefundFee(BigDecimal.ZERO);
+            });
+
             BigDecimal ratio = new BigDecimal(request.getNum().toString()).divide(new BigDecimal(orderDetail.getPayNum().toString()), 10, BigDecimal.ROUND_HALF_UP);
             refundOrderInfo.setRefundPrice(orderDetail.getPayPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+
             if (orderDetail.getUseIntegral() > 0) {
                 refundOrderInfo.setRefundUseIntegral(new BigDecimal(orderDetail.getUseIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             }
@@ -1832,14 +1852,25 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
                 refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
+            if(CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
+                BigDecimal refundWalletFee = BigDecimal.ZERO;
+                for (ProductDeduction deduction : refundOrderInfo.getRefundWalletList()) {
+                    if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
+                        deduction.setRefundFee(deduction.getDeductionFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+                        refundWalletFee = refundWalletFee.add(deduction.getRefundFee());
+                    }
+                }
+                refundOrderInfo.setRefundWalletFee(refundWalletFee);
+            }
             refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
         }
-
         refundOrder.setRefundPrice(refundOrderInfo.getRefundPrice());
         refundOrder.setRefundUseIntegral(refundOrderInfo.getRefundUseIntegral());
         refundOrder.setRefundGainIntegral(refundOrderInfo.getRefundGainIntegral());
         refundOrder.setRefundPlatCouponPrice(refundOrderInfo.getRefundPlatCouponPrice());
         refundOrder.setRefundFreightFee(refundOrderInfo.getRefundFreightFee());
+        refundOrder.setRefundWalletFee(refundOrderInfo.getRefundWalletFee());
+        refundOrder.setRefundWalletList(refundOrderInfo.getRefundWalletList());
 
         order.setRefundStatus(OrderConstants.ORDER_REFUND_STATUS_APPLY);
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
@@ -1849,6 +1880,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             refundOrderService.save(refundOrder);
             refundOrderInfoService.save(refundOrderInfo);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_APPLY, "用户发起退款单申请");
+            productCommChain.orderRefundIntercept(order);
             return Boolean.TRUE;
         });
         if (!execute) throw new CrmebException("申请退款失败");
@@ -2373,6 +2405,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());
         detailVo.setPayPrice(attrValue.getPrice());
+        detailVo.setScoreValue(attrValue.getScoreValue() == null ? BigDecimal.ZERO : attrValue.getScoreValue());
         detailVo.setPayNum(detailRequest.getProductNum());
         detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : product.getImage());
         detailVo.setVolume(attrValue.getVolume());
@@ -2885,6 +2918,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         detailVo.setSku(attrValue.getSku());
         detailVo.setPrice(attrValue.getPrice());
         detailVo.setPayPrice(attrValue.getPrice());
+        detailVo.setScoreValue(attrValue.getScoreValue() == null ? BigDecimal.ZERO : attrValue.getScoreValue());
         detailVo.setPayNum(detailRequest.getProductNum());
         detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : product.getHeadImg());
         detailVo.setVolume(attrValue.getVolume());

@@ -14,6 +14,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.RelationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,9 +32,12 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     private UserService userService;
 
     @Override
-    public PageInfo<RelationScoreFlow> pageList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreFlow> pageList(Integer uid,Integer orderuid,String ordersSn,  PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
-                .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid);
+                .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
+                .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
+                .eq(StringUtils.isNotEmpty(ordersSn),RelationScoreFlow::getOrdersSn,ordersSn)
+                .orderByDesc(RelationScoreFlow::getId);
         Page<RelationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScoreFlow> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){

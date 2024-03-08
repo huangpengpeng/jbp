@@ -27,15 +27,19 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
     @Override
     public PageInfo<OrdersFundSummary> pageList(String ordersSn, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<OrdersFundSummary> lqw = new LambdaQueryWrapper<OrdersFundSummary>()
-                .like(!ObjectUtil.isNull(ordersSn), OrdersFundSummary::getOrdersSn, ordersSn);
+                .like(!ObjectUtil.isNull(ordersSn), OrdersFundSummary::getOrdersSn, ordersSn)
+                .orderByDesc(OrdersFundSummary::getId);
         Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list(lqw));
     }
 
     @Override
     public OrdersFundSummary create(Integer ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv) {
+        if (getByOrdersSn(ordersSn) != null) {
+            throw new CrmebException("订单:" + ordersSn + ", 支付成功后置处理已经完成");
+        }
         OrdersFundSummary summary = new OrdersFundSummary(ordersId, ordersSn, payPrice, pv);
-        Boolean ifSuccess = save(summary);
+        save(summary);
         return summary;
     }
 

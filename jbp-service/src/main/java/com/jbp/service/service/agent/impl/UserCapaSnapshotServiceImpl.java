@@ -45,7 +45,8 @@ public class UserCapaSnapshotServiceImpl extends ServiceImpl<UserCapaSnapshotDao
         LambdaQueryWrapper<UserCapaSnapshot> userCapaSnapshotLambdaQueryWrapper = new LambdaQueryWrapper<UserCapaSnapshot>()
                 .eq(!ObjectUtil.isNull(uid), UserCapaSnapshot::getUid, uid)
                 .eq(!ObjectUtil.isNull(capaId), UserCapaSnapshot::getCapaId, capaId)
-                .eq(!ObjectUtil.isNull(type) && !type.equals(""), UserCapaSnapshot::getType, type);
+                .eq(!ObjectUtil.isNull(type) && !type.equals(""), UserCapaSnapshot::getType, type)
+                .orderByDesc(UserCapaSnapshot::getId);
         Page<UserCapaSnapshot> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapaSnapshot> list = list(userCapaSnapshotLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {

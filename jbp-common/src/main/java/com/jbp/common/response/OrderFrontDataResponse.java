@@ -87,4 +87,5 @@ public class OrderFrontDataResponse implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
 }

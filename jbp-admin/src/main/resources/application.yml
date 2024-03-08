@@ -38,4 +38,4 @@
 
   spring:
     profiles:
-      active: dev
+      active: beta

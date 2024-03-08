@@ -3,16 +3,13 @@ package com.jbp.common.request;
 import com.jbp.common.exception.CrmebException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -29,8 +26,8 @@ public class PlatformUpdateUserRequest implements Serializable {
     @ApiModelProperty(value = "性别，0未知，1男，2女，3保密")
     private Integer sex;
 
-    @ApiModelProperty(value = "真实姓名")
-    private String realName;
+    @ApiModelProperty(value = "用户昵称")
+    private String nickname;
 
     @ApiModelProperty(value = "手机号码")
     private String phone;
@@ -44,11 +41,17 @@ public class PlatformUpdateUserRequest implements Serializable {
     @ApiModelProperty(value = "城市")
     private String city;
 
+    @ApiModelProperty(value = "交易密码")
+    private String payPwd;
+
     @ApiModelProperty(value = "区")
     private String district;
 
     @ApiModelProperty(value = "详细地址")
     private String address;
+
+    @ApiModelProperty(value = "是否开店")
+    private Boolean openShop;
 
     public void setPhone(String phone) {
         if (phone != null && phone.matches("^1\\d{2}\\*{4}\\d{4}$")) {

@@ -3,6 +3,7 @@ package com.jbp.service.product.profit;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.RefundOrder;
 
 import java.util.List;
 
@@ -16,5 +17,5 @@ public interface ProductProfitHandler {
 
     void orderSuccess(Order order, List<OrderDetail> orderDetailList, List<ProductProfit> productProfitList);
 
-    void orderRefund(Order order);
+    void orderRefund(Order order, RefundOrder refundOrder);
 }

@@ -10,11 +10,12 @@ import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.model.user.User;
-import com.jbp.common.request.WalletChangeRequest;
-import com.jbp.common.request.WalletTradePasswordRequest;
-import com.jbp.common.request.WalletTransferRequest;
-import com.jbp.common.request.WalletWithdrawRequest;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.*;
 import com.jbp.common.request.agent.ChannelIdentityRequest;
+import com.jbp.common.request.agent.WalletFlowListRequest;
+import com.jbp.common.request.agent.WalletRequest;
+import com.jbp.common.response.UserWalletInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
@@ -26,12 +27,14 @@ import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -54,6 +57,7 @@ public class WalletController {
     private WalletWithdrawService walletWithdrawService;
     @Resource
     private SystemConfigService systemConfigService;
+
 
 
     @PostMapping("/identity")
@@ -108,6 +112,16 @@ public class WalletController {
         return CommonResult.success(walletFlowService.details(user.getId(), action));
 
     }
+
+    @GetMapping("/flowpage")
+    @ApiOperation("用户积分列表")
+    public CommonResult<CommonPage<WalletFlow>> getList(WalletFlowListRequest request) {
+        PageParamRequest pageParamRequest =new PageParamRequest();
+        pageParamRequest.setLimit(request.getLimit());
+        pageParamRequest.setPage(request.getPage());
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageWalletList( userService.getUserId(), request.getType(),request.getAction(), pageParamRequest)));
+    }
+
 
     @PostMapping("/withdraw")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户提现")
@@ -195,4 +209,15 @@ public class WalletController {
         walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt(), request.getType(), request.getPostscript());
         return CommonResult.success();
     }
+
+
+
+    @ApiOperation(value = "钱包配置余额明细")
+    @RequestMapping(value = "/walletConfigList", method = RequestMethod.GET)
+    public CommonResult<List<UserWalletInfoResponse>> walletConfigList() {
+        return CommonResult.success(walletConfigService.getUserWalletInfo());
+
+    }
+
+
 }

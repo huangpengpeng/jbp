@@ -8,23 +8,38 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserWalletInfoResponse;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.WalletConfigDao;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
+import com.jbp.service.service.agent.ChannelCardService;
+import com.jbp.service.service.agent.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, WalletConfig> implements WalletConfigService {
+
+    @Resource
+    private UserService userService;
+    @Resource
+    private WalletService walletService;
 
     @Override
     public PageInfo<WalletConfig> pageList(String name, Integer status, Boolean canWithdraw, Boolean recharge, PageParamRequest pageParamRequest) {
@@ -100,5 +115,22 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
     @Override
     public Map<Integer, WalletConfig> getWalletMap() {
         return FunctionUtil.keyValueMap(list(), WalletConfig::getType);
+    }
+    @Override
+    public List<UserWalletInfoResponse> getUserWalletInfo(){
+        List<WalletConfig> list = list();
+        List<UserWalletInfoResponse> userWalletInfoResponseList = new ArrayList<>();
+        User user = userService.getInfo();
+        list.forEach(e ->{
+
+            UserWalletInfoResponse userWalletInfoResponse = new UserWalletInfoResponse();
+            userWalletInfoResponse.setWalletConfig(e);
+            Wallet wallet =  walletService.getByUser(user.getId(),e.getType());
+            userWalletInfoResponse.setBalance(wallet == null ? BigDecimal.ZERO :wallet.getBalance());
+            userWalletInfoResponseList.add(userWalletInfoResponse);
+        });
+
+        return userWalletInfoResponseList;
+
     }
 }

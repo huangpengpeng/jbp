@@ -12,6 +12,7 @@ import com.jbp.common.lianlian.result.AcctInfoResult;
 import com.jbp.common.lianlian.result.LztQueryAcctInfo;
 import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
 import com.jbp.common.model.agent.LztAcct;
+import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
@@ -21,6 +22,7 @@ import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,6 +43,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     private MerchantService merchantService;
     @Resource
     private LztService lztService;
+    @Resource
+    private LztAcctApplyService lztAcctApplyService;
 
     @Override
     public LztAcct getByUserId(String userId) {
@@ -57,6 +61,10 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     @Override
     public LztAcct details(String userId) {
         LztAcct lztAcct = getByUserId(userId);
+        LztAcctApply lztAcctApply = lztAcctApplyService.getByUserId(userId);
+        if (lztAcctApply != null) {
+            lztAcct.setGatewayUrl(lztAcctApply.getGatewayUrl());
+        }
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),

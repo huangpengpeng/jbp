@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin/agent/lzt/transfer/morepyee")
@@ -73,5 +74,12 @@ public class LztTransferMorepyeeController {
         PageInfo<LztTransferMorepyee> page = lztTransferMorepyeeService.pageList(merId, payerId, payeeId, txnSeqno,
                 accpTxno, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
+    }
+
+    @GetMapping("/info")
+    @ApiOperation("统计")
+    public CommonResult<Map<String, Object>> info() {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(lztTransferMorepyeeService.info(systemAdmin.getMerId()));
     }
 }

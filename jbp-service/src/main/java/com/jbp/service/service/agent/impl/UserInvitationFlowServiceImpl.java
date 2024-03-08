@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
@@ -9,6 +10,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.Team;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -17,6 +20,8 @@ import com.jbp.service.dao.agent.UserInvitationFlowDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -27,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -43,6 +49,10 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
     private UserService userService;
     @Resource
     private UserInvitationFlowDao dao;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
 
     @Override
     public List<UserInvitationFlow> getUnderList(Integer pId, Long minCapaId) {
@@ -59,9 +69,10 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
      */
     @Override
     public void clear(Integer uId) {
-        LambdaQueryWrapper<UserInvitationFlow> wrapper = new LambdaQueryWrapper();
-        wrapper.eq(UserInvitationFlow::getUId, uId).or().eq(UserInvitationFlow::getPId, uId);
-        remove(wrapper);
+        List<UserInvitationFlow> list = list(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, uId));
+        List<Integer> userIdList = list.stream().map(UserInvitationFlow::getUId).collect(Collectors.toList());
+        userIdList.add(uId);
+        remove(new LambdaQueryWrapper<UserInvitationFlow>().in(UserInvitationFlow::getUId, userIdList));
     }
 
     /**
@@ -98,7 +109,8 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         LambdaQueryWrapper<UserInvitationFlow> lqw = new LambdaQueryWrapper<UserInvitationFlow>()
                 .eq(!ObjectUtil.isNull(uid), UserInvitationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserInvitationFlow::getPId, pid)
-                .eq(!ObjectUtil.isNull(level), UserInvitationFlow::getLevel, level);
+                .eq(!ObjectUtil.isNull(level), UserInvitationFlow::getLevel, level)
+                .orderByDesc(UserInvitationFlow::getId);
         Page<UserInvitationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserInvitationFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -108,13 +120,28 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(UserInvitationFlow::getPId).collect(Collectors.toList());
         Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        //等级
+        Map<Integer, UserCapa> capaUidMapList = userCapaService.getUidMap(uIdList);
+        Map<Integer, UserCapa> capaPidMapList = userCapaService.getUidMap(pIdList);
+        Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
+        Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            e.setURealName(uUser != null ? uUser.getRealName() : "");
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
+            //等级
+            UserCapa uUserCapa = capaUidMapList.get(e.getUId());
+            e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
+            UserCapa pUserCapa = capaPidMapList.get(e.getPId());
+            e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setPRealName(pUser != null ? pUser.getRealName() : "");
+            e.setUNickName(pUser != null ? pUser.getNickname() : "");
+            UserCapaXs uUserCapaXs = capaXsUidMapList.get(e.getUId());
+            e.setUCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
+            UserCapaXs pUserCapaXs = capaXsPidMapList.get(e.getPId());
+            e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
+
         });
         return CommonPage.copyPageInfo(page, list);
     }
