@@ -278,7 +278,7 @@ public class LztServiceImpl implements LztService {
             }
             return result;
         } catch (Exception e) {
-            throw new CrmebException("内部转账异常:" + s);
+            throw new CrmebException("内部转账异常:" + e.getMessage());
         }
     }
 
@@ -302,7 +302,7 @@ public class LztServiceImpl implements LztService {
             }
             return result;
         } catch (Exception e) {
-            throw new CrmebException("内部转账查询异常:" + s);
+            throw new CrmebException("内部转账异常:" + e.getMessage());
         }
     }
 
@@ -351,7 +351,7 @@ public class LztServiceImpl implements LztService {
             }
             return result;
         } catch (Exception e) {
-            throw new CrmebException("提现异常:" + s);
+            throw new CrmebException("提现异常:" + e.getMessage());
         }
     }
 
@@ -377,7 +377,7 @@ public class LztServiceImpl implements LztService {
             }
             return result;
         } catch (Exception e) {
-            throw new CrmebException("提现查询异常:" + s);
+            throw new CrmebException("提现查询异常:" + e.getMessage());
         }
     }
 
@@ -408,7 +408,34 @@ public class LztServiceImpl implements LztService {
             }
             return result;
         } catch (Exception e) {
-            throw new CrmebException("获取密码控件失败:" + s);
+            throw new CrmebException("获取密码控件失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取资金流水
+     */
+    @Override
+    public AcctSerialResult queryAcctSerial(String oidPartner, String priKey, String userId, String userType,
+                                            String dateStart, String endStart, String flagDc,  String pageNo) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        AcctSerialParams params = new AcctSerialParams(timestamp, oidPartner, userId, userType, "USEROWN_AVAILABLE",
+                dateStart, endStart, flagDc, pageNo, "10", "DESC");
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("获取资金流水失败" + userId);
+        }
+        try {
+            AcctSerialResult result = JSON.parseObject(s, AcctSerialResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("获取资金流水失败：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("获取资金流水失败:" + e.getMessage());
         }
     }
 }

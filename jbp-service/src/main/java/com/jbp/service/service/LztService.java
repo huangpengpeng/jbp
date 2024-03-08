@@ -72,4 +72,10 @@ public interface LztService {
     */
    ApplyPasswordElementResult getPasswordToken(String oidPartner, String priKey, String userId, String payCode, String pyee_name, BigDecimal amount, String scan);
 
+
+   /**
+    * 资金流水
+    */
+   AcctSerialResult  queryAcctSerial(String oidPartner, String priKey, String userId, String userType, String dateStart, String endStart, String flagDc, String pageNo);
+
 }

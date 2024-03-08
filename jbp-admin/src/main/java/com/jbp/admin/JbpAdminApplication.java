@@ -1,12 +1,17 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.controller.agent.LztAcctController;
+import com.jbp.common.lianlian.result.AcctBalList;
 import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.ChannelCardService;
@@ -25,6 +30,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Date;
+
 
 @EnableAsync //开启异步调用	
 @EnableSwagger2
@@ -38,19 +45,11 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
          ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
 
-         LztAcctApplyService bean = run.getBean(LztAcctApplyService.class);
-
-//        final LztAcctApply apply = bean.apply(4, "gz0001", "274112473", "凯赞办公用品旗舰店",
-//                "浙江省", "金华市", "义乌市", "江东街道青岩刘C区6栋2单元202");
-
-//        final LztAcctService lztAcctService = run.getBean(LztAcctService.class);
-//        final MerchantService merchantService = run.getBean(MerchantService.class);
-//        final LztService lztService = run.getBean(LztService.class);
-//        final LztAcct lztAcct = lztAcctService.getByUserId("gz0002");
-//        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-//        MerchantPayInfo payInfo = merchant.getPayInfo();
-//        final LztQueryAcctInfoResult lztQueryAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId());
-//
+//        LztAcctController bean = run.getBean(LztAcctController.class);
+//        Date now = DateTimeUtils.getNow();
+//        String dateStart = DateTimeUtils.format(DateTimeUtils.addDays(now, -10), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+//        String endStart = DateTimeUtils.format(now, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+//        CommonResult<CommonPage<AcctBalList>> page = bean.serialPage("gz0002", dateStart, endStart, null, 1);
 
         System.out.println("ok");
 

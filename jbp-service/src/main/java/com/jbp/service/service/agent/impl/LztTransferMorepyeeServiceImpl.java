@@ -4,15 +4,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.result.AcctInfo;
-import com.jbp.common.lianlian.result.LztQueryAcctInfo;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.common.lianlian.result.TransferMorepyeeResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.agent.LztTransferMorepyee;
@@ -155,57 +153,101 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
 
     @Override
     public Map<String, Object> info(Integer merId) {
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        if (payInfo == null || StringUtils.isAnyEmpty(payInfo.getOidPartner(), payInfo.getPriKey())) {
+            throw new RuntimeException("商户信息未配置完成请联系管理员");
+        }
         Map<String, Object> map = new HashMap<>();
-        //入金额
-        LambdaQueryWrapper<LztTransferMorepyee> lwq = new LambdaQueryWrapper<LztTransferMorepyee>()
-                .eq(ObjectUtil.isNotEmpty(merId), LztTransferMorepyee::getPayeeId, merId)
-                .eq(LztTransferMorepyee::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
-                .apply("TO_DAYS(finish_time) = TO_DAYS(NOW())");
-        BigDecimal todayWepositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        lwq.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
-        BigDecimal yesterdayDepositAmount = list(lwq).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        map.put("todayWepositAmount", todayWepositAmount);
-        map.put("yesterdayDepositAmount", yesterdayDepositAmount);
-        //出金额
-        LambdaQueryWrapper<LztTransferMorepyee> lambdaQueryWrapper = new LambdaQueryWrapper<LztTransferMorepyee>()
-                .eq(ObjectUtil.isNotEmpty(merId), LztTransferMorepyee::getMerId, merId)
-                .eq(LztTransferMorepyee::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
-                .apply("TO_DAYS(finish_time) = TO_DAYS(NOW())");
-        BigDecimal withdrawalAmount = list(lambdaQueryWrapper).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        lambdaQueryWrapper.apply("TO_DAYS(NOW()) - TO_DAYS(finish_time) = 1");
-        BigDecimal yesterdayWithdrawalAmount = list(lambdaQueryWrapper).stream().map(LztTransferMorepyee::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        map.put("todayWithdrawalAmount", withdrawalAmount);
-        map.put("yesterdayWithdrawalAmount", yesterdayWithdrawalAmount);
-        LambdaQueryWrapper<LztAcctOpen> openLambdaQueryWrapper = new LambdaQueryWrapper<LztAcctOpen>()
-                .eq(ObjectUtil.isNotEmpty(merId), LztAcctOpen::getMerId, merId)
-                .eq(LztAcctOpen::getStatus, LianLianPayConfig.TxnStatus.交易成功.getName())
-                .apply("TO_DAYS(txn_time) = TO_DAYS(NOW())");
-        int todayCount = lztAcctOpenService.count(openLambdaQueryWrapper);
-        openLambdaQueryWrapper.apply("TO_DAYS(NOW()) - TO_DAYS(txn_time) = 1");
-        int yesterdayTodayCount = lztAcctOpenService.count(openLambdaQueryWrapper);
-        map.put("todayCount", todayCount);
-        map.put("yesterdayTodayCount", yesterdayTodayCount);
+        List<LztAcct> lztAcctList = lztAcctService.list(new QueryWrapper<LztAcct>().lambda().eq(LztAcct::getMerId, merId));
+        //  账户数量
+        map.put("todayCount", lztAcctList.size());
 
         //总金额
-        LambdaQueryWrapper<LztAcctOpen> lztAcctOpenLambdaQueryWrapper = new LambdaQueryWrapper<LztAcctOpen>()
-                .eq(ObjectUtil.isNotEmpty(merId), LztAcctOpen::getMerId, merId)
-                .eq(LztAcctOpen::getStatus, LianLianPayConfig.TxnStatus.交易成功.getName());
-        List<String> userIdList = lztAcctOpenService.list(lztAcctOpenLambdaQueryWrapper).stream().map(LztAcctOpen::getUserId).collect(Collectors.toList());
-        BigDecimal totalAmt=new BigDecimal(0);
-        for (String s : userIdList) {
-            LztAcct details = lztAcctService.details(s);
-            List<AcctInfo> acctInfoList = details.getAcctInfoList();
-            for (AcctInfo acctInfo : acctInfoList) {
-                totalAmt.add(new BigDecimal(acctInfo.getAmt_balcur()));
-            }
+        BigDecimal totalAmt = BigDecimal.ZERO;
+        for (LztAcct lztAcct : lztAcctList) {
+            LztAcct details = lztAcctService.details(lztAcct.getUserId());
             List<LztQueryAcctInfo> bankAcctInfoList = details.getBankAcctInfoList();
             if (CollectionUtils.isNotEmpty(bankAcctInfoList)) {
-                for (LztQueryAcctInfo lztQueryAcctInfo : bankAcctInfoList) {
-                    totalAmt.add(new BigDecimal(lztQueryAcctInfo.getBank_acct_balance()));
+                for (LztQueryAcctInfo acctInfo : bankAcctInfoList) {
+                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getBank_acct_balance()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getBank_acct_balance());
+                    totalAmt = totalAmt.add(balance);
+                }
+            }
+            List<AcctInfo> acctInfoList = details.getAcctInfoList();
+            if (CollectionUtils.isNotEmpty(acctInfoList)) {
+                for (AcctInfo acctInfo : acctInfoList) {
+                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getAmt_balaval()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getAmt_balaval());
+                    totalAmt = totalAmt.add(balance);
                 }
             }
         }
-        map.put("totalAmt",totalAmt);
+        map.put("totalAmt", totalAmt);
+
+        Date now = DateTimeUtils.getNow();
+
+        // 昨天
+        BigDecimal yesterdayWithdrawalAmount = BigDecimal.ZERO;
+        BigDecimal yesterdayDepositAmount = BigDecimal.ZERO;
+        String yesterdayStart = DateTimeUtils.format(DateTimeUtils.getStartDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String yesterdayEnd = DateTimeUtils.format(DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        List<AcctBalList> yesterdayList = Lists.newArrayList();
+        for (LztAcct lztAcct : lztAcctList) {
+            Integer pageNo = 1;
+            do {
+                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
+                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), yesterdayStart, yesterdayEnd, null, pageNo.toString());
+                if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
+                    break;
+                }
+                yesterdayList.addAll(result.getAcctbal_list());
+                pageNo++;
+            } while (true);
+        }
+        for (AcctBalList acctBal : yesterdayList) {
+            // 出账
+            if ("DEBIT".equals(acctBal.getFlag_dc())) {
+                yesterdayWithdrawalAmount = yesterdayWithdrawalAmount.add(new BigDecimal(acctBal.getAmt()));
+            }
+            // 入账
+            if ("CREDIT".equals(acctBal.getFlag_dc())) {
+                yesterdayDepositAmount = yesterdayDepositAmount.add(new BigDecimal(acctBal.getAmt()));
+            }
+        }
+        map.put("yesterdayDepositAmount", yesterdayDepositAmount);
+        map.put("yesterdayWithdrawalAmount", yesterdayWithdrawalAmount);
+
+        // 今天
+        BigDecimal todayWithdrawalAmount = BigDecimal.ZERO;
+        BigDecimal todayWepositAmount = BigDecimal.ZERO;
+        String todayStart = DateTimeUtils.format(DateTimeUtils.getStartDate(now), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String todayEnd = DateTimeUtils.format(DateTimeUtils.getFinallyDate(now), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        List<AcctBalList> todayList = Lists.newArrayList();
+        for (LztAcct lztAcct : lztAcctList) {
+            Integer pageNo = 1;
+            do {
+                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
+                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), todayStart, todayEnd, null, pageNo.toString());
+                if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
+                    break;
+                }
+                todayList.addAll(result.getAcctbal_list());
+                pageNo++;
+            } while (true);
+        }
+
+        for (AcctBalList acctBal : yesterdayList) {
+            // 出账
+            if ("DEBIT".equals(acctBal.getFlag_dc())) {
+                todayWithdrawalAmount = todayWithdrawalAmount.add(new BigDecimal(acctBal.getAmt()));
+            }
+            // 入账
+            if ("CREDIT".equals(acctBal.getFlag_dc())) {
+                todayWepositAmount = todayWepositAmount.add(new BigDecimal(acctBal.getAmt()));
+            }
+        }
+        map.put("todayWepositAmount", todayWepositAmount);
+        map.put("todayWithdrawalAmount", todayWithdrawalAmount);
         return map;
     }
 }

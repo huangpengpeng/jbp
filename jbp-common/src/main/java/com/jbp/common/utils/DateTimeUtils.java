@@ -115,7 +115,7 @@ public class DateTimeUtils extends DateUtils {
                     new String[]{DEFAULT_DATE_TIME_FORMAT_PATTERN, DEFAULT_DATE_TIME_HHmm_FORMAT_PATTERN,
                             DEFAULT_DATE_TIME_HH_FORMAT_PATTERN, DEFAULT_DATE_FORMAT_PATTERN,
                             DEFAULT_TIME_FORMAT_PATTERN, DEFAULT_TIME_HHmm_FORMAT_PATTERN, DEFAULT_YYYY_FORMAT_PATTERN,
-                            DEFAULT_YYYY_MM_FORMAT_PATTERN, DEFAULT_DATE_FORMAT_PATTERN2});
+                            DEFAULT_YYYY_MM_FORMAT_PATTERN, DEFAULT_DATE_FORMAT_PATTERN2, DEFAULT_DATE_TIME_FORMAT_PATTERN2});
         } catch (ParseException e) {
             if (modeNum == 1) {
                 throw new IllegalArgumentException(arg0, e);

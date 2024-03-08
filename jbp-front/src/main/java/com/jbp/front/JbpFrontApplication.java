@@ -1,12 +1,21 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.constants.LianLianPayConfig;
+import com.jbp.common.lianlian.result.AcctSerialResult;
+import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.service.service.LztService;
+import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.PayService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
+import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +28,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,18 +54,22 @@ public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
-//        final PayService bean = run.getBean(PayService.class);
-//        bean.payAfterProcessingTemp("PT585170937969665839468");
+        MerchantService merchantService = run.getBean(MerchantService.class);
+        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
+        LztService lztService = run.getBean(LztService.class);
 
-//        final InvitationScoreFlowService bean = run.getBean(InvitationScoreFlowService.class);
-//
-//
-//        bean.pageList(null, null, "", new PageParamRequest());
-//
+        LztAcct lztAcct = lztAcctService.getByUserId("gz0002");
 
-//        final UserCapaService bean = run.getBean(UserCapaService.class);
-//        final List<UserCapa> list = bean.list();
-//        System.out.println("ok");
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        Date now = DateTimeUtils.getNow();
+        String dateStart = DateTimeUtils.format(DateTimeUtils.addDays(now, -10), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String endStart = DateTimeUtils.format(now, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), "gz0002",
+                LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), dateStart, endStart, null, "2");
+
+
+        System.out.println("ok");
 
     }
 
