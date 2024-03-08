@@ -24,6 +24,8 @@ import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,7 +111,6 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                 .eq(StringUtils.isNotEmpty(status), LztAcctApply::getStatus, status)
                 .eq(merId != null && merId > 0, LztAcctApply::getMerId, merId)
                 .orderByDesc(LztAcctApply::getId);
-
         Page<LztAcctApply> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<LztAcctApply> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -125,6 +126,15 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             } else {
                 s.setMerName(merchant.getName());
             }
+            if (StringUtils.isNotEmpty(s.getNotifyInfo())) {
+                try {
+                    JSONObject jsonObject = new JSONObject(s.getNotifyInfo());
+                    s.setGateway_url2(jsonObject.get("gateway_url").toString());
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         });
 
         return CommonPage.copyPageInfo(page, list);
