@@ -306,7 +306,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public String exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status) {
+    public  List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Long id = 0L;
         List<FundClearingVo> result = Lists.newArrayList();
@@ -347,31 +347,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             });
             id = fundClearingList.get(fundClearingList.size() - 1).getId();
         } while (true);
-
-//       以下为存储部分
-        //上传设置
-        UploadUtil.setHzwServerPath((crmebConfig.getImagePath() + "/").replace(" ", "").replace("//", "/"));
-        //文件名
-        String fileName = "佣金发放记录导出".concat(CrmebDateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
-        //自定义标题别名
-        LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
-        aliasMap.put("account", "用户账户");
-        aliasMap.put("realName", "真实姓名");
-        aliasMap.put("idCardNo", "身份证号");
-        aliasMap.put("bankName", "银行名称");
-        aliasMap.put("bankCode", "银行卡号");
-        aliasMap.put("phone", "预留手机");
-        aliasMap.put("uniqueNo", "流水单号");
-        aliasMap.put("externalNo", "外部单号");
-        aliasMap.put("commName", "佣金名称");
-        aliasMap.put("commAmt", "结算佣金");
-        aliasMap.put("sendAmt", "实发金额");
-        aliasMap.put("description", "描述");
-        aliasMap.put("status", "结算状态");
-        aliasMap.put("remark", "备注");
-        aliasMap.put("clearingTime", "结算时间");
-        aliasMap.put("createTime", "创建时间");
-        return ExportUtil.exportExcel(fileName, "佣金发放记录导出", result, aliasMap);
+        return result ;
     }
 
     @Override

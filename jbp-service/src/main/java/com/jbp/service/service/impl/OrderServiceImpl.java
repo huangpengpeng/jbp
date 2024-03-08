@@ -1098,7 +1098,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @param request 请求参数
      */
     @Override
-    public List<Order> findExportList(OrderSearchRequest request) {
+    public List<Order> findExportList(OrderSearchRequest request,Integer id) {
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
@@ -1112,6 +1112,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
+        lqw.gt(Order::getId, id);
+        lqw.last("LIMIT 1000");
         getMerchantStatusWhere(lqw, request.getStatus());
         lqw.orderByDesc(Order::getId);
         return dao.selectList(lqw);
