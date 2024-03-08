@@ -129,9 +129,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         if (payInfo == null || StringUtils.isAnyEmpty(payInfo.getOidPartner(), payInfo.getPriKey())) {
             throw new RuntimeException("商户信息未配置完成请联系管理员");
         }
-        Map<String, Object> map = new HashMap<>();
-        List<LztAcct> lztAcctList = list(new QueryWrapper<LztAcct>().lambda().eq(LztAcct::getMerId, merId));
         //  账户数量
+        List<LztAcct> lztAcctList = list(new QueryWrapper<LztAcct>().lambda().eq(LztAcct::getMerId, merId));
         response.setAccountNum(lztAcctList.size());
 
         //总金额
