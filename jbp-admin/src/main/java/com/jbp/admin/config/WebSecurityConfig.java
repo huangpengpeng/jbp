@@ -111,6 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/merchant/getLoginPic").permitAll()
                 .antMatchers("/api/admin/merchant/login").permitAll()
                 .antMatchers("/jmreport/desreport_/cdn/iview/fonts/**").permitAll()
+                .antMatchers("/api/admin/agent/lzt/**").permitAll()
                 // 放行资源路径
                 .antMatchers("/" + UploadConstants.UPLOAD_FILE_KEYWORD + "/**").permitAll()
                 .antMatchers("/" + UploadConstants.DOWNLOAD_FILE_KEYWORD + "/**").permitAll()
@@ -135,7 +136,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/captcha/get", "/captcha/check").anonymous()
                 .antMatchers("/api/admin/payment/callback/**").anonymous()
                 .antMatchers("/api/public/**").anonymous()
-//                .antMatchers("/api/admin/agent/lzt/**").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
