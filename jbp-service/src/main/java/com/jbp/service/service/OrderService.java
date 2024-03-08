@@ -317,5 +317,5 @@ public interface OrderService extends IService<Order> {
      * @param request 请求参数
      * @return
      */
-    List<Order> findExportList(OrderSearchRequest request);
+    List<Order> findExportList(OrderSearchRequest request,Integer id);
 }

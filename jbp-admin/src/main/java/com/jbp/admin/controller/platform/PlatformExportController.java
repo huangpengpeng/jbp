@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.ExportService;
 
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -43,11 +45,8 @@ public class PlatformExportController {
     @PreAuthorize("hasAuthority('platform:export:order:excel')")
     @ApiOperation(value = "导出订单Excel")
     @RequestMapping(value = "/order/excel", method = RequestMethod.GET)
-    public CommonResult<HashMap<String, String>> exportOrder(@Validated OrderSearchRequest request){
-        String fileName = exportService.exportOrder(request);
-        HashMap<String, String> map = CollUtil.newHashMap();
-        map.put("fileName", fileName);
-        return CommonResult.success(map);
+    public CommonResult<List<OrderExcelVo>> exportOrder(@Validated OrderSearchRequest request){
+        return CommonResult.success(exportService.exportOrder(request));
     }
 
 }

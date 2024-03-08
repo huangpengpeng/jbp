@@ -2,6 +2,9 @@ package com.jbp.service.service;
 
 
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.vo.OrderExcelVo;
+
+import java.util.List;
 
 /**
 * StoreProductService 接口
@@ -22,6 +25,6 @@ public interface ExportService {
      * @param request 查询条件
      * @return 文件名称
      */
-    String exportOrder(OrderSearchRequest request);
+    List<OrderExcelVo> exportOrder(OrderSearchRequest request);
 
 }
