@@ -3,14 +3,12 @@ package com.jbp.service.service.agent.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
-import com.jbp.common.lianlian.result.AcctInfo;
-import com.jbp.common.lianlian.result.AcctInfoResult;
-import com.jbp.common.lianlian.result.LztQueryAcctInfo;
-import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
@@ -18,6 +16,8 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.LztInfoResponse;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
@@ -31,6 +31,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -116,5 +119,104 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         });
 
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public LztInfoResponse lztInfo(Integer merId) {
+        LztInfoResponse response = new LztInfoResponse();
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        if (payInfo == null || StringUtils.isAnyEmpty(payInfo.getOidPartner(), payInfo.getPriKey())) {
+            throw new RuntimeException("商户信息未配置完成请联系管理员");
+        }
+        Map<String, Object> map = new HashMap<>();
+        List<LztAcct> lztAcctList = list(new QueryWrapper<LztAcct>().lambda().eq(LztAcct::getMerId, merId));
+        //  账户数量
+        response.setAccountNum(lztAcctList.size());
+
+        //总金额
+        BigDecimal totalAmt = BigDecimal.ZERO;
+        for (LztAcct lztAcct : lztAcctList) {
+            LztAcct details = details(lztAcct.getUserId());
+            List<LztQueryAcctInfo> bankAcctInfoList = details.getBankAcctInfoList();
+            if (CollectionUtils.isNotEmpty(bankAcctInfoList)) {
+                for (LztQueryAcctInfo acctInfo : bankAcctInfoList) {
+                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getBank_acct_balance()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getBank_acct_balance());
+                    totalAmt = totalAmt.add(balance);
+                }
+            }
+            List<AcctInfo> acctInfoList = details.getAcctInfoList();
+            if (CollectionUtils.isNotEmpty(acctInfoList)) {
+                for (AcctInfo acctInfo : acctInfoList) {
+                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getAmt_balaval()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getAmt_balaval());
+                    totalAmt = totalAmt.add(balance);
+                }
+            }
+        }
+        response.setTotalAmt(totalAmt);
+        // 昨天
+        Date now = DateTimeUtils.getNow();
+        BigDecimal yesterdayInAmt = BigDecimal.ZERO;
+        BigDecimal yesterdayOutAmt = BigDecimal.ZERO;
+        String yesterdayStart = DateTimeUtils.format(DateTimeUtils.getStartDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String yesterdayEnd = DateTimeUtils.format(DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        List<AcctBalList> yesterdayList = Lists.newArrayList();
+        for (LztAcct lztAcct : lztAcctList) {
+            Integer pageNo = 1;
+            do {
+                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
+                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), yesterdayStart, yesterdayEnd, null, pageNo.toString());
+                if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
+                    break;
+                }
+                yesterdayList.addAll(result.getAcctbal_list());
+                pageNo++;
+            } while (true);
+        }
+        for (AcctBalList acctBal : yesterdayList) {
+            // 出账
+            if ("DEBIT".equals(acctBal.getFlag_dc())) {
+                yesterdayOutAmt = yesterdayOutAmt.add(new BigDecimal(acctBal.getAmt()));
+            }
+            // 入账
+            if ("CREDIT".equals(acctBal.getFlag_dc())) {
+                yesterdayInAmt = yesterdayInAmt.add(new BigDecimal(acctBal.getAmt()));
+            }
+        }
+        response.setYesterdayInAmt(yesterdayInAmt);
+        response.setYesterdayOutAmt(yesterdayOutAmt);
+
+        // 今天
+        BigDecimal todayOutAmt = BigDecimal.ZERO;
+        BigDecimal todayInAmt = BigDecimal.ZERO;
+        String todayStart = DateTimeUtils.format(DateTimeUtils.getStartDate(now), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String todayEnd = DateTimeUtils.format(DateTimeUtils.getFinallyDate(now), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        List<AcctBalList> todayList = Lists.newArrayList();
+        for (LztAcct lztAcct : lztAcctList) {
+            Integer pageNo = 1;
+            do {
+                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
+                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), todayStart, todayEnd, null, pageNo.toString());
+                if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
+                    break;
+                }
+                todayList.addAll(result.getAcctbal_list());
+                pageNo++;
+            } while (true);
+        }
+
+        for (AcctBalList acctBal : yesterdayList) {
+            // 出账
+            if ("DEBIT".equals(acctBal.getFlag_dc())) {
+                todayOutAmt = todayOutAmt.add(new BigDecimal(acctBal.getAmt()));
+            }
+            // 入账
+            if ("CREDIT".equals(acctBal.getFlag_dc())) {
+                todayInAmt = todayInAmt.add(new BigDecimal(acctBal.getAmt()));
+            }
+        }
+        response.setTodayInAmt(todayInAmt);
+        response.setTodayOutAmt(todayOutAmt);
+        return response;
     }
 }

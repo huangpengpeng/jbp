@@ -14,10 +14,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.agent.ChannelCardService;
-import com.jbp.service.service.agent.LztAcctApplyService;
-import com.jbp.service.service.agent.LztAcctService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -31,6 +28,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Date;
+import java.util.Map;
 
 
 @EnableAsync //开启异步调用	
@@ -51,6 +49,8 @@ public class JbpAdminApplication {
 //        String endStart = DateTimeUtils.format(now, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
 //        CommonResult<CommonPage<AcctBalList>> page = bean.serialPage("gz0002", dateStart, endStart, null, 1);
 
+        LztTransferMorepyeeService bean = run.getBean(LztTransferMorepyeeService.class);
+        final Map<String, Object> info = bean.info(4);
         System.out.println("ok");
 
     }

@@ -3,13 +3,11 @@ package com.jbp.service.service.agent;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.common.model.agent.LztFundTransfer;
 import com.jbp.common.model.agent.LztTransferMorepyee;
 import com.jbp.common.request.PageParamRequest;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Map;
 
 public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee> {
 
@@ -29,5 +27,5 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
                                        String accpTxno, String status, Date startTime, Date endTime,
                                            PageParamRequest pageParamRequest);
 
-    Map<String, Object> info(Integer merId);
+
 }

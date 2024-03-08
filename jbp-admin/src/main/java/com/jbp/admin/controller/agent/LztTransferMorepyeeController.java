@@ -76,10 +76,5 @@ public class LztTransferMorepyeeController {
         return CommonResult.success(page);
     }
 
-    @GetMapping("/info")
-    @ApiOperation("统计")
-    public CommonResult<Map<String, Object>> info() {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        return CommonResult.success(lztTransferMorepyeeService.info(systemAdmin.getMerId()));
-    }
+
 }

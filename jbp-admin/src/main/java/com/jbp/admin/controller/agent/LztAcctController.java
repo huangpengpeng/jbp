@@ -15,6 +15,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
@@ -50,6 +51,14 @@ public class LztAcctController {
     @Resource
     private MerchantService merchantService;
 
+    @GetMapping("/info")
+    @ApiOperation("来账通首页")
+    public CommonResult<LztInfoResponse> info() {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(lztAcctService.lztInfo(systemAdmin.getMerId()));
+    }
+
+
     @ApiOperation(value = "来账通账户分页")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<LztAcct>> page(String userId, String username, PageParamRequest pageParamRequest) {
@@ -64,8 +73,6 @@ public class LztAcctController {
     public CommonResult<LztAcct> details(String userId) {
         return CommonResult.success(lztAcctService.details(userId));
     }
-
-
 
 
     @ApiOperation(value = "银行虚拟户申请")
@@ -181,7 +188,4 @@ public class LztAcctController {
         page.setList(acctbalList);
         return CommonResult.success(page);
     }
-
-
-
 }

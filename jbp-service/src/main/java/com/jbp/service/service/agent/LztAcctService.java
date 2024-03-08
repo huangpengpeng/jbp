@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.LztInfoResponse;
 
 import java.util.List;
 
@@ -16,4 +17,7 @@ public interface LztAcctService extends IService<LztAcct> {
     LztAcct details(String userId);
 
     PageInfo<LztAcct> pageList(Integer merId, String userId, String username,  PageParamRequest pageParamRequest);
+
+
+    LztInfoResponse lztInfo(Integer merId);
 }
