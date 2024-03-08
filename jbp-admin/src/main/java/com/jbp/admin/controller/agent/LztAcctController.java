@@ -177,7 +177,7 @@ public class LztAcctController {
                 acctBalList.setUsername(lztAcct.getUsername());
                 acctBalList.setUserType(lztAcct.getUserType());
                 acctBalList.setTxn_type(LianLianPayConfig.SerialTxnType.getName(acctBalList.getTxn_type()));
-                acctBalList.setFlag_dc("DEBIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
+                acctBalList.setFlag_dc("CREDIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
                 acctBalList.setTxn_time(DateTimeUtils.format(DateTimeUtils.parseDate(acctBalList.getTxn_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
             }
         }
