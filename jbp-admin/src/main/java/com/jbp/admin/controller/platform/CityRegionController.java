@@ -76,7 +76,7 @@ public class CityRegionController {
         return CommonResult.failed();
     }
 
-    @PreAuthorize("hasAuthority('platform:city:region:list:tree')")
+//    @PreAuthorize("hasAuthority('platform:city:region:list:tree')")
     @ApiOperation(value = "获取城市区域tree结构的列表")
     @RequestMapping(value = "/list/tree", method = RequestMethod.GET)
     public CommonResult<List<CityVo>> getListTree() {

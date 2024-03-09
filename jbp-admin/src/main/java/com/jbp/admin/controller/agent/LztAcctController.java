@@ -69,7 +69,7 @@ public class LztAcctController {
         PageInfo<LztAcct> page = lztAcctService.pageList(merId, userId, username, pageParamRequest);
         return CommonResult.success(CommonPage.restPage(page));
     }
-    @PreAuthorize("hasAuthority('agent:lzt:acct:details')")
+
     @ApiOperation(value = "来账通账户详情[余额信息]")
     @GetMapping(value = "/details")
     public CommonResult<LztAcct> details(String userId) {
@@ -84,7 +84,6 @@ public class LztAcctController {
         LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address);
         return CommonResult.success(apply);
     }
-    @PreAuthorize("hasAuthority('agent:lzt:acct:pwd')")
     @ApiOperation(value = "来账通账户密码控件")
     @GetMapping(value = "/pwd")
     public CommonResult<ApplyPasswordElementResult> pwd(String userId, BigDecimal amt, String scan) {
