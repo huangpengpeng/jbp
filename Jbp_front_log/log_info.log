@@ -1,0 +1,215 @@
+2024-03-08 15:55:23.004 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on 192.168.2.30 with PID 2225 (/Users/franky/work/jbp/jbp-front/target/classes started by kaycm in /Users/franky/work/jbp)
+2024-03-08 15:55:23.006 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-03-08 15:55:25.543 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-03-08 15:55:25.549 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-03-08 15:55:25.612 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 27ms. Found 0 Redis repository interfaces.
+2024-03-08 15:55:27.486 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-03-08 15:55:27.500 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-03-08 15:55:27.502 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-03-08 15:55:27.502 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-03-08 15:55:27.914 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-03-08 15:55:27.923 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-03-08 15:55:27.923 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4854 ms
+2024-03-08 15:55:34.939 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-03-08 15:55:44.602 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-03-08 15:55:45.144 [redisson-netty-2-23] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-03-08 15:55:45.162 [redisson-netty-2-16] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-03-08 15:55:47.234 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-03-08 15:55:47.239 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-03-08 15:55:47.246 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-03-08 15:55:47.290 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@125c03d3, ORIGINAL=[Ljava.lang.String;@7e9ea888, PIC_CLICK=[Ljava.lang.String;@24f8707c]
+2024-03-08 15:55:47.290 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-03-08 15:55:49.040 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-03-08 15:55:49.104 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@7a0eb939, ORIGINAL=[Ljava.lang.String;@54a7d1b9, PIC_CLICK=[Ljava.lang.String;@209f0986]
+2024-03-08 15:55:49.104 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-03-08 15:55:49.162 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-03-08 15:55:53.182 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-03-08 15:55:53.846 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@3e966e67, org.springframework.security.web.context.SecurityContextPersistenceFilter@4620e669, org.springframework.security.web.header.HeaderWriterFilter@23a0c7f3, org.springframework.security.web.authentication.logout.LogoutFilter@3ea95f79, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6c6fdf5d, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2d33aa31, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@45dbbb97, org.springframework.security.web.session.SessionManagementFilter@16263fb2, org.springframework.security.web.access.ExceptionTranslationFilter@5915ab69, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@3a22c944]
+2024-03-08 15:55:53.875 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-03-08 15:55:53.917 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-03-08 15:55:53.918 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-03-08 15:55:54.915 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-03-08 15:55:54.946 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-03-08 15:55:55.030 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-03-08 15:55:55.329 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-03-08 15:55:55.359 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-03-08 15:55:55.410 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-03-08 15:55:55.435 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-03-08 15:55:55.593 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-03-08 15:55:55.600 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-03-08 15:55:55.733 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-03-08 15:55:55.781 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-03-08 15:55:55.870 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-03-08 15:55:55.923 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-03-08 15:55:55.974 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-03-08 15:55:55.980 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-03-08 15:55:56.138 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-03-08 15:55:56.142 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-03-08 15:55:56.151 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-03-08 15:55:56.152 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-03-08 15:55:56.158 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-03-08 15:55:56.159 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-03-08 15:55:56.209 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-03-08 15:55:56.212 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-03-08 15:55:56.298 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-03-08 15:55:56.365 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-03-08 15:55:56.385 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-03-08 15:55:56.429 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-03-08 15:55:56.434 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 34.186 seconds (JVM running for 35.933)
+2024-03-08 15:55:56.666 [RMI TCP Connection(6)-192.168.2.30] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-03-08 15:55:56.666 [RMI TCP Connection(6)-192.168.2.30] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-03-08 15:55:56.686 [RMI TCP Connection(6)-192.168.2.30] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 20 ms
+2024-03-08 15:55:57.287 [main] INFO  c.j.common.lianlian.security.LLianPayAccpSignature - 签名处理中，签名源内容：{"acct_type":"USEROWN_AVAILABLE","date_end":"20240308155556","date_start":"20240227155556","oid_partner":"402402220000016691","page_no":"1","page_size":"10","sort_type":"DESC","timestamp":"20240308155557","user_id":"gz0002","user_type":"INNERCOMPANY"}，对应MD5值：436571a18b7e572c1bdeae72bc56e980
+2024-03-08 15:55:57.405 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求URL：https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial
+2024-03-08 15:55:57.405 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求签名值：nIvMSafJuBySaYOhJBcJUDUu8ndjFsBhtvbHclWVClKxpbML2v9f+hPMQaZy/X/vRu5C3ZG7QszXCeCgaYy0jv3pl9OVVDgVbtSoCs4mEm3hmfRFDRYOZzCK1oEkmE8vtIi7nAn1z2NqZ6oXUU52HZHVj9RVSDnN+FbgDaAcmAVsH36u9FmYtAvvqGYj18+BuhMA8gVpRwAz3vw+yXo9QsnM+lBWl1KkzSRoo+wWrTSSDwTKHQONTohKF2QXzBtfw926y/IGiuf4bLW/MaJPrAVnK8EeERMhdkEwrv5nDt0INbLKv1Eiyr+/KaiweWqVh0O7DdBVfP3Si7Bprrrff2oJHBjE9LgwZn6ajhhxOz6oMEf/0N029Ut9Z6G9cDrtavkAt0Ri2Pt+AGfDGLgFyyngzbZRxNEFQFYNdnmjlMW91jqBkRu2udk7fegzKYzxJdDYYKT2GLuX0oxIQcpXwxfJ97WaljI5nCBqyfs60r3WXg1lpowqOCESrnJCjuY+hN+buYKfRMhWZhxK5dpDTAVpuiB2L6k389RiEi2vz64JdxR0vBZtOyDInIzNlZy4k6SX5quyUjvsUz87SQofI0+K179tlMF7tTtK5x0PspGp+s+NFeO6yG1F5AOnMMZ+z8I3UYKShIBN6v9UX1DVWdahnVdbkhsv6Bry//EQsow=
+2024-03-08 15:55:57.405 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求参数：{"acct_type":"USEROWN_AVAILABLE","date_end":"20240308155556","date_start":"20240227155556","oid_partner":"402402220000016691","page_no":"1","page_size":"10","sort_type":"DESC","timestamp":"20240308155557","user_id":"gz0002","user_type":"INNERCOMPANY"}
+2024-03-08 15:55:57.996 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 响应结果：{"acctbal_list":[{"accp_txnno":"2024030790873341","amt":"1.00","amt_bal":"2.01","date_acct":"20240307","flag_dc":"CREDIT","jno_acct":"20240307002112957947","jno_cli":"88888ACS2024030721130632","memo":"AUTO_DEPOSIT","oid_acctno":"20240305000099561455","txn_time":"20240307100140","txn_type":"USER_TOPUP"},{"accp_txnno":"2024030790519089","amt":"1.01","amt_bal":"1.01","date_acct":"20240307","flag_dc":"CREDIT","jno_acct":"20240307002112424703","jno_cli":"88888ACS2024030719430634","memo":"AUTO_DEPOSIT","oid_acctno":"20240305000099561455","txn_time":"20240307070204","txn_type":"USER_TOPUP"}],"oid_partner":"402402220000016691","page_no":1,"ret_code":"0000","ret_msg":"交易成功","total_in_amt":"2.01","total_num":2,"total_out_amt":"0.00","total_page":1,"user_id":"gz0002"}
+2024-03-08 15:55:57.997 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 响应签名：Z9FkXIS/wpX+vfNTeLgRsYmNrEOzSENx9famOHH3t834a4fiRXt7BZtJbRiCc6UUnch8qNNNkdi/OIvh2Bz6R2zyBiYbqpwns+q3oiP+6mXOcVzS+vhQXvyUWipnq9p0629068angOL/09p0fsXFDGd5qbaZZhRxE8CwI44WciM=
+2024-03-08 15:55:57.997 [main] INFO  c.j.common.lianlian.security.LLianPayAccpSignature - 签名验证中，源串：{"acctbal_list":[{"accp_txnno":"2024030790873341","amt":"1.00","amt_bal":"2.01","date_acct":"20240307","flag_dc":"CREDIT","jno_acct":"20240307002112957947","jno_cli":"88888ACS2024030721130632","memo":"AUTO_DEPOSIT","oid_acctno":"20240305000099561455","txn_time":"20240307100140","txn_type":"USER_TOPUP"},{"accp_txnno":"2024030790519089","amt":"1.01","amt_bal":"1.01","date_acct":"20240307","flag_dc":"CREDIT","jno_acct":"20240307002112424703","jno_cli":"88888ACS2024030719430634","memo":"AUTO_DEPOSIT","oid_acctno":"20240305000099561455","txn_time":"20240307070204","txn_type":"USER_TOPUP"}],"oid_partner":"402402220000016691","page_no":1,"ret_code":"0000","ret_msg":"交易成功","total_in_amt":"2.01","total_num":2,"total_out_amt":"0.00","total_page":1,"user_id":"gz0002"}，对应MD5值：55bb9cff704759b49132ec75b052c8e3
+2024-03-08 15:55:57.997 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 响应验签通过！
+2024-03-08 15:56:29.209 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-03-08 15:56:29.277 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-03-08 15:56:29.284 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-03-08 15:56:35.978 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on 192.168.2.30 with PID 2265 (/Users/franky/work/jbp/jbp-front/target/classes started by kaycm in /Users/franky/work/jbp)
+2024-03-08 15:56:35.979 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-03-08 15:56:38.091 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-03-08 15:56:38.094 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-03-08 15:56:38.129 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 21ms. Found 0 Redis repository interfaces.
+2024-03-08 15:56:39.780 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-03-08 15:56:39.791 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-03-08 15:56:39.792 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-03-08 15:56:39.792 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-03-08 15:56:40.133 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-03-08 15:56:40.141 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-03-08 15:56:40.141 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4115 ms
+2024-03-08 15:56:46.530 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-03-08 15:56:53.218 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-03-08 15:56:53.678 [redisson-netty-2-23] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-03-08 15:56:53.695 [redisson-netty-2-18] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-03-08 15:56:55.389 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-03-08 15:56:55.393 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-03-08 15:56:55.400 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-03-08 15:56:55.428 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@42a198dd, ORIGINAL=[Ljava.lang.String;@5924ea91, PIC_CLICK=[Ljava.lang.String;@7bc239db]
+2024-03-08 15:56:55.428 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-03-08 15:56:56.463 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-03-08 15:56:56.518 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@14d9ae22, ORIGINAL=[Ljava.lang.String;@15e881c0, PIC_CLICK=[Ljava.lang.String;@68ee7b3b]
+2024-03-08 15:56:56.519 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-03-08 15:56:56.554 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-03-08 15:57:00.007 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-03-08 15:57:00.621 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@27df4dcb, org.springframework.security.web.context.SecurityContextPersistenceFilter@22599048, org.springframework.security.web.header.HeaderWriterFilter@54602d5a, org.springframework.security.web.authentication.logout.LogoutFilter@5fc82de5, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@38007ead, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1a524c6b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7ddd5715, org.springframework.security.web.session.SessionManagementFilter@7e00a43e, org.springframework.security.web.access.ExceptionTranslationFilter@4b391e45, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@7280785f]
+2024-03-08 15:57:00.681 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-03-08 15:57:00.725 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-03-08 15:57:00.726 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-03-08 15:57:01.609 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-03-08 15:57:01.633 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-03-08 15:57:01.695 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-03-08 15:57:01.976 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-03-08 15:57:02.009 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-03-08 15:57:02.058 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-03-08 15:57:02.083 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-03-08 15:57:02.226 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-03-08 15:57:02.234 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-03-08 15:57:02.370 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-03-08 15:57:02.417 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-03-08 15:57:02.501 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-03-08 15:57:02.554 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-03-08 15:57:02.604 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-03-08 15:57:02.610 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-03-08 15:57:02.767 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-03-08 15:57:02.771 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-03-08 15:57:02.780 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-03-08 15:57:02.781 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-03-08 15:57:02.787 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-03-08 15:57:02.788 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-03-08 15:57:02.838 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-03-08 15:57:02.842 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-03-08 15:57:02.918 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-03-08 15:57:02.978 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-03-08 15:57:02.996 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-03-08 15:57:03.045 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-03-08 15:57:03.053 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 27.727 seconds (JVM running for 28.417)
+2024-03-08 15:57:03.465 [RMI TCP Connection(4)-192.168.2.30] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-03-08 15:57:03.465 [RMI TCP Connection(4)-192.168.2.30] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-03-08 15:57:03.507 [RMI TCP Connection(4)-192.168.2.30] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 42 ms
+2024-03-08 15:57:04.073 [main] INFO  c.j.common.lianlian.security.LLianPayAccpSignature - 签名处理中，签名源内容：{"acct_type":"USEROWN_AVAILABLE","date_end":"20240308155703","date_start":"20240227155703","oid_partner":"402402220000016691","page_no":"2","page_size":"10","sort_type":"DESC","timestamp":"20240308155704","user_id":"gz0002","user_type":"INNERCOMPANY"}，对应MD5值：6117eb81d6a74e8574218ffd0b8e94aa
+2024-03-08 15:57:04.225 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求URL：https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial
+2024-03-08 15:57:04.225 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求签名值：A+A5Ouuz7rANMLLj6nPf5t9oGn+YGtCcXjjeQohyygVicjGaHBfORo9FEq4UpsXyZ05ip1iE1glG3VWv2oPURnNpqG9WeMk9wTtzJ50VV+56I67qRGV+EqjZZgtifvL8RXwMxlG//sPYzgIYDidvkiv0WF79biHdO5dsy1V9a7GzytH7nATTR2i+RYuRXvWo04H+XXSz5QpeLfuPhRRoBlyH3fOJeIwy9rhagFJJ5FTWKIqHQ+T9OWDzEc4vnSnZuA9/VpBPzwwdhDOq4MMerOL6gb8Wj0hTNSmIxLxdAT+NRqfLIJQzdJEUlB8JfDq6TOUNIrn04JeFtSlu4wGh5QI6bzcf6qbZLXXGT9Zf0MBVG08Aa+sRqqTSc0ww2nmpcXAdtCt/Bfur8xuTb0mxGDjmhkius2nLv6rcRRHLxQj6jdXwpGvvPIuiWwcdceyGtngXYpUUNAGqNPqRkKNMFCrZF1yqgd7GfhepwFQRnNZJMvMSWQptPcxA7hOw0+PocD/lWYgLI46I/7yLFMIbW1qbf3IhhyXVnWuZro55pbt4FYtnZwvNhr2pkuCKZplEd6E6BlVCgUT0YV6fMjETws1QbBAupvMjOshzbdWBm23lEG3bYRzDia6qwQoVcnruzAvJNQKMWgn63Ny0waSdi3bwEFCsPu9M/qZDLUQlT3o=
+2024-03-08 15:57:04.225 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求参数：{"acct_type":"USEROWN_AVAILABLE","date_end":"20240308155703","date_start":"20240227155703","oid_partner":"402402220000016691","page_no":"2","page_size":"10","sort_type":"DESC","timestamp":"20240308155704","user_id":"gz0002","user_type":"INNERCOMPANY"}
+2024-03-08 15:57:05.321 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 响应结果：{"acctbal_list":[],"oid_partner":"402402220000016691","page_no":2,"ret_code":"0000","ret_msg":"交易成功","total_in_amt":"2.01","total_num":2,"total_out_amt":"0.00","total_page":1,"user_id":"gz0002"}
+2024-03-08 15:57:05.321 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 响应签名：icWSNZVueo27OK3UPRY6AafI5t4Pt9YviNC9HwFhsVE0F+z6Cf8qyKf8MtBzWLFI+7qYGNrV8mpV77weOCwweJ6U0EZKcUrW09A3Xq+GwT/z8ve/E31kzSG2yq7h5gDOzqs7SQ2GlfndsCt2jnFX21C1mgX3iZR7H+ucv5Zq9xc=
+2024-03-08 15:57:05.322 [main] INFO  c.j.common.lianlian.security.LLianPayAccpSignature - 签名验证中，源串：{"acctbal_list":[],"oid_partner":"402402220000016691","page_no":2,"ret_code":"0000","ret_msg":"交易成功","total_in_amt":"2.01","total_num":2,"total_out_amt":"0.00","total_page":1,"user_id":"gz0002"}，对应MD5值：84456b3b35db7052dddd70d46801c146
+2024-03-08 15:57:05.322 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 响应验签通过！
+2024-03-08 15:57:16.352 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-03-08 15:57:16.430 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-03-08 15:57:16.436 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-03-08 21:15:16.341 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on 192.168.2.30 with PID 8721 (/Users/franky/work/jbp/jbp-front/target/classes started by kaycm in /Users/franky/work/jbp)
+2024-03-08 21:15:16.343 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-03-08 21:15:19.061 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-03-08 21:15:19.065 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-03-08 21:15:19.126 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 38ms. Found 0 Redis repository interfaces.
+2024-03-08 21:15:20.824 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-03-08 21:15:20.839 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-03-08 21:15:20.840 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-03-08 21:15:20.840 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-03-08 21:15:21.223 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-03-08 21:15:21.230 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-03-08 21:15:21.231 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4825 ms
+2024-03-08 21:15:28.682 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-03-08 21:15:36.409 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-03-08 21:15:36.927 [redisson-netty-2-22] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-03-08 21:15:36.945 [redisson-netty-2-19] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-03-08 21:15:39.025 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-03-08 21:15:39.028 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-03-08 21:15:39.036 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-03-08 21:15:39.067 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@3d84f113, ORIGINAL=[Ljava.lang.String;@51d26fed, PIC_CLICK=[Ljava.lang.String;@6779959d]
+2024-03-08 21:15:39.075 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-03-08 21:15:40.808 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-03-08 21:15:41.000 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@2c4eda3a, ORIGINAL=[Ljava.lang.String;@466bf366, PIC_CLICK=[Ljava.lang.String;@28be7db5]
+2024-03-08 21:15:41.000 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-03-08 21:15:41.195 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-03-08 21:15:45.475 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-03-08 21:15:46.142 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@270a113f, org.springframework.security.web.context.SecurityContextPersistenceFilter@5b1ebbe, org.springframework.security.web.header.HeaderWriterFilter@18be7f57, org.springframework.security.web.authentication.logout.LogoutFilter@4dfe14d4, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@109941fa, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2541b4d3, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3dc976da, org.springframework.security.web.session.SessionManagementFilter@6289376f, org.springframework.security.web.access.ExceptionTranslationFilter@4a0161ee, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@52db9036]
+2024-03-08 21:15:46.177 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-03-08 21:15:46.227 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-03-08 21:15:46.228 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-03-08 21:15:47.255 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-03-08 21:15:47.290 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-03-08 21:15:47.366 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-03-08 21:15:47.692 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-03-08 21:15:47.734 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-03-08 21:15:47.834 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-03-08 21:15:47.872 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-03-08 21:15:48.057 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-03-08 21:15:48.066 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-03-08 21:15:48.215 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-03-08 21:15:48.273 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-03-08 21:15:48.361 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-03-08 21:15:48.419 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-03-08 21:15:48.472 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-03-08 21:15:48.480 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-03-08 21:15:48.641 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-03-08 21:15:48.646 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-03-08 21:15:48.655 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-03-08 21:15:48.656 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-03-08 21:15:48.662 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-03-08 21:15:48.663 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-03-08 21:15:48.736 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-03-08 21:15:48.740 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-03-08 21:15:48.818 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-03-08 21:15:48.883 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-03-08 21:15:48.899 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-03-08 21:15:48.936 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-03-08 21:15:48.944 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 33.445 seconds (JVM running for 34.285)
+2024-03-08 21:15:49.087 [RMI TCP Connection(2)-192.168.2.30] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-03-08 21:15:49.088 [RMI TCP Connection(2)-192.168.2.30] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-03-08 21:15:49.103 [RMI TCP Connection(2)-192.168.2.30] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 15 ms
+2024-03-08 21:15:49.674 [main] INFO  c.j.common.lianlian.security.LLianPayAccpSignature - 签名处理中，签名源内容：{"amt":"1","bank_account_no":"1111","notify_url":"https://admin.jbp.kkyp.vip/api/publicly/payment/callback/lianlian/lzt/LZT_FT_179759728039186","oid_partner":"402402220000016691","timestamp":"20240308211549","txn_seqno":"LZT_FT_179759728039186","txn_time":"20240308211549","user_id":"gz0002"}，对应MD5值：1394bcfebdf4743b3047e74c3da28146
+2024-03-08 21:15:49.851 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求URL：https://accpapi.lianlianpay.com/v1/acctmgr/lzt-fund-transfer
+2024-03-08 21:15:49.851 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求签名值：VsJM4zpB2rh9aWTGZnmcV9kX9IKPKLChBvP4596VGCe0kLIYz3WLUWajr5gaCLJwKoKl8MCLje77AaN3hJa0m+Lyi4OrUr9Xm4KUtVYPu3LVP3KQofx4UZtH0hwsIHR+YvUMRtU5iCWi8zvHmx/1IDt4RA6+MqRaEMSDQ2CxCSSt0axgzqZZ0MP/NRX1VeUfOLI5m2FAs+eYtvnVGB4ccX/D5Lt1GDi7iHTa4bGaid7f+mNEiD7XxuSBsCLuwipB2hVypxswpHVAUYJ/jVfm199yRjPBEMygz8ejzsuJkrUE1SpmiMpuEkL/u7IhKLihurXkf7RB4CSzGHsf/eG97lJMz9DASzhVnc52IXnh5TUzF816rV5QUu2DM5PA8cH1E9KERh8IRT6u29daHIJfNQRc9ksnpEsgy2fDfNReFYzm8+0vEB0oWzPTJO7b8GjvIfHzotdcezHSv/YdybWibjghawkUnGbRBNM91TN02Uc3tpkSz60ySHv47v0z79kZ/Qx6nA+PhK8FmOFSz8wgr0K/V8VXmh0/T0dqc7bFvtSbUDefNK+CHTGsUHrWS79OQzOxvnXhBIJZ1cz4Pz+Jd1mhaQ/dP6CGrtay3/xj5IOb2q/qPfMZpDOeyeQvDVGhpg9ooTi9x07XG0HxeUIDXFGT9Bh4Sj0NE0wKnwTtnSY=
+2024-03-08 21:15:49.851 [main] INFO  com.jbp.common.lianlian.client.LLianPayClient - 请求参数：{"amt":"1","bank_account_no":"1111","notify_url":"https://admin.jbp.kkyp.vip/api/publicly/payment/callback/lianlian/lzt/LZT_FT_179759728039186","oid_partner":"402402220000016691","timestamp":"20240308211549","txn_seqno":"LZT_FT_179759728039186","txn_time":"20240308211549","user_id":"gz0002"}
+2024-03-08 21:24:27.100 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-03-08 21:24:27.184 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-03-08 21:24:27.198 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
