@@ -23,7 +23,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin/agent/lzt/transfer/morepyee")
