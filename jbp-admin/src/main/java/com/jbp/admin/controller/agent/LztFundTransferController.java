@@ -15,6 +15,7 @@ import com.jbp.service.service.agent.LztFundTransferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ public class LztFundTransferController {
     private LztFundTransferService lztFundTransferService;
     @Resource
     private LztAcctService lztAcctService;
-
+    @PreAuthorize("hasAuthority('agent:lzt:fund:page')")
     @ApiOperation(value = "分页")
     @GetMapping(value = "/page")
     public CommonResult<PageInfo<LztFundTransfer>> page(String userId, String username, String bankAccountNo, String txnSeqno,
@@ -45,7 +46,7 @@ public class LztFundTransferController {
                 accpTxno, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:transfer')")
     @ApiOperation(value = "来账通资金划拨")
     @GetMapping(value = "/transfer")
     public CommonResult<LztFundTransfer> transfer(String userId, String bankAccountNo, BigDecimal amt, String postscript) {

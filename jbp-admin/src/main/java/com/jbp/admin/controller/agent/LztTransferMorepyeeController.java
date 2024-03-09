@@ -15,6 +15,7 @@ import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,7 @@ public class LztTransferMorepyeeController {
     @Resource
     private LztTransferMorepyeeService lztTransferMorepyeeService;
 
-
+    @PreAuthorize("hasAuthority('agent:lzt:transfer:morepyee:create')")
     @ApiOperation(value = "来账通内部代发")
     @GetMapping(value = "/create")
     public CommonResult<LztTransferMorepyee> apply(HttpServletRequest request, String payerId, String payeeId, String payCode,
@@ -53,14 +54,14 @@ public class LztTransferMorepyeeController {
         LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, txnPurpose, pwd, randomKey, payeeId, ip, postscript);
         return CommonResult.success(result);
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:transfer:morepyee:refresh')")
     @ApiOperation(value = "来账通内部代发刷新")
     @GetMapping(value = "/refresh")
     public CommonResult refresh(String accpTxno) {
         lztTransferMorepyeeService.refresh(accpTxno);
         return CommonResult.success();
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:transfer:morepyee:page')")
     @ApiOperation(value = "分页")
     @GetMapping(value = "/page")
     public CommonResult<PageInfo<LztTransferMorepyee>> page(String payerId, String payeeId, String txnSeqno,

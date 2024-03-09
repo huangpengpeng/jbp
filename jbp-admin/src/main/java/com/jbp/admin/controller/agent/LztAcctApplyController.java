@@ -10,6 +10,7 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ import javax.annotation.Resource;
 public class LztAcctApplyController {
     @Resource
     private LztAcctApplyService lztAcctApplyService;
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:apply:page')")
     @GetMapping("/page")
     @ApiOperation("来账通账户申请列表")
     public CommonResult<CommonPage<LztAcctApply>> getList(LztAcctApplyRequest request, PageParamRequest pageParamRequest) {

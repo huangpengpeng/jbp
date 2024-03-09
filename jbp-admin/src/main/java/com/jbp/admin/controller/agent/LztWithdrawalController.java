@@ -15,6 +15,7 @@ import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,7 @@ public class                                                                    
     @Resource
     private LztWithdrawalService lztWithdrawalService;
 
-
+    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:create')")
     @ApiOperation(value = "来账通提现")
     @GetMapping(value = "/create")
     public CommonResult<LztWithdrawal> apply(HttpServletRequest request, String payeeId, String payCode,
@@ -50,14 +51,14 @@ public class                                                                    
         LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, postscript, pwd, randomKey, ip);
         return CommonResult.success(result);
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:refresh')")
     @ApiOperation(value = "来账通提现刷新")
     @GetMapping(value = "/refresh")
     public CommonResult refresh(String accpTxno) {
         lztWithdrawalService.refresh(accpTxno);
         return CommonResult.success();
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:page')")
     @ApiOperation(value = "分页")
     @GetMapping(value = "/page")
     public CommonResult<PageInfo<LztWithdrawal>> page(String payeeId, String txnSeqno, String accpTxno, String status, PageParamRequest pageParamRequest,

@@ -29,6 +29,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +52,7 @@ public class LztAcctController {
     @Resource
     private MerchantService merchantService;
 
+    @PreAuthorize("hasAuthority('agent:lzt:acct:info')")
     @GetMapping("/info")
     @ApiOperation("来账通首页")
     public CommonResult<LztInfoResponse> info() {
@@ -58,7 +60,7 @@ public class LztAcctController {
         return CommonResult.success(lztAcctService.lztInfo(systemAdmin.getMerId()));
     }
 
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:page')")
     @ApiOperation(value = "来账通账户分页")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<LztAcct>> page(String userId, String username, PageParamRequest pageParamRequest) {
@@ -67,14 +69,14 @@ public class LztAcctController {
         PageInfo<LztAcct> page = lztAcctService.pageList(merId, userId, username, pageParamRequest);
         return CommonResult.success(CommonPage.restPage(page));
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:details')")
     @ApiOperation(value = "来账通账户详情[余额信息]")
     @GetMapping(value = "/details")
     public CommonResult<LztAcct> details(String userId) {
         return CommonResult.success(lztAcctService.details(userId));
     }
 
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:bank:apply')")
     @ApiOperation(value = "银行虚拟户申请")
     @GetMapping(value = "/bank/apply")
     public CommonResult<LztAcctApply> apply(Integer merId, String userId, String shopId, String shopName, String province,
@@ -82,7 +84,7 @@ public class LztAcctController {
         LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address);
         return CommonResult.success(apply);
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:pwd')")
     @ApiOperation(value = "来账通账户密码控件")
     @GetMapping(value = "/pwd")
     public CommonResult<ApplyPasswordElementResult> pwd(String userId, BigDecimal amt, String scan) {
@@ -117,7 +119,7 @@ public class LztAcctController {
         result.setPayCode(payCode);
         return CommonResult.success(result);
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:purposeList')")
     @ApiOperation(value = "来账通账户代发资金用途")
     @GetMapping(value = "/purposeList")
     public CommonResult<List<String>> purposeList() {
@@ -143,7 +145,7 @@ public class LztAcctController {
         query.lambda().eq(merId > 0, LztAcct::getMerId, merId);
         return CommonResult.success(lztAcctService.list(query));
     }
-
+    @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
     @SneakyThrows
     @ApiOperation(value = "账户资金明细 flagDc-> DEBIT：出账 CREDIT：入账 时间格式 yyyyMMddHHmmss")
     @GetMapping(value = "/serialPage")
