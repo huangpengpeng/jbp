@@ -37,14 +37,14 @@ public class MerchantCityRegionController {
     @Autowired
     private CityRegionService cityRegionService;
 
-    @PreAuthorize("hasAuthority('merchant:city:list:tree')")
+//    @PreAuthorize("hasAuthority('merchant:city:list:tree')")
     @ApiOperation(value = "获取城市tree结构的列表")
     @RequestMapping(value = "/city/tree", method = RequestMethod.GET)
     public CommonResult<List<CityVo>> getCityListTree() {
         return CommonResult.success(cityRegionService.getCityListTree());
     }
 
-    @PreAuthorize("hasAuthority('merchant:city:region:list:tree')")
+//    @PreAuthorize("hasAuthority('merchant:city:region:list:tree')")
     @ApiOperation(value = "获取城市区域tree结构的列表")
     @RequestMapping(value = "/list/tree", method = RequestMethod.GET)
     public CommonResult<List<CityVo>> getRegionListTree() {

@@ -35,7 +35,7 @@ public class LztAcctOpenController {
         LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(merId, userId, userType, returnUrl, businessScope);
         return CommonResult.success(lztAcctOpen);
     }
-    @PreAuthorize("hasAuthority('agent:lzt:acct:open:refresh')")
+
     @ApiOperation(value = "来账通账户刷新")
     @GetMapping(value = "/refresh")
     public CommonResult refresh(String accpTxno) {
