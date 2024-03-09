@@ -1,9 +1,5 @@
 package com.jbp.front.config;
 
-import com.jbp.common.interceptor.SwaggerInterceptor;
-import com.jbp.front.filter.ResponseFilter;
-import com.jbp.front.interceptor.FrontTokenInterceptor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -14,6 +10,13 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.MappedInterceptor;
+
+import com.jbp.common.encryptapi.SignInterceptor;
+import com.jbp.common.interceptor.ResultInterceptor;
+import com.jbp.common.interceptor.SwaggerInterceptor;
+import com.jbp.front.filter.ResponseFilter;
+import com.jbp.front.filter.XssFilter;
+import com.jbp.front.interceptor.FrontTokenInterceptor;
 
 /**
  * token验证拦截器
@@ -37,6 +40,23 @@ public class WebConfig implements WebMvcConfigurer {
     public HandlerInterceptor frontTokenInterceptor(){
         return new FrontTokenInterceptor();
     }
+    
+	@Bean
+	public FilterRegistrationBean<?> XssFilter() {
+		FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<XssFilter>();
+		registration.setFilter(new XssFilter());
+		registration.addUrlPatterns("/*");
+		registration.addInitParameter("SplitChar", "@");
+		registration.addInitParameter("FilterChar",
+				"'@(@)@from@From@FRom@FROm@FROM@IFRAME@IFRAMe@IFRAme@IFRame@IFrame@Iframe@iframe@SCRIPT@SCRIPt@SCRipt@SCript@Script@script@SQL@SQl@Sql@sql@--@UNION@union@\\");
+		registration.addInitParameter("ReplaceChar",
+				"‘@（@）@＼from@＼from@＼from@＼from@＼from@＼iframe@＼iframe@＼iframe@＼iframe@＼iframe@＼iframe@＼iframe@＼script@＼script@＼script@＼script@＼script@＼script@＼sql@＼sql@＼sql@＼sql@————@＼UNION@＼UNION@＼");
+		registration.addInitParameter("excludeUrls", "");
+		registration.setName("XssFilter");
+		registration.setOrder(1);
+		return registration;
+	}
+
 
     @Bean
     public ResponseFilter responseFilter(){ return new ResponseFilter(); }
@@ -49,70 +69,60 @@ public class WebConfig implements WebMvcConfigurer {
     private Boolean check;
 
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        //添加token拦截器
-        //addPathPatterns添加需要拦截的命名空间；
-        //excludePathPatterns添加排除拦截命名空间
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		// 添加token拦截器
+		// addPathPatterns添加需要拦截的命名空间；
+		// excludePathPatterns添加排除拦截命名空间
 
-        //前端用户登录token
-        registry.addInterceptor(frontTokenInterceptor()).
-                addPathPatterns("/api/front/**").
-                excludePathPatterns("/api/front/safety/**").
-                excludePathPatterns("/api/front/captcha/**").
-                excludePathPatterns("/api/front/index/**").
-                excludePathPatterns("/api/front/product/category/**").
-                excludePathPatterns("/api/front/product/**").
-                excludePathPatterns("/api/front/qrcode/**").
-                excludePathPatterns("/api/front/login/config").
-                excludePathPatterns("/api/front/login/mobile/captcha").
-                excludePathPatterns("/api/front/login/mobile/password").
-                excludePathPatterns("/api/front/login/send/code").
-                excludePathPatterns("/api/front/login/wechat/public").
-                excludePathPatterns("/api/front/login/wechat/routine").
-                excludePathPatterns("/api/front/login/wechat/register/binding/phone").
-                excludePathPatterns("/api/front/login/wechat/app/login").
-                excludePathPatterns("/api/front/login/ios/login").
-                excludePathPatterns("/api/front/city/**").
-                excludePathPatterns("/api/front/agreement/**").
-                excludePathPatterns("/api/front/merchant/search/list").
-                excludePathPatterns("/api/front/merchant/street").
-                excludePathPatterns("/api/front/merchant/index/info/*").
-                excludePathPatterns("/api/front/merchant/detail/*").
-                excludePathPatterns("/api/front/merchant/all/type/list").
-                excludePathPatterns("/api/front/merchant/all/category/list").
-                excludePathPatterns("/api/front/merchant/customer/service/info/*").
-                excludePathPatterns("/api/front/merchant/product/category/cache/tree/*").
-                excludePathPatterns("/api/front/coupon/page/list").
-                excludePathPatterns("/api/front/article/**").
-                excludePathPatterns("/api/front/Seckill/**").
-                excludePathPatterns("/api/front/login/token/is/exist").
-                excludePathPatterns("/api/front/wechat/**").
-                excludePathPatterns("/api/front/ios/register/binding/phone").
-                excludePathPatterns("/api/front/community/category/list").
-                excludePathPatterns("/api/front/community/user/home/page/*").
-                excludePathPatterns("/api/front/community/topic/count/*").
-                excludePathPatterns("/api/front/community/topic/recommend/list").
-                excludePathPatterns("/api/front/community/topic/list").
-                excludePathPatterns("/api/front/community/note/discover/list").
-                excludePathPatterns("/api/front/community/note/author/list/*").
-                excludePathPatterns("/api/front/community/note/user/detail/*").
-                excludePathPatterns("/api/front/community/note/reply/list/*").
-                excludePathPatterns("/api/front/community/note/topic/list").
-                excludePathPatterns("/api/front/community/note/discover/list/recommend/*").
-                excludePathPatterns("/api/front/community/note/discover/list/recommend/*").
-                excludePathPatterns("/api/front/coupon/voucher/collection/center").
-                excludePathPatterns("/api/front/product/system/coupon/pro/list").
+		// 前端用户登录token
+		registry.addInterceptor(frontTokenInterceptor()).addPathPatterns("/api/front/**")
+				.excludePathPatterns("/api/front/safety/**").excludePathPatterns("/api/front/captcha/**")
+				.excludePathPatterns("/api/front/index/**").excludePathPatterns("/api/front/product/category/**")
+				.excludePathPatterns("/api/front/product/**").excludePathPatterns("/api/front/qrcode/**")
+				.excludePathPatterns("/api/front/login/config").excludePathPatterns("/api/front/login/mobile/captcha")
+				.excludePathPatterns("/api/front/login/mobile/password")
+				.excludePathPatterns("/api/front/login/send/code").excludePathPatterns("/api/front/login/wechat/public")
+				.excludePathPatterns("/api/front/login/wechat/routine")
+				.excludePathPatterns("/api/front/login/wechat/register/binding/phone")
+				.excludePathPatterns("/api/front/login/wechat/app/login")
+				.excludePathPatterns("/api/front/login/ios/login").excludePathPatterns("/api/front/city/**")
+				.excludePathPatterns("/api/front/agreement/**").excludePathPatterns("/api/front/merchant/search/list")
+				.excludePathPatterns("/api/front/merchant/street")
+				.excludePathPatterns("/api/front/merchant/index/info/*")
+				.excludePathPatterns("/api/front/merchant/detail/*")
+				.excludePathPatterns("/api/front/merchant/all/type/list")
+				.excludePathPatterns("/api/front/merchant/all/category/list")
+				.excludePathPatterns("/api/front/merchant/customer/service/info/*")
+				.excludePathPatterns("/api/front/merchant/product/category/cache/tree/*")
+				.excludePathPatterns("/api/front/coupon/page/list").excludePathPatterns("/api/front/article/**")
+				.excludePathPatterns("/api/front/Seckill/**").excludePathPatterns("/api/front/login/token/is/exist")
+				.excludePathPatterns("/api/front/wechat/**")
+				.excludePathPatterns("/api/front/ios/register/binding/phone")
+				.excludePathPatterns("/api/front/community/category/list")
+				.excludePathPatterns("/api/front/community/user/home/page/*")
+				.excludePathPatterns("/api/front/community/topic/count/*")
+				.excludePathPatterns("/api/front/community/topic/recommend/list")
+				.excludePathPatterns("/api/front/community/topic/list")
+				.excludePathPatterns("/api/front/community/note/discover/list")
+				.excludePathPatterns("/api/front/community/note/author/list/*")
+				.excludePathPatterns("/api/front/community/note/user/detail/*")
+				.excludePathPatterns("/api/front/community/note/reply/list/*")
+				.excludePathPatterns("/api/front/community/note/topic/list")
+				.excludePathPatterns("/api/front/community/note/discover/list/recommend/*")
+				.excludePathPatterns("/api/front/community/note/discover/list/recommend/*")
+				.excludePathPatterns("/api/front/coupon/voucher/collection/center")
+				.excludePathPatterns("/api/front/product/system/coupon/pro/list").
 
-                excludePathPatterns("/api/front/coupon/voucher/collection/center").
+				excludePathPatterns("/api/front/coupon/voucher/collection/center").
 
-                excludePathPatterns("/api/front/pc/home/**").
-                excludePathPatterns("/api/front/merchant/pc/**").
+				excludePathPatterns("/api/front/pc/home/**").excludePathPatterns("/api/front/merchant/pc/**").
 
-
-                excludePathPatterns("/api/front/pagediy/**").
-                excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
-    }
+				excludePathPatterns("/api/front/pagediy/**")
+				.excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
+		registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
+		registry.addInterceptor(new SignInterceptor()).addPathPatterns("/**");
+	}
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

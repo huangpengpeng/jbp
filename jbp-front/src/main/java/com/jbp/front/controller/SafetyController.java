@@ -2,6 +2,7 @@ package com.jbp.front.controller;
 
 import com.jbp.common.captcha.model.common.ResponseModel;
 import com.jbp.common.captcha.model.vo.CaptchaVO;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.front.service.captcha.CaptchaService;
 
 import io.swagger.annotations.Api;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("api/front/safety")
 @Api(tags = "安全验证控制器")
+@EncryptIgnore
 public class SafetyController {
 
     @Autowired

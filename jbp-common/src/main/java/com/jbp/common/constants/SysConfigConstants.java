@@ -44,6 +44,12 @@ public class SysConfigConstants {
     public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_TITLE = "wechat_share_title";
     /** 微信分享简介（公众号） */
     public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_SYNOPSIS = "wechat_share_synopsis";
+    
+    /** 平台端-开启mfa登录 */
+    public static final String CONFIG_KEY_ADMIN_MFA_OPEN = "mfa_open";
+    
+    /** 开启商户端 */
+    public static final String CONFIG_KEY_ADMIN_MER_OPEN = "mer_open";
 
 
     /** 是否启用分销:1-启用，0-禁止 */
@@ -82,6 +88,9 @@ public class SysConfigConstants {
 
     /** 网站名称 */
     public static final String CONFIG_KEY_SITE_NAME = "site_name";
+    
+    /** 版权LOGO */
+    public static final String CONFIG_KEY_COPY_RIGHT_LOGO = "copyright_logo";
 
     /** 用户默认头像 */
     public static final String USER_DEFAULT_AVATAR_CONFIG_KEY = "h5_avatar";

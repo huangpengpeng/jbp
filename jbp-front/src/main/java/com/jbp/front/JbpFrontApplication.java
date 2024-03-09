@@ -1,14 +1,15 @@
 package com.jbp.front;
 
-import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
