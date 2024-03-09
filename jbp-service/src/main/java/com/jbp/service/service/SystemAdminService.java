@@ -96,4 +96,6 @@ public interface SystemAdminService extends IService<SystemAdmin> {
 
 
     Map<Integer, SystemAdmin> getMapByMerIdList(List<Integer> idList);
+
+    SystemAdmin selectUserByPhoneAndType(String phone, Integer adminType);
 }

@@ -73,6 +73,17 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
         return dao.selectOne(lqw);
     }
 
+    @Override
+    public SystemAdmin selectUserByPhoneAndType(String phone, Integer adminType) {
+        List<Integer> types = addSuperRoleType(adminType);
+        LambdaQueryWrapper<SystemAdmin> lqw = Wrappers.lambdaQuery();
+        lqw.eq(SystemAdmin::getPhone, phone);
+        lqw.in(SystemAdmin::getType, types);
+        lqw.eq(SystemAdmin::getIsDel, false);
+        lqw.last(" limit 1");
+        return dao.selectOne(lqw);
+    }
+
     /**
      * 后台管理员列表
      *

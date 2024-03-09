@@ -108,7 +108,12 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 //			request.setReqCode(secretKeyConfig.decryptStr(request.getReqCode()));
 			// 校验验证码
 //			checkCaptcha(request);
-			SystemAdmin systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
+			SystemAdmin systemAdmin = new SystemAdmin();
+			if (StringUtils.isNotEmpty(request.getAccount())) {
+				systemAdmin = systemAdminService.selectUserByUserNameAndType(request.getAccount(), adminType);
+			}else if (StringUtils.isNotEmpty(request.getPhone())){
+				systemAdmin = systemAdminService.selectUserByPhoneAndType(request.getPhone(), adminType);
+			}
 			systemAdmin.setLastCheckCode(request.getReqCode());
 			systemAdminService.updateById(systemAdmin);
 		} else {
@@ -128,7 +133,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 			lqw.eq(SystemAdmin::getPhone, request.getPhone());
 			SystemAdmin systemAdmin = systemAdminService.getOne(lqw);
 			if(systemAdmin == null) {
-				throw new CrmebException("用户不存在或密码错误");
+				throw new CrmebException("手机号不存在或验证码错误");
 			}
 			try {
 				request.setPwd(CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount()));
