@@ -24,14 +24,11 @@ import javax.validation.constraints.Pattern;
  */
 @Data
 public class SystemAdminLoginRequest {
+
     @ApiModelProperty(value = "后台管理员账号", example = "userName")
-    @NotEmpty(message = "账号 不能为空")
-    @Length(max = 32, message = "账号长度不能超过32个字符")
     private String account;
 
     @ApiModelProperty(value = "后台管理员密码", example = "userPassword")
-    @NotEmpty(message = "密码 不能为空")
-    @Length(min = 6, max = 30 ,message = "密码长度在6-30个字符")
     private String pwd;
 
     @ApiModelProperty(value = "key", required = false)
@@ -47,7 +44,6 @@ public class SystemAdminLoginRequest {
     private String phone;
 
     @ApiModelProperty(value = "手机验证码", required = false)
-    @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
     private String captchaPhone;
 
 }
