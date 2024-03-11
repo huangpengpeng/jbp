@@ -418,12 +418,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         LambdaQueryWrapper<FundClearing> issue = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid)
                 .in(FundClearing::getStatus, FundClearing.Constants.待审核,FundClearing.Constants.待出款);
-        long count = list(issue).stream().map(FundClearing::getCommAmt).count();
+        BigDecimal count = list(issue).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
         map.put("issue", count);
         LambdaQueryWrapper<FundClearing> completed = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid)
                 .eq(FundClearing::getStatus, FundClearing.Constants.已出款);
-        long completedCount = list(completed).stream().map(FundClearing::getCommAmt).count();
+        BigDecimal completedCount = list(completed).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO,BigDecimal::add);
         map.put("completed", completedCount);
         return map;
     }
@@ -433,7 +433,14 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         LambdaQueryWrapper<FundClearing> lqw=new LambdaQueryWrapper<>();
         setFundClearingWrapperByStatus(lqw,uid,headerStatus);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        return CommonPage.copyPageInfo(page, list(lqw));
+        List<FundClearing> list = list(lqw);
+        list.forEach(e -> {
+            for (FundClearingItem item : e.getItems()) {
+                WalletConfig walletConfig = walletConfigService.getByType(item.getWalletType());
+                item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
+            }
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 
     public void setFundClearingWrapperByStatus(LambdaQueryWrapper<FundClearing> lqw, Integer uid, Integer headerStatus) {
