@@ -118,7 +118,6 @@ public class LztAcctController {
         result.setPayCode(payCode);
         return CommonResult.success(result);
     }
-    @PreAuthorize("hasAuthority('agent:lzt:acct:purposeList')")
     @ApiOperation(value = "来账通账户代发资金用途")
     @GetMapping(value = "/purposeList")
     public CommonResult<List<String>> purposeList() {
