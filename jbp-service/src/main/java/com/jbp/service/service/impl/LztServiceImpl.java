@@ -180,7 +180,7 @@ public class LztServiceImpl implements LztService {
         params.setTimestamp(timestamp);
         params.setOid_partner(oidPartner);
         params.setTxn_time(timestamp);
-        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/lzt-fund-transfer";
+        String url = "https://accpgw.lianlianpay.com/v1/acctmgr/lzt-fund-transfer";
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
         String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         if (StringUtils.isEmpty(s)) {
