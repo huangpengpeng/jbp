@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.platform;
 
 
+import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
@@ -8,6 +10,7 @@ import com.jbp.common.response.UserAdminDetailResponse;
 import com.jbp.common.response.UserResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -97,8 +100,14 @@ public class PlatformUserController {
     @PostMapping("/register/phone")
     @ApiOperation("用户注册")
     public CommonResult<User> registerPhone(@Validated @RequestBody RegisterPhoneRequest request) {
-        User user = userService.registerPhone(request.getUsername(), request.getPhone(), null);
-        return CommonResult.success(user);
+        User users = userService.getByAccount(request.getAccount());
+        if (ObjectUtil.isNotEmpty(users)){
+            throw new CrmebException("账号已存在");
+        }
+        userService.registerPhone(request.getUsername(),request.getPhone(),request.getAccount(),
+                request.getUserCapaTemplateRequest(),request.getRegionPAccount(),request.getRegionPNode(),
+                request.getInvitationPAccount(),request.getPwd());
+        return CommonResult.success();
     }
 
     @PreAuthorize("hasAuthority('platform:user:update:user')")

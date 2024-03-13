@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.UserCapaAddRequest;
 import com.jbp.common.request.merchant.MerchantUserSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.DeclUserInfoResultVo;
@@ -394,4 +395,5 @@ public interface UserService extends IService<User> {
 
     PageInfo<UserInviteInfoResponse> getUserInviteInfo(UserInviteRequest request);
 
+    void registerPhone(String username, String phone, String account,UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd);
 }

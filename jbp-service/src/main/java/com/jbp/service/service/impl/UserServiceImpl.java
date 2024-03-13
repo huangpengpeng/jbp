@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
@@ -34,6 +33,7 @@ import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.UserCapaAddRequest;
 import com.jbp.common.request.merchant.MerchantUserSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.token.FrontTokenComponent;
@@ -187,6 +187,65 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("创建用户失败!");
         }
         return user;
+    }
+
+    @Override
+    public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
+        User user = new User();
+        user.setAccount(account);
+        user.setPwd(CrmebUtil.encryptPassword(pwd, account));
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
+            throw new CrmebException("手机号重复");
+        }
+        user.setPhone(phone);
+        user.setRegisterType(UserConstants.REGISTER_TYPE_H5);
+        user.setNickname(com.jbp.common.utils.StringUtils.filterEmoji(username));
+        user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
+        Date nowDate = CrmebDateUtil.nowDateTime();
+        user.setCreateTime(nowDate);
+        user.setLastLoginTime(nowDate);
+        user.setLevel(1);
+        // 设置活跃时间
+        setActiveTime(user);
+        // 推广人
+        user.setSpreadUid(0);
+
+        Boolean execute = transactionTemplate.execute(e -> {
+            save(user);
+            // 推广人处理
+            // 增加代理等级
+            userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            throw new CrmebException("创建用户失败!");
+        }
+//        设置服务上级
+        if (ObjectUtils.isNotEmpty(regionPAccount)) {
+            User regionPid = userService.getByAccount(regionPAccount);
+            if (regionPid == null) {
+                throw new CrmebException("上级账户不存在");
+            }
+            relationService.band(user.getId(), regionPid.getId(), null, regionPNode);
+
+        }
+//        设置邀请上级账号
+        if (ObjectUtils.isNotEmpty(invitationPAccount)) {
+            Integer pid = null;
+            if (com.jbp.service.util.StringUtils.isNotEmpty(invitationPAccount)) {
+                User invitationPid = userService.getByAccount(invitationPAccount);
+                if (invitationPid == null) {
+                    throw new CrmebException("邀请上级账号信息错误");
+                }
+                pid = user.getId();
+            }
+            invitationService.band(user.getId(), pid, false, true);
+        }
+        if (ObjectUtils.isNotEmpty(userCapaTemplateRequest)){
+            userCapaService.saveOrUpdateCapa(user.getId(),userCapaTemplateRequest.getCapaId(),
+                    userCapaTemplateRequest.getRemark(),userCapaTemplateRequest.getDescription());
+        }
+
     }
 
     @Override
@@ -547,15 +606,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public PageInfo<UserResponse> getPlatformPage(UserSearchRequest request, PageParamRequest pageParamRequest) {
         Page<User> pageUser = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         Map<String, Object> map = CollUtil.newHashMap();
-       if (StrUtil.isNotEmpty(request.getAccount())){
-           map.put("account", request.getAccount());
-       }
-        if (StrUtil.isNotEmpty(request.getSpreadAccount())){
+        if (StrUtil.isNotEmpty(request.getAccount())) {
+            map.put("account", request.getAccount());
+        }
+        if (StrUtil.isNotEmpty(request.getSpreadAccount())) {
             User user = userService.getByAccount(request.getSpreadAccount());
             if (user == null) {
                 throw new CrmebException("推荐人用户账号信息错误");
             }
-            map.put("spreadid",user.getId());
+            map.put("spreadid", user.getId());
         }
         if (StrUtil.isNotEmpty(request.getNikename())) {
             String nikeName = URLUtil.decode(request.getNikename());
@@ -1469,16 +1528,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             User user = dao.selectOne(new QueryWrapper<User>().lambda()
                     .eq(User::getId, order.getUid()));
             //升级下单后重新赋值
-            if(orderRegister == null){
-                orderRegister  =new OrderRegister();
+            if (orderRegister == null) {
+                orderRegister = new OrderRegister();
                 UserCapa userCapa = userCapaService.getByUser(user.getId());
                 orderRegister.setUsername(user.getNickname());
                 orderRegister.setCapaId(userCapa.getCapaId());
             }
 
-            declUserInfoResultVo.setUserUame( orderRegister.getUsername());
+            declUserInfoResultVo.setUserUame(orderRegister.getUsername());
             declUserInfoResultVo.setAccount(user.getAccount());
-            declUserInfoResultVo.setCapa( capaService.getById(orderRegister.getCapaId()).getName());
+            declUserInfoResultVo.setCapa(capaService.getById(orderRegister.getCapaId()).getName());
             declUserInfoResultVo.setNode(orderRegister.getNode());
             declUserInfoResultVo.setRaccount(orderRegister.getRaccount());
         }
@@ -1495,7 +1554,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province, String city, String district, String address, String payPwd, Boolean openShop) {
-        User user  = getById(id);
+        User user = getById(id);
         LambdaUpdateWrapper<User> lqw = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, id)
                 .set(ObjectUtil.isNotEmpty(sex), User::getSex, sex)
@@ -1506,12 +1565,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 .set(ObjectUtil.isNotEmpty(city) && !city.equals(""), User::getCity, city)
                 .set(ObjectUtil.isNotEmpty(district) && !district.equals(""), User::getDistrict, district)
                 .set(ObjectUtil.isNotEmpty(address) && !address.equals(""), User::getAddress, address)
-                .set(ObjectUtil.isNotEmpty(openShop),User::getOpenShop,openShop);
-        if (ObjectUtils.isNotEmpty(pwd)&&!pwd.equals("")){
-            lqw.set( User::getPwd, CrmebUtil.encryptPassword(pwd, user.getAccount()));
+                .set(ObjectUtil.isNotEmpty(openShop), User::getOpenShop, openShop);
+        if (ObjectUtils.isNotEmpty(pwd) && !pwd.equals("")) {
+            lqw.set(User::getPwd, CrmebUtil.encryptPassword(pwd, user.getAccount()));
         }
-        if (ObjectUtils.isNotEmpty(payPwd)&&!payPwd.equals("")){
-            lqw.set( User::getPayPwd, CrmebUtil.encryptPassword(payPwd, user.getAccount()));
+        if (ObjectUtils.isNotEmpty(payPwd) && !payPwd.equals("")) {
+            lqw.set(User::getPayPwd, CrmebUtil.encryptPassword(payPwd, user.getAccount()));
         }
         update(lqw);
 
@@ -1520,7 +1579,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Boolean verifyPayPwd(String payPwd) throws Exception {
         User user = getInfo();
-        if(user.getPayPwd() == null){
+        if (user.getPayPwd() == null) {
             throw new CrmebException("用户没有设置交易密码");
         }
 
@@ -1532,7 +1591,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         User currentUser = getInfo();
         List<UserInviteInfoResponse> userInviteResponseList = invitationService.getUserNextInfoList(currentUser.getId(), request.getKeywords());
 
-        userInviteResponseList.forEach(e ->{
+        userInviteResponseList.forEach(e -> {
             e.setOneCount(invitationService.getInviteNumber(e.getUid()));
         });
 
