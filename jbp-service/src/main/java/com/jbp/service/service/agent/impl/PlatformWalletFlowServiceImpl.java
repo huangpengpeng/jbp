@@ -10,6 +10,8 @@ import com.jbp.common.model.agent.PlatformWalletFlow;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.PlatformWalletFlowDao;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletFlowService;
@@ -37,11 +39,17 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
         return platformWalletFlow;
     }
 
+    private void getRequestTimeWhere(LambdaQueryWrapper<PlatformWalletFlow> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(StringUtils.isNotEmpty(dateLimit), PlatformWalletFlow::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+    }
+
     @Override
-    public PageInfo<PlatformWalletFlow> pageList(Integer type, PageParamRequest pageParamRequest) {
+    public PageInfo<PlatformWalletFlow> pageList(Integer type, String dateLimit, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<PlatformWalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<PlatformWalletFlow>()
-                .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type)
-                .orderByDesc(PlatformWalletFlow::getId);
+                .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type);
+        getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
+        walletLambdaQueryWrapper.orderByDesc(PlatformWalletFlow::getId);
         Page<PlatformWalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<PlatformWalletFlow> list = list(walletLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {

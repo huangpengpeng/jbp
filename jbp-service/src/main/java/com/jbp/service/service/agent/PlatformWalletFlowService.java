@@ -13,6 +13,6 @@ public interface PlatformWalletFlowService extends IService<PlatformWalletFlow> 
 
     PlatformWalletFlow add(Integer type, String operate, String action, String externalNo, String postscript, BigDecimal amt, BigDecimal orgBalance, BigDecimal tagBalance);
 
-    PageInfo<PlatformWalletFlow> pageList(Integer type, PageParamRequest pageParamRequest);
+    PageInfo<PlatformWalletFlow> pageList(Integer type,String dateLimit, PageParamRequest pageParamRequest);
 
 }
