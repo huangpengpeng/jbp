@@ -23,8 +23,8 @@ public class PlatformWalletFlowController {
     @PreAuthorize("hasAuthority('agent:platform:wallet:flow')")
     @GetMapping("/page")
     @ApiOperation("平台积分详情列表")
-    public CommonResult<CommonPage<PlatformWalletFlow>> getList(Integer type,String dateLimit, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(platformWalletFlowService.pageList(type,dateLimit, pageParamRequest)));
+    public CommonResult<CommonPage<PlatformWalletFlow>> getList(Integer type,String dateLimit,String externalNo, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(platformWalletFlowService.pageList(type,dateLimit,externalNo, pageParamRequest)));
     }
 
 }

@@ -14,7 +14,7 @@ public interface WalletFlowService extends IService<WalletFlow> {
                    BigDecimal orgBalance, BigDecimal tagBalance, String postscript);
 
 
-    PageInfo<WalletFlow> pageList(Integer uid, Integer type,String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<WalletFlow> pageList(Integer uid, Integer type,String dateLimit,String externalNo, PageParamRequest pageParamRequest);
 
 
     PageInfo<WalletFlow> pageWalletList(Integer uid, Integer type, String action,PageParamRequest pageParamRequest);

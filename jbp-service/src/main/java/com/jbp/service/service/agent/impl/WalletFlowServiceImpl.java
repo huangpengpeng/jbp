@@ -47,10 +47,11 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, String externalNo, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<WalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<WalletFlow>()
                 .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
-                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type);
+                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
+                .eq(StringUtils.isNotEmpty(externalNo), WalletFlow::getExternalNo, externalNo);
         getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
         walletLambdaQueryWrapper.orderByDesc(WalletFlow::getId);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
