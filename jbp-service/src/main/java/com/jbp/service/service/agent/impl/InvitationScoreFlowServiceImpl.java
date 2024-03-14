@@ -7,11 +7,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
-import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.InvitationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
@@ -35,16 +36,17 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
     private UserService userService;
 
     @Override
-    public PageInfo<InvitationScoreFlow> pageList(Integer uid, Integer orderuid, String action,String ordersSn, PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScoreFlow> pageList(Integer uid, Integer orderuid, String action, String ordersSn, String dateLimit, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScoreFlow> lqw = new LambdaQueryWrapper<InvitationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), InvitationScoreFlow::getOrderUid, orderuid)
                 .eq(StringUtils.isNotEmpty(action), InvitationScoreFlow::getAction, action)
-                .eq(StringUtils.isNotEmpty(ordersSn),InvitationScoreFlow::getOrdersSn,ordersSn)
-                .orderByDesc(InvitationScoreFlow::getId);
+                .eq(StringUtils.isNotEmpty(ordersSn), InvitationScoreFlow::getOrdersSn, ordersSn);
+        getRequestTimeWhere(lqw, dateLimit);
+        lqw.orderByDesc(InvitationScoreFlow::getId);
         Page<InvitationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreFlow> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(InvitationScoreFlow::getUid).collect(Collectors.toList());
@@ -58,6 +60,11 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
             e.setOrderAccount(user2 != null ? user2.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    private void getRequestTimeWhere(LambdaQueryWrapper<InvitationScoreFlow> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(StringUtils.isNotEmpty(dateLimit), InvitationScoreFlow::getPayTime, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
 
     @Override

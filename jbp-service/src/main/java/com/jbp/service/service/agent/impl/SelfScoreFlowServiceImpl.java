@@ -7,11 +7,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
-import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.SelfScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.SelfScoreFlowService;
@@ -35,15 +36,16 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
     private UserService userService;
 
     @Override
-    public PageInfo<SelfScoreFlow> pageList(Integer uid, String action,String ordersSn, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScoreFlow> pageList(Integer uid, String action, String ordersSn, String dateLimit, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), SelfScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action)
-                .eq(StringUtils.isNotEmpty(ordersSn),SelfScoreFlow::getOrdersSn,ordersSn)
-                .orderByDesc(SelfScoreFlow::getId);
+                .eq(StringUtils.isNotEmpty(ordersSn), SelfScoreFlow::getOrdersSn, ordersSn);
+        getRequestTimeWhere(lqw, dateLimit);
+        lqw.orderByDesc(SelfScoreFlow::getId);
         Page<SelfScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScoreFlow> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(SelfScoreFlow::getUid).collect(Collectors.toList());
@@ -53,6 +55,11 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    private void getRequestTimeWhere(LambdaQueryWrapper<SelfScoreFlow> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(StringUtils.isNotEmpty(dateLimit), SelfScoreFlow::getPayTime, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
 
     @Override

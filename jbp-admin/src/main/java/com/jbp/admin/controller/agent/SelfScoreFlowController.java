@@ -40,7 +40,7 @@ public class SelfScoreFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(),request.getOrdersSn(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(),request.getOrdersSn(),request.getDateLimit(), pageParamRequest)));
     }
 
 

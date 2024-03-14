@@ -7,5 +7,5 @@ import com.jbp.common.request.PageParamRequest;
 
 public interface RelationScoreFlowService extends IService<RelationScoreFlow> {
 
-     PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid,String ordersSn, PageParamRequest pageParamRequest);
+     PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid,String ordersSn,String dateLimit, PageParamRequest pageParamRequest);
 }

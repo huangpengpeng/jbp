@@ -48,6 +48,6 @@ public class RelationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid,orderuid,request.getOrdersSn(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid,orderuid,request.getOrdersSn(),request.getDateLimit(), pageParamRequest)));
     }
 }
