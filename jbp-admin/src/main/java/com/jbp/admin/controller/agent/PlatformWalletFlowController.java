@@ -26,5 +26,4 @@ public class PlatformWalletFlowController {
     public CommonResult<CommonPage<PlatformWalletFlow>> getList(Integer type,String dateLimit,String externalNo, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(platformWalletFlowService.pageList(type,dateLimit,externalNo, pageParamRequest)));
     }
-
 }
