@@ -116,7 +116,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             walletLambdaQueryWrapper.orderByDesc(WalletFlow::getId);
             walletLambdaQueryWrapper.gt(WalletFlow::getId, id).last("LIMIT 1000");
             List<WalletFlow> list = list(walletLambdaQueryWrapper);
-            if (org.apache.commons.collections4.CollectionUtils.isEmpty(list)) {
+            if (CollectionUtils.isEmpty(list)) {
                 break;
             }
             List<Integer> uIdList = list.stream().map(WalletFlow::getUid).collect(Collectors.toList());

@@ -49,7 +49,7 @@ public class WalletFlowController {
 
     @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")
     @PostMapping("/excel")
-    @ApiOperation("用户积分导出")
+    @ApiOperation("用户积分详情导出")
     public CommonResult<List<WalletFlowVo>> excel(WalletRequest request) {
         if (ObjectUtils.isEmpty(request)) {
             throw new CrmebException("请选择一个过滤条件");
