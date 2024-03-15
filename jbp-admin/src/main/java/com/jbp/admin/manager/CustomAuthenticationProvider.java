@@ -62,7 +62,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         System.out.println(name);
         System.out.println(type);
 
-        System.out.println(CrmebUtil.encryptPassword("12345Aa#", "admin"));
+        System.out.println(CrmebUtil.encryptPassword("123merdpzx", "merdpzx"));
     }
 
 }

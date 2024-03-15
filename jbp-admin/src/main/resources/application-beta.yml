@@ -130,7 +130,7 @@ wx:
     configs:
       - appid: wx69627cafde0080bf #微信小程序的appid
         secret: 6a1851dd9474b745e91779f0a2319390 #微信小程序的Secret
-        token: CrmebJava #微信小程序消息服务器配置的token
+        token: CrmebJava #微信小程序消息服务器配置的tokenLL
         aesKey:  #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON
 
