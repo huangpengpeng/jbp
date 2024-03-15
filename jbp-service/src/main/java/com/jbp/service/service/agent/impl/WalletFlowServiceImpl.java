@@ -7,7 +7,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
-import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -128,7 +127,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                 User user = uidMapList.get(e.getUid());
                 e.setAccount(user != null ? user.getAccount() : "");
                 WalletFlowVo walletFlowVo = new WalletFlowVo();
-                BeanUtils.copyProperties(e,walletFlowVo);
+                BeanUtils.copyProperties(e, walletFlowVo);
                 result.add(walletFlowVo);
             });
             id = list.get(list.size() - 1).getId();

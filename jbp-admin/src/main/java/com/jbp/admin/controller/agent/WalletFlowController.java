@@ -44,8 +44,9 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(),request.getDateLimit(),request.getExternalNo(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")
     @PostMapping("/excel")
     @ApiOperation("用户积分导出")
@@ -61,6 +62,6 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(walletFlowService.excel(uid,request.getType(),request.getDateLimit(),request.getExternalNo()));
+        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo()));
     }
 }
