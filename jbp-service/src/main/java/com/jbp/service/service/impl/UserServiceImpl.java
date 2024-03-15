@@ -191,6 +191,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
+
         User user = new User();
         user.setAccount(account);
         user.setPwd(CrmebUtil.encryptPassword(pwd, account));
@@ -215,37 +216,36 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             // 推广人处理
             // 增加代理等级
             userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
+            //        设置服务上级
+            if (ObjectUtils.isNotEmpty(regionPAccount)) {
+                User regionPid = userService.getByAccount(regionPAccount);
+                if (regionPid == null) {
+                    throw new CrmebException("上级账户不存在");
+                }
+                relationService.band(user.getId(), regionPid.getId(), null, regionPNode);
+
+            }
+//        设置邀请上级账号
+            if (ObjectUtils.isNotEmpty(invitationPAccount)) {
+                Integer pid = null;
+                if (com.jbp.service.util.StringUtils.isNotEmpty(invitationPAccount)) {
+                    User invitationPid = userService.getByAccount(invitationPAccount);
+                    if (invitationPid == null) {
+                        throw new CrmebException("邀请上级账号信息错误");
+                    }
+                    pid = user.getId();
+                }
+                invitationService.band(user.getId(), pid, false, true);
+            }
+            if (ObjectUtils.isNotEmpty(userCapaTemplateRequest)) {
+                userCapaService.saveOrUpdateCapa(user.getId(), userCapaTemplateRequest.getCapaId(),
+                        userCapaTemplateRequest.getRemark(), userCapaTemplateRequest.getDescription());
+            }
             return Boolean.TRUE;
         });
         if (!execute) {
             throw new CrmebException("创建用户失败!");
         }
-//        设置服务上级
-        if (ObjectUtils.isNotEmpty(regionPAccount)) {
-            User regionPid = userService.getByAccount(regionPAccount);
-            if (regionPid == null) {
-                throw new CrmebException("上级账户不存在");
-            }
-            relationService.band(user.getId(), regionPid.getId(), null, regionPNode);
-
-        }
-//        设置邀请上级账号
-        if (ObjectUtils.isNotEmpty(invitationPAccount)) {
-            Integer pid = null;
-            if (com.jbp.service.util.StringUtils.isNotEmpty(invitationPAccount)) {
-                User invitationPid = userService.getByAccount(invitationPAccount);
-                if (invitationPid == null) {
-                    throw new CrmebException("邀请上级账号信息错误");
-                }
-                pid = user.getId();
-            }
-            invitationService.band(user.getId(), pid, false, true);
-        }
-        if (ObjectUtils.isNotEmpty(userCapaTemplateRequest)){
-            userCapaService.saveOrUpdateCapa(user.getId(),userCapaTemplateRequest.getCapaId(),
-                    userCapaTemplateRequest.getRemark(),userCapaTemplateRequest.getDescription());
-        }
-
     }
 
     @Override
