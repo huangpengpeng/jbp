@@ -9,6 +9,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawPageRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 import com.jbp.common.vo.WalletWithdrawVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletWithdrawService;
@@ -60,10 +61,10 @@ public class WalletWithdrawController {
         walletWithdrawService.cancel(requests);
         return CommonResult.success();
     }
-
+    @PreAuthorize("hasAuthority('agent:wallet:withdraw:excel')")
     @PostMapping("/excel")
-    @ApiOperation("钱包提现明细")
-    public CommonResult<List<WalletWithdrawVo>> excel(WalletWithdrawPageRequest request) {
+    @ApiOperation("钱包导出数据")
+    public CommonResult<WalletWithdrawExcelInfoVo> excel(WalletWithdrawPageRequest request) {
         if (ObjectUtil.isEmpty(request)) {
             throw new CrmebException("请选择一个过滤条件");
         }
@@ -75,8 +76,7 @@ public class WalletWithdrawController {
             }
             uid = user.getId();
         }
-//        return CommonResult.success(walletWithdrawService.excel(request.getAccount(), request.getWalletName(), request.getStatus(),request.getDateLimit(),uid));
-        return null;
+        return CommonResult.success(walletWithdrawService.excel(request.getAccount(), request.getWalletName(), request.getStatus(),request.getDateLimit(),uid));
     }
 
 
