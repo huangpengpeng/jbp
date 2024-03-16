@@ -2,7 +2,6 @@ package com.jbp.common.model.agent;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.jbp.common.model.BaseModel;
 import com.jbp.common.model.VersionModel;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
@@ -88,4 +87,16 @@ public class WalletWithdraw extends VersionModel {
     @ApiModelProperty("备注")
     @TableField("remark")
     private String remark;
+
+    @ApiModelProperty("银行卡名称")
+    @TableField(exist = false)
+    private String bankName;
+
+    @ApiModelProperty("银行卡号")
+    @TableField(exist = false)
+    private String bankCode;
+
+    @ApiModelProperty("真实姓名")
+    @TableField(exist = false)
+    private String realName;
 }

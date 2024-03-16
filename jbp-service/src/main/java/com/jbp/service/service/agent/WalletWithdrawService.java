@@ -6,6 +6,7 @@ import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
+import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,5 +21,7 @@ public interface WalletWithdrawService extends IService<WalletWithdraw> {
 
     void cancel(List<WalletWithdrawRequest> walletWithdrawList);
 
-    PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, PageParamRequest pageParamRequest);
+    PageInfo<WalletWithdraw> pageList(String account, String walletName, String status,String dateLimit,Integer uid, PageParamRequest pageParamRequest);
+
+    WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String dateLimit, Integer uid);
 }

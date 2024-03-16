@@ -1,5 +1,6 @@
 package com.jbp.common.request.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,4 +21,11 @@ public class WalletWithdrawPageRequest {
 
     @ApiModelProperty("状态")
     private String status;
+
+    @ApiModelProperty("真实姓名")
+    private String realName;
+
+    @ApiModelProperty(value = "创建时间区间")
+    private String dateLimit;
+
 }
