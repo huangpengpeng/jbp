@@ -2,9 +2,8 @@ package com.jbp.common.model.agent;
 
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
@@ -12,7 +11,11 @@ import java.math.BigDecimal;
  * 用户信息
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
 public class UserInfo {
 
     public UserInfo(String username, String account) {

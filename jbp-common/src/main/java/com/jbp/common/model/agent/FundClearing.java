@@ -121,4 +121,13 @@ public class FundClearing extends VersionModel {
     @TableField(exist = false)
     private String account;
 
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickName;
+
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
+
 }

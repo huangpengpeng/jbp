@@ -348,13 +348,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public User getByRealName(String realName) {
-        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getRealName, realName);
-        return getOne(lqw);
-    }
-
-    @Override
     public String getAccount() {
         String accountPrefix = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_PREFIX);
         String accountNum = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_ACCOUNT_NUM);
