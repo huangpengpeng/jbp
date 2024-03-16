@@ -80,7 +80,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
                 throw new CrmebException(ProductCommEnum.间推佣金.getName() + "参数不完整");
             }
         }
-        Set<Integer> set = rules.stream().map(Rule::getCapaId).collect(Collectors.toSet());
+        Set<Long> set = rules.stream().map(Rule::getCapaId).collect(Collectors.toSet());
         if (set.size() != rules.size()) {
             throw new CrmebException("等级配置不能重复");
         }
@@ -138,8 +138,8 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);
-            Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
-            Rule rule = ruleMap.get(capaId.intValue());
+            Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
+            Rule rule = ruleMap.get(capaId);
             BigDecimal ratio = BigDecimal.ZERO;
             if (rule != null) {
                 ratio = rule.getRatio();
@@ -170,7 +170,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
         /**
          * 等级
          */
-        private Integer capaId;
+        private Long capaId;
 
         /**
          * 比例

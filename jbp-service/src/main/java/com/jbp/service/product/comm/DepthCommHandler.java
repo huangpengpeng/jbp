@@ -107,7 +107,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
         }
         // 得奖比例
         List<Rule> rules = getRule(null);
-        Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
+        Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
         // 总积分
         BigDecimal totalScore = collisionFeeList.get(0).getPrice();
         for (CommCalculateResult calculateResult : collisionFeeList) {
@@ -115,7 +115,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
             BigDecimal minScore = BigDecimal.valueOf(Math.min(totalScore.doubleValue(), score.doubleValue()));
             if (ArithmeticUtils.gt(minScore, BigDecimal.ZERO)) {
                 UserCapa userCapa = userCapaService.getByUser(calculateResult.getUid());
-                Rule rule = userCapa == null ? null : ruleMap.get(userCapa.getCapaId().intValue());
+                Rule rule = userCapa == null ? null : ruleMap.get(userCapa.getCapaId());
                 BigDecimal ratio = rule == null ? BigDecimal.ZERO : rule.getRatio();
                 BigDecimal amt = minScore.multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
                 if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
@@ -134,7 +134,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
     public static void main(String[] args) {
         List<Rule> list = Lists.newArrayList();
         for (int i = 10; i <= 16 ; i++) {
-            Rule rule = new Rule(i, BigDecimal.valueOf(0.1));
+            Rule rule = new Rule(Long.valueOf(i), BigDecimal.valueOf(0.1));
             list.add(rule);
         }
         System.out.println(JSONArray.toJSONString(list));
@@ -152,7 +152,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
         /**
          * 等级
          */
-        private Integer capaId;
+        private Long capaId;
 
         /**
          * 比例

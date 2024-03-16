@@ -61,7 +61,7 @@ public class UserCapaXsController {
     @GetMapping("/delect")
     @ApiOperation("删除")
     public CommonResult delect(UserCapaXsDelectRequest request) {
-        userCapaXsService.delect(request.getUid(),request.getDescription(),request.getRemark());
+        userCapaXsService.del(request.getUid(),request.getDescription(),request.getRemark());
         return CommonResult.success();
     }
 }

@@ -82,6 +82,11 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     }
 
     @Override
+    public Capa getMaxCapa() {
+        return getOne(new QueryWrapper<Capa>().lambda().orderByDesc(Capa::getRankNum).last(" limit 1"));
+    }
+
+    @Override
     public Capa getNext(Long capaId) {
         if (capaId == null) {
             return getMinCapa();
