@@ -233,7 +233,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     if (invitationPid == null) {
                         throw new CrmebException("邀请上级账号信息错误");
                     }
-                    pid = user.getId();
+                    pid = invitationPid.getId();
                 }
                 invitationService.band(user.getId(), pid, false, true);
             }

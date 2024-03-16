@@ -86,7 +86,7 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     public void validBand(Integer uId, Integer pId, Integer operateId, Integer node) {
         UserRelation receiverUser = getByPid(pId, node);
         if (receiverUser != null) {
-            throw new RuntimeException("接受人当前点位存在用户接受人:" + pId + "点位:" + node);
+            throw new RuntimeException("服务人节点被占用:账号为" + pId + "点位:" + node);
         }
         if (hasChild(pId, uId)) {
             throw new RuntimeException("接受人不能是被安置人的下级, 被安置人:" + uId + "接受人:" + pId);
