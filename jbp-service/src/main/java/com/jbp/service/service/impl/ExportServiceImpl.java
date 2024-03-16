@@ -237,6 +237,7 @@ public class ExportServiceImpl implements ExportService {
         sortedMap.forEach((k, v) -> {
             head.put(k, v);
         });
+        vo.setHead(head);
         vo.setList(voList);
         return vo;
     }
