@@ -6,6 +6,7 @@ import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.UserCapaXsDelectRequest;
 import com.jbp.common.request.agent.UserCapaRequest;
 import com.jbp.common.request.agent.UserCapaXsAddRequest;
 import com.jbp.common.result.CommonResult;
@@ -56,5 +57,11 @@ public class UserCapaXsController {
         userCapaXsService.saveOrUpdateCapa(user.getId(), request.getCapaId(), request.getIfFake(), request.getRemark(), request.getDescription());
         return CommonResult.success();
     }
-
+    @PreAuthorize("hasAuthority('agent:user:capa:xs:delect')")
+    @GetMapping("/delect")
+    @ApiOperation("删除")
+    public CommonResult delect(UserCapaXsDelectRequest request) {
+        userCapaXsService.delect(request.getUid(),request.getDescription(),request.getRemark());
+        return CommonResult.success();
+    }
 }

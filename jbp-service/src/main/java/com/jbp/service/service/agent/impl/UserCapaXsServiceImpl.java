@@ -94,6 +94,16 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
 	}
 
     @Override
+    public void delect(Integer uid, String description, String remark) {
+        UserCapaXs userCapaXs = userCapaXsDao.selectOne(new LambdaQueryWrapper<UserCapaXs>().eq(UserCapaXs::getUid, uid));
+        remove(new QueryWrapper<UserCapaXs>().lambda().eq(UserCapaXs::getUid, uid));
+            // 记录快照
+            UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(userCapaXs.getCapaId()).type("删除")
+                    .remark(remark).description(description).build();
+            snapshotService.save(snapshot);
+    }
+
+    @Override
     public PageInfo<UserCapaXs> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserCapaXs> userCapaXsLambdaQueryWrapper = new LambdaQueryWrapper<UserCapaXs>();
         userCapaXsLambdaQueryWrapper.eq(!ObjectUtil.isNull(uid), UserCapaXs::getUid, uid);
