@@ -1,5 +1,6 @@
 package com.jbp.common.vo;
 
+import com.alibaba.fastjson.JSONArray;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class OrderExcelInfoVo implements Serializable {
 
 
     @ApiModelProperty(value = "表头 key=list 字段名称 value=表头名称")
-    private String head;
+    private JSONArray head;
 
     @ApiModelProperty(value = "导出数据")
     private List<OrderExcelVo> list;

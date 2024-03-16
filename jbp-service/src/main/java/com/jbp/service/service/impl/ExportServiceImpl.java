@@ -1,7 +1,9 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -234,7 +236,14 @@ public class ExportServiceImpl implements ExportService {
         sortedMap.forEach((k, v) -> {
             head.put(k, v);
         });
-        vo.setHead(JSONObject.toJSONString(head));
+        JSONArray array = new JSONArray();
+        head.forEach((k,v)->{
+            JSONObject json = new JSONObject();
+            json.put("k", k);
+            json.put("v", v);
+            array.add(json);
+        });
+        vo.setHead(array);
         vo.setList(voList);
         return vo;
     }
