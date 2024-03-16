@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,8 +23,10 @@ import java.util.List;
 public class OrderExcelInfoVo implements Serializable {
 
     private static final long serialVersionUID = -8330957183745338822L;
+
+
     @ApiModelProperty(value = "表头 key=list 字段名称 value=表头名称")
-    private LinkedHashMap head;
+    private String head;
 
     @ApiModelProperty(value = "导出数据")
     private List<OrderExcelVo> list;

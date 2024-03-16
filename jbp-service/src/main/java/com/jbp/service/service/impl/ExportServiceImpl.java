@@ -1,11 +1,10 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
-import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.Materials;
 import com.jbp.common.model.order.MerchantOrder;
@@ -14,14 +13,12 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
-import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.*;
-import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +68,7 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus()) && ObjectUtils.isEmpty(request.getType())) {
-            throw new CrmebException("请选择一个过滤条件");
+            throw new CrmebException("请选择一个查询条件");
         }
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         if (systemAdmin.getMerId() > 0) {
@@ -183,7 +180,7 @@ public class ExportServiceImpl implements ExportService {
         } while (true);
 
         OrderExcelInfoVo vo = new OrderExcelInfoVo();
-        LinkedHashMap head = new LinkedHashMap();
+        LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("orderDetailId", "订单详情ID");
         head.put("type", "订单类型");
         head.put("orderNo", "订单号");
@@ -237,10 +234,9 @@ public class ExportServiceImpl implements ExportService {
         sortedMap.forEach((k, v) -> {
             head.put(k, v);
         });
-        vo.setHead(head);
+        vo.setHead(JSONObject.toJSONString(head));
         vo.setList(voList);
         return vo;
     }
-
 }
 
