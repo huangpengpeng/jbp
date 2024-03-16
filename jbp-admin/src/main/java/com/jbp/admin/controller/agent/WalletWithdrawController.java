@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -9,6 +11,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.openxml4j.opc.internal.unmarshallers.PackagePropertiesUnmarshaller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +44,17 @@ public class WalletWithdrawController {
         walletWithdrawService.cancel(requests);
         return CommonResult.success();
     }
+
+    @PostMapping("/excel")
+    @ApiOperation("钱包提现明细")
+    public CommonResult excel(WalletWithdrawPageRequest request) {
+        if (ObjectUtil.isEmpty(request)) {
+            throw new CrmebException("请选择一个过滤条件");
+
+        }
+        return null;
+    }
+
 
     @GetMapping("/status/enum")
     @ApiOperation("钱包提现状态")
