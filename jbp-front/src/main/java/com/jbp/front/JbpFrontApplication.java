@@ -1,6 +1,11 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.google.common.collect.Lists;
+import com.jbp.service.product.comm.CollisionCommHandler;
+import com.jbp.service.product.comm.DepthCommHandler;
+import com.jbp.service.product.comm.DirectInvitationHandler;
+import com.jbp.service.service.OrderService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,6 +39,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
+
+//        final CollisionCommHandler bean = run.getBean(CollisionCommHandler.class);
+//
+//        final OrderService orderService = run.getBean(OrderService.class);
+//
+//
+//        bean.orderSuccessCalculateAmt(orderService.getById(294), Lists.newLinkedList());
         System.out.println("ok");
 
     }

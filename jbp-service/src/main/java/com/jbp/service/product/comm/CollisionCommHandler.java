@@ -153,7 +153,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
 
         // 等级比例
         Rule rule = getRule(null);
-        Map<Integer, CapaRatio> capaRatioMap = FunctionUtil.keyValueMap(rule.getCapaRatioList(), CapaRatio::getCapaId);
+        Map<Long, CapaRatio> capaRatioMap = FunctionUtil.keyValueMap(rule.getCapaRatioList(), CapaRatio::getCapaId);
         Map<Integer, LevelRatio> levelRatioMap = FunctionUtil.keyValueMap(rule.getLevelRatioList(), LevelRatio::getLevel);
 
         // 根据增加明细有序进行对碰减少
@@ -175,7 +175,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             BigDecimal ratio = BigDecimal.ZERO;
             UserCapa userCapa = userCapaService.getByUser(uid);
             if (userCapa != null) {
-                CapaRatio capaRatio = capaRatioMap.get(userCapa.getUid());
+                CapaRatio capaRatio = capaRatioMap.get(userCapa.getCapaId());
                 ratio = capaRatio == null ? BigDecimal.ZERO : capaRatio.getRatio();
             }
             // 层级比例
@@ -188,10 +188,6 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             ratio = ratio.multiply(lRatio);
             // 奖励金额[保留2为小数]
             BigDecimal amt = ratio.multiply(minScore).setScale(2, BigDecimal.ROUND_DOWN);
-            // 奖金大于0 层级+1
-            if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                level++;
-            }
             // 减少反方向
             relationScoreService.orderSuccessReduce(uid, flow.getOrderUid(), minScore, node, flow.getOrdersSn(),
                     flow.getPayTime(), level, amt, ratio);
@@ -209,6 +205,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
                         null, null, frontScore,
                         1, minScore, BigDecimal.ONE, ratio, amt, sort);
                 resultList.add(calculateResult);
+                level++;
             }
         }
     }
@@ -218,7 +215,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
         Rule rule = new Rule();
         List<CapaRatio> capaRatioList = Lists.newArrayList();
         for (int i = 10; i <= 16 ; i++) {
-            CapaRatio capaRatio = new CapaRatio(i, BigDecimal.valueOf(0.1));
+            CapaRatio capaRatio = new CapaRatio(Long.valueOf(i), BigDecimal.valueOf(0.1));
             capaRatioList.add(capaRatio);
         }
 
@@ -252,7 +249,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
         /**
          * 等级
          */
-        private Integer capaId;
+        private Long capaId;
 
         /**
          * 比例
