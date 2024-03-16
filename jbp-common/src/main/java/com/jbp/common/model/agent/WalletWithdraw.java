@@ -26,13 +26,14 @@ public class WalletWithdraw extends VersionModel {
 
     private static final long serialVersionUID = 1L;
 
-    public WalletWithdraw(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, String postscript) {
+    public WalletWithdraw(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, BigDecimal commission, String postscript) {
         this.uid = uid;
         this.account = account;
         this.walletType = walletType;
         this.walletName = walletName;
         this.uniqueNo = StringUtils.N_TO_10("W_");
         this.amt = amt;
+        this.commission = commission;
         this.status = StatusEnum.待出款.toString();
         this.postscript = postscript;
         this.createTime = DateTimeUtils.getNow();
@@ -64,6 +65,10 @@ public class WalletWithdraw extends VersionModel {
     @ApiModelProperty("提现金额")
     @TableField("amt")
     private BigDecimal amt;
+
+    @ApiModelProperty("手续费")
+    @TableField("commission")
+    private BigDecimal commission;
 
     @ApiModelProperty("状态")
     private String status;
