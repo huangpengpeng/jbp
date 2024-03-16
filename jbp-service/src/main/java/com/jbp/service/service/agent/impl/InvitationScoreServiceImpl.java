@@ -18,8 +18,10 @@ import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
 import com.jbp.service.service.agent.InvitationScoreService;
+import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     private InvitationScoreFlowService invitationScoreFlowService;
     @Resource
     private UserInvitationService userInvitationService;
+    @Resource
+    private SelfScoreService selfScoreService;
 
 
     @Override
@@ -71,6 +75,20 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     @Override
     public InvitationScore getByUser(Integer uid) {
         return getOne(new QueryWrapper<InvitationScore>().lambda().eq(InvitationScore::getUid, uid));
+    }
+
+    @Override
+    public BigDecimal getInvitationScore(Integer uid, Boolean containsSelf) {
+        InvitationScore nextInvitationScore = getByUser(uid);
+        BigDecimal score = nextInvitationScore == null ? BigDecimal.ZERO : nextInvitationScore.getScore();
+        if (BooleanUtils.isNotTrue(containsSelf)) {
+            return score;
+        }
+        // 自己业绩
+        SelfScore self = selfScoreService.getByUser(uid);
+        BigDecimal selfScore = self == null ? BigDecimal.ZERO : self.getScore();
+        score.add(selfScore);
+        return score;
     }
 
     @Override

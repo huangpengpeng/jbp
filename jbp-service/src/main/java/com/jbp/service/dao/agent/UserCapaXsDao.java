@@ -11,4 +11,6 @@ import java.util.List;
 public interface UserCapaXsDao extends BaseMapper<UserCapaXs> {
 
     List<UserCapaXs> getRelationUnder(@Param("uid") Integer uid, @Param("capaId") Long capaId);
+
+    List<UserCapaXs> getInvitationUnder(@Param("uid") Integer uid, @Param("capaId") Long capaId);
 }

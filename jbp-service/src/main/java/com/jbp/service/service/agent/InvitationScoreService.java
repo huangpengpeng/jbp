@@ -14,6 +14,8 @@ public interface InvitationScoreService extends IService<InvitationScore> {
     PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest);
     InvitationScore add(Integer uid);
     InvitationScore getByUser(Integer uid);
+
+    BigDecimal getInvitationScore(Integer uid, Boolean containsSelf);
     void orderSuccess(Integer uid, BigDecimal score, String ordersSn, Date payTime, List<ProductInfoDto> productInfo);
 
 }
