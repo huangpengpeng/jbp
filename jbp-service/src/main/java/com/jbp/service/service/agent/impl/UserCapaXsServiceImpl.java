@@ -171,4 +171,9 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     public List<UserCapaXs> getRelationUnder(Integer uid, Long capaId) {
         return userCapaXsDao.getRelationUnder(uid, capaId);
     }
+
+    @Override
+    public List<UserCapaXs> getInvitationUnder(Integer uid, Long capaId) {
+        return userCapaXsDao.getInvitationUnder(uid, capaId);
+    }
 }

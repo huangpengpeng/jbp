@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 小区业绩独立线星级人数
+ * 关联等级升星
  */
 @Component
 public class CapaXsJoinCapaHandler implements ConditionHandler {

@@ -22,5 +22,7 @@ public interface UserCapaXsService extends IService<UserCapaXs> {
 
     List<UserCapaXs> getRelationUnder(Integer uid, Long capaId);
 
+    List<UserCapaXs> getInvitationUnder(Integer uid, Long capaId);
+
     Map<Integer, UserCapaXs> getUidMap(List<Integer> uIdList);
 }
