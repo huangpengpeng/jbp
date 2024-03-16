@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent;
 
+import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.FundClearing;
@@ -11,6 +12,7 @@ import com.jbp.common.vo.FundClearingVo;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface FundClearingService extends IService<FundClearing> {
 
@@ -81,4 +83,8 @@ public interface FundClearingService extends IService<FundClearing> {
     List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status);
 
     void updateRemark(Long id, String remark);
+
+    Map<String, Object> totalGet(Integer uid);
+
+    PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest);
 }

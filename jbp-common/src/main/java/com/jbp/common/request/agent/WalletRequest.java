@@ -1,5 +1,6 @@
 package com.jbp.common.request.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,4 +19,12 @@ public class WalletRequest implements Serializable {
 
     @ApiModelProperty("钱包类型")
     private Integer type;
+
+
+    @ApiModelProperty(value = "创建时间区间")
+    private String dateLimit;
+
+    @ApiModelProperty("外部单号")
+    private String externalNo;
+
 }

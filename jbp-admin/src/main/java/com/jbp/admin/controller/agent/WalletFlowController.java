@@ -7,17 +7,21 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/user/wallet/flow")
@@ -40,6 +44,24 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(), pageParamRequest)));
+    }
+
+    @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")
+    @PostMapping("/excel")
+    @ApiOperation("用户积分详情导出")
+    public CommonResult<List<WalletFlowVo>> excel(WalletRequest request) {
+        if (ObjectUtils.isEmpty(request)) {
+            throw new CrmebException("请选择一个过滤条件");
+        }
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo()));
     }
 }

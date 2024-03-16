@@ -8,6 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingRequest;
 import com.jbp.common.request.agent.FundClearingUpdateRemarkRequest;
 import com.jbp.common.request.agent.FundClearingUpdateRequest;
+import com.jbp.common.request.agent.FundClearingUpdateSendAmtRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
@@ -100,5 +101,12 @@ public class FundClearingController {
             throw new CrmebException("请填写一个过滤信息");
         }
         return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus()));
+    }
+    @PreAuthorize("hasAuthority('agent:fund:clearing:update:send:amt')")
+    @PostMapping("/update/send/amt")
+    @ApiOperation("修改发放金额")
+    public CommonResult updateSendAmt(@RequestBody @Validated FundClearingUpdateSendAmtRequest request) {
+        fundClearingService.updateSendAmt(request.getId(),request.getSendAmt(),request.getRemark());
+        return CommonResult.success();
     }
 }

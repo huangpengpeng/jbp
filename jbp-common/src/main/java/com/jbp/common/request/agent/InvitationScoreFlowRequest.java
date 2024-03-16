@@ -27,4 +27,7 @@ public class InvitationScoreFlowRequest implements Serializable {
 
     @ApiModelProperty("单号")
     private String ordersSn;
+
+    @ApiModelProperty(value = "付款时间区间")
+    private String dateLimit;
 }
