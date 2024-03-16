@@ -24,4 +24,8 @@ public class WalletWithdrawPageRequest {
 
     @ApiModelProperty("真实姓名")
     private String realName;
+
+    @ApiModelProperty(value = "创建时间区间")
+    private String dateLimit;
+
 }

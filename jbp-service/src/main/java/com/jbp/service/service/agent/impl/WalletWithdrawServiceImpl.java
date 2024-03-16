@@ -13,9 +13,10 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
-import com.jbp.common.vo.FundClearingVo;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.WalletWithdrawDao;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.ChannelCardService;
@@ -24,6 +25,7 @@ import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,19 +51,21 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private ChannelCardService channelCardService;
 
     @Override
-    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit,Integer uid, PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
+                .eq(ObjectUtils.isNotEmpty(uid),WalletWithdraw::getUid,uid)
                 .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
                 .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
                 .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
                 .orderByDesc(WalletWithdraw::getId);
+        getRequestTimeWhere(lqw, dateLimit);
         Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WalletWithdraw> list = list(lqw);
         List<Integer> uIdList = list.stream().map(WalletWithdraw::getUid).collect(Collectors.toList());
         Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
         Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
-        list.forEach(e->{
+        list.forEach(e -> {
             ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
             if (channelIdentity != null) {
                 e.setRealName(channelIdentity.getRealName());
@@ -73,6 +77,11 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
             }
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    private void getRequestTimeWhere(LambdaQueryWrapper<WalletWithdraw> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), WalletWithdraw::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
 
     @Override
