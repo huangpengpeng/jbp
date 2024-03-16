@@ -8,17 +8,18 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Wallet;
-import com.jbp.common.model.agent.WalletFlow;
-import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.WalletWithdrawDao;
 import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.agent.ChannelCardService;
+import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,6 +32,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -40,16 +43,36 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private WalletService walletService;
     @Resource
     private SystemConfigService systemConfigService;
+    @Resource
+    private ChannelIdentityService channelIdentityService;
+    @Resource
+    private ChannelCardService channelCardService;
 
     @Override
     public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, PageParamRequest pageParamRequest) {
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
         LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
                 .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
                 .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
                 .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
                 .orderByDesc(WalletWithdraw::getId);
         Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        return CommonPage.copyPageInfo(page, list(lqw));
+        List<WalletWithdraw> list = list(lqw);
+        List<Integer> uIdList = list.stream().map(WalletWithdraw::getUid).collect(Collectors.toList());
+        Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
+        Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
+        list.forEach(e->{
+            ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
+            if (channelIdentity != null) {
+                e.setRealName(channelIdentity.getRealName());
+            }
+            ChannelCard channelCard = channelCardMap.get(e.getUid());
+            if (channelCard != null) {
+                e.setBankName(channelCard.getBankName());
+                e.setBankCode(channelCard.getBankCardNo());
+            }
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 
     @Override

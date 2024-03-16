@@ -11,7 +11,6 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.poi.openxml4j.opc.internal.unmarshallers.PackagePropertiesUnmarshaller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +23,14 @@ import java.util.List;
 public class WalletWithdrawController {
     @Resource
     private WalletWithdrawService walletWithdrawService;
+
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:page')")
     @GetMapping("/page")
     @ApiOperation("钱包提现列表")
     public CommonResult<CommonPage<WalletWithdraw>> getList(WalletWithdrawPageRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
     @PostMapping("/send")
     @ApiOperation("钱包提现批量出款")
@@ -37,6 +38,7 @@ public class WalletWithdrawController {
         walletWithdrawService.send(requests);
         return CommonResult.success();
     }
+
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:cancel')")
     @PostMapping("/cancel")
     @ApiOperation("钱包提现批量取消")
@@ -50,7 +52,6 @@ public class WalletWithdrawController {
     public CommonResult excel(WalletWithdrawPageRequest request) {
         if (ObjectUtil.isEmpty(request)) {
             throw new CrmebException("请选择一个过滤条件");
-
         }
         return null;
     }
