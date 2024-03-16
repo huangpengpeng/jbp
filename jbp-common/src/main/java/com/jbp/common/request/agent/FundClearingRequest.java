@@ -1,5 +1,6 @@
 package com.jbp.common.request.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -44,4 +45,14 @@ public class FundClearingRequest implements Serializable {
 
     @ApiModelProperty("结算状态  已创建  待审核  待出款  已出款  已取消  已拦截")
     private String status;
+
+    @ApiModelProperty("得奖用户账户")
+    private String account;
+
+    @ApiModelProperty("团队名称")
+    private String teamName;
+
+    @ApiModelProperty("描述")
+    private String description;
+
 }

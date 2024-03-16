@@ -8,10 +8,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.TeamUserDao;
+import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import org.springframework.stereotype.Service;
@@ -19,15 +21,19 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> implements TeamUserService {
     @Resource
-    TeamUserDao teamUserDao;
+    private TeamUserDao teamUserDao;
     @Resource
-    UserService userService;
+    private UserService userService;
+    @Resource
+    private TeamService teamService;
 
     @Override
     public TeamUser save(Integer uId, Integer tId) {
@@ -57,4 +63,17 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
         return CommonPage.copyPageInfo(page, teamUserList);
     }
 
+    @Override
+    public Map<Integer, TeamUser> getUidMapList(List<Integer> uidList) {
+        LambdaQueryWrapper<TeamUser> lqw = new LambdaQueryWrapper<TeamUser>()
+                .in(TeamUser::getUid, uidList);
+        List<TeamUser> list = list(lqw);
+        Map<Integer, TeamUser> teamUserMap = new HashMap<>();
+        list.forEach(e -> {
+            Team team = teamService.getById(e.getTid());
+            e.setName(team != null ? team.getName() : "");
+            teamUserMap.put(e.getUid(), e);
+        });
+        return teamUserMap;
+    }
 }

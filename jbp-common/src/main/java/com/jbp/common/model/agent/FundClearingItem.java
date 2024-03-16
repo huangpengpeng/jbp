@@ -2,9 +2,8 @@ package com.jbp.common.model.agent;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,7 +12,11 @@ import java.math.BigDecimal;
  * 出款备注
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
 public class FundClearingItem implements Serializable {
 
     public FundClearingItem(String name, Integer walletType, BigDecimal amt) {

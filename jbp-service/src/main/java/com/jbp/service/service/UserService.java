@@ -396,6 +396,4 @@ public interface UserService extends IService<User> {
     PageInfo<UserInviteInfoResponse> getUserInviteInfo(UserInviteRequest request);
 
     void registerPhone(String username, String phone, String account,UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd);
-
-    User getByRealName(String realName);
 }

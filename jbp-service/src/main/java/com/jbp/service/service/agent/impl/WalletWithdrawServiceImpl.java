@@ -8,10 +8,8 @@ import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
-import com.jbp.common.model.order.Order;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
@@ -20,7 +18,6 @@ import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.DateLimitUtilVo;
-import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 import com.jbp.common.vo.WalletWithdrawVo;
 import com.jbp.service.dao.agent.WalletWithdrawDao;
@@ -29,10 +26,8 @@ import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
-import io.micrometer.core.instrument.binder.BaseUnits;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -60,10 +55,9 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private ChannelCardService channelCardService;
 
     @Override
-    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit,Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName, PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
-                .eq(ObjectUtils.isNotEmpty(uid),WalletWithdraw::getUid,uid)
                 .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
                 .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
                 .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
@@ -85,17 +79,19 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
                 e.setBankCode(channelCard.getBankCardNo());
             }
         });
+        if (StringUtils.isNotEmpty(realName)) {
+            return CommonPage.copyPageInfo(page, list.stream().filter(e -> e.getRealName() == realName).collect(Collectors.toList()));
+        }
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
-    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String dateLimit, Integer uid) {
+    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
             LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
-                    .eq(ObjectUtils.isNotEmpty(uid),WalletWithdraw::getUid,uid)
                     .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
                     .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
                     .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
@@ -121,25 +117,31 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
                     e.setBankCode(channelCard.getBankCardNo());
                 }
                 WalletWithdrawVo walletWithdrawVo = new WalletWithdrawVo();
-                BeanUtils.copyProperties(e,walletWithdrawVo);
-                voList.add(walletWithdrawVo);
+                BeanUtils.copyProperties(e, walletWithdrawVo);
+                if (StringUtils.isEmpty(realName)) {
+                    voList.add(walletWithdrawVo);
+                } else if (StringUtils.isNotEmpty(realName)) {
+                    if (walletWithdrawVo.getRealName() == realName) {
+                        voList.add(walletWithdrawVo);
+                    }
+                }
             });
         } while (true);
         WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
         LinkedHashMap head = new LinkedHashMap();
-        head.put("account","账户");
-        head.put("walletName","钱包名称");
-        head.put("uniqueNo","流水单号");
-        head.put("amt","提现金额");
-        head.put("commission","手续费");
-        head.put("status","状态");
-        head.put("postscript","附言");
-        head.put("createTime","创建时间");
-        head.put("successTime","成功时间");
-        head.put("remark","备注");
-        head.put("bankName","银行卡名称");
-        head.put("bankCode","银行卡号");
-        head.put("realName","真实姓名");
+        head.put("account", "账户");
+        head.put("walletName", "钱包名称");
+        head.put("uniqueNo", "流水单号");
+        head.put("amt", "提现金额");
+        head.put("commission", "手续费");
+        head.put("status", "状态");
+        head.put("postscript", "附言");
+        head.put("createTime", "创建时间");
+        head.put("successTime", "成功时间");
+        head.put("remark", "备注");
+        head.put("bankName", "银行卡名称");
+        head.put("bankCode", "银行卡号");
+        head.put("realName", "真实姓名");
         walletWithdrawExcelInfoVo.setHead(head);
         walletWithdrawExcelInfoVo.setList(voList);
         return walletWithdrawExcelInfoVo;

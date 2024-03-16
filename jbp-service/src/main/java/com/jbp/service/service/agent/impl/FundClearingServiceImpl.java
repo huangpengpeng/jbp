@@ -9,12 +9,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
-import com.jbp.common.config.CrmebConfig;
-import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
-import com.jbp.common.model.merchant.MerchantInfo;
-import com.jbp.common.model.product.Product;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -62,32 +58,18 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Resource
     private WalletConfigService walletConfigService;
     @Resource
-    private CrmebConfig crmebConfig;
-    @Resource
     private SystemConfigService systemConfigService;
     @Resource
     private ChannelIdentityService channelIdentityService;
     @Resource
     private ChannelCardService channelCardService;
+    @Resource
+    private FundClearingDao fundClearingDao;
 
     @Override
-    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<FundClearing>()
-                .like(StringUtils.isNotEmpty(uniqueNo), FundClearing::getUniqueNo, uniqueNo)
-                .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
-                .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
-                .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
-                .between(!ObjectUtil.isNull(starteCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, starteCreateTime, endCreateTime)
-                .orderByDesc(FundClearing::getId);
+    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<FundClearing> list = list(lqw);
-        list.forEach(e -> {
-            e.setAccount(e.getUserInfo().getAccount());
-            for (FundClearingItem item : e.getItems()) {
-                WalletConfig walletConfig = walletConfigService.getByType(item.getWalletType());
-                item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
-            }
-        });
+        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description);
         return CommonPage.copyPageInfo(page, list);
     }
 
@@ -417,21 +399,21 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         Map<String, Object> map = new HashMap<>();
         LambdaQueryWrapper<FundClearing> issue = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid)
-                .in(FundClearing::getStatus, FundClearing.Constants.待审核,FundClearing.Constants.待出款);
+                .in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
         BigDecimal count = list(issue).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
         map.put("issue", count);
         LambdaQueryWrapper<FundClearing> completed = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid)
                 .eq(FundClearing::getStatus, FundClearing.Constants.已出款);
-        BigDecimal completedCount = list(completed).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO,BigDecimal::add);
+        BigDecimal completedCount = list(completed).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
         map.put("completed", completedCount);
         return map;
     }
 
     @Override
     public PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<FundClearing> lqw=new LambdaQueryWrapper<>();
-        setFundClearingWrapperByStatus(lqw,uid,headerStatus);
+        LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<>();
+        setFundClearingWrapperByStatus(lqw, uid, headerStatus);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = list(lqw);
         list.forEach(e -> {
@@ -444,14 +426,14 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     public void setFundClearingWrapperByStatus(LambdaQueryWrapper<FundClearing> lqw, Integer uid, Integer headerStatus) {
-        lqw.eq(FundClearing::getUid,uid);
+        lqw.eq(FundClearing::getUid, uid);
         switch (headerStatus) {
             case 0:
                 lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已出款);
                 break;
             case 1:
                 //仓库中（未上架）
-                lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核,FundClearing.Constants.待出款);
+                lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
                 break;
             case 2:
                 //仓库中（未上架）
