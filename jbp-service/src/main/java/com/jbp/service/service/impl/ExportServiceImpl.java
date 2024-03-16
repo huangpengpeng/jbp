@@ -1,9 +1,11 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.Materials;
 import com.jbp.common.model.order.MerchantOrder;
@@ -16,6 +18,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.ProductMaterialsService;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,11 +58,7 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private OrderDetailService orderDetailService;
     @Autowired
-    private CrmebConfig crmebConfig;
-    @Resource
-    private ProductAttrValueService productAttrValueService;
-    @Resource
-    private ProductMaterialsService productMaterialsService;
+    private WalletConfigService walletConfigService;
     @Resource
     private MerchantOrderService merchantOrderService;
 
@@ -69,7 +69,7 @@ public class ExportServiceImpl implements ExportService {
      * @return 文件名称
      */
     @Override
-    public List<OrderExcelVo> exportOrder(OrderSearchRequest request) {
+    public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus()) && ObjectUtils.isEmpty(request.getType())) {
             throw new CrmebException("请选择一个过滤条件");
         }
@@ -77,8 +77,10 @@ public class ExportServiceImpl implements ExportService {
         if (systemAdmin.getMerId() > 0) {
             request.setMerId(systemAdmin.getMerId());
         }
+
         Integer id = 0;
         List<OrderExcelVo> voList = CollUtil.newArrayList();
+        Map<String, String> walletDeductionMap = Maps.newConcurrentMap();
         do {
             List<Order> orderList = orderService.findExportList(request, id);
             if (CollectionUtils.isEmpty(orderList)) {
@@ -147,15 +149,11 @@ public class ExportServiceImpl implements ExportService {
                         vo.setProductPostage(orderDetail.getFreightFee());
                         vo.setProductCouponPrice(orderDetail.getCouponPrice());
                         vo.setProductWalletDeductionFee(orderDetail.getWalletDeductionFee());
-                        List<ProductDeduction> walletDeductionList = orderDetail.getWalletDeductionList();
-                        if (CollectionUtils.isNotEmpty(walletDeductionList)) {
-                            walletDeductionList = walletDeductionList.stream().filter(w -> ArithmeticUtils.gt(w.getDeductionFee(), BigDecimal.ZERO)).collect(Collectors.toList());
-                            StringBuilder walletDeductionStr = new StringBuilder();
-                            for (ProductDeduction deduction : walletDeductionList) {
-                                String format = String.format("积分名称:%s,抵扣金额:%s", deduction.getWalletName(), deduction.getDeductionFee());
-                                walletDeductionStr.append(format);
+                        vo.setWalletDeductionList(orderDetail.getWalletDeductionList());
+                        if (CollectionUtils.isNotEmpty(vo.getWalletDeductionList())) {
+                            for (ProductDeduction deduction : vo.getWalletDeductionList()) {
+                                walletDeductionMap.put(deduction.getWalletType().toString(), deduction.getWalletName());
                             }
-                            vo.setProductWalletDeductionFeeStr(walletDeductionStr.toString());
                         }
                         // 物料信息
                         BigDecimal price = materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity()));
@@ -183,7 +181,64 @@ public class ExportServiceImpl implements ExportService {
             }
             id = orderList.get(orderList.size() - 1).getId();
         } while (true);
-        return voList;
+
+        OrderExcelInfoVo vo = new OrderExcelInfoVo();
+        LinkedHashMap head = new LinkedHashMap();
+        head.put("orderDetailId", "订单详情ID");
+        head.put("type", "订单类型");
+        head.put("orderNo", "订单号");
+        head.put("merName", "商户名称");
+        head.put("uid", "用户ID");
+        head.put("userAccount", "下单账号");
+        head.put("payUserAccount", "付款账号");
+        head.put("payPrice", "货款");
+        head.put("payPostage", "运费");
+        head.put("couponPrice", "优惠");
+        head.put("walletDeductionFee", "抵扣");
+        head.put("paidStr", "支付状态");
+        head.put("orderPayType", "支付方式");
+        head.put("payMethod", "支付方法");
+        head.put("payChannel", "支付渠道");
+        head.put("status", "订单状态");
+        head.put("refundStatus", "退款状态");
+
+        head.put("productName", "商品名称");
+        head.put("productBarCode", "商品编码");
+        head.put("productQuantity", "商品数量");
+        head.put("productPrice", "商品总价");
+
+        head.put("materialsName", "物料名称");
+        head.put("materialsCode", "物料编码");
+        head.put("materialsQuantity", "物料数量");
+        head.put("materialsPrice", "物料总价");
+
+        head.put("realName", "收货人");
+        head.put("userPhone", "收货人手机");
+        head.put("shippingType", "配送方式");
+        head.put("userAddress", "收货详情地址");
+        head.put("userRemark", "用户备注");
+        head.put("merchantRemark", "商户备注");
+        head.put("createTime", "下单时间");
+
+        head.put("productPostage", "商品运费");
+        head.put("productCouponPrice", "商品优惠");
+        head.put("productWalletDeductionFee", "商品抵扣");
+
+        Map<String, String> sortedMap = walletDeductionMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (oldVal, newVal) -> oldVal,
+                                LinkedHashMap::new
+                        )
+                );
+        sortedMap.forEach((k, v) -> {
+            head.put(k, v);
+        });
+        vo.setList(voList);
+        return vo;
     }
 
 }

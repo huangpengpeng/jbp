@@ -2,6 +2,7 @@ package com.jbp.common.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 订单Excel VO对象
@@ -98,9 +100,7 @@ public class OrderExcelVo implements Serializable {
     private BigDecimal productWalletDeductionFee;
 
     @ApiModelProperty(value = "商品抵扣明细")
-    private String productWalletDeductionFeeStr;
-
-
+    private List<ProductDeduction> walletDeductionList;
 
     @ApiModelProperty(value = "物料名称")
     private String materialsName;
@@ -113,8 +113,6 @@ public class OrderExcelVo implements Serializable {
 
     @ApiModelProperty(value = "物料总价")
     private BigDecimal materialsPrice;
-
-
 
     @ApiModelProperty(value = "收货人")
     private String realName;
