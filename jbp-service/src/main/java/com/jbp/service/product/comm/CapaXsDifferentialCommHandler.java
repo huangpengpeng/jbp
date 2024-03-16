@@ -76,7 +76,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.星级级差佣金.getName() + "参数不完整");
         }
         for (Rule rule : rules) {
-            if (rule.getCapaId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
+            if (rule.getCapaXsId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
                 throw new CrmebException(ProductCommEnum.星级级差佣金.getName() + "参数不完整");
             }
         }
@@ -150,7 +150,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
             totalPv = totalPv.multiply(productComm.getScale());
             // 佣金规则
             List<Rule> rules = getRule(productComm);
-            Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
+            Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaXsId);
             // 已发比例
             BigDecimal usedRatio = BigDecimal.ZERO;
             // 每个人拿
@@ -211,7 +211,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
         /**
          * 等级
          */
-        private Long capaId;
+        private Long capaXsId;
 
         /**
          * 比例
