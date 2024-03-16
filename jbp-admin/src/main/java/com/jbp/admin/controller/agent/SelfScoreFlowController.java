@@ -48,7 +48,7 @@ public class SelfScoreFlowController {
     }
     @PreAuthorize("hasAuthority('agent:self:score:flow:excel')")
     @PostMapping("/excel")
-    @ApiOperation("个人业绩明细")
+    @ApiOperation("个人业绩明细导出")
     public CommonResult<List<SelfScoreFlowVo>> excel(SelfScoreFlowRequest request) {
         if (ObjectUtil.isEmpty(request)) {
             throw new CrmebException("请选择一个过滤条件");

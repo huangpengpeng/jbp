@@ -57,7 +57,7 @@ public class InvitationScoreFlowController {
 
     @PreAuthorize("hasAuthority('agent:invitation:score:flow:excel')")
     @PostMapping("/excel")
-    @ApiOperation("销售业绩明细")
+    @ApiOperation("销售业绩明细导出")
     public CommonResult<List<InvitationScoreFlowVo>> excel(InvitationScoreFlowRequest request) {
         if (ObjectUtil.isEmpty(request)) {
             throw new CrmebException("请选择一个过滤条件");
