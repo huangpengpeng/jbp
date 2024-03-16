@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.ExportService;
 
@@ -45,8 +46,8 @@ public class MerchantExportController {
     @PreAuthorize("hasAuthority('merchant:export:order:excel')")
     @ApiOperation(value = "导出订单Excel")
     @RequestMapping(value = "/order/excel", method = RequestMethod.GET)
-    public CommonResult<List<OrderExcelVo>> exportOrder(@Validated OrderSearchRequest request){
-        return CommonResult.success( exportService.exportOrder(request));
+    public CommonResult<OrderExcelInfoVo> exportOrder(@Validated OrderSearchRequest request){
+        return CommonResult.success(exportService.exportOrder(request));
     }
 
 }
