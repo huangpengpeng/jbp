@@ -107,7 +107,6 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
             // 得奖人
             Integer uid = calculateResult.getUid();
             User user = userService.getById(calculateResult.getUid());
-            UserCapaXs userCapaXs = uidCapaXsMap.get(uid);
             Boolean start = false;
             for (UserUpperDto upperDto : allUpper) {
                 // 没有上级就空了
