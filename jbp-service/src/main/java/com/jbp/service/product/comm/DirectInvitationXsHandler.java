@@ -7,7 +7,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
-import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
@@ -32,10 +32,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 直接推荐佣金
+ * 星级直接推荐佣金
  */
 @Component
-public class DirectInvitationHandler extends AbstractProductCommHandler {
+public class DirectInvitationXsHandler extends AbstractProductCommHandler {
 
     @Resource
     private ProductCommService productCommService;
@@ -44,9 +44,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     @Resource
     private UserInvitationService invitationService;
     @Resource
-    private UserCapaService userCapaService;
-    @Resource
-    private CapaService capaService;
+    private UserCapaXsService userCapaXsService;
     @Resource
     private ProductCommConfigService productCommConfigService;
     @Resource
@@ -56,7 +54,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
 
     @Override
     public Integer getType() {
-        return ProductCommEnum.直推佣金.getType();
+        return ProductCommEnum.星级直推佣金.getType();
     }
 
     @Override
@@ -68,20 +66,20 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     public Boolean saveOrUpdate(ProductComm productComm) {
         // 检查是否存在存在直接更新
         if (productComm.hasError()) {
-            throw new CrmebException(ProductCommEnum.直推佣金.getName() + "参数不完整");
+            throw new CrmebException(ProductCommEnum.星级直推佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
         List<Rule> rules = getRule(productComm);
         if (CollectionUtils.isEmpty(rules)) {
-            throw new CrmebException(ProductCommEnum.直推佣金.getName() + "参数不完整");
+            throw new CrmebException(ProductCommEnum.星级直推佣金.getName() + "参数不完整");
         }
         for (Rule rule : rules) {
-            if (rule == null || rule.getRatio() == null || rule.getCapaId() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
-                throw new CrmebException(ProductCommEnum.直推佣金.getName() + "参数不完整");
+            if (rule == null || rule.getRatio() == null || rule.getCapaXsId() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
+                throw new CrmebException(ProductCommEnum.星级直推佣金.getName() + "参数不完整");
             }
         }
 
-        Set<Long> set = rules.stream().map(Rule::getCapaId).collect(Collectors.toSet());
+        Set<Integer> set = rules.stream().map(Rule::getCapaXsId).collect(Collectors.toSet());
         if (set.size() != rules.size()) {
             throw new CrmebException("等级配置不能重复");
         }
@@ -115,9 +113,12 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
             return;
         }
         BigDecimal totalAmt = BigDecimal.ZERO;
-        // 上级等级
-        UserCapa pUserCapa = userCapaService.getByUser(pid);
-        Long capaId = pUserCapa == null ? capaService.getMinCapa().getId() : pUserCapa.getCapaId();
+        // 上级星级
+        final UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
+        if(userCapaXs == null){
+            return;
+        }
+        Long capaId = userCapaXs.getCapaId();
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
@@ -133,8 +134,8 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
             List<Rule> rules = getRule(productComm);
-            Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
-            Rule rule = ruleMap.get(capaId);
+            Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaXsId);
+            Rule rule = ruleMap.get(capaId.intValue());
             BigDecimal ratio = BigDecimal.ZERO;
             if (rule != null) {
                 ratio = rule.getRatio();
@@ -146,13 +147,12 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
                     orderDetail.getPayNum(), ratio, amt);
             productList.add(clearingProduct);
         }
-
         // 按订单保存佣金
         totalAmt = totalAmt.setScale(2, BigDecimal.ROUND_DOWN);
         if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
             User orderUser = userService.getById(order.getUid());
-            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.直推佣金.getName(), totalAmt,
-                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.直推佣金.getName(), "");
+            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.星级直推佣金.getName(), totalAmt,
+                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级直推佣金.getName(), "");
         }
     }
 
@@ -164,9 +164,9 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     @AllArgsConstructor
     public static class Rule {
         /**
-         * 等级
+         * 星级
          */
-        private Long capaId;
+        private Integer capaXsId;
 
         /**
          * 比例

@@ -18,6 +18,8 @@ public interface CapaXsService extends IService<CapaXs> {
 
     CapaXs getMinCapa();
 
+    CapaXs getMaxCapa();
+
     CapaXs getNext(Long capaId);
 
     CapaXs getByName(String name);

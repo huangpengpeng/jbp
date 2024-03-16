@@ -35,10 +35,10 @@
         SELECT
         eu.nickname,
         eu.account,
-        c.icon_url,
+        c.icon_url as iconUrl,
         eu.phone ,
         eo.orderCount,
-        eu.create_time,
+        eu.create_time as createTime,
         ei.uid,
         eu.avatar
         FROM

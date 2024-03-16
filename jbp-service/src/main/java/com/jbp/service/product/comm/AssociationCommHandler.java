@@ -130,7 +130,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
         // 下单用户信息
         User orderUser = userService.getById(order.getUid());
         List<Rule> rules = getRule(null);
-        Map<Integer, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaXsId);
+        Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaXsId);
         Rule maxRule = rules.get(rules.size() - 1);
         BigDecimal maxRatio = maxRule.getRatio(); // 最大比例
         BigDecimal usedRatio = BigDecimal.ZERO; // 已分比例
@@ -145,7 +145,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
             }
             UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
             if (userCapaXs != null) {
-                Rule rule = ruleMap.get(userCapaXs.getCapaId().intValue());
+                Rule rule = ruleMap.get(userCapaXs.getCapaId());
                 if (rule != null) {
                     BigDecimal ratio = rule.getRatio(); // 自己比例
                     BigDecimal usableRatio = ratio.subtract(usedRatio); // 可分比例
@@ -174,7 +174,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
     public static void main(String[] args) {
         List<Rule> list = Lists.newArrayList();
         for (int i = 6; i <= 8 ; i++) {
-            Rule rule = new Rule(i, BigDecimal.valueOf(i-5).divide(BigDecimal.valueOf(100)));
+            Rule rule = new Rule(Long.valueOf(i), BigDecimal.valueOf(i-5).divide(BigDecimal.valueOf(100)));
             list.add(rule);
         }
         System.out.println(JSONArray.toJSONString(list));
@@ -190,7 +190,7 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
         /**
          * 等级
          */
-        private Integer capaXsId;
+        private Long capaXsId;
 
         /**
          * 比例

@@ -41,7 +41,7 @@ public class FundClearingItemConfigServiceImpl extends ServiceImpl<FundClearingI
                     configRequest.getName(), configRequest.getScale(), configRequest.getWalletType());
             saveList.add(clearingItemConfig);
         }
-        remove(new QueryWrapper<FundClearingItemConfig>().lambda().eq(FundClearingItemConfig::getCommName, list.get(0)));
+        remove(new QueryWrapper<FundClearingItemConfig>().lambda().eq(FundClearingItemConfig::getCommName, list.get(0).getCommName()));
         saveBatch(saveList);
     }
 

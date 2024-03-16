@@ -94,7 +94,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
 	}
 
     @Override
-    public void delect(Integer uid, String description, String remark) {
+    public void del(Integer uid, String description, String remark) {
         UserCapaXs userCapaXs = userCapaXsDao.selectOne(new LambdaQueryWrapper<UserCapaXs>().eq(UserCapaXs::getUid, uid));
         remove(new QueryWrapper<UserCapaXs>().lambda().eq(UserCapaXs::getUid, uid));
             // 记录快照

@@ -19,6 +19,8 @@ public interface CapaService extends IService<Capa> {
     Capa saveRiseCondition(RiseConditionRequest request);
     Capa getMinCapa();
 
+    Capa getMaxCapa();
+
     Capa getNext(Long capaId);
 
     Capa getByName(String name);
