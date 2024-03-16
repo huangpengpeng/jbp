@@ -18,6 +18,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.WalletWithdrawDao;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -37,6 +38,8 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
 
     @Resource
     private WalletService walletService;
+    @Resource
+    private SystemConfigService systemConfigService;
 
     @Override
     public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, PageParamRequest pageParamRequest) {
@@ -58,7 +61,10 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), amt)) {
             throw new CrmebException("余额不足");
         }
-        WalletWithdraw walletWithdraw = new WalletWithdraw(uid, account, walletType, walletName, amt, postscript);
+        String commissionScale = systemConfigService.getValueByKey("wallet_withdraw_commission");
+        BigDecimal scale = StringUtils.isEmpty(commissionScale) ? BigDecimal.ZERO : new BigDecimal(commissionScale);
+        BigDecimal commission = amt.multiply(scale).setScale(2, BigDecimal.ROUND_DOWN);
+        WalletWithdraw walletWithdraw = new WalletWithdraw(uid, account, walletType, walletName, amt.subtract(commission), commission, postscript);
         save(walletWithdraw);
         walletService.reduce(uid, walletType, amt, WalletFlow.OperateEnum.提现.name(), walletWithdraw.getUniqueNo(), postscript);
         return walletWithdraw;
