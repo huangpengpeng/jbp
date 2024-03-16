@@ -55,7 +55,7 @@ public class FundClearingVo implements Serializable {
     @ApiModelProperty("身份证")
     private String idCardNo;
 
-    @ApiModelProperty("手机号")
+    @ApiModelProperty("银行卡预留手机号")
     private String phone;
 
     @ApiModelProperty("银行名称")
