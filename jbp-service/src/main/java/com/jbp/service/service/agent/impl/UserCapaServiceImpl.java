@@ -99,6 +99,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         if (CollectionUtils.isEmpty(allUpper)) {
             return list;
         }
+        Map<Integer, UserCapa> uidMap = getUidMap(allUpper.stream().filter(s -> s.getPId() != null).map(UserUpperDto::getPId).collect(Collectors.toList()));
         for (UserUpperDto upper : allUpper) {
             if (list.size() == num) {
                 return list;
@@ -106,12 +107,17 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             if (upper.getPId() == null) {
                 return list;
             }
-            UserCapa userCapa = getByUser(upper.getPId());
+            UserCapa userCapa = uidMap.get(upper.getPId());
             if (userCapa != null && capaIds.contains(userCapa.getCapaId())) {
                 list.add(userCapa);
             }
         }
         return list;
+    }
+
+    @Override
+    public List<UserCapa> getInvitationUnder(Integer uid, Long capaId) {
+        return dao.getInvitationUnder(uid, capaId);
     }
 
     @Override
@@ -148,9 +154,11 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             // 升级条件
             List<RiseCondition> conditionList = capa.getConditionList();
             Map<String, Boolean> map = Maps.newConcurrentMap();
-            for (RiseCondition riseCondition : conditionList) {
-                Boolean ok = conditionChain.isOk(uid, riseCondition);
-                map.put(riseCondition.getName(), ok);
+            if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(conditionList)){
+                for (RiseCondition riseCondition : conditionList) {
+                    Boolean ok = conditionChain.isOk(uid, riseCondition);
+                    map.put(riseCondition.getName(), ok);
+                }
             }
             // 是否满足升级条件
             Boolean ifRise = capa.parser(map);

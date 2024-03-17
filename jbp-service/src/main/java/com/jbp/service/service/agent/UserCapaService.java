@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.PageParamRequest;
 
@@ -23,6 +24,8 @@ public interface UserCapaService extends IService<UserCapa> {
      * @param num 人数
      */
     List<UserCapa> getUpperList(Integer uid, List<Long> capaIds, Integer num);
+
+    List<UserCapa> getInvitationUnder(Integer uid, Long capaId);
 
     PageInfo<UserCapa> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest);
 

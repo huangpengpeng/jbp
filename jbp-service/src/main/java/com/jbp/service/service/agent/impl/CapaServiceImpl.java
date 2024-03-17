@@ -20,6 +20,7 @@ import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,12 +64,14 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         Capa capa = getById(request.getCapaId());
         capa.setParser(request.getParser());
         List<String> conditionNames = capa.getConditionNames();
-        List<RiseCondition> conditionList = request.getConditionList();
         List<RiseCondition> saveConditionList = Lists.newArrayList();
-        for (RiseCondition riseCondition : conditionList) {
-            if (conditionNames.contains(riseCondition.getName())) {
-                conditionChain.valid(riseCondition);
-                saveConditionList.add(riseCondition);
+        if(CollectionUtils.isNotEmpty(conditionNames)){
+            List<RiseCondition> conditionList = request.getConditionList();
+            for (RiseCondition riseCondition : conditionList) {
+                if (conditionNames.contains(riseCondition.getName())) {
+                    conditionChain.valid(riseCondition);
+                    saveConditionList.add(riseCondition);
+                }
             }
         }
         capa.setConditionList(saveConditionList);

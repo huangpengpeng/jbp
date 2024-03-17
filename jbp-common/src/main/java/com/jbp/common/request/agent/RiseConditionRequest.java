@@ -27,7 +27,6 @@ public class RiseConditionRequest implements Serializable {
     @ApiModelProperty("条件")
     private List<RiseCondition> conditionList;
 
-    @NotBlank(message = "升级表达式不能为空")
     @ApiModelProperty("升级表达式")
     private String parser;
 }

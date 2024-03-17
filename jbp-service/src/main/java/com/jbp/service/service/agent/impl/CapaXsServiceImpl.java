@@ -8,6 +8,7 @@ import com.jbp.common.mybatis.RiseConditionListHandler;
 import com.jbp.common.request.agent.RiseConditionRequest;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,13 +63,15 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
     public CapaXs saveRiseCondition(RiseConditionRequest request) {
         CapaXs capaXs = getById(request.getCapaId());
         capaXs.setParser(request.getParser());
-        List<String> conditionNames = capaXs.getConditionNames();
-        List<RiseCondition> conditionList = request.getConditionList();
         List<RiseCondition> saveConditionList = Lists.newArrayList();
-        for (RiseCondition riseCondition : conditionList) {
-            if(conditionNames.contains(riseCondition.getName())){
-                conditionChain.valid(riseCondition);
-                saveConditionList.add(riseCondition);
+        List<String> conditionNames = capaXs.getConditionNames();
+        if(CollectionUtils.isNotEmpty(conditionNames)) {
+            List<RiseCondition> conditionList = request.getConditionList();
+            for (RiseCondition riseCondition : conditionList) {
+                if (conditionNames.contains(riseCondition.getName())) {
+                    conditionChain.valid(riseCondition);
+                    saveConditionList.add(riseCondition);
+                }
             }
         }
         capaXs.setConditionList(saveConditionList);

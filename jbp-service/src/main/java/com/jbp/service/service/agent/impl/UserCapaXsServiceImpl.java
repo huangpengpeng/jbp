@@ -136,9 +136,11 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             // 升级条件
             List<RiseCondition> conditionList = capaXs.getConditionList();
             Map<String, Boolean> map = Maps.newConcurrentMap();
-            for (RiseCondition riseCondition : conditionList) {
-                Boolean ok = conditionChain.isOk(uid, riseCondition);
-                map.put(riseCondition.getName(), ok);
+            if(CollectionUtils.isNotEmpty(conditionList)){
+                for (RiseCondition riseCondition : conditionList) {
+                    Boolean ok = conditionChain.isOk(uid, riseCondition);
+                    map.put(riseCondition.getName(), ok);
+                }
             }
             // 是否满足升级条件
             Boolean ifRise = capaXs.parser(map);

@@ -102,6 +102,9 @@ public class Capa extends BaseModel {
     }
 
     public Boolean parser(Map<String, Boolean> map) {
+        if(map == null || map.isEmpty()){
+            return false;
+        }
         String parserStr = this.parser;
         if (StringUtils.isNotEmpty(this.parser)) {
             ExpressionParser parser = new SpelExpressionParser();

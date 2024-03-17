@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.UserCapaDao">
+
+
+    <select id="getInvitationUnder" parameterType="java.util.Map" resultType="com.jbp.common.model.agent.UserCapa">
+        select id, capa_id as capaId, uid
+        from eb_user_capa
+        where capa_id >= #{capaId}  AND uid in (select uId from eb_user_invitation_flow where pId = #{uid})
+    </select>
+
+
+
+
+
+</mapper>

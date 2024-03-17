@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -47,6 +48,9 @@ public class ConditionChain implements ApplicationContextAware {
     }
 
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
+        if(riseCondition == null || StringUtils.isEmpty(riseCondition.getValue())){
+            return false;
+        }
         ConditionHandler handler = handlers.get(riseCondition.getName());
         if(handler == null){
             throw new CrmebException("当前升级条件不存在");
