@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
@@ -44,13 +43,15 @@ public class SelfScoreFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(),request.getOrdersSn(),request.getDateLimit(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(), request.getOrdersSn(), request.getDateLimit(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:self:score:flow:excel')")
     @PostMapping("/excel")
     @ApiOperation("个人业绩明细导出")
     public CommonResult<List<SelfScoreFlowVo>> excel(SelfScoreFlowRequest request) {
-        if (ObjectUtil.isEmpty(request)) {
+        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getAction()) && StringUtils.isEmpty(request.getOrdersSn())
+                && StringUtils.isEmpty(request.getDateLimit())) {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;
@@ -61,7 +62,7 @@ public class SelfScoreFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(selfScoreFlowService.excel(uid, request.getAction(),request.getOrdersSn(),request.getDateLimit()));
+        return CommonResult.success(selfScoreFlowService.excel(uid, request.getAction(), request.getOrdersSn(), request.getDateLimit()));
     }
 
 }

@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.user.User;
@@ -48,13 +47,17 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(fundClearingService.pageList(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(),request.getDescription(), pageParamRequest)));
+                uid, request.getTeamName(), request.getDescription(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
     @ApiOperation(value = "佣金发放记录导出Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
     public CommonResult<List<FundClearingVo>> exportOrder(FundClearingRequest request) {
-        if (ObjectUtil.isEmpty(request)) {
+        if (StringUtils.isEmpty(request.getUniqueNo()) && StringUtils.isEmpty(request.getExternalNo()) &&
+                request.getStartClearingTime() == null && request.getEndClearingTime() == null && request.getStartCreateTime() == null && request.getEndCreateTime() == null
+                && StringUtils.isEmpty(request.getStatus()) && StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getTeamName())
+                && StringUtils.isEmpty(request.getDescription())) {
             throw new CrmebException("请填写一个过滤信息");
         }
         Integer uid = null;
@@ -66,7 +69,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(),request.getDescription()));
+                uid, request.getTeamName(), request.getDescription()));
     }
 
     @GetMapping("/status/list")
