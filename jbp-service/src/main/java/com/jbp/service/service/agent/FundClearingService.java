@@ -80,7 +80,7 @@ public interface FundClearingService extends IService<FundClearing> {
      * 佣金发放导出
      * @return
      */
-    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status);
+    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description);
 
     void updateRemark(Long id, String remark);
 
