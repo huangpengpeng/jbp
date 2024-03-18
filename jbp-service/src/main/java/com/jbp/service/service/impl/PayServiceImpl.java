@@ -22,6 +22,7 @@ import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
@@ -632,6 +633,9 @@ public class PayServiceImpl implements PayService {
         if (ObjectUtil.isNull(platOrder)) {
             logger.error("OrderTaskServiceImpl.orderPaySuccessAfter | 订单不存在，orderNo: {}", orderNo);
             throw new CrmebException("订单不存在，orderNo: " + orderNo);
+        }
+        if (ordersFundSummaryService.getByOrdersSn(orderNo) != null) {
+            return true;
         }
         User user = userService.getById(platOrder.getUid());
         // 2.增加业绩

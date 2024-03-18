@@ -580,7 +580,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                     redisUtil.lPush(redisKey, data);
                 }
             } catch (Exception e) {
-                logger.error("order pay task error exception : {}", e.getMessage());
+                logger.error("order pay task error exception : {}, {}", e.getMessage(), String.valueOf(data));
                 redisUtil.lPush(redisKey, data);
             }
         }
