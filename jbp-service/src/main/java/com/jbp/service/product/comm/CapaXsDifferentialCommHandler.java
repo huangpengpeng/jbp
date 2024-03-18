@@ -118,12 +118,14 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 UserCapaXs userCapaXs = uidCapaXsMap.get(upperDto.getPId());
-                if (NumberUtils.compare(userCapaXs.getCapaId(), capaId) > 0) {
-                    userList.add(userCapaXs);
-                    capaId = userCapaXs.getCapaId();
-                }
-                if (NumberUtils.compare(maxCapa.getId(), capaId) == 0) {
-                    break;
+                if(userCapaXs != null){
+                    if (NumberUtils.compare(userCapaXs.getCapaId(), capaId) > 0) {
+                        userList.add(userCapaXs);
+                        capaId = userCapaXs.getCapaId();
+                    }
+                    if (NumberUtils.compare(maxCapa.getId(), capaId) == 0) {
+                        break;
+                    }
                 }
             }
         }

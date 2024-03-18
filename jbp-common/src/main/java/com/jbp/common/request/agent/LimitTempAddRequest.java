@@ -1,10 +1,12 @@
 package com.jbp.common.request.agent;
 
+import com.jbp.common.utils.DateTimeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -65,9 +67,11 @@ public class LimitTempAddRequest implements Serializable {
     @ApiModelProperty(value = "限购数量")
     private Integer buyLimitNum;
 
+    @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN)
     @ApiModelProperty(value = "限购开始时间")
     private Date buyLimitStartTime;
 
+    @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN)
     @ApiModelProperty(value = "限购结束时间")
     private Date buyLimitEndTime;
 

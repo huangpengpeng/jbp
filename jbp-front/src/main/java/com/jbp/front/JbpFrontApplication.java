@@ -6,6 +6,8 @@ import com.jbp.service.product.comm.CollisionCommHandler;
 import com.jbp.service.product.comm.DepthCommHandler;
 import com.jbp.service.product.comm.DirectInvitationHandler;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.PayService;
+import com.jbp.service.service.impl.OrderTaskServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,12 +42,18 @@ public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
-//        final CollisionCommHandler bean = run.getBean(CollisionCommHandler.class);
-//
-//        final OrderService orderService = run.getBean(OrderService.class);
-//
-//
-//        bean.orderSuccessCalculateAmt(orderService.getById(294), Lists.newLinkedList());
+        final CollisionCommHandler bean = run.getBean(CollisionCommHandler.class);
+
+
+        final OrderTaskServiceImpl orderTaskService = run.getBean(OrderTaskServiceImpl.class);
+
+
+        final PayService payService = run.getBean(PayService.class);
+
+//        bean.orderSuccessCalculateAmt(orderService.getByOrderNo("PT166171073091110928243"), Lists.newLinkedList());
+
+
+//        payService.payAfterProcessingTemp("PT166171073091110928243");
         System.out.println("ok");
 
     }
