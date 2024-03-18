@@ -59,26 +59,6 @@ public class DepthCommHandler extends AbstractProductCommHandler {
 
     @Override
     public Boolean saveOrUpdate(ProductComm productComm) {
-        // 检查是否存在存在直接更新
-        if (productComm.hasError2()) {
-            throw new CrmebException(ProductCommEnum.深度佣金.getName() + "参数不完整");
-        }
-        // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        List<Rule> rules = getRule(productComm);
-        if (CollectionUtils.isEmpty(rules)) {
-            throw new CrmebException(ProductCommEnum.深度佣金.getName() + "参数不完整");
-        }
-        for (Rule rule : rules) {
-            if(rule.getCapaId() == null || rule.getRatio() == null|| ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)){
-                throw new CrmebException(ProductCommEnum.深度佣金.getName() + "参数不完整");
-            }
-        }
-        // 删除数据库的信息
-        productCommService.remove(new LambdaQueryWrapper<ProductComm>()
-                .eq(ProductComm::getProductId, productComm.getProductId())
-                .eq(ProductComm::getType, productComm.getType()));
-        // 保存最新的信息
-        productCommService.save(productComm);
         return true;
     }
 
