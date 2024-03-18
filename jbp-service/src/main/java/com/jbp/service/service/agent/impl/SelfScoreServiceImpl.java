@@ -9,13 +9,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.model.agent.SelfScore;
+import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.SelfScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.SelfScoreFlowService;
 import com.jbp.service.service.agent.SelfScoreService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -38,10 +42,11 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     private SelfScoreFlowService selfScoreFlowService;
 
     @Override
-    public PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScore> pageList(Integer uid,String dateLimit, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScore> lqw = new LambdaQueryWrapper<SelfScore>()
                 .eq(!ObjectUtil.isNull(uid), SelfScore::getUid, uid)
                 .orderByDesc(SelfScore::getId);
+        getRequestTimeWhere(lqw,dateLimit);
         Page<SelfScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScore> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -55,7 +60,10 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
         });
         return CommonPage.copyPageInfo(page, list);
     }
-
+    private void getRequestTimeWhere(LambdaQueryWrapper<SelfScore> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(StringUtils.isNotEmpty(dateLimit), SelfScore::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+    }
     @Override
     public SelfScore add(Integer uid) {
         SelfScore selfScore = new SelfScore(uid);

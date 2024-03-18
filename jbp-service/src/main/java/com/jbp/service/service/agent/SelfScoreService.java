@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface SelfScoreService extends IService<SelfScore> {
-  PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest);
+  PageInfo<SelfScore> pageList(Integer uid,String dateLimit, PageParamRequest pageParamRequest);
 
   SelfScore add(Integer uid);
   SelfScore getByUser(Integer uid);

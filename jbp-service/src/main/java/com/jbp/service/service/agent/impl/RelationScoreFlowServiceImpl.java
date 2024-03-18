@@ -18,6 +18,7 @@ import com.jbp.service.dao.agent.RelationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;
 import com.jbp.service.util.StringUtils;
+import io.swagger.models.auth.In;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -36,13 +37,13 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     private UserService userService;
 
     @Override
-    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid, String ordersSn, String dateLimit, int node, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid, String ordersSn, String dateLimit, Integer node, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
                 .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn)
-                .eq(ObjectUtil.isEmpty(node), RelationScoreFlow::getNode, node)
-                .eq(StringUtils.isEmpty(action), RelationScoreFlow::getAction, action);
+                .eq(ObjectUtil.isNotEmpty(node), RelationScoreFlow::getNode, node)
+                .eq(StringUtils.isNotEmpty(action), RelationScoreFlow::getAction, action);
         getRequestTimeWhere(lqw, dateLimit);
         lqw.orderByDesc(RelationScoreFlow::getId);
         Page<RelationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -64,7 +65,7 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     }
 
     @Override
-    public List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit,int node, String action) {
+    public List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit, Integer node, String action) {
         Long id = 0L;
         List<RelationScoreFlowVo> result = Lists.newArrayList();
         do {

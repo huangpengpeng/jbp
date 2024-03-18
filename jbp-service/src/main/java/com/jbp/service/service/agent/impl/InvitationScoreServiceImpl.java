@@ -11,15 +11,19 @@ import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.SelfScore;
+import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
 import com.jbp.service.service.agent.InvitationScoreService;
 import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -47,10 +51,11 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
 
     @Override
-    public PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScore> pageList(Integer uid,String dateLimit,  PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid)
                 .orderByDesc(InvitationScore::getId);
+        getRequestTimeWhere(lqw,dateLimit);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -64,7 +69,10 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         });
         return CommonPage.copyPageInfo(page, list);
     }
-
+    private void getRequestTimeWhere(LambdaQueryWrapper<InvitationScore> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(StringUtils.isNotEmpty(dateLimit), InvitationScore::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+    }
     @Override
     public InvitationScore add(Integer uid) {
         InvitationScore invitationScore = new InvitationScore(uid);
