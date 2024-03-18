@@ -43,8 +43,6 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
     @Resource
     private UserInvitationService invitationService;
     @Resource
-    private CapaService capaService;
-    @Resource
     private UserService userService;
     @Resource
     private UserCapaService userCapaService;

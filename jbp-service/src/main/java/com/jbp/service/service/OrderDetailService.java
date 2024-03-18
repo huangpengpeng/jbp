@@ -7,6 +7,7 @@ import com.jbp.common.request.CommonSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -113,4 +114,15 @@ public interface OrderDetailService extends IService<OrderDetail> {
      * @return
      */
     BigDecimal getRealScore(OrderDetail orderDetail);
+
+
+    /**
+     * 指定时间购买成功的书剑-已退款数量
+     * @param uid
+     * @param proId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    Integer getBuySuccessCount(Integer uid, Integer proId, Date startTime, Date endTime);
 }

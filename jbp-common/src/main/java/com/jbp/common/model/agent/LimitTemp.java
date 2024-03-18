@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,12 @@ public class LimitTemp extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    public LimitTemp(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList,String description) {
+    public LimitTemp(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList,
+                     List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner,
+                     List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation,
+                     List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
+                     int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime,
+                     String description) {
         this.name = name;
         this.type = type;
         this.capaIdList = capaIdList;
@@ -98,6 +104,18 @@ public class LimitTemp extends BaseModel {
     @ApiModelProperty(value = "服务上级星级")
     @TableField(value = "rCapaXsIdList",typeHandler = LongListHandler.class)
     private List<Long> rCapaXsIdList;
+
+    @ApiModelProperty(value = "是否限购")
+    private Boolean hasBuyLimit;
+
+    @ApiModelProperty(value = "限购数量")
+    private int buyLimitNum;
+
+    @ApiModelProperty(value = "限购开始时间")
+    private Date buyLimitStartTime;
+
+    @ApiModelProperty(value = "限购结束时间")
+    private Date buyLimitEndTime;
 
     @ApiModelProperty(value = "说明")
     @TableField(value = "description")

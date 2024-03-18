@@ -6,6 +6,7 @@ import com.jbp.common.model.order.OrderDetail;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,4 +52,7 @@ public interface OrderDetailDao extends BaseMapper<OrderDetail> {
      * @return 待评价数量
      */
     Integer getAwaitReplyCount(@Param("userId") Integer userId);
+
+    Integer getBuySuccessCount(@Param("uid") Integer uid, @Param("proId")  Integer proId,
+                               @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

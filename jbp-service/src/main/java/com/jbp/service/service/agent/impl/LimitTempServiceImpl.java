@@ -18,10 +18,12 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LimitTempResponse;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.dao.agent.LimitTempDao;
+import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.WhiteService;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -30,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,16 +56,12 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     private TeamService teamService;
     @Resource
     private WhiteService whiteService;
+    @Resource
+    private OrderDetailService orderDetailService;
 
 
     @PostConstruct
     public void loadingTempCache() {
-//        if (redisUtil.exists(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST)) {
-//            Long hashSize = redisUtil.getHashSize(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST);
-//            if (hashSize > 0) {
-//                return;
-//            }
-//        }
         LambdaQueryWrapper<LimitTemp> lqw = Wrappers.lambdaQuery();
         List<LimitTemp> list = list(lqw);
         list.forEach(temp -> redisUtil.hset(SysConfigConstants.PRODUCT_LIMIT_TEM_LIST, temp.getId().toString(), temp));
@@ -78,8 +77,14 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     }
 
     @Override
-    public LimitTemp add(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList, String description) {
-        LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner, pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList, description);
+    public LimitTemp add(String name, String type, List<Long> capaIdList, List<Long> capaXsIdList,
+                         List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner,
+                         List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation,
+                         List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
+                         int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, String description) {
+        LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner,
+                pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList, hasBuyLimit, buyLimitNum, buyLimitStartTime, buyLimitEndTime,
+                description);
         temp.init();
         save(temp);
         async(temp);
@@ -132,8 +137,8 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     }
 
     @Override
-    public void validBuy(Long capaId, Long capaXsId, List<Long> whiteIdList,
-                         List<Long> teamIdList, Integer pId, Integer rId, List<Product> productList) {
+    public void validBuy(Integer uid, Long capaId, Long capaXsId, List<Long> whiteIdList,
+                         List<Long> teamIdList, Integer pId, Integer rId, List<Product> productList, Map<Integer, Integer> productNumMap) {
         if (CollectionUtils.isEmpty(productList)) {
             return;
         }
@@ -171,6 +176,15 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
                 if (!temp.check(capaId, capaXsId, whiteIdList, teamIdList, pId, pCapaId, pCapaXsId, rId, rCapaId, rCapaXsId)) {
                     throw new CrmebException(product.getName() + ":无购买权限");
                 }
+                // 开启限购
+                if (BooleanUtils.isTrue(temp.getHasBuyLimit()) && uid != null) {
+                    // 查询指定时间购买成功的订单
+                    Integer buySuccessCount = orderDetailService.getBuySuccessCount(uid, product.getId(), temp.getBuyLimitStartTime(), temp.getBuyLimitEndTime());
+                    buySuccessCount = buySuccessCount + productNumMap.get(product.getId());
+                    if (buySuccessCount > temp.getBuyLimitNum()) {
+                        throw new CrmebException(product.getName() + ":已购买超出限购数量");
+                    }
+                }
             }
         }
     }
@@ -193,8 +207,13 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     }
 
     @Override
-    public void update(Long id, String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList, String description) {
-        LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner, pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList, description);
+    public void update(Long id, String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList,
+                       List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList,
+                       Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
+                       int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, String description) {
+        LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner,
+                pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList, hasBuyLimit, buyLimitNum, buyLimitStartTime,
+                buyLimitEndTime, description);
         temp.setId(id);
         temp.init();
         updateById(temp);
