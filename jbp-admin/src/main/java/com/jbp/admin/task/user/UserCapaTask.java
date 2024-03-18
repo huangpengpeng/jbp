@@ -41,8 +41,10 @@ public class UserCapaTask {
         // cron : 0 0 1 * * ?
         logger.info("---UserCapaTask refreshUserCapa------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
         if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapa"))){
+            logger.info("---UserCapaTask refreshUserCapa-----未执行完成忽略本次", DateUtil.date());
             return;
         }
+
         stringRedisTemplate.opsForValue().set("refreshUserCapa","1");
         try {
             // 查询没下级的用户

@@ -38,6 +38,7 @@ public class UserRelationFlowTask {
         // cron : 0 0 1 * * ?
         logger.info("---UserRelationFlowTask refresh------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
         if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refresh"))){
+            logger.info("---UserRelationFlowTask refresh-----未执行完成忽略本次", DateUtil.date());
             return;
         }
         stringRedisTemplate.opsForValue().set("refresh","1");

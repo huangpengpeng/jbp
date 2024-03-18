@@ -1,13 +1,6 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.google.common.collect.Lists;
-import com.jbp.service.product.comm.CollisionCommHandler;
-import com.jbp.service.product.comm.DepthCommHandler;
-import com.jbp.service.product.comm.DirectInvitationHandler;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.PayService;
-import com.jbp.service.service.impl.OrderTaskServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,23 +32,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = {"com.jbp", "com.jbp.front"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
 public class JbpFrontApplication {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
-
-        final CollisionCommHandler bean = run.getBean(CollisionCommHandler.class);
-
-
-        final OrderTaskServiceImpl orderTaskService = run.getBean(OrderTaskServiceImpl.class);
-
-
-        final PayService payService = run.getBean(PayService.class);
-
-//        bean.orderSuccessCalculateAmt(orderService.getByOrderNo("PT166171073091110928243"), Lists.newLinkedList());
-
-
-        payService.payAfterProcessingTemp("PT692171074429672794771");
         System.out.println("ok");
-
     }
 
 

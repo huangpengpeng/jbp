@@ -35,6 +35,7 @@ public class UserInvitationFlowTask {
         // cron : 0 0 1 * * ?
         logger.info("---UserInvitationFlowTask refreshFlowAndTeam------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
         if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshFlowAndTeam"))){
+            logger.info("---UserInvitationFlowTask refreshFlowAndTeam-----未执行完成忽略本次", DateUtil.date());
             return;
         }
         stringRedisTemplate.opsForValue().set("refreshFlowAndTeam","1");

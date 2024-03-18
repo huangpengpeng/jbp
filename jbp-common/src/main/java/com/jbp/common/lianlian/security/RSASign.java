@@ -28,6 +28,7 @@ public class RSASign {
         return instance;
     }
 
+
     /**
      * 签名处理
      *
@@ -98,4 +99,5 @@ public class RSASign {
         String epStr = org.apache.commons.codec.binary.Base64.encodeBase64String(epByte);
         return epStr;
     }
+
 }
