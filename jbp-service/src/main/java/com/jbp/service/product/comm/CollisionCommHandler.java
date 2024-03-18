@@ -68,7 +68,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        Rule rule = getRule(productComm);
+        Rule rule = getRule(null);
         if (rule == null) {
             throw new CrmebException(ProductCommEnum.渠道佣金.getName() + "参数不完整");
         }
