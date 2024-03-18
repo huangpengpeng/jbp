@@ -15,6 +15,8 @@ import java.util.Date;
 @Accessors(chain = true)
 @ApiModel(value = "FundClearingVo对象", description = "佣金发放记录信息")
 public class FundClearingVo implements Serializable {
+    @ApiModelProperty("编号")
+    private long id;
 
     @ApiModelProperty("流水单号")
     private String uniqueNo;

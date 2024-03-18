@@ -1,6 +1,5 @@
 package com.jbp.service.service.agent.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -23,10 +22,8 @@ import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
-import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +34,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -342,46 +338,19 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status) {
+    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Long id = 0L;
         List<FundClearingVo> result = Lists.newArrayList();
         do {
-            LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<FundClearing>()
-                    .like(StringUtils.isNotEmpty(uniqueNo), FundClearing::getUniqueNo, uniqueNo)
-                    .like(StringUtils.isNotEmpty(externalNo), FundClearing::getExternalNo, externalNo)
-                    .eq(StringUtils.isNotEmpty(status), FundClearing::getStatus, status)
-                    .between(!ObjectUtil.isNull(startClearingTime) && !ObjectUtil.isNull(endClearingTime), FundClearing::getClearingTime, startClearingTime, endClearingTime)
-                    .between(!ObjectUtil.isNull(startCreateTime) && !ObjectUtil.isNull(endCreateTime), FundClearing::getCreateTime, startCreateTime, endCreateTime)
-                    .gt(FundClearing::getId, id).last("LIMIT 1000");
-            List<FundClearing> fundClearingList = list(lqw);
-            if (CollectionUtils.isEmpty(fundClearingList)) {
+            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName);
+            if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
-            List<Integer> uIdList = fundClearingList.stream().map(FundClearing::getUid).collect(Collectors.toList());
-
-            Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
-            Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
-            Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
-            fundClearingList.forEach(e -> {
-                User user = uidMapList.get(e.getUid());
-                e.setAccount(user != null ? user.getAccount() : "");
-                FundClearingVo fundClearingVo = new FundClearingVo();
-                BeanUtils.copyProperties(e, fundClearingVo);
-                ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
-                if (channelIdentity != null) {
-                    fundClearingVo.setRealName(channelIdentity.getRealName());
-                    fundClearingVo.setIdCardNo(channelIdentity.getIdCardNo());
-                }
-                ChannelCard channelCard = channelCardMap.get(e.getUid());
-                if (channelCard != null) {
-                    fundClearingVo.setPhone(channelCard.getPhone());
-                    fundClearingVo.setBankName(channelCard.getBankName());
-                    fundClearingVo.setBankCode(channelCard.getBankCardNo());
-                }
-                result.add(fundClearingVo);
+            fundClearingVos.forEach(e -> {
+                result.add(e);
             });
-            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
         } while (true);
         return result;
     }

@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.user.User;
@@ -48,6 +49,24 @@ public class FundClearingController {
         }
         return CommonResult.success(CommonPage.restPage(fundClearingService.pageList(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
                 uid, request.getTeamName(),request.getDescription(), pageParamRequest)));
+    }
+    @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
+    @ApiOperation(value = "佣金发放记录导出Excel")
+    @RequestMapping(value = "/excel", method = RequestMethod.GET)
+    public CommonResult<List<FundClearingVo>> exportOrder(FundClearingRequest request) {
+        if (ObjectUtil.isEmpty(request)) {
+            throw new CrmebException("请填写一个过滤信息");
+        }
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
+                uid, request.getTeamName(),request.getDescription()));
     }
 
     @GetMapping("/status/list")
@@ -102,16 +121,6 @@ public class FundClearingController {
     public CommonResult updateRemark(@RequestBody @Validated FundClearingUpdateRemarkRequest request) {
         fundClearingService.updateRemark(request.getId(), request.getRemark());
         return CommonResult.success();
-    }
-
-    @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
-    @ApiOperation(value = "佣金发放记录导出Excel")
-    @RequestMapping(value = "/excel", method = RequestMethod.GET)
-    public CommonResult<List<FundClearingVo>> exportOrder(FundClearingRequest request) {
-        if (StringUtils.isEmpty(request.getUniqueNo()) && StringUtils.isEmpty(request.getExternalNo()) && request.getStartClearingTime() == null && request.getEndClearingTime() == null && request.getStartCreateTime() == null && request.getEndCreateTime() == null && request.getStatus() == null) {
-            throw new CrmebException("请填写一个过滤信息");
-        }
-        return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus()));
     }
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:send:amt')")
