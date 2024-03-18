@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -225,6 +226,11 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
         // 实际PV = 总业绩 - 抵扣 + 抵扣PV
         BigDecimal totalPv = orderDetail.getScoreValue().subtract(walletDeductionFee).add(walletDeductionFeePv).subtract(integralPrice).subtract(merCouponPrice).subtract(platCouponPrice);
         return ArithmeticUtils.lessEquals(totalPv, BigDecimal.ZERO) ? BigDecimal.ZERO : totalPv;
+    }
+
+    @Override
+    public Integer getBuySuccessCount(Integer uid, Integer proId, Date startTime, Date endTime) {
+        return dao.getBuySuccessCount(uid, proId, startTime, endTime);
     }
 }
 

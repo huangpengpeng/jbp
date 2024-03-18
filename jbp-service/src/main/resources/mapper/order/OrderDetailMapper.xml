@@ -47,4 +47,16 @@
         and od.is_reply = 0
         and od.uid = #{userId}
     </select>
+
+    <select id="getBuySuccessCount" resultType="java.lang.Integer">
+        select IFNULL(sum(od.pay_num-od.refund_num), 0) as num
+        from eb_order_detail od left join eb_order o on o.order_no = od.order_no
+        where
+        o.uid = #{uid}
+        and o.paid = 1
+        and o.is_del = 0
+        and od.product_id = #{proId}
+        and o.pay_time <![CDATA[  >=  ]]> '#{startTime, jdbcType=DATE}'
+        and o.pay_time <![CDATA[  <=  ]]> '#{endTime, jdbcType=DATE}'
+    </select>
 </mapper>

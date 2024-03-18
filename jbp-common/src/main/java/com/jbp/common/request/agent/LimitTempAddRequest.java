@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -56,6 +57,19 @@ public class LimitTempAddRequest implements Serializable {
 
     @ApiModelProperty(value = "服务上级星级")
     private List<Long> rCapaXsIdList;
+
+    @NotNull(message = "限购选择是或否")
+    @ApiModelProperty(value = "是否限购")
+    private Boolean hasBuyLimit;
+
+    @ApiModelProperty(value = "限购数量")
+    private Integer buyLimitNum;
+
+    @ApiModelProperty(value = "限购开始时间")
+    private Date buyLimitStartTime;
+
+    @ApiModelProperty(value = "限购结束时间")
+    private Date buyLimitEndTime;
 
     @ApiModelProperty(value = "说明")
     private String description;

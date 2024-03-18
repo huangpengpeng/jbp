@@ -45,16 +45,24 @@ public class LimitTempController {
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
         }
-        if (CollectionUtils.isEmpty(request.getCapaIdList())&& CollectionUtils.isEmpty(request.getCapaXsIdList())&&CollectionUtils.isEmpty(request.getTeamIdList())&&!request.getHasPartner()&&!request.getHasRelation()) {
+        if (CollectionUtils.isEmpty(request.getCapaIdList()) && CollectionUtils.isEmpty(request.getCapaXsIdList()) && CollectionUtils.isEmpty(request.getTeamIdList()) && !request.getHasPartner() && !request.getHasRelation()) {
             throw new CrmebException("等级、星级、团队、销售上级、服务上级必须选填一个否则无法提交");
         }
-        if (request.getHasPartner()&&CollectionUtils.isEmpty(request.getPCapaIdList())&&CollectionUtils.isEmpty(request.getPCapaXsIdList())){
+        if (request.getHasPartner() && CollectionUtils.isEmpty(request.getPCapaIdList()) && CollectionUtils.isEmpty(request.getPCapaXsIdList())) {
             throw new CrmebException("销售上级请设置对应上级等级和星级");
         }
         if (request.getHasRelation() && CollectionUtils.isEmpty(request.getRCapaIdList()) && CollectionUtils.isEmpty(request.getRCapaIdList())) {
             throw new CrmebException("服务上级请设置对应上级等级和星级");
         }
-        limitTempService.add(request.getName(), request.getType(), request.getCapaIdList(), request.getCapaXsIdList(), request.getWhiteIdList(), request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(), request.getPCapaXsIdList(), request.getHasRelation(), request.getRCapaIdList(), request.getRCapaXsIdList(), request.getDescription());
+        if (request.getHasBuyLimit()) {
+            if (request.getBuyLimitNum() == null || request.getBuyLimitStartTime() == null || request.getBuyLimitEndTime() == null) {
+                throw new CrmebException("开启选购必须设置限购数量-限购时间区间");
+            }
+        }
+        limitTempService.add(request.getName(), request.getType(), request.getCapaIdList(), request.getCapaXsIdList(), request.getWhiteIdList(),
+                request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(), request.getPCapaXsIdList(), request.getHasRelation(),
+                request.getRCapaIdList(), request.getRCapaXsIdList(), request.getHasBuyLimit(), request.getBuyLimitNum(), request.getBuyLimitStartTime(),
+                request.getBuyLimitEndTime(), request.getDescription());
         return CommonResult.success();
     }
 
@@ -68,16 +76,25 @@ public class LimitTempController {
                 return CommonResult.failed("限制模板等级名称已经存在");
             }
         }
-        if (CollectionUtils.isEmpty(request.getCapaIdList())&& CollectionUtils.isEmpty(request.getCapaXsIdList())&&CollectionUtils.isEmpty(request.getTeamIdList())&&!request.getHasPartner()&&!request.getHasRelation()) {
+        if (CollectionUtils.isEmpty(request.getCapaIdList()) && CollectionUtils.isEmpty(request.getCapaXsIdList()) && CollectionUtils.isEmpty(request.getTeamIdList()) && !request.getHasPartner() && !request.getHasRelation()) {
             throw new CrmebException("等级、星级、团队、销售上级、服务上级必须选填一个否则无法提交");
         }
-        if (request.getHasPartner()&&CollectionUtils.isEmpty(request.getPCapaIdList())&&CollectionUtils.isEmpty(request.getPCapaXsIdList())){
+        if (request.getHasPartner() && CollectionUtils.isEmpty(request.getPCapaIdList()) && CollectionUtils.isEmpty(request.getPCapaXsIdList())) {
             throw new CrmebException("销售上级请设置对应上级等级和星级");
         }
         if (request.getHasRelation() && CollectionUtils.isEmpty(request.getRCapaIdList()) && CollectionUtils.isEmpty(request.getRCapaIdList())) {
             throw new CrmebException("服务上级请设置对应上级等级和星级");
         }
-        limitTempService.update(request.getId(), request.getName(), request.getType(), request.getCapaIdList(), request.getCapaXsIdList(), request.getWhiteIdList(), request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(), request.getPCapaXsIdList(), request.getHasRelation(), request.getRCapaIdList(), request.getRCapaXsIdList(), request.getDescription());
+        if (request.getHasBuyLimit()) {
+            if (request.getBuyLimitNum() == null || request.getBuyLimitStartTime() == null || request.getBuyLimitEndTime() == null) {
+                throw new CrmebException("开启选购必须设置限购数量-限购时间区间");
+            }
+        }
+        limitTempService.update(request.getId(), request.getName(), request.getType(), request.getCapaIdList(), request.getCapaXsIdList(),
+                request.getWhiteIdList(), request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(),
+                request.getPCapaXsIdList(), request.getHasRelation(), request.getRCapaIdList(), request.getRCapaXsIdList(),
+                request.getHasBuyLimit(), request.getBuyLimitNum(), request.getBuyLimitStartTime(), request.getBuyLimitEndTime(),
+                request.getDescription());
         return CommonResult.success();
     }
 

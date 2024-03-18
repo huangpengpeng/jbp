@@ -7,7 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -22,6 +24,7 @@ public class LimitTempEditRequest implements Serializable {
     @ApiModelProperty(value = "模版名称")
     private String name;
 
+    @NotBlank(message = "类型不能为空")
     @ApiModelProperty(value = "商品显示  商品购买  装修显示")
     private String type;
 
@@ -37,6 +40,7 @@ public class LimitTempEditRequest implements Serializable {
     @ApiModelProperty(value = "团队ID")
     private List<Long> teamIdList;
 
+    @NotNull(message = "要求必须有上级必填")
     @ApiModelProperty(value = "要求必须有上级")
     private Boolean  hasPartner;
 
@@ -46,6 +50,7 @@ public class LimitTempEditRequest implements Serializable {
     @ApiModelProperty(value = "上级星级")
     private List<Long> pCapaXsIdList;
 
+    @NotNull(message = "要求必须有服务上级必填")
     @ApiModelProperty(value = "要求必须有服务上级")
     private Boolean  hasRelation;
 
@@ -54,6 +59,19 @@ public class LimitTempEditRequest implements Serializable {
 
     @ApiModelProperty(value = "服务上级星级")
     private List<Long> rCapaXsIdList;
+
+    @NotNull(message = "限购选择是或否必填")
+    @ApiModelProperty(value = "是否限购")
+    private Boolean hasBuyLimit;
+
+    @ApiModelProperty(value = "限购数量")
+    private Integer buyLimitNum;
+
+    @ApiModelProperty(value = "限购开始时间")
+    private Date buyLimitStartTime;
+
+    @ApiModelProperty(value = "限购结束时间")
+    private Date buyLimitEndTime;
 
     @ApiModelProperty(value = "说明")
     private String  description;
