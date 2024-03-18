@@ -50,3 +50,7 @@ src/main/.DS_Store
 Jbp_admin_log/
 Jbp_front_log/
 测试后台.run.xml
+/target/
+/bin/
+/.run
+/Jbp_front_log

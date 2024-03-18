@@ -32,15 +32,35 @@
                w.postscript,
                w.create_time,
                w.success_time,
-               w.remark
+               w.remark,
+               asentity.real_name,
+               card.bank_name,
+               card.bank_card_no
         from eb_wallet_withdraw as w
-                 LEFT JOIN eb_channel_identity asentity on asentity.uid = c.uid and asentity.channel = #{channelName}
-                 left join eb_channel_card as card on card.uid = c.uid and card.channel = #{channelName}
+                 LEFT JOIN eb_channel_identity AS asentity on asentity.uid = w.uid and asentity.channel = #{channelName}
+                 left join eb_channel_card as card on card.uid = w.uid and card.channel = #{channelName}
 
     </sql>
 <!-- List<WalletWithdraw> pageList(String account, String walletName, String status, String endTime, String startTime, String realName, String channelName);-->
     <select id="pageList" resultMap="WalletWithdraw">
-
+        <include refid="selectwalletWithdraw"/>
+            <where>
+                <if test="account!=null and account!=''">
+                    and w.account=#{account}
+                </if>
+                <if test="walletName!=null and walletName!=''">
+                    and w.wallet_name=#{walletName}
+                </if>
+                <if test="status!=null and status!=''">
+                    and w.status=#{status}
+                </if>
+                <if test="endTime!=null and startTime!=null">
+                    and  w.create_time  BETWEEN #{startTime} AND #{endTime}
+                </if>
+                <if test="realName!=null and realName!=''">
+                    and asentity.real_name=#{realName}
+                </if>
+            </where>
     </select>
 
 </mapper>
