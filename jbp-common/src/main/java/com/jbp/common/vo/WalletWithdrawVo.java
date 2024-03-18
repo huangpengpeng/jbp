@@ -15,6 +15,9 @@ import java.util.Date;
 @ApiModel(value = "WalletWithdrawVo对象", description = "微信模板发送类")
 public class WalletWithdrawVo {
 
+    @ApiModelProperty
+    private Integer id;
+
     @ApiModelProperty("账户")
     private String account;
 

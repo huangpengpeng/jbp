@@ -9,7 +9,8 @@
     <result column="wallet_type" property="walletType"/>
     <result column="wallet_name" property="walletName"/>
     <result column="unique_no" property="uniqueNo"/>
-    <result column="amt" property="commission"/>
+    <result column="amt" property="amt"/>
+    <result column="commission" property="commission"/>
     <result column="status" property="status"/>
     <result column="postscript" property="postscript"/>
     <result column="create_time" property="createTime"/>
@@ -60,7 +61,48 @@
                 <if test="realName!=null and realName!=''">
                     and asentity.real_name=#{realName}
                 </if>
-            </where>
+            </where> ORDER BY w.id DESC
     </select>
-
+<!-- List<WalletWithdrawVo> excel(@Param("id") Integer id,@Param("account") String account,@Param("walletName") String walletName,@Param("status") String status,
+                                 @Param("realName") String realName, @Param("startTime") String startTime,@Param("endTime") String endTime,@Param("channelName") String channelName);
+-->
+    <resultMap id="excelVo" type="com.jbp.common.vo.WalletWithdrawVo">
+        <id column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="wallet_name" property="walletName"/>
+        <result column="unique_no" property="uniqueNo"/>
+        <result column="amt" property="amt"/>
+        <result column="commission" property="commission"/>
+        <result column="status" property="status"/>
+        <result column="postscript" property="postscript"/>
+        <result column="create_time" property="createTime"/>
+        <result column="success_time" property="successTime"/>
+        <result column="remark" property="remark"/>
+        <result column="bank_name" property="bankName"/>
+        <result column="bank_card_no" property="bankCode"/>
+        <result column="real_name" property="realName"/>
+    </resultMap>
+    <select id="excel" resultMap="excelVo">
+        <include refid="selectwalletWithdraw"/>
+        <where>
+            and w.id > #{id}
+            <if test="account!=null and account!=''">
+                and w.account=#{account}
+            </if>
+            <if test="walletName!=null and walletName!=''">
+                and w.wallet_name=#{walletName}
+            </if>
+            <if test="status!=null and status!=''">
+                and w.status=#{status}
+            </if>
+            <if test="endTime!=null and startTime!=null">
+                and  w.create_time  BETWEEN #{startTime} AND #{endTime}
+            </if>
+            <if test="realName!=null and realName!=''">
+                and asentity.real_name=#{realName}
+            </if>
+        </where>
+        ORDER BY w.id DESC
+        LIMIT 1000
+    </select>
 </mapper>

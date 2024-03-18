@@ -17,6 +17,5 @@ public class UserCapaRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("等级ID")
-    @TableField("capa_id")
     private Long capaId;
 }

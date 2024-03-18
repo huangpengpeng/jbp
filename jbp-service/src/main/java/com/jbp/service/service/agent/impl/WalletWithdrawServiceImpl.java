@@ -1,6 +1,8 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -70,66 +73,38 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            if (true) {
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(), channelName);
+            if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
+            voList.addAll(fundClearingVos);
+            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
         } while (true);
-        return null;
-//        do {
-//            LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
-//                    .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
-//                    .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
-//                    .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
-//                    .orderByDesc(WalletWithdraw::getId);
-//            getRequestTimeWhere(lqw, dateLimit);
-//            lqw.gt(WalletWithdraw::getId, id);
-//            lqw.last("LIMIT 1000");
-//            List<WalletWithdraw> list = list(lqw);
-//            if (CollectionUtils.isEmpty(list)) {
-//                break;
-//            }
-//            List<Integer> uIdList = list.stream().map(WalletWithdraw::getUid).collect(Collectors.toList());
-//            Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
-//            Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
-//            list.forEach(e -> {
-//                ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
-//                if (channelIdentity != null) {
-//                    e.setRealName(channelIdentity.getRealName());
-//                }
-//                ChannelCard channelCard = channelCardMap.get(e.getUid());
-//                if (channelCard != null) {
-//                    e.setBankName(channelCard.getBankName());
-//                    e.setBankCode(channelCard.getBankCardNo());
-//                }
-//                WalletWithdrawVo walletWithdrawVo = new WalletWithdrawVo();
-//                BeanUtils.copyProperties(e, walletWithdrawVo);
-//                if (StringUtils.isEmpty(realName)) {
-//                    voList.add(walletWithdrawVo);
-//                } else if (StringUtils.isNotEmpty(realName)) {
-//                    if (walletWithdrawVo.getRealName() == realName) {
-//                        voList.add(walletWithdrawVo);
-//                    }
-//                }
-//            });
-//        } while (true);
-//        WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
-//        LinkedHashMap head = new LinkedHashMap();
-//        head.put("account", "账户");
-//        head.put("walletName", "钱包名称");
-//        head.put("uniqueNo", "流水单号");
-//        head.put("amt", "提现金额");
-//        head.put("commission", "手续费");
-//        head.put("status", "状态");
-//        head.put("postscript", "附言");
-//        head.put("createTime", "创建时间");
-//        head.put("successTime", "成功时间");
-//        head.put("remark", "备注");
-//        head.put("bankName", "银行卡名称");
-//        head.put("bankCode", "银行卡号");
-//        head.put("realName", "真实姓名");
-//        walletWithdrawExcelInfoVo.setHead(head);
-//        walletWithdrawExcelInfoVo.setList(voList);
-//        return walletWithdrawExcelInfoVo;
+        WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
+        LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
+        head.put("account", "账户");
+        head.put("walletName", "钱包名称");
+        head.put("uniqueNo", "流水单号");
+        head.put("amt", "提现金额");
+        head.put("commission", "手续费");
+        head.put("status", "状态");
+        head.put("postscript", "附言");
+        head.put("createTime", "创建时间");
+        head.put("successTime", "成功时间");
+        head.put("remark", "备注");
+        head.put("bankName", "银行卡名称");
+        head.put("bankCode", "银行卡号");
+        head.put("realName", "真实姓名");
+        JSONArray array = new JSONArray();
+        head.forEach((k,v)->{
+            JSONObject json = new JSONObject();
+            json.put("k", k);
+            json.put("v", v);
+            array.add(json);
+        });
+        walletWithdrawExcelInfoVo.setHead(array);
+        walletWithdrawExcelInfoVo.setList(voList);
+        return walletWithdrawExcelInfoVo;
     }
 
     private void getRequestTimeWhere(LambdaQueryWrapper<WalletWithdraw> lqw, String dateLimit) {

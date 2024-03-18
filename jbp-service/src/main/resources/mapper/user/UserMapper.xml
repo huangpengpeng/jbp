@@ -23,6 +23,9 @@
             <if test="tagIdSql != null and tagIdSql !='' ">
                 and ${tagIdSql}
             </if>
+                   <if test="openShop!=null">
+                       and u.open_shop=#{openShop}
+                   </if>
             <if test="registerType != null and registerType !='' ">
                 and u.register_type = #{registerType, jdbcType=VARCHAR}
             </if>

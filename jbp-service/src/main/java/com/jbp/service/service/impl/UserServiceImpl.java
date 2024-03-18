@@ -33,7 +33,6 @@ import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
-import com.jbp.common.request.agent.UserCapaAddRequest;
 import com.jbp.common.request.merchant.MerchantUserSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.token.FrontTokenComponent;
@@ -608,6 +607,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         Map<String, Object> map = CollUtil.newHashMap();
         if (StrUtil.isNotEmpty(request.getAccount())) {
             map.put("account", request.getAccount());
+        }
+        if (request.getOpenShop() != null) {
+            map.put("openShop", request.getOpenShop());
         }
         if (StrUtil.isNotEmpty(request.getSpreadAccount())) {
             User user = userService.getByAccount(request.getSpreadAccount());
