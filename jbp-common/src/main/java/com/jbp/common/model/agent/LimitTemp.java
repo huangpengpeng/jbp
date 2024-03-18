@@ -46,6 +46,10 @@ public class LimitTemp extends BaseModel {
         this.rCapaIdList = rCapaIdList;
         this.rCapaXsIdList = rCapaXsIdList;
         this.description=description;
+        this.hasBuyLimit=hasBuyLimit;
+        this.buyLimitNum=buyLimitNum;
+        this.buyLimitStartTime=buyLimitStartTime;
+        this.buyLimitEndTime=buyLimitEndTime;
     }
 
     public void init(){

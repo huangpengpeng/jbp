@@ -19,6 +19,25 @@
     <result column="bank_card_no" property="bankCode"/>
     <result column="real_name" property="realName"/>
 </resultMap>
+    <sql id="selectwalletWithdraw">
+        select w.id,
+               w.uid,
+               w.account,
+               w.wallet_type,
+               w.wallet_name,
+               w.unique_no,
+               w.amt,
+               w.commission,
+               w.status,
+               w.postscript,
+               w.create_time,
+               w.success_time,
+               w.remark
+        from eb_wallet_withdraw as w
+                 LEFT JOIN eb_channel_identity asentity on asentity.uid = c.uid and asentity.channel = #{channelName}
+                 left join eb_channel_card as card on card.uid = c.uid and card.channel = #{channelName}
+
+    </sql>
 <!-- List<WalletWithdraw> pageList(String account, String walletName, String status, String endTime, String startTime, String realName, String channelName);-->
     <select id="pageList" resultMap="WalletWithdraw">
 
