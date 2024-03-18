@@ -53,36 +53,16 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private ChannelIdentityService channelIdentityService;
     @Resource
     private ChannelCardService channelCardService;
+    @Resource
+    private WalletWithdrawDao walletWithdrawDao;
 
     @Override
     public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName, PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
-        LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
-                .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
-                .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
-                .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
-                .orderByDesc(WalletWithdraw::getId);
-        getRequestTimeWhere(lqw, dateLimit);
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletWithdraw> list = list(lqw);
-        List<Integer> uIdList = list.stream().map(WalletWithdraw::getUid).collect(Collectors.toList());
-        Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
-        Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
-        list.forEach(e -> {
-            ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
-            if (channelIdentity != null) {
-                e.setRealName(channelIdentity.getRealName());
-            }
-            ChannelCard channelCard = channelCardMap.get(e.getUid());
-            if (channelCard != null) {
-                e.setBankName(channelCard.getBankName());
-                e.setBankCode(channelCard.getBankCardNo());
-            }
-        });
-        if (StringUtils.isNotEmpty(realName)) {
-            return CommonPage.copyPageInfo(page, list.stream().filter(e -> e.getRealName() == realName).collect(Collectors.toList()));
-        }
-        return CommonPage.copyPageInfo(page, list);
+        List<WalletWithdraw> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName);
+        return CommonPage.copyPageInfo(page, walletWithdrawsList);
     }
 
     @Override

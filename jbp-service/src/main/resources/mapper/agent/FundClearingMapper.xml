@@ -78,6 +78,7 @@
                 and c.create_time BETWEEN #{starteCreateTime} AND #{endCreateTime}
             </if>
         </where>
+        ORDER BY c.id DESC
     </select>
     <sql id="exportFundClearing">
         SELECT c.id,
