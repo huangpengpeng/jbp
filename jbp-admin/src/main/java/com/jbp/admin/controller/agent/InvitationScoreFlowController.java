@@ -59,7 +59,8 @@ public class InvitationScoreFlowController {
     @PostMapping("/excel")
     @ApiOperation("销售业绩明细导出")
     public CommonResult<List<InvitationScoreFlowVo>> excel(InvitationScoreFlowRequest request) {
-        if (ObjectUtil.isEmpty(request)) {
+        if (StringUtils.isEmpty(request.getAccount())&&StringUtils.isEmpty(request.getOrderAccount())&&StringUtils.isEmpty(request.getOrdersSn())
+        &&StringUtils.isEmpty(request.getDateLimit())) {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;

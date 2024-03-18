@@ -51,12 +51,17 @@ public class RelationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid,orderuid,request.getOrdersSn(),request.getDateLimit(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid, orderuid, request.getOrdersSn(), request.getDateLimit(), pageParamRequest)));
     }
+
     @PreAuthorize("hasAuthority('agent:relation:score:flow:excel')")
     @PostMapping("/excel")
     @ApiOperation("服务业绩明细导出")
     public CommonResult<List<RelationScoreFlowVo>> excel(RelationScoreFlowRequest request) {
+        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getOrderAccount()) && StringUtils.isEmpty(request.getOrdersSn())
+                && StringUtils.isEmpty(request.getDateLimit())) {
+            throw new CrmebException("请选择一个过滤条件");
+        }
         Integer uid = null;
         if (StringUtils.isNotEmpty(request.getAccount())) {
             User user = userService.getByAccount(request.getAccount());
@@ -73,6 +78,6 @@ public class RelationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(relationScoreFlowService.excel(uid,orderuid,request.getOrdersSn(),request.getDateLimit()));
+        return CommonResult.success(relationScoreFlowService.excel(uid, orderuid, request.getOrdersSn(), request.getDateLimit()));
     }
 }

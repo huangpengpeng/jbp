@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.page.CommonPage;
@@ -11,6 +10,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletWithdrawService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +32,7 @@ public class WalletWithdrawController {
     @GetMapping("/page")
     @ApiOperation("钱包提现列表")
     public CommonResult<CommonPage<WalletWithdraw>> getList(WalletWithdrawPageRequest request, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(),request.getRealName(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(), request.getRealName(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
@@ -55,10 +55,11 @@ public class WalletWithdrawController {
     @PostMapping("/excel")
     @ApiOperation("钱包导出数据")
     public CommonResult<WalletWithdrawExcelInfoVo> excel(WalletWithdrawPageRequest request) {
-        if (ObjectUtil.isEmpty(request)) {
+        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getWalletName()) && StringUtils.isEmpty(request.getStatus())
+                && StringUtils.isEmpty(request.getRealName()) && StringUtils.isEmpty(request.getDateLimit())) {
             throw new CrmebException("请选择一个过滤条件");
         }
-        return CommonResult.success(walletWithdrawService.excel(request.getAccount(), request.getWalletName(), request.getStatus(),request.getRealName(), request.getDateLimit()));
+        return CommonResult.success(walletWithdrawService.excel(request.getAccount(), request.getWalletName(), request.getStatus(), request.getRealName(), request.getDateLimit()));
     }
 
 

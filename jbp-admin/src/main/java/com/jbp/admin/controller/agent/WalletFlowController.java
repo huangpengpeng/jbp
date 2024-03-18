@@ -51,7 +51,8 @@ public class WalletFlowController {
     @PostMapping("/excel")
     @ApiOperation("用户积分详情导出")
     public CommonResult<List<WalletFlowVo>> excel(WalletRequest request) {
-        if (ObjectUtils.isEmpty(request)) {
+        if (StringUtils.isEmpty(request.getAccount()) && ObjectUtils.isEmpty(request.getType()) && StringUtils.isEmpty(request.getDateLimit()) &&
+                StringUtils.isEmpty(request.getExternalNo())) {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;
