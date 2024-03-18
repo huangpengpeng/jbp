@@ -53,7 +53,7 @@ public class JbpFrontApplication {
 //        bean.orderSuccessCalculateAmt(orderService.getByOrderNo("PT166171073091110928243"), Lists.newLinkedList());
 
 
-//        payService.payAfterProcessingTemp("PT166171073091110928243");
+        payService.payAfterProcessingTemp("PT692171074429672794771");
         System.out.println("ok");
 
     }

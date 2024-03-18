@@ -1,6 +1,7 @@
 package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
@@ -135,6 +136,35 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
         }
     }
 
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        rule.setCapaXsId(7L);
+        rule.setCapaXsName("一星");
+        List<LevelRatio> levelRatios = Lists.newArrayList();
+        for (int i = 1; i < 19; i++) {
+            LevelRatio levelRatio = new LevelRatio();
+            levelRatio.setLevel(i);
+            if(i==1 || i==2){
+                levelRatio.setRatio(BigDecimal.valueOf(0.15));
+            }
+            if(i==3 || i==4){
+                levelRatio.setRatio(BigDecimal.valueOf(0.1));
+            }
+            if(i >=5 && i<=10){
+                levelRatio.setRatio(BigDecimal.valueOf(0.05));
+            }
+            if(i > 10){
+                levelRatio.setRatio(BigDecimal.valueOf(0.025));
+            }
+
+            levelRatios.add(levelRatio);
+
+        }
+        rule.setLevelRatios(levelRatios);
+
+        System.out.println(JSONObject.toJSONString(rule));
+
+    }
 
     /**
      * 渠道佣金规则
