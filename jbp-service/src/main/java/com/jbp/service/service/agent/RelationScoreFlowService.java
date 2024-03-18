@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface RelationScoreFlowService extends IService<RelationScoreFlow> {
 
-     PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid,String ordersSn,String dateLimit, PageParamRequest pageParamRequest);
+     PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid,String ordersSn,String dateLimit,Integer node,String action, PageParamRequest pageParamRequest);
 
-    List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit);
+    List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit,Integer node, String action);
 }

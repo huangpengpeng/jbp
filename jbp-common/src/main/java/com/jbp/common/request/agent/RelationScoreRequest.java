@@ -15,4 +15,7 @@ import java.io.Serializable;
 public class RelationScoreRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
+
+    @ApiModelProperty(value = "创建时间区间")
+    private String dateLimit;
 }

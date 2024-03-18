@@ -104,7 +104,7 @@
                  LEFT JOIN eb_user AS u ON c.uid = u.id
                  LEFT JOIN eb_team_user as tu ON c.uid = tu.uid
                  LEFT JOIN eb_team as t on tu.tid = t.id
-                 LEFT JOIN eb_channel_identity asentity on asentity.uid = c.uid and asentity.channel=#{channelName}
+                 LEFT JOIN eb_channel_identity AS asentity on asentity.uid = c.uid and asentity.channel=#{channelName}
                  left join eb_channel_card as card on card.uid = c.uid  and card.channel=#{channelName}
     </sql>
     <resultMap id="FundClearingVo" type="com.jbp.common.vo.FundClearingVo">
@@ -155,6 +155,7 @@
                 and c.create_time BETWEEN #{starteCreateTime} AND #{endCreateTime}
             </if>
         </where>
+        ORDER BY c.id DESC
         LIMIT 1000
     </select>
 

@@ -24,6 +24,12 @@ public class RelationScoreFlowRequest implements Serializable {
     @ApiModelProperty("单号")
     private String ordersSn;
 
+    @ApiModelProperty("点位")
+    private Integer node;
+
+    @ApiModelProperty("方向")
+    private String action;
+
     @ApiModelProperty(value = "付款时间区间")
     private String dateLimit;
 }

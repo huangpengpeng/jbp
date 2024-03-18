@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -9,7 +10,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
 import com.jbp.common.model.agent.UserRelation;
@@ -18,6 +18,9 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.RelationScoreResponse;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.common.vo.RelationScoreVo;
 import com.jbp.service.dao.agent.RelationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreFlowService;
@@ -25,6 +28,7 @@ import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserRelationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,13 +58,14 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     }
 
     @Override
-    public PageInfo<RelationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScore> pageList(Integer uid, String dateLimit, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
                 .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid)
                 .orderByDesc(RelationScore::getId);
+        getRequestTimeWhere(lqw, dateLimit);
         Page<RelationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScore> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(RelationScore::getUid).collect(Collectors.toList());
@@ -70,6 +75,39 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public List<RelationScoreVo> excel(Integer uid, String dateLimit) {
+        Long id = 0L;
+        List<RelationScoreVo> voList = CollUtil.newArrayList();
+        do {
+            LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
+                    .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid)
+                    .orderByDesc(RelationScore::getId);
+            getRequestTimeWhere(lqw, dateLimit);
+            lqw.gt(RelationScore::getId, id).last("LIMIT 1000");
+            List<RelationScore> fundClearingVos = list(lqw);
+            if (CollectionUtils.isEmpty(fundClearingVos)) {
+                break;
+            }
+            List<Integer> uIdList = fundClearingVos.stream().map(RelationScore::getUid).collect(Collectors.toList());
+            Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+            fundClearingVos.forEach(e -> {
+                User user = uidMapList.get(e.getUid());
+                e.setAccount(user != null ? user.getAccount() : "");
+                RelationScoreVo relationScoreVo=new RelationScoreVo();
+                BeanUtils.copyProperties(e,relationScoreVo);
+                voList.add(relationScoreVo);
+            });
+            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
+        } while (true);
+        return voList;
+    }
+
+    private void getRequestTimeWhere(LambdaQueryWrapper<RelationScore> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), RelationScore::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
 
     @Override
@@ -133,14 +171,14 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     }
 
     @Override
-    public void operateReduceUsable(Integer uid,  BigDecimal score, int node, String ordersSn, Date payTime, String remark, Boolean ifUpdateUsed) {
+    public void operateReduceUsable(Integer uid, BigDecimal score, int node, String ordersSn, Date payTime, String remark, Boolean ifUpdateUsed) {
         RelationScore relationScore = getByUser(uid, node);
         if (relationScore == null || ArithmeticUtils.less(relationScore.getUsableScore(), score)) {
             throw new CrmebException("积分不足");
         }
         // 更新可用
         relationScore.setUsableScore(relationScore.getUsableScore().subtract(score));
-        if(BooleanUtils.isTrue(ifUpdateUsed)){
+        if (BooleanUtils.isTrue(ifUpdateUsed)) {
             relationScore.setUsedScore(relationScore.getUsedScore().add(score));
         }
         Boolean ifSuccess = updateById(relationScore);
@@ -155,27 +193,27 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
 
     @Override
     public RelationScoreResponse getUserResult() {
-        RelationScoreResponse relationScoreResponse =new RelationScoreResponse();
+        RelationScoreResponse relationScoreResponse = new RelationScoreResponse();
         User user = userService.getInfo();
-        UserRelation userRelation =  userRelationService.getByPid(user.getId(),0);
-        UserRelation  userRelation2 =  userRelationService.getByPid(user.getId(),1);
+        UserRelation userRelation = userRelationService.getByPid(user.getId(), 0);
+        UserRelation userRelation2 = userRelationService.getByPid(user.getId(), 1);
 
-        if(userRelation != null){
+        if (userRelation != null) {
             RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()));
             User zorouser = userService.getById(userRelation.getUId());
             relationScoreResponse.setNickname(zorouser.getNickname());
             relationScoreResponse.setAccount(zorouser.getAccount());
-            relationScoreResponse.setTotalScore(relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore().add(relationScore.getUsedScore()));
-            relationScoreResponse.setUsableScore( relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore());
+            relationScoreResponse.setTotalScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()));
+            relationScoreResponse.setUsableScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore());
         }
 
-        if(userRelation2 != null){
+        if (userRelation2 != null) {
             RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()));
             User zorouser = userService.getById(userRelation2.getUId());
             relationScoreResponse.setNickname2(zorouser.getNickname());
             relationScoreResponse.setAccount2(zorouser.getAccount());
-            relationScoreResponse.setTotalScore2( relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore().add(relationScore.getUsedScore()));
-            relationScoreResponse.setUsableScore2( relationScore == null? BigDecimal.ZERO :relationScore.getUsableScore());
+            relationScoreResponse.setTotalScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()));
+            relationScoreResponse.setUsableScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore());
         }
 
 

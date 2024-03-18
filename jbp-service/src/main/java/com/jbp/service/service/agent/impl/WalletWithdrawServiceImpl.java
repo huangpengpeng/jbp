@@ -1,6 +1,8 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,7 +11,9 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.Wallet;
+import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
@@ -28,7 +32,6 @@ import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +41,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -68,47 +69,19 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     @Override
     public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            LambdaQueryWrapper<WalletWithdraw> lqw = new LambdaQueryWrapper<WalletWithdraw>()
-                    .like(StringUtils.isNotEmpty(account), WalletWithdraw::getAccount, account)
-                    .like(StringUtils.isNotEmpty(walletName), WalletWithdraw::getWalletName, walletName)
-                    .eq(StringUtils.isNotEmpty(status), WalletWithdraw::getStatus, status)
-                    .orderByDesc(WalletWithdraw::getId);
-            getRequestTimeWhere(lqw, dateLimit);
-            lqw.gt(WalletWithdraw::getId, id);
-            lqw.last("LIMIT 1000");
-            List<WalletWithdraw> list = list(lqw);
-            if (CollectionUtils.isEmpty(list)) {
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(), channelName);
+            if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
-            List<Integer> uIdList = list.stream().map(WalletWithdraw::getUid).collect(Collectors.toList());
-            Map<Integer, ChannelIdentity> channelIdentityMap = channelIdentityService.getChannelIdentityMap(uIdList, channelName);
-            Map<Integer, ChannelCard> channelCardMap = channelCardService.getChannelCardMap(uIdList, channelName);
-            list.forEach(e -> {
-                ChannelIdentity channelIdentity = channelIdentityMap.get(e.getUid());
-                if (channelIdentity != null) {
-                    e.setRealName(channelIdentity.getRealName());
-                }
-                ChannelCard channelCard = channelCardMap.get(e.getUid());
-                if (channelCard != null) {
-                    e.setBankName(channelCard.getBankName());
-                    e.setBankCode(channelCard.getBankCardNo());
-                }
-                WalletWithdrawVo walletWithdrawVo = new WalletWithdrawVo();
-                BeanUtils.copyProperties(e, walletWithdrawVo);
-                if (StringUtils.isEmpty(realName)) {
-                    voList.add(walletWithdrawVo);
-                } else if (StringUtils.isNotEmpty(realName)) {
-                    if (walletWithdrawVo.getRealName() == realName) {
-                        voList.add(walletWithdrawVo);
-                    }
-                }
-            });
+            voList.addAll(fundClearingVos);
+            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
         } while (true);
         WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
-        LinkedHashMap head = new LinkedHashMap();
+        LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("account", "账户");
         head.put("walletName", "钱包名称");
         head.put("uniqueNo", "流水单号");
@@ -122,16 +95,17 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         head.put("bankName", "银行卡名称");
         head.put("bankCode", "银行卡号");
         head.put("realName", "真实姓名");
-        walletWithdrawExcelInfoVo.setHead(head);
+        JSONArray array = new JSONArray();
+        head.forEach((k,v)->{
+            JSONObject json = new JSONObject();
+            json.put("k", k);
+            json.put("v", v);
+            array.add(json);
+        });
+        walletWithdrawExcelInfoVo.setHead(array);
         walletWithdrawExcelInfoVo.setList(voList);
         return walletWithdrawExcelInfoVo;
     }
-
-    private void getRequestTimeWhere(LambdaQueryWrapper<WalletWithdraw> lqw, String dateLimit) {
-        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), WalletWithdraw::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
-    }
-
     @Override
     public WalletWithdraw create(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, String postscript) {
         if (amt == null || ArithmeticUtils.less(amt, BigDecimal.ZERO)) {

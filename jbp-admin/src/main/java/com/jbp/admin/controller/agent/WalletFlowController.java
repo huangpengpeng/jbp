@@ -16,7 +16,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +47,7 @@ public class WalletFlowController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     @ApiOperation("用户积分详情导出")
     public CommonResult<List<WalletFlowVo>> excel(WalletRequest request) {
         if (StringUtils.isEmpty(request.getAccount()) && ObjectUtils.isEmpty(request.getType()) && StringUtils.isEmpty(request.getDateLimit()) &&

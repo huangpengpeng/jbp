@@ -250,19 +250,21 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
         // 显示权益
         Integer pId = null, rId = null;
         List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
-        User currentUser = userService.getInfo();
+
+
+        Integer currentUser = userService.getUserId();
         JSONObject jsonValue =   JSON.parseObject(modifiedJsonString);
-        if (currentUser != null) {
-            whiteIdList = whiteUserService.getByUser(currentUser.getId());
-            TeamUser teamUser = teamUserService.getByUser(currentUser.getId());
+        if (currentUser != 0) {
+            whiteIdList = whiteUserService.getByUser(currentUser);
+            TeamUser teamUser = teamUserService.getByUser(currentUser);
             if (teamUser != null) {
                 teamIdList.add(Long.valueOf(teamUser.getTid()));
             }
-            pId = userInvitationService.getPid(currentUser.getId());
-            rId = userRelationService.getPid(currentUser.getId());
+            pId = userInvitationService.getPid(currentUser);
+            rId = userRelationService.getPid(currentUser);
 
-            UserCapa userCapa = userCapaService.getByUser(currentUser.getId());
-            UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser.getId());
+            UserCapa userCapa = userCapaService.getByUser(currentUser);
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser);
             List<Long> tempIds = limitTempService.hasLimits(userCapa == null ? null : userCapa.getCapaId(), userCapaXs == null ? null : userCapaXs.getCapaId(), whiteIdList, teamIdList, pId, rId);
             JSONObject jsonObject = JSON.parseObject(modifiedJsonString);
 

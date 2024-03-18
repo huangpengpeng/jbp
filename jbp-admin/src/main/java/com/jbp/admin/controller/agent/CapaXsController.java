@@ -1,6 +1,9 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.NumberUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.CapaXs;
@@ -18,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -95,8 +99,18 @@ public class CapaXsController {
 
     @ApiOperation(value = "星级升级条件")
     @GetMapping(value = "/condition/list")
-    public CommonResult<List<ConditionEnum>> conditionList() {
-        return CommonResult.success(ConditionEnum.getCapaList().stream().filter(s->s.getType().equals("星级")).collect(Collectors.toList()));
+    public CommonResult<JSONObject> conditionList() {
+        JSONObject json = new JSONObject();
+        List<ConditionEnum> list = ConditionEnum.getCapaList().stream().filter(s -> s.getType().equals("星级")).collect(Collectors.toList());
+        List<String> nameList = Lists.newArrayList();
+        List<String> desList = Lists.newArrayList();
+        for (ConditionEnum conditionEnum : list) {
+            nameList.add(conditionEnum.getName());
+            desList.add(conditionEnum.getDescription());
+        }
+        json.put("names", nameList);
+        json.put("dess", desList);
+        return CommonResult.success(json);
     }
 
     @PreAuthorize("hasAuthority('capa:xs:condition:save')")

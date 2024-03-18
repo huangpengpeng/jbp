@@ -36,7 +36,7 @@ public class RelationScoreUpdateRequest implements Serializable {
     @ApiModelProperty("单据")
     private String ordersSn;
 
-    @NotBlank(message = "单据不能为空")
+    @NotNull(message = "调整之间不能为空")
     @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN)
     @ApiModelProperty("调整时间")
     private Date payTime;

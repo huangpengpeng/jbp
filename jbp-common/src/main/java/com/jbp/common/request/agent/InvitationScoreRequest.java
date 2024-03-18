@@ -15,4 +15,7 @@ import java.io.Serializable;
 public class InvitationScoreRequest implements Serializable {
     @ApiModelProperty("账户")
     private String account;
+    @ApiModelProperty(value = "付款时间区间")
+    private String dateLimit;
+
 }

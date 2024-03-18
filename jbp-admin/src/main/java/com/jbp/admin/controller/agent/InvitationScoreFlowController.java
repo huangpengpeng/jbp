@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.user.User;
@@ -16,7 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,11 +54,11 @@ public class InvitationScoreFlowController {
     }
 
     @PreAuthorize("hasAuthority('agent:invitation:score:flow:excel')")
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     @ApiOperation("销售业绩明细导出")
     public CommonResult<List<InvitationScoreFlowVo>> excel(InvitationScoreFlowRequest request) {
-        if (StringUtils.isEmpty(request.getAccount())&&StringUtils.isEmpty(request.getOrderAccount())&&StringUtils.isEmpty(request.getOrdersSn())
-        &&StringUtils.isEmpty(request.getDateLimit())) {
+        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getOrderAccount()) && StringUtils.isEmpty(request.getOrdersSn())
+                && StringUtils.isEmpty(request.getDateLimit())) {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;
