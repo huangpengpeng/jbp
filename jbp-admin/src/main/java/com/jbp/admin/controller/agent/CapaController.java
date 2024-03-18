@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.NumberUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.Capa;
@@ -94,9 +96,26 @@ public class CapaController {
 
     @ApiOperation(value = "升级条件")
     @GetMapping(value = "/condition/list")
-    public CommonResult<List<ConditionEnum>> conditionList() {
-        return CommonResult.success(ConditionEnum.getCapaList().stream().filter(s->s.getType().equals("等级")).collect(Collectors.toList()));
+    public CommonResult<JSONObject> conditionList() {
+        JSONObject json = new JSONObject();
+        List<ConditionEnum> list = ConditionEnum.getCapaList().stream().filter(s -> s.getType().equals("等级")).collect(Collectors.toList());
+        List<String> nameList = Lists.newArrayList();
+        List<String> desList = Lists.newArrayList();
+        for (ConditionEnum conditionEnum : list) {
+            nameList.add(conditionEnum.getName());
+            desList.add(conditionEnum.getDescription());
+        }
+        json.put("names", nameList);
+        json.put("dess", desList);
+        return CommonResult.success(json);
     }
+
+    @ApiOperation(value = "升级条件")
+    @GetMapping(value = "/condition/desList")
+    public CommonResult<List<String>> desList() {
+        return CommonResult.success(ConditionEnum.getCapaList().stream().filter(s->s.getType().equals("等级")).map(ConditionEnum::getDescription).collect(Collectors.toList()));
+    }
+
     @PreAuthorize("hasAuthority('capa:condition:save')")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "等级升级条件保存")
     @ApiOperation(value = "升级条件保存")
