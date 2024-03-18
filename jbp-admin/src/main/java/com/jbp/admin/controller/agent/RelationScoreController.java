@@ -78,7 +78,7 @@ public class RelationScoreController {
     @ApiOperation("设置虚拟业绩")
     @GetMapping("/fake/edit")
     public CommonResult fakeEdit(String account, int node, int score) {
-        if (StringUtils.isNotEmpty(account)) {
+        if (StringUtils.isEmpty(account)) {
             throw new CrmebException("账号信息不能为空");
         }
         if (0 != node && 1 != node) {
