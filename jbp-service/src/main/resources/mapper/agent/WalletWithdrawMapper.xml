@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.WalletWithdrawDao">
+
+<resultMap id="WalletWithdraw" type="com.jbp.common.model.agent.WalletWithdraw">
+    <id column="id" property="id"/>
+    <result column="uid" property="uid"/>
+</resultMap>
+<!-- List<WalletWithdraw> pageList(String account, String walletName, String status, String endTime, String startTime, String realName, String channelName);-->
+    <select id="pageList" resultMap="WalletWithdraw">
+
+    </select>
+
+</mapper>
