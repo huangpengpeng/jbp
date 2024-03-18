@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -67,4 +68,17 @@ public class LimitTempResponse {
 
     @ApiModelProperty(value = "说明")
     private String  description;
+
+    @ApiModelProperty(value = "是否限购")
+    private Boolean hasBuyLimit;
+
+    @ApiModelProperty(value = "限购数量")
+    private int buyLimitNum;
+
+    @ApiModelProperty(value = "限购开始时间")
+    private Date buyLimitStartTime;
+
+    @ApiModelProperty(value = "限购结束时间")
+    private Date buyLimitEndTime;
+
 }

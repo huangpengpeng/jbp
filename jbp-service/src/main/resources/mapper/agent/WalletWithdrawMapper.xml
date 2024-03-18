@@ -5,6 +5,19 @@
 <resultMap id="WalletWithdraw" type="com.jbp.common.model.agent.WalletWithdraw">
     <id column="id" property="id"/>
     <result column="uid" property="uid"/>
+    <result column="account" property="account"/>
+    <result column="wallet_type" property="walletType"/>
+    <result column="wallet_name" property="walletName"/>
+    <result column="unique_no" property="uniqueNo"/>
+    <result column="amt" property="commission"/>
+    <result column="status" property="status"/>
+    <result column="postscript" property="postscript"/>
+    <result column="create_time" property="createTime"/>
+    <result column="success_time" property="successTime"/>
+    <result column="remark" property="remark"/>
+    <result column="bank_name" property="bankName"/>
+    <result column="bank_card_no" property="bankCode"/>
+    <result column="real_name" property="realName"/>
 </resultMap>
 <!-- List<WalletWithdraw> pageList(String account, String walletName, String status, String endTime, String startTime, String realName, String channelName);-->
     <select id="pageList" resultMap="WalletWithdraw">
