@@ -227,6 +227,10 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
         limitTempRequest.setName(limitTemp.getName());
         limitTempRequest.setId(limitTemp.getId());
         limitTempRequest.setType(limitTemp.getType());
+        limitTempRequest.setHasBuyLimit(limitTemp.getHasBuyLimit());
+        limitTempRequest.setBuyLimitNum(limitTemp.getBuyLimitNum());
+        limitTempRequest.setBuyLimitStartTime(limitTemp.getBuyLimitStartTime());
+        limitTempRequest.setBuyLimitEndTime(limitTemp.getBuyLimitEndTime());
         if (limitTemp.getCapaIdList().size() > 0) {
             limitTempRequest.setCapaIdList(capaService.listByIds(limitTemp.getCapaIdList()));
         }
