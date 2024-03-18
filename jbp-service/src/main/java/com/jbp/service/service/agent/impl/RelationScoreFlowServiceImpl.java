@@ -36,11 +36,13 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     private UserService userService;
 
     @Override
-    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid, String ordersSn, String dateLimit, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid, String ordersSn, String dateLimit, int node, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
-                .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn);
+                .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn)
+                .eq(ObjectUtil.isEmpty(node), RelationScoreFlow::getNode, node)
+                .eq(StringUtils.isEmpty(action), RelationScoreFlow::getAction, action);
         getRequestTimeWhere(lqw, dateLimit);
         lqw.orderByDesc(RelationScoreFlow::getId);
         Page<RelationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -62,14 +64,16 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     }
 
     @Override
-    public List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit) {
+    public List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit,int node, String action) {
         Long id = 0L;
         List<RelationScoreFlowVo> result = Lists.newArrayList();
         do {
             LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
                     .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
                     .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
-                    .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn);
+                    .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn)
+                    .eq(ObjectUtil.isEmpty(node), RelationScoreFlow::getNode, node)
+                    .eq(StringUtils.isEmpty(action), RelationScoreFlow::getAction, action);
             getRequestTimeWhere(lqw, dateLimit);
             lqw.gt(RelationScoreFlow::getId, id).last("LIMIT 1000");
             lqw.orderByDesc(RelationScoreFlow::getId);

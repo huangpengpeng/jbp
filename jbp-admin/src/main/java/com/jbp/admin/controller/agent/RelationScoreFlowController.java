@@ -14,10 +14,7 @@ import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -51,11 +48,11 @@ public class RelationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid, orderuid, request.getOrdersSn(), request.getDateLimit(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid, orderuid, request.getOrdersSn(), request.getDateLimit(),request.getNode(),request.getAction(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:relation:score:flow:excel')")
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     @ApiOperation("服务业绩明细导出")
     public CommonResult<List<RelationScoreFlowVo>> excel(RelationScoreFlowRequest request) {
         if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getOrderAccount()) && StringUtils.isEmpty(request.getOrdersSn())
@@ -78,6 +75,6 @@ public class RelationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(relationScoreFlowService.excel(uid, orderuid, request.getOrdersSn(), request.getDateLimit()));
+        return CommonResult.success(relationScoreFlowService.excel(uid, orderuid, request.getOrdersSn(), request.getDateLimit(),request.getNode(),request.getAction()));
     }
 }

@@ -47,7 +47,7 @@ public class SelfScoreFlowController {
     }
 
     @PreAuthorize("hasAuthority('agent:self:score:flow:excel')")
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     @ApiOperation("个人业绩明细导出")
     public CommonResult<List<SelfScoreFlowVo>> excel(SelfScoreFlowRequest request) {
         if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getAction()) && StringUtils.isEmpty(request.getOrdersSn())

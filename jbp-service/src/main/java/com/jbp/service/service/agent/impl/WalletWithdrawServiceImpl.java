@@ -106,12 +106,6 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         walletWithdrawExcelInfoVo.setList(voList);
         return walletWithdrawExcelInfoVo;
     }
-
-    private void getRequestTimeWhere(LambdaQueryWrapper<WalletWithdraw> lqw, String dateLimit) {
-        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), WalletWithdraw::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
-    }
-
     @Override
     public WalletWithdraw create(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, String postscript) {
         if (amt == null || ArithmeticUtils.less(amt, BigDecimal.ZERO)) {

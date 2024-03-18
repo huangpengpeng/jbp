@@ -8,6 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.RelationScoreRequest;
 import com.jbp.common.request.agent.RelationScoreUpdateRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.RelationScoreVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.util.StringUtils;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/relation/score")
@@ -41,7 +43,7 @@ public class RelationScoreController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, request.getDateLimit(), pageParamRequest)));
     }
 
 
@@ -98,4 +100,22 @@ public class RelationScoreController {
         return CommonResult.success();
     }
 
+    @PreAuthorize("hasAuthority('agent:relation:score:fake:excel')")
+    @GetMapping("/excel")
+    @ApiOperation("服务业绩汇总导出")
+    public CommonResult<List<RelationScoreVo>> excel(RelationScoreRequest request) {
+        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getDateLimit())) {
+            throw new CrmebException("请选择一个过滤条件");
+        }
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(relationScoreService.excel(uid, request.getDateLimit()));
+
+    }
 }

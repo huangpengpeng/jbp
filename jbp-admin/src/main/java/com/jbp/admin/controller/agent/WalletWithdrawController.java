@@ -52,7 +52,7 @@ public class WalletWithdrawController {
     }
 
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:excel')")
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     @ApiOperation("钱包导出数据")
     public CommonResult<WalletWithdrawExcelInfoVo> excel(WalletWithdrawPageRequest request) {
         if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getWalletName()) && StringUtils.isEmpty(request.getStatus())

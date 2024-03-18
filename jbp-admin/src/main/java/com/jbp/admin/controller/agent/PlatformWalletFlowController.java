@@ -33,7 +33,7 @@ public class PlatformWalletFlowController {
         return CommonResult.success(CommonPage.restPage(platformWalletFlowService.pageList(type, dateLimit, externalNo, pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:platform:wallet:excel')")
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     @ApiOperation("平台积分详情导出")
     public CommonResult<List<PlatformWalletFlowVo>> excel(Integer type, String dateLimit, String externalNo){
         if (ObjectUtil.isEmpty(type)&& ObjectUtil.isEmpty(dateLimit)&& ObjectUtil.isEmpty(externalNo)) {
