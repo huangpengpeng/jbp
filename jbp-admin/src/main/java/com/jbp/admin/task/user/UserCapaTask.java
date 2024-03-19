@@ -7,6 +7,7 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,10 @@ public class UserCapaTask {
         // cron : 0 0 1 * * ?
         logger.info("---UserCapaTask refreshUserCapa------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
         if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapa"))){
+            logger.info("---UserCapaTask refreshUserCapa-----未执行完成忽略本次", DateUtil.date());
             return;
         }
+
         stringRedisTemplate.opsForValue().set("refreshUserCapa","1");
         try {
             // 查询没下级的用户
@@ -51,6 +54,9 @@ public class UserCapaTask {
             for (User user : list) {
                 // 所有的上级
                 List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
+                if(CollectionUtils.isEmpty(allUpper)){
+                    userCapaService.riseCapa(user.getId());
+                }
                 // 升级
                 for (UserUpperDto upperDto : allUpper) {
                     userCapaService.riseCapa(upperDto.getUId());

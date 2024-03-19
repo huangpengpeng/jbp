@@ -7,6 +7,7 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserInvitationService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class UserCapaXsTask {
         // cron : 0 0 1 * * ?
         logger.info("---UserCapaXsTask refreshUserCapaXs------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
         if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapaXs"))){
+            logger.info("---UserCapaXsTask refreshUserCapaXs-----未执行完成忽略本次", DateUtil.date());
             return;
         }
         stringRedisTemplate.opsForValue().set("refreshUserCapaXs","1");
@@ -51,6 +53,9 @@ public class UserCapaXsTask {
             for (User user : list) {
                 // 所有的上级
                 List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
+                if(CollectionUtils.isEmpty(allUpper)){
+                    userCapaXsService.riseCapaXs(user.getId());
+                }
                 // 升星
                 for (UserUpperDto upperDto : allUpper) {
                     userCapaXsService.riseCapaXs(upperDto.getUId());

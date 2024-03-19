@@ -25,7 +25,7 @@ public class RelationScoreFlowRequest implements Serializable {
     private String ordersSn;
 
     @ApiModelProperty("点位")
-    private int node;
+    private Integer node;
 
     @ApiModelProperty("方向")
     private String action;

@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,11 @@ public class LimitTempController {
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(limitTempService.pageList(request.getName(), request.getType(), pageParamRequest)));
+    }
+    @GetMapping("/list")
+    @ApiOperation("限制模板列表")
+    public CommonResult<List<LimitTemp>> list(String type) {
+        return CommonResult.success(limitTempService.list(type));
     }
 
     @PreAuthorize("hasAuthority('agent:limit:temp:add')")
