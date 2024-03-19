@@ -13,7 +13,6 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
-import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -27,8 +26,6 @@ import java.util.List;
 @Service
 public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamService {
 
-    @Resource
-    TeamUserService teamUserService;
     @Resource
     private UserInvitationFlowService userInvitationFlowService;
 
