@@ -825,7 +825,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public String getPhone(String account) {
         LambdaQueryWrapper<User> lqw = Wrappers.lambdaQuery();
-        lqw.select(User::getAccount);
+        lqw.eq(User::getAccount,account);
         User one = getOne(lqw);
         return one.getPhone();
     }
