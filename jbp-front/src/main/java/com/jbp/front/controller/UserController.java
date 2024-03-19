@@ -165,9 +165,12 @@ public class UserController {
         }
         // 当前安置节点没有被占用不返回滑落
         UserRelation userRelation = relationService.getByPid(user.getId(), node);
-        if (!Objects.isNull(userRelation)) {
-            return CommonResult.success();
+        if (!invitationService.getNextList(user.getId()).isEmpty()) {
+            if (Objects.isNull(userRelation)) {
+                return CommonResult.success();
+            }
         }
+   
         userRelation = relationService.getLeftMost(user.getId());
         if (userRelation == null) {
             return CommonResult.success();
