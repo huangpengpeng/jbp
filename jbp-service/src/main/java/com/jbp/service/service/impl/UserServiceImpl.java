@@ -821,6 +821,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return ObjectUtil.isNotNull(user);
     }
 
+    @Override
+    public String getPhone(String account) {
+        LambdaQueryWrapper<User> lqw = Wrappers.lambdaQuery();
+        lqw.select(User::getAccount);
+        User one = getOne(lqw);
+        return one.getPhone();
+    }
+
     /**
      * 用户分配标签
      *

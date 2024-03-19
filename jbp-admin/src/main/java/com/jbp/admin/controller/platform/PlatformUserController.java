@@ -65,7 +65,12 @@ public class PlatformUserController {
     public CommonResult<UserAdminDetailResponse> detail(@PathVariable(value = "id") Integer id) {
         return CommonResult.success(userService.getAdminDetail(id));
     }
-
+    @PreAuthorize("hasAuthority('platform:user:phone')")
+    @GetMapping("/phone")
+    @ApiOperation(value = "获取手机号")
+    public CommonResult<String> getPhone(String account) {
+        return CommonResult.success(userService.getPhone(account));
+    }
     @PreAuthorize("hasAuthority('platform:user:tag')")
     @ApiOperation(value = "用户分配标签")
     @RequestMapping(value = "/tag", method = RequestMethod.POST)
