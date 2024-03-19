@@ -19,9 +19,7 @@ import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.UserBill;
 import com.jbp.common.model.order.Order;
@@ -672,17 +670,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             //获取等级名称
             UserCapa userCapa = userCapaService.getByUser(user.getId());
             if (!ObjectUtil.isNull(userCapa)) {
-                userResponse.setCapaName(capaService.getById(userCapa.getCapaId()).getName());
+                Capa capa = capaService.getById(userCapa.getCapaId());
+                userResponse.setCapaName(capa != null ? capa.getName() : "");
             }
             //获取星级名称
             UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
             if (!ObjectUtil.isNull(userCapaXs)) {
-                userResponse.setCapaXsName(capaXsService.getById(userCapaXs.getCapaId()).getName());
+                CapaXs capaXs = capaXsService.getById(userCapaXs.getCapaId());
+                userResponse.setCapaXsName(capaXs != null ? capaXs.getName() : "");
             }
             //获取团队名称
             TeamUser teamUser = teamUserService.getByUser(user.getId());
             if (!ObjectUtil.isNull(teamUser)) {
-                userResponse.setTeamName(teamService.getById(teamUser.getTid()).getName());
+                Team team = teamService.getById(teamUser.getTid());
+                userResponse.setTeamName(team != null ? team.getName() : "");
             }
             userResponses.add(userResponse);
         }
