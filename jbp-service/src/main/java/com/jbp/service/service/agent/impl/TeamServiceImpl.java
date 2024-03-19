@@ -87,8 +87,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
         }
         Team team = new Team(name, leaderId);
         save(team);
-//        添加团队用户
-        teamUserService.save(leaderId, team.getId());
         userInvitationFlowService.clear(team.getLeaderId());
     }
 

@@ -2,6 +2,7 @@ package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.task.user.UserCapaTask;
+import com.jbp.admin.task.user.UserCapaXsTask;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.user.User;
 import com.jbp.service.service.UserService;
@@ -38,11 +39,9 @@ public class JbpAdminApplication {
 
 //        userCapaXsService.riseCapaXs(95);
 //
-//        StringRedisTemplate stringRedisTemplate = run.getBean(StringRedisTemplate.class);
-//        String s = stringRedisTemplate.opsForValue().get("refreshUserCapa");
-//        stringRedisTemplate.opsForValue().set("refreshUserCapa","1");
-//        stringRedisTemplate.delete("refreshUserCapa");
-//        s = stringRedisTemplate.opsForValue().get("refreshUserCapa");
+//        UserCapaXsTask stringRedisTemplate = run.getBean(UserCapaXsTask.class);
+//        stringRedisTemplate.refreshUserCapaXs();
+
         System.out.println("ok");
     }
 

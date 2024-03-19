@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface UserRelationDao extends BaseMapper<UserRelation> {
-    @Select(" select t1.*, t2.node " +
+    @Select(" select t1.*, t1.userId as uid, t2.node " +
             "        from( " +
             "                select @r as userId,  (select @r := pId  from eb_user_relation where uId = userId) as pId, @I := @I + 1 as level " +
             "        from (select @r := #{uId} ,@I := 0) vars, eb_user_relation h " +

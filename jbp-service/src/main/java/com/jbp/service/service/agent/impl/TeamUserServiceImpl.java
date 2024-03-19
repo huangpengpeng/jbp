@@ -37,10 +37,6 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
 
     @Override
     public TeamUser save(Integer uId, Integer tId) {
-        TeamUser byUser = getByUser(uId);
-        if (!ObjectUtil.isNull(byUser)) {
-            throw new CrmebException(StringUtils.format("%s账号已有团队", userService.getById(uId).getAccount()));
-        }
         TeamUser teamUser = new TeamUser(uId, tId);
         save(teamUser);
         return teamUser;

@@ -7,6 +7,7 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,9 @@ public class UserCapaTask {
             for (User user : list) {
                 // 所有的上级
                 List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
+                if(CollectionUtils.isEmpty(allUpper)){
+                    userCapaService.riseCapa(user.getId());
+                }
                 // 升级
                 for (UserUpperDto upperDto : allUpper) {
                     userCapaService.riseCapa(upperDto.getUId());
