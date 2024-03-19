@@ -92,6 +92,13 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     }
 
     @Override
+    public List<LimitTemp> list(String type) {
+        LambdaQueryWrapper<LimitTemp> lqw=new LambdaQueryWrapper<LimitTemp>()
+                .eq(LimitTemp::getType,type);
+        return list(lqw);
+    }
+
+    @Override
     public List<Long> hasLimits(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId) {
         Long pCapaId, pCapaXsId, rCapaId, rCapaXsId;
         List<Long> list = Lists.newArrayList();
