@@ -144,7 +144,7 @@ public class LimitTemp extends BaseModel {
             }
         }
         if (CollectionUtils.isNotEmpty(this.teamIdList)) {
-            if (CollectionUtils.isEmpty(whiteIdList)) {
+            if (CollectionUtils.isEmpty(teamIdList)) {
                 return false;
             }
             List<Long> AnB = this.teamIdList.stream().filter(teamIdList::contains).collect(Collectors.toList());
