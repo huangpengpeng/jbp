@@ -37,4 +37,5 @@ public interface LimitTempService extends IService<LimitTemp> {
     LimitTempResponse details(Integer id);
 
 
+    List<LimitTemp> list(String type);
 }
