@@ -57,7 +57,8 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "开启隐私协议")
     private Boolean openPrivacyAgreement;
-    @ApiModelProperty(value = "H5配置")
+
+    @ApiModelProperty(value = "开启手机号11位")
     private Boolean mobilePhoneLengthOpen;
 
 }
