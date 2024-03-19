@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +36,7 @@ public class LimitTempController {
     public CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(limitTempService.pageList(request.getName(), request.getType(), pageParamRequest)));
     }
+
     @GetMapping("/list")
     @ApiOperation("限制模板列表")
     public CommonResult<List<LimitTemp>> list(String type) {
@@ -77,8 +77,8 @@ public class LimitTempController {
     @PostMapping("/update")
     public CommonResult update(@RequestBody @Validated LimitTempEditRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
-        if (!request.getId().equals(limitTemp.getId())) {
-            if (!ObjectUtil.isNull(limitTemp)) {
+        if (ObjectUtil.isNotEmpty(limitTemp)) {
+            if (request.getId() != limitTemp.getId()) {
                 return CommonResult.failed("限制模板等级名称已经存在");
             }
         }
