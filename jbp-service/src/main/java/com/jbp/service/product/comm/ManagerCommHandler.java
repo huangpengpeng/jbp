@@ -2,10 +2,10 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.google.common.collect.Lists;
+import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ProductComm;
-import com.jbp.common.model.agent.ProductCommConfig;
-import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +36,7 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
     @Resource
     private UserInvitationService userInvitationService;
     @Resource
-    private UserCapaXsService userCapaXsService;
+    private UserCapaService userCapaService;
     @Resource
     private FundClearingService fundClearingService;
     @Resource
@@ -55,21 +56,6 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
 
     @Override
     public Boolean saveOrUpdate(ProductComm productComm) {
-        // 检查是否存在存在直接更新
-        if (productComm.hasError2()) {
-            throw new CrmebException(ProductCommEnum.管理佣金.getName() + "参数不完整");
-        }
-        // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        Rule rule = getRule(productComm);
-        if(rule == null || rule.getLevel() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)){
-            throw new CrmebException(ProductCommEnum.管理佣金.getName() + "参数不完整");
-        }
-        // 删除数据库的信息
-        productCommService.remove(new LambdaQueryWrapper<ProductComm>()
-                .eq(ProductComm::getProductId, productComm.getProductId())
-                .eq(ProductComm::getType, productComm.getType()));
-        // 保存最新的信息
-        productCommService.save(productComm);
         return true;
     }
 
@@ -95,34 +81,69 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
         if (CollectionUtils.isEmpty(collisionFeeList)) {
             return;
         }
-        // 得奖比例
+
         Rule rule = getRule(null);
         for (CommCalculateResult calculateResult : collisionFeeList) {
             User user = userService.getById(calculateResult.getUid());
             Integer uid = calculateResult.getUid();
-            int i = 0;
-            do {
-                Integer pid = userInvitationService.getPid(uid);
-                if (pid == null) {
-                    break;
-                }
-                UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
-                if (userCapaXs != null) {
-                    BigDecimal amt = calculateResult.getAmt().multiply(rule.getRatio()).setScale(2, BigDecimal.ROUND_DOWN);
-                    if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                        fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.管理佣金.getName(), amt,
-                                null, null, user.getAccount() + "获得社群佣金, 奖励" + ProductCommEnum.管理佣金.getName(), "");
-                    }
-                    i++;
-                }
-                uid = pid;
-            } while (i < rule.getLevel());
-        }
 
+
+            // 往上找拿钱的人
+            BigDecimal upperAmt = calculateResult.getAmt().multiply(rule.getUpperRatio()).setScale(2, BigDecimal.ROUND_DOWN);
+            if(ArithmeticUtils.gt(upperAmt, BigDecimal.ZERO)){
+                List<UserUpperDto> allUpper = userInvitationService.getAllUpper(uid);
+                int i = 1;
+                if(CollectionUtils.isNotEmpty(allUpper)) {
+                    for (UserUpperDto upperDto : allUpper) {
+                        if (i > rule.getUpperLevel() || upperDto.getPId() == null) {
+                            break;
+                        }
+                        UserCapa userCapa = userCapaService.getByUser(upperDto.getPId());
+                        if (userCapa.getCapaId().intValue() >= rule.getCapaId().intValue()) {
+                            fundClearingService.create(upperDto.getPId(), order.getOrderNo(), ProductCommEnum.管理佣金.getName(), upperAmt,
+                                    null, null, user.getAccount() + "获得社群佣金, 奖励下拿" + ProductCommEnum.管理佣金.getName(), "");
+                            i++;
+                        }
+                    }
+                }
+            }
+
+
+
+            BigDecimal underAmt = calculateResult.getAmt().multiply(rule.getUnderRatio()).setScale(2, BigDecimal.ROUND_DOWN);
+            if(ArithmeticUtils.gt(underAmt, BigDecimal.ZERO)){
+                // 往下找拿钱人
+                LinkedList<List<UserInvitation>> levelList = userInvitationService.getLevelList(uid, rule.getUnderLevel());
+                List<UserInvitation> allUser = Lists.newArrayList();
+                levelList.forEach(s->{
+                    allUser.addAll(s);
+                });
+                if (CollectionUtils.isNotEmpty(allUser)) {
+                     Map<Integer, UserCapa> capaMap = userCapaService.getUidMap(allUser.stream().map(UserInvitation::getUId).collect(Collectors.toList()));
+
+                    for (List<UserInvitation> list : levelList) {
+                        if(CollectionUtils.isEmpty(list)){
+                            continue;
+                        }
+                        List<UserInvitation> sendUserList = list.stream().filter(u -> capaMap.get(u.getUId()).getCapaId().intValue() >= rule.getCapaId().intValue()).collect(Collectors.toList());
+                        if(sendUserList.isEmpty()){
+                            continue;
+                        }
+                        BigDecimal userAmt = underAmt.divide(BigDecimal.valueOf(sendUserList.size()), 2, BigDecimal.ROUND_DOWN);
+                        if(ArithmeticUtils.gt(userAmt, BigDecimal.ZERO)){
+                            for (UserInvitation userInvitation : sendUserList) {
+                                fundClearingService.create(userInvitation.getUId(), order.getOrderNo(), ProductCommEnum.管理佣金.getName(), userAmt,
+                                        null, null, user.getAccount() + "获得社群佣金, 奖励上拿" + ProductCommEnum.管理佣金.getName(), "");
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {
-        Rule rule = new Rule(3, BigDecimal.valueOf(0.1));
+        Rule rule = new Rule(11L, 7, BigDecimal.valueOf(0.03), 3, BigDecimal.valueOf(0.03));
         System.out.println(JSONObject.toJSONString(rule));
     }
 
@@ -131,14 +152,21 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
-        /**
-         * 层级
-         */
-        private Integer level;
 
-        /**
-         * 比例
-         */
-        private BigDecimal ratio;
+        // 等级要求
+        private Long capaId;
+
+        // 往上找几层
+        private int upperLevel;
+
+        // 往上分佣拿钱
+        private BigDecimal upperRatio;
+
+        // 往下找几层
+        private int underLevel;
+
+        // 往下分佣拿钱
+        private BigDecimal underRatio;
     }
+
 }
