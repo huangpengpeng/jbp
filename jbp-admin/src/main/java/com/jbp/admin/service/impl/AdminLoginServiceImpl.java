@@ -141,7 +141,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
                 throw new CrmebException("手机号不存在或验证码错误");
             }
             try {
-                request.setPwd(CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount()));
+              //  request.setPwd(CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount()));
                 request.setAccount(systemAdmin.getAccount());
             } catch (Exception e) {
                 throw new CrmebException(e.getMessage());
@@ -355,7 +355,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         SystemAdmin systemAdmin = new SystemAdmin();
         systemAdmin.setId(admin.getId());
         systemAdmin.setRealName(request.getRealName());
-        String pwd = CrmebUtil.encryptPassword(request.getPassword(), admin.getAccount());
+        String pwd = CrmebUtil.encryptPassword(request.getPassword());
         systemAdmin.setPwd(pwd);
         return systemAdminService.updateById(systemAdmin);
     }

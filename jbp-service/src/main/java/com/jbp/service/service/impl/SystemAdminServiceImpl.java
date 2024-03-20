@@ -182,7 +182,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
         SystemAdmin systemAdmin = new SystemAdmin();
         BeanUtils.copyProperties(systemAdminAddRequest, systemAdmin);
 
-        String pwd = CrmebUtil.encryptPassword(systemAdmin.getPwd(), systemAdmin.getAccount());
+        String pwd = CrmebUtil.encryptPassword(systemAdmin.getPwd());
         systemAdmin.setPwd(pwd);
         systemAdmin.setMerId(currentUser.getMerId());
         systemAdmin.setType(systemRoleService.getRoleTypeByCurrentAdmin());
@@ -223,7 +223,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
         BeanUtils.copyProperties(systemAdminRequest, systemAdmin);
         systemAdmin.setPwd(null);
         if (StrUtil.isNotBlank(systemAdminRequest.getPwd())) {
-            String pwd = CrmebUtil.encryptPassword(systemAdminRequest.getPwd(), systemAdminRequest.getAccount());
+            String pwd = CrmebUtil.encryptPassword(systemAdminRequest.getPwd());
             systemAdmin.setPwd(pwd);
         }
         systemAdmin.setMerId(currentUser.getMerId());

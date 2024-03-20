@@ -25,7 +25,7 @@ public class CommonUtil {
      */
     public static String createPwd(String phone) {
         String password = "Abc" + CrmebUtil.randomCount(10000, 99999);
-        return CrmebUtil.encryptPassword(password, phone);
+        return CrmebUtil.encryptPassword(password);
     }
 
     public static void main(String[] args) {

@@ -211,7 +211,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getAccount()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword()).equals(user.getPwd())) {
             throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
@@ -231,7 +231,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(),loginRequest.getAccount().toUpperCase()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword()).equals(user.getPwd())) {
             throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
