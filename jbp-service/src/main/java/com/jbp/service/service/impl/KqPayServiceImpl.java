@@ -39,7 +39,8 @@ public class KqPayServiceImpl implements KqPayService {
         MyRecord myRecord = systemConfigService.getValuesByKeyList(Lists.newArrayList("kq_merchantAcctId", "kq_applyName",
                 "kq_host", "kq_terminalIp", "kq_status"));
         KqPayInfoResult result = new KqPayInfoResult();
-        result.setMerchantAcctId(myRecord.getStr("kq_merchantAcctId"));
+        result.setMerchantCode(myRecord.getStr("kq_merchantCode"));
+        result.setMerchantId(myRecord.getStr("kq_merchantId"));
         result.setApplyName(myRecord.getStr("kq_applyName"));
         result.setTerminalIp(myRecord.getStr("kq_terminalIp"));
         result.setHost(myRecord.getStr("kq_host"));
@@ -53,7 +54,7 @@ public class KqPayServiceImpl implements KqPayService {
     public String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, String pageUrl, Date orderTime) {
         KqPayInfoResult kpInfo = get();
         KqCashierParams params = new KqCashierParams();
-        params.setMerchantAcctId(kpInfo.getMerchantAcctId()+"01");
+        params.setMerchantAcctId(kpInfo.getMerchantCode()+"01");
         params.setPageUrl(pageUrl);
         params.setBgUrl(kpInfo.getHost() + "/api/publicly/payment/callback/kq/" + orderId);
         params.setPayerId(payerId);
@@ -79,10 +80,10 @@ public class KqPayServiceImpl implements KqPayService {
     @Override
     public KqPayQueryResult queryPayResult(String orderId) {
         KqPayInfoResult payInfo = get();
-        KqHeadParams head = new KqHeadParams("1.0.0", "F0003", payInfo.getMerchantAcctId(), CrmebUtil.getOrderNo("KQQ_"));
+        KqHeadParams head = new KqHeadParams("1.0.0", "F0003", payInfo.getMerchantCode(), CrmebUtil.getOrderNo("KQQ_"));
         KqPayQueryParams body = new KqPayQueryParams();
         body.setOrderId(orderId);
-        body.setMerchantAcctId(payInfo.getMerchantAcctId() + "01");
+        body.setMerchantAcctId(payInfo.getMerchantCode() + "01");
         JSONObject originalString = new JSONObject();
         originalString.put("head", head);
         originalString.put("requestBody", body);
@@ -110,7 +111,7 @@ public class KqPayServiceImpl implements KqPayService {
     @Override
     public KqRefundResult refund(String orderId, String refundId, BigDecimal amt, Date refundTime) {
         KqPayInfoResult payInfo = get();
-        KqHeadParams head = new KqHeadParams("1.0.0", "F0001", payInfo.getMerchantAcctId(), refundId);
+        KqHeadParams head = new KqHeadParams("1.0.0", "F0001", payInfo.getMerchantCode(), refundId);
         KqRefundParams body = new KqRefundParams();
         body.setMerchantAcctId(head.getMemberCode());
         body.setAmount(String.valueOf(amt.multiply(BigDecimal.valueOf(100)).intValue()));
@@ -142,7 +143,7 @@ public class KqPayServiceImpl implements KqPayService {
     @Override
     public KqRefundQueryResult queryRefundResult(String refundId, Date refundTime) {
         KqPayInfoResult payInfo = get();
-        KqHeadParams head = new KqHeadParams("1.0.0", "F0002", payInfo.getMerchantAcctId(), CrmebUtil.getOrderNo("KQQ_"));
+        KqHeadParams head = new KqHeadParams("1.0.0", "F0002", payInfo.getMerchantCode(), CrmebUtil.getOrderNo("KQQ_"));
         KqRefundQueryParams body = new KqRefundQueryParams();
         body.setMerchantAcctId(head.getMemberCode() + "01");
         body.setStartDate(DateTimeUtils.format(DateTimeUtils.addHours(refundTime, -1), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
@@ -213,9 +214,4 @@ public class KqPayServiceImpl implements KqPayService {
         return returns;
     }
 
-    public static void main(String[] args) {
-        final BigDecimal multiply = BigDecimal.valueOf(0.01).multiply(BigDecimal.valueOf(100));
-        System.out.println(String.valueOf(multiply.intValue()));
-        System.out.println(multiply.toPlainString());
-    }
 }

@@ -26,19 +26,19 @@ public class Bill99ConfigInfo {
     }
 
 
-    public void refresh(int type) {
-        if(type==0){
-            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
-            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path")).getPath();
-            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
-        }
-        if(type==1){
-            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path2")).getPath();
-            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path2")).getPath();
-            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path2")).getPath();
-        }
-
-    }
+//    public void refresh(int type) {
+//        if(type==0){
+//            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
+//            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path")).getPath();
+//            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
+//        }
+//        if(type==1){
+//            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path2")).getPath();
+//            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path2")).getPath();
+//            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path2")).getPath();
+//        }
+//
+//    }
 
 
     /**

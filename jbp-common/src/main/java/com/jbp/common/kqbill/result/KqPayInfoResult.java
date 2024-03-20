@@ -12,7 +12,12 @@ public class KqPayInfoResult implements Serializable {
     /**
      * 商户编号
      */
-    private String merchantAcctId;
+    private String merchantCode;
+
+    /**
+     * 商户ID
+     */
+    private String merchantId;
 
     /**
      * 应用标识

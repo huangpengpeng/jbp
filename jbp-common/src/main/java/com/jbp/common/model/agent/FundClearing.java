@@ -26,7 +26,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "eb_fund_clearing", autoResultMap = true)
-@ApiModel(value="FundClearing对象", description="佣金发放记录")
+@ApiModel(value = "FundClearing对象", description = "佣金发放记录")
 public class FundClearing extends VersionModel {
 
     public FundClearing(Integer uid, String externalNo, String commName, BigDecimal commAmt, UserInfo userInfo,
@@ -44,6 +44,7 @@ public class FundClearing extends VersionModel {
         this.description = description;
         this.status = Constants.已创建.toString();
         this.remark = remark;
+        this.ifRefund = false;
         this.createTime = DateTimeUtils.getNow();
     }
 
@@ -108,6 +109,9 @@ public class FundClearing extends VersionModel {
     @ApiModelProperty("结算状态  已创建  待审核  待出款  已出款  已取消  已拦截")
     @TableField("status")
     private String status;
+
+    @ApiModelProperty("是否退回")
+    private Boolean ifRefund;
 
     @ApiModelProperty("备注")
     @TableField("remark")
