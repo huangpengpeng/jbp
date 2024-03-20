@@ -1,6 +1,8 @@
 package com.jbp.common.kqbill.contants;
 
 
+import com.jbp.common.model.system.SystemConfig;
+import com.jbp.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -13,10 +15,12 @@ public class Bill99ConfigInfo {
     @Autowired
     private Environment environment;
 
-
     @PostConstruct
     private void init() {
         Bill99ConfigInfo.UMGW_ENV = environment.getProperty("kq.env");
+        if(StringUtils.isEmpty(environment.getProperty("kq.env"))){
+            return;
+        }
         Bill99ConfigInfo.DE_PRI_NAME = environment.getProperty("kq.privateKey.name");
         Bill99ConfigInfo.DE_PRI_PWD = environment.getProperty("kq.privateKey.password");
         Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
@@ -25,20 +29,6 @@ public class Bill99ConfigInfo {
         Bill99ConfigInfo.SSL_PRI_PWD = environment.getProperty("kq.ssl.privateKey.password");
     }
 
-
-//    public void refresh(int type) {
-//        if(type==0){
-//            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
-//            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path")).getPath();
-//            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
-//        }
-//        if(type==1){
-//            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path2")).getPath();
-//            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path2")).getPath();
-//            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path2")).getPath();
-//        }
-//
-//    }
 
 
     /**

@@ -183,3 +183,16 @@ jeecg:
       - 20
       - 30
       - 40
+
+kq:
+  env: prod
+  privateKey:
+    path: "/certs/fny/20230404.3300000457641265.pfx"
+    name: "20230404.3300000457641265"
+    password: 123456
+  publicKey:
+    path: "/certs/fny/99bill.RSA.cerr"
+  ssl:
+    privateKey:
+      path: "/certs/fny/sandbox.ssl.pfx"
+      password: "123456"
