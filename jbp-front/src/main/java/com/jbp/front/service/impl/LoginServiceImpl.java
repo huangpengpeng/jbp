@@ -227,11 +227,11 @@ public class LoginServiceImpl implements LoginService {
             throw new CrmebException("密码不能为空");
         }
         //查询用户信息
-        User user = userService.getByAccount(loginRequest.getAccount());
+        User user = userService.getByAccount(loginRequest.getAccount().toUpperCase());
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(),loginRequest.getAccount()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(),loginRequest.getAccount().toUpperCase()).equals(user.getPwd())) {
             throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
@@ -548,6 +548,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN);
         keyList.add(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN);
         keyList.add(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN);
+        keyList.add(SysConfigConstants.ORDER_REFUND_OPEN);
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
@@ -563,6 +564,7 @@ public class LoginServiceImpl implements LoginService {
         response.setOpenAccountLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
         response.setOpenPrivacyAgreement(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
         response.setMobilePhoneLengthOpen(record.getStrBoolean(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN));
+        response.setOrderRefundOpen(record.getStrBoolean(SysConfigConstants.ORDER_REFUND_OPEN));
         return response;
     }
 

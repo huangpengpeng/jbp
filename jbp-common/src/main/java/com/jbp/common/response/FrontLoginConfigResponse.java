@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 
 /**
@@ -60,5 +61,7 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "开启手机号11位")
     private Boolean mobilePhoneLengthOpen;
+    @ApiModelProperty(value = "申请退款")
+    private Boolean orderRefundOpen;
 
 }
