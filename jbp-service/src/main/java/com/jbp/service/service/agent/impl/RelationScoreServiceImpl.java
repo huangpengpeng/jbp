@@ -148,46 +148,81 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         return flow;
     }
 
+
+
+
     @Override
-    public void operateIncreaseUsable(Integer uid, int score, int node, String ordersSn, Date payTime, String remark) {
+    public void operateUsable(Integer uid, BigDecimal score, int node, String ordersSn, Date payTime, String remark, Boolean ifAdd) {
+        RelationScore relationScore = getByUser(uid, node);
+        // 减少
+        if (BooleanUtils.isFalse(ifAdd)) {
+            if (relationScore == null || ArithmeticUtils.less(relationScore.getUsableScore(), score)) {
+                throw new CrmebException("可用积分不足");
+            }
+            relationScore.setUsableScore(relationScore.getUsableScore().subtract(score));
+            updateById(relationScore);
+            Boolean ifSuccess = updateById(relationScore);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
+            RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
+                    "调分可用", "减少", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+            relationScoreFlowService.save(flow);
+            return;
+        }
+        // 增加
+        if (BooleanUtils.isTrue(ifAdd) && relationScore == null) {
+            relationScore = new RelationScore(uid, node);
+            save(relationScore);
+        }
         int backNode = node == 0 ? 1 : 0;
         final RelationScore backRelationScore = getByUser(uid, backNode);
         if (backRelationScore != null && ArithmeticUtils.gt(backRelationScore.getUsableScore(), BigDecimal.ZERO)) {
             throw new CrmebException("反方向存在可用积分不允许新增");
         }
-
-        RelationScore relationScore = getByUser(uid, node);
-        if (relationScore == null) {
-            relationScore = new RelationScore(uid, node);
-            save(relationScore);
-        }
-        // 更新可用
-        relationScore.setUsableScore(relationScore.getUsableScore().add(BigDecimal.valueOf(score)));
-        updateById(relationScore);
-        // 增加明细
-        RelationScoreFlow flow = new RelationScoreFlow(uid, null, BigDecimal.valueOf(score), node,
-                "调分", "增加", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
-        relationScoreFlowService.save(flow);
-    }
-
-    @Override
-    public void operateReduceUsable(Integer uid, BigDecimal score, int node, String ordersSn, Date payTime, String remark, Boolean ifUpdateUsed) {
-        RelationScore relationScore = getByUser(uid, node);
-        if (relationScore == null || ArithmeticUtils.less(relationScore.getUsableScore(), score)) {
-            throw new CrmebException("积分不足");
-        }
-        // 更新可用
-        relationScore.setUsableScore(relationScore.getUsableScore().subtract(score));
-        if (BooleanUtils.isTrue(ifUpdateUsed)) {
-            relationScore.setUsedScore(relationScore.getUsedScore().add(score));
-        }
+        relationScore.setUsableScore(relationScore.getUsableScore().add(score));
         Boolean ifSuccess = updateById(relationScore);
         if (BooleanUtils.isNotTrue(ifSuccess)) {
             throw new CrmebException("当前操作人数过多");
         }
         // 增加明细
         RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
-                BooleanUtils.isTrue(ifUpdateUsed) ? "调分" : "调分2", "减少", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+                "调分可用", "增加", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+        relationScoreFlowService.save(flow);
+    }
+
+    @Override
+    public void operateUsed(Integer uid, BigDecimal score, int node, String ordersSn, Date payTime, String remark, Boolean ifAdd) {
+        RelationScore relationScore = getByUser(uid, node);
+        // 减少
+        if (BooleanUtils.isFalse(ifAdd)) {
+            if (relationScore == null || ArithmeticUtils.less(relationScore.getUsedScore(), score)) {
+                throw new CrmebException("已用积分不足");
+            }
+            relationScore.setUsedScore(relationScore.getUsedScore().subtract(score));
+            updateById(relationScore);
+            Boolean ifSuccess = updateById(relationScore);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
+            RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
+                    "调分已用", "减少", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
+            relationScoreFlowService.save(flow);
+            return;
+        }
+        // 增加
+        if (BooleanUtils.isTrue(ifAdd) && relationScore == null) {
+            relationScore = new RelationScore(uid, node);
+            save(relationScore);
+        }
+        relationScore.setUsedScore(relationScore.getUsedScore().add(score));
+        Boolean ifSuccess = updateById(relationScore);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
+        // 增加明细
+        RelationScoreFlow flow = new RelationScoreFlow(uid, null, score, node,
+                "调分已用", "增加", ordersSn, payTime, null, remark, 0, BigDecimal.ZERO, BigDecimal.ZERO);
         relationScoreFlowService.save(flow);
     }
 
