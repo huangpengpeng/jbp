@@ -8,6 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public interface UserInvitationService extends IService<UserInvitation> {
@@ -15,6 +16,10 @@ public interface UserInvitationService extends IService<UserInvitation> {
     UserInvitation getByUser(Integer uId);
 
     List<UserInvitation> getNextList(Integer uid);
+
+    List<UserInvitation> getNextList(List<Integer> uid);
+
+    LinkedList<List<UserInvitation>> getLevelList(Integer uid, int level);
 
     Integer getPid(Integer uId);
 

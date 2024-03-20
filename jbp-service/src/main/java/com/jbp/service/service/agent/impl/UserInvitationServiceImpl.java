@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +70,32 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
         wrapper.eq(UserInvitation::getPId, uid);
         return list(wrapper);
+    }
+
+    @Override
+    public List<UserInvitation> getNextList(List<Integer> uid) {
+        LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
+        wrapper.in(UserInvitation::getPId, uid);
+        return list(wrapper);
+    }
+
+    @Override
+    public LinkedList<List<UserInvitation>> getLevelList(Integer uid, int level) {
+        LinkedList<List<UserInvitation>> linkedList = Lists.newLinkedList();
+        List<Integer> uidList = Lists.newArrayList(uid);
+        for (int i = 0; i < level; i++) {
+            List<UserInvitation> nextList = Lists.newArrayList();
+            if (CollectionUtils.isNotEmpty(uidList)) {
+                nextList = getNextList(uidList);
+            }
+            linkedList.add(nextList);
+            if (CollectionUtils.isEmpty(nextList)) {
+                uidList.clear();
+            } else {
+                uidList = nextList.stream().map(UserInvitation::getUId).collect(Collectors.toList());
+            }
+        }
+        return linkedList;
     }
 
     @Override
