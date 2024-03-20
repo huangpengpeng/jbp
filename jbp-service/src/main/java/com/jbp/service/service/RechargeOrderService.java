@@ -75,4 +75,6 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
      * @return 充值记录
      */
     List<RechargeOrder> findByMonth(String month);
+
+    List<RechargeOrder> getWaitPayList(int intervalMinutes);
 }

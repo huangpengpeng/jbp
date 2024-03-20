@@ -318,4 +318,9 @@ public interface OrderService extends IService<Order> {
      * @return
      */
     List<Order> findExportList(OrderSearchRequest request,Integer id);
+
+    /**
+     * 获取待支付订单
+     */
+    List<Order> getWaitPayList(int intervalMinutes);
 }

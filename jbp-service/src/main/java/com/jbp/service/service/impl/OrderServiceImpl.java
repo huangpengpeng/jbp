@@ -28,10 +28,7 @@ import com.jbp.common.model.user.UserToken;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.FunctionUtil;
-import com.jbp.common.utils.RedisUtil;
-import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
@@ -1117,6 +1114,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         getMerchantStatusWhere(lqw, request.getStatus());
         lqw.orderByDesc(Order::getId);
         return dao.selectList(lqw);
+    }
+
+    @Override
+    public List<Order> getWaitPayList(int intervalMinutes) {
+        Date now = DateTimeUtils.getNow();
+        Date start = DateTimeUtils.addMinutes(now, -intervalMinutes);
+        LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+        lqw.eq(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_PAY);
+        lqw.eq(Order::getLevel, OrderConstants.ORDER_LEVEL_PLATFORM);
+        lqw.eq(Order::getIsDel, false);
+        lqw.eq(Order::getPaid, false);
+        lqw.ge(Order::getCreateTime, start);
+        lqw.le(Order::getCreateTime, now);
+        return list(lqw);
     }
 
     /**

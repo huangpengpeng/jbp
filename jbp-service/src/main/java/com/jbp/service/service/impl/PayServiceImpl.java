@@ -873,6 +873,7 @@ public class PayServiceImpl implements PayService {
             order.setPayMethod("积分支付");
             order.setPayType("wallet");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+            order.setOutTradeNo(null);
             orderService.updateById(order);
             Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
             if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
@@ -1756,7 +1757,8 @@ public class PayServiceImpl implements PayService {
         LianLianPayInfoResult payInfo = lianLianPayService.get();
         List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
         CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), order.getOrderNo(), order.getPayPrice(),
-                payInfo.getNotify_url(), payInfo.getReturn_url() + "/" + order.getOrderNo(), details.get(0).getProductName(), order.getIp());
+                payInfo.getNotify_url(), payInfo.getReturn_url() + "/" + order.getOrderNo(),
+                details.get(0).getProductName(), order.getIp());
         // 更新商户订单号
         order.setOutTradeNo(cashier.getAccp_txno());
         return cashier;

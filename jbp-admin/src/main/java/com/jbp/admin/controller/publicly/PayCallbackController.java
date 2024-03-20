@@ -88,8 +88,8 @@ public class PayCallbackController {
     }
 
     @ApiOperation(value = "连连支付回调")
-    @RequestMapping(value = "/lianlian", method = RequestMethod.POST)
-    public String lianlian(HttpServletRequest request) {
+    @RequestMapping(value = "/lianlian/{txnSeqno}")
+    public String lianLian(@PathVariable("txnSeqno") String txnSeqno, HttpServletRequest request) {
         // 从请求头中获取签名值
         String signature = request.getHeader("Signature-Data");
         BufferedReader reader = null;

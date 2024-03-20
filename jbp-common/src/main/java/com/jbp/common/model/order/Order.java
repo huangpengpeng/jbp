@@ -1,9 +1,6 @@
 package com.jbp.common.model.order;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.mybatis.ProductDeductionListHandler;
 import io.swagger.annotations.ApiModel;
@@ -120,6 +117,7 @@ public class Order implements Serializable {
     private Integer gainIntegral;
 
     @ApiModelProperty(value = "商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String outTradeNo;
 
     @ApiModelProperty(value = "支付重定向地址")

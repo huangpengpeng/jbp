@@ -20,6 +20,7 @@ import com.jbp.common.lianlian.result.LianLianPayInfoResult;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
@@ -31,10 +32,7 @@ import com.jbp.common.request.UserRechargeRequest;
 import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.RechargePackageResponse;
 import com.jbp.common.response.UserRechargeItemResponse;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.CrmebUtil;
-import com.jbp.common.utils.RequestUtil;
-import com.jbp.common.utils.WxPayUtil;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.service.dao.RechargeOrderDao;
 import com.jbp.service.service.*;
@@ -49,10 +47,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -514,6 +509,17 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         lqw.eq(RechargeOrder::getPaid, true);
         lqw.apply("date_format(pay_time, '%Y-%m') = {0}", month);
         return dao.selectList(lqw);
+    }
+
+    @Override
+    public List<RechargeOrder> getWaitPayList(int intervalMinutes) {
+        Date now = DateTimeUtils.getNow();
+        Date start = DateTimeUtils.addMinutes(now, -intervalMinutes);
+        LambdaQueryWrapper<RechargeOrder> lqw = Wrappers.lambdaQuery();
+        lqw.eq(RechargeOrder::getPaid, false);
+        lqw.ge(RechargeOrder::getCreateTime, start);
+        lqw.le(RechargeOrder::getCreateTime, now);
+        return list(lqw);
     }
 }
 
