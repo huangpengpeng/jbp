@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -78,4 +79,10 @@ public class UserCenterResponse implements Serializable {
 
     @ApiModelProperty(value = "个人中心服务")
     private List<HashMap<String, Object>> centerMenu;
+
+    @ApiModelProperty(value = "等级图片")
+    private String  capaPic;
+    @ApiModelProperty(value = "星级图片")
+    private String capaXsPic;
+
 }
