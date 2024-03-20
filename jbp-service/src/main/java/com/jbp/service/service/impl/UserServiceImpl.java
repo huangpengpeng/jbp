@@ -183,6 +183,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (!execute) {
             throw new CrmebException("创建用户失败!");
         }
+        //绑定用户账号
+        if (spreadUid != null && spreadUid > 0) {
+            invitationService.band(spreadUid, user.getId(), false, true);
+        }
         return user;
     }
 

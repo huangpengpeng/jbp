@@ -121,6 +121,10 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         if (userInvitation == null) {
             userInvitation = new UserInvitation();
         }
+        //强绑定用户无法换绑
+        if(userInvitation.getIfForce()){
+            return userInvitation ;
+        }
         if (BooleanUtils.isTrue(ifM)) {
             userInvitation.setMId(pId);
         } else {
