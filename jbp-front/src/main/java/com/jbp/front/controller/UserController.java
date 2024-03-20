@@ -170,7 +170,7 @@ public class UserController {
                 return CommonResult.success();
             }
         }
-   
+
         userRelation = relationService.getLeftMost(user.getId());
         if (userRelation == null) {
             return CommonResult.success();
