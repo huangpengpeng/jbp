@@ -78,7 +78,6 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                             "初始化", CrmebUtil.getOrderNo("INIT_"), DateTimeUtils.getNow(), null, "初始化");
                 }
             }
-
         }
     }
 
