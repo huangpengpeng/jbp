@@ -45,6 +45,6 @@ public class RelationScoreUpdateRequest implements Serializable {
     @ApiModelProperty("备注")
     private String remark;
 
-    @ApiModelProperty("是否调整已用, 减少可用的时候需要录入 默认false")
-    private Boolean ifUpdateUsed;
+    @ApiModelProperty("标题 方向 下拉选2个值  增加 true   减少 false  ")
+    private Boolean ifAdd;
 }

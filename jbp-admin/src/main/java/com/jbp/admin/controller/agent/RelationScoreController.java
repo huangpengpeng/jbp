@@ -48,28 +48,28 @@ public class RelationScoreController {
 
 
     @PreAuthorize("hasAuthority('agent:relation:score:increase')")
-    @ApiOperation("增加业绩")
+    @ApiOperation("更新可用")
     @PostMapping("/increase")
     public CommonResult increase(@Validated @RequestBody RelationScoreUpdateRequest request) {
         User user = userService.getByAccount(request.getAccount());
         if (user == null) {
             throw new CrmebException("账号信息错误");
         }
-        relationScoreService.operateIncreaseUsable(user.getId(),
-                request.getScore().intValue(), request.getNode(), request.getOrdersSn(), request.getPayTime(), request.getRemark());
+        relationScoreService.operateUsable(user.getId(),
+                request.getScore(), request.getNode(), request.getOrdersSn(), request.getPayTime(), request.getRemark(), request.getIfAdd());
         return CommonResult.success();
     }
 
     @PreAuthorize("hasAuthority('agent:relation:score:reduce')")
-    @ApiOperation("减少业绩")
+    @ApiOperation("更新已用")
     @PostMapping("/reduce")
     public CommonResult reduce(@Validated @RequestBody RelationScoreUpdateRequest request) {
         User user = userService.getByAccount(request.getAccount());
         if (user == null) {
             throw new CrmebException("账号信息错误");
         }
-        relationScoreService.operateReduceUsable(user.getId(), request.getScore(), request.getNode(),
-                request.getOrdersSn(), request.getPayTime(), request.getRemark(), request.getIfUpdateUsed());
+        relationScoreService.operateUsed(user.getId(),
+                request.getScore(), request.getNode(), request.getOrdersSn(), request.getPayTime(), request.getRemark(), request.getIfAdd());
         return CommonResult.success();
     }
 
