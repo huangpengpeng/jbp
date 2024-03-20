@@ -337,6 +337,26 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         }
     }
 
+
+    @Override
+    public void updateIfRefund(List<Long> ids, String remark) {
+        if (CollectionUtils.isEmpty(ids)) {
+            throw new CrmebException("请选择佣金发放记录");
+        }
+        List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().in(FundClearing::getId, ids).in(FundClearing::getStatus, FundClearing.Constants.已出款));
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        List<List<FundClearing>> partition = Lists.partition(list, 100);
+        for (List<FundClearing> fundClearingList : partition) {
+            for (FundClearing fundClearing : fundClearingList) {
+                fundClearing.setIfRefund(true);
+                fundClearing.setRemark(remark);
+            }
+            updateBatchById(fundClearingList);
+        }
+    }
+
     @Override
     public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");

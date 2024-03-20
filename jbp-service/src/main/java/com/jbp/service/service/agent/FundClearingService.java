@@ -87,4 +87,6 @@ public interface FundClearingService extends IService<FundClearing> {
     Map<String, Object> totalGet(Integer uid);
 
     PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest);
+
+    void updateIfRefund(List<Long> ids, String remark);
 }

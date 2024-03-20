@@ -17,6 +17,7 @@ import com.jbp.service.service.agent.FundClearingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.xml.core.Validate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -133,4 +134,12 @@ public class FundClearingController {
         fundClearingService.updateSendAmt(request.getId(), request.getSendAmt(), request.getRemark());
         return CommonResult.success();
     }
+    @PreAuthorize("hasAuthority('agent:fund:clearing:update:if:refund')")
+    @PostMapping("/update/if/refund")
+    @ApiOperation("标记退回")
+    public CommonResult updateIfRefund(@RequestBody @Validated FundClearingUpdateRequest request) {
+        fundClearingService.updateIfRefund(request.getIds(),request.getRemark());
+        return CommonResult.success();
+    }
+
 }
