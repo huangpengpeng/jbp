@@ -547,6 +547,8 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN);
         keyList.add(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN);
         keyList.add(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN);
+        keyList.add(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN);
+
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
@@ -560,6 +562,7 @@ public class LoginServiceImpl implements LoginService {
         response.setOpenMobileLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN));
         response.setOpenAccountLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
         response.setOpenPrivacyAgreement(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
+        response.setMobilePhoneLengthOpen(record.getStrBoolean(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN));
         return response;
     }
 

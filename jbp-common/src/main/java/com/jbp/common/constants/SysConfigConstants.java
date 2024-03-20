@@ -117,6 +117,7 @@ public class SysConfigConstants {
     public static final String CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN = "login_privacy_agreement_open";
     /** 手机号验证码登录默认注册 */
     public static final String CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN = "mobile_default_register_open";
+    public static final String MOBILE_PHONE_LENGTH_OPEN="mobile_phone_length_open";
 
 
     /** 用户默认头像 */

@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +36,7 @@ public class LimitTempController {
     public CommonResult<CommonPage<LimitTemp>> pageList(LimitTempRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(limitTempService.pageList(request.getName(), request.getType(), pageParamRequest)));
     }
+
     @GetMapping("/list")
     @ApiOperation("限制模板列表")
     public CommonResult<List<LimitTemp>> list(String type) {
@@ -51,8 +51,8 @@ public class LimitTempController {
         if (!ObjectUtil.isNull(limitTemp)) {
             return CommonResult.failed("限制模板等级名称已经存在");
         }
-        if (CollectionUtils.isEmpty(request.getCapaIdList()) && CollectionUtils.isEmpty(request.getCapaXsIdList()) && CollectionUtils.isEmpty(request.getTeamIdList()) && !request.getHasPartner() && !request.getHasRelation()) {
-            throw new CrmebException("等级、星级、团队、销售上级、服务上级必须选填一个否则无法提交");
+        if (CollectionUtils.isEmpty(request.getCapaIdList()) && CollectionUtils.isEmpty(request.getCapaXsIdList()) && CollectionUtils.isEmpty(request.getTeamIdList()) && !request.getHasPartner() && !request.getHasRelation()&&CollectionUtils.isEmpty( request.getWhiteIdList())) {
+            throw new CrmebException("等级、星级、团队、销售上级、服务上级、白名单、必须选填一个否则无法提交");
         }
         if (request.getHasPartner() && CollectionUtils.isEmpty(request.getPCapaIdList()) && CollectionUtils.isEmpty(request.getPCapaXsIdList())) {
             throw new CrmebException("销售上级请设置对应上级等级和星级");
@@ -77,13 +77,13 @@ public class LimitTempController {
     @PostMapping("/update")
     public CommonResult update(@RequestBody @Validated LimitTempEditRequest request) {
         LimitTemp limitTemp = limitTempService.getByName(request.getName());
-        if (!request.getId().equals(limitTemp.getId())) {
-            if (!ObjectUtil.isNull(limitTemp)) {
+        if (ObjectUtil.isNotEmpty(limitTemp)) {
+            if (request.getId() != limitTemp.getId()) {
                 return CommonResult.failed("限制模板等级名称已经存在");
             }
         }
-        if (CollectionUtils.isEmpty(request.getCapaIdList()) && CollectionUtils.isEmpty(request.getCapaXsIdList()) && CollectionUtils.isEmpty(request.getTeamIdList()) && !request.getHasPartner() && !request.getHasRelation()) {
-            throw new CrmebException("等级、星级、团队、销售上级、服务上级必须选填一个否则无法提交");
+        if (CollectionUtils.isEmpty(request.getCapaIdList()) && CollectionUtils.isEmpty(request.getCapaXsIdList()) && CollectionUtils.isEmpty(request.getTeamIdList()) && !request.getHasPartner() && !request.getHasRelation()&&CollectionUtils.isEmpty( request.getWhiteIdList())) {
+            throw new CrmebException("等级、星级、团队、销售上级、服务上级、白名单、必须选填一个否则无法提交");
         }
         if (request.getHasPartner() && CollectionUtils.isEmpty(request.getPCapaIdList()) && CollectionUtils.isEmpty(request.getPCapaXsIdList())) {
             throw new CrmebException("销售上级请设置对应上级等级和星级");
