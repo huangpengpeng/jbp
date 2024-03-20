@@ -9,6 +9,8 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserCapaXsSnapshot;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.record.BrowseRecord;
 import com.jbp.common.model.sgin.UserSignRecord;
@@ -28,6 +30,7 @@ import com.jbp.front.service.UserCenterService;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,6 +92,8 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     private CommunityNotesService communityNotesService;
     @Resource
     private UserCapaService userCapaService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
 
 
     /**
@@ -136,6 +141,8 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         }
         UserCapa capa = userCapaService.getByUser(uid);
         response.setCapaPic(capa != null ? capa.getCapaUrl() : "");
+        UserCapaXs capaXs = userCapaXsService.getByUser(uid);
+        response.setCapaXsPic(capaXs != null ? capaXs.getCapaUrl() : "");
         // 保存用户访问记录
         asyncService.visitUserCenter(user.getId());
         return response;
