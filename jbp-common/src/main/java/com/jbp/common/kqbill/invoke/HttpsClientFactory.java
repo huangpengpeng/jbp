@@ -25,7 +25,7 @@ public class HttpsClientFactory {
         SSLContextBuilder builder = SSLContexts.custom();
         // 加载客户端证书
         if(httpClientCert.getKeyStore() != null) {
-            if(StringUtils.isNotEmpty(httpClientCert.getKeyStorePwd())) {
+            if(StringUtils.isEmpty(httpClientCert.getKeyStorePwd())) {
                 builder = builder.loadKeyMaterial(httpClientCert.getKeyStore() , null);
             }else {
                 builder = builder.loadKeyMaterial(httpClientCert.getKeyStore() , httpClientCert.getKeyStorePwd().toCharArray());

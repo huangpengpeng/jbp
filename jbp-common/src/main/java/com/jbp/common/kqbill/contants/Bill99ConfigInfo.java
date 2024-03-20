@@ -1,69 +1,93 @@
 package com.jbp.common.kqbill.contants;
 
 
-import com.jbp.common.kqbill.utils.Bill99CertConfigLoader;
-import com.jbp.common.kqbill.utils.PropertiesLoader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
+@Component
 public class Bill99ConfigInfo {
 
-    /**
-     * 加载快钱UMGW接口配置文件
-     */
-    private static final PropertiesLoader propertiesLoader =
-            new PropertiesLoader("classpath:bill99-interface-umgw-config.properties");
+    @Autowired
+    private Environment environment;
 
 
-    /**
-     * 接口商户号信息
-     */
-    public static final String MEMBER_CODE = propertiesLoader.getProperty("merchant.memberCode");
-    public static final String MERCHANT_ID = propertiesLoader.getProperty("merchant.merchantId");
-    public static final String TERMINAL_ID = propertiesLoader.getProperty("merchant.terminalId");
+    @PostConstruct
+    private void init() {
+        Bill99ConfigInfo.UMGW_ENV = environment.getProperty("kq.env");
+        Bill99ConfigInfo.DE_PRI_NAME = environment.getProperty("kq.privateKey.name");
+        Bill99ConfigInfo.DE_PRI_PWD = environment.getProperty("kq.privateKey.password");
+        Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
+        Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path")).getPath();
+        Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
+        Bill99ConfigInfo.SSL_PRI_PWD = environment.getProperty("kq.ssl.privateKey.password");
+    }
+
+
+    public void refresh(int type) {
+        if(type==0){
+            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
+            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path")).getPath();
+            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
+        }
+        if(type==1){
+            Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path2")).getPath();
+            Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path2")).getPath();
+            Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path2")).getPath();
+        }
+
+    }
+
 
     /**
      * 请求快钱环境配置信息
      */
-    public static final String UMGW_ENV = propertiesLoader.getProperty("bill99.umgw.env");
-
+    public static String UMGW_ENV;
     /**
-     * 通用接口地址配置信息
+     * 默认证书配置信息
      */
-    public static final String UMGW_SANDBOX_URL = propertiesLoader.getProperty("bill99.umgw.sandbox.url");
-    public static final String UMGW_PROD_URL = propertiesLoader.getProperty("bill99.umgw.prod.url");
+    public static String DE_PRI_PATH;
+    public static String DE_PUB_PATH;
+    public static String SSL_PRI_PATH;
 
-    /**
-     * 进件接口地址配置信息
-     */
-    public static final String UMGW_BOSS_SANDBOX_URL = propertiesLoader.getProperty("bill99.umgw.boss.sandbox.url");
-    public static final String UMGW_BOSS_PROD_URL = propertiesLoader.getProperty("bill99.umgw.boss.prod.url");
 
-    /**
-     * 进件接口messageType配置信息
-     */
-    public static final String UMGW_BOSS_MESSAGETYPE_PREFIX = propertiesLoader.getProperty("bill99.umgw.boss.messageType.prefix");
+    public static String DE_PRI_NAME;
+    public static String DE_PRI_PWD;
+
 
     /**
      * 证书库类型
      */
-    public static final String STORE_TYPE = propertiesLoader.getProperty("keyStore.storeType");
-
-    /**
-     *默认证书配置信息
-     */
-    public static final String DE_PRI_PATH = propertiesLoader.getProperty("default.privateKey.path");
-    public static final String DE_PRI_PWD = propertiesLoader.getProperty("default.privateKey.password");
-    public static final String DE_PUB_PATH = propertiesLoader.getProperty("default.99bill.publicKey.path");
-
-
+    public static final String STORE_TYPE = "PKCS12";
 
 
     /**
-     *SSL通信配置信息
+     * SSL通信配置信息
      */
-    public static final String SSL_PRI_PATH = propertiesLoader.getProperty("ssl.privateKey.path");
-    public static final String SSL_PRI_PWD = propertiesLoader.getProperty("ssl.privateKey.password");
-    public static final String SO_TIMEOUT = propertiesLoader.getProperty("ssl.socket.timeout");
-    public static final String CONN_TIMEOUT = propertiesLoader.getProperty("ssl.conn.timeout");
-    public static final String TLS_VERSION = propertiesLoader.getProperty("ssl.tls.version");
+
+    public static String SSL_PRI_PWD;
+
+    /**
+     * 通用接口地址配置信息
+     */
+    public static final String UMGW_SANDBOX_URL = "https://sandbox.99bill.com:7445/umgw/common/distribute.html";
+    public static final String UMGW_PROD_URL = "https://umgw.99bill.com/umgw/common/distribute.html";
+
+    /**
+     * 进件接口地址配置信息
+     */
+    public static final String UMGW_BOSS_SANDBOX_URL = "https://sandbox.99bill.com:7445/umgw-boss/common/distribute.html";
+    public static final String UMGW_BOSS_PROD_URL = "https://umgw.99bill.com/umgw-boss/common/distribute.html";
+
+    /**
+     * 进件接口messageType配置信息
+     */
+    public static final String UMGW_BOSS_MESSAGETYPE_PREFIX = "BS,PS1,PS2";
+
+    public static final String SO_TIMEOUT = "60000";
+    public static final String CONN_TIMEOUT = "10000";
+    public static final String TLS_VERSION = "TLSv1.2";
 
 }
