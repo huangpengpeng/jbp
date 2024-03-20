@@ -10,12 +10,15 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.InvitationScore;
+import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScore;
 import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.UserService;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -48,6 +52,35 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     private UserInvitationService userInvitationService;
     @Resource
     private SelfScoreService selfScoreService;
+
+//    @PostConstruct
+    public void init() {
+        InvitationScoreFlow one = invitationScoreFlowService.getOne(new QueryWrapper<InvitationScoreFlow>().lambda().
+                like(InvitationScoreFlow::getOperate, "初始化").last("limit 1"));
+        if (one != null) {
+            return;
+        }
+        List<SelfScore> list = selfScoreService.list();
+        for (SelfScore selfScore : list) {
+            List<UserUpperDto> allUpper = userInvitationService.getAllUpper(selfScore.getUid());
+            if (CollectionUtils.isEmpty(allUpper)) {
+                return;
+            }
+            for (UserUpperDto upperDto : allUpper) {
+                if (upperDto.getPId() != null) {
+                    InvitationScore invitationScore = getByUser(upperDto.getPId());
+                    if (invitationScore == null) {
+                        invitationScore = add(upperDto.getPId());
+                    }
+                    invitationScore.setScore(invitationScore.getScore().add(selfScore.getScore()));
+                    updateById(invitationScore);
+                    invitationScoreFlowService.add(upperDto.getPId(), selfScore.getUid(), selfScore.getScore(), "增加",
+                            "初始化", CrmebUtil.getOrderNo("INIT_"), DateTimeUtils.getNow(), null, "初始化");
+                }
+            }
+
+        }
+    }
 
 
     @Override
