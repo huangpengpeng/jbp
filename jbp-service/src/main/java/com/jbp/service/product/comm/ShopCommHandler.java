@@ -98,6 +98,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
         List<FundClearingProduct> productList = Lists.newArrayList();
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         // 订单总PV
+        BigDecimal score = BigDecimal.ZERO;
         BigDecimal amt = BigDecimal.ZERO;
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
@@ -110,6 +111,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             // 总PV
             BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
+            score = score.add(totalPv);
             BigDecimal productAmt = totalPv.multiply(rule.getRatio()).setScale(2, BigDecimal.ROUND_DOWN);
             FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                     orderDetail.getPayNum(), rule.getRatio(), productAmt);
@@ -135,6 +137,12 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             if (openShop != null && BooleanUtils.isTrue(openShop)) {
                 fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
                         null, productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
+
+                int sort = resultList.size() + 1;
+                CommCalculateResult calculateResult = new CommCalculateResult(pid, getType(), ProductCommEnum.店铺佣金.getName(),
+                        null, null, BigDecimal.ZERO,
+                        1, score, BigDecimal.ONE, BigDecimal.ZERO, amt, sort);
+                resultList.add(calculateResult);
                 break;
             }
             uid = pid;
