@@ -234,6 +234,7 @@ public class PayServiceImpl implements PayService {
             throw new CrmebException("订单状态异常");
         }
         User user = userService.getInfo();
+        userService.validPayPwd(user.getId(), orderPayRequest.getPwd());
         // 根据支付类型进行校验,更换支付类型
         order.setPayType(orderPayRequest.getPayType());
         order.setPayChannel(orderPayRequest.getPayChannel());

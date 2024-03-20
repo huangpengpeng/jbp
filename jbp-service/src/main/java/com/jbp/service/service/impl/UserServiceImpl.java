@@ -131,9 +131,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private UserRelationService relationService;
     @Resource
     private OrderExtService orderExtService;
-
     @Resource
     private UserService userService;
+    @Resource
+    private WalletConfigService walletConfigService;
 
 
     /**
@@ -881,6 +882,19 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             userMap.put(user.getId(), user);
         });
         return userMap;
+    }
+
+    @Override
+    public void validPayPwd(Integer uid, String pwd) {
+        User user = getById(uid);
+        if (walletConfigService.hasPwd()) {
+            if (com.jbp.service.util.StringUtils.isEmpty(user.getPayPwd())) {
+                throw new CrmebException("请设置交易密码");
+            }
+            if (!CrmebUtil.encryptPassword(pwd, user.getAccount()).equals(user.getPayPwd())) {
+                throw new CrmebException("交易密码不正确");
+            }
+        }
     }
 
     /**

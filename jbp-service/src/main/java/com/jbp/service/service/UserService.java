@@ -398,4 +398,6 @@ public interface UserService extends IService<User> {
     void registerPhone(String username, String phone, String account,UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd);
 
     String getPhone(String account);
+
+    void validPayPwd(Integer uid, String pwd);
 }

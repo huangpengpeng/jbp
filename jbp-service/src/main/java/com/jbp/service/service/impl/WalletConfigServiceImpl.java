@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.constants.Constants;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
@@ -18,6 +20,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.UserWalletInfoResponse;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.WalletConfigDao;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.ChannelCardService;
@@ -40,6 +43,8 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
     private UserService userService;
     @Resource
     private WalletService walletService;
+    @Resource
+    private SystemConfigService systemConfigService;
 
     @Override
     public PageInfo<WalletConfig> pageList(String name, Integer status, Boolean canWithdraw, Boolean recharge, PageParamRequest pageParamRequest) {
@@ -71,21 +76,21 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
                        Boolean recharge, Boolean canTransfer, BigDecimal changeScale, Integer changeType) {
         WalletConfig walletConfig = getByType(id);
         // 1.设置可支付, 不能同时存在2个可支付的积分
-        if(canPay){
+        if (canPay) {
             WalletConfig canPayWallet = getCanPay();
             if (canPayWallet != null && canPayWallet.getId().compareTo(id) != 0) {
                 throw new CrmebException("可支付积分:" + canPayWallet.getName() + ", 已经存在不允许重复设置");
             }
         }
         // 2.设置可提现, 不能同时存在2个可提现的积分
-        if(canWithdraw){
+        if (canWithdraw) {
             WalletConfig canWithdrawWallet = getCanWithdraw();
             if (canWithdrawWallet != null && canWithdrawWallet.getId().compareTo(id) != 0) {
                 throw new CrmebException("可提现积分:" + canWithdrawWallet.getName() + ", 已经存在不允许重复设置");
             }
         }
         // 3.不允许同时设置抵扣+支付
-        if(canPay && canDeduction){
+        if (canPay && canDeduction) {
             throw new CrmebException("可支付&&可抵扣不能同时设置, 可支付不允许抵扣, 可抵扣不允许可支付");
         }
 
@@ -116,21 +121,27 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
     public Map<Integer, WalletConfig> getWalletMap() {
         return FunctionUtil.keyValueMap(list(), WalletConfig::getType);
     }
+
     @Override
-    public List<UserWalletInfoResponse> getUserWalletInfo(){
+    public List<UserWalletInfoResponse> getUserWalletInfo() {
         List<WalletConfig> list = list();
         List<UserWalletInfoResponse> userWalletInfoResponseList = new ArrayList<>();
         User user = userService.getInfo();
-        list.forEach(e ->{
+        list.forEach(e -> {
 
             UserWalletInfoResponse userWalletInfoResponse = new UserWalletInfoResponse();
             userWalletInfoResponse.setWalletConfig(e);
-            Wallet wallet =  walletService.getByUser(user.getId(),e.getType());
-            userWalletInfoResponse.setBalance(wallet == null ? BigDecimal.ZERO :wallet.getBalance());
+            Wallet wallet = walletService.getByUser(user.getId(), e.getType());
+            userWalletInfoResponse.setBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance());
             userWalletInfoResponseList.add(userWalletInfoResponse);
         });
 
         return userWalletInfoResponseList;
+    }
 
+    @Override
+    public Boolean hasPwd() {
+        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_OPEN_PASSWORD);
+        return Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
     }
 }

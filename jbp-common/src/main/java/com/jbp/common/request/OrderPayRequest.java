@@ -47,4 +47,6 @@ public class OrderPayRequest {
 
     @ApiModelProperty(value = "下单时小程序的场景值")
     private Integer scene;
+
+    private String pwd;
 }
