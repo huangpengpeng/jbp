@@ -25,7 +25,6 @@ import com.jbp.common.vo.AttachVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.WechatPayCallbackVo;
 import com.jbp.service.service.*;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -82,6 +81,8 @@ public class PayCallbackServiceImpl implements PayCallbackService {
     private RefundOrderService refundOrderService;
     @Autowired
     private AliPayCallbackService aliPayCallbackService;
+    @Autowired
+    private LianLianPayService lianLianPayService;
 
     /**
      * 微信支付回调

@@ -37,4 +37,5 @@ public interface PayCallbackService {
     String weChatRefund(String request);
 
     String  lianLianPayCallback(QueryPaymentResult queryPaymentResult);
+
 }
