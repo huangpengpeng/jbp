@@ -11,6 +11,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserToken;
@@ -29,6 +30,7 @@ import com.jbp.front.service.LoginService;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -85,6 +87,8 @@ public class LoginServiceImpl implements LoginService {
     private UserCapaService userCapaService;
     @Autowired
     private CapaService capaService;
+    @Autowired
+    private UserInvitationService userInvitationService;
 
     /**
      * 发送短信验证码
@@ -413,6 +417,11 @@ public class LoginServiceImpl implements LoginService {
                     finalUser.setSpreadTime(CrmebDateUtil.nowDateTime());
                     userService.updateSpreadCountByUid(registerThirdUserRequest.getSpreadPid(), Constants.OPERATION_TYPE_ADD);
                 }
+
+                if (spreadPid > 0) {
+                    userInvitationService.band(finalUser.getId(), spreadPid, false, true, false);
+                }
+
                 userService.save(finalUser);
                 userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType() + ":注册");
 
@@ -423,6 +432,9 @@ public class LoginServiceImpl implements LoginService {
                     bindSpread(finalUser, spreadPid);
                 }
             }
+
+
+
             userTokenService.bind(registerThirdUserRequest.getOpenId(), userTokenType, finalUser.getId());
             return Boolean.TRUE;
         });
