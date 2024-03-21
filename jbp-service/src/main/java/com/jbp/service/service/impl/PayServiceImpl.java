@@ -1755,7 +1755,6 @@ public class PayServiceImpl implements PayService {
      */
     private CashierPayCreateResult lianLianCashierPay(Order order) {
         User user = userService.getById(order.getPayUid());
-        LianLianPayInfoResult payInfo = lianLianPayService.get();
         List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
         CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), order.getOrderNo(), order.getPayPrice(),details.get(0).getProductName(), order.getIp());
         // 更新商户订单号
