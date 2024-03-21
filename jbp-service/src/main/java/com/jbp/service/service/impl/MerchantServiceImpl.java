@@ -1048,14 +1048,14 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         }
         merchant.setPhone(request.getPhone());
         SystemAdmin systemAdmin = adminService.getDetail(merchant.getAdminId());
-        String pwd = "";
-        try {
-            pwd = CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+     //   String pwd = "";
+//        try {
+//            pwd = CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         systemAdmin.setAccount(request.getPhone());
-        systemAdmin.setPwd(CrmebUtil.encryptPassword(pwd, request.getPhone()));
+    //    systemAdmin.setPwd(CrmebUtil.encryptPassword(pwd));
         return transactionTemplate.execute(e -> {
             updateById(merchant);
             adminService.updateById(systemAdmin);

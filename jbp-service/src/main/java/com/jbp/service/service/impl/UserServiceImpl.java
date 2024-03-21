@@ -196,7 +196,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
         User user = new User();
         user.setAccount(account);
-        user.setPwd(CrmebUtil.encryptPassword(pwd, account));
+        user.setPwd(CrmebUtil.encryptPassword(pwd));
         if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
             throw new CrmebException("手机号重复");
         }
@@ -449,7 +449,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         //检测验证码
         checkValidateCode(user.getPhone(), request.getValidateCode());
         //密码
-        user.setPwd(CrmebUtil.encryptPassword(request.getPassword(), user.getAccount()));
+        user.setPwd(CrmebUtil.encryptPassword(request.getPassword()));
         return updateById(user);
     }
 
@@ -585,15 +585,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 throw new CrmebException("手机号已被占用");
             }
         }
-        String password = "";
-        try {
-            password = CrmebUtil.decryptPassowrd(user.getPwd(), user.getPhone());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        String password = "";
+//        try {
+//            password = CrmebUtil.decryptPassowrd(user.getPwd(), user.getPhone());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         LambdaUpdateWrapper<User> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(User::getPhone, request.getPhone());
-        wrapper.set(User::getPwd, CrmebUtil.encryptPassword(password, request.getPhone()));
+     //   wrapper.set(User::getPwd, CrmebUtil.encryptPassword(user.getPwd()));
         wrapper.eq(User::getId, user.getId());
         return update(wrapper);
     }
@@ -891,7 +891,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             if (com.jbp.service.util.StringUtils.isEmpty(user.getPayPwd())) {
                 throw new CrmebException("请设置交易密码");
             }
-            if (!CrmebUtil.encryptPassword(pwd, user.getAccount()).equals(user.getPayPwd())) {
+            if (!CrmebUtil.encryptPassword(pwd).equals(user.getPayPwd())) {
                 throw new CrmebException("交易密码不正确");
             }
         }
@@ -1534,7 +1534,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         checkValidateCode(phone, code);
         //获取当前用户信息
         User user = getInfo();
-        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword, user.getAccount()));
+        user.setPayPwd(CrmebUtil.encryptPassword(tradePassword));
         updateById(user);
 
     }
@@ -1596,10 +1596,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 .set(ObjectUtil.isNotEmpty(address) && !address.equals(""), User::getAddress, address)
                 .set(ObjectUtil.isNotEmpty(openShop), User::getOpenShop, openShop);
         if (ObjectUtils.isNotEmpty(pwd) && !pwd.equals("")) {
-            lqw.set(User::getPwd, CrmebUtil.encryptPassword(pwd, user.getAccount()));
+            lqw.set(User::getPwd, CrmebUtil.encryptPassword(pwd));
         }
         if (ObjectUtils.isNotEmpty(payPwd) && !payPwd.equals("")) {
-            lqw.set(User::getPayPwd, CrmebUtil.encryptPassword(payPwd, user.getAccount()));
+            lqw.set(User::getPayPwd, CrmebUtil.encryptPassword(payPwd));
         }
         update(lqw);
 
@@ -1612,7 +1612,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("用户没有设置交易密码");
         }
 
-        return CrmebUtil.decryptPassowrd(user.getPayPwd(), user.getAccount()).equals(payPwd);
+        return user.getPayPwd().equals(CrmebUtil.encryptPassword(payPwd));
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.exception.CrmebException;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
@@ -18,6 +19,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.text.NumberFormat;
 import java.util.*;
@@ -38,15 +41,29 @@ import java.util.regex.Pattern;
  */
 public class CrmebUtil {
 
-    public static String encryptPassword(String pwd, String key) {
+    public static String encryptPassword(String pwd) {
         try {
-            Security.addProvider(new com.sun.crypto.provider.SunJCE());
-            Key _key = getDESSercretKey(key);
-            Cipher cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.ENCRYPT_MODE, _key);
-            byte[] data = pwd.getBytes(StandardCharsets.UTF_8);
-            byte[] result = cipher.doFinal(data);
-            return new sun.misc.BASE64Encoder().encode(result);
+//            Security.addProvider(new com.sun.crypto.provider.SunJCE());
+//            Key _key = getDESSercretKey(key);
+//            Cipher cipher = Cipher.getInstance("DES");
+//            cipher.init(Cipher.ENCRYPT_MODE, _key);
+//            byte[] data = pwd.getBytes(StandardCharsets.UTF_8);
+//            byte[] result = cipher.doFinal(data);
+//            return new sun.misc.BASE64Encoder().encode(result);
+
+
+            String saltedPass = mergePasswordAndSalt(pwd, null, false);
+            MessageDigest messageDigest = getMessageDigest();
+
+            byte[] digest;
+            try {
+                digest = messageDigest.digest(saltedPass.getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException var7) {
+                throw new IllegalStateException("UTF-8 not supported!");
+            }
+
+            return new String(Hex.encodeHex(digest));
+
         } catch (Exception e) {
             throw new CrmebException("密码处理异常");
         }
@@ -66,6 +83,29 @@ public class CrmebUtil {
         byte[] result = cipher.doFinal(data);
 
         return new String(result, StandardCharsets.UTF_8);
+    }
+
+
+
+    public static  MessageDigest getMessageDigest() {
+        String algorithm = "MD5";
+        try {
+            return MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException var3) {
+            throw new IllegalArgumentException("No such algorithm [" + algorithm + "]");
+        }
+    }
+
+    public static String mergePasswordAndSalt(String password, Object salt, boolean strict) {
+        if (password == null) {
+            password = "";
+        }
+
+        if (strict && salt != null && (salt.toString().lastIndexOf("{") != -1 || salt.toString().lastIndexOf("}") != -1)) {
+            throw new IllegalArgumentException("Cannot use { or } in salt.toString()");
+        } else {
+            return salt != null && !"".equals(salt) ? password + "{" + salt.toString() + "}" : password;
+        }
     }
 
     /**
@@ -140,8 +180,8 @@ public class CrmebUtil {
      * @param args String[] 字符串数组
      */
     public static void main(String[] args) throws Exception {
-//        System.out.println(encryptPassword("123456", "admin"));
-        System.out.println(decryptPassowrd("9n8S0bwrG6iXHK3vXWqppA==", "admin"));
+       System.out.println(encryptPassword("123456"));
+    //    System.out.println(decryptPassowrd());
     }
 
     /**
@@ -940,7 +980,7 @@ public class CrmebUtil {
         if (StrUtil.isBlank(account)) {
             return "";
         }
-        return encryptPassword("000000", account);
+        return encryptPassword("000000");
     }
 
     /**
