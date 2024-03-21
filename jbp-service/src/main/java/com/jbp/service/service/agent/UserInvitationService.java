@@ -31,7 +31,7 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     void validBand(Integer uId, Integer pId);
 
-    UserInvitation band(Integer uId, Integer pId, Boolean ifM, Boolean ifForce);
+    UserInvitation band(Integer uId, Integer pId, Boolean ifM, Boolean ifForce, Boolean ifPlatOperate);
 
     /**
      * 存在上下级关系没有层级关系的明细记录列表

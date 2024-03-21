@@ -186,7 +186,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         //绑定用户账号
         if (spreadUid != null && spreadUid > 0) {
-            invitationService.band(spreadUid, user.getId(), false, true);
+            invitationService.band(spreadUid, user.getId(), false, true, false);
         }
         return user;
     }
@@ -236,7 +236,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     }
                     pid = invitationPid.getId();
                 }
-                invitationService.band(user.getId(), pid, false, true);
+                invitationService.band(user.getId(), pid, false, true, false);
             }
             if (userCapaTemplateRequest.getCapaId()!=0) {
                 userCapaService.saveOrUpdateCapa(user.getId(), userCapaTemplateRequest.getCapaId(),
@@ -317,7 +317,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             // 注册用户
             User user = registerPhone(username, phone, 0);
             // 绑定上级
-            invitationService.band(user.getId(), pid, false, true);
+            invitationService.band(user.getId(), pid, false, true, false);
             // 绑定节点
             relationService.band(user.getId(), rId, null, node);
             result.set(user);
