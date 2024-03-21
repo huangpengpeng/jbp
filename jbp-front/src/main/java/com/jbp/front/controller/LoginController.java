@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 
 import com.jbp.common.request.*;
 import com.jbp.common.response.AccountCapaResponse;
+import com.jbp.common.response.FrontIndividualCenterConfigResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
@@ -44,6 +45,11 @@ public class LoginController {
         return CommonResult.success(loginService.getLoginConfig());
     }
 
+    @ApiOperation(value = "获取个人中心配置")
+    @RequestMapping(value = "/individual/center/config")
+    public CommonResult<FrontIndividualCenterConfigResponse> getIndividualCenterConfig() {
+        return CommonResult.success(loginService.getIndividualCenterConfig());
+    }
     @ApiOperation(value = "手机号获取账号")
     @RequestMapping(value = "/account/List", method = RequestMethod.POST)
     public CommonResult<List<AccountCapaResponse>> accountList(@RequestBody @Validated LoginMobileRequest loginRequest) {

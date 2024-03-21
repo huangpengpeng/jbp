@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
 import com.jbp.common.response.AccountCapaResponse;
+import com.jbp.common.response.FrontIndividualCenterConfigResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.vo.MyRecord;
@@ -98,4 +99,6 @@ public interface LoginService {
     Boolean tokenIsExist();
 
     LoginResponse accountLogin(LoginAccountwordRequest loginRequest);
+
+    FrontIndividualCenterConfigResponse getIndividualCenterConfig();
 }

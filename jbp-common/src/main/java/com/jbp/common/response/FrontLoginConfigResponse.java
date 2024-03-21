@@ -61,7 +61,13 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "开启手机号11位")
     private Boolean mobilePhoneLengthOpen;
+
     @ApiModelProperty(value = "申请退款")
     private Boolean orderRefundOpen;
 
+    @ApiModelProperty(value = "h5品牌Logo")
+    private String  mobileTopLogo;
+
+    @ApiModelProperty(value = "h5头像")
+    private String h5Avatar;
 }

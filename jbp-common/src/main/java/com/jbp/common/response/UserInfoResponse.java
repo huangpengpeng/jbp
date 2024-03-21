@@ -1,7 +1,5 @@
 package com.jbp.common.response;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.CapaXs;
 import io.swagger.annotations.ApiModel;
@@ -11,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * 用户个人资料响应对象
@@ -35,6 +32,9 @@ public class UserInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "用户id")
     private Integer id;
+
+    @ApiModelProperty(value = "账号")
+    private String account;
 
     @ApiModelProperty(value = "生日")
     private String birthday;
@@ -62,7 +62,6 @@ public class UserInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "星级")
     private CapaXs capaXs;
-
 
 
 }
