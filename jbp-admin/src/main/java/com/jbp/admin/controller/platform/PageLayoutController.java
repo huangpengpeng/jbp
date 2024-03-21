@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,6 +43,12 @@ public class PageLayoutController {
     @ApiOperation(value = "页面首页")
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public CommonResult<PageLayoutIndexResponse> index() {
+        PageLayoutIndexResponse index = pageLayoutService.index();
+        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+        stringObjectHashMap.put("hh","dfjkkasjfas");
+        List<HashMap<String, Object>> k = new ArrayList<>();
+        k.add(stringObjectHashMap);
+        index. setUserBench(k);
         return CommonResult.success(pageLayoutService.index());
     }
 

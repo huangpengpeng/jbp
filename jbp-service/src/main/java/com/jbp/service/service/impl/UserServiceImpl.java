@@ -194,7 +194,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
 
         User user = new User();
-        user.setAccount(account);
+        user.setAccount(account.toUpperCase());
         user.setPwd(CrmebUtil.encryptPassword(pwd, account));
         if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
             throw new CrmebException("手机号重复");
@@ -214,10 +214,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
         Boolean execute = transactionTemplate.execute(e -> {
             save(user);
-            // 推广人处理
-            // 增加代理等级
-            userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
-            //        设置服务上级
+            //设置服务上级
             if (ObjectUtils.isNotEmpty(regionPAccount)) {
                 User regionPid = userService.getByAccount(regionPAccount);
                 if (regionPid == null) {
@@ -238,9 +235,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 }
                 invitationService.band(user.getId(), pid, false, true);
             }
-            if (ObjectUtils.isNotEmpty(userCapaTemplateRequest)) {
+            if (userCapaTemplateRequest.getCapaId()!=0) {
                 userCapaService.saveOrUpdateCapa(user.getId(), userCapaTemplateRequest.getCapaId(),
                         userCapaTemplateRequest.getRemark(), userCapaTemplateRequest.getDescription());
+            }else {
+                userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
             }
             return Boolean.TRUE;
         });

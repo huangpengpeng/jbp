@@ -24,6 +24,27 @@ public class SysConfigConstants {
      */
     public static final String CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE = "site_logo_square";
     /**
+     * 账号注销
+     */
+    public static final String ACCOUNT_CANCEL = "account_cancel";
+    /**
+     * 协议规则
+     */
+    public static final String AGREEMENT_RULE="agreement_rule";
+    /**
+     * 资质证明
+     */
+    public static final String CERTIFICATION_PROVE="certification_prove";
+    /**
+     * 更改昵称
+     */
+    public static final String NICKNAME_CHANGE="nickname_change";
+    /**
+     * 更改手机号
+     */
+    public static final String CHANGE_PHONE="change-phone";
+
+    /**
      * 平台端-登录页LOGO
      */
     public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN = "site_logo_login";
@@ -208,6 +229,7 @@ public class SysConfigConstants {
     public static final String MOBILE_PHONE_LENGTH_OPEN = "mobile_phone_length_open";
 
     public static final String ORDER_REFUND_OPEN = "order_refund_open";
+    public static final String MOBILE_TOP_LOGO = "mobile_top_logo";
 
 
     /**

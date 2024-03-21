@@ -16,6 +16,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserToken;
 import com.jbp.common.request.*;
 import com.jbp.common.response.AccountCapaResponse;
+import com.jbp.common.response.FrontIndividualCenterConfigResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.token.FrontTokenComponent;
@@ -87,6 +88,7 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 发送短信验证码
+     *
      * @param phone 手机号
      * @return Boolean
      */
@@ -103,7 +105,7 @@ public class LoginServiceImpl implements LoginService {
      */
     private void checkValidateCode(String phone, String code) {
         String value = systemConfigService.getValueByKey("sms_code_valid_open");
-        if(StringUtils.isNotEmpty(value) && "0".equals(value)){
+        if (StringUtils.isNotEmpty(value) && "0".equals(value)) {
             return;
         }
         Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
@@ -119,7 +121,7 @@ public class LoginServiceImpl implements LoginService {
 
     private void checkValidateCodeNoDel(String phone, String code) {
         String value = systemConfigService.getValueByKey("sms_code_valid_open");
-        if(StringUtils.isNotEmpty(value) && "0".equals(value)){
+        if (StringUtils.isNotEmpty(value) && "0".equals(value)) {
             return;
         }
         Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
@@ -133,6 +135,7 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 退出登录
+     *
      * @param request HttpServletRequest
      */
     @Override
@@ -142,6 +145,7 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 手机号验证码登录
+     *
      * @param loginRequest 登录信息
      * @return LoginResponse
      */
@@ -159,7 +163,7 @@ public class LoginServiceImpl implements LoginService {
         MyRecord record = systemConfigService.getValuesByKeyList(Lists.newArrayList(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN));
         Boolean defaultRegister = record.getStrBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN);
         if (userList.isEmpty()) {// 此用户不存在，走新用户注册流程，默认注册用户走注册
-            if(BooleanUtils.isNotTrue(defaultRegister)){
+            if (BooleanUtils.isNotTrue(defaultRegister)) {
                 throw new CrmebException("当前手机号未注册请先申请账号");
             }
             User user = userService.registerPhone(loginRequest.getPhone(), loginRequest.getPhone(), spreadPid);
@@ -198,6 +202,7 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 手机号密码登录
+     *
      * @param loginRequest 登录信息
      * @return LoginResponse
      */
@@ -231,7 +236,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(),loginRequest.getAccount().toUpperCase()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getAccount().toUpperCase()).equals(user.getPwd())) {
             throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
@@ -240,8 +245,10 @@ public class LoginServiceImpl implements LoginService {
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
         return commonLogin(user, spreadPid);
     }
+
     /**
      * 微信公众号授权登录
+     *
      * @param request 登录参数
      * @return LoginResponse
      */
@@ -250,7 +257,7 @@ public class LoginServiceImpl implements LoginService {
         // 通过code获取获取公众号授权信息
         WeChatOauthToken oauthToken = wechatService.getOauth2AccessToken(request.getCode());
         //检测是否存在
-		UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  UserConstants.USER_TOKEN_TYPE_WECHAT);
+        UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(), UserConstants.USER_TOKEN_TYPE_WECHAT);
         Integer spreadPid = Optional.ofNullable(request.getSpreadPid()).orElse(0);
         LoginResponse loginResponse = new LoginResponse();
         if (ObjectUtil.isNotNull(userToken)) {// 已存在，正常登录
@@ -274,14 +281,15 @@ public class LoginServiceImpl implements LoginService {
 
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
-        
-    	User user = userService.getById(userToken.getUid());
-    	saveLastCheckCode(user);
+
+        User user = userService.getById(userToken.getUid());
+        saveLastCheckCode(user);
         return loginResponse;
     }
 
     /**
      * 微信登录小程序授权登录
+     *
      * @param request 用户参数
      * @return LoginResponse
      */
@@ -306,7 +314,7 @@ public class LoginServiceImpl implements LoginService {
         redisUtil.set(key, JSONObject.toJSONString(request), (long) (60 * 2), TimeUnit.MINUTES);
         loginResponse.setType(LoginConstants.LOGIN_STATUS_REGISTER);
         loginResponse.setKey(key);
-        
+
         return loginResponse;
     }
 
@@ -315,6 +323,7 @@ public class LoginServiceImpl implements LoginService {
      * 一个微信 在相同的客户端 只能绑定一个账户
      * 1、保证这个原则，主需要检查当前微信在需要绑定的客户端是否存在 存在就报错
      * 2、要保证 微信授权登录只能查出来一个账号
+     *
      * @param request 请求参数
      * @return 登录信息
      */
@@ -339,7 +348,7 @@ public class LoginServiceImpl implements LoginService {
         }
         boolean isNew = true;
         List<User> userList = userService.getByPhone(request.getPhone());
-        if(userList.size() > 1){
+        if (userList.size() > 1) {
             throw new CrmebException("当前手机号存在多个账号，一个微信只能绑定一个账号");
         }
         User user = userList.isEmpty() ? null : userList.get(0);
@@ -405,7 +414,7 @@ public class LoginServiceImpl implements LoginService {
                     userService.updateSpreadCountByUid(registerThirdUserRequest.getSpreadPid(), Constants.OPERATION_TYPE_ADD);
                 }
                 userService.save(finalUser);
-                userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType()+":注册");
+                userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType() + ":注册");
 
             } else {
                 userService.updateById(finalUser);
@@ -426,6 +435,7 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 获取用户Token类型
+     *
      * @param type 用户注册类型
      */
     private Integer getUserTokenType(String type) {
@@ -520,15 +530,15 @@ public class LoginServiceImpl implements LoginService {
         }
         return execute;
     }
-    
+
     /**
      * 保存用户最后一次登录code 用做接口加密签名
      */
     private void saveLastCheckCode(User user) {
-    	String lastcheckCode=	tokenComponent.getCheck();
-    	user.setLastCheckCode(lastcheckCode);
-    	userService.updateById(user);
-	}
+        String lastcheckCode = tokenComponent.getCheck();
+        user.setLastCheckCode(lastcheckCode);
+        userService.updateById(user);
+    }
 
     /**
      * 获取登录配置
@@ -549,6 +559,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN);
         keyList.add(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN);
         keyList.add(SysConfigConstants.ORDER_REFUND_OPEN);
+        keyList.add(SysConfigConstants.MOBILE_TOP_LOGO);
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
@@ -565,6 +576,26 @@ public class LoginServiceImpl implements LoginService {
         response.setOpenPrivacyAgreement(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
         response.setMobilePhoneLengthOpen(record.getStrBoolean(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN));
         response.setOrderRefundOpen(record.getStrBoolean(SysConfigConstants.ORDER_REFUND_OPEN));
+        response.setMobileTopLogo(record.getStr(SysConfigConstants.MOBILE_TOP_LOGO));
+        return response;
+    }
+
+    @Override
+    public FrontIndividualCenterConfigResponse getIndividualCenterConfig() {
+        List<String> keyList = new ArrayList<>();
+        keyList.add(SysConfigConstants.ACCOUNT_CANCEL);
+        keyList.add(SysConfigConstants.AGREEMENT_RULE);
+        keyList.add(SysConfigConstants.CERTIFICATION_PROVE);
+        keyList.add(SysConfigConstants.NICKNAME_CHANGE);
+        keyList.add(SysConfigConstants.CHANGE_PHONE);
+        MyRecord record = systemConfigService.getValuesByKeyList(keyList);
+
+        FrontIndividualCenterConfigResponse response = new FrontIndividualCenterConfigResponse();
+        response.setAgreementRule(record.getStrBoolean(SysConfigConstants.AGREEMENT_RULE));
+        response.setAccountCancel(record.getStrBoolean(SysConfigConstants.ACCOUNT_CANCEL));
+        response.setCertificationProve(record.getStrBoolean(SysConfigConstants.CERTIFICATION_PROVE));
+        response.setNicknameChange(record.getStrBoolean(SysConfigConstants.NICKNAME_CHANGE));
+        response.setChangePhone(record.getStrBoolean(SysConfigConstants.CHANGE_PHONE));
         return response;
     }
 
@@ -670,6 +701,7 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 校验token是否有效
+     *
      * @return true 有效， false 无效
      */
     @Override
@@ -705,30 +737,30 @@ public class LoginServiceImpl implements LoginService {
         loginResponse.setAccount(user.getAccount());
         //保存最后登录随机code
         saveLastCheckCode(user);
-        
+
         return loginResponse;
     }
 
 
-	private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
-		// 生成token
-		LoginResponse loginResponse = new LoginResponse();
-		String token = tokenComponent.createToken(user);
-		loginResponse.setToken(token);
-		loginResponse.setId(user.getId());
-		loginResponse.setNikeName(user.getNickname());
-		loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
-		loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
-		loginResponse.setAvatar(user.getAvatar());
-		if (isNew) {
-			loginResponse.setIsNew(true);
-			List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
-			if (CollUtil.isNotEmpty(couponList)) {
-				loginResponse.setNewPeopleCouponList(couponList);
-			}
-		}
-		// 保存最后登录随机code
-		saveLastCheckCode(user);
-		return loginResponse;
-	}
+    private LoginResponse getLoginResponse_V1_3(User user, Boolean isNew) {
+        // 生成token
+        LoginResponse loginResponse = new LoginResponse();
+        String token = tokenComponent.createToken(user);
+        loginResponse.setToken(token);
+        loginResponse.setId(user.getId());
+        loginResponse.setNikeName(user.getNickname());
+        loginResponse.setPhone(CrmebUtil.maskMobile(user.getPhone()));
+        loginResponse.setType(LoginConstants.LOGIN_STATUS_LOGIN);
+        loginResponse.setAvatar(user.getAvatar());
+        if (isNew) {
+            loginResponse.setIsNew(true);
+            List<Coupon> couponList = couponService.sendNewPeopleGift(user.getId());
+            if (CollUtil.isNotEmpty(couponList)) {
+                loginResponse.setNewPeopleCouponList(couponList);
+            }
+        }
+        // 保存最后登录随机code
+        saveLastCheckCode(user);
+        return loginResponse;
+    }
 }

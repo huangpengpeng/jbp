@@ -53,4 +53,6 @@ public class PageLayoutIndexResponse implements Serializable {
 
     @ApiModelProperty(value = "用户默认头像")
     private String userDefaultAvatar;
+    @ApiModelProperty(value = "userBench")
+    private List<HashMap<String, Object>> userBench;
 }
