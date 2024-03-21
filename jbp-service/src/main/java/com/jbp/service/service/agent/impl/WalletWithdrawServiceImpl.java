@@ -82,7 +82,6 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         } while (true);
         WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
-        head.put("ID","ID");
         head.put("account", "账户");
         head.put("walletName", "钱包名称");
         head.put("uniqueNo", "流水单号");
