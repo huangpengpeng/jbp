@@ -143,15 +143,17 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
      * @param ifForce 是否强制绑定
      */
     @Override
-    public UserInvitation band(Integer uId, Integer pId, Boolean ifM, Boolean ifForce) {
+    public UserInvitation band(Integer uId, Integer pId, Boolean ifM, Boolean ifForce, Boolean ifPlatOperate) {
         validBand(uId, pId);
         UserInvitation userInvitation = getByUser(uId);
         if (userInvitation == null) {
             userInvitation = new UserInvitation();
         }
         //强绑定用户无法换绑
-        if(BooleanUtils.isTrue(userInvitation.getIfForce())){
-            return userInvitation ;
+        if(BooleanUtils.isNotTrue(ifPlatOperate)){
+            if(BooleanUtils.isTrue(userInvitation.getIfForce())){
+                return userInvitation ;
+            }
         }
         if (BooleanUtils.isTrue(ifM)) {
             userInvitation.setMId(pId);

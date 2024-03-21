@@ -79,7 +79,7 @@ public class UserInvitationController {
         if (pUser == null) {
             throw new CrmebException("上级账户不存在");
         }
-        userInvitationService.band(user.getId(), pUser.getId(), false, true);
+        userInvitationService.band(user.getId(), pUser.getId(), false, true, true);
         return CommonResult.success();
     }
 
@@ -99,7 +99,7 @@ public class UserInvitationController {
         if (pUser == null) {
             throw new CrmebException("上级账户不存在");
         }
-        userInvitationService.band(user.getId(), pUser.getId(), true, true);
+        userInvitationService.band(user.getId(), pUser.getId(), true, true, true);
 
         return CommonResult.success();
     }
