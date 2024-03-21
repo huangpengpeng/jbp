@@ -78,7 +78,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
                 break;
             }
             voList.addAll(fundClearingVos);
-            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
+            id = fundClearingVos.get(0).getId();
         } while (true);
         WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();

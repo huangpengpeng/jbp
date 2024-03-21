@@ -230,7 +230,7 @@ public class SysConfigConstants {
 
     public static final String ORDER_REFUND_OPEN = "order_refund_open";
     public static final String MOBILE_TOP_LOGO = "mobile_top_logo";
-    public static final String H5_AVATAR = "h5_avatar";
+    public static final String H5_DEFAULT_AVATAR = "h5_default_avatar";
 
 
     /**

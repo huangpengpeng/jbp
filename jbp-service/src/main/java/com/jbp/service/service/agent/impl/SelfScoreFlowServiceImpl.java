@@ -85,7 +85,7 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
                 BeanUtils.copyProperties(e, selfScoreFlow);
                 result.add(selfScoreFlow);
             });
-            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+            id = fundClearingList.get(0).getId();
         } while (true);
         return result;
     }

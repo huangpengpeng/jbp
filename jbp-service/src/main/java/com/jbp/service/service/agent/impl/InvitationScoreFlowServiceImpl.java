@@ -95,7 +95,7 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
                 BeanUtils.copyProperties(e, invitationScoreFlowVo);
                 result.add(invitationScoreFlowVo);
             });
-            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+            id = fundClearingList.get(0).getId();
         } while (true);
         return result;
     }

@@ -88,7 +88,7 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
                 BeanUtils.copyProperties(e, platformWalletFlowVo);
                 result.add(platformWalletFlowVo);
             });
-            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+            id = fundClearingList.get(0).getId();
         } while (true);
         return result;
     }
