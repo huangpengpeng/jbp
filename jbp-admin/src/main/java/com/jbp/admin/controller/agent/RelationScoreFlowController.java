@@ -13,6 +13,7 @@ import com.jbp.service.service.agent.RelationScoreFlowService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,8 +56,8 @@ public class RelationScoreFlowController {
     @GetMapping("/excel")
     @ApiOperation("服务业绩明细导出")
     public CommonResult<List<RelationScoreFlowVo>> excel(RelationScoreFlowRequest request) {
-        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getOrderAccount()) && StringUtils.isEmpty(request.getOrdersSn())
-                && StringUtils.isEmpty(request.getDateLimit())) {
+        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getOrderAccount()) && StringUtils.isEmpty(request.getOrdersSn())&& ObjectUtils.isEmpty(request.getNode())&&StringUtils.isEmpty(request.getAction())&&StringUtils.isEmpty(request.getDateLimit()))
+        {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;

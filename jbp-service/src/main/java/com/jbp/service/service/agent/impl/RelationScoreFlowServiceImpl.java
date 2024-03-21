@@ -73,11 +73,11 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
                     .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
                     .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
                     .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn)
-                    .eq(ObjectUtil.isEmpty(node), RelationScoreFlow::getNode, node)
-                    .eq(StringUtils.isEmpty(action), RelationScoreFlow::getAction, action);
+                    .eq(ObjectUtil.isNotEmpty(node), RelationScoreFlow::getNode, node)
+                    .eq(StringUtils.isNotEmpty(action), RelationScoreFlow::getAction, action);
             getRequestTimeWhere(lqw, dateLimit);
-            lqw.gt(RelationScoreFlow::getId, id).last("LIMIT 1000");
             lqw.orderByDesc(RelationScoreFlow::getId);
+            lqw.gt(RelationScoreFlow::getId, id).last("LIMIT 1000");
             List<RelationScoreFlow> fundClearingList = list(lqw);
             if (CollectionUtils.isEmpty(fundClearingList)) {
                 break;
@@ -95,7 +95,7 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
                 BeanUtils.copyProperties(e, relationScoreFlowVo);
                 result.add(relationScoreFlowVo);
             });
-            id = fundClearingList.get(fundClearingList.size() - 1).getId();
+            id = fundClearingList.get(0).getId();
         } while (true);
         return result;
     }

@@ -100,7 +100,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 BeanUtils.copyProperties(e,relationScoreVo);
                 voList.add(relationScoreVo);
             });
-            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
+            id = fundClearingVos.get(0).getId();
         } while (true);
         return voList;
     }
