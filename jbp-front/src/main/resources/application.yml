@@ -36,7 +36,7 @@ server:
 
 spring:
   profiles:
-    active: beta
+    active: bate
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小

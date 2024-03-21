@@ -5,8 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.kqbill.contants.Bill99ConfigInfo;
 import com.jbp.common.kqbill.invoke.BuildHttpsClient;
+import com.jbp.common.model.agent.LimitTemp;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.KqPayService;
+import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.agent.LimitTempService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,18 +49,16 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
-        KqPayService kqPayService = run.getBean(KqPayService.class);
 
-        String orderId = CrmebUtil.getOrderNo("CS_");
-
-
-//        String cashier = kqPayService.cashier("FKY0000", "127.0.0.1",
-//                orderId, BigDecimal.valueOf(0.01), "测试", "https://admin.jbp.kkyp.vip/");
+//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+//        LimitTempService limitTempService = run.getBean(LimitTempService.class);
+//        final LimitTemp temp = limitTempService.getById(12);
 //
+//
+//        Integer buySuccessCount = orderDetailService.getBuySuccessCount(53906, 129, temp.getBuyLimitStartTime(), temp.getBuyLimitEndTime());
 
 
-//        System.out.println(cashier);
-        // CS_334171085751932731333
+
         System.out.println("ok");
 
     }
