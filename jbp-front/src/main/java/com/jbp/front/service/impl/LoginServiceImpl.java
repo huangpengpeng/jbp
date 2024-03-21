@@ -418,11 +418,12 @@ public class LoginServiceImpl implements LoginService {
                     userService.updateSpreadCountByUid(registerThirdUserRequest.getSpreadPid(), Constants.OPERATION_TYPE_ADD);
                 }
 
+
+                userService.save(finalUser);
                 if (spreadPid > 0) {
                     userInvitationService.band(finalUser.getId(), spreadPid, false, true, false);
                 }
 
-                userService.save(finalUser);
                 userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType() + ":注册");
 
             } else {
