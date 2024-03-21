@@ -216,7 +216,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getAccount()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword()).equals(user.getPwd())) {
             throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
@@ -236,7 +236,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
-        if (!CrmebUtil.encryptPassword(loginRequest.getPassword(), loginRequest.getAccount().toUpperCase()).equals(user.getPwd())) {
+        if (!CrmebUtil.encryptPassword(loginRequest.getPassword()).equals(user.getPwd())) {
             throw new CrmebException("账号或密码不正确");
         }
         if (!user.getStatus()) {
@@ -560,6 +560,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN);
         keyList.add(SysConfigConstants.ORDER_REFUND_OPEN);
         keyList.add(SysConfigConstants.MOBILE_TOP_LOGO);
+        keyList.add(SysConfigConstants.H5_AVATAR);
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
@@ -577,6 +578,7 @@ public class LoginServiceImpl implements LoginService {
         response.setMobilePhoneLengthOpen(record.getStrBoolean(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN));
         response.setOrderRefundOpen(record.getStrBoolean(SysConfigConstants.ORDER_REFUND_OPEN));
         response.setMobileTopLogo(record.getStr(SysConfigConstants.MOBILE_TOP_LOGO));
+        response.setH5Avatar(record.getStr(SysConfigConstants.H5_AVATAR));
         return response;
     }
 

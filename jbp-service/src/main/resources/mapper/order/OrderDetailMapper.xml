@@ -56,7 +56,7 @@
         and o.paid = 1
         and o.is_del = 0
         and od.product_id = #{proId}
-        and o.pay_time <![CDATA[  >=  ]]> '#{startTime, jdbcType=DATE}'
-        and o.pay_time <![CDATA[  <=  ]]> '#{endTime, jdbcType=DATE}'
+        and o.pay_time <![CDATA[  >=  ]]> #{startTime, jdbcType=DATE}
+        and o.pay_time <![CDATA[  <=  ]]> #{endTime, jdbcType=DATE}
     </select>
 </mapper>

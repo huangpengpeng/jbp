@@ -36,7 +36,7 @@ server:
 
 spring:
   profiles:
-    active: bate
+    active:
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小
@@ -54,9 +54,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-wz9o75s8venhi29r65o.mysql.rds.aliyuncs.com:3306/jbp?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
-    username: kk_account
-    password: kk_account2018
+    url: jdbc:mysql://fnyrds2.cl8owfyhsxx3.ap-southeast-1.rds.amazonaws.com:3306/fnynew?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: admin
+    password: "123456Aa#"
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
@@ -96,20 +96,6 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 
-pagehelper:
-  # 设置方言，此处指定 MySQL 数据库
-  helper-dialect: mysql
-  # 是否启动合理化，默认是 false。
-  # 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages（最大页数）会查询最后一页。
-  # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
-  reasonable: true
-  # 是否支持接口参数来传递分页参数，默认false
-  support-methods-arguments: true
-  # 为了支持startPage(Object params)方法，增加了该参数来配置参数映射，用于从对象中根据属性名取值
-  params: count=countSql
-  # 默认值为 false，当该参数设置为 true 时，如果 pageSize=0 或者 RowBounds.limit = 0 就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 Page 类型）
-  page-size-zero: true
-
 # 行为验证码
 aj:
   captcha:
@@ -138,8 +124,8 @@ swagger:
 wx:
   miniapp:
     configs:
-      - appid: wx69627cafde0080bf #微信小程序的appid
-        secret: 6a1851dd9474b745e91779f0a2319390 #微信小程序的Secret
+      - appid: wxfcc6dbbeb00cb7a3 #微信小程序的appid
+        secret: b74d9d5fe953f32f4a8461246dbdc2eb #微信小程序的Secret
         token: CrmebJava #微信小程序消息服务器配置的token
         aesKey: 111 #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON

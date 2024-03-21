@@ -150,7 +150,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
             userInvitation = new UserInvitation();
         }
         //强绑定用户无法换绑
-        if(userInvitation.getIfForce()){
+        if(BooleanUtils.isTrue(userInvitation.getIfForce())){
             return userInvitation ;
         }
         if (BooleanUtils.isTrue(ifM)) {
@@ -159,7 +159,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
             userInvitation.setPId(pId);
         }
         userInvitation.setUId(uId);
-        userInvitation.setIfForce(ifForce);
+        userInvitation.setIfForce(ifForce== null ? false : ifForce);
 
         // 执行更新
         UserInvitation finalUserInvitation = userInvitation;

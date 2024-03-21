@@ -67,4 +67,7 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "h5品牌Logo")
     private String  mobileTopLogo;
+
+    @ApiModelProperty(value = "h5头像")
+    private String h5Avatar;
 }

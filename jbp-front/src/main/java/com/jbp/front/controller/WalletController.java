@@ -59,7 +59,6 @@ public class WalletController {
     private SystemConfigService systemConfigService;
 
 
-
     @PostMapping("/identity")
     @ApiOperation("认证")
     public CommonResult identity(@Validated @RequestBody ChannelIdentityRequest request) {
@@ -116,10 +115,10 @@ public class WalletController {
     @GetMapping("/flowpage")
     @ApiOperation("用户积分列表")
     public CommonResult<CommonPage<WalletFlow>> getList(WalletFlowListRequest request) {
-        PageParamRequest pageParamRequest =new PageParamRequest();
+        PageParamRequest pageParamRequest = new PageParamRequest();
         pageParamRequest.setLimit(request.getLimit());
         pageParamRequest.setPage(request.getPage());
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageWalletList( userService.getUserId(), request.getType(),request.getAction(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageWalletList(userService.getUserId(), request.getType(), request.getAction(), pageParamRequest)));
     }
 
 
@@ -128,12 +127,7 @@ public class WalletController {
     @ApiOperation("用户提现")
     public CommonResult<WalletWithdraw> withdraw(@RequestBody @Validated WalletWithdrawRequest request) {
         User user = userService.getInfo();
-        if (StringUtils.isEmpty(user.getPayPwd())) {
-            throw new CrmebException("请设置交易密码");
-        }
-        if (!CrmebUtil.encryptPassword(request.getPwd(), user.getAccount()).equals(user.getPayPwd())) {
-            throw new CrmebException("交易密码不正确");
-        }
+        userService.validPayPwd(user.getId(), request.getPwd());
         WalletConfig walletConfig = walletConfigService.getByType(request.getWalletType());
         if (!walletConfig.getCanWithdraw()) {
             throw new CrmebException("类型积分不可提现");
@@ -167,12 +161,7 @@ public class WalletController {
     @ApiOperation("兑换")
     public CommonResult change(@RequestBody @Validated WalletChangeRequest request) {
         User user = userService.getInfo();
-        if (StringUtils.isEmpty(user.getPayPwd())) {
-            throw new CrmebException("请设置交易密码");
-        }
-        if (!CrmebUtil.encryptPassword(request.getPwd(), user.getAccount()).equals(user.getPayPwd())) {
-            throw new CrmebException("交易密码不正确");
-        }
+        userService.validPayPwd(user.getId(), request.getPwd());
         WalletConfig walletConfig = walletConfigService.getByType(request.getWalletType());
         if (walletConfig == null) {
             throw new CrmebException("积分信息不存在");
@@ -191,12 +180,7 @@ public class WalletController {
     @ApiOperation("转账")
     public CommonResult transfer(@RequestBody @Validated WalletTransferRequest request) {
         User user = userService.getInfo();
-        if (StringUtils.isEmpty(user.getPayPwd())) {
-            throw new CrmebException("请设置交易密码");
-        }
-        if (!CrmebUtil.encryptPassword(request.getPwd(), user.getAccount()).equals(user.getPayPwd())) {
-            throw new CrmebException("交易密码不正确");
-        }
+        userService.validPayPwd(user.getId(), request.getPwd());
         WalletConfig walletConfig = walletConfigService.getByType(request.getType());
         if (!walletConfig.getCanTransfer()) {
             throw new CrmebException("类型积分不可转账");
@@ -209,7 +193,6 @@ public class WalletController {
         walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt(), request.getType(), request.getPostscript());
         return CommonResult.success();
     }
-
 
 
     @ApiOperation(value = "钱包配置余额明细")
