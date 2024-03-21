@@ -79,8 +79,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
 
 
     @Override
-    public CashierPayCreateResult cashier(String account, String payCode, BigDecimal amount, String notifyUrl,
-                                          String returnUrl, String goodsName, String ip) {
+    public CashierPayCreateResult cashier(String account, String payCode, BigDecimal amount, String goodsName, String ip) {
         LianLianPayInfoResult lianLianInfo = get();
 
         CashierPayCreateParams params = new CashierPayCreateParams();
@@ -91,8 +90,8 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setTxn_type("GENERAL_CONSUME");
         params.setUser_id(account);
         params.setUser_type("ANONYMOUS");
-        params.setNotify_url(notifyUrl);
-        params.setReturn_url(returnUrl);
+        params.setNotify_url(lianLianInfo.getHost()+lianLianInfo.getNotify_url()+payCode);
+        params.setReturn_url(lianLianInfo.getHost()+lianLianInfo.getReturn_url()+payCode);
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
         // 测试风控参数
