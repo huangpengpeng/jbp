@@ -165,6 +165,7 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
         });
     }
 
+
     /**
      * 等级比例
      */

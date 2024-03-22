@@ -173,8 +173,35 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
 
     public static void main(String[] args) {
         List<Rule> list = Lists.newArrayList();
-        for (int i = 6; i <= 8 ; i++) {
-            Rule rule = new Rule(Long.valueOf(i), BigDecimal.valueOf(i-5).divide(BigDecimal.valueOf(100)));
+        for (int i = 1; i <= 9 ; i++) {
+            Rule rule = new Rule(Long.valueOf(i), BigDecimal.valueOf(0.03));
+             if(i==1){
+                 rule.setRatio(BigDecimal.valueOf(0.03));
+             }
+            if(i==2){
+                rule.setRatio(BigDecimal.valueOf(0.05));
+            }
+            if(i==3){
+                rule.setRatio(BigDecimal.valueOf(0.07));
+            }
+            if(i==4){
+                rule.setRatio(BigDecimal.valueOf(0.09));
+            }
+            if(i==5){
+                rule.setRatio(BigDecimal.valueOf(0.11));
+            }
+            if(i==6){
+                rule.setRatio(BigDecimal.valueOf(0.13));
+            }
+            if(i==7){
+                rule.setRatio(BigDecimal.valueOf(0.15));
+            }
+            if(i==8){
+                rule.setRatio(BigDecimal.valueOf(0.15));
+            }
+            if(i==9){
+                rule.setRatio(BigDecimal.valueOf(0.15));
+            }
             list.add(rule);
         }
         System.out.println(JSONArray.toJSONString(list));

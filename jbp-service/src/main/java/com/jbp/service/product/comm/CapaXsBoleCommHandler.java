@@ -138,7 +138,7 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
 
     public static void main(String[] args) {
         Rule rule = new Rule();
-        rule.setCapaXsId(7L);
+        rule.setCapaXsId(2L);
         rule.setCapaXsName("一星");
         List<LevelRatio> levelRatios = Lists.newArrayList();
         for (int i = 1; i < 19; i++) {

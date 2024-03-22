@@ -113,8 +113,14 @@ public class DepthCommHandler extends AbstractProductCommHandler {
 
     public static void main(String[] args) {
         List<Rule> list = Lists.newArrayList();
-        for (int i = 10; i <= 16 ; i++) {
-            Rule rule = new Rule(Long.valueOf(i), BigDecimal.valueOf(0.1));
+        for (int i = 1; i <= 5 ; i++) {
+            Rule rule = new Rule(Long.valueOf(i), BigDecimal.valueOf(0));
+            if(i==4){
+                rule.setRatio(BigDecimal.valueOf(0.05));
+            }
+            if(i==5){
+                rule.setRatio(BigDecimal.valueOf(0.1));
+            }
             list.add(rule);
         }
         System.out.println(JSONArray.toJSONString(list));

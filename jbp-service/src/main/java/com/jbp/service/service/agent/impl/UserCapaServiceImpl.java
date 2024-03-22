@@ -153,6 +153,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             Capa capa = capaMap.get(capaId);
             // 升级条件
             List<RiseCondition> conditionList = capa.getConditionList();
+
             Map<String, Boolean> map = Maps.newConcurrentMap();
             if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(conditionList)){
                 for (RiseCondition riseCondition : conditionList) {
@@ -162,10 +163,9 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             }
             // 是否满足升级条件
             Boolean ifRise = capa.parser(map);
-            if (BooleanUtils.isNotTrue(ifRise)) {
-                break;
+            if(BooleanUtils.isTrue(ifRise)){
+                riseCapaId = capa.getId();
             }
-            riseCapaId = capa.getId();
             capaId = capa.getPCapaId();
             if (capaId == null) {
                 break;

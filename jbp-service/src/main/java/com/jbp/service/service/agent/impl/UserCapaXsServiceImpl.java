@@ -144,10 +144,9 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             }
             // 是否满足升级条件
             Boolean ifRise = capaXs.parser(map);
-            if (BooleanUtils.isNotTrue(ifRise)) {
-                break;
+            if (BooleanUtils.isTrue(ifRise)) {
+                riseCapaId = capaXs.getId();
             }
-            riseCapaId = capaXs.getId();
             capaId = capaXs.getPCapaId();
             if (capaId == null) {
                 break;
