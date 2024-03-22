@@ -105,7 +105,7 @@
     </select>
 
     <select id="getNoChild" resultType="com.jbp.common.model.user.User" parameterType="Map">
-        SELECT u.* FROM eb_user AS u where u.id not in(select IFNULL(mId, pId) from eb_user_invitation) ORDER BY u.id asc
+        SELECT u.* FROM eb_user where 1=1
     </select>
 
 </mapper>
