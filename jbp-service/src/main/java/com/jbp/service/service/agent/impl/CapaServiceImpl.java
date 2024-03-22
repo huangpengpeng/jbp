@@ -21,9 +21,12 @@ import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -36,6 +39,8 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     private SystemAttachmentService systemAttachmentService;
     @Resource
     private ConditionChain conditionChain;
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     @Override
     public PageInfo<Capa> page(PageParamRequest pageParamRequest) {
@@ -55,7 +60,15 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
         }
         String cdnUrl = systemAttachmentService.getCdnUrl();
         Capa capa = new Capa(name, pCapaId, rankNum, systemAttachmentService.clearPrefix(iconUrl, cdnUrl), systemAttachmentService.clearPrefix(riseImgUrl, cdnUrl), systemAttachmentService.clearPrefix(shareImgUrl, cdnUrl));
-        save(capa);
+        Boolean execute = transactionTemplate.execute(e -> {
+            save(capa);
+            if (ObjectUtils.isNotEmpty(pCapaId)) {
+                if (capa.getId()>pCapaId){
+                    throw new CrmebException("请设置下个等级比本等级较大");
+                }
+            }
+            return Boolean.TRUE;
+        });
         return capa;
     }
 

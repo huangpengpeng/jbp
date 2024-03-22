@@ -16,7 +16,7 @@ import java.util.Map;
 
 public interface FundClearingService extends IService<FundClearing> {
 
-    PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description,  PageParamRequest pageParamRequest);
+    PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description,String commName,  PageParamRequest pageParamRequest);
 
     FundClearing create(Integer uid, String externalNo, String commName, BigDecimal commAmt,
                      List<FundClearingItem> items, List<FundClearingProduct> productList,
@@ -80,7 +80,7 @@ public interface FundClearingService extends IService<FundClearing> {
      * 佣金发放导出
      * @return
      */
-    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description);
+    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description,String commName);
 
     void updateRemark(Long id, String remark);
 
