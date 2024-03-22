@@ -43,7 +43,7 @@ public class MerchantAddressController {
     @Autowired
     private MerchantAddressService addressService;
 
-    @PreAuthorize("hasAuthority('merchant:address:list')")
+    @PreAuthorize("hasAuthority({'merchant:address:list'})")
     @ApiOperation(value = "商户地址分页列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
