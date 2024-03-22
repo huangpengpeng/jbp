@@ -2298,8 +2298,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 //                    throw new CrmebException("注册下单只能选择积分支付商品");
 //                }
 //            });
-            capaId = registerInfo.getCapaId();
-            capaXsId = registerInfo.getCapaXsId();
+            capaId = capaService.getMinCapa().getId();
             TeamUser teamUser = teamUserService.getByUser(response.getPId());
             if (teamUser != null) {
                 teamIdList.add(teamUser.getTid());
