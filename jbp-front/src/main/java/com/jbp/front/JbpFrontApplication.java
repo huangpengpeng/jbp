@@ -14,6 +14,7 @@ import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.LimitTempService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserRelationService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -52,10 +53,6 @@ import java.util.UUID;
 public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
-
-        CapaXsDifferentialCommHandler bean = run.getBean(CapaXsDifferentialCommHandler.class);
-        OrderService ordersBean = run.getBean(OrderService.class);
-        bean.orderSuccessCalculateAmt(ordersBean.getByOrderNo("PT697171109502087732588"), Lists.newLinkedList());
 
         System.out.println("ok");
 
