@@ -61,6 +61,8 @@ public class UserCapaTask {
                 for (UserUpperDto upperDto : allUpper) {
                     userCapaService.riseCapa(upperDto.getUId());
                 }
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,17 +2,16 @@ package com.jbp.front;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.google.common.collect.Lists;
 import com.jbp.common.kqbill.contants.Bill99ConfigInfo;
 import com.jbp.common.kqbill.invoke.BuildHttpsClient;
 import com.jbp.common.model.agent.LimitTemp;
 import com.jbp.common.utils.CrmebUtil;
-import com.jbp.front.service.FrontOrderService;
+import com.jbp.service.product.comm.CapaXsDifferentialCommHandler;
 import com.jbp.service.service.KqPayService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
-import com.jbp.service.service.PayService;
 import com.jbp.service.service.agent.LimitTempService;
 import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
@@ -54,14 +53,9 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
-
-//        PayService bean = run.getBean(PayService.class);
-
-//        bean.payAfterProcessingTemp("PT318171107555764846387");
-
-
-
-
+        CapaXsDifferentialCommHandler bean = run.getBean(CapaXsDifferentialCommHandler.class);
+        OrderService ordersBean = run.getBean(OrderService.class);
+        bean.orderSuccessCalculateAmt(ordersBean.getByOrderNo("PT697171109502087732588"), Lists.newLinkedList());
 
         System.out.println("ok");
 

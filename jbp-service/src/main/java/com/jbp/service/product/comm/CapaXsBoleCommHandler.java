@@ -99,12 +99,11 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
         Rule rule = getRule(null);
         List<LevelRatio> levelRatios = rule.getLevelRatios();
         Map<Integer, LevelRatio> ratioMap = FunctionUtil.keyValueMap(levelRatios, LevelRatio::getLevel);
-
         int maxLevel = levelRatios.size();
         Map<Integer, UserCapaXs> uidCapaXsMap = userCapaXsService.getUidMap(allUpper.stream().filter(u -> u.getPId() != null).map(UserUpperDto::getPId).collect(Collectors.toList()));
         // 往上找18个人获得佣金
-        int i = 1;
         for (CommCalculateResult calculateResult : collisionFeeList) {
+            int i = 1;
             // 得奖人
             Integer uid = calculateResult.getUid();
             User user = userService.getById(calculateResult.getUid());
@@ -133,6 +132,9 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
                     }
                 }
             }
+
+
+
         }
     }
 
