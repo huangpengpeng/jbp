@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -135,9 +136,9 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
         }
 
         // 分钱用户产品
-        Map<Integer, List<FundClearingProduct>> productMap = Maps.newConcurrentMap();
+        LinkedHashMap<Integer, List<FundClearingProduct>> productMap = Maps.newLinkedHashMap();
         // 分钱用户金额
-        Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
+        LinkedHashMap<Integer, Double> userAmtMap = Maps.newLinkedHashMap();
 
         List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         for (OrderDetail orderDetail : orderDetails) {

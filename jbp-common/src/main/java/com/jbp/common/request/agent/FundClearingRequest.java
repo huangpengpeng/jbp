@@ -55,4 +55,7 @@ public class FundClearingRequest implements Serializable {
     @ApiModelProperty("描述")
     private String description;
 
+    @ApiModelProperty("佣金名称")
+    private String commName;
+
 }

@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import javax.annotation.Resource;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.mybatis.RiseConditionListHandler;
@@ -9,6 +10,7 @@ import com.jbp.common.request.agent.RiseConditionRequest;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.CapaXsDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.agent.CapaXsService;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,8 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
     private SystemAttachmentService systemAttachmentService;
     @Resource
     private ConditionChain conditionChain;
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
 
     @Override
@@ -55,7 +60,15 @@ public class CapaXsServiceImpl extends ServiceImpl<CapaXsDao, CapaXs> implements
         }
         String cdnUrl = systemAttachmentService.getCdnUrl();
         CapaXs capaXs = new CapaXs(name, pCapaId, rankNum, systemAttachmentService.clearPrefix(iconUrl, cdnUrl), systemAttachmentService.clearPrefix(riseImgUrl, cdnUrl), systemAttachmentService.clearPrefix(shareImgUrl, cdnUrl));
-        save(capaXs);
+        Boolean execute = transactionTemplate.execute(e -> {
+            save(capaXs);
+            if (ObjectUtils.isNotEmpty(pCapaId)) {
+                if (capaXs.getId()>pCapaId){
+                    throw new CrmebException("请设置下个星级比本星级较大");
+                }
+            }
+            return Boolean.TRUE;
+        });
         return capaXs;
     }
 
