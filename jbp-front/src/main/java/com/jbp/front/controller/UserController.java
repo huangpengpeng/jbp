@@ -195,12 +195,12 @@ public class UserController {
         Integer rId = rUser.getId();
         // 检查操作一张网
         User loginUser = userService.getInfo();
-//        if (loginUser.getId() != pId && !invitationService.hasChild(pId, loginUser.getId())) {
-//            throw new CrmebException("只能帮自己或者下级注册");
-//        }
-//        if (loginUser.getId() != rId && !invitationService.hasChild(rId, loginUser.getId())) {
-//            throw new CrmebException("只能帮自己或者下级安置");
-//        }
+        if (loginUser.getId() != pId && !relationService.hasChild(pId, loginUser.getId())) {
+            throw new CrmebException("只能帮自己或者下级注册");
+        }
+        if (loginUser.getId() != rId && !relationService.hasChild(rId, loginUser.getId())) {
+            throw new CrmebException("只能帮自己或者下级安置");
+        }
         if (relationService.getByPid(rId, request.getNode()) != null) {
             throw new CrmebException("节点已被占用");
         }

@@ -84,6 +84,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
 
     @Override
     public void validBand(Integer uId, Integer pId, Integer operateId, Integer node) {
+        if (uId.intValue() == pId.intValue()) {
+            throw new RuntimeException("自己不能绑定自己");
+        }
         UserRelation receiverUser = getByPid(pId, node);
         if (receiverUser != null) {
             throw new RuntimeException("服务人节点被占用:账号为" + pId + "点位:" + node);
@@ -92,10 +95,10 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
             throw new RuntimeException("接受人不能是被安置人的下级, 被安置人:" + uId + "接受人:" + pId);
         }
         if (operateId != null) {
-            if (!userInvitationService.hasChild(pId, operateId)) {
+            if (!hasChild(pId, operateId)) {
                 throw new RuntimeException("接受人不是当前操作用户的下级, 接受人:" + pId + "操作人:" + operateId);
             }
-            if (!userInvitationService.hasChild(uId, operateId)) {
+            if (!hasChild(uId, operateId)) {
                 throw new RuntimeException("被安置人不是当前操作用户的下级, 被安置人:" + uId + "操作人:" + operateId);
             }
         }
