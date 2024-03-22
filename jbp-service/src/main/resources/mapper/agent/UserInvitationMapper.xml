@@ -18,15 +18,23 @@
         order by level asc
     </select>
     <select id="getUserNextList"  parameterType="java.util.Map" resultType="com.jbp.common.response.UserInviteResponse">
-        select eu.nickname  ,eu.account,c.name as capa_name,ec.capa_id,eu.phone from   eb_user_invitation ei
-         left join eb_user eu on eu.id = ei.uId
-         left join eb_user_capa ec on ec.uid = eu.id
-         left join eb_capa c on c.id = ec.capa_id
+         select eu.nickname  ,eu.account,c.name as capa_name,ec.capa_id,eu.phone from   eb_user_invitation ei
+        left join eb_user eu on eu.id = ei.uId
+        left join eb_user_capa ec on ec.uid = eu.id
+        left join eb_capa c on c.id = ec.capa_id
 
-         where ei.pId = #{uId}
+
+        where 1=1
+        <if test="account =='' or account == null ">
+         and  ei.pId = #{uId}
+        </if>
 
         <if test="account!='' and account!= null ">
-            and eu.account = #{account}
+          and ei .uid  = (
+              select uid from eb_user_invitation_flow  f
+              inner join eb_user eu2 on eu2.id = f.uId
+              where f.pId =  #{uId} and eu2.account = #{account}
+            )
         </if>
 
     </select>

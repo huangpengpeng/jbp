@@ -152,7 +152,7 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
                 RelationScore right = relationScoreService.getByUser(map.get(1).getUId(), map.get(1).getNode());
                 BigDecimal rightScore = right == null ? BigDecimal.ZERO : right.getUsableScore().add(right.getUsedScore());
                 // 返回大区 继续往下走
-                userId = ArithmeticUtils.gte(leftScore, rightScore) ? left.getUid() : right.getUid();
+                userId = ArithmeticUtils.gte(leftScore, rightScore) ? map.get(0).getUId() : map.get(1).getUId();
             }
         } while (true);
     }
