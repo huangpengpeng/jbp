@@ -143,7 +143,7 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
     }
 
     public static void main(String[] args) {
-        Rule rule = new Rule(11L, 7, BigDecimal.valueOf(0.03), 3, BigDecimal.valueOf(0.03));
+        Rule rule = new Rule(2L, 7, BigDecimal.valueOf(0.03), 3, BigDecimal.valueOf(0.03));
         System.out.println(JSONObject.toJSONString(rule));
     }
 

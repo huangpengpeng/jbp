@@ -91,6 +91,12 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
         }
     }
 
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        rule.setRatio(BigDecimal.valueOf(0.05));
+        System.out.println(JSONObject.toJSONString(rule));
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

@@ -2,14 +2,19 @@ package com.jbp.front;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.kqbill.contants.Bill99ConfigInfo;
 import com.jbp.common.kqbill.invoke.BuildHttpsClient;
 import com.jbp.common.model.agent.LimitTemp;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.front.service.FrontOrderService;
 import com.jbp.service.service.KqPayService;
 import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.OrderService;
+import com.jbp.service.service.PayService;
 import com.jbp.service.service.agent.LimitTempService;
+import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -50,12 +55,11 @@ public class JbpFrontApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
 
-//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
-//        LimitTempService limitTempService = run.getBean(LimitTempService.class);
-//        final LimitTemp temp = limitTempService.getById(12);
-//
-//
-//        Integer buySuccessCount = orderDetailService.getBuySuccessCount(53906, 129, temp.getBuyLimitStartTime(), temp.getBuyLimitEndTime());
+//        PayService bean = run.getBean(PayService.class);
+
+//        bean.payAfterProcessingTemp("PT318171107555764846387");
+
+
 
 
 

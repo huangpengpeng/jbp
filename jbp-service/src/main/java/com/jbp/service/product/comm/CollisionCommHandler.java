@@ -214,14 +214,22 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     public static void main(String[] args) {
         Rule rule = new Rule();
         List<CapaRatio> capaRatioList = Lists.newArrayList();
-        for (int i = 10; i <= 16 ; i++) {
+        for (int i = 1; i <= 5 ; i++) {
             CapaRatio capaRatio = new CapaRatio(Long.valueOf(i), BigDecimal.valueOf(0.1));
+            if(i==5){
+                capaRatio.setRatio(BigDecimal.valueOf(0.12));
+            }
             capaRatioList.add(capaRatio);
         }
-
         List<LevelRatio> levelRatioList = Lists.newArrayList();
         for (int i = 1; i <= 8 ; i++) {
-            LevelRatio levelRatio = new LevelRatio(i, BigDecimal.valueOf(0.1));
+            LevelRatio levelRatio = new LevelRatio(i, BigDecimal.valueOf(1));
+            if(i==6 || i==7){
+                levelRatio.setRatio(BigDecimal.valueOf(0.5));
+            }
+            if(i==8){
+                levelRatio.setRatio(BigDecimal.valueOf(0.25));
+            }
             levelRatioList.add(levelRatio);
         }
         rule.setCapaRatioList(capaRatioList);
