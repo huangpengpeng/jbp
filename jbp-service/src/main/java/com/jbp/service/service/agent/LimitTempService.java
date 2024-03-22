@@ -35,7 +35,4 @@ public interface LimitTempService extends IService<LimitTemp> {
                 int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, String description);
 
     LimitTempResponse details(Integer id);
-
-
-    List<LimitTemp> list(String type);
 }
