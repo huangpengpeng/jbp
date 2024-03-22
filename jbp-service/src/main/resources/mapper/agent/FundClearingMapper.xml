@@ -56,6 +56,9 @@
             <if test="uniqueNo!=null and uniqueNo !=''">
                 and c.unique_no=#{uniqueNo}
             </if>
+            <if test="commName !=null and commName !''">
+                and c.comm_name=#{commName}
+            </if>
             <if test="externalNo !=null and externalNo!=''">
                 and c.external_no=#{externalNo}
             </if>
@@ -138,6 +141,9 @@
             </if>
             <if test="status !=null and status!=''">
                 and c.status=#{status}
+            </if>
+            <if test="commName !=null and commName !''">
+                and c.comm_name=#{commName}
             </if>
             <if test="uid != null">
                 and c.uid=#{uid}

@@ -22,6 +22,7 @@ import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -63,9 +64,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private FundClearingDao fundClearingDao;
 
     @Override
-    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, PageParamRequest pageParamRequest) {
+    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description,String commName, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description);
+        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description,commName);
         return CommonPage.copyPageInfo(page, list);
     }
 
@@ -358,12 +359,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description) {
+    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description,String commName) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Long id = 0L;
         List<FundClearingVo> result = Lists.newArrayList();
         do {
-            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName);
+            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName,commName);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }

@@ -1,10 +1,12 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -69,6 +71,11 @@ public class CapaController {
         Capa capaToName = capaService.getByName(capaRequest.getName());
         if (capaToName != null && NumberUtil.compare(capaToName.getId(), capa.getId()) != 0) {
             return CommonResult.failed("等级名称不能重复");
+        }
+        if (ObjectUtil.isNotEmpty(capaRequest.getPCapaId())){
+            if (capa.getId()>capa.getPCapaId()){
+                throw new CrmebException("请设置下个等级比本等级较大");
+            }
         }
         String cdnUrl = systemAttachmentService.getCdnUrl();
         capa.setName(capaRequest.getName());
