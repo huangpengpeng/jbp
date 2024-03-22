@@ -1435,7 +1435,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         List<Integer> idList = Stream.of(ids.split(",")).map(Integer::valueOf).collect(Collectors.toList());
         LambdaUpdateWrapper<Product> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(Product::getIsShow, true);
-        wrapper.set(Product::getIsAudit, true);
+        wrapper.set(Product::getIsAudit, false);
         wrapper.set(Product::getAuditStatus, ProductConstants.AUDIT_STATUS_EXEMPTION);
         wrapper.in(Product::getId, idList);
         boolean update = update(wrapper);
