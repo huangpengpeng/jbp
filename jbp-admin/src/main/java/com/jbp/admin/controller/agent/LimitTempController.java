@@ -40,7 +40,7 @@ public class LimitTempController {
     @GetMapping("/list")
     @ApiOperation("限制模板列表")
     public CommonResult<List<LimitTemp>> list(String type) {
-        return CommonResult.success(limitTempService.list(type));
+        return CommonResult.success(limitTempService.list());
     }
 
     @PreAuthorize("hasAuthority('agent:limit:temp:add')")
