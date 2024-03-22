@@ -159,6 +159,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         Date nowDate = CrmebDateUtil.nowDateTime();
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
+        user.setPwd(CrmebUtil.encryptPassword("123456"));
+
+        if(!ObjectUtil.isNull(phone)){
+            user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
+        }
+
         user.setLevel(1);
         // 设置活跃时间
         setActiveTime(user);
