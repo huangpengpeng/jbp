@@ -1,15 +1,16 @@
 package com.jbp.service.condition;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaSnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,8 @@ public class CapaRepairDifferenceHandler implements ConditionHandler {
     private OrderService orderService;
     @Resource
     private UserCapaService userCapaService;
+    @Resource
+    private UserCapaSnapshotService snapshotService;
 
     @Override
     public String getName() {
@@ -66,14 +69,20 @@ public class CapaRepairDifferenceHandler implements ConditionHandler {
         Order order = orderService.getOne(new QueryWrapper<Order>().lambda()
                 .eq(Order::getUid, uid).eq(Order::getPaid, true)
                 .eq(Order::getLevel, 0)
+                .eq(Order::getPlatform, "报单")
                 .orderByDesc(Order::getId)
                 .last(" limit 1"));
 
         if (order == null) {
             return false;
         }
+
         UserCapa userCapa = userCapaService.getByUser(uid);
         if (userCapa == null) {
+            return false;
+        }
+        List<UserCapaSnapshot> snapshots = snapshotService.getByDescription(order.getOrderNo());
+        if (!snapshots.isEmpty()) {
             return false;
         }
         List<Rule> list = getRule(riseCondition);

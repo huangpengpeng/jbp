@@ -1450,6 +1450,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 infoResponse.setCancelTime(cancelTime.getTime());
             }
 
+            infoResponse.setPayGateway(order.getPayGateway());
             responseList.add(infoResponse);
         }
         return CommonPage.copyPageInfo(pageInfo, responseList);
