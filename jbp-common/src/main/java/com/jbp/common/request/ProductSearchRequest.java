@@ -33,7 +33,7 @@ public class ProductSearchRequest implements Serializable {
     @ApiModelProperty(value = "类型（-1:搜素可以加条件 0:全部   1：出售中（已上架），2：仓库中（未上架），3：已售罄，4：警戒库存，5：回收站,6:待审核，7：审核失败）")
     @NotNull(message = "商品类型不能为空")
     @Range(min = -1, max = 7, message = "未知的商品类型")
-    private int type;
+    private Integer type;
 
     @ApiModelProperty(value = "平台商品分类ID")
     private Integer categoryId;
@@ -49,4 +49,6 @@ public class ProductSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "商户是否自营：0-非自营，1-自营,平台端商品列表使用")
     private Integer isSelf;
+    @ApiModelProperty(value = "物料编码")
+    private String materialsCode;
 }
