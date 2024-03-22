@@ -121,7 +121,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Page<RefundOrder> page = PageHelper.startPage(request.getPage(), request.getLimit());
         QueryWrapper<RefundOrder> wrapper = Wrappers.query();
-        wrapper.eq("mer_id", systemAdmin.getMerId());
+        if (systemAdmin.getMerId() > 0) {
+            wrapper.eq("mer_id", systemAdmin.getMerId());
+        }
         if (StrUtil.isNotEmpty(request.getRefundOrderNo())) {
             wrapper.eq("refund_order_no", request.getRefundOrderNo());
         }
@@ -1056,8 +1058,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY)) {
             throw new CrmebException("售后单状态异常");
         }
-        if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("无法操作非自己商户的资源");
+        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
+        if(!ifPlatformAdd){
+            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
+                throw new CrmebException("无法操作非自己商户的订单");
+            }
         }
         Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
         if (ObjectUtil.isNull(order)) {
@@ -1116,8 +1121,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REVOKE)) {
             throw new CrmebException("退款单状态异常");
         }
-        if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("无法操作非自己商户的订单");
+        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
+        if(!ifPlatformAdd){
+            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
+                throw new CrmebException("无法操作非自己商户的订单");
+            }
         }
 
         Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
@@ -1132,8 +1140,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     public Boolean compulsoryRefund(String refundOrderNo) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(refundOrderNo);
-        if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("无法操作非自己商户的订单");
+        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
+        if(!ifPlatformAdd){
+            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
+                throw new CrmebException("无法操作非自己商户的订单");
+            }
         }
         // todo 判断退款单状态
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_AWAIT_RECEIVING)) {
@@ -1152,8 +1163,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     public Boolean receivingReject(RejectReceivingRequest request) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(request.getRefundOrderNo());
-        if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("无法操作非自己商户的订单");
+        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
+        if(!ifPlatformAdd){
+            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
+                throw new CrmebException("无法操作非自己商户的订单");
+            }
         }
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_AWAIT_RECEIVING)) {
             throw new CrmebException("退款单状态异常");
