@@ -53,9 +53,9 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
-//        CapaXsDifferentialCommHandler bean = run.getBean(CapaXsDifferentialCommHandler.class);
-//        OrderService ordersBean = run.getBean(OrderService.class);
-//        bean.orderSuccessCalculateAmt(ordersBean.getByOrderNo("PT697171109502087732588"), Lists.newLinkedList());
+        CapaXsDifferentialCommHandler bean = run.getBean(CapaXsDifferentialCommHandler.class);
+        OrderService ordersBean = run.getBean(OrderService.class);
+        bean.orderSuccessCalculateAmt(ordersBean.getByOrderNo("PT697171109502087732588"), Lists.newLinkedList());
 
         System.out.println("ok");
 
