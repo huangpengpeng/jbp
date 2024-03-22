@@ -38,6 +38,9 @@ public class UserCenterResponse implements Serializable {
     @ApiModelProperty(value = "用户昵称")
     private String nickname;
 
+    @ApiModelProperty(value = "账号")
+    private String account;
+
     @ApiModelProperty(value = "用户头像")
     private String avatar;
 

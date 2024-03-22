@@ -190,4 +190,62 @@
           and (name like CONCAT('%', #{keyword, jdbcType=VARCHAR}, '%')
             or keyword like CONCAT('%', #{keyword, jdbcType=VARCHAR}, '%'))
     </select>
+
+    <!--List<AdminProductListResponse> selectList(@Param("id") Integer id, @Param("type") Integer type,@Param("keywords") String keywords,@Param("categoryId") Integer categoryId,@Param("cateId") String cateId);-->
+    <resultMap id="AdminProductListResponse" type="com.jbp.common.response.AdminProductListResponse">
+        <id column="id" property="id"/>
+        <result column="image" property="image"/>
+        <result column="name" property="name"/>
+        <result column="keyword" property="keyword"/>
+        <result column="cate_id" property="categoryId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="price" property="price"/>
+        <result column="sort" property="sort"/>
+        <result column="sales" property="sales"/>
+        <result column="stock" property="stock"/>
+        <result column="is_show" property="isShow"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="is_audit" property="isAudit"/>
+        <result column="ficti" property="ficti"/>
+        <result column="reason" property="reason"/>
+        <result column="buy_limit_temp_id" property="buyLimitTempId"/>
+        <result column="show_limit_temp_id" property="showLimitTempId"/>
+        <result column="pay_type" property="payType"/>
+        <result column="deduction_list" property="deductionList" typeHandler="com.jbp.common.mybatis.ProductDeductionListHandler"/>
+        <result column="bar_code" property="barCode"/>
+        <result column="materials_code" property="materialsCode"/>
+    </resultMap>
+    <sql id="selectlist">
+        select p.id,
+               p.image,
+               p.name,
+               p.keyword,
+               p.cate_id,
+               p.category_id,
+               p.price,
+               p.sort,
+               p.sales,
+               p.stock,
+               p.is_show,
+               p.audit_status,
+               p.is_audit,
+               p.ficti,
+               p.reason,
+               p.buy_limit_temp_id,
+               p.show_limit_temp_id,
+               p.pay_type,
+               p.deduction_list,
+               m.bar_code,
+               m.materials_code
+        from eb_product as p
+                 left join eb_product_attr_value as v on v.product_id = p.id
+                 left join eb_product_materials as m on m.bar_code = v.bar_code
+
+    </sql>
+    <select id="selectList" resultMap="com.jbp.service.dao.agent.FundClearingDao.FundClearing">
+        <include refid="selectlist"/>
+        <where>
+
+        </where>
+    </select>
 </mapper>

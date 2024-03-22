@@ -49,4 +49,6 @@ public class ProductSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "商户是否自营：0-非自营，1-自营,平台端商品列表使用")
     private Integer isSelf;
+    @ApiModelProperty(value = "物料编码")
+    private String materialsCode;
 }

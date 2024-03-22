@@ -2,6 +2,7 @@ package com.jbp.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.product.Product;
+import com.jbp.common.response.AdminProductListResponse;
 import com.jbp.common.response.PlatformProductListResponse;
 import com.jbp.common.response.ProductActivityResponse;
 import com.jbp.common.response.ProductFrontResponse;
@@ -56,4 +57,5 @@ public interface ProductDao extends BaseMapper<Product> {
      */
     List<Integer> findProductCategoryIdByKeyword(@Param(value = "keyword") String keyword);
 
+    List<AdminProductListResponse> selectList(@Param("id") Integer id, @Param("type") Integer type,@Param("keywords") String keywords,@Param("categoryId") Integer categoryId,@Param("cateId") String cateIdL,@Param("materialsCode") String materialsCode);
 }
