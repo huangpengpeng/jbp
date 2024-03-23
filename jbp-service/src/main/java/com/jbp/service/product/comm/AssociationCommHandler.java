@@ -12,6 +12,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -20,14 +21,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +50,9 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
     private ProductCommConfigService productCommConfigService;
     @Resource
     private FundClearingService fundClearingService;
+    @Autowired
+    private Environment environment;
+
 
     public Integer getType() {
         return ProductCommEnum.社群佣金.getType();
@@ -135,6 +138,13 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
         BigDecimal maxRatio = maxRule.getRatio(); // 最大比例
         BigDecimal usedRatio = BigDecimal.ZERO; // 已分比例
         Integer uid = order.getUid();
+
+        // 内部账户
+        String internalUid = environment.getProperty("internal.uid");
+        List<String> internalList = Lists.newArrayList();
+        if(StringUtils.isNotEmpty(internalUid)){
+            internalList = Arrays.stream(internalUid.split(",")).collect(Collectors.toList());
+        }
         do {
             Integer pid = invitationService.getPid(uid);
             if (pid == null) {
@@ -155,11 +165,13 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
                             fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.社群佣金.getName(), amt,
                                     null, orderUser.getAccount() + "下单获得" + ProductCommEnum.社群佣金.getName(), "");
                             // 将奖金透传出去
-                            int sort = resultList.size() + 1;
-                            CommCalculateResult calculateResult = new CommCalculateResult(pid, getType(), ProductCommEnum.社群佣金.getName(),
-                                    null, null, score,
-                                    1, score, BigDecimal.ONE, ratio, amt, sort);
-                            resultList.add(calculateResult);
+                            if(!internalList.contains(pid.toString())){
+                                int sort = resultList.size() + 1;
+                                CommCalculateResult calculateResult = new CommCalculateResult(pid, getType(), ProductCommEnum.社群佣金.getName(),
+                                        null, null, score,
+                                        1, score, BigDecimal.ONE, ratio, amt, sort);
+                                resultList.add(calculateResult);
+                            }
                             usedRatio = ratio; // 设置已分比例
                         }
                     }
