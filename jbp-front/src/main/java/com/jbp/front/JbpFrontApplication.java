@@ -54,9 +54,9 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
 
-
-        UserRelationService bean = run.getBean(UserRelationService.class);
-        final Boolean b = bean.hasChild(1020488, 1013111);
+//
+//        UserRelationService bean = run.getBean(UserRelationService.class);
+//        final Boolean b = bean.hasChild(1020488, 1013111);
 
 
         System.out.println("ok");
