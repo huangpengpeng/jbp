@@ -234,7 +234,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         UserRelation userRelation2 = userRelationService.getByPid(user.getId(), 1);
 
         if (userRelation != null) {
-            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()));
+            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()).eq(RelationScore::getNode,0));
             User zorouser = userService.getById(userRelation.getUId());
             relationScoreResponse.setNickname(zorouser.getNickname());
             relationScoreResponse.setAccount(zorouser.getAccount());
@@ -243,7 +243,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         }
 
         if (userRelation2 != null) {
-            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()));
+            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()).eq(RelationScore::getNode,1));
             User zorouser = userService.getById(userRelation2.getUId());
             relationScoreResponse.setNickname2(zorouser.getNickname());
             relationScoreResponse.setAccount2(zorouser.getAccount());
