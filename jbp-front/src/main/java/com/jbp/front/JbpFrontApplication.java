@@ -36,8 +36,10 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         Environment bean = run.getBean(Environment.class);
+
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
     }
 
 }

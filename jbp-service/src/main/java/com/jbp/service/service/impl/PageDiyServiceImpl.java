@@ -272,7 +272,7 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
                 JSONObject jsonObject2 =  jsonObject.getJSONObject(key);
                 JSONObject jsonObject1 =  jsonObject2.getJSONObject("showLimitTemp");
                 if(jsonObject1 != null){
-                   if(!tempIds.contains(jsonObject1.getString("activeValue")) && StringUtils.isNotBlank(jsonObject1.getString("activeValue"))){
+                   if(StringUtils.isNotBlank(jsonObject1.getString("activeValue")) && !tempIds.contains(jsonObject1.getLongValue("activeValue"))){
                        jsonValue.remove(key);
                    }
 
@@ -285,7 +285,8 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
         return response;
     }
 
-////////////////////////////////// 内部处理json配置中的素材地址方法 START
+
+    ////////////////////////////////// 内部处理json配置中的素材地址方法 START
 
     /**
      * 调用diy配置数据后结合本地配置，传递给递归方法替换
