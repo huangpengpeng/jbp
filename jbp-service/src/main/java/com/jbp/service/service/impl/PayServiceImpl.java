@@ -695,7 +695,7 @@ public class PayServiceImpl implements PayService {
                         Materials materials = new Materials(productMaterials.getMaterialsName(),
                                 productMaterials.getMaterialsQuantity() * orderDetail.getPayNum(),
                                 productMaterials.getMaterialsPrice(), productMaterials.getMaterialsCode(),
-                                payPrice.multiply(price.divide(totalPrice)).setScale(2, BigDecimal.ROUND_DOWN));
+                                ArithmeticUtils.equals(BigDecimal.ZERO, totalPrice) ? BigDecimal.ZERO : payPrice.multiply(price.divide(totalPrice, 4, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN));
                         materialsList.add(materials);
                     }
                     orderDetail.setMaterialsList(materialsList);
@@ -844,7 +844,7 @@ public class PayServiceImpl implements PayService {
 
     @Override
     public Boolean zeroPay(Order order) {
-        if (ArithmeticUtils.equals(order.getPayPrice(), BigDecimal.ZERO)) {
+        if (!ArithmeticUtils.equals(order.getPayPrice(), BigDecimal.ZERO)) {
             throw new CrmebException("支付金额不等于0 不支持0元付:" + order.getOrderNo());
         }
         // 用户余额扣除

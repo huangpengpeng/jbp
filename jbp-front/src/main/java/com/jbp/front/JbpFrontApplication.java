@@ -12,9 +12,12 @@ import com.jbp.service.product.comm.CapaXsDifferentialCommHandler;
 import com.jbp.service.service.KqPayService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.PayService;
 import com.jbp.service.service.agent.LimitTempService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.service.impl.AsyncServiceImpl;
+import com.jbp.service.service.impl.PayServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,6 +56,14 @@ import java.util.UUID;
 public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
+
+//
+//        UserRelationService bean = run.getBean(UserRelationService.class);
+//        final Boolean b = bean.hasChild(1020488, 1013111);
+
+
+//        PayService bean = run.getBean(PayService.class);
+//        bean.payAfterProcessingTemp("PT905171116366608568944");
 
         System.out.println("ok");
 
