@@ -237,10 +237,12 @@ public class WechatLiveGoodsServiceImpl extends ServiceImpl<WechatLiveGoodsDao, 
     public void getGoodsWareHouse() {
         logger.info("直播商品 - 更新直播商品状态START");
         try {
-            SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
             LambdaQueryWrapper<WechatLiveGoods> wrapperQuery = Wrappers.lambdaQuery();
             wrapperQuery.eq(WechatLiveGoods::getReviewStatus, WechatMPLiveGoodsReviewStatusEnum.PLAT_REVIEW_SUCCESS.getCode());
-            wrapperQuery.eq(WechatLiveGoods::getMerId, admin.getMerId());
+            if (SecurityUtil.hasLogin()) {
+                SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+                wrapperQuery.eq(WechatLiveGoods::getMerId, admin.getMerId());
+            }
             List<WechatLiveGoods> wechatLiveGoodsList = dao.selectList(wrapperQuery);
             logger.info("直播商品 - 待更新的商品:{}", JSON.toJSONString(wechatLiveGoodsList));
             List<Integer> goodsIds = wechatLiveGoodsList.stream().map(WechatLiveGoods::getGoodsId).distinct().collect(Collectors.toList());
