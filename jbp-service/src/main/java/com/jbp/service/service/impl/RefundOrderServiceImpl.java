@@ -1373,10 +1373,12 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                     platformWalletService.transferToUser(refundOrder.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                 }
             }
-            if (order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
-
+            if (order.getPayType().equals("confirmPay")) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+            }
             updateById(refundOrder);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
             productProfitChain.orderRefund(order, refundOrder);

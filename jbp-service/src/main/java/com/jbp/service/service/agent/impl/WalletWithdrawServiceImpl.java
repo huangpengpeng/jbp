@@ -192,7 +192,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         for (List<WalletWithdraw> walletWithdraws : partition) {
             for (WalletWithdraw walletWithdraw : walletWithdraws) {
                 walletService.increase(walletWithdraw.getUid(), walletWithdraw.getWalletType(),
-                        walletWithdraw.getAmt(), WalletFlow.OperateEnum.提现取消.toString(), walletWithdraw.getUniqueNo(), walletWithdraw.getPostscript());
+                        walletWithdraw.getAmt().add(walletWithdraw.getCommission()), WalletFlow.OperateEnum.提现取消.toString(), walletWithdraw.getUniqueNo(), walletWithdraw.getPostscript());
             }
             Boolean ifSuccess = updateBatchById(walletWithdraws);
             if (BooleanUtils.isNotTrue(ifSuccess)) {

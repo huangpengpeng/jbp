@@ -8,7 +8,7 @@
         ro.refund_reason as refundReason, ro.refund_price as refundPrice, ro.refund_time as refundTime, ro.create_time as createTime,
         roi.product_id as productId, roi.product_name as productName, roi.image as image, roi.sku as sku, roi.apply_refund_num as applyRefundNum,
         roi.product_type as productType, roi.refund_use_integral as refundUseIntegral, roi.refund_gain_integral as refundGainIntegral,
-        ro.receiver, ro.receiver_phone as receiverPhone, ro.receiver_address_detail as receiverAddressDetail, ro._return_goods_type as returnGoodsType,
+        ro.receiver, ro.receiver_phone as receiverPhone, ro.receiver_address_detail as receiverAddressDetail, ro.return_goods_type as returnGoodsType,
         ro.express_name as expressName, ro.tracking_number as trackingNumber, ro.telephone
         from eb_refund_order ro
         left join eb_refund_order_info roi on ro.refund_order_no = roi.refund_order_no

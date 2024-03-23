@@ -6,9 +6,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_order_product_profit")
@@ -24,6 +26,10 @@ public class OrderProductProfit extends BaseModel {
         this.rule = rule;
         this.postscript = postscript;
         this.status = Constants.成功.name();
+    }
+
+    public String getOrderNo() {
+        return orderNo;
     }
 
     public static enum Constants {

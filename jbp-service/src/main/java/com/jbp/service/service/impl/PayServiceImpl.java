@@ -874,7 +874,7 @@ public class PayServiceImpl implements PayService {
             order.setPayMethod("积分支付");
             order.setPayType("wallet");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-            order.setOutTradeNo(null);
+            order.setOutTradeNo(order.getOrderNo());
             orderService.updateById(order);
             Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
             if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
