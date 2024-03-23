@@ -6,6 +6,7 @@ import com.jbp.common.model.agent.UserInfo;
 import com.jbp.common.model.user.User;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.InvitationScoreService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,8 +47,9 @@ public class JbpAdminApplication {
 //            fundClearingService.updateById(fundClearing);
 //        }
 
+        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
 
-
+        invitationScoreService.init();
     }
 
 }
