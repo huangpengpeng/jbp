@@ -2322,7 +2322,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (NumberUtil.compare(riseInfo.getCapaId(), userCapaService.getByUser(user.getId()).getCapaId()) <= 0) {
                 throw new CrmebException("等级不能小于当前等级");
             }
-            capaId = riseInfo.getCapaId();
+            capaId =  userCapaService.getByUser(user.getId()).getCapaId();
             UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
             capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
             whiteIdList = whiteUserService.getByUser(user.getId());
