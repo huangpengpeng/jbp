@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.NumberUtil;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.TeamUser;
@@ -22,12 +23,14 @@ import com.jbp.common.vo.*;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
+import io.swagger.models.auth.In;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -178,7 +181,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private ProductCommChain productCommChain;
 
 
-
+    @Value("${historyOrder.ifOpenOrder}")
+    private Boolean ifOpenOrder;
+    @Value("${historyOrder.name}")
+    private String name;
 
 
     /**
@@ -1420,9 +1426,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         PageInfo<Order> pageInfo = orderService.getUserOrderList_v1_4(userId, request);
         List<Order> orderList = pageInfo.getList();
-        if (CollUtil.isEmpty(orderList)) {
-            return CommonPage.copyPageInfo(pageInfo, CollUtil.newArrayList());
-        }
+
         List<Integer> merIdList = orderList.stream().map(Order::getMerId).filter(i -> i > 0).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = null;
         if (CollUtil.isNotEmpty(merIdList)) {
@@ -1453,6 +1457,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             infoResponse.setPayGateway(order.getPayGateway());
             responseList.add(infoResponse);
         }
+        //查询历史订单
+        if(ifOpenOrder && request.getPage() >= pageInfo.getPages() ){
+            responseList.addAll(getHistoryOrder(request.getStatus(),userId,request.getAgent()));
+        }
+
         return CommonPage.copyPageInfo(pageInfo, responseList);
     }
 
@@ -3539,4 +3548,69 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderInfoVo.setWalletDeductionFee(walletDeductionFee);
         orderInfoVo.setWallwtDeductionList(totalMap.values().stream().collect(Collectors.toList()));
     }
+
+
+
+    public   List<OrderFrontDataResponse>  getHistoryOrder(Integer status,Integer userId,Boolean agent){
+        List<OrderFrontDataResponse> orderFrontDataResponses = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder("select *  from "+name+".orders   where 1=1 ");
+        if(status== -1){
+            stringBuilder.append(" and status IN (201,301,401,402,501 )");
+        }else if (status == 1){
+            stringBuilder.append(" and status IN (201)");
+        }else if (status == 6){
+            stringBuilder.append(" and status IN (401)");
+        }else if (status == 4){
+            stringBuilder.append(" and status IN (301)");
+        }else{
+            stringBuilder.append(" and status IN (1)");
+        }
+
+        if(agent != null && !agent){
+            stringBuilder.append(" and userId = "+userId+"");
+        }else{
+            stringBuilder.append(" and payuserId = "+userId+" and userId !=  "+userId+"");
+        }
+
+
+        List<Map<String,Object>> maps =  SqlRunner.db().selectList(stringBuilder.toString());
+        for(Map<String,Object> map : maps){
+            StringBuilder goodsSql = new StringBuilder("select * from "+name+".ordergoods   where  orderId =  "+map.get("id")+"");
+
+            List<Map<String,Object>> goodsMaps =  SqlRunner.db().selectList(goodsSql.toString());
+            List<OrderInfoFrontDataResponse> infoResponseList = CollUtil.newArrayList();
+            for(Map<String,Object> goodsMap :goodsMaps) {
+                OrderInfoFrontDataResponse orderInfoFrontDataResponse = new OrderInfoFrontDataResponse();
+                orderInfoFrontDataResponse.setProductName(goodsMap.get("goodsName").toString());
+                orderInfoFrontDataResponse.setImage(goodsMap.get("picUrl").toString());
+                orderInfoFrontDataResponse.setPrice(new BigDecimal(goodsMap.get("price").toString()));
+                orderInfoFrontDataResponse.setPayNum(Integer.valueOf(goodsMap.get("number").toString()));
+
+                infoResponseList.add(orderInfoFrontDataResponse);
+            }
+
+            Integer status2 = 0;
+            if(map.get("status").toString().equals("201")){
+                status2 = 1;
+            }else if (map.get("status").toString().equals("301")){
+                status2 = 4;
+            }else if (map.get("status").toString().equals("401")){
+                status2 =6;
+            }
+            OrderFrontDataResponse orderFrontDataResponse = new OrderFrontDataResponse();
+            orderFrontDataResponse.setOrderNo(map.get("orderSn").toString());
+            orderFrontDataResponse.setPaid(true);
+            orderFrontDataResponse.setPayTime( DateUtil.parse(map.get("payTime").toString()) );
+            orderFrontDataResponse.setPayPrice(new BigDecimal(map.get("payPrice").toString()));
+            orderFrontDataResponse.setStatus(status2);
+            orderFrontDataResponse.setCreateTime(DateUtil.parse(map.get("createTime").toString()));
+            orderFrontDataResponse.setOrderInfoList(infoResponseList);
+            orderFrontDataResponses.add(orderFrontDataResponse);
+
+
+        }
+        return orderFrontDataResponses;
+
+    }
+
 }
