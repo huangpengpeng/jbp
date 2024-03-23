@@ -47,9 +47,9 @@ public class JbpAdminApplication {
 //            fundClearingService.updateById(fundClearing);
 //        }
 
-        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
+//        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
 
-        invitationScoreService.init();
+//        invitationScoreService.init();
     }
 
 }

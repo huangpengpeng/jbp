@@ -15,6 +15,7 @@ public class LianLianPayInfoResult implements Serializable {
     private String req_domain;
     private String notify_url;
     private String return_url;
+    private String return_url2;
     private String status;
     private String host;
 

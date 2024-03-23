@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
@@ -34,6 +35,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String status = systemConfigService.getValueByKey("lianlian_pay_status");
         String notify_url = systemConfigService.getValueByKey("lianlian_notify_url");
         String return_url = systemConfigService.getValueByKey("lianlian_return_url");
+        String return_url2 = systemConfigService.getValueByKey("lianlian_return_url2");
         String host = systemConfigService.getValueByKey("lianlian_host");
 
         String lzt_oid_partner = systemConfigService.getValueByKey("lianlian_lzt_oid_partner");
@@ -48,6 +50,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         result.setStatus(status);
         result.setNotify_url(notify_url);
         result.setReturn_url(return_url);
+        result.setReturn_url2(return_url2);
         result.setHost(host);
 
         // 来账通产品信息
@@ -91,7 +94,11 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setUser_id(account);
         params.setUser_type("ANONYMOUS");
         params.setNotify_url(lianLianInfo.getHost()+lianLianInfo.getNotify_url()+payCode);
-        params.setReturn_url(lianLianInfo.getHost()+lianLianInfo.getReturn_url()+payCode);
+        if (payCode.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+            params.setReturn_url(lianLianInfo.getReturn_url2()+payCode);
+        }else{
+            params.setReturn_url(lianLianInfo.getReturn_url()+payCode);
+        }
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
         // 测试风控参数
