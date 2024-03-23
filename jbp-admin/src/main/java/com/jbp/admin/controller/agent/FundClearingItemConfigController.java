@@ -67,6 +67,8 @@ public class FundClearingItemConfigController {
         for (ProductCommEnum value : ProductCommEnum.values()) {
             list.add(value.getName());
         }
+        list.add("销售佣金");
+        list.add("培育佣金");
         list.add("其他佣金");
         return CommonResult.success(list);
     }
