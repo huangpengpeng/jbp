@@ -695,7 +695,7 @@ public class PayServiceImpl implements PayService {
                         Materials materials = new Materials(productMaterials.getMaterialsName(),
                                 productMaterials.getMaterialsQuantity() * orderDetail.getPayNum(),
                                 productMaterials.getMaterialsPrice(), productMaterials.getMaterialsCode(),
-                                payPrice.multiply(price.divide(totalPrice)).setScale(2, BigDecimal.ROUND_DOWN));
+                                ArithmeticUtils.equals(BigDecimal.ZERO, totalPrice) ? BigDecimal.ZERO : payPrice.multiply(price.divide(totalPrice, 4, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN));
                         materialsList.add(materials);
                     }
                     orderDetail.setMaterialsList(materialsList);
