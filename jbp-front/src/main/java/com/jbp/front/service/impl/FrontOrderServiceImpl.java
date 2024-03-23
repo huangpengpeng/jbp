@@ -1,56 +1,27 @@
 package com.jbp.front.service.impl;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.jbp.common.config.CrmebConfig;
+import com.jbp.common.constants.*;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.Wallet;
-import com.jbp.common.model.order.*;
-import com.jbp.common.model.product.*;
-import com.jbp.common.request.*;
-import com.jbp.common.response.*;
-import com.jbp.common.utils.*;
-import com.jbp.common.vo.*;
-import com.jbp.service.product.comm.ProductCommChain;
-import com.jbp.service.service.*;
-import com.jbp.service.service.agent.*;
-import io.swagger.models.auth.In;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.beust.jcommander.internal.Sets;
-import com.github.pagehelper.PageInfo;
-import com.jbp.common.config.CrmebConfig;
-import com.jbp.common.constants.Constants;
-import com.jbp.common.constants.CouponConstants;
-import com.jbp.common.constants.GroupDataConstants;
-import com.jbp.common.constants.IntegralRecordConstants;
-import com.jbp.common.constants.OrderConstants;
-import com.jbp.common.constants.OrderStatusConstants;
-import com.jbp.common.constants.ProductConstants;
-import com.jbp.common.constants.RefundOrderConstants;
-import com.jbp.common.constants.ShippingTemplatesConstants;
-import com.jbp.common.constants.SysConfigConstants;
-import com.jbp.common.constants.TaskConstants;
-import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.cat.Cart;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
@@ -59,6 +30,8 @@ import com.jbp.common.model.express.ShippingTemplates;
 import com.jbp.common.model.express.ShippingTemplatesFree;
 import com.jbp.common.model.express.ShippingTemplatesRegion;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.order.*;
+import com.jbp.common.model.product.*;
 import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserAddress;
@@ -66,15 +39,29 @@ import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.model.wechat.video.PayComponentProductSku;
 import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.*;
+import com.jbp.common.response.*;
+import com.jbp.common.utils.*;
+import com.jbp.common.vo.*;
 import com.jbp.front.service.FrontOrderService;
 import com.jbp.front.service.SeckillService;
+import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.service.*;
+import com.jbp.service.service.agent.*;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * H5端订单操作
@@ -180,12 +167,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private ProductCommChain productCommChain;
 
-
-    @Value("${historyOrder.ifOpenOrder}")
-    private Boolean ifOpenOrder;
-    @Value("${historyOrder.name}")
-    private String name;
-
+    @Autowired
+    private Environment environment;
 
     /**
      * 订单预下单V1.3
@@ -195,6 +178,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public OrderNoResponse preOrder_V1_3(PreOrderRequest request) {
+
         // 付款用户
         User payUser = userService.getInfo();
         // 校验预下单商品信息
@@ -1458,7 +1442,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             responseList.add(infoResponse);
         }
         //查询历史订单
-        if(ifOpenOrder && request.getPage() >= pageInfo.getPages() ){
+        String ifOpenOrder =environment.getProperty("historyOrder.ifOpenOrder");
+        if( Boolean.parseBoolean(ifOpenOrder)  && request.getPage() >= pageInfo.getPages() ){
             responseList.addAll(getHistoryOrder(request.getStatus(),userId,request.getAgent()));
         }
 
@@ -3553,6 +3538,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     public   List<OrderFrontDataResponse>  getHistoryOrder(Integer status,Integer userId,Boolean agent){
         List<OrderFrontDataResponse> orderFrontDataResponses = new ArrayList<>();
+        String name =environment.getProperty("historyOrder.name");
         StringBuilder stringBuilder = new StringBuilder("select *  from "+name+".orders   where 1=1 ");
         if(status== -1){
             stringBuilder.append(" and status IN (201,301,401,402,501 )");
@@ -3575,6 +3561,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         List<Map<String,Object>> maps =  SqlRunner.db().selectList(stringBuilder.toString());
         for(Map<String,Object> map : maps){
+
             StringBuilder goodsSql = new StringBuilder("select * from "+name+".ordergoods   where  orderId =  "+map.get("id")+"");
 
             List<Map<String,Object>> goodsMaps =  SqlRunner.db().selectList(goodsSql.toString());
