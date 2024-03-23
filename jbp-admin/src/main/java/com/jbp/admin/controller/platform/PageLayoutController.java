@@ -1,7 +1,6 @@
 package com.jbp.admin.controller.platform;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.response.OrderCenterResponse;
 import com.jbp.common.response.PageLayoutBottomNavigationResponse;
 import com.jbp.common.response.PageLayoutIndexResponse;
 import com.jbp.common.result.CommonResult;
@@ -44,11 +43,6 @@ public class PageLayoutController {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public CommonResult<PageLayoutIndexResponse> index() {
         PageLayoutIndexResponse index = pageLayoutService.index();
-        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        stringObjectHashMap.put("hh","dfjkkasjfas");
-        List<HashMap<String, Object>> k = new ArrayList<>();
-        k.add(stringObjectHashMap);
-        index. setUserBench(k);
         return CommonResult.success(pageLayoutService.index());
     }
 
@@ -88,6 +82,16 @@ public class PageLayoutController {
         }
         return CommonResult.failed();
     }
+    @PreAuthorize("hasAuthority('platform:page:layout:index:order:save')")
+    @ApiOperation("订单中心配置")
+    @RequestMapping(value = "/index/order/save",method = RequestMethod.POST)
+    public CommonResult<Object> indexOrderSave(@RequestBody JSONObject jsonObject) {
+        if (pageLayoutService.indexOrderSave(jsonObject)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
+    }
+
 
 //    @PreAuthorize("hasAuthority('platform:page:layout:index:news:save')")
 //    @ApiOperation(value = "页面首页新闻保存")

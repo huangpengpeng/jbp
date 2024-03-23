@@ -34,4 +34,6 @@ public class GroupDataConstants {
     public static final Integer GROUP_DATA_ID_BOTTOM_NAVIGATION = 14;
     /** 移动端_订单中心 */
     public static final Integer GROUP_DATA_ID_ORDER_CENTER = 15;
+    /*移动端——订单中心*/
+    public static final Integer GROUP_DATA_ID_USER_ORDER=16;
 }

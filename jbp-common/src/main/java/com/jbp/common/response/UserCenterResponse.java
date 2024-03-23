@@ -87,5 +87,7 @@ public class UserCenterResponse implements Serializable {
     private String  capaPic;
     @ApiModelProperty(value = "星级图片")
     private String capaXsPic;
+    @ApiModelProperty(value = "个人中心订单")
+    private List<HashMap<String,Object>> orderMenu;
 
 }

@@ -78,6 +78,9 @@ public class PageLayoutServiceImpl implements PageLayoutService {
         response.setUserDefaultAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
         // 首页logo 1.3 版本DIY已经替代
 //        response.setIndexLogo(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MOBILE_TOP_LOGO));
+        /*订单中心*/
+        List<SystemGroupData> listByGid = systemGroupDataService.findListByGid(GroupDataConstants.GROUP_DATA_ID_USER_ORDER);
+        response.setUserOrder(convertData(listByGid));
         return response;
     }
 
@@ -149,6 +152,19 @@ public class PageLayoutServiceImpl implements PageLayoutService {
         return transactionTemplate.execute(e -> {
             // 先删除历史数据
             systemGroupDataService.deleteByGid(GroupDataConstants.GROUP_DATA_ID_INDEX_MENU);
+            // 保存新数据
+            systemGroupDataService.saveBatch(dataList, 100);
+            return Boolean.TRUE;
+        });
+    }
+
+    @Override
+    public Boolean indexOrderSave(JSONObject jsonObject) {
+        List<JSONObject> userOrder = CrmebUtil.jsonArrayToJsonObjectList((jsonObject.getJSONArray("userOrder")));
+        List<SystemGroupData> dataList = convertGroupData(userOrder, GroupDataConstants.GROUP_DATA_ID_USER_ORDER);
+        return transactionTemplate.execute(e -> {
+            // 先删除历史数据
+            systemGroupDataService.deleteByGid(GroupDataConstants.GROUP_DATA_ID_USER_ORDER);
             // 保存新数据
             systemGroupDataService.saveBatch(dataList, 100);
             return Boolean.TRUE;

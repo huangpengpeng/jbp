@@ -6,11 +6,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@NoArgsConstructor
 @TableName("eb_order_product_profit")
 @ApiModel(value="OrderProductProfit对象", description="订单商品收益")
 public class OrderProductProfit extends BaseModel {

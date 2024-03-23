@@ -57,5 +57,4 @@ public interface ProductDao extends BaseMapper<Product> {
      */
     List<Integer> findProductCategoryIdByKeyword(@Param(value = "keyword") String keyword);
 
-//    List<AdminProductListResponse> selectList(@Param("id") Integer id, @Param("type") Integer type,@Param("keywords") String keywords,@Param("categoryId") Integer categoryId,@Param("cateId") String cateIdL,@Param("materialsCode") String materialsCode);
 }

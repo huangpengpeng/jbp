@@ -51,7 +51,7 @@ public class MerchantAddressServiceImpl extends ServiceImpl<MerchantAddressDao, 
     public List<MerchantAddress> findList(MerchantAddressSearchRequest request) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         LambdaQueryWrapper<MerchantAddress> lqw = Wrappers.lambdaQuery();
-        lqw.eq(MerchantAddress::getMerId, admin.getMerId());
+        lqw.eq(admin.getMerId()>0,MerchantAddress::getMerId, admin.getMerId());
         lqw.eq(MerchantAddress::getIsDel, 0);
         if (ObjectUtil.isNotNull(request.getIsShow())) {
             lqw.eq(MerchantAddress::getIsShow, request.getIsShow());

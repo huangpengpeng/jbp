@@ -107,6 +107,8 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         UserCenterResponse response = new UserCenterResponse();
         response.setCenterBanner(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_BANNER));
         response.setCenterMenu(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_MENU));
+        response.setOrderMenu(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_ORDER));
+
         if (uid <= 0) {
             response.setId(0);
             return response;

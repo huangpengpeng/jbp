@@ -81,4 +81,6 @@ public interface PageLayoutService {
     List<HashMap<String, Object>>  getOrderCeterList();
 
     List<HashMap<String, Object>> orderCenterTemplate(String template);
+
+    Boolean indexOrderSave(JSONObject jsonObject);
 }
