@@ -1,11 +1,14 @@
 package com.jbp.admin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.task.order.OrderPayResultSyncTask;
 import com.jbp.admin.task.order.OrderPaySuccessTask;
+import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.UserInfo;
 import com.jbp.common.model.user.User;
+import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
@@ -57,6 +60,9 @@ public class JbpAdminApplication {
 //        OrderPayResultSyncTask payService = run.getBean(OrderPayResultSyncTask.class);
 //
 //        payService.payResultSync();
+
+
+
     }
 
 }
