@@ -237,6 +237,10 @@ public class LoginServiceImpl implements LoginService {
         }
         //查询用户信息
         User user = userService.getByAccount(loginRequest.getAccount().toUpperCase());
+        if(userService.isUnique4Phone() && user == null){
+            List<User> userList = userService.getByPhone(loginRequest.getAccount());
+            user = userList.isEmpty() ? null : userList.get(0);
+        }
         if (ObjectUtil.isNull(user)) {// 此用户不存在，走新用户注册流程
             throw new CrmebException("账号或密码不正确");
         }
