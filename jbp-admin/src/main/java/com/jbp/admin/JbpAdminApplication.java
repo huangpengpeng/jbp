@@ -1,6 +1,11 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.agent.FundClearing;
+import com.jbp.common.model.agent.UserInfo;
+import com.jbp.common.model.user.User;
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.FundClearingService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,6 +17,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.List;
 
 
 @EnableAsync //开启异步调用	
@@ -28,6 +35,19 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+        UserService userService = run.getBean(UserService.class);
+        List<FundClearing> list = fundClearingService.list();
+        for (FundClearing fundClearing : list) {
+            User user = userService.getById(fundClearing.getUid());
+            UserInfo userInfo = new UserInfo(user.getNickname(), user.getAccount());
+            fundClearing.setUserInfo(userInfo);
+            fundClearingService.updateById(fundClearing);
+        }
+
+
+
     }
 
 }

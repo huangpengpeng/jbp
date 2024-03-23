@@ -53,7 +53,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     @Resource
     private SelfScoreService selfScoreService;
 
-//    @PostConstruct
+    @PostConstruct
     public void init() {
         InvitationScoreFlow one = invitationScoreFlowService.getOne(new QueryWrapper<InvitationScoreFlow>().lambda().
                 like(InvitationScoreFlow::getOperate, "初始化").last("limit 1"));
