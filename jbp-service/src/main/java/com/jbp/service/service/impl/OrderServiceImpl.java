@@ -120,9 +120,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         lqw.eq(Order::getOrderNo, orderNo);
         lqw.last(" limit 1");
         Order order = dao.selectOne(lqw);
-        if (ObjectUtil.isNull(order)) {
-            throw new CrmebException("订单不存在");
-        }
         return order;
     }
 
