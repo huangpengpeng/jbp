@@ -53,7 +53,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     @Resource
     private SelfScoreService selfScoreService;
 
-//    @PostConstruct
+
+    @Override
     public void init() {
         InvitationScoreFlow one = invitationScoreFlowService.getOne(new QueryWrapper<InvitationScoreFlow>().lambda().
                 like(InvitationScoreFlow::getOperate, "初始化").last("limit 1"));
@@ -64,7 +65,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         for (SelfScore selfScore : list) {
             List<UserUpperDto> allUpper = userInvitationService.getAllUpper(selfScore.getUid());
             if (CollectionUtils.isEmpty(allUpper)) {
-                return;
+                continue;
             }
             for (UserUpperDto upperDto : allUpper) {
                 if (upperDto.getPId() != null) {

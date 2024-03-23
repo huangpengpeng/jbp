@@ -42,7 +42,6 @@ public class PageLayoutController {
     @ApiOperation(value = "页面首页")
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public CommonResult<PageLayoutIndexResponse> index() {
-        PageLayoutIndexResponse index = pageLayoutService.index();
         return CommonResult.success(pageLayoutService.index());
     }
 
