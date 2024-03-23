@@ -16,6 +16,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.service.SystemConfigService;
@@ -85,7 +86,10 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         List<FundClearingItem> items = createItemList(fundClearing, fundClearingItemConfigService.getMap());
         fundClearing.setItems(items);
         save(fundClearing);
-
+        String dsh = systemConfigService.getValueByKey("fund_clearing_status_dsh");
+        if (StringUtils.isNotEmpty(dsh) && "1".equals(dsh)) {
+            updateWaitAudit(externalNo, "平台开启自动待审核");
+        }
         // 更新概况
         ordersFundSummaryService.increaseCommAmt(externalNo, commAmt);
         return fundClearing;
