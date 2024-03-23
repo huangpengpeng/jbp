@@ -1,9 +1,12 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.task.order.OrderPayResultSyncTask;
+import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.UserInfo;
 import com.jbp.common.model.user.User;
+import com.jbp.service.service.PayService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.InvitationScoreService;
@@ -50,6 +53,10 @@ public class JbpAdminApplication {
 //        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
 
 //        invitationScoreService.init();
+//
+//        OrderPayResultSyncTask payService = run.getBean(OrderPayResultSyncTask.class);
+//
+//        payService.payResultSync();
     }
 
 }
