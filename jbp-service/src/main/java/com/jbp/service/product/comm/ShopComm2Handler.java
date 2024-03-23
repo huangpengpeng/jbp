@@ -86,7 +86,7 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
             BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
             if (pid != null && ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                 fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
-                        null, null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+                         null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
             }
         }
     }

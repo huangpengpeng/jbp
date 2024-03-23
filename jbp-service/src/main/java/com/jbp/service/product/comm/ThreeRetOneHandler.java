@@ -159,7 +159,7 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
         if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
             User orderUser = userService.getById(order.getUid());
             fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推三返一.getName(), totalAmt,
-                    null, productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.推三返一.getName(), "");
+                     productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.推三返一.getName(), "");
         }
     }
 

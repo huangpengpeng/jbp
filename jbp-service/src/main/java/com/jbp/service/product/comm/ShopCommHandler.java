@@ -136,7 +136,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             final Boolean openShop = userService.getById(pid).getOpenShop();
             if (openShop != null && BooleanUtils.isTrue(openShop)) {
                 fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
-                        null, productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
+                         productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(pid, getType(), ProductCommEnum.店铺佣金.getName(),
