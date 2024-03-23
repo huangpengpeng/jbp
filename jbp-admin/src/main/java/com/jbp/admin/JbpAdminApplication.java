@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -24,7 +25,9 @@ public class JbpAdminApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
-        System.out.println("ok");
+        Environment bean = run.getBean(Environment.class);
+        System.out.println("spring.datasource.dbName="+ bean.getProperty("spring.datasource.dbName"));
+        System.out.println("启动完成");
     }
 
 }
