@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -195,10 +196,10 @@ public class UserController {
         Integer rId = rUser.getId();
         // 检查操作一张网
         User loginUser = userService.getInfo();
-        if (loginUser.getId() != pId && !relationService.hasChild(pId, loginUser.getId())) {
+        if (loginUser.getId().intValue() != pId.intValue() && !relationService.hasChild(pId, loginUser.getId())) {
             throw new CrmebException("只能帮自己或者下级注册");
         }
-        if (loginUser.getId() != rId && !relationService.hasChild(rId, loginUser.getId())) {
+        if (loginUser.getId().intValue() != rId.intValue() && !relationService.hasChild(rId, loginUser.getId())) {
             throw new CrmebException("只能帮自己或者下级安置");
         }
         if (relationService.getByPid(rId, request.getNode()) != null) {

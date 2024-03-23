@@ -844,7 +844,7 @@ public class PayServiceImpl implements PayService {
 
     @Override
     public Boolean zeroPay(Order order) {
-        if (ArithmeticUtils.equals(order.getPayPrice(), BigDecimal.ZERO)) {
+        if (!ArithmeticUtils.equals(order.getPayPrice(), BigDecimal.ZERO)) {
             throw new CrmebException("支付金额不等于0 不支持0元付:" + order.getOrderNo());
         }
         // 用户余额扣除
