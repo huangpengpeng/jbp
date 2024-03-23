@@ -234,9 +234,6 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 fundClearing.setRemark(remark);
                 List<FundClearingItem> items = getItemList(fundClearing, configListMap);
                 fundClearing.setItems(items);
-                if (CollectionUtils.isEmpty(items)) {
-                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
-                }
                 for (FundClearingItem item : items) {
                     WalletConfig walletConfig = walletMap.get(item.getWalletType());
                     if (walletConfig != null) {
