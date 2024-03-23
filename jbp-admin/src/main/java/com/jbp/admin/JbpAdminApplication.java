@@ -26,7 +26,7 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         Environment bean = run.getBean(Environment.class);
-        System.out.println("spring.datasource.dbName="+ bean.getProperty("spring.datasource.dbName"));
+        System.out.println("spring.datasource.dbName="+ bean.getProperty("spring.datasource.username"));
         System.out.println("启动完成");
     }
 
