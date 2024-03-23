@@ -36,15 +36,15 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
-        UserService userService = run.getBean(UserService.class);
-        List<FundClearing> list = fundClearingService.list();
-        for (FundClearing fundClearing : list) {
-            User user = userService.getById(fundClearing.getUid());
-            UserInfo userInfo = new UserInfo(user.getNickname(), user.getAccount());
-            fundClearing.setUserInfo(userInfo);
-            fundClearingService.updateById(fundClearing);
-        }
+//        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+//        UserService userService = run.getBean(UserService.class);
+//        List<FundClearing> list = fundClearingService.list();
+//        for (FundClearing fundClearing : list) {
+//            User user = userService.getById(fundClearing.getUid());
+//            UserInfo userInfo = new UserInfo(user.getNickname(), user.getAccount());
+//            fundClearing.setUserInfo(userInfo);
+//            fundClearingService.updateById(fundClearing);
+//        }
 
 
 
