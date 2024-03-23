@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@NoArgsConstructor
 @TableName("eb_order_product_profit")
 @ApiModel(value="OrderProductProfit对象", description="订单商品收益")
 public class OrderProductProfit extends BaseModel {
@@ -26,6 +26,10 @@ public class OrderProductProfit extends BaseModel {
         this.rule = rule;
         this.postscript = postscript;
         this.status = Constants.成功.name();
+    }
+
+    public String getOrderNo() {
+        return orderNo;
     }
 
     public static enum Constants {

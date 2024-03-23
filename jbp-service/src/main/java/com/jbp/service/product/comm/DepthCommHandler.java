@@ -102,7 +102,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
 
                     User user = userService.getById(calculateResult.getUid());
                     fundClearingService.create(calculateResult.getUid(), order.getOrderNo(), ProductCommEnum.深度佣金.getName(), amt,
-                            null, null, user.getAccount() + "获得对碰佣金，奖励" + ProductCommEnum.深度佣金.getName(), "");
+                             null, user.getAccount() + "获得对碰佣金，奖励" + ProductCommEnum.深度佣金.getName(), "");
                 }
                 totalScore = totalScore.subtract(minScore);
             } else {

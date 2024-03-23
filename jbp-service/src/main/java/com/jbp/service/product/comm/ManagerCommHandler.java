@@ -101,7 +101,7 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
                         UserCapa userCapa = userCapaService.getByUser(upperDto.getPId());
                         if (userCapa.getCapaId().intValue() >= rule.getCapaId().intValue()) {
                             fundClearingService.create(upperDto.getPId(), order.getOrderNo(), ProductCommEnum.管理佣金.getName(), upperAmt,
-                                    null, null, user.getAccount() + "获得社群佣金, 奖励下拿" + ProductCommEnum.管理佣金.getName(), "");
+                                     null, user.getAccount() + "获得社群佣金, 奖励下拿" + ProductCommEnum.管理佣金.getName(), "");
                             i++;
                         }
                     }
@@ -133,7 +133,7 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
                         if(ArithmeticUtils.gt(userAmt, BigDecimal.ZERO)){
                             for (UserInvitation userInvitation : sendUserList) {
                                 fundClearingService.create(userInvitation.getUId(), order.getOrderNo(), ProductCommEnum.管理佣金.getName(), userAmt,
-                                        null, null, user.getAccount() + "获得社群佣金, 奖励上拿" + ProductCommEnum.管理佣金.getName(), "");
+                                         null, user.getAccount() + "获得社群佣金, 奖励上拿" + ProductCommEnum.管理佣金.getName(), "");
                             }
                         }
                     }

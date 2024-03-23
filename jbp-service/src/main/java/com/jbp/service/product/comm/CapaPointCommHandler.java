@@ -160,7 +160,7 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.见点佣金.getName(), clearingFee,
-                        null, fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.见点佣金.getName(), "");
+                         fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.见点佣金.getName(), "");
             }
         });
     }

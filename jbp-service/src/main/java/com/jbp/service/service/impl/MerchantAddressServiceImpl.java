@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantAddress;
 import com.jbp.common.request.merchant.MerchantAddressSaveRequest;
 import com.jbp.common.request.merchant.MerchantAddressSearchRequest;
@@ -14,6 +16,8 @@ import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.dao.MerchantAddressDao;
 import com.jbp.service.service.MerchantAddressService;
 
+import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -41,6 +45,10 @@ public class MerchantAddressServiceImpl extends ServiceImpl<MerchantAddressDao, 
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+    @Resource
+    private MerchantService merchantService;
+    @Resource
+    private SystemConfigService systemConfigService;
 
     /**
      * 商户地址列表
@@ -50,8 +58,15 @@ public class MerchantAddressServiceImpl extends ServiceImpl<MerchantAddressDao, 
     @Override
     public List<MerchantAddress> findList(MerchantAddressSearchRequest request) {
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        Boolean ifPlatformAdd = admin.getMerId() == 0;// 是否平台新增商品
+        Merchant merchant;
+        if (!ifPlatformAdd) {
+            merchant = merchantService.getByIdException(admin.getMerId());
+        } else {
+            merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
+        }
         LambdaQueryWrapper<MerchantAddress> lqw = Wrappers.lambdaQuery();
-        lqw.eq(admin.getMerId()>0,MerchantAddress::getMerId, admin.getMerId());
+        lqw.eq(MerchantAddress::getMerId, merchant.getId());
         lqw.eq(MerchantAddress::getIsDel, 0);
         if (ObjectUtil.isNotNull(request.getIsShow())) {
             lqw.eq(MerchantAddress::getIsShow, request.getIsShow());

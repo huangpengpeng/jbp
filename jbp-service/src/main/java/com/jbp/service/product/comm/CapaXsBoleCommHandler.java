@@ -126,7 +126,7 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
                         BigDecimal amt = ratio.multiply(calculateResult.getAmt()).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                             fundClearingService.create(upperDto.getPId(), order.getOrderNo(), ProductCommEnum.级差伯乐佣金.getName(), amt,
-                                    null, null, user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
+                                     null, user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
                         }
                         i++;
                     }

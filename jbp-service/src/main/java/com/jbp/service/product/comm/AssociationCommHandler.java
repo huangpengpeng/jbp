@@ -153,10 +153,10 @@ public class AssociationCommHandler extends AbstractProductCommHandler {
                         BigDecimal amt = score.multiply(usableRatio).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                             fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.社群佣金.getName(), amt,
-                                    null, null, orderUser.getAccount() + "下单获得" + ProductCommEnum.社群佣金.getName(), "");
+                                    null, orderUser.getAccount() + "下单获得" + ProductCommEnum.社群佣金.getName(), "");
                             // 将奖金透传出去
                             int sort = resultList.size() + 1;
-                            CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.社群佣金.getName(),
+                            CommCalculateResult calculateResult = new CommCalculateResult(pid, getType(), ProductCommEnum.社群佣金.getName(),
                                     null, null, score,
                                     1, score, BigDecimal.ONE, ratio, amt, sort);
                             resultList.add(calculateResult);

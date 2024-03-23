@@ -1,8 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.response.ProductTabsHeaderResponse;
-import com.jbp.service.service.ProductService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,11 +8,10 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.List;
 
 
 @EnableAsync //开启异步调用	
@@ -28,10 +25,9 @@ public class JbpAdminApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
-        ProductService productService = run.getBean(ProductService.class);
-        final List<ProductTabsHeaderResponse> tabsHeader = productService.getTabsHeader();
-
-        System.out.println("ok");
+        Environment bean = run.getBean(Environment.class);
+        System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
+        System.out.println("启动完成");
     }
 
 }

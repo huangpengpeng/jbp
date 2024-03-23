@@ -372,7 +372,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public boolean isUnique4Phone() {
         String value = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_REGISTER_PHONE_IS_UNIQUE);
-        return StringUtils.isNotBlank(value) && value.equals("1");
+        return StringUtils.isNotBlank(value) && value.equals("'true'");
     }
 
     /**

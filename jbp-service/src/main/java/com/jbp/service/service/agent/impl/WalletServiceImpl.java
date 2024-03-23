@@ -118,10 +118,9 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     public Boolean change(Integer uid, BigDecimal amt, Integer type, Integer changeType, String postscript) {
         //扣除用户
         String externalNo = StringUtils.N_TO_10("DH_");
-        WalletConfig walletConfig = walletConfigService.getByType(changeType);
         reduce(uid, type, amt, WalletFlow.OperateEnum.兑换.name(), externalNo, postscript);
-
         //类型兑换比例积分
+        WalletConfig walletConfig = walletConfigService.getByType(type);
         BigDecimal amtIntegral = amt.multiply(walletConfig.getChangeScale());
         increase(uid, changeType, amtIntegral, WalletFlow.OperateEnum.兑换.name(), externalNo, postscript);
         return true;

@@ -1,20 +1,6 @@
 package com.jbp.front;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.google.common.collect.Lists;
-import com.jbp.common.kqbill.contants.Bill99ConfigInfo;
-import com.jbp.common.kqbill.invoke.BuildHttpsClient;
-import com.jbp.common.model.agent.LimitTemp;
-import com.jbp.common.utils.CrmebUtil;
-import com.jbp.service.product.comm.CapaXsDifferentialCommHandler;
-import com.jbp.service.service.KqPayService;
-import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.agent.LimitTempService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserRelationService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,14 +8,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
 
 /**
  * 程序主入口
@@ -53,9 +35,9 @@ import java.util.UUID;
 public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
-
-        System.out.println("ok");
-
+        Environment bean = run.getBean(Environment.class);
+        System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
+        System.out.println("启动完成");
     }
 
 }

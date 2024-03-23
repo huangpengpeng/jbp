@@ -16,13 +16,13 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -57,22 +57,17 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Resource
     private SystemConfigService systemConfigService;
     @Resource
-    private ChannelIdentityService channelIdentityService;
-    @Resource
-    private ChannelCardService channelCardService;
-    @Resource
     private FundClearingDao fundClearingDao;
 
     @Override
-    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description,String commName, PageParamRequest pageParamRequest) {
+    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description,commName);
+        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, commName);
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
-    public FundClearing create(Integer uid, String externalNo, String commName, BigDecimal commAmt,
-                               List<FundClearingItem> items, List<FundClearingProduct> productList, String description, String remark) {
+    public FundClearing create(Integer uid, String externalNo, String commName, BigDecimal commAmt, List<FundClearingProduct> productList, String description, String remark) {
         User user = userService.getById(uid);
         UserInfo userInfo = new UserInfo(user.getNickname(), user.getAccount());
         UserCapa userCapa = userCapaService.getByUser(uid);
@@ -85,10 +80,16 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             userInfo.setCapaXsId(userCapaXs.getCapaId());
             userInfo.setCapaXsName(userCapaXs.getCapaName());
         }
-        FundClearing fundClearing = new FundClearing(uid, externalNo, commName, commAmt, userInfo, items,
+        FundClearing fundClearing = new FundClearing(uid, externalNo, commName, commAmt, userInfo, null,
                 productList, description, remark);
+        // 获取发放信息
+        List<FundClearingItem> items = createItemList(fundClearing, fundClearingItemConfigService.getMap());
+        fundClearing.setItems(items);
         save(fundClearing);
-
+        String dsh = systemConfigService.getValueByKey("fund_clearing_status_dsh");
+        if (StringUtils.isNotEmpty(dsh) && "1".equals(dsh)) {
+            updateWaitAudit(externalNo, "平台开启自动待审核");
+        }
         // 更新概况
         ordersFundSummaryService.increaseCommAmt(externalNo, commAmt);
         return fundClearing;
@@ -125,27 +126,13 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         BigDecimal orgSendAmt = fundClearing.getSendAmt();
         fundClearing.setSendAmt(sendAmt);
         fundClearing.setRemark(remark);
-        List<FundClearingItemConfig> configAllList = fundClearingItemConfigService.list();
-        Map<String, List<FundClearingItemConfig>> configListMap = FunctionUtil.valueMap(configAllList, FundClearingItemConfig::getCommName);
-        List<FundClearingItem> items = Lists.newArrayList();
-        List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
-        if (CollectionUtils.isEmpty(configList)) {
-            throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
-        }
-        for (FundClearingItemConfig clearingItemConfig : configList) {
-            BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
-            if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                FundClearingItem item = new FundClearingItem(clearingItemConfig.getName(), clearingItemConfig.getWalletType(), amt);
-                items.add(item);
-            }
-        }
+        List<FundClearingItem> items = getItemList(fundClearing, fundClearingItemConfigService.getMap());
         fundClearing.setItems(items);
 
         Boolean ifSuccess = updateById(fundClearing);
         if (BooleanUtils.isNotTrue(ifSuccess)) {
             throw new CrmebException("当前操作人数过多");
         }
-
         if (ArithmeticUtils.gt(sendAmt, orgSendAmt)) {
             ordersFundSummaryService.increaseCommAmt(fundClearing.getExternalNo(), sendAmt.subtract(orgSendAmt));
         }
@@ -164,24 +151,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        List<FundClearingItemConfig> configAllList = fundClearingItemConfigService.list();
-        Map<String, List<FundClearingItemConfig>> configListMap = FunctionUtil.valueMap(configAllList, FundClearingItemConfig::getCommName);
+        Map<String, List<FundClearingItemConfig>> configListMap = fundClearingItemConfigService.getMap();
+
         for (FundClearing fundClearing : list) {
             fundClearing.setStatus(FundClearing.Constants.待审核.toString());
             fundClearing.setRemark(remark);
-            List<FundClearingItem> items = Lists.newArrayList();
-            List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
-            if (CollectionUtils.isEmpty(configList)) {
-                throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
-            }
-            for (FundClearingItemConfig clearingItemConfig : configList) {
-                BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
-                if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                    FundClearingItem item = new FundClearingItem(clearingItemConfig.getName(), clearingItemConfig.getWalletType(), amt);
-                    items.add(item);
-                }
-            }
-            fundClearing.setItems(items);
+            fundClearing.setItems(getItemList(fundClearing, configListMap));
         }
         Boolean ifSuccess = updateBatchById(list);
         if (BooleanUtils.isNotTrue(ifSuccess)) {
@@ -207,18 +182,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             for (FundClearing fundClearing : fundClearingList) {
                 fundClearing.setStatus(FundClearing.Constants.待审核.toString());
                 fundClearing.setRemark(remark);
-                List<FundClearingItem> items = Lists.newArrayList();
-                List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
-                if (CollectionUtils.isEmpty(configList)) {
-                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
-                }
-                for (FundClearingItemConfig clearingItemConfig : configList) {
-                    BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
-                    if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                        FundClearingItem item = new FundClearingItem(clearingItemConfig.getName(), clearingItemConfig.getWalletType(), amt);
-                        items.add(item);
-                    }
-                }
+                final List<FundClearingItem> items = getItemList(fundClearing, configListMap);
                 fundClearing.setItems(items);
             }
             Boolean ifSuccess = updateBatchById(fundClearingList);
@@ -237,31 +201,20 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        List<FundClearingItemConfig> configAllList = fundClearingItemConfigService.list();
-        Map<String, List<FundClearingItemConfig>> configListMap = FunctionUtil.valueMap(configAllList, FundClearingItemConfig::getCommName);
+        Map<String, List<FundClearingItemConfig>> configListMap = fundClearingItemConfigService.getMap();
 
         List<List<FundClearing>> partition = Lists.partition(list, 100);
         for (List<FundClearing> fundClearingList : partition) {
             for (FundClearing fundClearing : fundClearingList) {
                 fundClearing.setStatus(FundClearing.Constants.待出款.toString());
                 fundClearing.setRemark(remark);
-                List<FundClearingItem> items = Lists.newArrayList();
-                List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
-                if (CollectionUtils.isEmpty(configList)) {
-                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
-                }
-                for (FundClearingItemConfig clearingItemConfig : configList) {
-                    BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
-                    if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                        FundClearingItem item = new FundClearingItem(clearingItemConfig.getName(), clearingItemConfig.getWalletType(), amt);
-                        items.add(item);
-                    }
-                }
+                List<FundClearingItem> items = getItemList(fundClearing, configListMap);
                 fundClearing.setItems(items);
             }
             updateBatchById(fundClearingList);
         }
     }
+
 
     @Override
     public void updateSend(List<Long> ids, String remark) {
@@ -273,6 +226,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
+        Map<String, List<FundClearingItemConfig>> configListMap = fundClearingItemConfigService.getMap();
 
         Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
         Date now = DateTimeUtils.getNow();
@@ -282,10 +236,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 fundClearing.setStatus(FundClearing.Constants.已出款.toString());
                 fundClearing.setClearingTime(now);
                 fundClearing.setRemark(remark);
-                List<FundClearingItem> items = fundClearing.getItems();
-                if (CollectionUtils.isEmpty(items)) {
-                    throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
-                }
+                List<FundClearingItem> items = getItemList(fundClearing, configListMap);
+                fundClearing.setItems(items);
                 for (FundClearingItem item : items) {
                     WalletConfig walletConfig = walletMap.get(item.getWalletType());
                     if (walletConfig != null) {
@@ -359,12 +311,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description,String commName) {
+    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Long id = 0L;
         List<FundClearingVo> result = Lists.newArrayList();
         do {
-            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName,commName);
+            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName, commName);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
@@ -411,6 +363,38 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             }
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    private static List<FundClearingItem> createItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {
+        List<FundClearingItem> items = Lists.newArrayList();
+        List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
+        if (CollectionUtils.isEmpty(configList)) {
+            return items;
+        }
+        for (FundClearingItemConfig clearingItemConfig : configList) {
+            BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
+            if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
+                FundClearingItem item = new FundClearingItem(clearingItemConfig.getName(), clearingItemConfig.getWalletType(), amt);
+                items.add(item);
+            }
+        }
+        return items;
+    }
+
+    private static List<FundClearingItem> getItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {
+        List<FundClearingItem> items = Lists.newArrayList();
+        List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
+        if (CollectionUtils.isEmpty(configList)) {
+            throw new CrmebException(fundClearing.getCommName() + "未配置出款规则" + fundClearing.getUniqueNo());
+        }
+        for (FundClearingItemConfig clearingItemConfig : configList) {
+            BigDecimal amt = clearingItemConfig.getScale().multiply(fundClearing.getSendAmt()).setScale(2, BigDecimal.ROUND_DOWN);
+            if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
+                FundClearingItem item = new FundClearingItem(clearingItemConfig.getName(), clearingItemConfig.getWalletType(), amt);
+                items.add(item);
+            }
+        }
+        return items;
     }
 
     public void setFundClearingWrapperByStatus(LambdaQueryWrapper<FundClearing> lqw, Integer uid, Integer headerStatus) {

@@ -1,24 +1,50 @@
 package com.jbp.front.service.impl;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.jbp.common.config.CrmebConfig;
+import com.jbp.common.constants.*;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.Wallet;
+import com.jbp.common.model.cat.Cart;
+import com.jbp.common.model.coupon.Coupon;
+import com.jbp.common.model.coupon.CouponProduct;
+import com.jbp.common.model.coupon.CouponUser;
+import com.jbp.common.model.express.ShippingTemplates;
+import com.jbp.common.model.express.ShippingTemplatesFree;
+import com.jbp.common.model.express.ShippingTemplatesRegion;
+import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.*;
+import com.jbp.common.model.seckill.SeckillProduct;
+import com.jbp.common.model.user.User;
+import com.jbp.common.model.user.UserAddress;
+import com.jbp.common.model.user.UserIntegralRecord;
+import com.jbp.common.model.wechat.video.PayComponentProduct;
+import com.jbp.common.model.wechat.video.PayComponentProductSku;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
+import com.jbp.front.service.FrontOrderService;
+import com.jbp.front.service.SeckillService;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
@@ -28,50 +54,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.beust.jcommander.internal.Sets;
-import com.github.pagehelper.PageInfo;
-import com.jbp.common.config.CrmebConfig;
-import com.jbp.common.constants.Constants;
-import com.jbp.common.constants.CouponConstants;
-import com.jbp.common.constants.GroupDataConstants;
-import com.jbp.common.constants.IntegralRecordConstants;
-import com.jbp.common.constants.OrderConstants;
-import com.jbp.common.constants.OrderStatusConstants;
-import com.jbp.common.constants.ProductConstants;
-import com.jbp.common.constants.RefundOrderConstants;
-import com.jbp.common.constants.ShippingTemplatesConstants;
-import com.jbp.common.constants.SysConfigConstants;
-import com.jbp.common.constants.TaskConstants;
-import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.cat.Cart;
-import com.jbp.common.model.coupon.Coupon;
-import com.jbp.common.model.coupon.CouponProduct;
-import com.jbp.common.model.coupon.CouponUser;
-import com.jbp.common.model.express.ShippingTemplates;
-import com.jbp.common.model.express.ShippingTemplatesFree;
-import com.jbp.common.model.express.ShippingTemplatesRegion;
-import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.seckill.SeckillProduct;
-import com.jbp.common.model.user.User;
-import com.jbp.common.model.user.UserAddress;
-import com.jbp.common.model.user.UserIntegralRecord;
-import com.jbp.common.model.wechat.video.PayComponentProduct;
-import com.jbp.common.model.wechat.video.PayComponentProductSku;
-import com.jbp.common.page.CommonPage;
-import com.jbp.front.service.FrontOrderService;
-import com.jbp.front.service.SeckillService;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * H5端订单操作
@@ -177,9 +167,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private ProductCommChain productCommChain;
 
-
-
-
+    @Autowired
+    private Environment environment;
 
     /**
      * 订单预下单V1.3
@@ -189,6 +178,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public OrderNoResponse preOrder_V1_3(PreOrderRequest request) {
+
         // 付款用户
         User payUser = userService.getInfo();
         // 校验预下单商品信息
@@ -1420,9 +1410,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         PageInfo<Order> pageInfo = orderService.getUserOrderList_v1_4(userId, request);
         List<Order> orderList = pageInfo.getList();
-        if (CollUtil.isEmpty(orderList)) {
-            return CommonPage.copyPageInfo(pageInfo, CollUtil.newArrayList());
-        }
+
         List<Integer> merIdList = orderList.stream().map(Order::getMerId).filter(i -> i > 0).distinct().collect(Collectors.toList());
         Map<Integer, Merchant> merchantMap = null;
         if (CollUtil.isNotEmpty(merIdList)) {
@@ -1453,6 +1441,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             infoResponse.setPayGateway(order.getPayGateway());
             responseList.add(infoResponse);
         }
+        //查询历史订单
+        String ifOpenOrder =environment.getProperty("historyOrder.ifOpenOrder");
+        if( Boolean.parseBoolean(ifOpenOrder)  && request.getPage() >= pageInfo.getPages() ){
+            responseList.addAll(getHistoryOrder(request.getStatus(),userId,request.getAgent()));
+        }
+
         return CommonPage.copyPageInfo(pageInfo, responseList);
     }
 
@@ -2322,7 +2316,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (NumberUtil.compare(riseInfo.getCapaId(), userCapaService.getByUser(user.getId()).getCapaId()) <= 0) {
                 throw new CrmebException("等级不能小于当前等级");
             }
-            capaId = riseInfo.getCapaId();
+            capaId =  userCapaService.getByUser(user.getId()).getCapaId();
             UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
             capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
             whiteIdList = whiteUserService.getByUser(user.getId());
@@ -3539,4 +3533,71 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderInfoVo.setWalletDeductionFee(walletDeductionFee);
         orderInfoVo.setWallwtDeductionList(totalMap.values().stream().collect(Collectors.toList()));
     }
+
+
+
+    public   List<OrderFrontDataResponse>  getHistoryOrder(Integer status,Integer userId,Boolean agent){
+        List<OrderFrontDataResponse> orderFrontDataResponses = new ArrayList<>();
+        String name =environment.getProperty("historyOrder.name");
+        StringBuilder stringBuilder = new StringBuilder("select *  from "+name+".orders   where 1=1 ");
+        if(status== -1){
+            stringBuilder.append(" and status IN (201,301,401,402,501 )");
+        }else if (status == 1){
+            stringBuilder.append(" and status IN (201)");
+        }else if (status == 6){
+            stringBuilder.append(" and status IN (401)");
+        }else if (status == 4){
+            stringBuilder.append(" and status IN (301)");
+        }else{
+            stringBuilder.append(" and status IN (1)");
+        }
+
+        if(agent != null && !agent){
+            stringBuilder.append(" and userId = "+userId+"");
+        }else{
+            stringBuilder.append(" and payuserId = "+userId+" and userId !=  "+userId+"");
+        }
+
+
+        List<Map<String,Object>> maps =  SqlRunner.db().selectList(stringBuilder.toString());
+        for(Map<String,Object> map : maps){
+
+            StringBuilder goodsSql = new StringBuilder("select * from "+name+".ordergoods   where  orderId =  "+map.get("id")+"");
+
+            List<Map<String,Object>> goodsMaps =  SqlRunner.db().selectList(goodsSql.toString());
+            List<OrderInfoFrontDataResponse> infoResponseList = CollUtil.newArrayList();
+            for(Map<String,Object> goodsMap :goodsMaps) {
+                OrderInfoFrontDataResponse orderInfoFrontDataResponse = new OrderInfoFrontDataResponse();
+                orderInfoFrontDataResponse.setProductName(goodsMap.get("goodsName").toString());
+                orderInfoFrontDataResponse.setImage(goodsMap.get("picUrl").toString());
+                orderInfoFrontDataResponse.setPrice(new BigDecimal(goodsMap.get("price").toString()));
+                orderInfoFrontDataResponse.setPayNum(Integer.valueOf(goodsMap.get("number").toString()));
+
+                infoResponseList.add(orderInfoFrontDataResponse);
+            }
+
+            Integer status2 = 0;
+            if(map.get("status").toString().equals("201")){
+                status2 = 1;
+            }else if (map.get("status").toString().equals("301")){
+                status2 = 4;
+            }else if (map.get("status").toString().equals("401")){
+                status2 =6;
+            }
+            OrderFrontDataResponse orderFrontDataResponse = new OrderFrontDataResponse();
+            orderFrontDataResponse.setOrderNo(map.get("orderSn").toString());
+            orderFrontDataResponse.setPaid(true);
+            orderFrontDataResponse.setPayTime( DateUtil.parse(map.get("payTime").toString()) );
+            orderFrontDataResponse.setPayPrice(new BigDecimal(map.get("payPrice").toString()));
+            orderFrontDataResponse.setStatus(status2);
+            orderFrontDataResponse.setCreateTime(DateUtil.parse(map.get("createTime").toString()));
+            orderFrontDataResponse.setOrderInfoList(infoResponseList);
+            orderFrontDataResponses.add(orderFrontDataResponse);
+
+
+        }
+        return orderFrontDataResponses;
+
+    }
+
 }
