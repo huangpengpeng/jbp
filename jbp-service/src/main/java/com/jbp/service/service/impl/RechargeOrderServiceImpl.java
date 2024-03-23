@@ -203,10 +203,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             WxPayJsResultVo vo = record.get("vo");
             String outTradeNo = record.getStr("outTradeNo");
             response.setJsConfig(vo);
+            response.setPayType(PayConstants.PAY_TYPE_WE_CHAT);
             rechargeOrder.setOutTradeNo(outTradeNo);
         }
         if (request.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY)) {
             String result = aliPayService.pay(rechargeNo, rechargePrice, "recharge", request.getPayChannel());
+            response.setPayType(PayConstants.PAY_TYPE_ALI_PAY);
             response.setAlipayRequest(result);
             rechargeOrder.setOutTradeNo(rechargeNo);
         }
@@ -214,6 +216,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), rechargeNo, rechargePrice, "卡包", request.getIp());
             response.setStatus(true);
             response.setLianLianCashierConfig(cashier);
+            response.setPayType(PayConstants.PAY_TYPE_LIANLIAN);
             rechargeOrder.setOutTradeNo(cashier.getAccp_txno());
         }
         rechargeOrder.setUid(user.getId());
