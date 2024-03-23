@@ -1,5 +1,6 @@
 package com.jbp.admin;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.task.order.OrderPayResultSyncTask;
@@ -60,6 +61,8 @@ public class JbpAdminApplication {
 //        OrderPayResultSyncTask payService = run.getBean(OrderPayResultSyncTask.class);
 //
 //        payService.payResultSync();
+
+
 
 
 

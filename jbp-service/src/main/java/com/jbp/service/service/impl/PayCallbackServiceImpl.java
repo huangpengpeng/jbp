@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.crypto.Cipher;
@@ -477,6 +479,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 }
                 if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
                     Boolean execute = transactionTemplate.execute(e -> {
+                        rechargeOrder.setPaid(true);
                         rechargeOrder.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
                         final boolean b = rechargeOrderService.updateById(rechargeOrder);
                         if (!b) {
@@ -494,7 +497,6 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 }
             }
         }
-
 
 
         return "Success";
