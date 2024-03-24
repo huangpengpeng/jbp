@@ -41,7 +41,7 @@ public class CapaController {
     private CapaPaymentHandler capaPaymentHandler;
 
 
-    @ApiOperation(value = "等级记录列表")
+    @ApiOperation(value = "等级记录列表[报单专用]")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<List<Capa>> getList() {
         return CommonResult.success(capaService.getList());
