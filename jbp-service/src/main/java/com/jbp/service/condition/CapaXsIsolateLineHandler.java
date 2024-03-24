@@ -69,7 +69,7 @@ public class CapaXsIsolateLineHandler implements ConditionHandler {
         RelationScore relationScore0 = relationScoreService.getByUser(uid, 0);
         BigDecimal score0 = relationScore0 == null ? BigDecimal.ZERO : relationScore0.getUsableScore().add(relationScore0.getUsedScore()).subtract(relationScore0.getFakeScore());
         RelationScore relationScore1 = relationScoreService.getByUser(uid, 1);
-        BigDecimal score1 = relationScore1 == null ? BigDecimal.ZERO : relationScore1.getUsableScore().add(relationScore1.getUsedScore()).subtract(relationScore0.getFakeScore());
+        BigDecimal score1 = relationScore1 == null ? BigDecimal.ZERO : relationScore1.getUsableScore().add(relationScore1.getUsedScore()).subtract(relationScore1.getFakeScore());
         // 小区业绩
         BigDecimal minTeam = BigDecimal.valueOf(Math.min(score0.doubleValue(), score1.doubleValue()));
         if (ArithmeticUtils.less(minTeam, BigDecimal.ZERO)) {

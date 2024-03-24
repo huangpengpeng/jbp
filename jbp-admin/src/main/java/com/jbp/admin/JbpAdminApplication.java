@@ -56,10 +56,13 @@ public class JbpAdminApplication {
 //
 //        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
 //        invitationScoreService.init();
-//
-//        OrderPayResultSyncTask payService = run.getBean(OrderPayResultSyncTask.class);
-//
-//        payService.payResultSync();
+
+        PayService payService = run.getBean(PayService.class);
+
+//        payService.payAfterProcessingTemp(
+//                "PT882171122922518255967"
+//        );
+
 
 
 

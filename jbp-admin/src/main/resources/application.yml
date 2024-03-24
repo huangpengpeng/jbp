@@ -38,4 +38,4 @@
 
   spring:
     profiles:
-      active: fny1
+      active: jh
