@@ -492,7 +492,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         throw new CrmebException("充值订单回执失败" + txnStatus);
                     }
                 } else {
-                    logger.error("lianlian pay error : 支付回调订单失败 ===》" + orderNo);
+                    logger.info("lianlian pay error : 支付回调订单状态未完成 ===》" + orderNo);
                     return "error";
                 }
             }

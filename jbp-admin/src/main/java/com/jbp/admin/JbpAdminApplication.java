@@ -1,19 +1,7 @@
 package com.jbp.admin;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.task.order.OrderPayResultSyncTask;
-import com.jbp.admin.task.order.OrderPaySuccessTask;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.common.model.agent.FundClearing;
-import com.jbp.common.model.agent.UserInfo;
-import com.jbp.common.model.user.User;
-import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.agent.InvitationScoreService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,8 +13,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.List;
 
 
 @EnableAsync //开启异步调用	
@@ -57,14 +43,11 @@ public class JbpAdminApplication {
 //        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
 //        invitationScoreService.init();
 
-        PayService payService = run.getBean(PayService.class);
+//        PayService payService = run.getBean(PayService.class);
 
 //        payService.payAfterProcessingTemp(
 //                "PT882171122922518255967"
 //        );
-
-
-
 
 
 
