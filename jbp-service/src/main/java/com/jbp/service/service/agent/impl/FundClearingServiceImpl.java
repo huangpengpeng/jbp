@@ -354,6 +354,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     public PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<>();
         setFundClearingWrapperByStatus(lqw, uid, headerStatus);
+        lqw.orderByDesc(FundClearing::getId);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = list(lqw);
         list.forEach(e -> {
