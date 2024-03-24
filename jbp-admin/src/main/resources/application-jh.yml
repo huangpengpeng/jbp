@@ -7,7 +7,7 @@ crmeb:
   imagePath: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/ # 服务器图片路径配置 斜杠结尾
   retailStoreBrokerageRatio: 30 #佣金返佣比例和上限
   activityStyleCachedTime: 10 #活动边框缓存周期 秒为单位，生产环境适当5-10分钟即可
-  activityStyleProductLimit: 100 # 活动边框指定商品上线
+  activityStyleProductLimit: 300 # 活动边框指定商品上线
   productTagCacheMinutes: 10 # 商品标签缓存分钟数
   orderCancelTime: 30 # 订单支付取消时间，单位分钟
   ignored: #安全路径白名单
