@@ -49,7 +49,7 @@ public class CapaController {
 
         List<Capa> capas = capaService.getList();
         String value =  systemConfigService.getValueByKey("system_register_capa");
-        if(value.equals("1")){
+        if(!value.isEmpty() && value.equals("1")){
             capas.remove(0);
         }
         return CommonResult.success(capas);
