@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.condition.CapaPaymentHandler;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.CapaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,12 +40,19 @@ public class CapaController {
     private CapaService capaService;
     @Autowired
     private CapaPaymentHandler capaPaymentHandler;
-
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     @ApiOperation(value = "等级记录列表[报单专用]")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<List<Capa>> getList() {
-        return CommonResult.success(capaService.getList());
+
+        List<Capa> capas = capaService.getList();
+        String value =  systemConfigService.getValueByKey("system_register_capa");
+        if(!value.isEmpty() && value.equals("1")){
+            capas.remove(0);
+        }
+        return CommonResult.success(capas);
     }
 
 
