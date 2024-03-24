@@ -87,7 +87,6 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
             User user = userService.getById(calculateResult.getUid());
             Integer uid = calculateResult.getUid();
 
-
             // 往上找拿钱的人
             BigDecimal upperAmt = calculateResult.getAmt().multiply(rule.getUpperRatio()).setScale(2, BigDecimal.ROUND_DOWN);
             if(ArithmeticUtils.gt(upperAmt, BigDecimal.ZERO)){

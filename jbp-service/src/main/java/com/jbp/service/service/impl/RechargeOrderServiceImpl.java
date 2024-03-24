@@ -42,6 +42,7 @@ import com.jbp.service.service.agent.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -418,6 +419,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
      *
      * @param rechargeOrder 支付订单
      */
+    @Async
     @Override
     public Boolean paySuccessAfter(RechargeOrder rechargeOrder) {
         User user = userService.getById(rechargeOrder.getUid());
@@ -480,7 +482,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         wrapper.set(RechargeOrder::getPayTime, CrmebDateUtil.nowDateTime());
         wrapper.eq(RechargeOrder::getId, id);
         wrapper.eq(RechargeOrder::getOrderNo, orderNo);
-        wrapper.eq(RechargeOrder::getPaid, false);
         return update(wrapper);
     }
 

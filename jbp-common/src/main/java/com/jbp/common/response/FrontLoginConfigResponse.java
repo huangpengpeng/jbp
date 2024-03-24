@@ -70,4 +70,7 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "h5头像")
     private String h5DefaultAvatar;
+
+    @ApiModelProperty(value = "游客模式")
+    private Boolean touristLoginOpen;
 }

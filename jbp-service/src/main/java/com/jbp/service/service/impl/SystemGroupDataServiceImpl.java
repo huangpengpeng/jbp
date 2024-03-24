@@ -18,7 +18,6 @@ import com.jbp.service.dao.SystemGroupDataDao;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.SystemFormTempService;
 import com.jbp.service.service.SystemGroupDataService;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -242,6 +241,5 @@ public class SystemGroupDataServiceImpl extends ServiceImpl<SystemGroupDataDao, 
         }
         return Boolean.FALSE;
     }
-
 }
 

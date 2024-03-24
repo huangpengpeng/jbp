@@ -61,6 +61,7 @@ public interface PageDiyService extends IService<PageDiy> {
      */
     PageDiyResponse getDiyPageByPageIdForFront(Integer id);
 
+
     /** 针对Admin
      * 根据id加载diy模版配置
      * @param id 对应的模版id

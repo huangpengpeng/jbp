@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.crypto.Cipher;
@@ -477,6 +479,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 }
                 if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
                     Boolean execute = transactionTemplate.execute(e -> {
+                        rechargeOrder.setPaid(true);
                         rechargeOrder.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
                         final boolean b = rechargeOrderService.updateById(rechargeOrder);
                         if (!b) {
@@ -489,12 +492,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         throw new CrmebException("充值订单回执失败" + txnStatus);
                     }
                 } else {
-                    logger.error("lianlian pay error : 支付回调订单失败 ===》" + orderNo);
+                    logger.info("lianlian pay error : 支付回调订单状态未完成 ===》" + orderNo);
                     return "error";
                 }
             }
         }
-
 
 
         return "Success";
