@@ -109,6 +109,7 @@ public class ExportServiceImpl implements ExportService {
                     List<Materials> materialsList = orderDetail.getMaterialsList();
                     // 没有设置物料 默认原始商品信息即可
                     if (CollectionUtils.isEmpty(materialsList)) {
+                        materialsList = Lists.newArrayList();
                         Materials materials = new Materials(orderDetail.getProductName(), 1, payPrice, orderDetail.getBarCode(), payPrice);
                         materialsList.add(materials);
                     }
