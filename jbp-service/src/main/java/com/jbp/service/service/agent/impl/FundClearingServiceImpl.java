@@ -321,7 +321,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 break;
             }
             result.addAll(fundClearingVos);
-            id = fundClearingVos.get(0).getId();
+            id = fundClearingVos.get(fundClearingVos.size()-1).getId();
         } while (true);
         return result;
     }

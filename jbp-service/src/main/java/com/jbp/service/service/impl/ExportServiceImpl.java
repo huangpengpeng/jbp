@@ -15,6 +15,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
@@ -157,11 +158,15 @@ public class ExportServiceImpl implements ExportService {
                         }
                         // 物料信息
                         BigDecimal price = materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity()));
-                        BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
+                        if(ArithmeticUtils.gt(materialsTotalPrice, BigDecimal.ZERO) && ArithmeticUtils.gt(payPrice, BigDecimal.ZERO)){
+                            BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
+                            vo.setMaterialsPrice(materialsPrice);
+                        }else{
+                            vo.setMaterialsPrice(BigDecimal.ZERO);
+                        }
                         vo.setMaterialsName(materials.getName());
                         vo.setMaterialsCode(materials.getCode());
                         vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getQuantity());
-                        vo.setMaterialsPrice(materialsPrice);
 
                         // 收货人
                         vo.setRealName(merchantOrder.getRealName());
