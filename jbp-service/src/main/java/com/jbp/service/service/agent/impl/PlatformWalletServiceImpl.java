@@ -117,5 +117,4 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
         walletService.increase(uid, type, amt, operate, externalNo, postscript);
         return Boolean.TRUE;
     }
-
 }

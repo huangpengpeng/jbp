@@ -1046,6 +1046,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setPayGateway(orderInfoVo.getPayGateway());
         order.setPlatform(orderRequest.getPlatform());
         order.setIp(orderRequest.getIp());
+        order.setIfPull(false);
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
@@ -1061,7 +1062,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             MerchantOrder merchantOrder = new MerchantOrder();
             merchantOrder.setOrderNo(order.getOrderNo());
             merchantOrder.setMerId(merchantOrderVo.getMerId());
-            merchantOrder.setUid(payUser.getId());
+            merchantOrder.setUid(orderInfoVo.getUid());
+            merchantOrder.setPayUid(payUser.getId());
             for (OrderMerchantRequest om : orderMerchantRequestList) {
                 if (om.getMerId().equals(merchantOrderVo.getMerId())) {
                     if (StrUtil.isNotBlank(om.getRemark())) {
@@ -1199,7 +1201,6 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 UserIntegralRecord userIntegralRecord = initOrderUseIntegral(payUser.getId(), order.getUseIntegral(), payUser.getIntegral(), order.getOrderNo());
                 userIntegralRecordService.save(userIntegralRecord);
             }
-
             if (CollUtil.isNotEmpty(couponIdList)) {
                 couponUserService.useBatch(couponIdList);
             }
@@ -1209,6 +1210,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (CollUtil.isNotEmpty(orderInfoVo.getCartIdList())) {
                 cartService.deleteCartByIds(orderInfoVo.getCartIdList());
             }
+            // 抵扣积分
+            walletService.deduction(order.getPayUid(), order.getWalletDeductionList(), order.getOrderNo(), "付款抵扣");
             return Boolean.TRUE;
         });
         if (!execute) {

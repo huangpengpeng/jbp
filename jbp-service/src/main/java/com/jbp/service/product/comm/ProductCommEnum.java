@@ -46,6 +46,7 @@ public enum ProductCommEnum {
     @Getter
     private final String desc;
 
+
     ProductCommEnum(Integer type, String name, Boolean ifWhole, String desc) {
         this.type = type;
         this.name = name;

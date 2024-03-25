@@ -17,4 +17,5 @@ public interface PlatformWalletFlowService extends IService<PlatformWalletFlow> 
     PageInfo<PlatformWalletFlow> pageList(Integer type,String dateLimit,String externalNo, PageParamRequest pageParamRequest);
 
     List<PlatformWalletFlowVo> excel(Integer type, String dateLimit, String externalNo);
+
 }

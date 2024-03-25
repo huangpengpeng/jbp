@@ -1,7 +1,9 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -10,17 +12,21 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.order.Order;
+import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.WalletDao;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.service.agent.WalletService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -33,17 +39,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements WalletService {
     @Resource
-    WalletFlowService walletFlowService;
+    private WalletFlowService walletFlowService;
     @Resource
-    PlatformWalletService platformWalletService;
+    private PlatformWalletService platformWalletService;
     @Resource
-    WalletConfigService walletConfigService;
+    private WalletConfigService walletConfigService;
     @Resource
-    UserService userService;
+    private UserService userService;
 
     @Override
     public Wallet add(Integer uId, Integer type) {
@@ -107,6 +114,40 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     }
 
     @Override
+    public void deduction(Integer uid, List<ProductDeduction> deductionList, String externalNo, String postscript) {
+        if (CollUtil.isEmpty(deductionList)) {
+            return;
+        }
+        List<WalletFlow> walletFlows = walletFlowService.getByUser(uid, externalNo, WalletFlow.OperateEnum.抵扣.toString(), WalletFlow.ActionEnum.支出.name());
+        if (CollUtil.isNotEmpty(walletFlows)) {
+            return;
+        }
+        for (ProductDeduction deduction : deductionList) {
+            if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
+                transferToPlatform(uid, deduction.getWalletType(), deduction.getDeductionFee(),
+                        WalletFlow.OperateEnum.抵扣.toString(), externalNo, postscript);
+            }
+        }
+    }
+
+    @Override
+    public void refundDeduction(Integer uid, String externalNo, String postscript) {
+        List<WalletFlow> walletFlows = walletFlowService.getByUser(uid, externalNo, WalletFlow.OperateEnum.抵扣.toString(),
+                WalletFlow.ActionEnum.收入.name());
+        if (CollectionUtils.isNotEmpty(walletFlows)) {
+            return;
+        }
+        walletFlows = walletFlowService.getByUser(uid, externalNo, WalletFlow.OperateEnum.抵扣.toString(), WalletFlow.ActionEnum.支出.name());
+        if (CollUtil.isEmpty(walletFlows)) {
+            return;
+        }
+        for (WalletFlow flow : walletFlows) {
+            platformWalletService.transferToUser(flow.getUid(), flow.getWalletType(), flow.getAmt(),
+                    WalletFlow.OperateEnum.抵扣.toString(), externalNo, postscript);
+        }
+    }
+
+    @Override
     public Boolean transfer(Integer uid, Integer receiveUserId, BigDecimal amt, Integer type, String postscript) {
         String externalNo = StringUtils.N_TO_10("ZZ_");
         reduce(uid, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript);
@@ -155,5 +196,24 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
             throw new CrmebException("平台未配置可付款积分类型");
         }
         return getByUser(uid, walletConfig.getType());
+    }
+
+    @Resource
+    private OrderService orderService;
+    @Override
+    public void init() {
+        QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Order::getLevel, 0);
+        List<Order> list = orderService.list(queryWrapper);
+        for (Order order : list) {
+            deduction(order.getPayUid(), order.getWalletDeductionList(), order.getOrderNo(), "下单抵扣");
+            log.info("正在初始化抵扣减少");
+        }
+        for (Order order : list) {
+            if (order.getStatus().equals(Integer.valueOf(9))) {
+                refundDeduction(order.getPayUid(), order.getOrderNo(), "取消回退");
+                log.info("正在初始化抵扣回退");
+            }
+        }
     }
 }

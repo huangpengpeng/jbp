@@ -323,4 +323,8 @@ public interface OrderService extends IService<Order> {
      * 获取待支付订单
      */
     List<Order> getWaitPayList(int intervalMinutes);
+
+    List<Order> getWaitPullList();
+
+
 }
