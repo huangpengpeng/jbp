@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
@@ -62,6 +63,8 @@ public class ExportServiceImpl implements ExportService {
     private MerchantOrderService merchantOrderService;
     @Resource
     private ProductMaterialsService productMaterialsService;
+    @Resource
+    private TeamUserService teamUserService;
 
     /**
      * 订单导出
@@ -140,7 +143,17 @@ public class ExportServiceImpl implements ExportService {
                         // 组装订单
                         OrderExcelVo vo = new OrderExcelVo();
                         vo.setType(order.getOrderType());
+                        vo.setPlatOrderNo(order.getPlatOrderNo());
                         vo.setOrderNo(order.getOrderNo());
+                        vo.setPlatform(order.getPlatform());
+                        if(order.getUid() != null) {
+                            TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                            if (teamUser != null) {
+                                vo.setTeam(teamUser.getName());
+                            }
+                        }else{
+                            vo.setTeam("");
+                        }
                         Merchant merchant = merchantMap.get(order.getMerId());
                         vo.setMerName("平台商");
                         if(merchant != null){
@@ -213,7 +226,12 @@ public class ExportServiceImpl implements ExportService {
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("orderDetailId", "订单详情ID");
         head.put("type", "订单类型");
-        head.put("orderNo", "订单号");
+        head.put("platOrderNo", "平台单号");
+        head.put("orderNo", "商户单号");
+        head.put("platform", "场景");
+        head.put("team", "团队");
+
+
         head.put("merName", "商户名称");
         head.put("uid", "用户ID");
         head.put("userAccount", "下单账号");
