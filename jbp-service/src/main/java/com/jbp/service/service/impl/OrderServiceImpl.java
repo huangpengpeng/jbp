@@ -118,7 +118,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     @Override
     public String getPlatOrderNo(String orderNo) {
-        return getByOrderNo(orderNo).getPlatOrderNo();
+        Order order = getByOrderNo(orderNo);
+        return StringUtils.isEmpty(order.getPlatOrderNo()) ? orderNo : order.getPlatOrderNo();
     }
 
     /**
