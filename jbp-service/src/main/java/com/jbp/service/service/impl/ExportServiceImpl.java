@@ -7,8 +7,8 @@ import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.order.Materials;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -22,6 +22,7 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,10 +58,10 @@ public class ExportServiceImpl implements ExportService {
     private UserService userService;
     @Autowired
     private OrderDetailService orderDetailService;
-    @Autowired
-    private WalletConfigService walletConfigService;
     @Resource
     private MerchantOrderService merchantOrderService;
+    @Resource
+    private ProductMaterialsService productMaterialsService;
 
     /**
      * 订单导出
@@ -70,8 +71,10 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
-        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus()) && ObjectUtils.isEmpty(request.getType())) {
-            throw new CrmebException("请选择一个查询条件");
+        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
+                && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
+                && ObjectUtils.isEmpty(request.getType())) {
+            throw new CrmebException("请至少选择一个查询条件");
         }
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         if (systemAdmin.getMerId() > 0) {
@@ -81,6 +84,8 @@ public class ExportServiceImpl implements ExportService {
         Integer id = 0;
         List<OrderExcelVo> voList = CollUtil.newArrayList();
         Map<String, String> walletDeductionMap = Maps.newConcurrentMap();
+
+        Map<String, List<ProductMaterials>> materialsMap = Maps.newConcurrentMap();
         do {
             List<Order> orderList = orderService.findExportList(request, id);
             if (CollectionUtils.isEmpty(orderList)) {
@@ -94,7 +99,11 @@ public class ExportServiceImpl implements ExportService {
             userIdList = userIdList.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
 
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
+            Map<Integer, Merchant> merchantMap = Maps.newConcurrentMap();
+            if(CollectionUtils.isNotEmpty(merIdList)){
+                merchantMap = merchantService.getMapByIdList(merIdList);
+            }
+
             Map<Integer, User> userMap = userService.getUidMapList(userIdList);
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
 
@@ -106,31 +115,44 @@ public class ExportServiceImpl implements ExportService {
                 List<OrderDetail> orderDetailsList = orderDetailMap.get(order.getOrderNo());
                 // 循环设置
                 for (OrderDetail orderDetail : orderDetailsList) {
+                    // 获取物料信息
                     BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
-                    List<Materials> materialsList = orderDetail.getMaterialsList();
-                    // 没有设置物料 默认原始商品信息即可
-                    if (CollectionUtils.isEmpty(materialsList)) {
-                        materialsList = Lists.newArrayList();
-                        Materials materials = new Materials(orderDetail.getProductName(), 1, payPrice, orderDetail.getBarCode(), payPrice);
-                        materialsList.add(materials);
+                    List<ProductMaterials> productMaterials = materialsMap.get(orderDetail.getBarCode());
+                    if (CollectionUtils.isEmpty(productMaterials)) {
+                        productMaterials = productMaterialsService.getByBarCode(merchantOrder.getMerId(), orderDetail.getBarCode());
+                        if (CollectionUtils.isEmpty(productMaterials)) {
+                            productMaterials = Lists.newArrayList();
+                            ProductMaterials materials = new ProductMaterials(merchantOrder.getMerId(),
+                                    orderDetail.getBarCode(), orderDetail.getProductName(), 1, payPrice.divide(BigDecimal.valueOf(orderDetail.getPayNum()), 4, BigDecimal.ROUND_DOWN), orderDetail.getBarCode());
+                            productMaterials.add(materials);
+                        }
+                        materialsMap.put(orderDetail.getBarCode(), productMaterials);
                     }
+
+
                     // 物料总价
                     BigDecimal materialsTotalPrice = BigDecimal.ZERO;
-                    for (Materials materials : materialsList) {
-                        materialsTotalPrice = materialsTotalPrice.add(materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity())));
+                    for (ProductMaterials materials : productMaterials) {
+                        materialsTotalPrice = materialsTotalPrice.add(materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity())));
                     }
                     // 物料信息
-                    for (Materials materials : materialsList) {
+                    for (ProductMaterials materials : productMaterials) {
                         // 组装订单
                         OrderExcelVo vo = new OrderExcelVo();
                         vo.setType(order.getOrderType());
                         vo.setOrderNo(order.getOrderNo());
-                        vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "平台商");
+                        Merchant merchant = merchantMap.get(order.getMerId());
+                        vo.setMerName("平台商");
+                        if(merchant != null){
+                            vo.setMerName(merchant.getName());
+                        }
                         if (order.getUid() != null) {
                             vo.setUid(order.getUid());
                             vo.setUserAccount(userMap.get(order.getUid()).getAccount());
                         }
-                        vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                        if (order.getPayUid() != null) {
+                            vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                        }
                         vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
                         vo.setPayPostage(order.getPayPostage());
                         vo.setCouponPrice(order.getCouponPrice());
@@ -157,16 +179,16 @@ public class ExportServiceImpl implements ExportService {
                             }
                         }
                         // 物料信息
-                        BigDecimal price = materials.getPrice().multiply(BigDecimal.valueOf(materials.getQuantity()));
-                        if(ArithmeticUtils.gt(materialsTotalPrice, BigDecimal.ZERO) && ArithmeticUtils.gt(payPrice, BigDecimal.ZERO)){
+                        BigDecimal price = materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity()));
+                        if (ArithmeticUtils.gt(materialsTotalPrice, BigDecimal.ZERO) && ArithmeticUtils.gt(payPrice, BigDecimal.ZERO)) {
                             BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
                             vo.setMaterialsPrice(materialsPrice);
-                        }else{
+                        } else {
                             vo.setMaterialsPrice(BigDecimal.ZERO);
                         }
-                        vo.setMaterialsName(materials.getName());
-                        vo.setMaterialsCode(materials.getCode());
-                        vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getQuantity());
+                        vo.setMaterialsName(materials.getMaterialsName());
+                        vo.setMaterialsCode(materials.getMaterialsCode());
+                        vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getMaterialsQuantity());
 
                         // 收货人
                         vo.setRealName(merchantOrder.getRealName());
@@ -243,7 +265,7 @@ public class ExportServiceImpl implements ExportService {
             head.put(k, v);
         });
         JSONArray array = new JSONArray();
-        head.forEach((k,v)->{
+        head.forEach((k, v) -> {
             JSONObject json = new JSONObject();
             json.put("k", k);
             json.put("v", v);

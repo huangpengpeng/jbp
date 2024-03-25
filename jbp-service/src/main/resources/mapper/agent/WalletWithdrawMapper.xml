@@ -102,7 +102,7 @@
                 and asentity.real_name=#{realName}
             </if>
         </where>
-        ORDER BY w.id DESC
+        ORDER BY w.id ASC
         LIMIT 1000
     </select>
 </mapper>

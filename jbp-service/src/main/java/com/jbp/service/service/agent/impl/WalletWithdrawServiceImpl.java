@@ -73,13 +73,17 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(), channelName);
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
             voList.addAll(fundClearingVos);
-            id = fundClearingVos.get(0).getId();
+            id = fundClearingVos.get(fundClearingVos.size() - 1).getId();
         } while (true);
+        return getWalletWithdrawExcelInfoVo(voList);
+    }
+
+    private static WalletWithdrawExcelInfoVo getWalletWithdrawExcelInfoVo(List<WalletWithdrawVo> voList) {
         WalletWithdrawExcelInfoVo walletWithdrawExcelInfoVo = new WalletWithdrawExcelInfoVo();
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("account", "账户");
@@ -106,6 +110,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         walletWithdrawExcelInfoVo.setList(voList);
         return walletWithdrawExcelInfoVo;
     }
+
     @Override
     public WalletWithdraw create(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, String postscript) {
         if (amt == null || ArithmeticUtils.less(amt, BigDecimal.ZERO)) {
