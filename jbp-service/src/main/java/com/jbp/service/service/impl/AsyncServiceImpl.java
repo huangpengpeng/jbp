@@ -28,6 +28,7 @@ import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -192,7 +193,8 @@ public class AsyncServiceImpl implements AsyncService {
     @Override
     public void orderPaySuccessSplit(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
-        if(StringUtils.isNotEmpty(order.getPlatOrderNo())){
+        List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
+        if (CollectionUtils.isNotEmpty(shOrders)) {
             redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
         }
         if (ObjectUtil.isNull(order)) {
