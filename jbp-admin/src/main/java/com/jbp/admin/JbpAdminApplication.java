@@ -1,6 +1,8 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.order.Order;
+import com.jbp.service.product.profit.UserWalletHandler;
 import com.jbp.service.service.PayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -43,7 +45,6 @@ public class JbpAdminApplication {
 //        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
 //        invitationScoreService.init();
 
-//        PayService payService = run.getBean(PayService.class);
 
 //        payService.payAfterProcessingTemp(
 //                "PT882171122922518255967"
