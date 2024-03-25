@@ -683,12 +683,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             return dataResponse;
         }).collect(Collectors.toList());
         response.setOrderDetailList(orderInfoList);
-
         // 用户信息
-        User user = userService.getById(order.getUid());
-        response.setNikeName(user.getNickname());
-        response.setPhone(user.getPhone());
-        response.setIsLogoff(user.getIsLogoff());
+        if(order.getUid() != null){
+            User user = userService.getById(order.getUid());
+            response.setNikeName(user.getNickname());
+            response.setPhone(user.getPhone());
+            response.setIsLogoff(user.getIsLogoff());
+        }
         if (merchantOrder.getClerkId() > 0) {
             SystemAdmin clerkAdmin = systemAdminService.getById(merchantOrder.getClerkId());
             response.setClerkName(clerkAdmin.getRealName());

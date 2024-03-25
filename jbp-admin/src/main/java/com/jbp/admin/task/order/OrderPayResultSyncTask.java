@@ -38,7 +38,7 @@ public class OrderPayResultSyncTask {
         // cron : 0 */1 * * * ?
         logger.info("---OrderPayResultSyncTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {
-            List<Order> orders = orderService.getWaitPayList(15);
+            List<Order> orders = orderService.getWaitPayList(3);
             for (Order order : orders) {
                 if (order.getPayChannel().equals(PayConstants.PAY_TYPE_LIANLIAN) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
                     QueryPaymentResult result = lianLianPayService.queryPayResult(order.getOrderNo());
@@ -47,7 +47,7 @@ public class OrderPayResultSyncTask {
                     }
                 }
             }
-            List<RechargeOrder> rechargeOrders = rechargeOrderService.getWaitPayList(15);
+            List<RechargeOrder> rechargeOrders = rechargeOrderService.getWaitPayList(3);
             for (RechargeOrder order : rechargeOrders) {
                 if (order.getPayChannel().equals(PayConstants.PAY_TYPE_LIANLIAN) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
                     QueryPaymentResult result = lianLianPayService.queryPayResult(order.getOrderNo());
