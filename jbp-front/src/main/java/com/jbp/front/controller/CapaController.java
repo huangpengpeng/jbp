@@ -43,7 +43,7 @@ public class CapaController {
     @Autowired
     private SystemConfigService systemConfigService;
 
-    @ApiOperation(value = "等级记录列表")
+    @ApiOperation(value = "等级记录列表[报单专用]")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<List<Capa>> getList() {
 

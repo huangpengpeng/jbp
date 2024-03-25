@@ -321,7 +321,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 break;
             }
             result.addAll(fundClearingVos);
-            id = fundClearingVos.get(0).getId();
+            id = fundClearingVos.get(fundClearingVos.size()-1).getId();
         } while (true);
         return result;
     }
@@ -354,6 +354,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     public PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<>();
         setFundClearingWrapperByStatus(lqw, uid, headerStatus);
+        lqw.orderByDesc(FundClearing::getId);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = list(lqw);
         list.forEach(e -> {
