@@ -668,9 +668,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 userIntegralRecordService.save(userIntegralRecord);
             }
             // 回退抵扣
-            wa
-
-
+            walletService.refundDeduction(order.getPayUid(), order.getOrderNo(), "订单取消");
             // 回滚库存
             Boolean rollbackStock = rollbackStock(order);
             if (!rollbackStock) {
