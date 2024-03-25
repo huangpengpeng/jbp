@@ -128,7 +128,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             wrapper.eq("refund_order_no", request.getRefundOrderNo());
         }
         if (StrUtil.isNotEmpty(request.getOrderNo())) {
-            wrapper.eq("order_no", request.getOrderNo());
+            List<Order> orders = orderService.getByPlatOrderNo(request.getOrderNo());
+            if(CollUtil.isNotEmpty(orders)){
+                wrapper.in("order_no", orders.stream().map(Order::getOrderNo).collect(Collectors.toList()));
+            }
         }
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(wrapper, request.getDateLimit());
@@ -141,6 +144,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         }
         List<Integer> uidList = refundOrderList.stream().map(RefundOrder::getUid).distinct().collect(Collectors.toList());
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
+        List<String> orderNoList = refundOrderList.stream().map(RefundOrder::getOrderNo).collect(Collectors.toList());
+        List<Order> orderList = orderService.list(new QueryWrapper<Order>().lambda().in(Order::getOrderNo, orderNoList));
+        Map<String, Order> orderMap = FunctionUtil.keyValueMap(orderList, Order::getOrderNo);
         List<MerchantRefundOrderPageResponse> responseList = refundOrderList.stream().map(order -> {
             MerchantRefundOrderPageResponse response = new MerchantRefundOrderPageResponse();
             response.setRefundOrderNo(order.getRefundOrderNo());
@@ -152,6 +158,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             response.setMerRemark(order.getMerRemark());
             response.setAfterSalesType(order.getAfterSalesType());
             response.setUserNickName(userMap.get(order.getUid()).getNickname());
+            Order o = orderMap.get(order.getOrderNo());
+            response.setOrderNo(o.getPlatOrderNo());
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
@@ -165,7 +173,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
      */
     @Override
     public Boolean refundApply(OrderRefundApplyRequest request) {
-        Order order = orderService.getByOrderNo(request.getOrderNo());
+        OrderDetail orderDetail = orderDetailService.getById(request.getOrderDetailId());
+        int canApplyNum = orderDetail.getPayNum() - orderDetail.getApplyRefundNum() - orderDetail.getRefundNum();
+        if (canApplyNum < request.getNum()) {
+            throw new CrmebException(StrUtil.format("剩余可退款数量为{}", canApplyNum));
+        }
+        if (ObjectUtil.isNull(orderDetail)) {
+            throw new CrmebException("订单详情不存在");
+        }
+        Order order = orderService.getByOrderNo(orderDetail.getOrderNo());
         if (order.getIsUserDel()) {
             throw new CrmebException("订单不存在");
         }
@@ -181,16 +197,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         if (order.getStatus().equals(OrderConstants.ORDER_STATUS_COMPLETE)) {
             throw new CrmebException("已完成订单无法申请退款");
         }
-        OrderDetail orderDetail = orderDetailService.getById(request.getOrderDetailId());
-        if (ObjectUtil.isNull(orderDetail) || !orderDetail.getOrderNo().equals(order.getOrderNo())) {
-            throw new CrmebException("订单详情不存在");
-        }
-        int canApplyNum = orderDetail.getPayNum() - orderDetail.getApplyRefundNum() - orderDetail.getRefundNum();
-        if (canApplyNum < request.getNum()) {
-            throw new CrmebException(StrUtil.format("剩余可退款数量为{}", canApplyNum));
-        }
-        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
 
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
         RefundOrder refundOrder = new RefundOrder();
         refundOrder.setRefundOrderNo(CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_REFUND));
         refundOrder.setOrderNo(order.getOrderNo());
@@ -286,6 +294,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             save(refundOrder);
             refundOrderInfoService.save(refundOrderInfo);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_APPLY, "用户发起退款单申请");
+            productCommChain.orderRefundIntercept(orderService.getByOrderNo(refundOrder.getOrderNo()));
             return Boolean.TRUE;
         });
         if (!execute) throw new CrmebException("申请退款失败");
@@ -1046,7 +1055,6 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             throw new CrmebException("退款单状态异常");
         }
         refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REVOKE);
-        productCommChain.orderRefundIntercept(orderService.getByOrderNo(refundOrder.getOrderNo()));
         return updateById(refundOrder);
     }
 
@@ -1083,6 +1091,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 updateById(refundOrder);
                 orderDetailService.updateById(orderDetail);
                 refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
+                productCommChain.orderCancelIntercept(orderService.getByOrderNo(refundOrder.getOrderNo()));
                 return Boolean.TRUE;
             });
             if (execute) {
@@ -1187,7 +1196,6 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             orderDetailService.updateById(orderDetail);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
-            productCommChain.orderCancelIntercept(order);
             return Boolean.TRUE;
         });
         if (execute) {
@@ -1387,6 +1395,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
             productProfitChain.orderRefund(order, refundOrder);
+            productCommChain.orderRefundIntercept(order);
             return Boolean.TRUE;
         });
         if (execute) {

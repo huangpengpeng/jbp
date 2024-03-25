@@ -558,10 +558,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             lqw.eq(Order::getMerId, request.getMerId());
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
-            lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
-        }
-        if (StrUtil.isNotBlank(request.getPlatOrderNo())) {
-            lqw.like(Order::getPlatOrderNo, URLUtil.decode(request.getPlatOrderNo()));
+            lqw.and((wrapper) -> {
+                wrapper.eq(Order::getOrderNo, request.getOrderNo())
+                        .or().eq(Order::getPlatOrderNo, request.getOrderNo());
+            });
         }
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());
@@ -617,6 +617,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             pageResponse.setShippingType(merchantOrder.getShippingType());
             pageResponse.setUserRemark(merchantOrder.getUserRemark());
             pageResponse.setMerRemark(merchantOrder.getMerchantRemark());
+            if(StringUtils.isNotEmpty(pageResponse.getPlatOrderNo())){
+                pageResponse.setOrderNo(pageResponse.getPlatOrderNo());
+            }
             User user = userMap.get(e.getUid());
             if (user != null) {
                 pageResponse.setUid(user.getId());
@@ -1121,7 +1124,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             lqw.eq(Order::getMerId, request.getMerId());
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
-            lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
+            lqw.and((wrapper) -> {
+                wrapper.eq(Order::getOrderNo, request.getOrderNo())
+                        .or().eq(Order::getPlatOrderNo, request.getOrderNo());
+            });
         }
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());

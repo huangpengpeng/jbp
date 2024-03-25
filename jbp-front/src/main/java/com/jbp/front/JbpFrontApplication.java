@@ -3,6 +3,8 @@ package com.jbp.front;
 import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
+import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
 import com.jbp.service.service.agent.WalletService;

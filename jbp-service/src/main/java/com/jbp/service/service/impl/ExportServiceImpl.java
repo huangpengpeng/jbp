@@ -95,7 +95,6 @@ public class ExportServiceImpl implements ExportService {
                 break;
             }
             // 商户 用户 订单 数据准备
-            List<Integer> merIdList = orderList.stream().filter(e -> e.getMerId() > 0).map(Order::getMerId).distinct().collect(Collectors.toList());
             List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
             List<Integer> payUserIdList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
             userIdList.addAll(payUserIdList);
@@ -126,7 +125,6 @@ public class ExportServiceImpl implements ExportService {
                         materialsMap.put(orderDetail.getBarCode(), productMaterials);
                     }
 
-
                     // 物料总价
                     BigDecimal materialsTotalPrice = BigDecimal.ZERO;
                     for (ProductMaterials materials : productMaterials) {
@@ -137,8 +135,10 @@ public class ExportServiceImpl implements ExportService {
                         // 组装订单
                         OrderExcelVo vo = new OrderExcelVo();
                         vo.setType(order.getOrderType());
-                        vo.setPlatOrderNo(order.getPlatOrderNo());
                         vo.setOrderNo(order.getOrderNo());
+                        if(StringUtils.isNotEmpty(order.getPlatOrderNo())){
+                            vo.setOrderNo(order.getPlatOrderNo());
+                        }
                         vo.setPlatform(order.getPlatform());
                         if(order.getUid() != null) {
                             TeamUser teamUser = teamUserService.getByUser(order.getUid());
@@ -216,7 +216,6 @@ public class ExportServiceImpl implements ExportService {
         head.put("orderDetailId", "订单详情ID");
         head.put("type", "订单类型");
         head.put("platform", "场景");
-        head.put("platOrderNo", "结算单号");
         head.put("orderNo", "单号");
         head.put("uid", "用户ID");
         head.put("userAccount", "下单账号");

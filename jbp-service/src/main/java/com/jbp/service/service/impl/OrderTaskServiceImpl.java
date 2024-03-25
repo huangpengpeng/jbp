@@ -267,7 +267,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
      *
      * @param refundOrderNo 退款订单号
      */
-    private Boolean refundAfterProcessing(String refundOrderNo) {
+    public Boolean refundAfterProcessing(String refundOrderNo) {
         RefundOrder refundOrder = refundOrderService.getInfoException(refundOrderNo);
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND)) {
             throw new CrmebException("退款单状态异常");
