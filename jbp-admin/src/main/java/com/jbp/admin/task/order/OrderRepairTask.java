@@ -38,7 +38,7 @@ public class OrderRepairTask {
             List<Map<String, Object>> maps = SqlRunner.db().selectList(sql);
             for (Map<String, Object> map : maps) {
                 String order_no = MapUtils.getString(map, "order_no");
-                asyncService.orderPaySuccessSplit(order_no);
+                asyncService.orderPaySuccessSplit2(order_no);
             }
         } catch (Exception e) {
             e.printStackTrace();
