@@ -846,7 +846,12 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             response.setMerRemark(order.getMerRemark());
             response.setAfterSalesType(order.getAfterSalesType());
             response.setUserNickName(userMap.get(order.getUid()).getNickname());
-            response.setMerName(merchantMap.get(order.getMerId()).getName());
+            Merchant merchant = merchantMap.get(order.getMerId());
+            if(merchant != null){
+                response.setMerName(merchant.getName());
+            }else{
+                response.setMerName("平台");
+            }
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);

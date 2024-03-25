@@ -548,8 +548,14 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
      */
     @Override
     public Map<Integer, Merchant> getMerIdMapByIdList(List<Integer> merIdList) {
-        List<Merchant> merchantList = getListByIdList(merIdList);
         Map<Integer, Merchant> merchantMap = new HashMap<>();
+        if(CollUtil.isEmpty(merIdList)){
+            return merchantMap;
+        }
+        List<Merchant> merchantList = getListByIdList(merIdList);
+        if(CollUtil.isEmpty(merchantList)){
+            return merchantMap;
+        }
         merchantList.forEach(merchant -> {
             merchantMap.put(merchant.getId(), merchant);
         });
