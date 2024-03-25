@@ -44,7 +44,14 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
 
     @Override
     public TeamUser getByUser(Integer uId) {
-        return getOne(new LambdaQueryWrapper<TeamUser>().eq(TeamUser::getUid, uId));
+         TeamUser one = getOne(new LambdaQueryWrapper<TeamUser>().eq(TeamUser::getUid, uId));
+         if(one != null && one.getTid() != null){
+             Team team = teamService.getById(one.getTid());
+             if(team != null){
+                 one.setName(team.getName());
+             }
+         }
+        return one;
     }
 
     @Override

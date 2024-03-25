@@ -100,13 +100,7 @@ public class ExportServiceImpl implements ExportService {
             List<Integer> payUserIdList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
             userIdList.addAll(payUserIdList);
             userIdList = userIdList.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
-
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, Merchant> merchantMap = Maps.newConcurrentMap();
-            if(CollectionUtils.isNotEmpty(merIdList)){
-                merchantMap = merchantService.getMapByIdList(merIdList);
-            }
-
             Map<Integer, User> userMap = userService.getUidMapList(userIdList);
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
 
@@ -153,11 +147,6 @@ public class ExportServiceImpl implements ExportService {
                             }
                         }else{
                             vo.setTeam("");
-                        }
-                        Merchant merchant = merchantMap.get(order.getMerId());
-                        vo.setMerName("平台商");
-                        if(merchant != null){
-                            vo.setMerName(merchant.getName());
                         }
                         if (order.getUid() != null) {
                             vo.setUid(order.getUid());
@@ -226,13 +215,10 @@ public class ExportServiceImpl implements ExportService {
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("orderDetailId", "订单详情ID");
         head.put("type", "订单类型");
-        head.put("platOrderNo", "平台单号");
-        head.put("orderNo", "商户单号");
+        head.put("orderNo", "单号");
+        head.put("platOrderNo", "结算单号");
         head.put("platform", "场景");
         head.put("team", "团队");
-
-
-        head.put("merName", "商户名称");
         head.put("uid", "用户ID");
         head.put("userAccount", "下单账号");
         head.put("payUserAccount", "付款账号");
