@@ -90,4 +90,8 @@ public class UserCenterResponse implements Serializable {
     @ApiModelProperty(value = "个人中心订单")
     private List<HashMap<String,Object>> orderMenu;
 
+
+    @ApiModelProperty(value = "用户等级")
+    private Long capaLevel;
+
 }

@@ -143,6 +143,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         }
         UserCapa capa = userCapaService.getByUser(uid);
         response.setCapaPic(capa != null ? capa.getCapaUrl() : "");
+        response.setCapaLevel(capa != null ? capa.getCapaId() : 0);
         UserCapaXs capaXs = userCapaXsService.getByUser(uid);
         response.setCapaXsPic(capaXs != null ? capaXs.getCapaUrl() : "");
         // 保存用户访问记录

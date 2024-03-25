@@ -1550,7 +1550,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             response.setCancelTime(cancelTime.getTime());
         }
         User user =  userService.getById(order.getUid())  ;
-        response.setDealaccount(user.getAccount());
+        if(user != null){
+            response.setDealaccount(user.getAccount());
+        }
         return response;
     }
 
