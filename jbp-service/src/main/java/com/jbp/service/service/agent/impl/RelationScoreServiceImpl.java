@@ -61,8 +61,8 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     public PageInfo<RelationScore> pageList(Integer uid, String dateLimit, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
                 .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid)
-                .orderByDesc(RelationScore::getUid)
-                .orderByDesc(RelationScore::getId);
+                .orderByDesc(RelationScore::getId)
+                .orderByDesc(RelationScore::getUid);
         getRequestTimeWhere(lqw, dateLimit);
         Page<RelationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScore> list = list(lqw);
