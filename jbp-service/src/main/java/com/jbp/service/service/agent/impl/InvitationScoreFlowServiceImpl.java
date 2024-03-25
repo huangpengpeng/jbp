@@ -71,13 +71,14 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
         List<InvitationScoreFlowVo> result = Lists.newArrayList();
         do {
             LambdaQueryWrapper<InvitationScoreFlow> lqw = new LambdaQueryWrapper<InvitationScoreFlow>()
+                    .gt(InvitationScoreFlow::getId, id)
                     .eq(!ObjectUtil.isNull(uid), InvitationScoreFlow::getUid, uid)
                     .eq(!ObjectUtil.isNull(orderuid), InvitationScoreFlow::getOrderUid, orderuid)
                     .eq(StringUtils.isNotEmpty(action), InvitationScoreFlow::getAction, action)
                     .eq(StringUtils.isNotEmpty(ordersSn), InvitationScoreFlow::getOrdersSn, ordersSn);
             getRequestTimeWhere(lqw, dateLimit);
-            lqw.gt(InvitationScoreFlow::getId, id).last("LIMIT 1000");
-            lqw.orderByDesc(InvitationScoreFlow::getId);
+            lqw.orderByAsc(InvitationScoreFlow::getId);
+            lqw.last("LIMIT 1000");
             List<InvitationScoreFlow> fundClearingList = list(lqw);
             if (CollectionUtils.isEmpty(fundClearingList)) {
                 break;
@@ -95,7 +96,7 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
                 BeanUtils.copyProperties(e, invitationScoreFlowVo);
                 result.add(invitationScoreFlowVo);
             });
-            id = fundClearingList.get(0).getId();
+            id = fundClearingList.get(fundClearingList.size()-1).getId();
         } while (true);
         return result;
     }

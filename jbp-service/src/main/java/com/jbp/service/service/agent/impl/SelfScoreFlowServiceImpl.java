@@ -66,12 +66,13 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
         List<SelfScoreFlowVo> result = Lists.newArrayList();
         do {
             LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()
+                    .ge(SelfScoreFlow::getId, id)
                     .eq(!ObjectUtil.isNull(uid), SelfScoreFlow::getUid, uid)
                     .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action)
                     .eq(StringUtils.isNotEmpty(ordersSn), SelfScoreFlow::getOrdersSn, ordersSn);
             getRequestTimeWhere(lqw, dateLimit);
-            lqw.gt(SelfScoreFlow::getId, id).last("LIMIT 1000");
-            lqw.orderByDesc(SelfScoreFlow::getId);
+            lqw.orderByAsc(SelfScoreFlow::getId);
+            lqw.last("LIMIT 1000");
             List<SelfScoreFlow> fundClearingList = list(lqw);
             if (CollectionUtils.isEmpty(fundClearingList)) {
                 break;
@@ -85,7 +86,7 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
                 BeanUtils.copyProperties(e, selfScoreFlow);
                 result.add(selfScoreFlow);
             });
-            id = fundClearingList.get(0).getId();
+            id = fundClearingList.get(fundClearingList.size() - 1).getId();
         } while (true);
         return result;
     }
