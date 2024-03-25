@@ -128,10 +128,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             wrapper.eq("refund_order_no", request.getRefundOrderNo());
         }
         if (StrUtil.isNotEmpty(request.getOrderNo())) {
-            List<Order> orders = orderService.getByPlatOrderNo(request.getOrderNo());
-            if(CollUtil.isNotEmpty(orders)){
-                wrapper.in("order_no", orders.stream().map(Order::getOrderNo).collect(Collectors.toList()));
-            }
+            wrapper.eq("order_no", orderService.getOrderNo(request.getOrderNo()));
         }
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(wrapper, request.getDateLimit());
@@ -144,13 +141,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         }
         List<Integer> uidList = refundOrderList.stream().map(RefundOrder::getUid).distinct().collect(Collectors.toList());
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
-        List<String> orderNoList = refundOrderList.stream().map(RefundOrder::getOrderNo).collect(Collectors.toList());
-        List<Order> orderList = orderService.list(new QueryWrapper<Order>().lambda().in(Order::getOrderNo, orderNoList));
-        Map<String, Order> orderMap = FunctionUtil.keyValueMap(orderList, Order::getOrderNo);
         List<MerchantRefundOrderPageResponse> responseList = refundOrderList.stream().map(order -> {
             MerchantRefundOrderPageResponse response = new MerchantRefundOrderPageResponse();
             response.setRefundOrderNo(order.getRefundOrderNo());
-            response.setOrderNo(order.getOrderNo());
+            response.setOrderNo(orderService.getOrderNo(order.getOrderNo()));
             response.setUid(order.getUid());
             response.setRefundStatus(order.getRefundStatus());
             response.setRefundPrice(order.getRefundPrice());
@@ -158,8 +152,6 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             response.setMerRemark(order.getMerRemark());
             response.setAfterSalesType(order.getAfterSalesType());
             response.setUserNickName(userMap.get(order.getUid()).getNickname());
-            Order o = orderMap.get(order.getOrderNo());
-            response.setOrderNo(o.getPlatOrderNo());
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
@@ -829,7 +821,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             wrapper.eq("refund_order_no", request.getRefundOrderNo());
         }
         if (StrUtil.isNotEmpty(request.getOrderNo())) {
-            wrapper.eq("order_no", request.getOrderNo());
+            wrapper.eq("order_no", orderService.getOrderNo(request.getOrderNo()));
         }
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(wrapper, request.getDateLimit());
@@ -844,10 +836,12 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         Map<Integer, Merchant> merchantMap = merchantService.getMerIdMapByIdList(merIdList);
         List<Integer> uidList = refundOrderList.stream().map(RefundOrder::getUid).distinct().collect(Collectors.toList());
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
+
+
         List<PlatformRefundOrderPageResponse> responseList = refundOrderList.stream().map(order -> {
             PlatformRefundOrderPageResponse response = new PlatformRefundOrderPageResponse();
             response.setRefundOrderNo(order.getRefundOrderNo());
-            response.setOrderNo(order.getOrderNo());
+            response.setOrderNo(orderService.getOrderNo(order.getOrderNo()));
             response.setUid(order.getUid());
             response.setRefundStatus(order.getRefundStatus());
             response.setRefundPrice(order.getRefundPrice());
