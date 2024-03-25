@@ -215,12 +215,12 @@ public class ExportServiceImpl implements ExportService {
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("orderDetailId", "订单详情ID");
         head.put("type", "订单类型");
-        head.put("orderNo", "单号");
-        head.put("platOrderNo", "结算单号");
         head.put("platform", "场景");
-        head.put("team", "团队");
+        head.put("platOrderNo", "结算单号");
+        head.put("orderNo", "单号");
         head.put("uid", "用户ID");
         head.put("userAccount", "下单账号");
+        head.put("team", "团队");
         head.put("payUserAccount", "付款账号");
         head.put("payPrice", "货款");
         head.put("payPostage", "运费");
@@ -232,7 +232,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("payChannel", "支付渠道");
         head.put("status", "订单状态");
         head.put("refundStatus", "退款状态");
-
+        
         head.put("productName", "商品名称");
         head.put("productBarCode", "商品编码");
         head.put("productQuantity", "商品数量");
