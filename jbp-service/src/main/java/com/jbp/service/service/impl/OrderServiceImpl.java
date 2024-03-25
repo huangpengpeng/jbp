@@ -113,7 +113,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (CollUtil.isEmpty(list)) {
             return orderNo;
         }
-        return list.get(0).getPlatOrderNo();
+        return list.get(0).getOrderNo();
+    }
+
+    @Override
+    public String getPlatOrderNo(String orderNo) {
+        return getByOrderNo(orderNo).getPlatOrderNo();
     }
 
     /**
