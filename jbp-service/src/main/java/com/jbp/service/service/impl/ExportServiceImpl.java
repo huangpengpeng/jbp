@@ -232,7 +232,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("payChannel", "支付渠道");
         head.put("status", "订单状态");
         head.put("refundStatus", "退款状态");
-        
+
         head.put("productName", "商品名称");
         head.put("productBarCode", "商品编码");
         head.put("productQuantity", "商品数量");
