@@ -45,18 +45,18 @@ public class JbpFrontApplication {
 //        WalletService walletService = run.getBean(WalletService.class);
 //        walletService.init();
 
-//        PayService payService = run.getBean(PayService.class);
-//        payService.payAfterProcessingTemp(
-//                "PT371171136628874380221"
-//        );
+        PayService payService = run.getBean(PayService.class);
+        payService.payAfterProcessingTemp(
+                "PT907171135185666279091"
+        );
 
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        PayCallbackService payCallbackService = run.getBean(PayCallbackService.class);
-//        String str = "{\"accp_txno\":\"2024032423682932\",\"oid_partner\":\"402401020000015944\",\"orderInfo\":{\"total_amount\":\"200.00\",\"txn_seqno\":\"CZ181171126647837894714\",\"txn_time\":\"20240324154758\"},\"payeeInfo\":[{\"amount\":\"200.00\",\"payee_id\":\"system_user_c_01\",\"payee_type\":\"USER\"}],\"ret_code\":\"0000\",\"ret_msg\":\"交易成功\",\"txn_status\":\"TRADE_WAIT_PAY\",\"txn_type\":\"GENERAL_CONSUME\"}";
-//
-//        final String s = payCallbackService.lianLianPayCallback(JSONObject.parseObject(str, QueryPaymentResult.class));
+        PayCallbackService payCallbackService = run.getBean(PayCallbackService.class);
+        String str = "{\"accp_txno\":\"2024032423682932\",\"oid_partner\":\"402401020000015944\",\"orderInfo\":{\"total_amount\":\"200.00\",\"txn_seqno\":\"CZ181171126647837894714\",\"txn_time\":\"20240324154758\"},\"payeeInfo\":[{\"amount\":\"200.00\",\"payee_id\":\"system_user_c_01\",\"payee_type\":\"USER\"}],\"ret_code\":\"0000\",\"ret_msg\":\"交易成功\",\"txn_status\":\"TRADE_WAIT_PAY\",\"txn_type\":\"GENERAL_CONSUME\"}";
+
+        final String s = payCallbackService.lianLianPayCallback(JSONObject.parseObject(str, QueryPaymentResult.class));
 
 
 

@@ -23,6 +23,7 @@ import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.*;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.UserCapaService;
@@ -191,6 +192,9 @@ public class AsyncServiceImpl implements AsyncService {
     @Override
     public void orderPaySuccessSplit(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
+        if(StringUtils.isNotEmpty(order.getPlatOrderNo())){
+            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+        }
         if (ObjectUtil.isNull(order)) {
             logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
             return;
