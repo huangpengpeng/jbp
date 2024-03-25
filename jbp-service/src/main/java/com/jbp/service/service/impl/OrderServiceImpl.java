@@ -1109,10 +1109,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
-        lqw.gt(Order::getId, id);
-        lqw.last("LIMIT 1000");
         getMerchantStatusWhere(lqw, request.getStatus());
-        lqw.orderByDesc(Order::getId);
+        lqw.gt(Order::getId, id);
+        lqw.orderByAsc(Order::getId);
+        lqw.last("LIMIT 1000");
         return dao.selectList(lqw);
     }
 
