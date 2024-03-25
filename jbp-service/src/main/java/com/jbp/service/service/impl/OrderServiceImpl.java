@@ -558,7 +558,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             lqw.eq(Order::getMerId, request.getMerId());
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
-            lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo())).or().like(Order::getPlatOrderNo, URLUtil.decode(request.getPlatOrderNo()));
+            lqw.like(Order::getOrderNo, URLUtil.decode(request.getOrderNo()));
         }
         if (StrUtil.isNotBlank(request.getPlatOrderNo())) {
             lqw.like(Order::getPlatOrderNo, URLUtil.decode(request.getPlatOrderNo()));
