@@ -566,9 +566,29 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());
         }
+        if (StrUtil.isNotEmpty(request.getUaccount())) {
+            User user = userService.getByAccount(request.getUaccount());
+            if (user != null) {
+                lqw.eq(Order::getUid, user.getId());
+            }
+        }
+        if (StrUtil.isNotEmpty(request.getPayAccount())) {
+            User user = userService.getByAccount(request.getPayAccount());
+            if (user != null) {
+                lqw.eq(Order::getPayUid, user.getId());
+            }
+        }
+        if (StrUtil.isNotEmpty(request.getPayPhone())) {
+            List<User> userList = userService.getByPhone(request.getPayPhone());
+            if (!CollectionUtils.isEmpty(userList)) {
+                List<Integer> collect = userList.stream().map(User::getId).collect(Collectors.toList());
+                lqw.in(Order::getUid, collect);
+            }
+        }
         if (StrUtil.isNotEmpty(request.getDateLimit())) {
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
+
         getMerchantStatusWhere(lqw, request.getStatus());
         lqw.orderByDesc(Order::getId);
         List<Order> orderList = dao.selectList(lqw);

@@ -48,4 +48,15 @@ public class OrderSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单")
     private Integer type;
+
+    @ApiModelProperty(value = "下单账户")
+    private String uaccount;
+
+    @ApiModelProperty(value = "付款账户")
+    private String payAccount;
+
+    @ApiModelProperty(value = "付款手机号")
+    private String payPhone;
+
+
 }
