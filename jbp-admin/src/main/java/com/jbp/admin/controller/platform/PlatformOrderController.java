@@ -2,6 +2,7 @@ package com.jbp.admin.controller.platform;
 
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
@@ -66,6 +67,7 @@ public class PlatformOrderController {
     @ApiOperation(value = "平台端订单详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<PlatformOrderAdminDetailResponse> info(@RequestParam(value = "orderNo") String orderNo) {
+        orderNo = orderService.getOrderNo(orderNo);
         return CommonResult.success(orderService.platformInfo(orderNo));
     }
 
@@ -73,6 +75,7 @@ public class PlatformOrderController {
     @ApiOperation(value = "获取订单发货单列表")
     @RequestMapping(value = "/{orderNo}/invoice/list", method = RequestMethod.GET)
     public CommonResult<List<OrderInvoiceResponse>> getInvoiceList(@PathVariable(value = "orderNo") String orderNo) {
+        orderNo = orderService.getOrderNo(orderNo);
         return CommonResult.success(orderService.getInvoiceList(orderNo));
     }
 

@@ -25,6 +25,8 @@ import java.util.List;
 */
 public interface OrderService extends IService<Order> {
 
+    String getOrderNo(String orderNo);
+
     /**
      * 根据订单编号获取订单
      * @param orderNo 订单编号

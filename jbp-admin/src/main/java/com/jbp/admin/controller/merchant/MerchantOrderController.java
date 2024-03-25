@@ -7,6 +7,7 @@ import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.express.Express;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
@@ -83,6 +84,7 @@ public class MerchantOrderController {
     @ApiOperation(value = "订单删除")
     @RequestMapping(value = "/delete/{orderNo}", method = RequestMethod.POST)
     public CommonResult<String> delete(@PathVariable(name = "orderNo") String orderNo) {
+        orderNo = orderService.getOrderNo(orderNo);
         if (orderService.merchantDeleteByOrderNo(orderNo)) {
             return CommonResult.success();
         }
@@ -94,6 +96,7 @@ public class MerchantOrderController {
     @ApiOperation(value = "商户备注订单")
     @RequestMapping(value = "/mark", method = RequestMethod.POST)
     public CommonResult<String> mark(@RequestBody @Validated OrderRemarkRequest request) {
+        request.setOrderNo(orderService.getOrderNo(request.getOrderNo()));
         if (orderService.merchantMark(request)) {
             return CommonResult.success();
         }
@@ -104,6 +107,7 @@ public class MerchantOrderController {
     @ApiOperation(value = "订单详情")
     @RequestMapping(value = "/info/{orderNo}", method = RequestMethod.GET)
     public CommonResult<OrderAdminDetailResponse> info(@PathVariable(value = "orderNo") String orderNo) {
+        orderNo = orderService.getOrderNo(orderNo);
         return CommonResult.success(orderService.adminDetail(orderNo));
     }
 
@@ -111,7 +115,7 @@ public class MerchantOrderController {
     @ApiOperation(value = "订单细节详情列表（发货使用）")
     @RequestMapping(value = "/{orderNo}/detail/list", method = RequestMethod.GET)
     public CommonResult<List<OrderDetail>> getDetailList(@PathVariable(value = "orderNo") String orderNo) {
-        return CommonResult.success(orderService.getDetailList(orderNo));
+        return CommonResult.success(orderService.getDetailList(orderService.getOrderNo(orderNo)));
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "订单发货")
@@ -119,6 +123,7 @@ public class MerchantOrderController {
     @ApiOperation(value = "订单发货")
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public CommonResult<Boolean> send(@RequestBody @Validated OrderSendRequest request) {
+        request.setOrderNo(orderService.getOrderNo(request.getOrderNo()));
         if (orderService.send(request)) {
             return CommonResult.success();
         }
@@ -130,15 +135,18 @@ public class MerchantOrderController {
     @ApiOperation(value = "小票打印")
     @RequestMapping(value = "/printreceipt/{orderno}", method = RequestMethod.GET)
     public CommonResult<Boolean> printReceipt(@PathVariable(value = "orderno") String orderno) {
-       orderService.printReceipt(orderno);
+        Order order = orderService.getByPlatOrderNo(orderno).get(0);
+        orderno = order.getOrderNo();
+        orderService.printReceipt(orderno);
         return CommonResult.success();
-
     }
 
     @PreAuthorize("hasAuthority('merchant:order:invoice:list')")
     @ApiOperation(value = "获取订单发货单列表")
     @RequestMapping(value = "/{orderNo}/invoice/list", method = RequestMethod.GET)
     public CommonResult<List<OrderInvoiceResponse>> getInvoiceList(@PathVariable(value = "orderNo") String orderNo) {
+        Order order = orderService.getByPlatOrderNo(orderNo).get(0);
+        orderNo = order.getOrderNo();
         return CommonResult.success(orderService.getInvoiceListByMerchant(orderNo));
     }
 
@@ -171,6 +179,9 @@ public class MerchantOrderController {
     public CommonResult importSend(@RequestBody @Validated List<OrderShippingExcelVo> request){
         if(CollUtil.isEmpty(request)){
             return CommonResult.failed("导入发货数据不能为空");
+        }
+        for (OrderShippingExcelVo orderShippingExcelVo : request) {
+            orderShippingExcelVo.setOrderNo(orderService.getOrderNo(orderShippingExcelVo.getOrderNo()));
         }
         Set<Integer> orderDetailIdSet = request.stream().map(OrderShippingExcelVo::getOrderDetailId).collect(Collectors.toSet());
         if (orderDetailIdSet.size() != request.size()) {

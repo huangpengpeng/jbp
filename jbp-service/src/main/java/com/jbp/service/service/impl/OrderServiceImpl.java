@@ -107,6 +107,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     @Resource
     private CapaService capaService;
 
+    @Override
+    public String getOrderNo(String orderNo) {
+        List<Order> list = getByPlatOrderNo(orderNo);
+        if (CollUtil.isEmpty(list)) {
+            return orderNo;
+        }
+        return list.get(0).getOrderNo();
+    }
 
     /**
      * 根据订单编号获取订单
@@ -436,6 +444,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     public Boolean batchSend(List<OrderSendRequest> sendRequestList) {
         for (OrderSendRequest vo : sendRequestList) {
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(vo.getOrderNo());
+
             Order order = getByOrderNo(vo.getOrderNo());
             List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(vo.getOrderNo());
             if (order.getIsUserDel() || order.getIsMerchantDel()) {
