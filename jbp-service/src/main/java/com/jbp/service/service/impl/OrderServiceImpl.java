@@ -66,7 +66,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Resource
     private OrderDao dao;
-
     @Autowired
     private MerchantOrderService merchantOrderService;
     @Autowired
@@ -105,9 +104,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private MerchantPrintService merchantPrintService;
     @Resource
     private OrderExtService orderExtService;
-
     @Resource
     private CapaService capaService;
+
 
     /**
      * 根据订单编号获取订单
@@ -684,12 +683,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             return dataResponse;
         }).collect(Collectors.toList());
         response.setOrderDetailList(orderInfoList);
-
         // 用户信息
-        User user = userService.getById(order.getUid());
-        response.setNikeName(user.getNickname());
-        response.setPhone(user.getPhone());
-        response.setIsLogoff(user.getIsLogoff());
+        if(order.getUid() != null){
+            User user = userService.getById(order.getUid());
+            response.setNikeName(user.getNickname());
+            response.setPhone(user.getPhone());
+            response.setIsLogoff(user.getIsLogoff());
+        }
         if (merchantOrder.getClerkId() > 0) {
             SystemAdmin clerkAdmin = systemAdminService.getById(merchantOrder.getClerkId());
             response.setClerkName(clerkAdmin.getRealName());
@@ -1127,6 +1127,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         lqw.eq(Order::getPaid, false);
         lqw.ge(Order::getCreateTime, start);
         lqw.le(Order::getCreateTime, now);
+        return list(lqw);
+    }
+
+    @Override
+    public List<Order> getWaitPullList() {
+        LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+        lqw.eq(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+        lqw.eq(Order::getPaid, true);
+        lqw.eq(Order::getIfPull, false);
+        lqw.eq(Order::getLevel, OrderConstants.ORDER_LEVEL_MERCHANT);
+        lqw.eq(Order::getIsDel, false);
         return list(lqw);
     }
 

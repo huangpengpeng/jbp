@@ -34,6 +34,7 @@ import com.jbp.service.service.*;
 
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.PlatformWalletService;
+import com.jbp.service.service.agent.WalletService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +124,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     private FundClearingService fundClearingService;
     @Autowired
     private PlatformWalletService platformWalletService;
+    @Autowired
+    private WalletService walletService;
 
 
     /**
@@ -197,6 +200,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 UserIntegralRecord userIntegralRecord = initOrderCancelIntegralRecord(user.getId(), order.getUseIntegral(), user.getIntegral(), order.getOrderNo());
                 userIntegralRecordService.save(userIntegralRecord);
             }
+            // 退抵扣
+            walletService.refundDeduction(order.getUid(), order.getOrderNo(), "订单取消回退");
             Boolean rollbackStock = rollbackStock(order);
             if (!rollbackStock) {
                 e.setRollbackOnly();
@@ -441,10 +446,10 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             if (CollUtil.isNotEmpty(couponIdList)) {
                 couponUserService.rollbackByIds(couponIdList);
             }
-            if(CollUtil.isNotEmpty(refundOrder.getRefundWalletList())){
-                refundOrder.getRefundWalletList().forEach(w->{
-                    if(w.getRefundFee() != null && ArithmeticUtils.gt(w.getRefundFee(), BigDecimal.ZERO)){
-                        platformWalletService.transferToUser(refundOrder.getPayUid(), w.getWalletType(), w.getRefundFee(), WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
+            if(CollUtil.isNotEmpty(refundOrder.getRefundWalletList())) {
+                refundOrder.getRefundWalletList().forEach(w -> {
+                    if (w.getRefundFee() != null && ArithmeticUtils.gt(w.getRefundFee(), BigDecimal.ZERO)) {
+                        platformWalletService.transferToUser(order.getPayUid(), w.getWalletType(), w.getRefundFee(), WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                     }
                 });
             }
@@ -662,6 +667,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 UserIntegralRecord userIntegralRecord = initOrderCancelIntegralRecord(user.getId(), order.getUseIntegral(), user.getIntegral(), order.getOrderNo());
                 userIntegralRecordService.save(userIntegralRecord);
             }
+            // 回退抵扣
+            walletService.refundDeduction(order.getPayUid(), order.getOrderNo(), "订单取消");
             // 回滚库存
             Boolean rollbackStock = rollbackStock(order);
             if (!rollbackStock) {

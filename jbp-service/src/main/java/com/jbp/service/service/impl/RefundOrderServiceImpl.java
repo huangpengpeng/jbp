@@ -196,7 +196,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         refundOrder.setOrderNo(order.getOrderNo());
         refundOrder.setMerId(order.getMerId());
         refundOrder.setUid(order.getUid());
-        refundOrder.setPayUid(merchantOrder.getPayUid());
+        refundOrder.setPayUid(order.getPayUid());
         refundOrder.setRealName(merchantOrder.getRealName());
         refundOrder.setUserPhone(merchantOrder.getUserPhone());
         refundOrder.setUserAddress(merchantOrder.getUserAddress());
@@ -846,7 +846,12 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             response.setMerRemark(order.getMerRemark());
             response.setAfterSalesType(order.getAfterSalesType());
             response.setUserNickName(userMap.get(order.getUid()).getNickname());
-            response.setMerName(merchantMap.get(order.getMerId()).getName());
+            Merchant merchant = merchantMap.get(order.getMerId());
+            if(merchant != null){
+                response.setMerName(merchant.getName());
+            }else{
+                response.setMerName("平台");
+            }
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
@@ -1370,7 +1375,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
                 if (refundPrice.compareTo(BigDecimal.ZERO) > 0) {
                     WalletConfig walletConfig = walletConfigService.getCanPay();
-                    platformWalletService.transferToUser(refundOrder.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
+                    platformWalletService.transferToUser(order.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                 }
             }
             if (order.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {

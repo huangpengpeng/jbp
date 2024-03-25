@@ -19,6 +19,7 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
+import com.jbp.service.product.comm.CommAliasNameEnum;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
@@ -357,7 +358,11 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         lqw.orderByDesc(FundClearing::getId);
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, Lists.newArrayList());
+        }
         list.forEach(e -> {
+            e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
             for (FundClearingItem item : e.getItems()) {
                 WalletConfig walletConfig = walletConfigService.getByType(item.getWalletType());
                 item.setWalletName(walletConfig != null ? walletConfig.getName() : "");

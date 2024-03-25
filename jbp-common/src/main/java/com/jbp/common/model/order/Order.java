@@ -162,6 +162,9 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "下单场景（报单，换购）")
     private String platform;
 
+    @ApiModelProperty(value = "是否被拉取")
+    private Boolean ifPull;
+
     public String getOrderType() {
         String typeStr = "";
         if (this.getType() == null) {

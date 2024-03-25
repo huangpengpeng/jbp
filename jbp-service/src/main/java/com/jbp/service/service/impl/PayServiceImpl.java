@@ -1212,6 +1212,9 @@ public class PayServiceImpl implements PayService {
         if (count == 0L) {
             return CollUtil.newArrayList();
         }
+        if(merchantOrder.getUid() == null){
+            return CollUtil.newArrayList();
+        }
         // 查找订单所属人信息
         User user = userService.getById(merchantOrder.getUid());
         // 当前用户不存在 没有上级 或者 当用用户上级时自己  直接返回
