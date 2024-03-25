@@ -115,4 +115,8 @@ public class OrderFrontDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "下单场景")
     private String platform;
+
+    @ApiModelProperty(value = "报单账号")
+    private String dealaccount;
+
 }

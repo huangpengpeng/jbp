@@ -1546,6 +1546,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
             response.setCancelTime(cancelTime.getTime());
         }
+        User user =  userService.getById(order.getUid())  ;
+        response.setDealaccount(user.getAccount());
         return response;
     }
 
