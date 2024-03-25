@@ -879,6 +879,8 @@ public class AsyncServiceImpl implements AsyncService {
         // 0.订单详情列表
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
         // 1.下单赠送积分
+        merchantOrder.setUid(order.getUid());
+        merchantOrder.setPayUid(order.getPayUid());
         presentIntegral(merchantOrder, orderDetailList, order);
 
         // 生成新的商户订单
@@ -958,6 +960,8 @@ public class AsyncServiceImpl implements AsyncService {
 
         order.setIsDel(true);
         for (MerchantOrder merchantOrder : merchantOrderList) {
+            merchantOrder.setUid(order.getUid());
+            merchantOrder.setPayUid(order.getPayUid());
             Order newOrder = new Order();
             BeanUtils.copyProperties(order, newOrder);
             newOrder.setId(null);

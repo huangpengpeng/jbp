@@ -53,20 +53,17 @@ public class JbpAdminApplication {
 
 
 
-        PayService payService = run.getBean(PayService.class);
 
 
-        // PT671171134918065489563
+//
 //        PayCallbackService payCallbackService = run.getBean(PayCallbackService.class);
 //        String str = "{\"oid_partner\":\"402401020000015944\",\"payerInfo\":[{\"amount\":\"9600.00\",\"method\":\"ALIPAY_NATIVE\",\"payer_type\":\"USER\",\"payer_id\":\"cn111171\"}],\"txn_type\":\"GENERAL_CONSUME\",\"payeeInfo\":[{\"amount\":\"9600.00\",\"payee_id\":\"system_user_c_01\",\"payee_type\":\"USER\"}],\"orderInfo\":{\"total_amount\":\"9600.00\",\"txn_seqno\":\"PT671171134918065489563\",\"txn_time\":\"20240325185858\"},\"chnl_txno\":\"2024032568843418\",\"txn_status\":\"TRADE_SUCCESS\",\"accounting_date\":\"20240325\",\"finish_time\":\"20240325190231\",\"accp_txno\":\"2024032526034746\"}";
 //         QueryPaymentResult result = JSONObject.parseObject(str, QueryPaymentResult.class);
 //        payCallbackService.lianLianPayCallback(result);
+//
 
 
 
-//        payService.payAfterProcessingTemp(
-//                "PT671171134918065489563"
-//        );
 
 
 

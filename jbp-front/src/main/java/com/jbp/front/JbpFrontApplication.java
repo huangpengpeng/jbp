@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.service.service.PayCallbackService;
+import com.jbp.service.service.PayService;
 import com.jbp.service.service.agent.WalletService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -43,6 +44,11 @@ public class JbpFrontApplication {
 //
 //        WalletService walletService = run.getBean(WalletService.class);
 //        walletService.init();
+
+//        PayService payService = run.getBean(PayService.class);
+//        payService.payAfterProcessingTemp(
+//                "PT371171136628874380221"
+//        );
 
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
