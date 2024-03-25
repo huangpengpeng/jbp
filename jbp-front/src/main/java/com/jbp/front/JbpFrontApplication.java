@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.service.service.PayCallbackService;
+import com.jbp.service.service.agent.WalletService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,6 +40,9 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         Environment bean = run.getBean(Environment.class);
+//
+//        WalletService walletService = run.getBean(WalletService.class);
+//        walletService.init();
 
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
