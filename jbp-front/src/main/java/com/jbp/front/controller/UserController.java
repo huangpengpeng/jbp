@@ -166,14 +166,27 @@ public class UserController {
         }
         // 当前安置节点没有被占用不返回滑落
         UserRelation userRelation = relationService.getByPid(user.getId(), node);
-        if (!invitationService.getNextList(user.getId()).isEmpty()) {
+        // 邀请过其他人
+        if (CollectionUtils.isNotEmpty(invitationService.getNextList(user.getId()))) {
+            // 当前位置没人不返回滑落
             if (Objects.isNull(userRelation)) {
                 return CommonResult.success();
+            }else{
+                // 当前位置有人
+                userRelation = relationService.getLeftMost(user.getId());
+                if (userRelation == null) {
+                    return CommonResult.success();
+                }
+                user = userService.getById(userRelation.getPId());
+                UserRelationInfoResponse response = new UserRelationInfoResponse(userRelation.getPId(), user.getAccount(), userRelation.getNode());
+                return CommonResult.success(response);
             }
         }
-
         userRelation = relationService.getLeftMost(user.getId());
         if (userRelation == null) {
+            return CommonResult.success();
+        }
+        if(userRelation != null && userRelation.getNode().equals(node)){
             return CommonResult.success();
         }
         user = userService.getById(userRelation.getPId());
