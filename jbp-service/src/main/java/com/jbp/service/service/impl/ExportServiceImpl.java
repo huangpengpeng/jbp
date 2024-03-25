@@ -9,7 +9,6 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.order.Materials;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -72,7 +71,9 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
-        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus()) && ObjectUtils.isEmpty(request.getType())) {
+        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
+                && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
+                && ObjectUtils.isEmpty(request.getType())) {
             throw new CrmebException("请至少选择一个查询条件");
         }
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
@@ -98,7 +99,11 @@ public class ExportServiceImpl implements ExportService {
             userIdList = userIdList.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
 
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
+            Map<Integer, Merchant> merchantMap = Maps.newConcurrentMap();
+            if(CollectionUtils.isNotEmpty(merIdList)){
+                merchantMap = merchantService.getMapByIdList(merIdList);
+            }
+
             Map<Integer, User> userMap = userService.getUidMapList(userIdList);
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
 
@@ -136,12 +141,18 @@ public class ExportServiceImpl implements ExportService {
                         OrderExcelVo vo = new OrderExcelVo();
                         vo.setType(order.getOrderType());
                         vo.setOrderNo(order.getOrderNo());
-                        vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "平台商");
+                        Merchant merchant = merchantMap.get(order.getMerId());
+                        vo.setMerName("平台商");
+                        if(merchant != null){
+                            vo.setMerName(merchant.getName());
+                        }
                         if (order.getUid() != null) {
                             vo.setUid(order.getUid());
                             vo.setUserAccount(userMap.get(order.getUid()).getAccount());
                         }
-                        vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                        if (order.getPayUid() != null) {
+                            vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                        }
                         vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
                         vo.setPayPostage(order.getPayPostage());
                         vo.setCouponPrice(order.getCouponPrice());
