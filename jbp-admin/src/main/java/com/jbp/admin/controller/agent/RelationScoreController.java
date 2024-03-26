@@ -73,7 +73,6 @@ public class RelationScoreController {
         return CommonResult.success();
     }
 
-
     @PreAuthorize("hasAuthority('agent:relation:score:fake:set')")
     @ApiOperation("设置虚拟业绩")
     @GetMapping("/fake/edit")

@@ -45,6 +45,14 @@ public class SysConfigConstants {
     public static final String CHANGE_PHONE="change-phone";
 
     /**
+     * 个人中心背景
+     */
+    public static final String PERSONAL_BACKGROUND = "personal_background";
+    /**
+     * 店铺开关
+     */
+    public static final String  STORE_GOODS_OPEN="store_goods_open";
+    /**
      * 平台端-登录页LOGO
      */
     public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN = "site_logo_login";

@@ -72,6 +72,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
+            e.setUpdateTime(e.getGmtModify());
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
@@ -97,6 +98,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 User user = uidMapList.get(e.getUid());
                 e.setAccount(user != null ? user.getAccount() : "");
                 RelationScoreVo relationScoreVo=new RelationScoreVo();
+                e.setUpdateTime(e.getGmtModify());
                 BeanUtils.copyProperties(e,relationScoreVo);
                 voList.add(relationScoreVo);
             });

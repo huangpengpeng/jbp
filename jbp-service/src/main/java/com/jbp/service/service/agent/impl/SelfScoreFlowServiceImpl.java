@@ -66,7 +66,7 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
         List<SelfScoreFlowVo> result = Lists.newArrayList();
         do {
             LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()
-                    .ge(SelfScoreFlow::getId, id)
+                    .gt(SelfScoreFlow::getId, id)
                     .eq(!ObjectUtil.isNull(uid), SelfScoreFlow::getUid, uid)
                     .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action)
                     .eq(StringUtils.isNotEmpty(ordersSn), SelfScoreFlow::getOrdersSn, ordersSn);

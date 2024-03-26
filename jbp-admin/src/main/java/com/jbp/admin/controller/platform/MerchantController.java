@@ -154,7 +154,6 @@ public class MerchantController {
         return CommonResult.failed("开启商户失败");
     }
 
-    @PreAuthorize("hasAuthority('platform:merchant:use:category:list')")
     @ApiOperation(value="可用分类商户列表")
     @RequestMapping(value = "/use/category/list", method = RequestMethod.GET)
     public CommonResult<List<CategoryMerchantResponse>> getUseCategoryList() {

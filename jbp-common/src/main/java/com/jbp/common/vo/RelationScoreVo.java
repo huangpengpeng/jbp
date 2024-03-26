@@ -35,4 +35,8 @@ public class RelationScoreVo {
 
     @ApiModelProperty("创建时间")
     private Date gmtCreated;
+    @ApiModelProperty("修改时间")
+    @TableField(exist = false)
+    private Date updateTime;
+
 }
