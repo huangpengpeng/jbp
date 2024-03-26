@@ -1,12 +1,17 @@
 package com.jbp.admin.task.order;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jbp.common.model.agent.OrderSuccessMsg;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.service.service.OrderTaskService;
 
+import com.jbp.service.service.agent.OrderSuccessMsgService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 订单支付成功后置task任务
@@ -27,7 +32,7 @@ public class OrderPaySuccessTask {
     private static final Logger logger = LoggerFactory.getLogger(OrderPaySuccessTask.class);
 
     @Autowired
-    private OrderTaskService orderTaskService;
+    private OrderSuccessMsgService orderSuccessMsgService;
 
     /**
      * 1分钟同步一次数据
@@ -36,7 +41,10 @@ public class OrderPaySuccessTask {
         // cron : 0 */1 * * * ?
         logger.info("---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {
-            orderTaskService.orderPaySuccessAfter();
+            List<OrderSuccessMsg> list = orderSuccessMsgService.list(new QueryWrapper<OrderSuccessMsg>().lambda().eq(OrderSuccessMsg::getExec, false));
+            for (OrderSuccessMsg msg : list) {
+                orderSuccessMsgService.exec(msg);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("OrderPaySuccessTask.task" + " | msg : " + e.getMessage());
