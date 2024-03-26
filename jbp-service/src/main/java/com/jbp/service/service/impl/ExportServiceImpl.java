@@ -389,8 +389,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("payUserAccount","付款账号");
         head.put("payPostage","整单运费");
         head.put("couponPrice","整单优惠");
-        head.put("payPrice","整单贷款");
-        head.put("payPrice", "实际支付金额");
+        head.put("payPrice", "整单金额");
         head.put("walletDeductionFee","整单抵扣");
         head.put("payType", "支付方式");
         head.put("payChannel", "支付渠道");
