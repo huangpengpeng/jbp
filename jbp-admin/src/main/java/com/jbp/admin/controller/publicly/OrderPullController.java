@@ -166,9 +166,12 @@ public class OrderPullController {
                 }
                 orderSendRequest.setDetailList(list);
                 orderSendRequest.setExpressTempId(shipSync.getShipNo());
-                orderService.send(orderSendRequest);
-            } else {
-                ordersSnList.add(shipSync.getOrdersSn());
+                try {
+                    orderService.send(orderSendRequest);
+                    ordersSnList.add(shipSync.getOrdersSn());
+                }catch (Exception e){
+
+                }
             }
         }
         return ordersSnList;
