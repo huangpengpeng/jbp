@@ -1177,6 +1177,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         lqw.eq(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
         lqw.eq(Order::getPaid, true);
         lqw.eq(Order::getIfPull, false);
+        lqw.eq(Order::getRefundStatus, OrderConstants.ORDER_REFUND_STATUS_NOT_APPLY);
         lqw.eq(Order::getLevel, OrderConstants.ORDER_LEVEL_MERCHANT);
         lqw.eq(Order::getIsDel, false);
         return list(lqw);
