@@ -33,15 +33,7 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-        OrderPullController orderPullController = run.getBean(OrderPullController.class);
-        List<ErpOrderShipSyncRequest> shipSyncList = Lists.newArrayList();
-        ErpOrderShipSyncRequest req = new ErpOrderShipSyncRequest();
-        req.setOrdersSn("PT618171121389531982547");
-        req.setShipCode("shunfeng");
-        req.setShipNo("SF1615156160728");
-        shipSyncList.add(req);
-        orderPullController.send(shipSyncList);
+        
 
     }
 
