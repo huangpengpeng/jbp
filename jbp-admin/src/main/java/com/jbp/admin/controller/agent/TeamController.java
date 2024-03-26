@@ -66,7 +66,6 @@ public class TeamController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('agent:team:name')")
     @GetMapping("/name")
     @ApiOperation("获取团队名")
     public CommonResult getTeamName() {
