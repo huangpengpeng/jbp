@@ -75,7 +75,7 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
                     .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type)
                     .eq(StringUtils.isNotEmpty(externalNo), PlatformWalletFlow::getExternalNo, externalNo);
             getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
-            walletLambdaQueryWrapper.orderByDesc(PlatformWalletFlow::getId);
+            walletLambdaQueryWrapper.orderByAsc(PlatformWalletFlow::getId);
             walletLambdaQueryWrapper.gt(PlatformWalletFlow::getId, id).last("LIMIT 1000");
             List<PlatformWalletFlow> fundClearingList = list(walletLambdaQueryWrapper);
             if (CollectionUtils.isEmpty(fundClearingList)) {
@@ -88,7 +88,7 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
                 BeanUtils.copyProperties(e, platformWalletFlowVo);
                 result.add(platformWalletFlowVo);
             });
-            id = fundClearingList.get(0).getId();
+            id = fundClearingList.get(fundClearingList.size()-1).getId();
         } while (true);
         return result;
     }

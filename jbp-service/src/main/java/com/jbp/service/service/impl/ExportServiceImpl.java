@@ -319,7 +319,7 @@ public class ExportServiceImpl implements ExportService {
                 vo.setType(getOrderType(order.getType()));
                 vo.setOrderNo(order.getOrderNo());
                 vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
-                vo.setUserNickname(userMap.get(order.getUid()).getNickname() + "|" + order.getUid());
+                vo.setUserNickname(userMap.get(order.getUid())!=null?userMap.get(order.getUid()).getNickname() + "|" + order.getUid():"");
                 vo.setPayPrice(order.getPayPrice().toString());
                 vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
                 vo.setPayType(getOrderPayType(order.getPayType()));

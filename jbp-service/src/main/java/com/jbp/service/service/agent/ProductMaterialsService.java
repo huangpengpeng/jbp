@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductMaterialsService extends IService<ProductMaterials> {
-    PageInfo<ProductMaterials> pageList(Integer merId, String materialsName, PageParamRequest pageParamRequest);
+    PageInfo<ProductMaterials> pageList(Integer merId, String materialsName,String barCode, PageParamRequest pageParamRequest);
 
     Boolean add(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode);
 

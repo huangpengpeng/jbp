@@ -122,7 +122,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                     .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
                     .eq(StringUtils.isNotEmpty(externalNo), WalletFlow::getExternalNo, externalNo);
             getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
-            walletLambdaQueryWrapper.orderByDesc(WalletFlow::getId);
+            walletLambdaQueryWrapper.orderByAsc(WalletFlow::getId);
             walletLambdaQueryWrapper.gt(WalletFlow::getId, id).last("LIMIT 1000");
             List<WalletFlow> list = list(walletLambdaQueryWrapper);
             if (CollectionUtils.isEmpty(list)) {
@@ -139,7 +139,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                 BeanUtils.copyProperties(e, walletFlowVo);
                 result.add(walletFlowVo);
             });
-            id = list.get(0).getId();
+            id = list.get(list.size()-1).getId();
         } while (true);
         return result;
     }
