@@ -58,22 +58,22 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private WalletWithdrawDao walletWithdrawDao;
 
     @Override
-    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletWithdraw> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName);
+        List<WalletWithdraw> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName);
         return CommonPage.copyPageInfo(page, walletWithdrawsList);
     }
 
     @Override
-    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit) {
+    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName);
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName,nickName);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }

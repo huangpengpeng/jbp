@@ -28,4 +28,6 @@ public class WalletWithdrawPageRequest {
     @ApiModelProperty(value = "创建时间区间")
     private String dateLimit;
 
+    @ApiModelProperty(value = "用户昵称")
+    private String nickName;
 }

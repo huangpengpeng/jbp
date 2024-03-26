@@ -21,7 +21,7 @@ public interface WalletWithdrawService extends IService<WalletWithdraw> {
 
     void cancel(List<WalletWithdrawRequest> walletWithdrawList);
 
-    PageInfo<WalletWithdraw> pageList(String account, String walletName, String status,String dateLimit,String realName, PageParamRequest pageParamRequest);
+    PageInfo<WalletWithdraw> pageList(String account, String walletName, String status,String dateLimit,String realName,String nickName, PageParamRequest pageParamRequest);
 
-    WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit);
+    WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName);
 }
