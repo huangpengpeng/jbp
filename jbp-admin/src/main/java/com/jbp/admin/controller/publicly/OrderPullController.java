@@ -143,7 +143,7 @@ public class OrderPullController {
             List<Order> orderList = orderService.getByPlatOrderNo(shipSync.getOrdersSn());
 
             Order orders = CollectionUtils.isNotEmpty(orderList) ? orderList.get(0) : null;
-            if (orders != null && orders.getOrderStatus().equals("1")) {
+            if (orders != null && orders.getStatus().equals("1")) {
 
                 OrderSendRequest orderSendRequest =new OrderSendRequest();
                 orderSendRequest.setOrderNo(orders.getOrderNo());
