@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -309,9 +310,12 @@ public class ExportServiceImpl implements ExportService {
             if (CollectionUtils.isEmpty(orderList)) {
                 break;
             }
-            List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
+            List<Integer> userIdList = orderList.stream().filter(s->s.getUid()!= null).map(Order::getUid).distinct().collect(Collectors.toList());
+            List<Integer> payUserIdList = orderList.stream().filter(s->s.getPayUid()!= null).map(Order::getPayUid).distinct().collect(Collectors.toList());
+            userIdList.addAll(payUserIdList);
+            Set<Integer> userSet = userIdList.stream().collect(Collectors.toSet());
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, User> userMap = userService.getUidMapList(userIdList);
+            Map<Integer, User> userMap = userService.getUidMapList(userSet.stream().collect(Collectors.toList()));
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
             for (Order order : orderList) {
                 MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
