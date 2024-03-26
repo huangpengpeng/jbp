@@ -131,7 +131,7 @@ public class MerchantOrderController {
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "小票打印")
-    @PreAuthorize("hasAuthority('merchant:order:print')")
+
     @ApiOperation(value = "小票打印")
     @RequestMapping(value = "/printreceipt/{orderno}", method = RequestMethod.GET)
     public CommonResult<Boolean> printReceipt(@PathVariable(value = "orderno") String orderno) {
@@ -141,7 +141,7 @@ public class MerchantOrderController {
         return CommonResult.success();
     }
 
-    @PreAuthorize("hasAuthority('merchant:order:invoice:list')")
+
     @ApiOperation(value = "获取订单发货单列表")
     @RequestMapping(value = "/{orderNo}/invoice/list", method = RequestMethod.GET)
     public CommonResult<List<OrderInvoiceResponse>> getInvoiceList(@PathVariable(value = "orderNo") String orderNo) {
@@ -150,7 +150,7 @@ public class MerchantOrderController {
         return CommonResult.success(orderService.getInvoiceListByMerchant(orderNo));
     }
 
-    @PreAuthorize("hasAuthority('merchant:order:logistics:info')")
+
     @ApiOperation(value = "订单物流详情")
     @RequestMapping(value = "/get/{invoiceId}/logistics/info", method = RequestMethod.GET)
     public CommonResult<LogisticsResultVo> getLogisticsInfo(@PathVariable(value = "invoiceId") Integer invoiceId) {

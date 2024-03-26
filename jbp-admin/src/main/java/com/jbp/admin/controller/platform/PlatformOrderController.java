@@ -63,7 +63,6 @@ public class PlatformOrderController {
         return CommonResult.success(orderService.getPlatformOrderStatusNum(dateLimit));
     }
 
-    @PreAuthorize("hasAuthority('platform:order:info')")
     @ApiOperation(value = "平台端订单详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<PlatformOrderAdminDetailResponse> info(@RequestParam(value = "orderNo") String orderNo) {
@@ -71,7 +70,6 @@ public class PlatformOrderController {
         return CommonResult.success(orderService.platformInfo(orderNo));
     }
 
-    @PreAuthorize("hasAuthority('platform:order:invoice:list')")
     @ApiOperation(value = "获取订单发货单列表")
     @RequestMapping(value = "/{orderNo}/invoice/list", method = RequestMethod.GET)
     public CommonResult<List<OrderInvoiceResponse>> getInvoiceList(@PathVariable(value = "orderNo") String orderNo) {
@@ -79,7 +77,6 @@ public class PlatformOrderController {
         return CommonResult.success(orderService.getInvoiceList(orderNo));
     }
 
-    @PreAuthorize("hasAuthority('platform:order:logistics:info')")
     @ApiOperation(value = "订单物流详情")
     @RequestMapping(value = "/get/{invoiceId}/logistics/info", method = RequestMethod.GET)
     public CommonResult<LogisticsResultVo> getLogisticsInfo(@PathVariable(value = "invoiceId") Integer invoiceId) {
