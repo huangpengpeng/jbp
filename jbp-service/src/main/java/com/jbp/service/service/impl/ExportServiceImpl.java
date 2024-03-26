@@ -1,10 +1,13 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
+import com.jbp.common.config.CrmebConfig;
+import com.jbp.common.constants.DateConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
@@ -16,12 +19,11 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.SecurityUtil;
-import com.jbp.common.utils.StringUtils;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.OrderExcelInfoVo;
+import com.jbp.common.vo.OrderExcelShipmentVo;
 import com.jbp.common.vo.OrderExcelVo;
+import com.jbp.common.vo.OrderShipmentExcelInfoVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,14 +68,18 @@ public class ExportServiceImpl implements ExportService {
     @Resource
     private TeamUserService teamUserService;
 
+    @Autowired
+    private CrmebConfig crmebConfig;
+
     /**
      * 订单导出
      *
      * @param request 查询条件
      * @return 文件名称
+     *
      */
     @Override
-    public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
+    public OrderShipmentExcelInfoVo exportOrderShipment(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
                 && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
                 && ObjectUtils.isEmpty(request.getType())) {
@@ -85,7 +91,7 @@ public class ExportServiceImpl implements ExportService {
         }
 
         Integer id = 0;
-        List<OrderExcelVo> voList = CollUtil.newArrayList();
+        List<OrderExcelShipmentVo> voList = CollUtil.newArrayList();
         Map<String, String> walletDeductionMap = Maps.newConcurrentMap();
 
         Map<String, List<ProductMaterials>> materialsMap = Maps.newConcurrentMap();
@@ -133,19 +139,19 @@ public class ExportServiceImpl implements ExportService {
                     // 物料信息
                     for (ProductMaterials materials : productMaterials) {
                         // 组装订单
-                        OrderExcelVo vo = new OrderExcelVo();
+                        OrderExcelShipmentVo vo = new OrderExcelShipmentVo();
                         vo.setType(order.getOrderType());
                         vo.setOrderNo(order.getOrderNo());
-                        if(StringUtils.isNotEmpty(order.getPlatOrderNo())){
+                        if (StringUtils.isNotEmpty(order.getPlatOrderNo())) {
                             vo.setOrderNo(order.getPlatOrderNo());
                         }
                         vo.setPlatform(order.getPlatform());
-                        if(order.getUid() != null) {
+                        if (order.getUid() != null) {
                             TeamUser teamUser = teamUserService.getByUser(order.getUid());
                             if (teamUser != null) {
                                 vo.setTeam(teamUser.getName());
                             }
-                        }else{
+                        } else {
                             vo.setTeam("");
                         }
                         if (order.getUid() != null) {
@@ -211,7 +217,7 @@ public class ExportServiceImpl implements ExportService {
             id = orderList.get(orderList.size() - 1).getId();
         } while (true);
 
-        OrderExcelInfoVo vo = new OrderExcelInfoVo();
+        OrderShipmentExcelInfoVo vo = new OrderShipmentExcelInfoVo();
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("orderDetailId", "订单详情ID");
         head.put("type", "订单类型");
@@ -277,6 +283,263 @@ public class ExportServiceImpl implements ExportService {
         vo.setHead(array);
         vo.setList(voList);
         return vo;
+    }
+
+    /**
+     * 订单导出
+     *
+     * @param request 查询条件
+     * @return 文件名称
+     */
+    @Override
+    public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
+        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
+                && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
+                && ObjectUtils.isEmpty(request.getType())) {
+            throw new CrmebException("请至少选择一个查询条件");
+        }
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        if (systemAdmin.getMerId() > 0) {
+            request.setMerId(systemAdmin.getMerId());
+        }
+        Integer id = 0;
+        List<OrderExcelVo> voList = CollUtil.newArrayList();
+        do {
+            List<Order> orderList = orderService.findExportList(request, id);
+            if (CollectionUtils.isEmpty(orderList)) {
+                break;
+            }
+            List<Integer> merIdList = orderList.stream().filter(e -> e.getMerId() > 0).map(Order::getMerId).distinct().collect(Collectors.toList());
+            List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
+            List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
+            Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
+            Map<Integer, User> userMap = userService.getUidMapList(userIdList);
+            Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+            for (Order order : orderList) {
+                MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+                // 循环设置
+                    OrderExcelVo vo = new OrderExcelVo();
+                    vo.setType(getOrderType(order.getType()));
+                    vo.setOrderNo(order.getOrderNo());
+                    vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
+                    vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() + "|" + order.getUid() : "");
+                    vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
+                    vo.setPayType(getOrderPayType(order.getPayType()));
+                    vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
+                    vo.setStatus(getOrderStatus(order.getStatus()));
+                    vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
+                    vo.setWalletDeductionFee(order.getWalletDeductionFee());
+                    vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+                    vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
+
+                    // 收货人
+                    vo.setRealName(merchantOrder.getRealName());
+                    vo.setUserPhone(merchantOrder.getUserPhone());
+                    vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
+                    vo.setUserRemark(merchantOrder.getUserRemark());
+                    vo.setMerchantRemark(merchantOrder.getMerchantRemark());
+                    vo.setUserAddress(merchantOrder.getUserAddress());
+                    vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
+                    vo.setPayPostage(order.getPayPostage());
+                    vo.setCouponPrice(order.getCouponPrice());
+                    //设置场景
+                    vo.setPlatform(order.getPlatform());
+                    if (order.getUid() != null) {
+                        TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                        if (teamUser != null) {
+                            vo.setTeam(teamUser.getName());
+                        }
+                    } else {
+                        vo.setTeam("");
+                    }
+                    //设置团队
+                    if (order.getUid() != null) {
+                        TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                        if (teamUser != null) {
+                            vo.setTeam(teamUser.getName());
+                        }
+                    } else {
+                        vo.setTeam("");
+                    }
+                    //设置用id
+                    if (order.getUid() != null) {
+                        vo.setUid(order.getUid());
+                        vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                    }
+                    //设置付款账号
+                    if (order.getPayUid() != null) {
+                        vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                    }
+                voList.add(vo);
+                }
+            id = orderList.get(orderList.size() - 1).getId();
+        } while (true);
+
+        OrderExcelInfoVo orderExcelInfoVo=new OrderExcelInfoVo();
+        //自定义标题别名
+        LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
+        head.put("type", "订单类型");
+        head.put("orderNo", "订单号");
+        head.put("merName", "商户名称");
+        head.put("platform","场景");
+        head.put("team","团队");
+        head.put("uid","用户编号");
+        head.put("userNickname", "用户昵称");
+        head.put("userAccount","下单账号");
+        head.put("payUserAccount","付款账号");
+        head.put("payPostage","整单运费");
+        head.put("couponPrice","整单优惠");
+        head.put("payPrice","整单贷款");
+        head.put("payPrice", "实际支付金额");
+        head.put("walletDeductionFee","整单抵扣");
+        head.put("payType", "支付方式");
+        head.put("payChannel", "支付渠道");
+        head.put("paidStr", "支付状态");
+        head.put("refundStatus", "退款状态");
+        head.put("status", "订单状态");
+        head.put("realName","收货人");
+        head.put("userPhone","收货人手机");
+        head.put("shippingType","配送方式");
+        head.put("userAddress","收货详情地址");
+        head.put("productInfo", "商品信息");
+        head.put("userRemark","用户备注");
+        head.put("merchantRemark","商户备注");
+        head.put("createTime", "创建时间");
+        JSONArray array = new JSONArray();
+        head.forEach((k, v) -> {
+            JSONObject json = new JSONObject();
+            json.put("k", k);
+            json.put("v", v);
+            array.add(json);
+        });
+        orderExcelInfoVo.setHead(array);
+        orderExcelInfoVo.setList(voList);
+        return orderExcelInfoVo;
+    }
+
+    private String getOrderProductInfo(List<OrderDetail> orderDetails) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < orderDetails.size(); i++) {
+            OrderDetail orderDetail = orderDetails.get(i);
+            stringBuilder.append(StrUtil.format("{}  {} * {}", orderDetail.getProductName(), orderDetail.getPayPrice(), orderDetail.getPayNum()));
+            if ((i + 1) < orderDetails.size()) {
+                stringBuilder.append("\r\n");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private String getOrderType(Integer type) {
+        String typeStr = "";
+        switch (type) {
+            case 0:
+                typeStr = "普通";
+                break;
+            case 1:
+                typeStr = "视频号";
+                break;
+            case 2:
+                typeStr = "秒杀";
+                break;
+        }
+        return typeStr;
+    }
+
+    private String getOrderRefundStatus(Integer refundStatus) {
+        String refundStatusStr = "";
+        switch (refundStatus) {
+            case 0:
+                refundStatusStr = "未退款";
+                break;
+            case 1:
+                refundStatusStr = "申请中";
+                break;
+            case 2:
+                refundStatusStr = "部分退款";
+                break;
+            case 3:
+                refundStatusStr = "已退款";
+                break;
+        }
+        return refundStatusStr;
+    }
+
+    private String getOrderStatus(Integer status) {
+        String statusStr = "";
+        switch (status) {
+            case 0:
+                statusStr = "待支付";
+                break;
+            case 1:
+                statusStr = "待发货";
+                break;
+            case 2:
+                statusStr = "部分发货";
+                break;
+            case 3:
+                statusStr = "待核销";
+                break;
+            case 4:
+                statusStr = "待收货";
+                break;
+            case 5:
+                statusStr = "已收货";
+                break;
+            case 6:
+                statusStr = "已完成";
+                break;
+            case 9:
+                statusStr = "已取消";
+                break;
+        }
+        return statusStr;
+    }
+
+    private String getOrderPayChannel(String payChannel) {
+        String payChannelStr = "";
+        switch (payChannel) {
+            case "public":
+                payChannelStr = "公众号";
+                break;
+            case "mini":
+                payChannelStr = "小程序";
+                break;
+            case "h5":
+                payChannelStr = "微信网页支付";
+                break;
+            case "yue":
+                payChannelStr = "余额";
+                break;
+            case "wechatIos":
+                payChannelStr = "微信Ios";
+                break;
+            case "wechatAndroid":
+                payChannelStr = "微信Android";
+                break;
+            case "alipay":
+                payChannelStr = "支付宝";
+                break;
+            case "alipayApp":
+                payChannelStr = "支付宝App";
+                break;
+        }
+        return payChannelStr;
+    }
+
+    private String getOrderPayType(String payType) {
+        String payTypeStr = "";
+        switch (payType) {
+            case "weixin":
+                payTypeStr = "微信支付";
+                break;
+            case "alipay":
+                payTypeStr = "支付宝支付";
+                break;
+            case "yue":
+                payTypeStr = "余额支付";
+                break;
+        }
+        return payTypeStr;
     }
 }
 

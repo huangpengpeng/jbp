@@ -73,4 +73,10 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "游客模式")
     private Boolean touristLoginOpen;
+
+    @ApiModelProperty(value = "个人中心背景图")
+    private String personalBackground;
+
+    @ApiModelProperty(value = "店铺开关")
+    private Boolean storeGoodsOpen;
 }

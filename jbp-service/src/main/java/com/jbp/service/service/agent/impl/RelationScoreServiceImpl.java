@@ -72,6 +72,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
+            e.setUpdateTime(e.getGmtModify());
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
@@ -84,7 +85,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         do {
             LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
                     .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid)
-                    .orderByDesc(RelationScore::getId);
+                    .orderByAsc(RelationScore::getId);
             getRequestTimeWhere(lqw, dateLimit);
             lqw.gt(RelationScore::getId, id).last("LIMIT 1000");
             List<RelationScore> fundClearingVos = list(lqw);
@@ -97,17 +98,18 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 User user = uidMapList.get(e.getUid());
                 e.setAccount(user != null ? user.getAccount() : "");
                 RelationScoreVo relationScoreVo=new RelationScoreVo();
+                e.setUpdateTime(e.getGmtModify());
                 BeanUtils.copyProperties(e,relationScoreVo);
                 voList.add(relationScoreVo);
             });
-            id = fundClearingVos.get(0).getId();
+            id = fundClearingVos.get(fundClearingVos.size()-1).getId();
         } while (true);
         return voList;
     }
 
     private void getRequestTimeWhere(LambdaQueryWrapper<RelationScore> lqw, String dateLimit) {
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), RelationScore::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), RelationScore::getGmtModify, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
 
     @Override

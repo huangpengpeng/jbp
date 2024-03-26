@@ -47,7 +47,7 @@ public class ProductMaterialsController {
             }
             merchantId = merchant.getId();
         }
-        return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(),request.getBarCode(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:product:materials:add')")

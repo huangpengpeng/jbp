@@ -99,4 +99,8 @@ public class WalletWithdraw extends VersionModel {
     @ApiModelProperty("真实姓名")
     @TableField(exist = false)
     private String realName;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickName;
 }

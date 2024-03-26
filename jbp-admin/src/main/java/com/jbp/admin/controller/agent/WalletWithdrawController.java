@@ -32,7 +32,7 @@ public class WalletWithdrawController {
     @GetMapping("/page")
     @ApiOperation("钱包提现列表")
     public CommonResult<CommonPage<WalletWithdraw>> getList(WalletWithdrawPageRequest request, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(), request.getRealName(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(), request.getRealName(),request.getNickName(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
@@ -59,7 +59,7 @@ public class WalletWithdrawController {
                 && StringUtils.isEmpty(request.getRealName()) && StringUtils.isEmpty(request.getDateLimit())) {
             throw new CrmebException("请选择一个过滤条件");
         }
-        return CommonResult.success(walletWithdrawService.excel(request.getAccount(), request.getWalletName(), request.getStatus(), request.getRealName(), request.getDateLimit()));
+        return CommonResult.success(walletWithdrawService.excel(request.getAccount(), request.getWalletName(), request.getStatus(), request.getRealName(), request.getDateLimit(),request.getNickName()));
     }
 
 

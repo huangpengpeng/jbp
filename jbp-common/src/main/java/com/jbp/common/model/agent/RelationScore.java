@@ -1,7 +1,9 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jbp.common.model.VersionModel;
 import com.jbp.common.utils.ArithmeticUtils;
 import io.swagger.annotations.ApiModel;
@@ -10,8 +12,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -55,5 +59,10 @@ public class RelationScore extends VersionModel {
     @ApiModelProperty("账户")
     @TableField(exist = false)
     private String account;
+
+    @ApiModelProperty("修改时间")
+    @TableField(exist = false)
+    private Date updateTime;
+
 
 }

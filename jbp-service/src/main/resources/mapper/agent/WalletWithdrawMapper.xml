@@ -19,6 +19,7 @@
     <result column="bank_name" property="bankName"/>
     <result column="bank_card_no" property="bankCode"/>
     <result column="real_name" property="realName"/>
+    <result column="nickname" property="nickName"/>
 </resultMap>
     <sql id="selectwalletWithdraw">
         select w.id,
@@ -36,10 +37,12 @@
                w.remark,
                asentity.real_name,
                card.bank_name,
-               card.bank_card_no
+               card.bank_card_no,
+               u.nickname
         from eb_wallet_withdraw as w
                  LEFT JOIN eb_channel_identity AS asentity on asentity.uid = w.uid and asentity.channel = #{channelName}
                  left join eb_channel_card as card on card.uid = w.uid and card.channel = #{channelName}
+                 LEFT JOIN eb_user as u on u.id = w.uid
 
     </sql>
 <!-- List<WalletWithdraw> pageList(String account, String walletName, String status, String endTime, String startTime, String realName, String channelName);-->
@@ -61,6 +64,9 @@
                 <if test="realName!=null and realName!=''">
                     and asentity.real_name=#{realName}
                 </if>
+                <if test="nickName!=null and nickName!=''">
+                    and u.nickname=#{nickName}
+                </if>
             </where> ORDER BY w.id DESC
     </select>
 <!-- List<WalletWithdrawVo> excel(@Param("id") Integer id,@Param("account") String account,@Param("walletName") String walletName,@Param("status") String status,
@@ -81,6 +87,7 @@
         <result column="bank_name" property="bankName"/>
         <result column="bank_card_no" property="bankCode"/>
         <result column="real_name" property="realName"/>
+        <result column="nickname" property="nickName"/>
     </resultMap>
     <select id="excel" resultMap="excelVo">
         <include refid="selectwalletWithdraw"/>
@@ -100,6 +107,9 @@
             </if>
             <if test="realName!=null and realName!=''">
                 and asentity.real_name=#{realName}
+            </if>
+            <if test="nickName!=null and nickName!=''">
+                and u.nickname=#{nickName}
             </if>
         </where>
         ORDER BY w.id ASC

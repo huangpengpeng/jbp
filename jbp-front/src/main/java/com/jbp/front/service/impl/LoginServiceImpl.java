@@ -579,6 +579,9 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.MOBILE_TOP_LOGO);
         keyList.add(SysConfigConstants.H5_DEFAULT_AVATAR);
         keyList.add(SysConfigConstants.TOURIST_LOGIN_OPEN);
+        keyList.add(SysConfigConstants.PERSONAL_BACKGROUND);
+        keyList.add(SysConfigConstants.STORE_GOODS_OPEN);
+
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
@@ -598,6 +601,8 @@ public class LoginServiceImpl implements LoginService {
         response.setMobileTopLogo(record.getStr(SysConfigConstants.MOBILE_TOP_LOGO));
         response.setH5DefaultAvatar(record.getStr(SysConfigConstants.H5_DEFAULT_AVATAR));
         response.setTouristLoginOpen(record.getStrBoolean(SysConfigConstants.TOURIST_LOGIN_OPEN));
+        response.setPersonalBackground(record.getStr(SysConfigConstants.PERSONAL_BACKGROUND));
+        response.setStoreGoodsOpen(record.getStrBoolean(SysConfigConstants.STORE_GOODS_OPEN));
         return response;
     }
 

@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface WalletWithdrawDao extends BaseMapper<WalletWithdraw> {
     List<WalletWithdraw> pageList(@Param("account") String account, @Param("walletName") String walletName, @Param("status") String status,
-                                  @Param("endTime") String endTime, @Param("startTime") String startTime, @Param("realName") String realName, @Param("channelName") String channelName);
+                                  @Param("endTime") String endTime, @Param("startTime") String startTime, @Param("realName") String realName,
+                                  @Param("channelName") String channelName,@Param("nickName")String nickName);
 
     List<WalletWithdrawVo> excel(@Param("id") Integer id,@Param("account") String account,@Param("walletName") String walletName,@Param("status") String status,
-                                 @Param("realName") String realName, @Param("startTime") String startTime,@Param("endTime") String endTime,@Param("channelName") String channelName);
+                                 @Param("realName") String realName, @Param("startTime") String startTime,@Param("endTime") String endTime,
+                                 @Param("channelName") String channelName ,@Param("nickName")String nickName);
 }
