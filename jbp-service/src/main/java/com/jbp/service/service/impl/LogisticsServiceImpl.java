@@ -68,8 +68,9 @@ public class LogisticsServiceImpl implements LogisticService {
             return JSONObject.toJavaObject(result, LogisticsResultVo.class);
         }
         // 顺丰请输入单号 : 收件人或寄件人手机号后四位。例如：123456789:1234
+
         if (StrUtil.isNotBlank(com) && (com.equals("shunfengkuaiyun") || com.equals("shunfeng"))) {
-            expressNo = expressNo.concat(":").concat(StrUtil.sub(phone, 7, -1));
+            expressNo = expressNo.concat(":").concat(StrUtil.sub(phone, 7, phone.length()));
         }
         String logisticsType = systemConfigService.getValueByKeyException(SysConfigConstants.LOGISTICS_QUERY_TYPE);
         if (logisticsType.equals("1")) {// 平台查询

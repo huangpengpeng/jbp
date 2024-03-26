@@ -5,6 +5,7 @@ import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.service.LogisticService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
@@ -48,6 +49,9 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//        final LogisticService bean1 = run.getBean(LogisticService.class);
+//        bean1.info("621110728192092", null, "", "15871898210");
     }
 
 }
