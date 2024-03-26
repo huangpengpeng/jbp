@@ -538,6 +538,15 @@ public class ExportServiceImpl implements ExportService {
             case "yue":
                 payTypeStr = "余额支付";
                 break;
+            case "wallet":
+                payTypeStr = "积分支付";
+                break;
+            case "lianlian":
+                payTypeStr = "连连支付";
+                break;
+            case "confirmPay":
+                payTypeStr = "人工确认";
+                break;
         }
         return payTypeStr;
     }
