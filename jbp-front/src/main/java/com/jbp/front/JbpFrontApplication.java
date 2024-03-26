@@ -53,7 +53,7 @@ public class JbpFrontApplication {
 //         UserRelationService relationService = run.getBean(UserRelationService.class);
 //
 //         UserRelation leftMost = relationService.getLeftMost(1010998);
-        System.out.println(leftMost);
+//        System.out.println(leftMost);
 
     }
 
