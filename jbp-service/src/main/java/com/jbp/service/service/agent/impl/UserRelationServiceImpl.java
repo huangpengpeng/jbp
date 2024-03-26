@@ -198,4 +198,13 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
+    @Override
+    public void del(Integer uid) {
+        UserRelation userRelation = getByUid(uid);
+        if(userRelation != null){
+            removeById(userRelation.getId());
+            userRelationFlowService.clear(uid);
+        }
+    }
 }

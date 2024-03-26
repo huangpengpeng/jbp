@@ -309,69 +309,66 @@ public class ExportServiceImpl implements ExportService {
             if (CollectionUtils.isEmpty(orderList)) {
                 break;
             }
-            List<Integer> merIdList = orderList.stream().filter(e -> e.getMerId() > 0).map(Order::getMerId).distinct().collect(Collectors.toList());
             List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
             Map<Integer, User> userMap = userService.getUidMapList(userIdList);
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
             for (Order order : orderList) {
                 MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
                 // 循环设置
-                    OrderExcelVo vo = new OrderExcelVo();
-                    vo.setType(getOrderType(order.getType()));
-                    vo.setOrderNo(order.getOrderNo());
-                    vo.setMerName(order.getMerId() > 0 ? merchantMap.get(order.getMerId()).getName() : "");
-                    vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() + "|" + order.getUid() : "");
-                    vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
-                    vo.setPayType(getOrderPayType(order.getPayType()));
-                    vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
-                    vo.setStatus(getOrderStatus(order.getStatus()));
-                    vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
-                    vo.setWalletDeductionFee(order.getWalletDeductionFee());
-                    vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-                    vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
+                OrderExcelVo vo = new OrderExcelVo();
+                vo.setType(getOrderType(order.getType()));
+                vo.setOrderNo(StringUtils.isNotEmpty(order.getPlatOrderNo()) ? order.getPlatOrderNo() : order.getOrderNo());
+                vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
+                vo.setPayType(getOrderPayType(order.getPayType()));
+                vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
+                vo.setStatus(getOrderStatus(order.getStatus()));
+                vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
+                vo.setWalletDeductionFee(order.getWalletDeductionFee());
+                vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+                vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
 
-                    // 收货人
-                    vo.setRealName(merchantOrder.getRealName());
-                    vo.setUserPhone(merchantOrder.getUserPhone());
-                    vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
-                    vo.setUserRemark(merchantOrder.getUserRemark());
-                    vo.setMerchantRemark(merchantOrder.getMerchantRemark());
-                    vo.setUserAddress(merchantOrder.getUserAddress());
-                    vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
-                    vo.setPayPostage(order.getPayPostage());
-                    vo.setCouponPrice(order.getCouponPrice());
-                    //设置场景
-                    vo.setPlatform(order.getPlatform());
-                    if (order.getUid() != null) {
-                        TeamUser teamUser = teamUserService.getByUser(order.getUid());
-                        if (teamUser != null) {
-                            vo.setTeam(teamUser.getName());
-                        }
-                    } else {
-                        vo.setTeam("");
+                // 收货人
+                vo.setRealName(merchantOrder.getRealName());
+                vo.setUserPhone(merchantOrder.getUserPhone());
+                vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
+                vo.setUserRemark(merchantOrder.getUserRemark());
+                vo.setMerchantRemark(merchantOrder.getMerchantRemark());
+                vo.setUserAddress(merchantOrder.getUserAddress());
+                vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
+                vo.setPayPostage(order.getPayPostage());
+                vo.setCouponPrice(order.getCouponPrice());
+                //设置场景
+                vo.setPlatform(order.getPlatform());
+                if (order.getUid() != null) {
+                    TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                    if (teamUser != null) {
+                        vo.setTeam(teamUser.getName());
                     }
-                    //设置团队
-                    if (order.getUid() != null) {
-                        TeamUser teamUser = teamUserService.getByUser(order.getUid());
-                        if (teamUser != null) {
-                            vo.setTeam(teamUser.getName());
-                        }
-                    } else {
-                        vo.setTeam("");
-                    }
-                    //设置用id
-                    if (order.getUid() != null) {
-                        vo.setUid(order.getUid());
-                        vo.setUserAccount(userMap.get(order.getUid()).getAccount());
-                    }
-                    //设置付款账号
-                    if (order.getPayUid() != null) {
-                        vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
-                    }
-                voList.add(vo);
+                } else {
+                    vo.setTeam("");
                 }
+                //设置团队
+                if (order.getUid() != null) {
+                    TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                    if (teamUser != null) {
+                        vo.setTeam(teamUser.getName());
+                    }
+                } else {
+                    vo.setTeam("");
+                }
+                //设置用id
+                if (order.getUid() != null) {
+                    vo.setUid(order.getUid());
+                    vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() : "");
+                    vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                }
+                //设置付款账号
+                if (order.getPayUid() != null) {
+                    vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                }
+                voList.add(vo);
+            }
             id = orderList.get(orderList.size() - 1).getId();
         } while (true);
 
@@ -380,7 +377,6 @@ public class ExportServiceImpl implements ExportService {
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
         head.put("type", "订单类型");
         head.put("orderNo", "订单号");
-        head.put("merName", "商户名称");
         head.put("platform","场景");
         head.put("team","团队");
         head.put("uid","用户编号");

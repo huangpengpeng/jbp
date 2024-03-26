@@ -33,6 +33,8 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     UserInvitation band(Integer uId, Integer pId, Boolean ifM, Boolean ifForce, Boolean ifPlatOperate);
 
+    void del(Integer uId);
+
     /**
      * 存在上下级关系没有层级关系的明细记录列表
      * @return

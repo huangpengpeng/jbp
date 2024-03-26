@@ -37,4 +37,6 @@ public interface UserRelationService extends IService<UserRelation> {
     UserRelation getLeftMost(Integer userId);
 
     PageInfo<UserRelation> pageList(Integer uid, Integer pid, Integer node, PageParamRequest pageParamRequest);
+
+    void del(Integer id);
 }

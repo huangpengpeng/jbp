@@ -86,7 +86,6 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
         for (CommCalculateResult calculateResult : collisionFeeList) {
             User user = userService.getById(calculateResult.getUid());
             Integer uid = calculateResult.getUid();
-
             // 往上找拿钱的人
             BigDecimal upperAmt = calculateResult.getAmt().multiply(rule.getUpperRatio()).setScale(2, BigDecimal.ROUND_DOWN);
             if(ArithmeticUtils.gt(upperAmt, BigDecimal.ZERO)){
@@ -106,8 +105,6 @@ public class ManagerCommHandler extends AbstractProductCommHandler {
                     }
                 }
             }
-
-
 
             BigDecimal underAmt = calculateResult.getAmt().multiply(rule.getUnderRatio()).setScale(2, BigDecimal.ROUND_DOWN);
             if(ArithmeticUtils.gt(underAmt, BigDecimal.ZERO)){

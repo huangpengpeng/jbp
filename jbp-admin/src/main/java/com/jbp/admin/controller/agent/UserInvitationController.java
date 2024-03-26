@@ -103,4 +103,20 @@ public class UserInvitationController {
 
         return CommonResult.success();
     }
+
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "销售关系上下级删除上级")
+    @GetMapping("/del")
+    @ApiOperation("删除")
+    public CommonResult band(Integer uid) {
+        if (uid == null) {
+            throw new CrmebException("账户信息不能为空");
+        }
+        User user = userService.getById(uid);
+        if (user == null) {
+            throw new CrmebException("账户不存在");
+        }
+        userInvitationService.del(user.getId());
+        return CommonResult.success();
+    }
 }

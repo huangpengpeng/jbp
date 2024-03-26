@@ -175,6 +175,15 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     }
 
     @Override
+    public void del(Integer uId) {
+        UserInvitation userInvitation = getByUser(uId);
+        if (userInvitation != null) {
+            removeById(userInvitation.getId());
+            userInvitationFlowService.clear(uId);
+        }
+    }
+
+    @Override
     public List<UserInvitation> getNoFlowList() {
         return dao.getNoFlowList();
     }
