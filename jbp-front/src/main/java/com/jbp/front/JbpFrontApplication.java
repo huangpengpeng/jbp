@@ -50,9 +50,9 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-         UserRelationService relationService = run.getBean(UserRelationService.class);
-
-         UserRelation leftMost = relationService.getLeftMost(1010998);
+//         UserRelationService relationService = run.getBean(UserRelationService.class);
+//
+//         UserRelation leftMost = relationService.getLeftMost(1010998);
         System.out.println(leftMost);
 
     }
