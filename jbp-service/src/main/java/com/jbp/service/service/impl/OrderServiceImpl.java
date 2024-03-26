@@ -399,9 +399,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (!(order.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING) || order.getStatus().equals(OrderConstants.ORDER_STATUS_PART_SHIPPING))) {
             throw new CrmebException("订单不处于待发货状态");
         }
-//        if (order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_ALL)) {
-//            throw new CrmebException("订单已退款无法发货");
-//        }
+        if (order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_ALL)) {
+            throw new CrmebException("订单已退款无法发货");
+        }
         MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(request.getOrderNo());
         if (!merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS)) {
             throw new CrmebException("订单非发货类型订单");

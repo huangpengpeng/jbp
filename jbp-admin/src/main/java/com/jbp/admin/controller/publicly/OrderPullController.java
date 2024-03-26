@@ -133,19 +133,23 @@ public class OrderPullController {
 
     @ApiOperation(value = "发货同步", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/erp/order/shipSync", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> shipSync(String appKey, String timeStr, String method, String sign, @RequestBody List<ErpOrderShipSyncRequest> shipSyncList) {
+    public List<String> shipSync(String appKey, String timeStr, String method, String sign,
+                                 @RequestBody List<ErpOrderShipSyncRequest> shipSyncList) {
         validSign(appKey, timeStr, method, sign);
         if (CollectionUtils.isEmpty(shipSyncList)) {
             throw new RuntimeException("回执单号不能为空");
         }
+        return send(shipSyncList);
+    }
+
+    public List<String> send(List<ErpOrderShipSyncRequest> shipSyncList) {
         List<String> ordersSnList = Lists.newArrayList();
         for (ErpOrderShipSyncRequest shipSync : shipSyncList) {
             List<Order> orderList = orderService.getByPlatOrderNo(shipSync.getOrdersSn());
-
             Order orders = CollectionUtils.isNotEmpty(orderList) ? orderList.get(0) : null;
-            if (orders != null && orders.getStatus().equals("1")) {
+            if (orders != null && orders.getStatus().equals(1)) {
 
-                OrderSendRequest orderSendRequest =new OrderSendRequest();
+                OrderSendRequest orderSendRequest = new OrderSendRequest();
                 orderSendRequest.setOrderNo(orders.getOrderNo());
                 orderSendRequest.setDeliveryType("express");
                 orderSendRequest.setExpressCode(shipSync.getShipCode());
@@ -156,10 +160,10 @@ public class OrderPullController {
                 orderSendRequest.setToName(merchantOrder.getRealName());
                 orderSendRequest.setToTel(merchantOrder.getUserPhone());
                 orderSendRequest.setToAddr(merchantOrder.getUserAddress());
-                List<OrderDetail> orderDetailList =orderDetailService.getByOrderNo(orders.getOrderNo());
-                List<SplitOrderSendDetailRequest> list =new ArrayList<>();
-                for(OrderDetail orderDetail :orderDetailList ){
-                    SplitOrderSendDetailRequest splitOrderSendDetailRequest =new SplitOrderSendDetailRequest();
+                List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orders.getOrderNo());
+                List<SplitOrderSendDetailRequest> list = new ArrayList<>();
+                for (OrderDetail orderDetail : orderDetailList) {
+                    SplitOrderSendDetailRequest splitOrderSendDetailRequest = new SplitOrderSendDetailRequest();
                     splitOrderSendDetailRequest.setNum(orderDetail.getPayNum());
                     splitOrderSendDetailRequest.setOrderDetailId(orderDetail.getId());
                     list.add(splitOrderSendDetailRequest);
@@ -169,8 +173,8 @@ public class OrderPullController {
                 try {
                     orderService.send(orderSendRequest);
                     ordersSnList.add(shipSync.getOrdersSn());
-                }catch (Exception e){
-
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
