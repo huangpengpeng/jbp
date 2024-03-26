@@ -26,6 +26,7 @@ import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.OrderSuccessMsgService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -123,6 +124,8 @@ public class AsyncServiceImpl implements AsyncService {
     private UserCapaService userCapaService;
     @Autowired
     private UserCapaXsService userCapaXsService;
+    @Autowired
+    private OrderSuccessMsgService orderSuccessMsgService;
 
 
     /**
@@ -245,9 +248,10 @@ public class AsyncServiceImpl implements AsyncService {
             logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", orderNo);
             return;
         }
+        orderSuccessMsgService.add(order.getOrderNo());
         // 添加支付成功redis队列
         logger.info("异步——订单支付成功拆单处理 | 拆单成功，加入后置处理队列");
-        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
     }
 
     @Override
@@ -305,9 +309,10 @@ public class AsyncServiceImpl implements AsyncService {
             logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", orderNo);
             return;
         }
+        orderSuccessMsgService.add(order.getOrderNo());
         // 添加支付成功redis队列
         logger.info("异步——订单支付成功拆单处理 | 拆单成功，加入后置处理队列");
-        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
 
     }
 

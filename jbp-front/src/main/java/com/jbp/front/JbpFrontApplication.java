@@ -8,10 +8,7 @@ import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserCapaXsService;
-import com.jbp.service.service.agent.UserRelationService;
-import com.jbp.service.service.agent.WalletService;
+import com.jbp.service.service.agent.*;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,16 +46,8 @@ public class JbpFrontApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         Environment bean = run.getBean(Environment.class);
-        System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
+        System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-         PayService relationService = run.getBean(PayService.class);
-
-                // PT618171121389531982547
-        // PT234171121718579099853
-        // PT496171135573907689810
-        relationService.payAfterProcessingTemp("PT131171143315706654035");
-
     }
 
 }
