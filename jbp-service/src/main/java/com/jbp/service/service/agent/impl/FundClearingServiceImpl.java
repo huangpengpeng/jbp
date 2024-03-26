@@ -371,6 +371,11 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         return CommonPage.copyPageInfo(page, list);
     }
 
+    @Override
+    public boolean hasCreate(String orderNo, String commName) {
+        return getOne(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, orderNo).eq(FundClearing::getCommName, commName)) != null;
+    }
+
     private static List<FundClearingItem> createItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {
         List<FundClearingItem> items = Lists.newArrayList();
         List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());

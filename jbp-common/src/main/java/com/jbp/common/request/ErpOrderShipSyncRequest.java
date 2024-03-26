@@ -9,7 +9,7 @@ public class ErpOrderShipSyncRequest implements Serializable {
 
     private String ordersSn;
 
-    private String shipName;
+    private String shipCode;
 
     private String shipNo;
 }

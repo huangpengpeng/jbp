@@ -52,9 +52,12 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//         UserCapaXsService relationService = run.getBean(UserCapaXsService.class);
+         PayService relationService = run.getBean(PayService.class);
 
-//        relationService.riseCapaXs(1019690);
+                // PT618171121389531982547
+        // PT234171121718579099853
+        // PT496171135573907689810
+        relationService.payAfterProcessingTemp("PT131171143315706654035");
 
     }
 
