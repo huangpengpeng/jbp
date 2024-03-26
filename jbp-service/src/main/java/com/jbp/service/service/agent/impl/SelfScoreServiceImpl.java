@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
+import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScore;
 import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
@@ -78,6 +79,11 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
 
     @Override
     public void orderSuccess(Integer uid, BigDecimal score, String ordersSn, Date payTime, List<ProductInfoDto> productInfo) {
+        SelfScoreFlow one = selfScoreFlowService.getOne(new QueryWrapper<SelfScoreFlow>().lambda()
+                .eq(SelfScoreFlow::getOrdersSn, ordersSn).last(" limit 1"));
+        if (one != null) {
+            return;
+        }
         SelfScore selfScore = getByUser(uid);
         if (selfScore == null) {
             selfScore = add(uid);

@@ -635,9 +635,9 @@ public class PayServiceImpl implements PayService {
             logger.error("OrderTaskServiceImpl.orderPaySuccessAfter | 订单不存在，orderNo: {}", orderNo);
             throw new CrmebException("订单不存在，orderNo: " + orderNo);
         }
-        if (ordersFundSummaryService.getByOrdersSn(orderNo) != null) {
-            return true;
-        }
+//        if (ordersFundSummaryService.getByOrdersSn(orderNo) != null) {
+//            return true;
+//        }
         User user = userService.getById(platOrder.getUid());
         // 2.增加业绩
         BigDecimal score = BigDecimal.ZERO;
@@ -755,30 +755,30 @@ public class PayServiceImpl implements PayService {
             // 3.团队业绩
             invitationScoreService.orderSuccess(platOrder.getUid(), finalScore, orderNo, platOrder.getPayTime(), productInfoList);
             // 4.个人升级
-            userCapaService.riseCapa(platOrder.getUid());
-            userCapaXsService.riseCapaXs(platOrder.getUid());
+//            userCapaService.riseCapa(platOrder.getUid());
+//            userCapaXsService.riseCapaXs(platOrder.getUid());
             // 5.分销佣金
             LinkedList<CommCalculateResult> commList = new LinkedList<>();
             productCommChain.orderSuccessCalculateAmt(platOrder, commList);
             // 订单、佣金
-            if (CollUtil.isNotEmpty(brokerageRecordList)) {
-                merchantOrderService.updateBatchById(merchantOrderList);
-                userBrokerageRecordService.saveBatch(brokerageRecordList);
-            }
+//            if (CollUtil.isNotEmpty(brokerageRecordList)) {
+//                merchantOrderService.updateBatchById(merchantOrderList);
+//                userBrokerageRecordService.saveBatch(brokerageRecordList);
+//            }
             // 订单信息
-            orderDetailService.updateBatchById(orderDetailList);
+//            orderDetailService.updateBatchById(orderDetailList);
             // 订单日志
             orderList.forEach(o -> orderStatusService.createLog(o.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, platOrder.getOrderNo())));
             // 用户信息变更
-            userService.paySuccessChange(user.getId(), user.getIsPromoter());
+//            userService.paySuccessChange(user.getId(), user.getIsPromoter());
             // 积分记录
-            if (CollUtil.isNotEmpty(integralList)) {
-                userIntegralRecordService.saveBatch(integralList);
-            }
-            billService.saveBatch(billList);
-            merchantBillService.saveBatch(merchantBillList);
-            orderProfitSharingService.saveBatch(profitSharingList);
-            merchantBalanceRecordService.saveBatch(merchantBalanceRecordList);
+//            if (CollUtil.isNotEmpty(integralList)) {
+//                userIntegralRecordService.saveBatch(integralList);
+//            }
+//            billService.saveBatch(billList);
+//            merchantBillService.saveBatch(merchantBillList);
+//            orderProfitSharingService.saveBatch(profitSharingList);
+//            merchantBalanceRecordService.saveBatch(merchantBalanceRecordList);
             return Boolean.TRUE;
         });
         if (execute) {

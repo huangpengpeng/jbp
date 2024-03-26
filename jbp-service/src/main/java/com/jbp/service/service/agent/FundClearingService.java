@@ -88,4 +88,6 @@ public interface FundClearingService extends IService<FundClearing> {
     PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest);
 
     void updateIfRefund(List<Long> ids, String remark);
+
+    boolean hasCreate(String orderNo, String commName);
 }

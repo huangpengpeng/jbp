@@ -53,4 +53,13 @@ public enum ProductCommEnum {
         this.ifWhole = ifWhole;
         this.desc = desc;
     }
+
+    public static String getCommName(Integer type) {
+        for (ProductCommEnum value : ProductCommEnum.values()) {
+            if (value.getType().equals(type)) {
+                return value.getName();
+            }
+        }
+        return null;
+    }
 }
