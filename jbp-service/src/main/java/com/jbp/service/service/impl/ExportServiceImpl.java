@@ -522,6 +522,9 @@ public class ExportServiceImpl implements ExportService {
             case "alipayApp":
                 payChannelStr = "支付宝App";
                 break;
+            case "wallet":
+                payChannelStr = "积分支付";
+                break;
         }
         return payChannelStr;
     }
