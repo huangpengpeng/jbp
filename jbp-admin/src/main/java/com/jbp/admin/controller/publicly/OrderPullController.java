@@ -3,10 +3,21 @@
 //import com.beust.jcommander.internal.Lists;
 //import com.jbp.common.annotation.CustomResponseAnnotation;
 //import com.jbp.common.encryptapi.EncryptIgnore;
+//import com.jbp.common.model.agent.ProductMaterials;
+//import com.jbp.common.model.agent.TeamUser;
+//import com.jbp.common.model.order.MerchantOrder;
 //import com.jbp.common.model.order.Order;
+//import com.jbp.common.model.order.OrderDetail;
+//import com.jbp.common.model.product.Product;
+//import com.jbp.common.model.user.User;
+//import com.jbp.common.request.ErpOrderShipSyncRequest;
+//import com.jbp.common.response.ErpOrderGoodVo;
 //import com.jbp.common.response.ErpOrderShipWaitVo;
+//import com.jbp.common.utils.AddressUtil;
+//import com.jbp.common.utils.DateTimeUtils;
 //import com.jbp.common.utils.SignUtil;
-//import com.jbp.service.service.OrderService;
+//import com.jbp.service.service.*;
+//import com.jbp.service.service.agent.ProductMaterialsService;
 //import io.swagger.annotations.Api;
 //import io.swagger.annotations.ApiOperation;
 //import lombok.extern.slf4j.Slf4j;
@@ -25,7 +36,6 @@
 //import java.util.HashMap;
 //import java.util.List;
 //import java.util.Map;
-//import java.util.stream.Collectors;
 //
 //
 //@Slf4j
@@ -37,7 +47,19 @@
 //public class OrderPullController {
 //
 //    @Resource
+//    private TeamUserService teamUserService;
+//    @Resource
+//    private ProductService productService;
+//    @Resource
 //    private OrderService orderService;
+//    @Resource
+//    private UserService userService;
+//    @Resource
+//    private OrderDetailService orderDetailService;
+//    @Resource
+//    private ProductMaterialsService productMaterialsService;
+//    @Resource
+//    private MerchantOrderService merchantOrderService;
 //
 //    @ApiOperation(value = "待发货订单列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PostMapping(value = "/shipWait", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,49 +70,43 @@
 //        if (CollectionUtils.isEmpty(waitShip)) {
 //            return list;
 //        }
-//        waitShip = waitShip.stream().filter(w -> BooleanUtils.isNotTrue(w.getIfErpSync())).collect(Collectors.toList());
 //        if (CollectionUtils.isEmpty(waitShip)) {
 //            return list;
 //        }
-//        for (Orders orders : waitShip) {
-//            User user = userMng.get(orders.getUserId());
-//            List<OrderGoods> orderGoodsList = orderGoodsMng.getOrdersId(orders.getId());
+//        for (Order order : waitShip) {
+//            User user = userService.getById(order.getUid());
+//            List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 //            List<ErpOrderGoodVo> orderGoodVoList = Lists.newArrayList();
 //
-//            BigDecimal exchangeScore = orders.getExchangeScore() == null ? BigDecimal.ZERO : orders.getExchangeScore();
-//            BigDecimal totalOrgPrice = BigDecimal.ZERO;
-//            for (OrderGoods orderGoods : orderGoodsList) {
-//                BigDecimal orgPrice = orderGoods.getOrgPrice().multiply(BigDecimal.valueOf(orderGoods.getNumber()));
-//                totalOrgPrice = totalOrgPrice.add(orgPrice);
-//            }
-//            for (OrderGoods orderGoods : orderGoodsList) {
-//                Goods goods = goodsMng.get(orderGoods.getGoodsId());
-//                BigDecimal orgPrice = orderGoods.getOrgPrice().multiply(BigDecimal.valueOf(orderGoods.getNumber()));
-//                BigDecimal divide = BigDecimal.ZERO;
-//                BigDecimal ratio = BigDecimal.ZERO;
-//                if (ArithmeticUtils.gt(totalOrgPrice, BigDecimal.ZERO) && ArithmeticUtils.gt(orgPrice, BigDecimal.ZERO)) {
-//                    ratio = orgPrice.divide(totalOrgPrice, 10, BigDecimal.ROUND_DOWN);
+//            for (OrderDetail orderGoods : orderDetailList) {
+//                Product product = productService.getById(orderGoods.getProductId());
+//                List<ProductMaterials> productMaterials = productMaterialsService.getByBarCode(orderGoods.getMerId(), orderGoods.getBarCode());
+//                if (CollectionUtils.isEmpty(productMaterials)) {
+//                    ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderGoods.getProductName(),
+//                            orderGoods.getPayNum(), product.getUnitName(), orderGoods.getBarCode(),
+//                            orderGoods.getPayPrice().divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN),
+//                            orderGoods.getWalletDeductionFee().divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN));
+//                    orderGoodVoList.add(orderGoodVo);
+//                } else {
+//                    for (ProductMaterials productMaterial : productMaterials) {
+//                        Integer payNum = orderGoods.getPayNum() * productMaterial.getMaterialsQuantity();
+//                        ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(productMaterial.getMaterialsName(),
+//                                payNum, product.getUnitName(), productMaterial.getMaterialsCode(),
+//                                orderGoods.getPayPrice().divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN),
+//                                orderGoods.getWalletDeductionFee().divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN));
+//                        orderGoodVoList.add(orderGoodVo);
+//                    }
 //                }
-//                if (ArithmeticUtils.gt(ratio, BigDecimal.ZERO) && ArithmeticUtils.gt(exchangeScore, BigDecimal.ZERO)){
-//                    divide = ratio.multiply(exchangeScore).divide(BigDecimal.valueOf(orderGoods.getNumber()), 4, BigDecimal.ROUND_DOWN);
-//                }
-//                ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderGoods.getGoodsName(),
-//                        orderGoods.getNumber(), goods.getUnit(), orderGoods.getSpecificationsBarCode(), orderGoods.getPrice(), divide);
-//                orderGoodVoList.add(orderGoodVo);
 //            }
-//
-//            String groupName = "";
-//            UserReflection userReflection = userReflectionMng.getByUser(orders.getUserId());
-//            if (userReflection != null && userReflection.getLeaderId() != null) {
-//                User leader = userMng.get(userReflection.getLeaderId());
-//                groupName = leader.getGrouponName();
-//            }
-//            ErpOrderShipWaitVo vo = new ErpOrderShipWaitVo("A" + orders.getUserId(),
-//                    user.getNumberCode(), groupName, user.getUsername(), user.getMobile(), orders.getOrderSn(),
-//                    DateTimeUtils.format(orders.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
-//                    orders.getFreightPrice(), orders.getPayPrice(), orders.getCouponPrice(),
-//                    orders.getExchangeScore(), orderGoodVoList, orders.getReceiveName(),
-//                    orders.getMobile(), orders.getProvince(), orders.getCity(), orders.getArea(), orders.getAddress());
+//            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+//            TeamUser teamUser = teamUserService.getByUser(order.getUid());
+//            Map<String, String> address = AddressUtil.getAddress(merchantOrder.getUserAddress());
+//            ErpOrderShipWaitVo vo = new ErpOrderShipWaitVo("A" + order.getUid(),
+//                    user.getAccount(), teamUser.getName(), user.getNickname(), user.getPhone(), order.getPlatOrderNo(),
+//                    DateTimeUtils.format(order.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
+//                    order.getTotalPostage(), order.getPayPrice(), order.getCouponPrice(),
+//                    order.getWalletDeductionFee(), orderGoodVoList, merchantOrder.getRealName(),
+//                    merchantOrder.getUserPhone(), address.get("province"), address.get("city"), address.get("district"), address.get("street") + address.get("detail"));
 //            list.add(vo);
 //        }
 //        return list;
@@ -104,10 +120,12 @@
 //            throw new RuntimeException("回执单号不能为空");
 //        }
 //        for (String s : ordersSnList) {
-//            Orders orders = ordersMng.getByOrderSn(s);
-//            if (orders != null) {
-//                orders.setIfErpSync(true);
-//                ordersMng.updateByUpdater(orders);
+//            List<Order> orderList = orderService.getByPlatOrderNo(s);
+//            if (CollectionUtils.isNotEmpty(orderList)) {
+//                for (Order order : orderList) {
+//                    order.setIfPull(true);
+//                    orderService.updateById(order);
+//                }
 //            }
 //        }
 //        return "SUCCESS";
@@ -123,8 +141,12 @@
 //        }
 //        List<String> ordersSnList = Lists.newArrayList();
 //        for (ErpOrderShipSyncRequest shipSync : shipSyncList) {
-//            Orders orders = ordersMng.getByOrderSn(shipSync.getOrdersSn());
+//            List<Order> orderList = orderService.getByPlatOrderNo(shipSync.getOrdersSn());
+//
+//            Order orders = CollectionUtils.isNotEmpty(orderList) ? orderList.get(0) : null;
 //            if (orders != null && OrderUtils.build(orders).isShip()) {
+//
+//                orderService.send();
 //                orders.setShipName(shipSync.getShipName());
 //                orders.setShipSn(shipSync.getShipNo());
 //                orders.setShipTime(new Date());
@@ -139,22 +161,13 @@
 //                messageMng.pushOrderShipMsg(orders.getUserId(), orders.getMobile(), orders.getOrderSn(),
 //                        orders.getShipName(), orders.getShipSn());
 //                ordersSnList.add(shipSync.getOrdersSn());
-//            }else{
+//            } else {
 //                ordersSnList.add(shipSync.getOrdersSn());
 //            }
 //        }
 //        return ordersSnList;
 //    }
 //
-//    @ApiOperation(value = "获取加密字符串", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PostMapping(value = "/erp/order/sign", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public String sign(String appKey, String timeStr, String method) throws Exception {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("appKey", appKey);
-//        map.put("method", method);
-//        map.put("timeStr", timeStr);
-//        return SignUtil.getSignToUpperCase("2e556e8f433dc3b9971aa21fa32458b8", map);
-//    }
 //
 //    private void validSign(String appKey, String timeStr, String method, String sign) {
 //        if (StringUtils.isAnyBlank(appKey, timeStr, method, sign)) {

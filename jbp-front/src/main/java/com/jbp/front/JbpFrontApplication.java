@@ -3,10 +3,14 @@ package com.jbp.front;
 import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.service.agent.UserRelationService;
 import com.jbp.service.service.agent.WalletService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +23,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import javax.management.relation.RelationService;
 
 /**
  * 程序主入口
@@ -45,6 +51,11 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//         UserCapaXsService relationService = run.getBean(UserCapaXsService.class);
+
+//        relationService.riseCapaXs(1019690);
+
     }
 
 }
