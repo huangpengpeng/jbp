@@ -36,7 +36,7 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
     @Override
     public OrdersFundSummary create(Integer ordersId, String ordersSn, BigDecimal payPrice, BigDecimal pv) {
         if (getByOrdersSn(ordersSn) != null) {
-            throw new CrmebException("订单:" + ordersSn + ", 支付成功后置处理已经完成");
+            return null;
         }
         OrdersFundSummary summary = new OrdersFundSummary(ordersId, ordersSn, payPrice, pv);
         save(summary);

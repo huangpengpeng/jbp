@@ -64,7 +64,9 @@ public class ProductCommChain implements ApplicationContextAware {
      */
     public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
         for (AbstractProductCommHandler handler : handlers) {
-            handler.orderSuccessCalculateAmt(order, resultList);
+            if (!fundClearingService.hasCreate(order.getOrderNo(), ProductCommEnum.getCommName(handler.getType()))) {
+                handler.orderSuccessCalculateAmt(order, resultList);
+            }
         }
     }
 

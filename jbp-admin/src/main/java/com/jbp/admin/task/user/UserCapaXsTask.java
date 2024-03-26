@@ -41,25 +41,29 @@ public class UserCapaXsTask {
     public void refreshUserCapaXs() {
         // cron : 0 0 1 * * ?
         logger.info("---UserCapaXsTask refreshUserCapaXs------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
-        if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapaXs"))){
-            logger.info("---UserCapaXsTask refreshUserCapaXs-----未执行完成忽略本次", DateUtil.date());
-            return;
-        }
+//        if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapaXs"))){
+//            logger.info("---UserCapaXsTask refreshUserCapaXs-----未执行完成忽略本次", DateUtil.date());
+//            return;
+//        }
         stringRedisTemplate.opsForValue().set("refreshUserCapaXs","1");
         try {
-            // 查询没下级的用户
-            List<User> list = userService.getNoChild();
-            // 所有的底层用户往上一次升级
+//            // 查询没下级的用户
+//            List<User> list = userService.getNoChild();
+//            // 所有的底层用户往上一次升级
+//            for (User user : list) {
+//                // 所有的上级
+//                List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
+//                if(CollectionUtils.isEmpty(allUpper)){
+//                    userCapaXsService.riseCapaXs(user.getId());
+//                }
+//                // 升星
+//                for (UserUpperDto upperDto : allUpper) {
+//                    userCapaXsService.riseCapaXs(upperDto.getUId());
+//                }
+//            }
+            List<User> list = userService.list();
             for (User user : list) {
-                // 所有的上级
-                List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
-                if(CollectionUtils.isEmpty(allUpper)){
-                    userCapaXsService.riseCapaXs(user.getId());
-                }
-                // 升星
-                for (UserUpperDto upperDto : allUpper) {
-                    userCapaXsService.riseCapaXs(upperDto.getUId());
-                }
+                userCapaXsService.riseCapaXs(user.getId());
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -134,6 +134,11 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
     @Override
     public void orderSuccess(Integer uid, BigDecimal score, String ordersSn, Date payTime, List<ProductInfoDto> productInfo) {
+        InvitationScoreFlow one = invitationScoreFlowService.getOne(new QueryWrapper<InvitationScoreFlow>().lambda()
+                .eq(InvitationScoreFlow::getOrdersSn, ordersSn).last(" limit 1"));
+        if (one != null) {
+            return;
+        }
         List<UserUpperDto> allUpper = userInvitationService.getAllUpper(uid);
         if (CollectionUtils.isEmpty(allUpper)) {
             return;

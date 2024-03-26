@@ -157,7 +157,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
         Map<Integer, LevelRatio> levelRatioMap = FunctionUtil.keyValueMap(rule.getLevelRatioList(), LevelRatio::getLevel);
 
         // 根据增加明细有序进行对碰减少
-        int level = 1;
+        int level = 1, index=1;
         for (RelationScoreFlow flow : relationScoreFlowList) {
             Integer uid = flow.getUid();
             int node = flow.getNode() == 0 ? 1 : 0; // 反方向
@@ -190,10 +190,11 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             BigDecimal amt = ratio.multiply(minScore).setScale(2, BigDecimal.ROUND_DOWN);
             // 减少反方向
             relationScoreService.orderSuccessReduce(uid, flow.getOrderUid(), minScore, node, flow.getOrdersSn(),
-                    flow.getPayTime(), level, amt, ratio);
+                    flow.getPayTime(), index, amt, ratio);
             // 减少正方向
             relationScoreService.orderSuccessReduce(uid, flow.getOrderUid(), minScore, flow.getNode(), flow.getOrdersSn(),
-                    flow.getPayTime(), level, amt, ratio);
+                    flow.getPayTime(), index, amt, ratio);
+            index++;
             // 增加奖励
             if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                 User orderUser = userService.getById(flow.getOrderUid());

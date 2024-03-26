@@ -8,6 +8,8 @@ import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.PayCallbackService;
 import com.jbp.service.service.PayService;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserRelationService;
 import com.jbp.service.service.agent.WalletService;
 import org.mybatis.spring.annotation.MapperScan;
@@ -50,10 +52,12 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//         UserRelationService relationService = run.getBean(UserRelationService.class);
-//
-//         UserRelation leftMost = relationService.getLeftMost(1010998);
-//        System.out.println(leftMost);
+         PayService relationService = run.getBean(PayService.class);
+
+                // PT618171121389531982547
+        // PT234171121718579099853
+        // PT496171135573907689810
+        relationService.payAfterProcessingTemp("PT131171143315706654035");
 
     }
 
