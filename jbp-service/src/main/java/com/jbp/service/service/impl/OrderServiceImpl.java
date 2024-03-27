@@ -1174,7 +1174,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     @Override
     public List<Order> getWaitPullList() {
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
-        lqw.eq(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+        lqw.in(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING, OrderConstants.ORDER_STATUS_WAIT_RECEIPT);
         lqw.eq(Order::getPaid, true);
         lqw.eq(Order::getIfPull, false);
         lqw.eq(Order::getRefundStatus, OrderConstants.ORDER_REFUND_STATUS_NOT_APPLY);
