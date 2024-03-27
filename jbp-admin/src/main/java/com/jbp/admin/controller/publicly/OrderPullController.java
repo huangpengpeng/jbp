@@ -105,7 +105,7 @@ public class OrderPullController {
                     DateTimeUtils.format(order.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
                     order.getTotalPostage(), order.getPayPrice(), order.getCouponPrice(),
                     order.getWalletDeductionFee(), orderGoodVoList, merchantOrder.getRealName(),
-                    merchantOrder.getUserPhone(), address.get("province"), address.get("city"), address.get("district"), address.get("street") + address.get("detail"));
+                    merchantOrder.getUserPhone(), address.get("province"), address.get("city"), address.get("district"), (address.get("street").isEmpty()? "" :address.get("street")) + address.get("detail"));
             list.add(vo);
         }
         return list;
