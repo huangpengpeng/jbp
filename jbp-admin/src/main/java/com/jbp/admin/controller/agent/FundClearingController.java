@@ -48,7 +48,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(fundClearingService.pageList(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(), request.getDescription(),request.getCommName(), pageParamRequest)));
+                uid, request.getTeamName(), request.getDescription(),request.getCommName(), request.getIfRefund(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
