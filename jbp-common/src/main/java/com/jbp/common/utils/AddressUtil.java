@@ -47,6 +47,8 @@ public class AddressUtil {
         if (StringUtils.isEmpty(address)) {
             return map;
         }
+
+        address = address.replace("null","");
         List<Map<String, String>> table = addressResolution(address);
         map.put("province", table.get(0).get("province"));
         map.put("city", table.get(0).get("city"));

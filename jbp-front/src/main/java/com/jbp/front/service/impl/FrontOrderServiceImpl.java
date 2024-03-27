@@ -1081,6 +1081,13 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merchantOrder.setUserPhone(userAddress.getPhone());
                 String userAddressStr = userAddress.getProvince() + userAddress.getCity() + userAddress.getDistrict() + userAddress.getStreet() + userAddress.getDetail();
                 merchantOrder.setUserAddress(userAddressStr);
+
+                merchantOrder.setProvince(userAddress.getProvince());
+                merchantOrder.setCity(userAddress.getCity());
+                merchantOrder.setDistrict(userAddress.getDistrict());
+                merchantOrder.setStreet(userAddress.getStreet());
+                merchantOrder.setAddress(userAddress.getDetail());
+
             }
             merchantOrder.setTotalNum(merchantOrderVo.getProTotalNum());
             merchantOrder.setProTotalPrice(merchantOrderVo.getProTotalFee());
