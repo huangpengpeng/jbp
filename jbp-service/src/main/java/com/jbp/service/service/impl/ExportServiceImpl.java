@@ -7,19 +7,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
-import com.jbp.common.constants.DateConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
-import com.jbp.common.utils.*;
+import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelShipmentVo;
 import com.jbp.common.vo.OrderExcelVo;
@@ -389,8 +390,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("payUserAccount","付款账号");
         head.put("payPostage","整单运费");
         head.put("couponPrice","整单优惠");
-        head.put("payPrice","整单贷款");
-        head.put("payPrice", "实际支付金额");
+        head.put("payPrice", "整单金额");
         head.put("walletDeductionFee","整单抵扣");
         head.put("payType", "支付方式");
         head.put("payChannel", "支付渠道");
@@ -522,6 +522,9 @@ public class ExportServiceImpl implements ExportService {
             case "alipayApp":
                 payChannelStr = "支付宝App";
                 break;
+            case "wallet":
+                payChannelStr = "积分支付";
+                break;
         }
         return payChannelStr;
     }
@@ -537,6 +540,15 @@ public class ExportServiceImpl implements ExportService {
                 break;
             case "yue":
                 payTypeStr = "余额支付";
+                break;
+            case "wallet":
+                payTypeStr = "积分支付";
+                break;
+            case "lianlian":
+                payTypeStr = "连连支付";
+                break;
+            case "confirmPay":
+                payTypeStr = "人工确认";
                 break;
         }
         return payTypeStr;
