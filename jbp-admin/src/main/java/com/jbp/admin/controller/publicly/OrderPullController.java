@@ -133,7 +133,7 @@ public class OrderPullController {
                     DateTimeUtils.format(order.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
                     order.getTotalPostage(), order.getPayPrice(), order.getCouponPrice(),
                     order.getWalletDeductionFee(), orderGoodVoList, merchantOrder.getRealName(),
-                    merchantOrder.getUserPhone(), address.get("province"), address.get("city"),  address.get("district"),  (address.get("street").equals("null") ? "" : address.get("street")) + address.get("detail"));
+                    merchantOrder.getUserPhone(), merchantOrder.getProvince(), merchantOrder.getCity(), merchantOrder.getDistrict(),  merchantOrder.getProvince()+merchantOrder.getCity()+merchantOrder.getDistrict()+merchantOrder.getStreet()+merchantOrder.getAddress());
             list.add(vo);
         }
         return list;
