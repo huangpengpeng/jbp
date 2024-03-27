@@ -567,10 +567,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     public PageInfo<PlatformOrderPageResponse> getPlatformAdminPage(OrderSearchRequest request, PageParamRequest pageParamRequest) {
         Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
-        lqw.select(Order::getMerId, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
+        lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
+        }
+        if (StrUtil.isNotBlank(request.getPayTime())) {
+            getPayTimeWhere(lqw,request.getPayTime());
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
             lqw.and((wrapper) -> {
@@ -1144,6 +1147,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                         .or().eq(Order::getPlatOrderNo, request.getOrderNo());
             });
         }
+        if (StrUtil.isNotBlank(request.getPayTime())) {
+            getPayTimeWhere(lqw,request.getPayTime());
+        }
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());
         }
@@ -1532,6 +1538,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private void getRequestTimeWhere(LambdaQueryWrapper<Order> lqw, String dateLimit) {
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         lqw.between(Order::getCreateTime, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+    }
+    private void getPayTimeWhere(LambdaQueryWrapper<Order> lqw, String dateLimit) {
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        lqw.between(Order::getPayTime, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
 
 

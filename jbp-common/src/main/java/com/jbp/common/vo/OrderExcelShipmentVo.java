@@ -143,4 +143,7 @@ public class OrderExcelShipmentVo implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     private String createTime;
+
+    @ApiModelProperty(value = "支付时间")
+    private Date payTime;
 }

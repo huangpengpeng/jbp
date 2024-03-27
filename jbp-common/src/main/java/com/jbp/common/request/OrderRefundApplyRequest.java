@@ -45,8 +45,8 @@ public class OrderRefundApplyRequest {
     private Integer afterSalesType;
 
     @ApiModelProperty(value = "退货类型：0-不退货 1-快递退回，2-到店退货", required = true)
-    @NotNull(message = "请选择退货类型")
-    @Range(min = 0, max = 2, message = "未知的退货类型")
+//    @NotNull(message = "请选择退货类型")
+//    @Range(min = 0, max = 2, message = "未知的退货类型")
     private Integer returnGoodsType;
 
     @ApiModelProperty(value = "退款数量", required = true)
@@ -54,7 +54,7 @@ public class OrderRefundApplyRequest {
     private Integer num;
 
     @ApiModelProperty(value = "退款原因", required = true)
-    @NotEmpty(message = "退款原因必须填写")
+//    @NotEmpty(message = "退款原因必须填写")
     @Length(max = 255, message = "退款原因不能超过255个字符")
     private String text;
 

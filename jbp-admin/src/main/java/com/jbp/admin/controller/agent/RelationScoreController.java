@@ -43,7 +43,7 @@ public class RelationScoreController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, request.getDateLimit(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, pageParamRequest)));
     }
 
 
@@ -103,7 +103,7 @@ public class RelationScoreController {
     @GetMapping("/excel")
     @ApiOperation("服务业绩汇总导出")
     public CommonResult<List<RelationScoreVo>> excel(RelationScoreRequest request) {
-        if (StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getDateLimit())) {
+        if (StringUtils.isEmpty(request.getAccount())) {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;
@@ -114,7 +114,7 @@ public class RelationScoreController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(relationScoreService.excel(uid, request.getDateLimit()));
+        return CommonResult.success(relationScoreService.excel(uid));
 
     }
 }

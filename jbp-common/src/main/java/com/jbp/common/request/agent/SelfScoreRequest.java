@@ -16,6 +16,4 @@ public class SelfScoreRequest implements Serializable {
     @ApiModelProperty("账户")
     private String account;
 
-    @ApiModelProperty(value = "创建时间区间")
-    private String dateLimit;
 }

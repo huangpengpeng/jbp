@@ -13,7 +13,7 @@ import java.util.List;
 public interface InvitationScoreService extends IService<InvitationScore> {
 
     void init();
-    PageInfo<InvitationScore> pageList(Integer uid,String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest);
     InvitationScore add(Integer uid);
     InvitationScore getByUser(Integer uid);
 

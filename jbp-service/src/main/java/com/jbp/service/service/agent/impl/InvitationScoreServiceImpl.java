@@ -84,11 +84,10 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
 
     @Override
-    public PageInfo<InvitationScore> pageList(Integer uid,String dateLimit,  PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScore> pageList(Integer uid,  PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid)
                 .orderByDesc(InvitationScore::getId);
-        getRequestTimeWhere(lqw,dateLimit);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -101,10 +100,6 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
-    }
-    private void getRequestTimeWhere(LambdaQueryWrapper<InvitationScore> lqw, String dateLimit) {
-        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        lqw.between(StringUtils.isNotEmpty(dateLimit), InvitationScore::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
     @Override
     public InvitationScore add(Integer uid) {

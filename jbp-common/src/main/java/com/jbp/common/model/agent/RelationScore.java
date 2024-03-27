@@ -60,9 +60,6 @@ public class RelationScore extends VersionModel {
     @TableField(exist = false)
     private String account;
 
-    @ApiModelProperty("修改时间")
-    @TableField(exist = false)
-    private Date updateTime;
 
 
 }

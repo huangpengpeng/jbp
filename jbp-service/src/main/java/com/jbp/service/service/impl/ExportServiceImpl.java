@@ -82,7 +82,7 @@ public class ExportServiceImpl implements ExportService {
     public OrderShipmentExcelInfoVo exportOrderShipment(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
                 && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
-                && ObjectUtils.isEmpty(request.getType())) {
+                && ObjectUtils.isEmpty(request.getType())&&StringUtils.isEmpty(request.getPayTime())) {
             throw new CrmebException("请至少选择一个查询条件");
         }
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
@@ -171,6 +171,7 @@ public class ExportServiceImpl implements ExportService {
                         vo.setPayChannel(order.getPayChannel());
                         vo.setStatus(order.getOrderStatus());
                         vo.setRefundStatus(order.getOrderRefundStatus());
+                        vo.setPayTime(order.getPayTime());
                         // 原始产品
                         vo.setOrderDetailId(orderDetail.getId());
                         vo.setProductName(orderDetail.getProductName());
@@ -255,6 +256,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("userRemark", "用户备注");
         head.put("merchantRemark", "商户备注");
         head.put("createTime", "下单时间");
+        head.put("payTime","支付时间");
 
         head.put("productPostage", "商品运费");
         head.put("productCouponPrice", "商品优惠");
@@ -295,7 +297,7 @@ public class ExportServiceImpl implements ExportService {
     public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
                 && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
-                && ObjectUtils.isEmpty(request.getType())) {
+                && ObjectUtils.isEmpty(request.getType())&&StringUtils.isEmpty(request.getPayTime())) {
             throw new CrmebException("请至少选择一个查询条件");
         }
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
@@ -331,6 +333,7 @@ public class ExportServiceImpl implements ExportService {
                     vo.setWalletDeductionFee(order.getWalletDeductionFee());
                     vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
                     vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
+                    vo.setPayTime(order.getPayTime());
 
                     // 收货人
                     vo.setRealName(merchantOrder.getRealName());
@@ -405,6 +408,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("userRemark","用户备注");
         head.put("merchantRemark","商户备注");
         head.put("createTime", "创建时间");
+        head.put("payTime","支付时间");
         JSONArray array = new JSONArray();
         head.forEach((k, v) -> {
             JSONObject json = new JSONObject();

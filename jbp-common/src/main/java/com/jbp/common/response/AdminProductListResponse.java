@@ -93,7 +93,5 @@ public class AdminProductListResponse implements Serializable {
     private List<ProductDeduction> deductionList;
 
     @ApiModelProperty(value = "商品条码")
-    private String barCode;
-    @ApiModelProperty(value = "物料编码")
-    private String materialsCode;
+    private List<String> barCode;
 }

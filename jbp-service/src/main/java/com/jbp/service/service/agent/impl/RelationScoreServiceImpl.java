@@ -58,10 +58,9 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     }
 
     @Override
-    public PageInfo<RelationScore> pageList(Integer uid, String dateLimit, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
                 .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid);
-        getRequestTimeWhere(lqw, dateLimit);
         lqw.last("order by uid, id desc ");
         Page<RelationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScore> list = list(lqw);
@@ -72,21 +71,19 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
-            e.setUpdateTime(e.getGmtModify());
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
-    public List<RelationScoreVo> excel(Integer uid, String dateLimit) {
+    public List<RelationScoreVo> excel(Integer uid) {
         Long id = 0L;
         List<RelationScoreVo> voList = CollUtil.newArrayList();
         do {
             LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
                     .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid)
                     .orderByAsc(RelationScore::getId);
-            getRequestTimeWhere(lqw, dateLimit);
             lqw.gt(RelationScore::getId, id).last("LIMIT 1000");
             List<RelationScore> fundClearingVos = list(lqw);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
@@ -98,7 +95,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 User user = uidMapList.get(e.getUid());
                 e.setAccount(user != null ? user.getAccount() : "");
                 RelationScoreVo relationScoreVo=new RelationScoreVo();
-                e.setUpdateTime(e.getGmtModify());
                 BeanUtils.copyProperties(e,relationScoreVo);
                 voList.add(relationScoreVo);
             });
@@ -107,10 +103,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         return voList;
     }
 
-    private void getRequestTimeWhere(LambdaQueryWrapper<RelationScore> lqw, String dateLimit) {
-        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        lqw.between(com.jbp.service.util.StringUtils.isNotEmpty(dateLimit), RelationScore::getGmtModify, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
-    }
 
     @Override
     public RelationScoreFlow orderSuccessIncrease(Integer uid, Integer orderUid, BigDecimal score, int node,

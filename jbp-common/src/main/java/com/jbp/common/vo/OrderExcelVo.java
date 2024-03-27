@@ -105,4 +105,7 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "整单抵扣")
     private BigDecimal walletDeductionFee;
 
+    @ApiModelProperty(value = "支付时间")
+    private Date payTime;
+
 }
