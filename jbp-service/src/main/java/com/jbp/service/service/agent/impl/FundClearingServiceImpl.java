@@ -65,7 +65,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private WalletService walletService;
 
     @Override
-    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, PageParamRequest pageParamRequest) {
+    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime,
+                                           Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, commName);
         return CommonPage.copyPageInfo(page, list);

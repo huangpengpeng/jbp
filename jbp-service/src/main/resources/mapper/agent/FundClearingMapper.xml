@@ -9,6 +9,7 @@
         <result column="comm_name" property="commName"/>
         <result column="comm_amt" property="commAmt"/>
         <result column="send_amt" property="sendAmt"/>
+        <result column="if_refund" property="ifRefund"/>
         <result column="user_info" property="userInfo" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="items" property="items" typeHandler="com.jbp.common.mybatis.FundClearingItemListHandler"/>
         <result column="product_list" property="productList" typeHandler="com.jbp.common.mybatis.FundClearingProductListHandler"/>
@@ -35,6 +36,7 @@
                c.comm_amt,
                c.send_amt,
                c.user_info,
+               c.if_refund,
                c.items,
                c.product_list,
                c.description,
@@ -58,6 +60,9 @@
             </if>
             <if test="commName !=null and commName !=''">
                 and c.comm_name=#{commName}
+            </if>
+            <if test="ifRefund !=null and ifRefund !=''">
+                and c.if_refund is #{ifRefund}
             </if>
             <if test="externalNo !=null and externalNo!=''">
                 and c.external_no=#{externalNo}
