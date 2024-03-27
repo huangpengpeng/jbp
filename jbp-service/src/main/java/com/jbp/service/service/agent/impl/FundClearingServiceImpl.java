@@ -302,11 +302,14 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             throw new CrmebException("请选择佣金发放记录");
         }
         List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().
-                in(FundClearing::getId, ids).in(FundClearing::getStatus, FundClearing.Constants.已出款));
+                in(FundClearing::getId, ids).eq(FundClearing::getStatus, FundClearing.Constants.已出款).eq(FundClearing::getIfRefund, false));
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
         for (FundClearing fundClearing : list) {
+            if(fundClearing.getIfRefund() != null && fundClearing.getIfRefund()){
+                throw new RuntimeException(fundClearing.getUniqueNo()+"已经退回请勿重复操作");
+            }
             List<WalletFlow> walletFlows = walletFlowService.getByUser(fundClearing.getUid(), fundClearing.getUniqueNo(), WalletFlow.OperateEnum.奖励.toString(), WalletFlow.ActionEnum.收入.name());
             if (CollectionUtils.isNotEmpty(walletFlows)) {
                 for (WalletFlow walletFlow : walletFlows) {
