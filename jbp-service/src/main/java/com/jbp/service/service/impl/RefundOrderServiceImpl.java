@@ -1380,7 +1380,17 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                     platformWalletService.transferToUser(order.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                 }
             }
+            if(CollUtil.isNotEmpty(refundOrder.getRefundWalletList())) {
+                refundOrder.getRefundWalletList().forEach(w -> {
+                    if (w.getRefundFee() != null && ArithmeticUtils.gt(w.getRefundFee(), BigDecimal.ZERO)) {
+                        platformWalletService.transferToUser(order.getPayUid(), w.getWalletType(), w.getRefundFee(), WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
+                    }
+                });
+            }
             if (order.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+            }
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
             if (order.getPayType().equals("confirmPay")) {

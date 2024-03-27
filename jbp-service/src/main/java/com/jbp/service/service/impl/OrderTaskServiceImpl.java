@@ -446,13 +446,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             if (CollUtil.isNotEmpty(couponIdList)) {
                 couponUserService.rollbackByIds(couponIdList);
             }
-            if(CollUtil.isNotEmpty(refundOrder.getRefundWalletList())) {
-                refundOrder.getRefundWalletList().forEach(w -> {
-                    if (w.getRefundFee() != null && ArithmeticUtils.gt(w.getRefundFee(), BigDecimal.ZERO)) {
-                        platformWalletService.transferToUser(order.getPayUid(), w.getWalletType(), w.getRefundFee(), WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
-                    }
-                });
-            }
             return Boolean.TRUE;
         });
     }
