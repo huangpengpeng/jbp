@@ -80,10 +80,10 @@
                 AND c.description LIKE CONCAT('%', #{description}, '%')
             </if>
             <if test="startClearingTime!=null and endClearingTime!=null">
-                and c.clearing_time  BETWEEN #{startClearingTime} AND #{endClearingTime}
+                and  DATE(c.clearing_time)  BETWEEN #{startClearingTime} AND #{endClearingTime}
             </if>
             <if test="starteCreateTime!=null and endCreateTime!=null">
-                and c.create_time BETWEEN #{starteCreateTime} AND #{endCreateTime}
+                and DATE(c.create_time) BETWEEN #{starteCreateTime} AND #{endCreateTime}
             </if>
         </where>
         ORDER BY c.id DESC
@@ -165,10 +165,10 @@
                 AND c.description LIKE CONCAT('%', #{description}, '%')
             </if>
             <if test="startClearingTime!=null and endClearingTime!=null">
-                and c.clearing_time  BETWEEN #{startClearingTime} AND #{endClearingTime}
+                and DATE (c.clearing_time)  BETWEEN #{startClearingTime} AND #{endClearingTime}
             </if>
             <if test="starteCreateTime!=null and endCreateTime!=null">
-                and c.create_time BETWEEN #{starteCreateTime} AND #{endCreateTime}
+                and DATE( c.create_time) BETWEEN #{starteCreateTime} AND #{endCreateTime}
             </if>
         </where>
         ORDER BY c.id ASC

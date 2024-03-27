@@ -113,4 +113,7 @@ public class PlatformOrderPageResponse implements Serializable {
 
     @ApiModelProperty(value = "成功后等级")
     private String successCapaName;
+
+    @ApiModelProperty(value = "支付时间")
+    private Date payTime;
 }

@@ -1,5 +1,6 @@
 package com.jbp.common.request.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,7 +16,4 @@ import java.io.Serializable;
 public class RelationScoreRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
-
-    @ApiModelProperty(value = "创建时间区间")
-    private String dateLimit;
 }

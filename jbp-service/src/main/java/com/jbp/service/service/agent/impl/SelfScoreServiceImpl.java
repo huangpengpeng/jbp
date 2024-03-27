@@ -43,11 +43,10 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     private SelfScoreFlowService selfScoreFlowService;
 
     @Override
-    public PageInfo<SelfScore> pageList(Integer uid,String dateLimit, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScore> lqw = new LambdaQueryWrapper<SelfScore>()
                 .eq(!ObjectUtil.isNull(uid), SelfScore::getUid, uid)
                 .orderByDesc(SelfScore::getId);
-        getRequestTimeWhere(lqw,dateLimit);
         Page<SelfScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScore> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -60,10 +59,6 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
             e.setAccount(user != null ? user.getAccount() : "");
         });
         return CommonPage.copyPageInfo(page, list);
-    }
-    private void getRequestTimeWhere(LambdaQueryWrapper<SelfScore> lqw, String dateLimit) {
-        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        lqw.between(StringUtils.isNotEmpty(dateLimit), SelfScore::getGmtCreated, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
     }
     @Override
     public SelfScore add(Integer uid) {

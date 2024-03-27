@@ -200,6 +200,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             BeanUtils.copyProperties(product, productResponse);
             // 收藏数
             productResponse.setCollectCount(productRelationService.getCollectCountByProductId(product.getId()));
+            List<ProductAttrValue> productAttrValueList = productAttrValueService.getListByProductIdAndType(product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+            List<String> barCodelist = productAttrValueList.stream().map(ProductAttrValue::getBarCode).collect(Collectors.toList());
+            productResponse.setBarCode(barCodelist);
             productResponses.add(productResponse);
         }
         // 多条sql查询处理分页正确
