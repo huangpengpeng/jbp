@@ -16,7 +16,10 @@ import java.util.Map;
 
 public interface FundClearingService extends IService<FundClearing> {
 
-    PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description,String commName,  PageParamRequest pageParamRequest);
+    PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime,
+                                    Date endClearingTime, Date startCreateTime, Date endCreateTime,
+                                    String status,Integer uid,String teamName,String description,
+                                    String commName, Boolean ifRefund, PageParamRequest pageParamRequest);
 
     FundClearing create(Integer uid, String externalNo, String commName, BigDecimal commAmt, List<FundClearingProduct> productList,
                      String description, String remark);

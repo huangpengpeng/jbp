@@ -58,4 +58,7 @@ public class FundClearingRequest implements Serializable {
     @ApiModelProperty("佣金名称")
     private String commName;
 
+    @ApiModelProperty("是否退回")
+    private Boolean ifRefund;
+
 }

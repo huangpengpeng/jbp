@@ -59,11 +59,17 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private SystemConfigService systemConfigService;
     @Resource
     private FundClearingDao fundClearingDao;
+    @Resource
+    private WalletFlowService walletFlowService;
+    @Resource
+    private WalletService walletService;
 
     @Override
-    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, PageParamRequest pageParamRequest) {
+    public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime,
+                                           Date starteCreateTime, Date endCreateTime, String status, Integer uid,
+                                           String teamName, String description, String commName, Boolean ifRefund, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, commName);
+        List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, commName, ifRefund);
         return CommonPage.copyPageInfo(page, list);
     }
 
@@ -297,18 +303,27 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(ids)) {
             throw new CrmebException("请选择佣金发放记录");
         }
-        List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().in(FundClearing::getId, ids).in(FundClearing::getStatus, FundClearing.Constants.已出款));
+        List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().
+                in(FundClearing::getId, ids).eq(FundClearing::getStatus, FundClearing.Constants.已出款).eq(FundClearing::getIfRefund, false));
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        List<List<FundClearing>> partition = Lists.partition(list, 100);
-        for (List<FundClearing> fundClearingList : partition) {
-            for (FundClearing fundClearing : fundClearingList) {
-                fundClearing.setIfRefund(true);
-                fundClearing.setRemark(remark);
+        for (FundClearing fundClearing : list) {
+            if(fundClearing.getIfRefund() != null && fundClearing.getIfRefund()){
+                throw new RuntimeException(fundClearing.getUniqueNo()+"已经退回请勿重复操作");
             }
-            updateBatchById(fundClearingList);
+            List<WalletFlow> walletFlows = walletFlowService.getByUser(fundClearing.getUid(), fundClearing.getUniqueNo(), WalletFlow.OperateEnum.奖励.toString(), WalletFlow.ActionEnum.收入.name());
+            if (CollectionUtils.isNotEmpty(walletFlows)) {
+                for (WalletFlow walletFlow : walletFlows) {
+                    walletService.transferToPlatform(walletFlow.getUid(), walletFlow.getWalletType(), walletFlow.getAmt(),
+                            WalletFlow.OperateEnum.退款.toString(), fundClearing.getUniqueNo(), "订单退款回退");
+                }
+            }
+            fundClearing.setIfRefund(true);
+            fundClearing.setRemark(remark);
+            updateById(fundClearing);
         }
+
     }
 
     @Override
