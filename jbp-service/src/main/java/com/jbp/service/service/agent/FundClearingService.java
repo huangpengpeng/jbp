@@ -82,7 +82,9 @@ public interface FundClearingService extends IService<FundClearing> {
      * 佣金发放导出
      * @return
      */
-    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime, String status,Integer uid,String teamName,String description,String commName);
+    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo,
+                                            Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime,
+                                            String status,Integer uid,String teamName,String description,String commName, Boolean ifRefund);
 
     void updateRemark(Long id, String remark);
 
@@ -93,4 +95,6 @@ public interface FundClearingService extends IService<FundClearing> {
     void updateIfRefund(List<Long> ids, String remark);
 
     boolean hasCreate(String orderNo, String commName);
+
+    BigDecimal getSendCommAmt(Integer uid, String commName, Date start, Date end);
 }

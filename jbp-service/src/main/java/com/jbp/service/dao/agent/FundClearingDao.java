@@ -20,5 +20,5 @@ public interface FundClearingDao extends BaseMapper<FundClearing> {
                                             @Param("startClearingTime") Date startClearingTime,@Param("endClearingTime") Date endClearingTime,
                                             @Param("starteCreateTime") Date starteCreateTime,@Param("endCreateTime") Date endCreateTime,
                                             @Param("status") String status,@Param("uid") Integer uid,@Param("teamName") String teamName,@Param("description") String description,
-                                            @Param("id")Long id,@Param("channelName")  String channelName,@Param("commName") String commName);
+                                            @Param("id")Long id,@Param("channelName")  String channelName,@Param("commName") String commName, @Param("ifRefund")Boolean ifRefund);
 }

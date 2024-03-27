@@ -11,6 +11,7 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -188,20 +190,42 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             ratio = ratio.multiply(lRatio);
             // 奖励金额[保留2为小数]
             BigDecimal amt = ratio.multiply(minScore).setScale(2, BigDecimal.ROUND_DOWN);
+
+            String remark = "";
+            List<LimitAmt> limitList = rule.getLimitList();
+            if(CollectionUtils.isNotEmpty(limitList)) {
+                Map<Long, BigDecimal> limitMap = FunctionUtil.keyValueMap(limitList, LimitAmt::getCapaId, LimitAmt::getMaxAmt);
+                BigDecimal maxAmt = limitMap.get(userCapa.getCapaId());
+                if (maxAmt != null) {
+                    BigDecimal orgAmt = amt;
+                    // 增加奖励
+                    Date now = DateTimeUtils.getNow();
+                    Date start = DateTimeUtils.getStartDate(now);
+                    Date end = DateTimeUtils.getFinallyDate(now);
+                    BigDecimal usedAmt = fundClearingService.getSendCommAmt(uid, ProductCommEnum.渠道佣金.getName(), start, end);
+                    BigDecimal usableAmt = maxAmt.subtract(usedAmt);
+                    if (ArithmeticUtils.lessEquals(usableAmt, BigDecimal.ZERO)) {
+                        amt = BigDecimal.ZERO;
+                        remark = "当日已得金额:" + usedAmt + ",最大金额限制:" + maxAmt + ",本次应得金额:" + orgAmt + ",实得金额:" + amt;
+                    } else {
+                        amt = BigDecimal.valueOf(Math.min(usableAmt.doubleValue(), amt.doubleValue()));
+                        remark = "当日已得金额:" + usedAmt + ",最大金额限制:" + maxAmt + ",本次应得金额:" + orgAmt + ",实得金额:" + amt;
+                    }
+                }
+            }
             // 减少反方向
             relationScoreService.orderSuccessReduce(uid, flow.getOrderUid(), minScore, node, flow.getOrdersSn(),
-                    flow.getPayTime(), index, amt, ratio);
+                    flow.getPayTime(), index, amt, ratio, remark);
             // 减少正方向
             relationScoreService.orderSuccessReduce(uid, flow.getOrderUid(), minScore, flow.getNode(), flow.getOrdersSn(),
-                    flow.getPayTime(), index, amt, ratio);
+                    flow.getPayTime(), index, amt, ratio, remark);
             index++;
-            // 增加奖励
             if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                 User orderUser = userService.getById(flow.getOrderUid());
                 fundClearingService.create(uid, flow.getOrdersSn(), ProductCommEnum.渠道佣金.getName(), amt,
-                         null, orderUser.getAccount() + "下单获得" + ProductCommEnum.渠道佣金.getName(), "");
+                        null, orderUser.getAccount() + "下单获得" + ProductCommEnum.渠道佣金.getName(), "");
                 // 将奖金透传出去
-                int sort =  resultList.size() + 1;
+                int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.渠道佣金.getName(),
                         null, null, frontScore,
                         1, minScore, BigDecimal.ONE, ratio, amt, sort);
@@ -212,7 +236,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     }
 
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         Rule rule = new Rule();
         List<CapaRatio> capaRatioList = Lists.newArrayList();
         for (int i = 1; i <= 5 ; i++) {
@@ -239,13 +263,30 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
 
     }
 
+    public static void main(String[] args) {
 
+        List<LimitAmt> list = Lists.newArrayList();
+        for (int i = 2; i <=3 ; i++) {
+            LimitAmt limitAmt = new LimitAmt();
+            limitAmt.setCapaId(Long.valueOf(i));
+            if(i==2){
+                limitAmt.setMaxAmt(BigDecimal.valueOf(1000));
+            }
+            if(i==3){
+                limitAmt.setMaxAmt(BigDecimal.valueOf(3000));
+            }
+            list.add(limitAmt);
+            
+        }
+        System.out.println(JSONObject.toJSONString(list));
+    }
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
         private List<CapaRatio> capaRatioList;
         private List<LevelRatio> levelRatioList;
+        private List<LimitAmt> limitList;
     }
 
     /**
@@ -281,7 +322,25 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
          */
         private BigDecimal ratio;
 
-
     }
+
+    /**
+     * 最大等级比例
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LimitAmt {
+        /**
+         * 等级
+         */
+        private Long capaId;
+
+        /**
+         * 比例
+         */
+        private BigDecimal maxAmt;
+    }
+
 
 }

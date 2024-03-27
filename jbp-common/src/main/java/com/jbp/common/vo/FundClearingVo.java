@@ -65,4 +65,7 @@ public class FundClearingVo implements Serializable {
 
     @ApiModelProperty("卡号")
     private String bankCode;
+
+    @ApiModelProperty("是否退款")
+    private Boolean ifRefund;
 }

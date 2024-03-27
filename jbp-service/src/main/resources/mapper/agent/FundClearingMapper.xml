@@ -98,6 +98,7 @@
                c.description,
                c.clearing_time,
                c.status,
+               c.if_refund,
                c.remark,
                c.create_time,
                u.account,
@@ -122,6 +123,7 @@
         <result column="comm_name" property="commName"/>
         <result column="comm_amt" property="commAmt"/>
         <result column="send_amt" property="sendAmt"/>
+        <result column="if_refund" property="ifRefund"/>
         <result column="description" property="description"/>
         <result column="clearing_time" property="clearingTime"/>
         <result column="status" property="status"/>
@@ -149,6 +151,9 @@
             </if>
             <if test="commName !=null and commName !=''">
                 and c.comm_name=#{commName}
+            </if>
+            <if test="ifRefund!=null and ifRefund!=''">
+                and c.if_refund=#{ifRefund}
             </if>
             <if test="uid != null">
                 and c.uid=#{uid}

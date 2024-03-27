@@ -132,7 +132,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
 
     @Override
     public RelationScoreFlow orderSuccessReduce(Integer uid, Integer orderUid, BigDecimal score, int node, String ordersSn,
-                                                Date payTime, Integer level, BigDecimal amt, BigDecimal ratio) {
+                                                Date payTime, Integer level, BigDecimal amt, BigDecimal ratio, String remark) {
         RelationScore relationScore = getByUser(uid, node);
         if (relationScore == null) {
             throw new CrmebException("对碰减少积分不存在，用户:" + uid + ",点位:" + node);
@@ -145,7 +145,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         }
         // 增加明细
         RelationScoreFlow flow = new RelationScoreFlow(uid, orderUid, score, node,
-                "对碰", "减少", ordersSn, payTime, null, "", level, amt, ratio);
+                "对碰", "减少", ordersSn, payTime, null, remark, level, amt, ratio);
         relationScoreFlowService.save(flow);
         return flow;
     }

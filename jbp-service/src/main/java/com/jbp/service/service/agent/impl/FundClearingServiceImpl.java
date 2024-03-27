@@ -327,12 +327,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName) {
+    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         Long id = 0L;
         List<FundClearingVo> result = Lists.newArrayList();
         do {
-            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName, commName);
+            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName, commName, ifRefund);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
@@ -376,10 +376,11 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, Lists.newArrayList());
         }
+        Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
         list.forEach(e -> {
             e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
             for (FundClearingItem item : e.getItems()) {
-                WalletConfig walletConfig = walletConfigService.getByType(item.getWalletType());
+                WalletConfig walletConfig = walletMap.get(item.getWalletType());
                 item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
             }
         });
@@ -388,7 +389,23 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
     @Override
     public boolean hasCreate(String orderNo, String commName) {
-        return getOne(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, orderNo).eq(FundClearing::getCommName, commName)) != null;
+        return getOne(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, orderNo).eq(FundClearing::getCommName, commName).last(" limit 1")) != null;
+    }
+
+    @Override
+    public BigDecimal getSendCommAmt(Integer uid, String commName, Date start, Date end) {
+        QueryWrapper<FundClearing> lw = new QueryWrapper<>();
+        lw.select("SUM(comm_amt) AS send_amt ");
+        lw.lambda()
+                .eq(FundClearing::getUid, uid)
+                .eq(FundClearing::getCommName, commName)
+                .eq(FundClearing::getIfRefund, false)
+                .ge(FundClearing::getCreateTime, start)
+                .le(FundClearing::getCreateTime, end)
+                .notIn(FundClearing::getStatus, Lists.newArrayList(FundClearing.Constants.已取消.toString(), FundClearing.Constants.已拦截.toString()) )
+        ;
+        FundClearing one = getOne(lw);
+        return one == null ? BigDecimal.ZERO : one.getSendAmt();
     }
 
     private static List<FundClearingItem> createItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {
