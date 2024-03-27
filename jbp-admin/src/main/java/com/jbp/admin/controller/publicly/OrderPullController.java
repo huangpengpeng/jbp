@@ -16,6 +16,7 @@ import com.jbp.common.request.SplitOrderSendDetailRequest;
 import com.jbp.common.response.ErpOrderGoodVo;
 import com.jbp.common.response.ErpOrderShipWaitVo;
 import com.jbp.common.utils.AddressUtil;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
 import com.jbp.service.service.*;
@@ -26,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +62,8 @@ public class OrderPullController {
     private ProductMaterialsService productMaterialsService;
     @Resource
     private MerchantOrderService merchantOrderService;
+    @Autowired
+    private Environment environment;
 
     @ApiOperation(value = "待发货订单列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/shipWait", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,19 +85,39 @@ public class OrderPullController {
             for (OrderDetail orderGoods : orderDetailList) {
                 Product product = productService.getById(orderGoods.getProductId());
                 List<ProductMaterials> productMaterials = productMaterialsService.getByBarCode(orderGoods.getMerId(), orderGoods.getBarCode());
+                BigDecimal goodsPrice = orderGoods.getPayPrice().subtract(orderGoods.getFreightFee());
                 if (CollectionUtils.isEmpty(productMaterials)) {
                     ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderGoods.getProductName(),
                             orderGoods.getPayNum(), product.getUnitName(), orderGoods.getBarCode(),
-                            orderGoods.getPayPrice().divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN),
+                            goodsPrice.divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN),
                             orderGoods.getWalletDeductionFee().divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN));
                     orderGoodVoList.add(orderGoodVo);
                 } else {
+                    BigDecimal total = BigDecimal.ZERO;
+                    for (ProductMaterials productMaterial : productMaterials) {
+                        total = total.add(productMaterial.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterial.getMaterialsQuantity())));
+                    }
+
                     for (ProductMaterials productMaterial : productMaterials) {
                         Integer payNum = orderGoods.getPayNum() * productMaterial.getMaterialsQuantity();
+                        BigDecimal orgTotal = productMaterial.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterial.getMaterialsQuantity()));
+
+                        BigDecimal divide = BigDecimal.ZERO;
+                        if (ArithmeticUtils.gt(total, BigDecimal.ZERO) && ArithmeticUtils.gt(orgTotal, BigDecimal.ZERO)) {
+                            divide = orgTotal.divide(total, 4, BigDecimal.ROUND_DOWN);
+                        }
+
+                        BigDecimal price = BigDecimal.ZERO;
+                        if (ArithmeticUtils.gt(divide, BigDecimal.ZERO) && ArithmeticUtils.gt(goodsPrice, BigDecimal.ZERO)) {
+                            price = goodsPrice.multiply(divide).divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN);
+                        }
+                        BigDecimal walletDeductionFee = BigDecimal.ZERO;
+                        if (ArithmeticUtils.gt(divide, BigDecimal.ZERO) && ArithmeticUtils.gt(orderGoods.getWalletDeductionFee(), BigDecimal.ZERO)) {
+                            walletDeductionFee = orderGoods.getWalletDeductionFee().multiply(divide).divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN);
+                        }
                         ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(productMaterial.getMaterialsName(),
                                 payNum, product.getUnitName(), productMaterial.getMaterialsCode(),
-                                orderGoods.getPayPrice().divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN),
-                                orderGoods.getWalletDeductionFee().divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN));
+                                price, walletDeductionFee);
                         orderGoodVoList.add(orderGoodVo);
                     }
                 }
@@ -100,12 +125,15 @@ public class OrderPullController {
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
             TeamUser teamUser = teamUserService.getByUser(order.getUid());
             Map<String, String> address = AddressUtil.getAddress(merchantOrder.getUserAddress());
-            ErpOrderShipWaitVo vo = new ErpOrderShipWaitVo("A" + order.getUid(),
+
+            String userPrefix = environment.getProperty("erp.userPrefix");
+            userPrefix = StringUtils.isBlank(userPrefix) ? "" : userPrefix;
+            ErpOrderShipWaitVo vo = new ErpOrderShipWaitVo(userPrefix + order.getUid(),
                     user.getAccount(), teamUser.getName(), user.getNickname(), user.getPhone(), order.getPlatOrderNo(),
                     DateTimeUtils.format(order.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
                     order.getTotalPostage(), order.getPayPrice(), order.getCouponPrice(),
                     order.getWalletDeductionFee(), orderGoodVoList, merchantOrder.getRealName(),
-                    merchantOrder.getUserPhone(), address.get("province"), address.get("city"), address.get("district"), (address.get("street").isEmpty()? "" :address.get("street")) + address.get("detail"));
+                    merchantOrder.getUserPhone(), address.get("province"), address.get("city"), address.get("district"), (address.get("street").isEmpty() ? "" : address.get("street")) + address.get("detail"));
             list.add(vo);
         }
         return list;
