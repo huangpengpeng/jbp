@@ -97,8 +97,8 @@ public class JimuReportTokenService implements JmReportTokenServiceI {
          SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
          List<SystemPermissions> permissions =  SecurityUtil.getLoginUserVo().getPermissions();
 		//查询是否包含报表的权限
-		 Boolean ifContain = permissions.stream().anyMatch(s ->s.getName() == "报表");
-		 
+		 Boolean ifContain = permissions.stream().anyMatch(s ->StringUtils.equals(s.getName(), "报表"));
+
 
          if(ifContain || StringUtils.equals(admin.getRoles(), "1")){
          	return true;
