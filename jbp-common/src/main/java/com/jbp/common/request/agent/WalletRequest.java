@@ -27,4 +27,7 @@ public class WalletRequest implements Serializable {
     @ApiModelProperty("外部单号")
     private String externalNo;
 
+    @ApiModelProperty("资金方向   收入 支出")
+    private String action;
+
 }

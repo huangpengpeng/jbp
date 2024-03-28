@@ -1,5 +1,12 @@
 package com.jbp.common.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.jbp.common.model.agent.FundClearingItem;
+import com.jbp.common.model.agent.FundClearingProduct;
+import com.jbp.common.model.agent.UserInfo;
+import com.jbp.common.mybatis.FundClearingItemListHandler;
+import com.jbp.common.mybatis.FundClearingProductListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,6 +16,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -68,4 +76,33 @@ public class FundClearingVo implements Serializable {
 
     @ApiModelProperty("是否退款")
     private Boolean ifRefund;
+
+
+
+
+
+    @ApiModelProperty("得奖用户")
+    @TableField("uid")
+    private Integer uid;
+
+    @ApiModelProperty("用户信息")
+    @TableField(value = "user_info", typeHandler = JacksonTypeHandler.class)
+    private UserInfo userInfo;
+
+    @ApiModelProperty("实际出款明细【根据系统配置 积分钱包占比  手续费  管理费】")
+    @TableField(value = "items", typeHandler = FundClearingItemListHandler.class)
+    private List<FundClearingItem> items;
+
+    @ApiModelProperty("商品信息")
+    @TableField(value = "product_list", typeHandler = FundClearingProductListHandler.class)
+    private List<FundClearingProduct> productList;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickName;
+
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
 }

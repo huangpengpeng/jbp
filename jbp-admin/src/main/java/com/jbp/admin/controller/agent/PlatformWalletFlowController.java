@@ -8,6 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.PlatformWalletFlowVo;
 import com.jbp.service.service.agent.PlatformWalletFlowService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,16 +30,16 @@ public class PlatformWalletFlowController {
     @PreAuthorize("hasAuthority('agent:platform:wallet:flow')")
     @GetMapping("/page")
     @ApiOperation("平台积分详情列表")
-    public CommonResult<CommonPage<PlatformWalletFlow>> getList(Integer type, String dateLimit, String externalNo, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(platformWalletFlowService.pageList(type, dateLimit, externalNo, pageParamRequest)));
+    public CommonResult<CommonPage<PlatformWalletFlow>> getList(Integer type, String dateLimit, String externalNo,String action, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(platformWalletFlowService.pageList(type, dateLimit, externalNo,action, pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:platform:wallet:excel')")
     @GetMapping("/excel")
     @ApiOperation("平台积分详情导出")
-    public CommonResult<List<PlatformWalletFlowVo>> excel(Integer type, String dateLimit, String externalNo){
-        if (ObjectUtil.isEmpty(type)&& ObjectUtil.isEmpty(dateLimit)&& ObjectUtil.isEmpty(externalNo)) {
+    public CommonResult<List<PlatformWalletFlowVo>> excel(Integer type, String dateLimit, String externalNo,String action){
+        if (ObjectUtil.isEmpty(type)&& ObjectUtil.isEmpty(dateLimit)&& ObjectUtil.isEmpty(externalNo)&& StringUtils.isEmpty(action)) {
             throw new CrmebException("请选择一个过滤条件");
         }
-        return CommonResult.success(platformWalletFlowService.excel(type,dateLimit,externalNo));
+        return CommonResult.success(platformWalletFlowService.excel(type,dateLimit,externalNo,action));
     }
 }

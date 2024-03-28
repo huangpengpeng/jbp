@@ -17,7 +17,7 @@ import com.jbp.service.service.agent.FundClearingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.core.Validate;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +48,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(fundClearingService.pageList(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(), request.getDescription(),request.getCommName(), request.getIfRefund(), pageParamRequest)));
+                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
@@ -58,7 +58,7 @@ public class FundClearingController {
         if (StringUtils.isEmpty(request.getUniqueNo()) && StringUtils.isEmpty(request.getExternalNo()) &&
                 request.getStartClearingTime() == null && request.getEndClearingTime() == null && request.getStartCreateTime() == null && request.getEndCreateTime() == null
                 && StringUtils.isEmpty(request.getStatus()) && StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getTeamName())
-                && StringUtils.isEmpty(request.getDescription())) {
+                && StringUtils.isEmpty(request.getDescription())&& ObjectUtils.isEmpty(request.getIfRefund())&&StringUtils.isEmpty(request.getCommName())) {
             throw new CrmebException("请填写一个过滤信息");
         }
         Integer uid = null;
@@ -70,7 +70,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(), request.getDescription(),request.getCommName(), request.getIfRefund()));
+                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund()));
     }
 
     @GetMapping("/status/list")
@@ -134,11 +134,12 @@ public class FundClearingController {
         fundClearingService.updateSendAmt(request.getId(), request.getSendAmt(), request.getRemark());
         return CommonResult.success();
     }
+
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:if:refund')")
     @PostMapping("/update/if/refund")
     @ApiOperation("标记退回")
     public CommonResult updateIfRefund(@RequestBody @Validated FundClearingUpdateRequest request) {
-        fundClearingService.updateIfRefund(request.getIds(),request.getRemark());
+        fundClearingService.updateIfRefund(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
 

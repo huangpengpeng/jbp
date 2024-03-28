@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -41,4 +42,7 @@ public class PlatformWalletFlowVo {
     private BigDecimal tagBalance;
     @ApiModelProperty("钱包名称")
     private String typeName;
+
+    @ApiModelProperty("创建时间")
+    private Date gmtCreated;
 }

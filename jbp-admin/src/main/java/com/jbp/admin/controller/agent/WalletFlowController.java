@@ -43,7 +43,7 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")
@@ -51,7 +51,7 @@ public class WalletFlowController {
     @ApiOperation("用户积分详情导出")
     public CommonResult<List<WalletFlowVo>> excel(WalletRequest request) {
         if (StringUtils.isEmpty(request.getAccount()) && ObjectUtils.isEmpty(request.getType()) && StringUtils.isEmpty(request.getDateLimit()) &&
-                StringUtils.isEmpty(request.getExternalNo())) {
+                StringUtils.isEmpty(request.getExternalNo())&&StringUtils.isEmpty(request.getAction())) {
             throw new CrmebException("请选择一个过滤条件");
         }
         Integer uid = null;
@@ -62,6 +62,6 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo()));
+        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction()));
     }
 }
