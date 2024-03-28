@@ -2079,74 +2079,63 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 continue;
             }
             // 运费根据商品计算
-            Map<Integer, MyRecord> proMap = CollUtil.newHashMap();
-            merchantOrderVo.getOrderInfoList().forEach(e -> {
-                Integer proId = e.getProductId();
-                if (proMap.containsKey(proId)) {
-                    MyRecord record = proMap.get(proId);
-                    record.set("totalPrice", record.getBigDecimal("totalPrice").add(e.getPrice().multiply(BigDecimal.valueOf(e.getPayNum()))));
-                    record.set("totalNum", record.getInt("totalNum") + e.getPayNum());
-                    BigDecimal weight = e.getWeight().multiply(BigDecimal.valueOf(e.getPayNum()));
-                    record.set("weight", record.getBigDecimal("weight").add(weight));
-                    BigDecimal volume = e.getVolume().multiply(BigDecimal.valueOf(e.getPayNum()));
-                    record.set("volume", record.getBigDecimal("volume").add(volume));
-                } else {
-                    MyRecord record = new MyRecord();
-                    record.set("totalPrice", e.getPrice().multiply(BigDecimal.valueOf(e.getPayNum())));
-                    record.set("totalNum", e.getPayNum());
-                    record.set("tempId", e.getTempId());
-                    record.set("proId", proId);
-                    BigDecimal weight = e.getWeight().multiply(BigDecimal.valueOf(e.getPayNum()));
-                    record.set("weight", weight);
-                    BigDecimal volume = e.getVolume().multiply(BigDecimal.valueOf(e.getPayNum()));
-                    record.set("volume", volume);
-                    proMap.put(proId, record);
-                }
-            });
+            Set<Integer> tempIdSet = Sets.newHashSet();
+            BigDecimal totalPrice = BigDecimal.ZERO;
+            BigDecimal weight = BigDecimal.ZERO;
+            BigDecimal volume = BigDecimal.ZERO;
+            Integer totalNum = 0;
+            for (PreOrderInfoDetailVo e : merchantOrderVo.getOrderInfoList()) {
+                volume = volume.add(e.getVolume().multiply(BigDecimal.valueOf(e.getPayNum())));
+                weight = weight.add(e.getWeight().multiply(BigDecimal.valueOf(e.getPayNum())));
+                totalNum = totalNum + e.getPayNum();
+                totalPrice = totalPrice.add(e.getPrice().multiply(BigDecimal.valueOf(e.getPayNum())));
+                tempIdSet.add(e.getTempId());
+            }
 
             // 指定包邮（单品运费模板）> 指定区域配送（单品运费模板）
             int districtId = userAddress.getDistrictId();
-            for (Map.Entry<Integer, MyRecord> m : proMap.entrySet()) {
-                MyRecord record = m.getValue();
-                Integer tempId = record.getInt("tempId");
+
+            for (Integer tempId : tempIdSet) {
                 ShippingTemplates shippingTemplate = shippingTemplatesService.getById(tempId);
                 if (ObjectUtil.isNull(shippingTemplate) || shippingTemplate.getAppoint().equals(ShippingTemplatesConstants.APPOINT_TYPE_ALL)) {
-                    continue;
+                    break; // 包邮跳出去 当前商户单不计算运费
                 }
                 if (shippingTemplate.getAppoint().equals(ShippingTemplatesConstants.APPOINT_TYPE_DEFINED)) {
                     ShippingTemplatesFree shippingTemplatesFree = shippingTemplatesFreeService.getByTempIdAndCityId(tempId, districtId);
                     if (ObjectUtil.isNotNull(shippingTemplatesFree)) {
-                        BigDecimal totalPrice = record.getBigDecimal("totalPrice");
-                        if (totalPrice.compareTo(shippingTemplatesFree.getPrice()) >= 0) {
-                            continue;
+                        if (ArithmeticUtils.gte(totalPrice, shippingTemplatesFree.getPrice())) {
+                            break;
                         }
                         if (shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_NUMBER)) {
-                            if (BigDecimal.valueOf(record.getInt("totalNum")).compareTo(shippingTemplatesFree.getNumber()) >= 0) {
-                                continue;
+                            if (ArithmeticUtils.gte(BigDecimal.valueOf(totalNum), shippingTemplatesFree.getNumber())) {
+                                break;
                             }
                         }
                         BigDecimal surplus = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT)
-                                ? record.getBigDecimal("weight") : record.getBigDecimal("volume");
-                        if (surplus.compareTo(shippingTemplatesFree.getNumber()) >= 0) {
+                                ? weight : volume;
+                        if (ArithmeticUtils.gte(surplus, shippingTemplatesFree.getNumber())) {
                             continue;
                         }
                     }
                 }
+
+
                 ShippingTemplatesRegion shippingTemplatesRegion = shippingTemplatesRegionService.getByTempIdAndCityId(tempId, districtId);
                 if (ObjectUtil.isNull(shippingTemplatesRegion)) {
                     shippingTemplatesRegion = shippingTemplatesRegionService.getByTempIdAndCityId(tempId, 0);
                 }
                 if (shippingTemplate.getAppoint().equals(ShippingTemplatesConstants.APPOINT_TYPE_PART)) {
                     if (ObjectUtil.isNull(shippingTemplatesRegion)) {
-                        continue;
+                        break; // 不分包邮区域不计算运费
                     }
                 }
                 BigDecimal postageFee = BigDecimal.ZERO;
                 // 判断计费方式：件数、重量、体积
                 switch (shippingTemplate.getType()) {
                     case ShippingTemplatesConstants.CHARGE_MODE_TYPE_NUMBER: // 件数
+                    {
                         // 判断件数是否超过首件
-                        Integer num = record.getInt("totalNum");
+                        Integer num = totalNum;
                         if (num <= shippingTemplatesRegion.getFirst().intValue()) {
                             storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
                             postageFee = shippingTemplatesRegion.getFirstPrice();
@@ -2158,7 +2147,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
                             postageFee = shippingTemplatesRegion.getFirstPrice().add(renewalPrice);
                         }
-                        List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList().stream().filter(e -> e.getProductId().equals(record.getInt("proId"))).collect(Collectors.toList());
+                        List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList();
                         if (detailVoList.size() == 1) {
                             detailVoList.get(0).setFreightFee(postageFee);
                         } else {
@@ -2175,9 +2164,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             }
                         }
                         break;
+                    }
                     case ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT: // 重量
                     case ShippingTemplatesConstants.CHARGE_MODE_TYPE_VOLIME: // 体积
-                        BigDecimal surplus = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT) ? record.getBigDecimal("weight") : record.getBigDecimal("volume");
+                    {
+                        BigDecimal surplus = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT) ? weight : volume;
                         if (surplus.compareTo(shippingTemplatesRegion.getFirst()) <= 0) {
                             storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
                             postageFee = shippingTemplatesRegion.getFirstPrice();
@@ -2189,7 +2180,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
                             postageFee = shippingTemplatesRegion.getFirstPrice().add(renewalPrice);
                         }
-                        List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList().stream().filter(e -> e.getProductId().equals(record.getInt("proId"))).collect(Collectors.toList());
+                        List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList();
                         if (infoDetailVoList.size() == 1) {
                             infoDetailVoList.get(0).setFreightFee(postageFee);
                         } else {
@@ -2207,6 +2198,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             }
                         }
                         break;
+                    }
                 }
             }
             merchantOrderVo.setFreightFee(storePostage);
