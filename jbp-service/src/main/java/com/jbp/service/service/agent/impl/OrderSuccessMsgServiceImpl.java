@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.constants.OrderStatusConstants;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.model.agent.OrderSuccessMsg;
@@ -23,6 +24,7 @@ import com.jbp.service.service.OrderService;
 import com.jbp.service.service.OrderStatusService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -32,14 +34,13 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, OrderSuccessMsg> implements OrderSuccessMsgService {
 
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private UserService userService;
     @Autowired
     private OrderStatusService orderStatusService;
     @Autowired
@@ -71,6 +72,7 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
     public void exec(OrderSuccessMsg msg) {
         String orderNo = msg.getOrdersSn();
         Order platOrder = orderService.getByOrderNo(msg.getOrdersSn());
+
         if (ObjectUtil.isNull(platOrder)) {
             throw new RuntimeException("订单不存在，orderNo: " + platOrder.getOrderNo());
         }
@@ -94,7 +96,14 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         if (CollUtil.isEmpty(orderList)) {
             throw new RuntimeException("商户订单信息不存在，orderNo: " + orderNo);
         }
-
+        for (Order order : orderList) {
+            if (!order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_NORMAL)) {
+                msg.setExec(true);
+                updateById(msg);
+                log.info("订单已申请退款忽略");
+                return;
+            }
+        }
         List<OrderDetail> orderDetailList = CollUtil.newArrayList();
         for (Order order : orderList) {
             // 拆单后，一个主订单只会对应一个商户订单
