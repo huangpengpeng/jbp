@@ -1,5 +1,6 @@
 package com.jbp.common.response;
 
+import com.jbp.common.model.product.ProductDeduction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -186,4 +187,7 @@ public class PlatformOrderAdminDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "平台优惠券金额")
     private BigDecimal platCouponPrice;
+
+    @ApiModelProperty(value = "钱包抵扣")
+    private List<ProductDeduction> walletDeductionList;
 }
