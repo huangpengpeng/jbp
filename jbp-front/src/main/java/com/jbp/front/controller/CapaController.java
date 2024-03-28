@@ -2,7 +2,9 @@ package com.jbp.front.controller;
 
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.CapaPaymentHandler;
+import com.jbp.service.condition.CapaRepairDifferenceHandler;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.CapaService;
 import io.swagger.annotations.Api;
@@ -41,6 +43,8 @@ public class CapaController {
     @Autowired
     private CapaPaymentHandler capaPaymentHandler;
     @Autowired
+    private CapaRepairDifferenceHandler capaRepairDifferenceHandler;
+    @Autowired
     private SystemConfigService systemConfigService;
 
     @ApiOperation(value = "等级记录列表[报单专用]")
@@ -56,15 +60,26 @@ public class CapaController {
     }
 
 
-    @ApiOperation(value = "获取升级等级购买金额")
+     @ApiOperation(value = "获取升级等级购买金额")
     @RequestMapping(value = "/getUpgradesPrice", method = RequestMethod.GET)
-    public CommonResult<Map<String, Object>> getUpgradesPrice(Long capaId) {
+    public CommonResult<Map<String, Object>> getUpgradesPrice(Long capaId,Boolean rise,Long defaultCapa) {
 
         Capa capa = capaService.getById(capaId);
-        CapaPaymentHandler.Rule rule = capaPaymentHandler.getRule(capa.getConditionList().stream().filter(s -> s.getName().equals(capaPaymentHandler.getName())).findFirst().get());
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", capa.getName());
-        map.put("riseOrderPrice", rule.getAmt());
+         Map<String, Object> map = new HashMap<>();
+        //补差金额
+        if(rise){
+            List<CapaRepairDifferenceHandler.Rule> ruleList= capaRepairDifferenceHandler.getRule(capa.getConditionList().stream().filter(s -> s.getName().equals(capaRepairDifferenceHandler.getName())).findFirst().get());
+             Map<Long, CapaRepairDifferenceHandler.Rule> ruleMap = FunctionUtil.keyValueMap(ruleList, CapaRepairDifferenceHandler.Rule::getOrgCapaId);
+            CapaRepairDifferenceHandler.Rule rule = ruleMap.get(defaultCapa);
+            map.put("riseOrderPrice", rule.getRepairDifference());
+
+        }else{
+            //单次升级金额
+            CapaPaymentHandler.Rule rule = capaPaymentHandler.getRule(capa.getConditionList().stream().filter(s -> s.getName().equals(capaPaymentHandler.getName())).findFirst().get());
+            map.put("riseOrderPrice", rule.getAmt());
+        }
+         map.put("name", capa.getName());
+
         return CommonResult.success(map);
     }
 
