@@ -173,7 +173,7 @@ public class UserController {
                 return CommonResult.success();
             }else{
                 // 当前位置有人
-                userRelation = relationService.getLeftMost(user.getId());
+                userRelation = relationService.getLeftMost(userRelation.getUId());
                 if (userRelation == null) {
                     return CommonResult.success();
                 }
@@ -186,7 +186,7 @@ public class UserController {
         if (userRelation == null) {
             return CommonResult.success();
         }
-        if(userRelation != null && userRelation.getNode().equals(node)){
+        if(userRelation != null && userRelation.getNode().equals(node) && userRelation.getPId().intValue() == user.getId().intValue()){
             return CommonResult.success();
         }
         user = userService.getById(userRelation.getPId());
