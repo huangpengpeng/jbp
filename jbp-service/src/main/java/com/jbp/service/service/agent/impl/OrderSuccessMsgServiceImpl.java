@@ -100,7 +100,7 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
             if (!order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_NORMAL)) {
                 msg.setExec(true);
                 updateById(msg);
-                log.info("订单已申请退款忽略");
+                log.info("订单已申请退款忽略:"+ order.getPlatOrderNo());
                 return;
             }
         }
