@@ -3,6 +3,9 @@ package com.jbp.admin.config;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.jbp.common.model.admin.SystemPermissions;
+import com.jbp.common.model.admin.SystemRole;
+import com.jbp.common.model.admin.SystemRoleMenu;
 import org.apache.commons.codec.binary.StringUtils;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +15,8 @@ import com.jbp.admin.filter.TokenComponent;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.utils.RequestUtil;
 import com.jbp.common.utils.SecurityUtil;
+
+import java.util.List;
 
 /**
  * 自定义积木报表鉴权(如果不进行自定义，则所有请求不做权限控制)
@@ -90,7 +95,16 @@ public class JimuReportTokenService implements JmReportTokenServiceI {
         	 return false;
          }
          SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
-         return StringUtils.equals(admin.getRoles(), "1");
+         List<SystemPermissions> permissions =  SecurityUtil.getLoginUserVo().getPermissions();
+		//查询是否包含报表的权限
+		 Boolean ifContain = permissions.stream().anyMatch(s -> s.getPath().contains("/jmreport/list"));
+         if(ifContain|| StringUtils.equals(admin.getRoles(), "1")){
+         	return true;
+		 }
+
+         return false;
+
+
     }
 
 	/**
