@@ -74,10 +74,16 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         Order platOrder = orderService.getByOrderNo(msg.getOrdersSn());
 
         if (ObjectUtil.isNull(platOrder)) {
-            throw new RuntimeException("订单不存在，orderNo: " + platOrder.getOrderNo());
+            msg.setExec(true);
+            updateById(msg);
+            log.info("订单不存在:"+ orderNo);
+            return;
         }
         if (ordersFundSummaryService.getByOrdersSn(platOrder.getOrderNo()) != null) {
-            throw new RuntimeException("订单已经执行重复：" + platOrder.getOrderNo());
+            msg.setExec(true);
+            updateById(msg);
+            log.info("订单已经执行重复:"+ orderNo);
+            return;
         }
         // 2.增加业绩
         BigDecimal score = BigDecimal.ZERO;
@@ -94,7 +100,10 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         // 获取拆单后订单
         List<Order> orderList = orderService.getByPlatOrderNo(platOrder.getOrderNo());
         if (CollUtil.isEmpty(orderList)) {
-            throw new RuntimeException("商户订单信息不存在，orderNo: " + orderNo);
+            msg.setExec(true);
+            updateById(msg);
+            log.info("商户订单信息不存在:"+ orderNo);
+            return;
         }
         for (Order order : orderList) {
             if (!order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_NORMAL)) {
