@@ -53,6 +53,10 @@ public class SysConfigConstants {
      */
     public static final String  STORE_GOODS_OPEN="store_goods_open";
     /**
+     * 控制等级显示
+     */
+    public static  final String WORKBENCH_CAPA_OPEN="workbench_capa_open";
+    /**
      * 平台端-登录页LOGO
      */
     public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN = "site_logo_login";

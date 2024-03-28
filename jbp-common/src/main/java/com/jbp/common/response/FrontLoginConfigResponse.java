@@ -43,18 +43,18 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "公司名称")
     private String siteName;
-    
+
     @ApiModelProperty(value = "版权logo")
     private String copyrightLogo;
 
     @ApiModelProperty(value = "开启微信登录")
-    private Boolean openWechatLogin ;
+    private Boolean openWechatLogin;
 
     @ApiModelProperty(value = "开启手机号登录")
-    private Boolean openMobileLogin ;
+    private Boolean openMobileLogin;
 
     @ApiModelProperty(value = "开启账号登录")
-    private Boolean openAccountLogin ;
+    private Boolean openAccountLogin;
 
     @ApiModelProperty(value = "开启隐私协议")
     private Boolean openPrivacyAgreement;
@@ -66,7 +66,7 @@ public class FrontLoginConfigResponse implements Serializable {
     private Boolean orderRefundOpen;
 
     @ApiModelProperty(value = "h5品牌Logo")
-    private String  mobileTopLogo;
+    private String mobileTopLogo;
 
     @ApiModelProperty(value = "h5头像")
     private String h5DefaultAvatar;
@@ -79,4 +79,7 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "店铺开关")
     private Boolean storeGoodsOpen;
+
+    @ApiModelProperty(value = "工作台不可见等级")
+    private String workbenchCapaOpen;
 }

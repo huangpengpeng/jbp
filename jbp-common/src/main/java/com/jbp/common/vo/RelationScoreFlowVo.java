@@ -23,6 +23,7 @@ public class RelationScoreFlowVo {
     private BigDecimal score;
 
     @ApiModelProperty("点位")
+
     private int node;
 
     @ApiModelProperty("操作")
@@ -57,4 +58,10 @@ public class RelationScoreFlowVo {
 
     @ApiModelProperty("下单用户账户")
     private String orderAccount;
+
+    @ApiModelProperty("用户id")
+    private Integer uid;
+
+    @ApiModelProperty("下单用户id")
+    private Integer orderUid;
 }

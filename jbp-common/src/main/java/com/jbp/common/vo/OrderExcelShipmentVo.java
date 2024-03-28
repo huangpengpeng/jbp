@@ -48,6 +48,9 @@ public class OrderExcelShipmentVo implements Serializable {
     @ApiModelProperty(value = "用户id")
     private Integer uid;
 
+    @ApiModelProperty(value = "用户昵称")
+    private String userNickname;
+
     @ApiModelProperty(value = "下单账号")
     private String userAccount;
 
@@ -146,4 +149,10 @@ public class OrderExcelShipmentVo implements Serializable {
 
     @ApiModelProperty(value = "支付时间")
     private Date payTime;
+
+    @ApiModelProperty(value = "下单前等级名称")
+    private String capaName;
+
+    @ApiModelProperty(value = "成功后等级")
+    private String successCapaName;
 }

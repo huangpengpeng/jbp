@@ -13,7 +13,7 @@ public interface WalletFlowService extends IService<WalletFlow> {
     WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
                    BigDecimal orgBalance, BigDecimal tagBalance, String postscript);
 
-    PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, String externalNo, PageParamRequest pageParamRequest);
+    PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, String externalNo,String action, PageParamRequest pageParamRequest);
 
     List<WalletFlow> getByUser(Integer uid, String externalNo, String operate, String action);
 
@@ -21,5 +21,5 @@ public interface WalletFlowService extends IService<WalletFlow> {
 
     List<WalletFlow> details(Integer uid, String action);
 
-    List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo);
+    List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action);
 }

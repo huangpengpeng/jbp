@@ -581,6 +581,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.TOURIST_LOGIN_OPEN);
         keyList.add(SysConfigConstants.PERSONAL_BACKGROUND);
         keyList.add(SysConfigConstants.STORE_GOODS_OPEN);
+        keyList.add(SysConfigConstants.WORKBENCH_CAPA_OPEN);
 
 
 
@@ -603,6 +604,7 @@ public class LoginServiceImpl implements LoginService {
         response.setTouristLoginOpen(record.getStrBoolean(SysConfigConstants.TOURIST_LOGIN_OPEN));
         response.setPersonalBackground(record.getStr(SysConfigConstants.PERSONAL_BACKGROUND));
         response.setStoreGoodsOpen(record.getStrBoolean(SysConfigConstants.STORE_GOODS_OPEN));
+        response.setWorkbenchCapaOpen(record.getStr(SysConfigConstants.WORKBENCH_CAPA_OPEN));
         return response;
     }
 

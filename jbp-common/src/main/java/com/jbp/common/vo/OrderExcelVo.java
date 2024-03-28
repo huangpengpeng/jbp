@@ -108,4 +108,10 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "支付时间")
     private Date payTime;
 
+    @ApiModelProperty(value = "下单前等级名称")
+    private String capaName;
+
+    @ApiModelProperty(value = "成功后等级")
+    private String successCapaName;
+
 }

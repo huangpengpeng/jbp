@@ -1,6 +1,7 @@
 package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -9,11 +10,13 @@ import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
@@ -26,6 +29,7 @@ import com.jbp.common.vo.OrderExcelShipmentVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.common.vo.OrderShipmentExcelInfoVo;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -73,6 +77,11 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private CrmebConfig crmebConfig;
 
+    @Resource
+    private OrderExtService orderExtService;
+    @Resource
+    private CapaService capaService;
+
     /**
      * 订单导出
      *
@@ -110,7 +119,7 @@ public class ExportServiceImpl implements ExportService {
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
             Map<Integer, User> userMap = userService.getUidMapList(userIdList);
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
-
+            Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
             // 导出对象
             for (Order order : orderList) {
                 // 商户详情
@@ -159,6 +168,7 @@ public class ExportServiceImpl implements ExportService {
                         if (order.getUid() != null) {
                             vo.setUid(order.getUid());
                             vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                            vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() : "");
                         }
                         if (order.getPayUid() != null) {
                             vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
@@ -187,6 +197,19 @@ public class ExportServiceImpl implements ExportService {
                         if (CollectionUtils.isNotEmpty(vo.getWalletDeductionList())) {
                             for (ProductDeduction deduction : vo.getWalletDeductionList()) {
                                 walletDeductionMap.put(deduction.getWalletType().toString(), deduction.getWalletName());
+                            }
+                        }
+                        //设置下单前 后等级
+                        OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+                        if (orderExt != null) {
+                            if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
+                                Capa capa = capaService.getById(orderExt.getCapaId());
+                                vo.setCapaName(capa != null ? capa.getName() : "");
+                            }
+                            //设置成功后等级
+                            if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
+                                Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
+                                vo.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
                             }
                         }
                         // 物料信息
@@ -227,6 +250,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("platform", "场景");
         head.put("orderNo", "单号");
         head.put("uid", "用户ID");
+        head.put("userNickname", "用户昵称");
         head.put("userAccount", "下单账号");
         head.put("team", "团队");
         head.put("payUserAccount", "付款账号");
@@ -259,11 +283,12 @@ public class ExportServiceImpl implements ExportService {
         head.put("merchantRemark", "商户备注");
         head.put("createTime", "下单时间");
         head.put("payTime","支付时间");
+        head.put("capaName","下单前等级名称");
+        head.put("successCapaName","下单后等级名称");
 
         head.put("productPostage", "商品运费");
         head.put("productCouponPrice", "商品优惠");
         head.put("productWalletDeductionFee", "商品抵扣");
-
         Map<String, String> sortedMap = walletDeductionMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(
@@ -320,6 +345,7 @@ public class ExportServiceImpl implements ExportService {
             List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
             Map<Integer, User> userMap = userService.getUidMapList(userSet.stream().collect(Collectors.toList()));
             Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+            Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
             for (Order order : orderList) {
                 MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
                 // 循环设置
@@ -345,6 +371,19 @@ public class ExportServiceImpl implements ExportService {
                 vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
                 vo.setPayPostage(order.getPayPostage());
                 vo.setCouponPrice(order.getCouponPrice());
+                //设置下单 前 后等级名称
+                OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+                if (orderExt != null) {
+                    if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
+                        Capa capa = capaService.getById(orderExt.getCapaId());
+                        vo.setCapaName(capa != null ? capa.getName() : "");
+                    }
+                    //设置成功后等级
+                    if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
+                        Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
+                        vo.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
+                    }
+                }
                 //设置场景
                 vo.setPlatform(order.getPlatform());
                 if (order.getUid() != null) {
@@ -408,6 +447,8 @@ public class ExportServiceImpl implements ExportService {
         head.put("merchantRemark","商户备注");
         head.put("createTime", "创建时间");
         head.put("payTime","支付时间");
+        head.put("capaName","下单前等级名称");
+        head.put("successCapaName","下单后等级名称");
         JSONArray array = new JSONArray();
         head.forEach((k, v) -> {
             JSONObject json = new JSONObject();

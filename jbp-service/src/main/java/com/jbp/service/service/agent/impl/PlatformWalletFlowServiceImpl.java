@@ -48,10 +48,11 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
     }
 
     @Override
-    public PageInfo<PlatformWalletFlow> pageList(Integer type, String dateLimit, String externalNo, PageParamRequest pageParamRequest) {
+    public PageInfo<PlatformWalletFlow> pageList(Integer type, String dateLimit, String externalNo,String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<PlatformWalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<PlatformWalletFlow>()
                 .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type)
-                .eq(StringUtils.isNotEmpty(externalNo), PlatformWalletFlow::getExternalNo, externalNo);
+                .eq(StringUtils.isNotEmpty(externalNo), PlatformWalletFlow::getExternalNo, externalNo)
+                .eq(StringUtils.isNotEmpty(action), PlatformWalletFlow::getAction, action);
         getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
         walletLambdaQueryWrapper.orderByDesc(PlatformWalletFlow::getId);
         Page<PlatformWalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -67,13 +68,14 @@ public class PlatformWalletFlowServiceImpl extends ServiceImpl<PlatformWalletFlo
     }
 
     @Override
-    public List<PlatformWalletFlowVo> excel(Integer type, String dateLimit, String externalNo) {
+    public List<PlatformWalletFlowVo> excel(Integer type, String dateLimit, String externalNo,String action) {
         Long id = 0L;
         List<PlatformWalletFlowVo> result = Lists.newArrayList();
         do {
             LambdaQueryWrapper<PlatformWalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<PlatformWalletFlow>()
                     .eq(!ObjectUtil.isNull(type), PlatformWalletFlow::getWalletType, type)
-                    .eq(StringUtils.isNotEmpty(externalNo), PlatformWalletFlow::getExternalNo, externalNo);
+                    .eq(StringUtils.isNotEmpty(externalNo), PlatformWalletFlow::getExternalNo, externalNo)
+                    .eq(StringUtils.isNotEmpty(action), PlatformWalletFlow::getAction, action);
             getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
             walletLambdaQueryWrapper.orderByAsc(PlatformWalletFlow::getId);
             walletLambdaQueryWrapper.gt(PlatformWalletFlow::getId, id).last("LIMIT 1000");

@@ -90,20 +90,25 @@
     </select>
     <sql id="exportFundClearing">
         SELECT c.id,
+               c.uid,
                c.unique_no,
                c.external_no,
                c.comm_name,
                c.comm_amt,
+               c.items,
                c.send_amt,
+               c.user_info,
                c.description,
                c.clearing_time,
                c.status,
                c.if_refund,
                c.remark,
                c.create_time,
+               c.product_list,
                u.account,
                u.nickname,
                t.name,
+               u.nickname,
                asentity.real_name,
                asentity.id_card_no,
                card.phone,
@@ -118,6 +123,7 @@
     </sql>
     <resultMap id="FundClearingVo" type="com.jbp.common.vo.FundClearingVo">
         <id column="id" property="id"/>
+        <result column="uid" property="uid"/>
         <result column="unique_no" property="uniqueNo"/>
         <result column="external_no" property="externalNo"/>
         <result column="comm_name" property="commName"/>
@@ -133,8 +139,13 @@
         <result column="real_name" property="realName"/>
         <result column="id_card_no" property="idCardNo"/>
         <result column="phone" property="phone"/>
+        <result column="nickname" property="nickName"/>
         <result column="bank_name" property="bankName"/>
         <result column="bank_card_no" property="bankCode"/>
+        <result column="name" property="teamName"/>
+        <result column="user_info" property="userInfo" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="items" property="items" typeHandler="com.jbp.common.mybatis.FundClearingItemListHandler"/>
+        <result column="product_list" property="productList" typeHandler="com.jbp.common.mybatis.FundClearingProductListHandler"/>
     </resultMap>
     <select id="exportFundClearing" resultMap="FundClearingVo">
     <include refid="exportFundClearing"/>

@@ -38,4 +38,7 @@ public class InvitationScoreFlowVo {
 
     @ApiModelProperty("下单用户账户")
     private String orderAccount;
+
+    @ApiModelProperty("用户id")
+    private Integer uid;
 }
