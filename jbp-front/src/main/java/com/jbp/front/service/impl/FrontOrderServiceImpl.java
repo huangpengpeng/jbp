@@ -2069,13 +2069,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
         for (PreMerchantOrderVo merchantOrderVo : merchantOrderVoList) {
-            BigDecimal storePostage = BigDecimal.ZERO;
             if (merchantOrderVo.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP)) {
-                merchantOrderVo.setFreightFee(storePostage);
+                merchantOrderVo.setFreightFee(BigDecimal.ZERO);
                 continue;
             }
             if (ObjectUtil.isNull(userAddress) || userAddress.getCityId() <= 0) {
-                merchantOrderVo.setFreightFee(storePostage);
+                merchantOrderVo.setFreightFee(BigDecimal.ZERO);
                 continue;
             }
             // 运费根据商品计算
@@ -2095,26 +2094,31 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             // 指定包邮（单品运费模板）> 指定区域配送（单品运费模板）
             int districtId = userAddress.getDistrictId();
 
+            List<BigDecimal> feeList = Lists.newArrayList();
             for (Integer tempId : tempIdSet) {
                 ShippingTemplates shippingTemplate = shippingTemplatesService.getById(tempId);
                 if (ObjectUtil.isNull(shippingTemplate) || shippingTemplate.getAppoint().equals(ShippingTemplatesConstants.APPOINT_TYPE_ALL)) {
+                    feeList.clear();
                     break; // 包邮跳出去 当前商户单不计算运费
                 }
                 if (shippingTemplate.getAppoint().equals(ShippingTemplatesConstants.APPOINT_TYPE_DEFINED)) {
                     ShippingTemplatesFree shippingTemplatesFree = shippingTemplatesFreeService.getByTempIdAndCityId(tempId, districtId);
                     if (ObjectUtil.isNotNull(shippingTemplatesFree)) {
                         if (ArithmeticUtils.gte(totalPrice, shippingTemplatesFree.getPrice())) {
+                            feeList.clear();
                             break;
                         }
                         if (shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_NUMBER)) {
                             if (ArithmeticUtils.gte(BigDecimal.valueOf(totalNum), shippingTemplatesFree.getNumber())) {
+                                feeList.clear();
                                 break;
                             }
                         }
                         BigDecimal surplus = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT)
                                 ? weight : volume;
                         if (ArithmeticUtils.gte(surplus, shippingTemplatesFree.getNumber())) {
-                            continue;
+                            feeList.clear();
+                            break;
                         }
                     }
                 }
@@ -2126,41 +2130,45 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 }
                 if (shippingTemplate.getAppoint().equals(ShippingTemplatesConstants.APPOINT_TYPE_PART)) {
                     if (ObjectUtil.isNull(shippingTemplatesRegion)) {
+                        feeList.clear();
                         break; // 不分包邮区域不计算运费
                     }
                 }
+
                 BigDecimal postageFee = BigDecimal.ZERO;
                 // 判断计费方式：件数、重量、体积
                 switch (shippingTemplate.getType()) {
                     case ShippingTemplatesConstants.CHARGE_MODE_TYPE_NUMBER: // 件数
+
                     {
                         // 判断件数是否超过首件
                         Integer num = totalNum;
                         if (num <= shippingTemplatesRegion.getFirst().intValue()) {
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
                             postageFee = shippingTemplatesRegion.getFirstPrice();
+                            feeList.add(postageFee);
                         } else {// 超过首件的需要计算续件
                             int renewalNum = num - shippingTemplatesRegion.getFirst().intValue();
                             // 剩余件数/续件 = 需要计算的续件费用的次数
                             BigDecimal divide = BigDecimal.valueOf(renewalNum).divide(shippingTemplatesRegion.getRenewal(), 0, BigDecimal.ROUND_UP);
                             BigDecimal renewalPrice = shippingTemplatesRegion.getRenewalPrice().multiply(divide);
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
                             postageFee = shippingTemplatesRegion.getFirstPrice().add(renewalPrice);
+                            feeList.add(postageFee);
                         }
                         List<PreOrderInfoDetailVo> detailVoList = merchantOrderVo.getOrderInfoList();
                         if (detailVoList.size() == 1) {
                             detailVoList.get(0).setFreightFee(postageFee);
                         } else {
+                            BigDecimal fee = postageFee;
                             for (int i = 0; i < detailVoList.size(); i++) {
                                 PreOrderInfoDetailVo detail = detailVoList.get(i);
                                 if (detailVoList.size() == (i + 1)) {
-                                    detail.setFreightFee(postageFee);
+                                    detail.setFreightFee(fee);
                                     break;
                                 }
                                 BigDecimal ratio = new BigDecimal(detail.getPayNum().toString()).divide(new BigDecimal(num.toString()), 10, BigDecimal.ROUND_HALF_UP);
-                                BigDecimal multiply = postageFee.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                                BigDecimal multiply = fee.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
                                 detail.setFreightFee(multiply);
-                                postageFee = postageFee.subtract(multiply);
+                                fee = fee.subtract(multiply);
                             }
                         }
                         break;
@@ -2170,42 +2178,50 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                     {
                         BigDecimal surplus = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT) ? weight : volume;
                         if (surplus.compareTo(shippingTemplatesRegion.getFirst()) <= 0) {
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
                             postageFee = shippingTemplatesRegion.getFirstPrice();
+                            feeList.add(postageFee);
                         } else {// 超过首件的需要计算续件
                             BigDecimal renewalNum = surplus.subtract(shippingTemplatesRegion.getFirst());
                             // 剩余件数/续件 = 需要计算的续件费用的次数
                             BigDecimal divide = renewalNum.divide(shippingTemplatesRegion.getRenewal(), 0, BigDecimal.ROUND_UP);
                             BigDecimal renewalPrice = shippingTemplatesRegion.getRenewalPrice().multiply(divide);
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
                             postageFee = shippingTemplatesRegion.getFirstPrice().add(renewalPrice);
+                            feeList.add(postageFee);
                         }
                         List<PreOrderInfoDetailVo> infoDetailVoList = merchantOrderVo.getOrderInfoList();
                         if (infoDetailVoList.size() == 1) {
                             infoDetailVoList.get(0).setFreightFee(postageFee);
                         } else {
+                            BigDecimal fee = postageFee;
                             for (int i = 0; i < infoDetailVoList.size(); i++) {
                                 PreOrderInfoDetailVo detail = infoDetailVoList.get(i);
                                 if (infoDetailVoList.size() == (i + 1)) {
-                                    detail.setFreightFee(postageFee);
+                                    detail.setFreightFee(fee);
                                     break;
                                 }
                                 BigDecimal wv = shippingTemplate.getType().equals(ShippingTemplatesConstants.CHARGE_MODE_TYPE_WEIGHT) ? detail.getWeight() : detail.getVolume();
                                 BigDecimal ratio = wv.multiply(new BigDecimal(detail.getPayNum().toString())).divide(surplus, 10, BigDecimal.ROUND_HALF_UP);
-                                BigDecimal multiply = postageFee.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+                                BigDecimal multiply = fee.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
                                 detail.setFreightFee(multiply);
-                                postageFee = postageFee.subtract(multiply);
+                                fee = fee.subtract(multiply);
                             }
                         }
                         break;
                     }
                 }
             }
+
+            BigDecimal storePostage = BigDecimal.ZERO;
+            if(!feeList.isEmpty()){
+                storePostage = Collections.min(feeList);
+            }
             merchantOrderVo.setFreightFee(storePostage);
             freightFee = freightFee.add(storePostage);
         }
+
         orderInfoVo.setFreightFee(freightFee);
     }
+
 
     /**
      * 校验预下单商品信息
