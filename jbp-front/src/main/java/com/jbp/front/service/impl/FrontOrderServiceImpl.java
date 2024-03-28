@@ -2594,8 +2594,16 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         List<OrderMerchantRequest> orderMerchantRequestList = request.getOrderMerchantRequestList();
         Map<Integer, OrderMerchantRequest> orderMerchantRequestMap = FunctionUtil.keyValueMap(orderMerchantRequestList, OrderMerchantRequest::getMerId);
 
+        UserAddress userAddress = null;
         // 计算运费
-        UserAddress userAddress = userAddressService.getById(request.getAddressId());
+        if (request.getAddressId() == null || request.getAddressId().intValue() == 0) {
+            userAddress = userAddressService.getDefaultByUid(user.getId());
+        } else {
+            userAddress = userAddressService.getById(request.getAddressId());
+        }
+        if (userAddress == null) {
+            throw new CrmebException("请选择收货地址");
+        }
         // 优惠券计算[清空优惠金额]
         orderInfoVo.setCouponFee(BigDecimal.ZERO);
         orderInfoVo.setPlatCouponFee(BigDecimal.ZERO);
