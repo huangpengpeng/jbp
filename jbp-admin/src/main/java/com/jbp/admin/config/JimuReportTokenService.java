@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.jbp.common.model.admin.SystemPermissions;
 import com.jbp.common.model.admin.SystemRole;
 import com.jbp.common.model.admin.SystemRoleMenu;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +24,7 @@ import java.util.List;
  * 1.自定义获取登录token
  * 2.自定义获取登录用户
  */
+@Slf4j
 @Component
 public class JimuReportTokenService implements JmReportTokenServiceI {
 	
@@ -95,10 +97,14 @@ public class JimuReportTokenService implements JmReportTokenServiceI {
         	 return false;
          }
          SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+
+
+
          List<SystemPermissions> permissions =  SecurityUtil.getLoginUserVo().getPermissions();
+		 log.info(permissions.toString());
 		//查询是否包含报表的权限
 		 Boolean ifContain = permissions.stream().anyMatch(s ->StringUtils.equals(s.getName(), "报表"));
-
+		log.info("验证权限"+ifContain);
 
          if(ifContain || StringUtils.equals(admin.getRoles(), "1")){
          	return true;
