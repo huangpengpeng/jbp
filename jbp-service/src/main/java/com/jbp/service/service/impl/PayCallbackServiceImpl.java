@@ -438,68 +438,71 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
     @Override
     public String lianLianPayCallback(QueryPaymentResult queryPaymentResult) {
-        // 回调状态
-        String txnStatus = queryPaymentResult.getTxn_status();
-        // 业务单号
-        String orderNo = queryPaymentResult.getOrderInfo().getTxn_seqno();
-        if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
-            Order order = orderService.getByOrderNo(queryPaymentResult.getOrderInfo().getTxn_seqno());
-            if (order != null) {
-                if (BooleanUtils.isTrue(order.getPaid())) {
-                    logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
-                    return "Success";
-                }
-                if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
-                    Boolean execute = transactionTemplate.execute(e -> {
-                        order.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
-                        order.setPaid(true);
-                        order.setPayType("lianlian");
-                        order.setPayTime(CrmebDateUtil.nowDateTime());
-                        order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-                        orderService.updateById(order);
-                        return Boolean.TRUE;
-                    });
-                    if (!execute) {
-                        throw new CrmebException("订单回执失败" + txnStatus);
+
+        synchronized (queryPaymentResult.getOrderInfo().getTxn_seqno().intern()) {
+            // 回调状态
+            String txnStatus = queryPaymentResult.getTxn_status();
+            // 业务单号
+            String orderNo = queryPaymentResult.getOrderInfo().getTxn_seqno();
+            if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+                Order order = orderService.getByOrderNo(queryPaymentResult.getOrderInfo().getTxn_seqno());
+                if (order != null) {
+                    if (BooleanUtils.isTrue(order.getPaid())) {
+                        logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
+                        return "Success";
                     }
-                    asyncService.orderPaySuccessSplit(order.getOrderNo());
-                } else {
-                    logger.error("lianlian pay error : 支付回调订单失败 ===》" + orderNo);
-                    return "error";
-                }
-            }
-        }
-        if (orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
-            RechargeOrder rechargeOrder = rechargeOrderService.getByOrderNo(orderNo);
-            // 充值
-            if (rechargeOrder != null) {
-                if (BooleanUtils.isTrue(rechargeOrder.getPaid())) {
-                    logger.info("lianlian pay error : 充值订单已支付 ===》" + orderNo);
-                    return "Success";
-                }
-                if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
-                    Boolean execute = transactionTemplate.execute(e -> {
-                        rechargeOrder.setPaid(true);
-                        rechargeOrder.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
-                        final boolean b = rechargeOrderService.updateById(rechargeOrder);
-                        if (!b) {
-                            e.setRollbackOnly();
+                    if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
+                        Boolean execute = transactionTemplate.execute(e -> {
+                            order.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
+                            order.setPaid(true);
+                            order.setPayType("lianlian");
+                            order.setPayTime(CrmebDateUtil.nowDateTime());
+                            order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                            orderService.updateById(order);
+                            return Boolean.TRUE;
+                        });
+                        if (!execute) {
+                            throw new CrmebException("订单回执失败" + txnStatus);
                         }
-                        rechargeOrderService.paySuccessAfter(rechargeOrder);
-                        return true;
-                    });
-                    if (!execute) {
-                        throw new CrmebException("充值订单回执失败" + txnStatus);
+                        asyncService.orderPaySuccessSplit(order.getOrderNo());
+                    } else {
+                        logger.error("lianlian pay error : 支付回调订单失败 ===》" + orderNo);
+                        return "error";
                     }
-                } else {
-                    logger.info("lianlian pay error : 支付回调订单状态未完成 ===》" + orderNo);
-                    return "error";
                 }
             }
+            if (orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+                RechargeOrder rechargeOrder = rechargeOrderService.getByOrderNo(orderNo);
+                // 充值
+                if (rechargeOrder != null) {
+                    if (BooleanUtils.isTrue(rechargeOrder.getPaid())) {
+                        logger.info("lianlian pay error : 充值订单已支付 ===》" + orderNo);
+                        return "Success";
+                    }
+                    if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
+                        Boolean execute = transactionTemplate.execute(e -> {
+                            rechargeOrder.setPaid(true);
+                            rechargeOrder.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
+                            final boolean b = rechargeOrderService.updateById(rechargeOrder);
+                            if (!b) {
+                                e.setRollbackOnly();
+                            }
+                            rechargeOrderService.paySuccessAfter(rechargeOrder);
+                            return true;
+                        });
+                        if (!execute) {
+                            throw new CrmebException("充值订单回执失败" + txnStatus);
+                        }
+                    } else {
+                        logger.info("lianlian pay error : 支付回调订单状态未完成 ===》" + orderNo);
+                        return "error";
+                    }
+                }
+            }
+
+
+            return "Success";
         }
-
-
-        return "Success";
     }
 
     /**
