@@ -90,7 +90,7 @@ public class OrderPullController {
                 List<ProductMaterials> productMaterials = productMaterialsService.getByBarCode(orderGoods.getMerId(), orderGoods.getBarCode());
                 BigDecimal goodsPrice = orderGoods.getPayPrice().subtract(orderGoods.getFreightFee());
                 if (CollectionUtils.isEmpty(productMaterials)) {
-                    String orderDetailId =  order.getPlatOrderNo()+"_"+orderGoods.getId();
+                    String orderDetailId =  order.getId()+"_"+orderGoods.getId();
                     ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderDetailId, orderGoods.getProductName(),
                             orderGoods.getPayNum(), product.getUnitName(), orderGoods.getBarCode(),
                             goodsPrice.divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN),
@@ -119,7 +119,7 @@ public class OrderPullController {
                         if (ArithmeticUtils.gt(divide, BigDecimal.ZERO) && ArithmeticUtils.gt(orderGoods.getWalletDeductionFee(), BigDecimal.ZERO)) {
                             walletDeductionFee = orderGoods.getWalletDeductionFee().multiply(divide).divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN);
                         }
-                        String orderDetailId =  order.getPlatOrderNo()+"_"+orderGoods.getId()+"_"+productMaterial.getId();
+                        String orderDetailId =  order.getId()+"_"+orderGoods.getId()+"_"+productMaterial.getId();
                         ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderDetailId, productMaterial.getMaterialsName(),
                                 payNum, product.getUnitName(), productMaterial.getMaterialsCode(),
                                 price, walletDeductionFee);
