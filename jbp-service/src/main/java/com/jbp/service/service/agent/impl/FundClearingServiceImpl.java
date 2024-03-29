@@ -377,6 +377,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             return CommonPage.copyPageInfo(page, Lists.newArrayList());
         }
         Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
+        walletMap.put(-1, new WalletConfig().setName("管理费"));
+        walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
             e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
             for (FundClearingItem item : e.getItems()) {

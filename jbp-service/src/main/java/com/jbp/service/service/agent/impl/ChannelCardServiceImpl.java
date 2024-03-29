@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -52,7 +53,7 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
                 .orderByDesc(ChannelCard::getId);
         Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelCard> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ChannelCard::getUid).collect(Collectors.toList());
@@ -87,6 +88,22 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
         ChannelCard channelCard = new ChannelCard(uid, bankId, bankCardNo, bankName, branchId, branchName, type, province, city, phone, channel);
         save(channelCard);
         return channelCard;
+    }
+
+    @Override
+    public void update(Integer id,String bankName, String bankCardNo, String bankId, String phone, String type, String branchId, String branchName, String province, String city) {
+        LambdaUpdateWrapper<ChannelCard> luw = new LambdaUpdateWrapper<ChannelCard>()
+                .eq(ChannelCard::getId, id)
+                .set(StringUtils.isNotEmpty(bankName), ChannelCard::getBankName, bankName)
+                .set(StringUtils.isNotEmpty(bankCardNo), ChannelCard::getBankCardNo, bankCardNo)
+                .set(StringUtils.isNotEmpty(bankId), ChannelCard::getBankId, bankId)
+                .set(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone)
+                .set(StringUtils.isNotEmpty(type), ChannelCard::getType, type)
+                .set(StringUtils.isNotEmpty(branchId), ChannelCard::getBranchId, branchId)
+                .set(StringUtils.isNotEmpty(branchName), ChannelCard::getBranchName, branchName)
+                .set(StringUtils.isNotEmpty(province), ChannelCard::getProvince, province)
+                .set(StringUtils.isNotEmpty(city), ChannelCard::getCity, city);
+        update(luw);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -24,7 +25,9 @@ import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.ChannelWalletService;
 import com.jbp.service.util.StringUtils;
+import io.netty.channel.ChannelId;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,6 +112,19 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
         channelCardService.add(uid, null, aliBankCard.getCardNum(),
                 aliBankCard.getBankName(), null, request.getBankName(), aliBankCard.getCardType(),
                 request.getDistrictCode(), request.getAddress(), request.getMobile(), channelName);
+    }
+
+    @Override
+    public void update(Integer id, String idCardNo, String realName, String idCardNoFrontImg, String idCardNoBackImg, String otherJSON) {
+        LambdaUpdateWrapper<ChannelIdentity> luw = new LambdaUpdateWrapper<ChannelIdentity>()
+                .eq(ChannelIdentity::getId, id)
+                .set(StringUtils.isNotEmpty(idCardNo), ChannelIdentity::getIdCardNo, idCardNo)
+                .set(StringUtils.isNotEmpty(realName),ChannelIdentity::getRealName,realName)
+                .set(StringUtils.isNotEmpty(idCardNoFrontImg),ChannelIdentity::getIdCardNoFrontImg,idCardNoFrontImg)
+                .set(StringUtils.isNotEmpty(idCardNoBackImg),ChannelIdentity::getIdCardNoBackImg,idCardNoBackImg    )
+                .set(StringUtils.isNotEmpty(otherJSON),ChannelIdentity::getOtherJSON,otherJSON);
+
+        update(luw);
     }
 
     @Override

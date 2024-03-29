@@ -76,6 +76,9 @@ public class OrderInfoFrontDataResponse implements Serializable {
     @ApiModelProperty(value = "钱包抵扣")
     private BigDecimal walletDeductionFee;
 
+    @ApiModelProperty(value = "商品条码")
+    private String barCode;
+
     @ApiModelProperty(value = "钱包抵扣")
     private List<ProductDeduction> walletDeductionList;
 }
