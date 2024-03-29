@@ -91,18 +91,18 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
     }
 
     @Override
-    public void update(Integer id,String bankName, String bankCardNo, String bankId, String phone, String type, String branchId, String branchName, String province, String city) {
+    public void update(Integer id, String bankName, String bankCardNo, String bankId, String phone, String type, String branchId, String branchName, String province, String city) {
         LambdaUpdateWrapper<ChannelCard> luw = new LambdaUpdateWrapper<ChannelCard>()
                 .eq(ChannelCard::getId, id)
-                .set(StringUtils.isNotEmpty(bankName), ChannelCard::getBankName, bankName)
-                .set(StringUtils.isNotEmpty(bankCardNo), ChannelCard::getBankCardNo, bankCardNo)
-                .set(StringUtils.isNotEmpty(bankId), ChannelCard::getBankId, bankId)
-                .set(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone)
-                .set(StringUtils.isNotEmpty(type), ChannelCard::getType, type)
-                .set(StringUtils.isNotEmpty(branchId), ChannelCard::getBranchId, branchId)
-                .set(StringUtils.isNotEmpty(branchName), ChannelCard::getBranchName, branchName)
-                .set(StringUtils.isNotEmpty(province), ChannelCard::getProvince, province)
-                .set(StringUtils.isNotEmpty(city), ChannelCard::getCity, city);
+                .set(ChannelCard::getBankName, bankName)
+                .set(ChannelCard::getBankCardNo, bankCardNo)
+                .set(ChannelCard::getBankId, bankId)
+                .set(ChannelCard::getPhone, phone)
+                .set(ChannelCard::getType, type)
+                .set(ChannelCard::getBranchId, branchId)
+                .set(ChannelCard::getBranchName, branchName)
+                .set(ChannelCard::getProvince, province)
+                .set(ChannelCard::getCity, city);
         update(luw);
     }
 

@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelCard;
 import com.jbp.common.model.agent.ChannelIdentity;
@@ -25,9 +24,7 @@ import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.ChannelWalletService;
 import com.jbp.service.util.StringUtils;
-import io.netty.channel.ChannelId;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +57,7 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
                 .orderByDesc(ChannelIdentity::getId);
         Page<ChannelIdentity> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelIdentity> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ChannelIdentity::getUid).collect(Collectors.toList());
@@ -118,11 +115,11 @@ public class ChannelIdentityServiceImpl extends ServiceImpl<ChannelIdentityDao, 
     public void update(Integer id, String idCardNo, String realName, String idCardNoFrontImg, String idCardNoBackImg, String otherJSON) {
         LambdaUpdateWrapper<ChannelIdentity> luw = new LambdaUpdateWrapper<ChannelIdentity>()
                 .eq(ChannelIdentity::getId, id)
-                .set(StringUtils.isNotEmpty(idCardNo), ChannelIdentity::getIdCardNo, idCardNo)
-                .set(StringUtils.isNotEmpty(realName),ChannelIdentity::getRealName,realName)
-                .set(StringUtils.isNotEmpty(idCardNoFrontImg),ChannelIdentity::getIdCardNoFrontImg,idCardNoFrontImg)
-                .set(StringUtils.isNotEmpty(idCardNoBackImg),ChannelIdentity::getIdCardNoBackImg,idCardNoBackImg    )
-                .set(StringUtils.isNotEmpty(otherJSON),ChannelIdentity::getOtherJSON,otherJSON);
+                .set(ChannelIdentity::getIdCardNo, idCardNo)
+                .set(ChannelIdentity::getRealName, realName)
+                .set(ChannelIdentity::getIdCardNoFrontImg, idCardNoFrontImg)
+                .set(ChannelIdentity::getIdCardNoBackImg, idCardNoBackImg)
+                .set(ChannelIdentity::getOtherJSON, otherJSON);
 
         update(luw);
     }
