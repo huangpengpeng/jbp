@@ -21,4 +21,6 @@ public interface ChannelIdentityService extends IService<ChannelIdentity> {
     void identity(Integer uid, ChannelIdentityRequest request);
 
     Map<Integer, ChannelIdentity> getChannelIdentityMap(List<Integer> uidList, String channel);
+
+    void update(Integer id, String idCardNo, String realName, String idCardNoFrontImg, String idCardNoBackImg, String otherJSON);
 }

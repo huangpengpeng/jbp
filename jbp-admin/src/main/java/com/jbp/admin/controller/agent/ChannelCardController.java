@@ -5,6 +5,7 @@ import com.jbp.common.model.agent.ChannelCard;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ChannelCardEditRequest;
 import com.jbp.common.request.agent.ChannelCardRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
@@ -12,10 +13,10 @@ import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -42,5 +43,14 @@ public class ChannelCardController {
         }
         return CommonResult.success(CommonPage.restPage(channelCardService.pageList(uid,request.getBankCardNo(),request.getType(),request.getPhone(),pageParamRequest)));
     }
+    @PreAuthorize("hasAuthority('agent:channel:card:update')")
+    @PostMapping("/update")
+    @ApiOperation("修改渠道银行卡")
+    public CommonResult update(@RequestBody @Validated ChannelCardEditRequest request) {
+        channelCardService.update(request.getId(),request.getBankName(),request.getBankCardNo(),request.getBankId(),
+                request.getPhone(),request.getType(),request.getBranchId(),request.getBranchName(),request.getProvince(),request.getCity());
+        return CommonResult.success();
+    }
+
 
 }

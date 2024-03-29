@@ -23,4 +23,7 @@ public interface ChannelCardService extends IService<ChannelCard> {
     ChannelCard getByUser(Integer uid, String channel);
 
     Map<Integer, ChannelCard> getChannelCardMap(List<Integer> uidList, String channel);
+
+    void update(Integer id , String bankName, String bankCardNo,  String bankId, String phone, String type, String branchId, String branchName, String province, String city);
+
 }

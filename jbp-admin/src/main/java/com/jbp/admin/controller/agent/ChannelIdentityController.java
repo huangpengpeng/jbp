@@ -5,17 +5,19 @@ import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ChannelIdentityEditRequest;
 import com.jbp.common.request.agent.ChannelIdentityPageRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -27,6 +29,8 @@ public class ChannelIdentityController {
     private ChannelIdentityService channelIdentityService;
     @Resource
     private UserService userService;
+    @Resource
+    private SystemAttachmentService systemAttachmentService;
 
     @PreAuthorize("hasAuthority('agent:channel:identity:page')")
     @GetMapping("/page")
@@ -41,5 +45,13 @@ public class ChannelIdentityController {
             uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(channelIdentityService.pageList(uid, request.getIdCardNo(), request.getRealName(), request.getChannel(), pageParamRequest)));
+    }
+    @PreAuthorize("hasAuthority('agent:channel:identity:update')")
+    @PostMapping("/update")
+    @ApiModelProperty("渠道身份信息修改")
+    public CommonResult update(@RequestBody @Validated ChannelIdentityEditRequest request) {
+        String cdnUrl = systemAttachmentService.getCdnUrl();
+        channelIdentityService.update(request.getId(), request.getIdCardNo(), request.getRealName(),systemAttachmentService.clearPrefix( request.getIdCardNoFrontImg(),cdnUrl),systemAttachmentService.clearPrefix(  request.getIdCardNoBackImg(),cdnUrl), request.getOtherJSON());
+        return CommonResult.success();
     }
 }

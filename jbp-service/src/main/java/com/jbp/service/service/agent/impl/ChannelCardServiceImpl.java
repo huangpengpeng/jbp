@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -52,7 +53,7 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
                 .orderByDesc(ChannelCard::getId);
         Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelCard> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ChannelCard::getUid).collect(Collectors.toList());
@@ -87,6 +88,22 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
         ChannelCard channelCard = new ChannelCard(uid, bankId, bankCardNo, bankName, branchId, branchName, type, province, city, phone, channel);
         save(channelCard);
         return channelCard;
+    }
+
+    @Override
+    public void update(Integer id, String bankName, String bankCardNo, String bankId, String phone, String type, String branchId, String branchName, String province, String city) {
+        LambdaUpdateWrapper<ChannelCard> luw = new LambdaUpdateWrapper<ChannelCard>()
+                .eq(ChannelCard::getId, id)
+                .set(ChannelCard::getBankName, bankName)
+                .set(ChannelCard::getBankCardNo, bankCardNo)
+                .set(ChannelCard::getBankId, bankId)
+                .set(ChannelCard::getPhone, phone)
+                .set(ChannelCard::getType, type)
+                .set(ChannelCard::getBranchId, branchId)
+                .set(ChannelCard::getBranchName, branchName)
+                .set(ChannelCard::getProvince, province)
+                .set(ChannelCard::getCity, city);
+        update(luw);
     }
 
     @Override
