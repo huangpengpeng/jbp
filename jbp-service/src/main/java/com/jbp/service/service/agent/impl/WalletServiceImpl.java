@@ -151,8 +151,10 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     @Override
     public Boolean transfer(Integer uid, Integer receiveUserId, BigDecimal amt, Integer type, String postscript) {
         String externalNo = StringUtils.N_TO_10("ZZ_");
-        reduce(uid, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript);
-        increase(receiveUserId, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript);
+        User receiveUser = userService.getById(receiveUserId);
+        User user = userService.getById(uid);
+        reduce(uid, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript + "【接收账户:" + receiveUser.getAccount() + "】");
+        increase(receiveUserId, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript + "【转出账户" + user.getAccount() + "】");
         return true;
     }
 
