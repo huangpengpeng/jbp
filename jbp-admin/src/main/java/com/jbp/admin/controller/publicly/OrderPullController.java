@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.publicly;
 
+import cn.hutool.core.lang.UUID;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.annotation.CustomResponseAnnotation;
 import com.jbp.common.encryptapi.EncryptIgnore;
@@ -25,7 +26,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -37,7 +37,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -87,7 +90,8 @@ public class OrderPullController {
                 List<ProductMaterials> productMaterials = productMaterialsService.getByBarCode(orderGoods.getMerId(), orderGoods.getBarCode());
                 BigDecimal goodsPrice = orderGoods.getPayPrice().subtract(orderGoods.getFreightFee());
                 if (CollectionUtils.isEmpty(productMaterials)) {
-                    ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderGoods.getProductName(),
+                    String orderDetailId = UUID.randomUUID().toString().replace("-", "");
+                    ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderDetailId, orderGoods.getProductName(),
                             orderGoods.getPayNum(), product.getUnitName(), orderGoods.getBarCode(),
                             goodsPrice.divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN),
                             orderGoods.getWalletDeductionFee().divide(BigDecimal.valueOf(orderGoods.getPayNum()), 4, BigDecimal.ROUND_DOWN));
@@ -115,7 +119,8 @@ public class OrderPullController {
                         if (ArithmeticUtils.gt(divide, BigDecimal.ZERO) && ArithmeticUtils.gt(orderGoods.getWalletDeductionFee(), BigDecimal.ZERO)) {
                             walletDeductionFee = orderGoods.getWalletDeductionFee().multiply(divide).divide(BigDecimal.valueOf(payNum), 4, BigDecimal.ROUND_DOWN);
                         }
-                        ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(productMaterial.getMaterialsName(),
+                        String orderDetailId = UUID.randomUUID().toString().replace("-", "");
+                        ErpOrderGoodVo orderGoodVo = new ErpOrderGoodVo(orderDetailId, productMaterial.getMaterialsName(),
                                 payNum, product.getUnitName(), productMaterial.getMaterialsCode(),
                                 price, walletDeductionFee);
                         orderGoodVoList.add(orderGoodVo);
@@ -223,15 +228,4 @@ public class OrderPullController {
             throw new RuntimeException("签名错误");
         }
     }
-
-
-    public static void main(String[] args) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("appKey", "fny");
-        map.put("method", "shipWait");
-        map.put("timeStr", "1703034721");
-        // 11D8B138A75484F5E36A805AE3B3B2D2
-        System.out.println(SignUtil.getSignToUpperCase("2e556e8f433dc3b9971aa21fa32458b8", map));
-    }
-
 }

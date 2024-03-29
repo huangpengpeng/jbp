@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ErpOrderGoodVo implements Serializable {
 
-    public ErpOrderGoodVo(String goodsName, int quantity, String unit, String productSn, BigDecimal price, BigDecimal consumePrice) {
+    public ErpOrderGoodVo(String orderDetailId, String goodsName, int quantity, String unit, String productSn, BigDecimal price, BigDecimal consumePrice) {
+        this.orderDetailId = orderDetailId;
         this.goodsName = goodsName;
         this.quantity = quantity;
         this.unit = unit;
@@ -19,6 +20,9 @@ public class ErpOrderGoodVo implements Serializable {
         this.price = price;
         this.consumePrice = consumePrice;
     }
+
+    @ApiModelProperty(value = "订单详情ID")
+    private String orderDetailId;
 
     @ApiModelProperty(value = "商品名称")
     private String goodsName;
