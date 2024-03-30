@@ -112,7 +112,7 @@ mybatis-plus:
   typeAliasesPackage: com.jbp.**.model
   # 配置slq打印日志
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
     enable-sql-runner: true
     db-config:
