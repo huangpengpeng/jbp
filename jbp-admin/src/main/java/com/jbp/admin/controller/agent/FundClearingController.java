@@ -5,13 +5,11 @@ import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.agent.FundClearingRequest;
-import com.jbp.common.request.agent.FundClearingUpdateRemarkRequest;
-import com.jbp.common.request.agent.FundClearingUpdateRequest;
-import com.jbp.common.request.agent.FundClearingUpdateSendAmtRequest;
+import com.jbp.common.request.agent.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
+import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
 import io.swagger.annotations.Api;
@@ -142,5 +140,26 @@ public class FundClearingController {
         fundClearingService.updateIfRefund(request.getIds(), request.getRemark());
         return CommonResult.success();
     }
+
+
+
+
+    @PreAuthorize("hasAuthority('agent:fund:clearing:save')")
+    @PostMapping("/save")
+    @ApiOperation("增加自定义佣金")
+    public CommonResult save(@RequestBody @Validated FundClearingSaveRequest request) {
+
+        User user = userService.getByAccount(request.getAccount());
+        if (user == null) {
+            throw new CrmebException("账号信息错误");
+        }
+        fundClearingService.create(user.getId(), request.getOrderNo(), request.getType(), request.getClearingFee(),
+                null, request.getDescription(), request.getRemark());
+        return CommonResult.success();
+    }
+
+
+
+
 
 }
