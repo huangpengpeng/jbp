@@ -2,12 +2,14 @@ package com.jbp.service.product.comm;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.ProductCommConfigService;
@@ -16,10 +18,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +44,8 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
     private ProductCommConfigService productCommConfigService;
     @Resource
     private FundClearingService fundClearingService;
+    @Autowired
+    private Environment environment;
 
 
     @Override
@@ -82,12 +89,26 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
         for (CommCalculateResult calculateResult : collisionFeeList) {
 
             Integer uid = calculateResult.getUid();
-            Integer pid = invitationService.getPid(uid);
-            BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
-            if (pid != null && ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
-                         null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+
+            String internalUid = environment.getProperty("internal.shop.uid");
+            String internalPid = environment.getProperty("internal.shop.pid");
+            List<String> internalList = Lists.newArrayList();
+            if(StringUtils.isNotEmpty(internalUid)){
+                internalList = Arrays.stream(internalUid.split(",")).collect(Collectors.toList());
             }
+            if(CollectionUtils.isNotEmpty(internalList) && internalList.contains(uid.toString())) {
+                BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
+                fundClearingService.create(Integer.valueOf(internalPid), order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
+                        null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+            }else {
+                Integer pid = invitationService.getPid(uid);
+                BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
+                if (pid != null && ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
+                    fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
+                            null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+                }
+            }
+
         }
     }
 

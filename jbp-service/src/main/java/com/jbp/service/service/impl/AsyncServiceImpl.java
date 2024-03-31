@@ -37,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
@@ -192,14 +194,16 @@ public class AsyncServiceImpl implements AsyncService {
      *
      * @param orderNo 订单号
      */
-//    @Async
+    @Async
     @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void orderPaySuccessSplit(String orderNo) {
         synchronized (orderNo) {
             Order order = orderService.getByOrderNo(orderNo);
             List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
             if (CollectionUtils.isNotEmpty(shOrders)) {
-                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+//                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+                return;
             }
             if (ObjectUtil.isNull(order)) {
                 logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
