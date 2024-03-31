@@ -96,7 +96,7 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
             if(StringUtils.isNotEmpty(internalUid)){
                 internalList = Arrays.stream(internalUid.split(",")).collect(Collectors.toList());
             }
-            if(CollectionUtils.isNotEmpty(internalList) && internalList.contains(uid.toString())) {
+            if(CollectionUtils.isNotEmpty(internalList) && internalList.contains(uid.toString()) && StringUtils.isNotEmpty(internalPid)) {
                 BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
                 fundClearingService.create(Integer.valueOf(internalPid), order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
                         null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
