@@ -71,7 +71,7 @@ public class OrderPullController {
     @ApiOperation(value = "待发货订单列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/shipWait", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ErpOrderShipWaitVo> shipWait(String appKey, String timeStr, String method, String sign) {
-        validSign(appKey, timeStr, method, sign);
+//        validSign(appKey, timeStr, method, sign);
         List<ErpOrderShipWaitVo> list = Lists.newArrayList();
         List<Order> waitShip = orderService.getWaitPullList();
         if (CollectionUtils.isEmpty(waitShip)) {
@@ -133,7 +133,7 @@ public class OrderPullController {
             String userPrefix = environment.getProperty("erp.userPrefix");
             userPrefix = StringUtils.isBlank(userPrefix) ? "" : userPrefix;
             ErpOrderShipWaitVo vo = new ErpOrderShipWaitVo(userPrefix + order.getUid(),
-                    user.getAccount(), teamUser.getName(), user.getNickname(), user.getPhone(), order.getPlatOrderNo(),
+                    user.getAccount(), teamUser != null ? teamUser.getName() : "", user.getNickname(), user.getPhone(), order.getPlatOrderNo(),
                     DateTimeUtils.format(order.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
                     order.getTotalPostage(), order.getPayPrice(), order.getCouponPrice(),
                     order.getWalletDeductionFee(), orderGoodVoList, merchantOrder.getRealName(),
