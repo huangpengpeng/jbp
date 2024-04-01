@@ -460,7 +460,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             logger.info("锁住订单回调退出");
             return "error";
         }
-        redisTemplate.expire("PaySuccessCall" + orderNo, 3, TimeUnit.MINUTES);
+        redisTemplate.expire("PaySuccessCall" + orderNo, 1, TimeUnit.MINUTES);
         if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
             Order order = orderService.getByOrderNo(queryPaymentResult.getOrderInfo().getTxn_seqno());
             if (order != null) {

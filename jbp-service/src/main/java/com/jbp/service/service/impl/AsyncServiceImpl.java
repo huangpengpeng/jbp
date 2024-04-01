@@ -210,7 +210,7 @@ public class AsyncServiceImpl implements AsyncService {
             logger.info("锁住订单拆单退出");
             return ;
         }
-        redisTemplate.expire("orderPaySuccessSplit" + orderNo, 3, TimeUnit.MINUTES);
+        redisTemplate.expire("orderPaySuccessSplit" + orderNo, 1, TimeUnit.MINUTES);
 
         Order order = orderService.getByOrderNo(orderNo);
         List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
