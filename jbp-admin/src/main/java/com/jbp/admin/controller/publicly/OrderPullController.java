@@ -154,8 +154,10 @@ public class OrderPullController {
             List<Order> orderList = orderService.getByPlatOrderNo(s);
             if (CollectionUtils.isNotEmpty(orderList)) {
                 for (Order order : orderList) {
-                    order.setIfPull(true);
-                    orderService.updateById(order);
+                    Order update = new Order();
+                    update.setId(order.getId());
+                    update.setIfPull(true);
+                    orderService.updateById(update);
                 }
             }
         }

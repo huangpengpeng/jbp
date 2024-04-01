@@ -165,6 +165,10 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "是否被拉取")
     private Boolean ifPull;
 
+    @Version
+    @TableField(value = "version", fill = FieldFill.INSERT)
+    private Integer version = 1;
+
     public String getOrderType() {
         String typeStr = "";
         if (this.getType() == null) {

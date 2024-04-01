@@ -42,7 +42,5 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-
-
     }
 }
