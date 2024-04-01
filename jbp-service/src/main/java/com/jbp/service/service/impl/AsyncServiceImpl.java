@@ -30,6 +30,7 @@ import com.jbp.service.service.agent.OrderSuccessMsgService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -202,7 +203,6 @@ public class AsyncServiceImpl implements AsyncService {
             Order order = orderService.getByOrderNo(orderNo);
             List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
             if (CollectionUtils.isNotEmpty(shOrders)) {
-//                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
                 return;
             }
             if (ObjectUtil.isNull(order)) {
@@ -217,8 +217,10 @@ public class AsyncServiceImpl implements AsyncService {
                     User pUser = userService.getByAccount(orderRegister.getPaccount());
                     User rUser = userService.getByAccount(orderRegister.getRaccount());
                     User user = userService.helpRegister(orderRegister.getUsername(), orderRegister.getMobile(), pUser.getId(), rUser.getId(), orderRegister.getNode());
-                    order.setUid(user.getId());
-                    orderService.updateById(order);
+                    Boolean b = orderService.registerOrder(orderNo, user.getId());
+                    if(BooleanUtils.isNotTrue(b)){
+                        return;
+                    }
                     order = orderService.getByOrderNo(orderNo);
                 }
             }
@@ -256,71 +258,9 @@ public class AsyncServiceImpl implements AsyncService {
             orderSuccessMsgService.add(order.getOrderNo());
             // 添加支付成功redis队列
             logger.info("异步——订单支付成功拆单处理 | 拆单成功，加入后置处理队列");
-//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
         }
     }
 
-    @Override
-    public void orderPaySuccessSplit2(String orderNo) {
-        Order order = orderService.getByOrderNo(orderNo);
-        List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
-        if (CollectionUtils.isNotEmpty(shOrders)) {
-            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
-        }
-        if (ObjectUtil.isNull(order)) {
-            logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
-            return;
-        }
-        // 1. 处理注册
-        OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
-        if (orderExt != null) {
-            OrderRegister orderRegister = orderExt.getOrderRegister();
-            if (orderRegister != null) {
-                User pUser = userService.getByAccount(orderRegister.getPaccount());
-                User rUser = userService.getByAccount(orderRegister.getRaccount());
-                User user = userService.helpRegister(orderRegister.getUsername(), orderRegister.getMobile(), pUser.getId(), rUser.getId(), orderRegister.getNode());
-                order.setUid(user.getId());
-                orderService.updateById(order);
-                order = orderService.getByOrderNo(orderNo);
-            }
-        }
-        // 2. 处理收益【等级  星级 活跃 白名单 积分】
-        productProfitChain.orderSuccess(order);
-        // 3.更新扩展信息
-        if (orderExt != null) {
-            UserCapa userCapa = userCapaService.getByUser(order.getUid());
-            if (userCapa != null) {
-                orderExt.setSuccessCapaId(userCapa.getCapaId());
-            }
-            UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
-            if (userCapaXs != null) {
-                orderExt.setSuccessCapaXsId(userCapaXs.getCapaId());
-            }
-            orderExtService.updateById(orderExt);
-        }
-
-        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
-        if (CollUtil.isEmpty(merchantOrderList)) {
-            logger.error("异步——订单支付成功拆单处理 | 商户订单信息不存在,orderNo: {}", orderNo);
-            return;
-        }
-        Boolean execute;
-        if (merchantOrderList.size() == 1) {
-            // 单商户订单
-            execute = oneMerchantOrderProcessing(order, merchantOrderList.get(0));
-        } else {
-            execute = manyMerchantOrderProcessing(order, merchantOrderList);
-        }
-        if (!execute) {
-            logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", orderNo);
-            return;
-        }
-        orderSuccessMsgService.add(order.getOrderNo());
-        // 添加支付成功redis队列
-        logger.info("异步——订单支付成功拆单处理 | 拆单成功，加入后置处理队列");
-//        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
-
-    }
 
     /**
      * 访问用户个人中心记录

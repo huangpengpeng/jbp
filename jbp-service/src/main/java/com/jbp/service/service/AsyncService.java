@@ -39,8 +39,6 @@ public interface AsyncService {
      */
     void orderPaySuccessSplit(String orderNo);
 
-    void orderPaySuccessSplit2(String orderNo);
-
     /**
      * 访问用户个人中心记录
      * @param uid 用户id

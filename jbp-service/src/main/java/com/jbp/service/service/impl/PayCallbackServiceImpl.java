@@ -436,6 +436,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
         return refundRecord.getStr("returnXml");
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public String lianLianPayCallback(QueryPaymentResult queryPaymentResult) {
 
