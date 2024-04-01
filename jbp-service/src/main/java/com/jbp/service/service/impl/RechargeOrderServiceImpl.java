@@ -482,6 +482,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         wrapper.set(RechargeOrder::getPayTime, CrmebDateUtil.nowDateTime());
         wrapper.eq(RechargeOrder::getId, id);
         wrapper.eq(RechargeOrder::getOrderNo, orderNo);
+        wrapper.eq(RechargeOrder::getPaid, false);
         return update(wrapper);
     }
 
