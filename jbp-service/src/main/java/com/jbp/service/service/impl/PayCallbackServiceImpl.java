@@ -447,9 +447,9 @@ public class PayCallbackServiceImpl implements PayCallbackService {
         String txnStatus = queryPaymentResult.getTxn_status();
         // 业务单号
         String orderNo = queryPaymentResult.getOrderInfo().getTxn_seqno();
-        Boolean task = redisTemplate.opsForValue().setIfAbsent("PayCall" + orderNo, 1);
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("PaySuccessCall" + orderNo, 1);
         //2.设置锁的过期时间,防止死锁
-        redisTemplate.expire("PayCall" + orderNo, 3, TimeUnit.MINUTES);
+        redisTemplate.expire("PaySuccessCall" + orderNo, 3, TimeUnit.MINUTES);
         if (!task) {
             //没有争抢(设置)到锁
             logger.info("锁住订单回调退出");
@@ -514,7 +514,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             }
         }
 
-        redisTemplate.delete("PayCall" + orderNo);
+        redisTemplate.delete("PaySuccessCall" + orderNo);
         return "Success";
     }
 
