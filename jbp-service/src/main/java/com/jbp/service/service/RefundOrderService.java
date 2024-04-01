@@ -61,7 +61,7 @@ public interface RefundOrderService extends IService<RefundOrder> {
      * @param request 退款参数
      * @return Boolean
      */
-    Boolean refund(OrderRefundAuditRequest request);
+//    Boolean refund(OrderRefundAuditRequest request);
 
     RefundOrder getInfoException(String refundOrderNo);
 

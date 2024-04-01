@@ -24,6 +24,8 @@ public interface OrderTaskService {
      * 订单退款
      */
      void orderRefund();
+
+    void orderRefund2();
 //
 //     void complete();
 

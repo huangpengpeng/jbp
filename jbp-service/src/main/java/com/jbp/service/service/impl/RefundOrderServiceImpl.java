@@ -371,211 +371,211 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
      * @param request 退款参数
      * @return Boolean
      */
-    @Override
-    public Boolean refund(OrderRefundAuditRequest request) {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        RefundOrder refundOrder = getInfoException(request.getRefundOrderNo());
-        if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY)) {
-            throw new CrmebException("退款单状态异常");
-        }
-        if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-            throw new CrmebException("无法操作非自己商户的订单");
-        }
-
-
-        Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
-        if (!order.getPaid()) {
-            throw new CrmebException("未支付无法退款");
-        }
-        if (refundOrder.getAfterSalesType().equals(2)) {
-            if (ObjectUtil.isNull(request.getMerAddressId())) {
-                throw new CrmebException("请选择商家退货地址");
-            }
-            MerchantAddress merchantAddress = merchantAddressService.getByIdException(request.getMerAddressId());
-            refundOrder.setReceiver(merchantAddress.getReceiverName());
-            refundOrder.setReceiverPhone(merchantAddress.getReceiverPhone());
-            refundOrder.setReceiverAddressDetail(merchantAddress.getDetail());
-            refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_RETURN_GOODS);
-
-            return transactionTemplate.execute(e -> {
-                updateById(refundOrder);
-                refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
-                return Boolean.TRUE;
-            });
-        }
-
-        RefundOrderInfo refundOrderInfo = refundOrderInfoService.getByRefundOrderNo(refundOrder.getRefundOrderNo());
-        OrderDetail orderDetail = orderDetailService.getById(refundOrderInfo.getOrderDetailId());
-        BigDecimal refundPrice;
-        if (orderDetail.getPayNum().equals(refundOrderInfo.getApplyRefundNum())) {
-            // sku整退
-            refundPrice = orderDetail.getPayPrice();
-            orderDetail.setRefundPrice(refundPrice);
-            refundOrderInfo.setRefundPrice(refundPrice);
-            if (orderDetail.getUseIntegral() > 0) {
-                orderDetail.setRefundUseIntegral(orderDetail.getUseIntegral());
-                orderDetail.setRefundIntegralPrice(orderDetail.getIntegralPrice());
-                refundOrderInfo.setRefundUseIntegral(orderDetail.getRefundUseIntegral());
-                refundOrderInfo.setRefundIntegralPrice(orderDetail.getRefundIntegralPrice());
-            }
-            if (orderDetail.getGainIntegral() > 0) {
-                orderDetail.setRefundGainIntegral(orderDetail.getGainIntegral());
-                refundOrderInfo.setRefundGainIntegral(orderDetail.getRefundGainIntegral());
-            }
-            if (orderDetail.getFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-                orderDetail.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee());
-                refundOrderInfo.setRefundFirstBrokerageFee(orderDetail.getRefundFirstBrokerageFee());
-            }
-            if (orderDetail.getSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-                orderDetail.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee());
-                refundOrderInfo.setRefundSecondBrokerageFee(orderDetail.getRefundSecondBrokerageFee());
-            }
-            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
-                orderDetail.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice());
-                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice());
-            }
-            refundOrderInfo.setMerchantRefundPrice(refundPrice);
-            if (orderDetail.getFreightFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
-                orderDetail.setRefundFreightFee(orderDetail.getFreightFee());
-            }
-        } else if (orderDetail.getPayNum() == (orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum())) { // sku分退
-            refundPrice = orderDetail.getPayPrice().subtract(orderDetail.getRefundPrice());
-            // sku最后一部分退款
-            orderDetail.setRefundPrice(orderDetail.getPayPrice());
-            refundOrderInfo.setRefundPrice(refundPrice);
-            refundOrderInfo.setMerchantRefundPrice(refundPrice);
-            if (orderDetail.getUseIntegral() > 0) {
-                refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral() - orderDetail.getRefundUseIntegral());
-                refundOrderInfo.setRefundIntegralPrice(orderDetail.getIntegralPrice().subtract(orderDetail.getRefundIntegralPrice()));
-                orderDetail.setRefundUseIntegral(orderDetail.getUseIntegral());
-                orderDetail.setRefundIntegralPrice(orderDetail.getIntegralPrice());
-            }
-            if (orderDetail.getGainIntegral() > 0) {
-                refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral() - orderDetail.getRefundGainIntegral());
-                orderDetail.setRefundGainIntegral(orderDetail.getGainIntegral());
-            }
-            if (orderDetail.getFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee().subtract(orderDetail.getRefundFirstBrokerageFee()));
-                orderDetail.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee());
-            }
-            if (orderDetail.getSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee().subtract(orderDetail.getRefundSecondBrokerageFee()));
-                orderDetail.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee());
-            }
-            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().subtract(orderDetail.getRefundPlatCouponPrice()));
-                orderDetail.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice());
-            }
-            if (orderDetail.getFreightFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().subtract(orderDetail.getRefundFreightFee()));
-                orderDetail.setRefundFreightFee(orderDetail.getFreightFee());
-            }
-        } else {
-            // sku非最后一部分退款
-            BigDecimal ratio = new BigDecimal(refundOrderInfo.getApplyRefundNum()).divide(new BigDecimal(orderDetail.getPayNum()), 10, BigDecimal.ROUND_HALF_UP);
-            refundPrice = orderDetail.getPayPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
-            orderDetail.setRefundPrice(orderDetail.getRefundPrice().add(refundPrice));
-            refundOrderInfo.setRefundPrice(refundPrice);
-            refundOrderInfo.setMerchantRefundPrice(refundPrice);
-
-            if (orderDetail.getUseIntegral() > 0) {
-                refundOrderInfo.setRefundUseIntegral(new BigDecimal(orderDetail.getUseIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
-                refundOrderInfo.setRefundIntegralPrice(orderDetail.getIntegralPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
-                orderDetail.setRefundUseIntegral(orderDetail.getRefundUseIntegral() + refundOrderInfo.getRefundUseIntegral());
-                orderDetail.setRefundIntegralPrice(orderDetail.getRefundIntegralPrice().add(refundOrderInfo.getRefundIntegralPrice()));
-            }
-            if (orderDetail.getGainIntegral() > 0) {
-                refundOrderInfo.setRefundGainIntegral(new BigDecimal(orderDetail.getGainIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
-                orderDetail.setRefundGainIntegral(orderDetail.getRefundGainIntegral() + refundOrderInfo.getRefundGainIntegral());
-            }
-            if (orderDetail.getFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
-                orderDetail.setRefundFirstBrokerageFee(orderDetail.getRefundFirstBrokerageFee().add(refundOrderInfo.getRefundFirstBrokerageFee()));
-            }
-            if (orderDetail.getSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
-                orderDetail.setRefundSecondBrokerageFee(orderDetail.getRefundSecondBrokerageFee().add(refundOrderInfo.getRefundSecondBrokerageFee()));
-            }
-            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
-                orderDetail.setRefundPlatCouponPrice(orderDetail.getRefundPlatCouponPrice().add(refundOrderInfo.getRefundPlatCouponPrice()));
-            }
-            if (orderDetail.getFreightFee().compareTo(BigDecimal.ZERO) > 0) {
-                refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
-                orderDetail.setRefundFreightFee(orderDetail.getRefundFreightFee().add(refundOrderInfo.getRefundFreightFee()));
-            }
-        }
-
-        refundOrder.setRefundPrice(refundPrice);
-        refundOrder.setMerchantRefundPrice(refundOrderInfo.getMerchantRefundPrice());
-        refundOrder.setRefundUseIntegral(refundOrderInfo.getRefundUseIntegral());
-        refundOrder.setRefundIntegralPrice(refundOrderInfo.getRefundIntegralPrice());
-        refundOrder.setRefundGainIntegral(refundOrderInfo.getRefundGainIntegral());
-        refundOrder.setRefundFirstBrokerageFee(refundOrderInfo.getRefundFirstBrokerageFee());
-        refundOrder.setRefundSecondBrokerageFee(refundOrderInfo.getRefundSecondBrokerageFee());
-        refundOrder.setRefundPayType(order.getPayType());
-        refundOrder.setRefundPlatCouponPrice(refundOrderInfo.getRefundPlatCouponPrice());
-        refundOrder.setRefundFreightFee(refundOrderInfo.getRefundFreightFee());
-        //退款
-        if (order.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
-            try {
-                Order platOrder = orderService.getByOrderNo(order.getPlatOrderNo());
-                wxRefund(order, refundOrder.getRefundOrderNo(), refundPrice, platOrder.getPayPrice());
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new CrmebException("微信申请退款失败！" + e.getMessage());
-            }
-        }
-        if (order.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
-            try {
-                aliPayService.refund(order.getOrderNo(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReasonWapExplain(), refundPrice);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new CrmebException("支付宝申请退款失败！" + e.getMessage());
-            }
-        }
-
-        orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() - refundOrderInfo.getApplyRefundNum());
-        orderDetail.setRefundNum(orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum());
-
-        User user = userService.getById(order.getUid());
-        refundOrder.setRefundTime(DateUtil.date());
-        Boolean execute = transactionTemplate.execute(e -> {
-            orderDetailService.updateById(orderDetail);
-            refundOrderInfoService.updateById(refundOrderInfo);
-            refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUNDING);
-            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
-                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
-                if (refundOrder.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
-                    // 更新用户金额
-                    userService.updateNowMoney(order.getUid(), refundOrder.getRefundPrice(), Constants.OPERATION_TYPE_ADD);
-                    // 用户余额记录
-                    UserBalanceRecord userBalanceRecord = new UserBalanceRecord();
-                    userBalanceRecord.setUid(user.getId());
-                    userBalanceRecord.setLinkId(refundOrder.getRefundOrderNo());
-                    userBalanceRecord.setLinkType(BalanceRecordConstants.BALANCE_RECORD_LINK_TYPE_ORDER);
-                    userBalanceRecord.setType(BalanceRecordConstants.BALANCE_RECORD_TYPE_ADD);
-                    userBalanceRecord.setAmount(refundOrder.getRefundPrice());
-                    userBalanceRecord.setBalance(user.getNowMoney().add(refundOrder.getRefundPrice()));
-                    userBalanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_ORDER_REFUND, refundOrder.getRefundPrice()));
-                    userBalanceRecordService.save(userBalanceRecord);
-                }
-            }
-            updateById(refundOrder);
-            refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
-            return Boolean.TRUE;
-        });
-        if (execute) {
-            settingOrderStatus(order);
-            orderService.updateById(order);
-            // 积分、佣金、优惠券等放入后置task中处理
-            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
-                redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());
-            }
-        }
-        return execute;
-    }
+//    @Override
+//    public Boolean refund(OrderRefundAuditRequest request) {
+//        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+//        RefundOrder refundOrder = getInfoException(request.getRefundOrderNo());
+//        if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY)) {
+//            throw new CrmebException("退款单状态异常");
+//        }
+//        if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
+//            throw new CrmebException("无法操作非自己商户的订单");
+//        }
+//
+//
+//        Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
+//        if (!order.getPaid()) {
+//            throw new CrmebException("未支付无法退款");
+//        }
+//        if (refundOrder.getAfterSalesType().equals(2)) {
+//            if (ObjectUtil.isNull(request.getMerAddressId())) {
+//                throw new CrmebException("请选择商家退货地址");
+//            }
+//            MerchantAddress merchantAddress = merchantAddressService.getByIdException(request.getMerAddressId());
+//            refundOrder.setReceiver(merchantAddress.getReceiverName());
+//            refundOrder.setReceiverPhone(merchantAddress.getReceiverPhone());
+//            refundOrder.setReceiverAddressDetail(merchantAddress.getDetail());
+//            refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_RETURN_GOODS);
+//
+//            return transactionTemplate.execute(e -> {
+//                updateById(refundOrder);
+//                refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
+//                return Boolean.TRUE;
+//            });
+//        }
+//
+//        RefundOrderInfo refundOrderInfo = refundOrderInfoService.getByRefundOrderNo(refundOrder.getRefundOrderNo());
+//        OrderDetail orderDetail = orderDetailService.getById(refundOrderInfo.getOrderDetailId());
+//        BigDecimal refundPrice;
+//        if (orderDetail.getPayNum().equals(refundOrderInfo.getApplyRefundNum())) {
+//            // sku整退
+//            refundPrice = orderDetail.getPayPrice();
+//            orderDetail.setRefundPrice(refundPrice);
+//            refundOrderInfo.setRefundPrice(refundPrice);
+//            if (orderDetail.getUseIntegral() > 0) {
+//                orderDetail.setRefundUseIntegral(orderDetail.getUseIntegral());
+//                orderDetail.setRefundIntegralPrice(orderDetail.getIntegralPrice());
+//                refundOrderInfo.setRefundUseIntegral(orderDetail.getRefundUseIntegral());
+//                refundOrderInfo.setRefundIntegralPrice(orderDetail.getRefundIntegralPrice());
+//            }
+//            if (orderDetail.getGainIntegral() > 0) {
+//                orderDetail.setRefundGainIntegral(orderDetail.getGainIntegral());
+//                refundOrderInfo.setRefundGainIntegral(orderDetail.getRefundGainIntegral());
+//            }
+//            if (orderDetail.getFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+//                orderDetail.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee());
+//                refundOrderInfo.setRefundFirstBrokerageFee(orderDetail.getRefundFirstBrokerageFee());
+//            }
+//            if (orderDetail.getSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+//                orderDetail.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee());
+//                refundOrderInfo.setRefundSecondBrokerageFee(orderDetail.getRefundSecondBrokerageFee());
+//            }
+//            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
+//                orderDetail.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice());
+//                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice());
+//            }
+//            refundOrderInfo.setMerchantRefundPrice(refundPrice);
+//            if (orderDetail.getFreightFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
+//                orderDetail.setRefundFreightFee(orderDetail.getFreightFee());
+//            }
+//        } else if (orderDetail.getPayNum() == (orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum())) { // sku分退
+//            refundPrice = orderDetail.getPayPrice().subtract(orderDetail.getRefundPrice());
+//            // sku最后一部分退款
+//            orderDetail.setRefundPrice(orderDetail.getPayPrice());
+//            refundOrderInfo.setRefundPrice(refundPrice);
+//            refundOrderInfo.setMerchantRefundPrice(refundPrice);
+//            if (orderDetail.getUseIntegral() > 0) {
+//                refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral() - orderDetail.getRefundUseIntegral());
+//                refundOrderInfo.setRefundIntegralPrice(orderDetail.getIntegralPrice().subtract(orderDetail.getRefundIntegralPrice()));
+//                orderDetail.setRefundUseIntegral(orderDetail.getUseIntegral());
+//                orderDetail.setRefundIntegralPrice(orderDetail.getIntegralPrice());
+//            }
+//            if (orderDetail.getGainIntegral() > 0) {
+//                refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral() - orderDetail.getRefundGainIntegral());
+//                orderDetail.setRefundGainIntegral(orderDetail.getGainIntegral());
+//            }
+//            if (orderDetail.getFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee().subtract(orderDetail.getRefundFirstBrokerageFee()));
+//                orderDetail.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee());
+//            }
+//            if (orderDetail.getSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee().subtract(orderDetail.getRefundSecondBrokerageFee()));
+//                orderDetail.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee());
+//            }
+//            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().subtract(orderDetail.getRefundPlatCouponPrice()));
+//                orderDetail.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice());
+//            }
+//            if (orderDetail.getFreightFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().subtract(orderDetail.getRefundFreightFee()));
+//                orderDetail.setRefundFreightFee(orderDetail.getFreightFee());
+//            }
+//        } else {
+//            // sku非最后一部分退款
+//            BigDecimal ratio = new BigDecimal(refundOrderInfo.getApplyRefundNum()).divide(new BigDecimal(orderDetail.getPayNum()), 10, BigDecimal.ROUND_HALF_UP);
+//            refundPrice = orderDetail.getPayPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
+//            orderDetail.setRefundPrice(orderDetail.getRefundPrice().add(refundPrice));
+//            refundOrderInfo.setRefundPrice(refundPrice);
+//            refundOrderInfo.setMerchantRefundPrice(refundPrice);
+//
+//            if (orderDetail.getUseIntegral() > 0) {
+//                refundOrderInfo.setRefundUseIntegral(new BigDecimal(orderDetail.getUseIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+//                refundOrderInfo.setRefundIntegralPrice(orderDetail.getIntegralPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+//                orderDetail.setRefundUseIntegral(orderDetail.getRefundUseIntegral() + refundOrderInfo.getRefundUseIntegral());
+//                orderDetail.setRefundIntegralPrice(orderDetail.getRefundIntegralPrice().add(refundOrderInfo.getRefundIntegralPrice()));
+//            }
+//            if (orderDetail.getGainIntegral() > 0) {
+//                refundOrderInfo.setRefundGainIntegral(new BigDecimal(orderDetail.getGainIntegral().toString()).multiply(ratio).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+//                orderDetail.setRefundGainIntegral(orderDetail.getRefundGainIntegral() + refundOrderInfo.getRefundGainIntegral());
+//            }
+//            if (orderDetail.getFirstBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundFirstBrokerageFee(orderDetail.getFirstBrokerageFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+//                orderDetail.setRefundFirstBrokerageFee(orderDetail.getRefundFirstBrokerageFee().add(refundOrderInfo.getRefundFirstBrokerageFee()));
+//            }
+//            if (orderDetail.getSecondBrokerageFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundSecondBrokerageFee(orderDetail.getSecondBrokerageFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+//                orderDetail.setRefundSecondBrokerageFee(orderDetail.getRefundSecondBrokerageFee().add(refundOrderInfo.getRefundSecondBrokerageFee()));
+//            }
+//            if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+//                orderDetail.setRefundPlatCouponPrice(orderDetail.getRefundPlatCouponPrice().add(refundOrderInfo.getRefundPlatCouponPrice()));
+//            }
+//            if (orderDetail.getFreightFee().compareTo(BigDecimal.ZERO) > 0) {
+//                refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
+//                orderDetail.setRefundFreightFee(orderDetail.getRefundFreightFee().add(refundOrderInfo.getRefundFreightFee()));
+//            }
+//        }
+//
+//        refundOrder.setRefundPrice(refundPrice);
+//        refundOrder.setMerchantRefundPrice(refundOrderInfo.getMerchantRefundPrice());
+//        refundOrder.setRefundUseIntegral(refundOrderInfo.getRefundUseIntegral());
+//        refundOrder.setRefundIntegralPrice(refundOrderInfo.getRefundIntegralPrice());
+//        refundOrder.setRefundGainIntegral(refundOrderInfo.getRefundGainIntegral());
+//        refundOrder.setRefundFirstBrokerageFee(refundOrderInfo.getRefundFirstBrokerageFee());
+//        refundOrder.setRefundSecondBrokerageFee(refundOrderInfo.getRefundSecondBrokerageFee());
+//        refundOrder.setRefundPayType(order.getPayType());
+//        refundOrder.setRefundPlatCouponPrice(refundOrderInfo.getRefundPlatCouponPrice());
+//        refundOrder.setRefundFreightFee(refundOrderInfo.getRefundFreightFee());
+//        //退款
+//        if (order.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+//            try {
+//                Order platOrder = orderService.getByOrderNo(order.getPlatOrderNo());
+//                wxRefund(order, refundOrder.getRefundOrderNo(), refundPrice, platOrder.getPayPrice());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new CrmebException("微信申请退款失败！" + e.getMessage());
+//            }
+//        }
+//        if (order.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+//            try {
+//                aliPayService.refund(order.getOrderNo(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReasonWapExplain(), refundPrice);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new CrmebException("支付宝申请退款失败！" + e.getMessage());
+//            }
+//        }
+//
+//        orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() - refundOrderInfo.getApplyRefundNum());
+//        orderDetail.setRefundNum(orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum());
+//
+//        User user = userService.getById(order.getUid());
+//        refundOrder.setRefundTime(DateUtil.date());
+//        Boolean execute = transactionTemplate.execute(e -> {
+//            orderDetailService.updateById(orderDetail);
+//            refundOrderInfoService.updateById(refundOrderInfo);
+//            refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUNDING);
+//            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+//                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+//                if (refundOrder.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
+//                    // 更新用户金额
+//                    userService.updateNowMoney(order.getUid(), refundOrder.getRefundPrice(), Constants.OPERATION_TYPE_ADD);
+//                    // 用户余额记录
+//                    UserBalanceRecord userBalanceRecord = new UserBalanceRecord();
+//                    userBalanceRecord.setUid(user.getId());
+//                    userBalanceRecord.setLinkId(refundOrder.getRefundOrderNo());
+//                    userBalanceRecord.setLinkType(BalanceRecordConstants.BALANCE_RECORD_LINK_TYPE_ORDER);
+//                    userBalanceRecord.setType(BalanceRecordConstants.BALANCE_RECORD_TYPE_ADD);
+//                    userBalanceRecord.setAmount(refundOrder.getRefundPrice());
+//                    userBalanceRecord.setBalance(user.getNowMoney().add(refundOrder.getRefundPrice()));
+//                    userBalanceRecord.setRemark(StrUtil.format(BalanceRecordConstants.BALANCE_RECORD_REMARK_ORDER_REFUND, refundOrder.getRefundPrice()));
+//                    userBalanceRecordService.save(userBalanceRecord);
+//                }
+//            }
+//            updateById(refundOrder);
+//            refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
+//            return Boolean.TRUE;
+//        });
+//        if (execute) {
+//            settingOrderStatus(order);
+//            orderService.updateById(order);
+//            // 积分、佣金、优惠券等放入后置task中处理
+//            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+//                redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());
+//            }
+//        }
+//        return execute;
+//    }
 
     /**
      * 微信退款

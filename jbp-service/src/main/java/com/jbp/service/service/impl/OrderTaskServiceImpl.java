@@ -262,6 +262,33 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         }
     }
 
+
+    @Override
+    public void orderRefund2() {
+        String redisKey = TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER;
+        Long size = redisUtil.getListSize(redisKey);
+        logger.info("OrderTaskServiceImpl.orderRefund | size:" + size);
+        if (size < 1) {
+            return;
+        }
+        for (int i = 0; i < size; i++) {
+            //如果10秒钟拿不到一个数据，那么退出循环
+            Object orderNoData = redisUtil.getRightPop(redisKey, 10L);
+            if (ObjectUtil.isNull(orderNoData)) {
+                continue;
+            }
+            try {
+                Boolean result = refundAfterProcessing2(orderNoData.toString());
+                if (!result) {
+                    redisUtil.lPush(redisKey, orderNoData);
+                }
+            } catch (Exception e) {
+                logger.error("订单退款错误：" + e.getMessage());
+                redisUtil.lPush(redisKey, orderNoData);
+            }
+        }
+    }
+
     /**
      * 订单退款后置处理
      *
@@ -443,6 +470,40 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
             orderProfitSharingService.updateById(orderProfitSharing);
 
+            if (CollUtil.isNotEmpty(couponIdList)) {
+                couponUserService.rollbackByIds(couponIdList);
+            }
+            return Boolean.TRUE;
+        });
+    }
+
+
+    public Boolean refundAfterProcessing2(String refundOrderNo) {
+        RefundOrder refundOrder = refundOrderService.getInfoException(refundOrderNo);
+        if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND)) {
+            return true;
+        }
+        Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
+        RefundOrderInfo refundOrderInfo = refundOrderInfoService.getByRefundOrderNo(refundOrderNo);
+        Integer platCouponId = 0;
+        Integer merCouponId = 0;
+        OrderDetail orderDetail = orderDetailService.getById(refundOrderInfo.getOrderDetailId());
+        if (orderDetail.getMerCouponPrice().compareTo(BigDecimal.ZERO) > 0 && orderDetail.getPayNum().equals(orderDetail.getRefundNum())) {
+            merCouponId = getRefundMerCouponId(refundOrder.getOrderNo());
+        }
+        if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0 && orderDetail.getPayNum().equals(orderDetail.getRefundNum())) {
+            platCouponId = getRefundPlatCouponId(order.getPlatOrderNo());
+        }
+        List<Integer> couponIdList = new ArrayList<>();
+        if (merCouponId > 0) {
+            couponIdList.add(merCouponId);
+        }
+        if (platCouponId > 0) {
+            couponIdList.add(platCouponId);
+        }
+        return transactionTemplate.execute(e -> {
+            // 回滚库存
+            refundRollbackStock(refundOrderInfo, order.getType());
             if (CollUtil.isNotEmpty(couponIdList)) {
                 couponUserService.rollbackByIds(couponIdList);
             }

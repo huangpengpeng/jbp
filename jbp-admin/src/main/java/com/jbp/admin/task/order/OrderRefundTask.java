@@ -36,7 +36,7 @@ public class OrderRefundTask {
         // cron : 0 */1 * * * ?
         logger.info("---OrderRefundTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {
-            orderTaskService.orderRefund();
+            orderTaskService.orderRefund2();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("OrderRefundTask.task" + " | msg : " + e.getMessage());
