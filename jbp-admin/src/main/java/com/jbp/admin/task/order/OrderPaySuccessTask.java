@@ -45,12 +45,12 @@ public class OrderPaySuccessTask {
         // 1.加锁成功
         Boolean task = redisTemplate.opsForValue().setIfAbsent("OrderPaySuccessTask.orderPayAfter", 1);
         //2.设置锁的过期时间,防止死锁
-        redisTemplate.expire("OrderPaySuccessTask.orderPayAfter",10, TimeUnit.MINUTES);
         if(!task){
             //没有争抢(设置)到锁
             logger.info("上一次任务未执行完成退出");
             return;//方法结束
         }
+        redisTemplate.expire("OrderPaySuccessTask.orderPayAfter",10, TimeUnit.MINUTES);
         // cron : 0 */1 * * * ?
         logger.info("---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {

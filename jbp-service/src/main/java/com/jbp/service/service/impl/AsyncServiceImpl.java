@@ -204,8 +204,10 @@ public class AsyncServiceImpl implements AsyncService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void orderPaySuccessSplit(String orderNo) {
         Boolean task = redisTemplate.opsForValue().setIfAbsent("orderPaySuccessSplit" + orderNo, 1);
-        //2.设置锁的过期时间,防止死锁
-        redisTemplate.expire("orderPaySuccessSplit" + orderNo, 3, TimeUnit.MINUTES);
+        //2.设置锁的过期时间,防止死锁 避免卡在里面出不来
+        if(task){
+            redisTemplate.expire("orderPaySuccessSplit" + orderNo, 3, TimeUnit.MINUTES);
+        }
         if (!task) {
             //没有争抢(设置)到锁
             logger.info("锁住订单拆单退出");

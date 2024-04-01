@@ -449,12 +449,12 @@ public class PayCallbackServiceImpl implements PayCallbackService {
         String orderNo = queryPaymentResult.getOrderInfo().getTxn_seqno();
         Boolean task = redisTemplate.opsForValue().setIfAbsent("PaySuccessCall" + orderNo, 1);
         //2.设置锁的过期时间,防止死锁
-        redisTemplate.expire("PaySuccessCall" + orderNo, 3, TimeUnit.MINUTES);
         if (!task) {
             //没有争抢(设置)到锁
             logger.info("锁住订单回调退出");
             return "error";
         }
+        redisTemplate.expire("PaySuccessCall" + orderNo, 3, TimeUnit.MINUTES);
         if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
             Order order = orderService.getByOrderNo(queryPaymentResult.getOrderInfo().getTxn_seqno());
             if (order != null) {
