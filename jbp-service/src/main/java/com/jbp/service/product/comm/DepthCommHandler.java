@@ -99,12 +99,12 @@ public class DepthCommHandler extends AbstractProductCommHandler {
                 BigDecimal ratio = rule == null ? BigDecimal.ZERO : rule.getRatio();
                 BigDecimal amt = minScore.multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
                 if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-
                     User user = userService.getById(calculateResult.getUid());
                     fundClearingService.create(calculateResult.getUid(), order.getOrderNo(), ProductCommEnum.深度佣金.getName(), amt,
                              null, user.getAccount() + "获得对碰佣金，奖励" + ProductCommEnum.深度佣金.getName(), "");
+                    totalScore = totalScore.subtract(minScore);
                 }
-                totalScore = totalScore.subtract(minScore);
+
             } else {
                 break;
             }

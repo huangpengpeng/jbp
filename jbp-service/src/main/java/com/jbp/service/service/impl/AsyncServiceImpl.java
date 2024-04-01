@@ -37,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
@@ -194,64 +196,68 @@ public class AsyncServiceImpl implements AsyncService {
      */
     @Async
     @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void orderPaySuccessSplit(String orderNo) {
-        Order order = orderService.getByOrderNo(orderNo);
-        List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
-        if (CollectionUtils.isNotEmpty(shOrders)) {
-            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
-        }
-        if (ObjectUtil.isNull(order)) {
-            logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
-            return;
-        }
-        // 1. 处理注册
-        OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
-        if (orderExt != null) {
-            OrderRegister orderRegister = orderExt.getOrderRegister();
-            if (orderRegister != null) {
-                User pUser = userService.getByAccount(orderRegister.getPaccount());
-                User rUser = userService.getByAccount(orderRegister.getRaccount());
-                User user = userService.helpRegister(orderRegister.getUsername(), orderRegister.getMobile(), pUser.getId(), rUser.getId(), orderRegister.getNode());
-                order.setUid(user.getId());
-                orderService.updateById(order);
-                order = orderService.getByOrderNo(orderNo);
+        synchronized (orderNo) {
+            Order order = orderService.getByOrderNo(orderNo);
+            List<Order> shOrders = orderService.getByPlatOrderNo(orderNo);
+            if (CollectionUtils.isNotEmpty(shOrders)) {
+//                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+                return;
             }
-        }
-        // 2. 处理收益【等级  星级 活跃 白名单 积分】
-        productProfitChain.orderSuccess(order);
-        // 3.更新扩展信息
-        if (orderExt != null) {
-            UserCapa userCapa = userCapaService.getByUser(order.getUid());
-            if (userCapa != null) {
-                orderExt.setSuccessCapaId(userCapa.getCapaId());
+            if (ObjectUtil.isNull(order)) {
+                logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", orderNo);
+                return;
             }
-            UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
-            if (userCapaXs != null) {
-                orderExt.setSuccessCapaXsId(userCapaXs.getCapaId());
+            // 1. 处理注册
+            OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
+            if (orderExt != null) {
+                OrderRegister orderRegister = orderExt.getOrderRegister();
+                if (orderRegister != null) {
+                    User pUser = userService.getByAccount(orderRegister.getPaccount());
+                    User rUser = userService.getByAccount(orderRegister.getRaccount());
+                    User user = userService.helpRegister(orderRegister.getUsername(), orderRegister.getMobile(), pUser.getId(), rUser.getId(), orderRegister.getNode());
+                    order.setUid(user.getId());
+                    orderService.updateById(order);
+                    order = orderService.getByOrderNo(orderNo);
+                }
             }
-            orderExtService.updateById(orderExt);
-        }
+            // 2. 处理收益【等级  星级 活跃 白名单 积分】
+            productProfitChain.orderSuccess(order);
+            // 3.更新扩展信息
+            if (orderExt != null) {
+                UserCapa userCapa = userCapaService.getByUser(order.getUid());
+                if (userCapa != null) {
+                    orderExt.setSuccessCapaId(userCapa.getCapaId());
+                }
+                UserCapaXs userCapaXs = userCapaXsService.getByUser(order.getUid());
+                if (userCapaXs != null) {
+                    orderExt.setSuccessCapaXsId(userCapaXs.getCapaId());
+                }
+                orderExtService.updateById(orderExt);
+            }
 
-        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
-        if (CollUtil.isEmpty(merchantOrderList)) {
-            logger.error("异步——订单支付成功拆单处理 | 商户订单信息不存在,orderNo: {}", orderNo);
-            return;
-        }
-        Boolean execute;
-        if (merchantOrderList.size() == 1) {
-            // 单商户订单
-            execute = oneMerchantOrderProcessing(order, merchantOrderList.get(0));
-        } else {
-            execute = manyMerchantOrderProcessing(order, merchantOrderList);
-        }
-        if (!execute) {
-            logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", orderNo);
-            return;
-        }
-        orderSuccessMsgService.add(order.getOrderNo());
-        // 添加支付成功redis队列
-        logger.info("异步——订单支付成功拆单处理 | 拆单成功，加入后置处理队列");
+            List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
+            if (CollUtil.isEmpty(merchantOrderList)) {
+                logger.error("异步——订单支付成功拆单处理 | 商户订单信息不存在,orderNo: {}", orderNo);
+                return;
+            }
+            Boolean execute;
+            if (merchantOrderList.size() == 1) {
+                // 单商户订单
+                execute = oneMerchantOrderProcessing(order, merchantOrderList.get(0));
+            } else {
+                execute = manyMerchantOrderProcessing(order, merchantOrderList);
+            }
+            if (!execute) {
+                logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", orderNo);
+                return;
+            }
+            orderSuccessMsgService.add(order.getOrderNo());
+            // 添加支付成功redis队列
+            logger.info("异步——订单支付成功拆单处理 | 拆单成功，加入后置处理队列");
 //        redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, order.getOrderNo());
+        }
     }
 
     @Override

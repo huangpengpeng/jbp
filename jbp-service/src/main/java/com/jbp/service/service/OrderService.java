@@ -267,6 +267,8 @@ public interface OrderService extends IService<Order> {
      */
     Boolean paySplitDelete(String orderNo);
 
+    Boolean registerOrder(String orderNo, Integer uid);
+
     /**
      * 通过原始单号获取订单列表
      * @param orderNo 原始单号

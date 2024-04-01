@@ -7,11 +7,14 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderProductProfit;
 import com.jbp.common.model.order.RefundOrder;
 import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.OrderProductProfitService;
 import com.jbp.service.service.agent.ProductProfitService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -33,6 +36,8 @@ public class ProductProfitChain implements ApplicationContextAware {
     private ProductProfitService productProfitService;
     @Resource
     private OrderDetailService orderDetailService;
+    @Resource
+    private OrderProductProfitService orderProductProfitService;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -65,7 +70,10 @@ public class ProductProfitChain implements ApplicationContextAware {
         List<Integer> productIdList = orderDetailList.stream().map(OrderDetail::getProductId).collect(Collectors.toList());
         List<ProductProfit> productProfitList = productProfitService.getByProduct(productIdList);
         handlers.forEach((k, v) -> {
-            v.orderSuccess(order, orderDetailList, productProfitList);
+            List<OrderProductProfit> list = orderProductProfitService.getByOrder(order.getOrderNo(), v.getType(), OrderProductProfit.Constants.成功.name());
+            if (CollectionUtils.isEmpty(list)) {
+                v.orderSuccess(order, orderDetailList, productProfitList);
+            }
         });
     }
 

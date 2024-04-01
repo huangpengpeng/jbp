@@ -1030,6 +1030,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         return update(wrapper);
     }
 
+    @Override
+    public Boolean registerOrder(String orderNo, Integer uid) {
+        LambdaUpdateWrapper<Order> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(Order::getUid, uid);
+        wrapper.eq(Order::getOrderNo, orderNo);
+        wrapper.last(" uid is null");
+        return update(wrapper);
+    }
+
     /**
      * 通过原始单号获取订单列表
      *

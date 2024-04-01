@@ -82,6 +82,7 @@ public class UserActiveHandler implements ProductProfitHandler {
         if (profitConfig == null || !BooleanUtil.isTrue(profitConfig.getIfOpen())) {
             return;
         }
+
         productProfitList = ListUtils.emptyIfNull(productProfitList).stream().filter(p -> p.getType() == getType() && BooleanUtil.isTrue(p.getStatus())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(productProfitList)) {
             return;
