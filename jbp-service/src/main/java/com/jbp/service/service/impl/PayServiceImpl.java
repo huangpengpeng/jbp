@@ -291,6 +291,7 @@ public class PayServiceImpl implements PayService {
             response.setStatus("0000".equals(result.getRet_code()));
             response.setLianLianCashierConfig(result);
             logger.info("连连支付 response : {}", JSON.toJSONString(response));
+
             return response;
         }
         // 微信视频号下单 需要额外调用支付参数
@@ -1762,6 +1763,10 @@ public class PayServiceImpl implements PayService {
         CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), order.getOrderNo(), order.getPayPrice(),details.get(0).getProductName(), order.getIp());
         // 更新商户订单号
         order.setOutTradeNo(cashier.getAccp_txno());
+        Order update = new Order();
+        update.setId(order.getId());
+        update.setOutTradeNo(cashier.getAccp_txno());
+        orderService.updateById(update);
         return cashier;
     }
 
