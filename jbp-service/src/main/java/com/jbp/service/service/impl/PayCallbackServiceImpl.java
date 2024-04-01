@@ -493,6 +493,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     asyncService.orderPaySuccessSplit(order.getOrderNo());
                 } else {
                     logger.error("lianlian pay error : 支付回调订单失败 ===》" + orderNo);
+                    redisTemplate.delete("PaySuccessCall" + orderNo);
                     return "error";
                 }
             }
@@ -515,6 +516,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         throw new CrmebException("充值订单回执失败" + txnStatus);
                     }
                 } else {
+                    redisTemplate.delete("PaySuccessCall" + orderNo);
                     logger.info("lianlian pay error : 支付回调订单状态未完成 ===》" + orderNo);
                     return "error";
                 }
