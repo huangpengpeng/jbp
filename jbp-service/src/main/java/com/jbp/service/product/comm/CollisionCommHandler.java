@@ -2,7 +2,8 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.beust.jcommander.internal.Lists;
+
+import com.google.common.collect.Lists;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
@@ -52,6 +53,8 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     private ProductCommConfigService productCommConfigService;
     @Resource
     private FundClearingService fundClearingService;
+    @Resource
+    private RelationScoreFlowService relationScoreFlowService;
 
     @Override
     public Integer getType() {
@@ -151,6 +154,10 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             RelationScoreFlow flow = relationScoreService.orderSuccessIncrease(upperDto.getPId(), order.getUid(), score,
                     upperDto.getNode(), order.getOrderNo(), order.getPayTime(), productInfoList, upperDto.getLevel());
             relationScoreFlowList.add(flow);
+        }
+        List<List<RelationScoreFlow>> partition = Lists.partition(relationScoreFlowList, 300);
+        for (List<RelationScoreFlow> relationScoreFlows : partition) {
+            relationScoreFlowService.saveBatch(relationScoreFlows);
         }
 
         // 等级比例
