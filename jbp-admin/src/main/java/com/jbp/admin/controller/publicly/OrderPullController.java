@@ -4,6 +4,7 @@ import cn.hutool.core.lang.UUID;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.annotation.CustomResponseAnnotation;
 import com.jbp.common.encryptapi.EncryptIgnore;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.order.MerchantOrder;
@@ -155,7 +156,10 @@ public class OrderPullController {
             if (CollectionUtils.isNotEmpty(orderList)) {
                 for (Order order : orderList) {
                     order.setIfPull(true);
-                    orderService.updateById(order);
+                    boolean b = orderService.updateById(order);
+                    if(!b){
+                        throw new CrmebException("当前操作人数过多");
+                    }
                 }
             }
         }

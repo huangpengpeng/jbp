@@ -281,7 +281,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         order.setRefundStatus(OrderConstants.ORDER_REFUND_STATUS_APPLY);
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
         Boolean execute = transactionTemplate.execute(e -> {
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                e.setRollbackOnly();
+                log.error("当前操作人数过多");
+            }
             orderDetailService.updateById(orderDetail);
             save(refundOrder);
             refundOrderInfoService.save(refundOrderInfo);
@@ -356,13 +360,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             orderDetailService.updateById(orderDetail);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
-            return Boolean.TRUE;
-        });
-        if (execute) {
+
             // 设置订单退款状态
             settingOrderStatus(order);
-            orderService.updateById(order);
-        }
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
+            return Boolean.TRUE;
+        });
         return execute;
     }
 
@@ -1086,13 +1092,14 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 orderDetailService.updateById(orderDetail);
                 refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
                 productCommChain.orderCancelIntercept(orderService.getByOrderNo(refundOrder.getOrderNo()));
-                return Boolean.TRUE;
-            });
-            if (execute) {
                 // 设置订单退款状态
                 settingOrderStatus(order);
-                orderService.updateById(order);
-            }
+                boolean b = orderService.updateById(order);
+                if(!b){
+                    throw new RuntimeException("当前操作人数过多");
+                }
+                return Boolean.TRUE;
+            });
             return execute;
         }
         if (refundOrder.getAfterSalesType().equals(2)) {
@@ -1190,13 +1197,14 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             orderDetailService.updateById(orderDetail);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核拒绝");
-            return Boolean.TRUE;
-        });
-        if (execute) {
             // 设置订单退款状态
             settingOrderStatus(order);
-            orderService.updateById(order);
-        }
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
+            return Boolean.TRUE;
+        });
         return execute;
     }
 
@@ -1400,11 +1408,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
             productProfitChain.orderRefund(order, refundOrder);
             productCommChain.orderRefundIntercept(order);
+
+            settingOrderStatus(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             return Boolean.TRUE;
         });
         if (execute) {
-            settingOrderStatus(order);
-            orderService.updateById(order);
             // 积分、佣金、优惠券等放入后置task中处理
             if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
                 redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());

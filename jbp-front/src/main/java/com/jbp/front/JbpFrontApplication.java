@@ -2,6 +2,7 @@ package com.jbp.front;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.constants.RefundOrderConstants;
 import com.jbp.common.model.agent.OrderSuccessMsg;
 import com.jbp.common.model.order.Order;
 import com.jbp.service.service.OrderService;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -43,6 +45,5 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
     }
 }

@@ -389,7 +389,10 @@ public class PayServiceImpl implements PayService {
         if (order.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
             logger.info("订单支付 微信下单");
             WxPayJsResultVo vo = wechatPayment(order);
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             response.setStatus(true);
             response.setJsConfig(vo);
             logger.info("订单支付 微信下单 response :{}", JSON.toJSONString(response));
@@ -399,7 +402,10 @@ public class PayServiceImpl implements PayService {
             logger.info("订单支付 支付宝");
             String result = aliPayment(order);
             order.setOutTradeNo(order.getOrderNo());
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             response.setStatus(true);
             response.setAlipayRequest(result);
             logger.info("订单支付 支付宝 response :{}", JSON.toJSONString(response));
@@ -447,7 +453,10 @@ public class PayServiceImpl implements PayService {
         wechatPayInfo.setTimeEnd(myRecord.getStr("time_end"));
         wechatPayInfo.setTradeStateDesc(myRecord.getStr("trade_state_desc"));
         Boolean updatePaid = transactionTemplate.execute(e -> {
-            orderService.updatePaid(orderNo);
+            Boolean b = orderService.updatePaid(orderNo);
+            if(!b){
+                e.setRollbackOnly();
+            }
             wechatPayInfoService.updateById(wechatPayInfo);
             return Boolean.TRUE;
         });
@@ -854,7 +863,10 @@ public class PayServiceImpl implements PayService {
             order.setPaid(true);
             order.setPayTime(DateUtil.date());
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             return true;
         });
         if (!execute) {
@@ -876,7 +888,10 @@ public class PayServiceImpl implements PayService {
             order.setPayType("wallet");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             order.setOutTradeNo(order.getOrderNo());
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
             if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
                 logger.error("钱包支付，扣除用户余额失败，orderNo = {}", order.getOrderNo());
@@ -912,7 +927,10 @@ public class PayServiceImpl implements PayService {
             order.setPayChannel("confirmPay");
             order.setPayType("confirmPay");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             return update;
         });
         if (!execute) throw new CrmebException("人工确认支付订单失败");
@@ -982,7 +1000,10 @@ public class PayServiceImpl implements PayService {
         order.setIsDel(true);
         return transactionTemplate.execute(e -> {
             // 订单
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             merchantOrderService.updateById(merchantOrder);
             if (order.getGainIntegral() > 0) {
                 orderDetailService.updateBatchById(orderDetailList);
@@ -1105,7 +1126,10 @@ public class PayServiceImpl implements PayService {
 
         return transactionTemplate.execute(e -> {
             // 订单
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             merchantOrderService.updateBatchById(merchantOrderList);
             orderService.saveBatch(newOrderList);
             merchantOrderService.saveBatch(newMerchantOrderList);
@@ -1764,7 +1788,11 @@ public class PayServiceImpl implements PayService {
         // 更新商户订单号
         order.setOutTradeNo(cashier.getAccp_txno());
         order.setOutTradeNo(cashier.getAccp_txno());
-        orderService.updateById(order);
+        boolean b = orderService.updateById(order);
+        if(!b){
+            throw new RuntimeException("当前操作人数过多");
+        }
+        order = orderService.getById(order.getId());
         return cashier;
     }
 
@@ -1784,7 +1812,10 @@ public class PayServiceImpl implements PayService {
             order.setPayType("yue");
             order.setPayTime(DateUtil.date());
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             // 这里只扣除金额，账单记录在task中处理
             if (order.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
                 update = userService.updateNowMoney(order.getUid(), order.getPayPrice(), Constants.OPERATION_TYPE_SUBTRACT);

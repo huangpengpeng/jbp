@@ -173,7 +173,10 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     order.setPaid(true);
                     order.setPayTime(CrmebDateUtil.nowDateTime());
                     order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-                    orderService.updateById(order);
+                    boolean b = orderService.updateById(order);
+                    if(!b){
+                        throw new RuntimeException("当前操作人数过多");
+                    }
                     wechatPayInfoService.updateById(wechatPayInfo);
                     return Boolean.TRUE;
                 });
@@ -330,7 +333,10 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         order.setPaid(true);
                         order.setPayTime(CrmebDateUtil.nowDateTime());
                         order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-                        orderService.updateById(order);
+                        boolean b = orderService.updateById(order);
+                        if(!b){
+                            throw new RuntimeException("当前操作人数过多");
+                        }
                         return Boolean.TRUE;
                     });
                     if (!execute) {
@@ -474,7 +480,10 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         update.setPayType("lianlian");
                         update.setPayTime(CrmebDateUtil.nowDateTime());
                         update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
-                        orderService.updateById(update);
+                        boolean b1 = orderService.updateById(update);
+                        if(!b1){
+                            throw new RuntimeException("当前操作人数过多");
+                        }
                         return Boolean.TRUE;
                     });
                     if (!execute) {
