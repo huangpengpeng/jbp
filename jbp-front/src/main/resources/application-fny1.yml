@@ -143,13 +143,13 @@ kq:
   privateKey:
     path: "/certs/fny/20240329.3300000480031808.pfx"
     name: "20240329.3300000480031808"
-    password: "Bcqd870122"
+    password: Bcqd870122
   publicKey:
     path: "/certs/fny/10222278350.RSA.cer"
   ssl:
     privateKey:
-      path: "/certs/fny/20230404.3300000457641265.pfx"
-      password: "Bcqd870122"
+      path: "/certs/fny/20240329.3300000480031808.pfx"
+      password: Bcqd870122
 
 historyOrder:
   ifOpenOrder: true

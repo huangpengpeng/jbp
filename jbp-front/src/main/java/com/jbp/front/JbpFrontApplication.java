@@ -1,6 +1,9 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.KqPayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,6 +15,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 程序主入口
@@ -38,5 +44,14 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+        KqPayService bean1 = run.getBean(KqPayService.class);
+        String orderId = StringUtils.N_TO_10("CS_");
+        System.out.println(orderId);
+        Date now = DateTimeUtils.getNow();
+        System.out.println(DateTimeUtils.format(now, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+        String cashier = bean1.cashier("franky", "115.196.160.207", orderId, BigDecimal.valueOf(1), "11", now);
+
+        System.out.println(cashier);
     }
 }

@@ -12,7 +12,7 @@ public interface KqPayService {
 
     KqPayInfoResult get();
 
-    String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, String pageUrl, Date orderTime);
+    String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, Date orderTime);
 
     KqPayQueryResult queryPayResult(String orderId);
 
