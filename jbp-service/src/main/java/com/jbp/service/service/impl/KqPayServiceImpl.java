@@ -37,7 +37,7 @@ public class KqPayServiceImpl implements KqPayService {
     @Override
     public KqPayInfoResult get() {
         MyRecord myRecord = systemConfigService.getValuesByKeyList(Lists.newArrayList("kq_merchantAcctId", "kq_applyName",
-                "kq_host", "kq_terminalIp", "kq_status"));
+                "kq_host", "kq_terminalIp", "kq_status", "kq_page_url"));
         KqPayInfoResult result = new KqPayInfoResult();
         result.setMerchantCode(myRecord.getStr("kq_merchantCode"));
         result.setMerchantId(myRecord.getStr("kq_merchantId"));
@@ -45,6 +45,9 @@ public class KqPayServiceImpl implements KqPayService {
         result.setTerminalIp(myRecord.getStr("kq_terminalIp"));
         result.setHost(myRecord.getStr("kq_host"));
         result.setStatus(myRecord.getStr("kq_status"));
+        result.setPageUrl(myRecord.getStr("kq_page_url"));
+        result.setBgUrl(myRecord.getStr("kq_bg_url"));
+
         return result;
     }
 
@@ -55,8 +58,8 @@ public class KqPayServiceImpl implements KqPayService {
         KqPayInfoResult kpInfo = get();
         KqCashierParams params = new KqCashierParams();
         params.setMerchantAcctId(kpInfo.getMerchantCode()+"01");
-        params.setPageUrl(pageUrl);
-        params.setBgUrl(kpInfo.getHost() + "/api/publicly/payment/callback/kq/" + orderId);
+        params.setPageUrl(kpInfo.getPageUrl() + orderId);
+        params.setBgUrl(kpInfo.getBgUrl() + orderId);
         params.setPayerId(payerId);
         params.setPayerIP(payerIP);
         params.setTerminalIp(kpInfo.getTerminalIp());

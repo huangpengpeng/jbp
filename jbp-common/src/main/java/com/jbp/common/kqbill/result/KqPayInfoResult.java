@@ -34,6 +34,17 @@ public class KqPayInfoResult implements Serializable {
      */
     private String terminalIp;
 
+
+    /**
+     * 跳转地址
+     */
+    private String pageUrl;
+
+    /**
+     * 通知地址
+     */
+    private String bgUrl;
+
     /**
      * 状态 0 关闭  1开启
      */

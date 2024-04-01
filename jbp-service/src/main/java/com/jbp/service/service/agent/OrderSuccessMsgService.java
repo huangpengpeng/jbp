@@ -9,7 +9,7 @@ public interface OrderSuccessMsgService extends IService<OrderSuccessMsg> {
 
    void  add(String orderSn);
 
-    void exec(OrderSuccessMsg msg);
+    void exec(OrderSuccessMsg msg) throws InterruptedException;
 
 
 
