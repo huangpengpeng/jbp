@@ -126,7 +126,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         if (pId == null) {
             throw new RuntimeException("上级不能为空");
         }
-        if (uId == pId) {
+        if (uId.intValue() == pId.intValue()) {
             throw new RuntimeException("自己不能绑定自己");
         }
         if (hasChild(pId, uId)) {
