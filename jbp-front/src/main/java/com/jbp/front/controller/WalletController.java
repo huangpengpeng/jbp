@@ -84,7 +84,7 @@ public class WalletController {
     @GetMapping("/trade/password")
     @ApiOperation("设置交易密码")
     public CommonResult tradePassword(WalletTradePasswordRequest request) {
-        userService.tradePassword(request.getPhone(), request.getCode(), request.getTradePassword());
+        userService.tradePassword(request.getCode(), request.getTradePassword());
         return CommonResult.success();
     }
 

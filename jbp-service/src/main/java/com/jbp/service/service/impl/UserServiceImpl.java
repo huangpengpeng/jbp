@@ -1533,14 +1533,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public void tradePassword(String phone, String code, String tradePassword) {
+    public void tradePassword( String code, String tradePassword) {
         if (StrUtil.isBlank(code)) {
             throw new CrmebException("手机号码验证码不能为空");
         }
-        //检测验证码
-        checkValidateCode(phone, code);
-        //获取当前用户信息
         User user = getInfo();
+
+        //检测验证码
+        checkValidateCode(user.getPhone(), code);
+        //获取当前用户信息
         user.setPayPwd(CrmebUtil.encryptPassword(tradePassword));
         updateById(user);
 

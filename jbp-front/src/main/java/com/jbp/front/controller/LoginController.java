@@ -1,6 +1,9 @@
 package com.jbp.front.controller;
 
 
+import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
 import com.jbp.common.response.AccountCapaResponse;
 import com.jbp.common.response.FrontIndividualCenterConfigResponse;
@@ -8,6 +11,8 @@ import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.front.service.LoginService;
+import com.jbp.service.service.UserService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -38,6 +44,8 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
+    @Resource
+    private UserService userService;
 
     @ApiOperation(value = "获取登录配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)
@@ -57,6 +65,18 @@ public class LoginController {
         return CommonResult.success(account);
     }
 
+    @ApiOperation(value = "账号获取手机号")
+    @GetMapping( "/account/phone/list")
+    public CommonResult<String> accountPhoneList(String account) {
+        User user = userService.getByAccount(account);
+        if (ObjectUtil.isEmpty(user)) {
+            throw new CrmebException("暂无账号,请先注册");
+        }
+        if (StringUtils.isEmpty(user.getPhone())) {
+            throw new CrmebException("请联系管理员绑定手机号");
+        }
+        return CommonResult.success(user.getPhone());
+    }
     @ApiOperation(value = "手机号验证码登录")
     @RequestMapping(value = "/mobile/captcha", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest) {
@@ -127,6 +147,12 @@ public class LoginController {
         return CommonResult.success(loginService.tokenIsExist());
     }
 
+    @ApiOperation(value = "忘记密码")
+    @PostMapping(value = "/forgot/password")
+    public CommonResult forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
+        loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha());
+        return CommonResult.success();
+    }
 }
 
 
