@@ -142,56 +142,80 @@ public class UserController {
         if (CollectionUtils.isNotEmpty(nextList)) {
             return CommonResult.success();
         }
-        UserRelation userRelation = relationService.getLeftMost(user.getId());
-        if (userRelation == null) {
+        List<UserRelation> relationList = relationService.getByPid(user.getId());
+        if (CollectionUtils.isEmpty(relationList)) {
             return CommonResult.success();
         }
-        user = userService.getById(userRelation.getPId());
-        UserRelationInfoResponse response = new UserRelationInfoResponse(userRelation.getPId(), user.getAccount(), userRelation.getNode());
+        if(relationList.size() == 2){
+            return CommonResult.success();
+        }
+        UserRelation leftMost = relationService.getLeftMost(relationList.get(0).getUId());
+        User leftUser = userService.getById(leftMost.getPId());
+        UserRelationInfoResponse response = new UserRelationInfoResponse(leftUser.getId(), leftUser.getAccount(), leftMost.getNode());
         return CommonResult.success(response);
     }
 
     @ApiOperation(value = "获取滑落节点")
     @RequestMapping(value = "/relation/slip/get", method = RequestMethod.GET)
-    public CommonResult<UserRelationInfoResponse> slipGet(String pAccount, Integer node) {
-        if (StringUtils.isBlank(pAccount)) {
+    public CommonResult<UserRelationInfoResponse> slipGet(String pAccount, Integer node, String iAccount) {
+        if (StringUtils.isBlank(pAccount) || StringUtils.isBlank(iAccount)) {
             throw new RuntimeException("账户为空");
         }
-        User user = userService.getByAccount(pAccount);
-        if (user == null) {
-            throw new RuntimeException("账户错误");
+        User rUser = userService.getByAccount(pAccount);
+        if (rUser == null) {
+            throw new RuntimeException("服务人账户错误");
         }
         if(node == null || node > 1 || node < 0){
             throw new RuntimeException("节点错误");
         }
-        // 当前安置节点没有被占用不返回滑落
-        UserRelation userRelation = relationService.getByPid(user.getId(), node);
-        // 邀请过其他人
-        if (CollectionUtils.isNotEmpty(invitationService.getNextList(user.getId()))) {
-            // 当前位置没人不返回滑落
+
+        User pUser = userService.getByAccount(iAccount);
+        if (pUser == null) {
+            throw new RuntimeException("销售人账户错误");
+        }
+        // 选中位置[占位置的人]
+        UserRelation userRelation = relationService.getByPid(rUser.getId(), node);
+
+        // 销售人邀请过其他人
+        if (CollectionUtils.isNotEmpty(invitationService.getNextList(pUser.getId()))) {
             if (Objects.isNull(userRelation)) {
                 return CommonResult.success();
-            }else{
-                // 当前位置有人
-                userRelation = relationService.getLeftMost(userRelation.getUId());
-                if (userRelation == null) {
-                    return CommonResult.success();
-                }
-                user = userService.getById(userRelation.getPId());
-                UserRelationInfoResponse response = new UserRelationInfoResponse(userRelation.getPId(), user.getAccount(), userRelation.getNode());
-                return CommonResult.success(response);
             }
+            // 当前位置有人
+            UserRelation leftMost  = relationService.getLeftMost(userRelation.getUId());
+            if (leftMost == null) {
+                return CommonResult.success();
+            }
+            User user = userService.getById(leftMost.getPId());
+            UserRelationInfoResponse response = new UserRelationInfoResponse(user.getId(), user.getAccount(), leftMost.getNode());
+            return CommonResult.success(response);
         }
-        userRelation = relationService.getLeftMost(user.getId());
-        if (userRelation == null) {
+
+        List<UserRelation> relationList = relationService.getByPid(rUser.getId());
+        if (CollectionUtils.isEmpty(relationList)) {
             return CommonResult.success();
         }
-        if(userRelation != null && userRelation.getNode().equals(node) && userRelation.getPId().intValue() == user.getId().intValue()){
-            return CommonResult.success();
+
+        if(relationList.size() == 2){
+            UserRelation leftMost  = relationService.getLeftMost(userRelation.getUId());
+            if (leftMost == null) {
+                return CommonResult.success();
+            }
+            User user = userService.getById(leftMost.getPId());
+            UserRelationInfoResponse response = new UserRelationInfoResponse(user.getId(), user.getAccount(), leftMost.getNode());
+            return CommonResult.success(response);
         }
-        user = userService.getById(userRelation.getPId());
-        UserRelationInfoResponse response = new UserRelationInfoResponse(userRelation.getPId(), user.getAccount(), userRelation.getNode());
-        return CommonResult.success(response);
+
+        if(relationList.size() == 1){
+            UserRelation leftMost  = relationService.getLeftMost(relationList.get(0).getUId());
+            if (leftMost == null) {
+                return CommonResult.success();
+            }
+            User user = userService.getById(leftMost.getPId());
+            UserRelationInfoResponse response = new UserRelationInfoResponse(user.getId(), user.getAccount(), leftMost.getNode());
+            return CommonResult.success(response);
+        }
+        return CommonResult.success();
     }
 
     @ApiOperation(value = "注册校验")
