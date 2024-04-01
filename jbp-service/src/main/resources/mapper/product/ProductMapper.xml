@@ -68,7 +68,7 @@
         p.brand_id
         FROM eb_product AS p
         right join eb_merchant AS m on p.mer_id = m.id
-        left join eb_product_profit  as r on r.product_id = p.id and type = 1
+        left join eb_product_profit  as r on r.product_id = p.id and type = 1 and r.`status` = 1
         where p.is_del = 0 and p.is_recycle = 0 and p.is_show = 1
         and p.audit_status in (0,2)
         <if test="id != null">
