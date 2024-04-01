@@ -463,15 +463,13 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     return "Success";
                 }
                 if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
-                    Order finalOrder = order;
                     Boolean execute = transactionTemplate.execute(e -> {
                         Boolean b = orderService.updatePaid(orderNo);
                         if (!b) {
                             e.setRollbackOnly();
                             return Boolean.FALSE;
                         }
-                        Order update = new Order();
-                        update.setId(finalOrder.getId());
+                        Order update = orderService.getByOrderNo(orderNo);
                         update.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
                         update.setPayType("lianlian");
                         update.setPayTime(CrmebDateUtil.nowDateTime());

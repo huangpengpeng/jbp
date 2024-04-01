@@ -3,6 +3,8 @@ package com.jbp.front;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.model.agent.OrderSuccessMsg;
+import com.jbp.common.model.order.Order;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.OrderSuccessMsgService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
