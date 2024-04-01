@@ -70,101 +70,104 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
 
     @Override
     public void exec(OrderSuccessMsg msg) {
-        String orderNo = msg.getOrdersSn();
-        Order platOrder = orderService.getByOrderNo(msg.getOrdersSn());
+        synchronized (msg.getOrdersSn()) {
+            String orderNo = msg.getOrdersSn();
+            Order platOrder = orderService.getByOrderNo(msg.getOrdersSn());
 
-        if (ObjectUtil.isNull(platOrder)) {
-            msg.setExec(true);
-            updateById(msg);
-            log.info("订单不存在:"+ orderNo);
-            return;
-        }
-        if (ordersFundSummaryService.getByOrdersSn(platOrder.getOrderNo()) != null) {
-            msg.setExec(true);
-            updateById(msg);
-            log.info("订单已经执行重复:"+ orderNo);
-            return;
-        }
-        // 2.增加业绩
-        BigDecimal score = BigDecimal.ZERO;
-        List<ProductInfoDto> productInfoList = Lists.newArrayList();
-        List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(platOrder.getOrderNo());
-        for (OrderDetail orderDetail : platOrderDetailList) {
-            BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
-            score = score.add(realScore);
-            ProductInfoDto productInfo = new ProductInfoDto(orderDetail.getProductId(), orderDetail.getProductName(),
-                    orderDetail.getPayNum(), orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()), realScore);
-            productInfoList.add(productInfo);
-        }
-
-        // 获取拆单后订单
-        List<Order> orderList = orderService.getByPlatOrderNo(platOrder.getOrderNo());
-        if (CollUtil.isEmpty(orderList)) {
-            msg.setExec(true);
-            updateById(msg);
-            log.info("商户订单信息不存在:"+ orderNo);
-            return;
-        }
-        for (Order order : orderList) {
-            if (!order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_NORMAL)) {
+            if (ObjectUtil.isNull(platOrder)) {
                 msg.setExec(true);
                 updateById(msg);
-                log.info("订单已申请退款忽略:"+ order.getPlatOrderNo());
+                log.info("订单不存在:" + orderNo);
                 return;
             }
-        }
-        List<OrderDetail> orderDetailList = CollUtil.newArrayList();
-        for (Order order : orderList) {
-            // 拆单后，一个主订单只会对应一个商户订单
-            List<OrderDetail> merOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
-            // 处理ERP商品转换
-            for (OrderDetail orderDetail : merOrderDetailList) {
-                BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee());
-                List<Materials> materialsList = Lists.newArrayList();
-                if (StringUtils.isNotEmpty(orderDetail.getBarCode())) {
-                    List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(orderDetail.getMerId(), orderDetail.getBarCode());
-                    BigDecimal totalPrice = BigDecimal.ZERO;
-                    for (ProductMaterials productMaterials : productMaterialsList) {
-                        totalPrice = totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
-                    }
-                    for (ProductMaterials productMaterials : productMaterialsList) {
-                        BigDecimal price = productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity()));
-                        Materials materials = new Materials(productMaterials.getMaterialsName(),
-                                productMaterials.getMaterialsQuantity() * orderDetail.getPayNum(),
-                                productMaterials.getMaterialsPrice(), productMaterials.getMaterialsCode(),
-                                ArithmeticUtils.equals(BigDecimal.ZERO, totalPrice) ? BigDecimal.ZERO : payPrice.multiply(price.divide(totalPrice, 4, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN));
-                        materialsList.add(materials);
-                    }
-                    orderDetail.setMaterialsList(materialsList);
+            if (ordersFundSummaryService.getByOrdersSn(platOrder.getOrderNo()) != null) {
+                msg.setExec(true);
+                updateById(msg);
+                log.info("订单已经执行重复:" + orderNo);
+                return;
+            }
+            // 2.增加业绩
+            BigDecimal score = BigDecimal.ZERO;
+            List<ProductInfoDto> productInfoList = Lists.newArrayList();
+            List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(platOrder.getOrderNo());
+            for (OrderDetail orderDetail : platOrderDetailList) {
+                BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
+                score = score.add(realScore);
+                ProductInfoDto productInfo = new ProductInfoDto(orderDetail.getProductId(), orderDetail.getProductName(),
+                        orderDetail.getPayNum(), orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()), realScore);
+                productInfoList.add(productInfo);
+            }
+
+            // 获取拆单后订单
+            List<Order> orderList = orderService.getByPlatOrderNo(platOrder.getOrderNo());
+            if (CollUtil.isEmpty(orderList)) {
+                msg.setExec(true);
+                updateById(msg);
+                log.info("商户订单信息不存在:" + orderNo);
+                return;
+            }
+            for (Order order : orderList) {
+                if (!order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_NORMAL)) {
+                    msg.setExec(true);
+                    updateById(msg);
+                    log.info("订单已申请退款忽略:" + order.getPlatOrderNo());
+                    return;
                 }
             }
-            orderDetailList.addAll(merOrderDetailList);
+            List<OrderDetail> orderDetailList = CollUtil.newArrayList();
+            for (Order order : orderList) {
+                // 拆单后，一个主订单只会对应一个商户订单
+                List<OrderDetail> merOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+                // 处理ERP商品转换
+                for (OrderDetail orderDetail : merOrderDetailList) {
+                    BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee());
+                    List<Materials> materialsList = Lists.newArrayList();
+                    if (StringUtils.isNotEmpty(orderDetail.getBarCode())) {
+                        List<ProductMaterials> productMaterialsList = productMaterialsService.getByBarCode(orderDetail.getMerId(), orderDetail.getBarCode());
+                        BigDecimal totalPrice = BigDecimal.ZERO;
+                        for (ProductMaterials productMaterials : productMaterialsList) {
+                            totalPrice = totalPrice.add(productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity())));
+                        }
+                        for (ProductMaterials productMaterials : productMaterialsList) {
+                            BigDecimal price = productMaterials.getMaterialsPrice().multiply(BigDecimal.valueOf(productMaterials.getMaterialsQuantity()));
+                            Materials materials = new Materials(productMaterials.getMaterialsName(),
+                                    productMaterials.getMaterialsQuantity() * orderDetail.getPayNum(),
+                                    productMaterials.getMaterialsPrice(), productMaterials.getMaterialsCode(),
+                                    ArithmeticUtils.equals(BigDecimal.ZERO, totalPrice) ? BigDecimal.ZERO : payPrice.multiply(price.divide(totalPrice, 4, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN));
+                            materialsList.add(materials);
+                        }
+                        orderDetail.setMaterialsList(materialsList);
+                    }
+                }
+                orderDetailList.addAll(merOrderDetailList);
+            }
+            boolean b = true;
+            // 1..资金概况
+            ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
+                    platOrder.getPayPrice().subtract(platOrder.getPayPostage()), score);
+            // 2.自有业绩
+            selfScoreService.orderSuccess(platOrder.getUid(), score, orderNo, platOrder.getPayTime(), productInfoList);
+            // 3.团队业绩
+            invitationScoreService.orderSuccess(platOrder.getUid(), score, orderNo, platOrder.getPayTime(), productInfoList);
+            // 4.个人升级
+            userCapaService.riseCapa(platOrder.getUid());
+            userCapaXsService.riseCapaXs(platOrder.getUid());
+            // 5.分销佣金
+            LinkedList<CommCalculateResult> commList = new LinkedList<>();
+            productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+            // 订单信息
+            b = orderDetailService.updateBatchById(orderDetailList);
+            if (!b) {
+                throw new RuntimeException("执行订单成功消息失败[更新订单详情]:" + msg.getOrdersSn());
+            }
+            // 订单日志
+            orderList.forEach(o -> orderStatusService.createLog(o.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, platOrder.getOrderNo())));
+            msg.setExec(true);
+            b = updateById(msg);
+            if (!b) {
+                throw new RuntimeException("执行订单成功消息失败:" + msg.getOrdersSn());
+            }
         }
-        boolean b = true;
-        // 1..资金概况
-        ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
-                platOrder.getPayPrice().subtract(platOrder.getPayPostage()), score);
-        // 2.自有业绩
-        selfScoreService.orderSuccess(platOrder.getUid(), score, orderNo, platOrder.getPayTime(), productInfoList);
-        // 3.团队业绩
-        invitationScoreService.orderSuccess(platOrder.getUid(), score, orderNo, platOrder.getPayTime(), productInfoList);
-        // 4.个人升级
-        userCapaService.riseCapa(platOrder.getUid());
-        userCapaXsService.riseCapaXs(platOrder.getUid());
-        // 5.分销佣金
-        LinkedList<CommCalculateResult> commList = new LinkedList<>();
-        productCommChain.orderSuccessCalculateAmt(platOrder, commList);
-        // 订单信息
-        b = orderDetailService.updateBatchById(orderDetailList);
-        if (!b) {
-            throw new RuntimeException("执行订单成功消息失败[更新订单详情]:" + msg.getOrdersSn());
-        }
-        // 订单日志
-        orderList.forEach(o -> orderStatusService.createLog(o.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, platOrder.getOrderNo())));
-        msg.setExec(true);
-        b = updateById(msg);
-        if (!b) {
-            throw new RuntimeException("执行订单成功消息失败:" + msg.getOrdersSn());
-        }
+
     }
 }
