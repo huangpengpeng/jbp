@@ -1035,7 +1035,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaUpdateWrapper<Order> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(Order::getUid, uid);
         wrapper.eq(Order::getOrderNo, orderNo);
-        wrapper.last(" uid is null");
+        wrapper.last(" and  uid is null");
         return update(wrapper);
     }
 
