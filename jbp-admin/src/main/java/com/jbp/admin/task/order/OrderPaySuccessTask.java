@@ -9,9 +9,11 @@ import com.jbp.service.service.agent.OrderSuccessMsgService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 订单支付成功后置task任务
@@ -33,11 +35,22 @@ public class OrderPaySuccessTask {
 
     @Autowired
     private OrderSuccessMsgService orderSuccessMsgService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 1分钟同步一次数据
      */
     public void orderPayAfter() {
+        // 1.加锁成功
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("OrderPaySuccessTask.orderPayAfter", 1);
+        //2.设置锁的过期时间,防止死锁
+        if(!task){
+            //没有争抢(设置)到锁
+            logger.info("上一次任务未执行完成退出");
+            return;//方法结束
+        }
+        redisTemplate.expire("OrderPaySuccessTask.orderPayAfter",10, TimeUnit.MINUTES);
         // cron : 0 */1 * * * ?
         logger.info("---OrderPaySuccessTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {
@@ -48,7 +61,10 @@ public class OrderPaySuccessTask {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("OrderPaySuccessTask.task" + " | msg : " + e.getMessage());
+        }finally {
+            redisTemplate.delete("OrderPaySuccessTask.orderPayAfter");
         }
+
     }
 
 }

@@ -7,36 +7,33 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScore;
-import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
 import com.jbp.service.service.agent.InvitationScoreService;
 import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
-import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -138,6 +135,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         if (CollectionUtils.isEmpty(allUpper)) {
             return;
         }
+        LinkedList<InvitationScoreFlow> list = Lists.newLinkedList();
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 InvitationScore invitationScore = getByUser(upperDto.getPId());
@@ -146,9 +144,13 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 }
                 invitationScore.setScore(invitationScore.getScore().add(score));
                 updateById(invitationScore);
-                invitationScoreFlowService.add(upperDto.getPId(), uid, score, "增加",
-                        "下单", ordersSn, payTime, productInfo, "");
+                InvitationScoreFlow flow = new InvitationScoreFlow(uid, uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
+                list.add(flow);
             }
+        }
+        List<List<InvitationScoreFlow>> partition = Lists.partition(list, 100);
+        for (List<InvitationScoreFlow> invitationScoreFlows : partition) {
+            invitationScoreFlowService.saveBatch(invitationScoreFlows);
         }
     }
 }

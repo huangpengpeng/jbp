@@ -1719,7 +1719,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         order.setIsUserDel(true);
         return transactionTemplate.execute(e -> {
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             orderStatusService.createLog(orderNo, OrderStatusConstants.ORDER_STATUS_USER_DELETE, OrderStatusConstants.ORDER_LOG_USER_DELETE);
             return Boolean.TRUE;
         });
@@ -1884,7 +1887,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setRefundStatus(OrderConstants.ORDER_REFUND_STATUS_APPLY);
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
         Boolean execute = transactionTemplate.execute(e -> {
-            orderService.updateById(order);
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new CrmebException("操作人数过多申请退款失败");
+            }
             orderDetailService.updateById(orderDetail);
             refundOrderService.save(refundOrder);
             refundOrderInfoService.save(refundOrderInfo);

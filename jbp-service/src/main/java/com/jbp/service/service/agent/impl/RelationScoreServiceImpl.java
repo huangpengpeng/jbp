@@ -118,7 +118,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         // 增加明细
         RelationScoreFlow flow = new RelationScoreFlow(uid, orderUid, score, node,
                 "下单", "增加", ordersSn, payTime, productInfo, "", level, BigDecimal.ZERO, BigDecimal.ZERO);
-        relationScoreFlowService.save(flow);
         return flow;
     }
 

@@ -137,22 +137,14 @@ public class UserController {
         if (user == null) {
             throw new RuntimeException("账户错误");
         }
-        // 邀请过其他人返回null
-        List<UserInvitation> nextList = invitationService.getNextList(user.getId());
-        if (CollectionUtils.isNotEmpty(nextList)) {
-            return CommonResult.success();
+        Integer pId = user.getId();
+        // 检查操作一张网
+        User loginUser = userService.getInfo();
+        if (loginUser.getId().intValue() != pId.intValue() && !relationService.hasChild(pId, loginUser.getId())) {
+            throw new CrmebException("只能帮自己或者下级注册");
         }
-        List<UserRelation> relationList = relationService.getByPid(user.getId());
-        if (CollectionUtils.isEmpty(relationList)) {
-            return CommonResult.success();
-        }
-        if(relationList.size() == 2){
-            return CommonResult.success();
-        }
-        UserRelation leftMost = relationService.getLeftMost(relationList.get(0).getUId());
-        User leftUser = userService.getById(leftMost.getPId());
-        UserRelationInfoResponse response = new UserRelationInfoResponse(leftUser.getId(), leftUser.getAccount(), leftMost.getNode());
-        return CommonResult.success(response);
+
+        return CommonResult.success();
     }
 
     @ApiOperation(value = "获取滑落节点")
