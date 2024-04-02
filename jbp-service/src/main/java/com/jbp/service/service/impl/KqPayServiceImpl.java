@@ -36,8 +36,8 @@ public class KqPayServiceImpl implements KqPayService {
 
     @Override
     public KqPayInfoResult get() {
-        MyRecord myRecord = systemConfigService.getValuesByKeyList(Lists.newArrayList("kq_merchantAcctId", "kq_applyName",
-                "kq_host", "kq_terminalIp", "kq_status"));
+        MyRecord myRecord = systemConfigService.getValuesByKeyList(Lists.newArrayList("kq_merchantCode", "kq_merchantId", "kq_applyName",
+                "kq_host", "kq_terminalIp", "kq_status", "kq_pageUrl", "kq_bgUrl"));
         KqPayInfoResult result = new KqPayInfoResult();
         result.setMerchantCode(myRecord.getStr("kq_merchantCode"));
         result.setMerchantId(myRecord.getStr("kq_merchantId"));
@@ -45,18 +45,21 @@ public class KqPayServiceImpl implements KqPayService {
         result.setTerminalIp(myRecord.getStr("kq_terminalIp"));
         result.setHost(myRecord.getStr("kq_host"));
         result.setStatus(myRecord.getStr("kq_status"));
+        result.setPageUrl(myRecord.getStr("kq_pageUrl"));
+        result.setBgUrl(myRecord.getStr("kq_bgUrl"));
+
         return result;
     }
 
 
 
     @Override
-    public String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, String pageUrl, Date orderTime) {
+    public String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, Date orderTime) {
         KqPayInfoResult kpInfo = get();
         KqCashierParams params = new KqCashierParams();
-        params.setMerchantAcctId(kpInfo.getMerchantCode()+"01");
-        params.setPageUrl(pageUrl);
-        params.setBgUrl(kpInfo.getHost() + "/api/publicly/payment/callback/kq/" + orderId);
+        params.setMerchantAcctId(kpInfo.getMerchantId());
+        params.setPageUrl(kpInfo.getPageUrl() + orderId);
+        params.setBgUrl(kpInfo.getBgUrl() + orderId);
         params.setPayerId(payerId);
         params.setPayerIP(payerIP);
         params.setTerminalIp(kpInfo.getTerminalIp());
@@ -72,7 +75,7 @@ public class KqPayServiceImpl implements KqPayService {
         signMsg = URLEncoder.encode(signMsg);
         params.setSignMsg(signMsg);
 
-        String host = "https://sandbox.99bill.com/mobilegateway/recvMerchantInfoAction.htm";
+        String host = "https://www.99bill.com/mobilegateway/recvMerchantInfoAction.htm";
         String url = cashierAppendParam(params);
         return host + "?" + url;
     }

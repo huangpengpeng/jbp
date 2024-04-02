@@ -111,6 +111,8 @@ mybatis-plus:
   typeAliasesPackage: com.jbp.**.model
   # 配置slq打印日志
   configuration:
+    cache-enabled: false #禁用二级缓存
+    local-cache-scope: session #一级缓存指定为statement级别
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
