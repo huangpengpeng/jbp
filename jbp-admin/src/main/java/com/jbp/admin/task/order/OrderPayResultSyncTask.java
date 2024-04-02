@@ -38,7 +38,7 @@ public class OrderPayResultSyncTask {
         // cron : 0 */1 * * * ?
         logger.info("---OrderPayResultSyncTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {
-            List<Order> orders = orderService.getWaitPayList(3);
+            List<Order> orders = orderService.getWaitPayList(15);
             for (Order order : orders) {
                 if (order.getPayChannel().equals(PayConstants.PAY_TYPE_LIANLIAN) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
                     QueryPaymentResult result = lianLianPayService.queryPayResult(order.getOrderNo());
