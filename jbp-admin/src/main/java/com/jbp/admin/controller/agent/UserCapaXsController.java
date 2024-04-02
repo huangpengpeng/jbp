@@ -43,7 +43,7 @@ public class UserCapaXsController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(userCapaXsService.pageList(uid, request.getCapaId(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userCapaXsService.pageList(uid, request.getCapaId(),request.getIfFake(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:capa:xs:add')")

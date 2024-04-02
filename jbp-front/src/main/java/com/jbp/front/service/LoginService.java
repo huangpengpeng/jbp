@@ -101,4 +101,6 @@ public interface LoginService {
     LoginResponse accountLogin(LoginAccountwordRequest loginRequest);
 
     FrontIndividualCenterConfigResponse getIndividualCenterConfig();
+
+    void forgotPassword(String account, String password, String captcha, String phone);
 }
