@@ -18,6 +18,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
@@ -135,19 +136,31 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         if (CollectionUtils.isEmpty(allUpper)) {
             return;
         }
+        List<Integer> pIdList = allUpper.stream().filter(u -> u.getPId() != null).map(UserUpperDto::getPId).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(pIdList)){
+            return;
+        }
+        List<InvitationScore> invitationScores = list(new QueryWrapper<InvitationScore>().lambda().in(InvitationScore::getUid, pIdList));
+        Map<Integer, InvitationScore> invitationScoreMap = FunctionUtil.keyValueMap(invitationScores, InvitationScore::getUid);
         LinkedList<InvitationScoreFlow> list = Lists.newLinkedList();
+        LinkedList<InvitationScore> invitationScoreList = Lists.newLinkedList();
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
-                InvitationScore invitationScore = getByUser(upperDto.getPId());
+                InvitationScore invitationScore = invitationScoreMap.get(upperDto.getPId());
                 if (invitationScore == null) {
                     invitationScore = add(upperDto.getPId());
                 }
+                // 汇总
                 invitationScore.setScore(invitationScore.getScore().add(score));
-                updateById(invitationScore);
+                invitationScoreList.add(invitationScore);
+                // 明细
                 InvitationScoreFlow flow = new InvitationScoreFlow(uid, uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
                 list.add(flow);
             }
         }
+        // 更新团队业绩
+        saveOrUpdateBatch(invitationScoreList);
+        // 增加明细
         List<List<InvitationScoreFlow>> partition = Lists.partition(list, 100);
         for (List<InvitationScoreFlow> invitationScoreFlows : partition) {
             invitationScoreFlowService.saveBatch(invitationScoreFlows);

@@ -24,10 +24,12 @@ import com.jbp.service.service.OrderStatusService;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +59,13 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
     private UserCapaXsService userCapaXsService;
     @Autowired
     private ProductMaterialsService productMaterialsService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+    
+    @PostConstruct
+    private void init(){
+        redisTemplate.delete("OrderPaySuccessTask.orderPayAfter");
+    }
 
     @Override
     public void add(String orderSn) {
