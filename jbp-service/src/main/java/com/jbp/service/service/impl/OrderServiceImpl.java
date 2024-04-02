@@ -590,6 +590,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 lqw.eq(Order::getUid, user.getId());
             }
         }
+        if (ObjectUtil.isNotEmpty(request.getUid())) {
+            lqw.eq(Order::getUid, request.getUid());
+        }
         if (StrUtil.isNotEmpty(request.getPayAccount())) {
             User user = userService.getByAccount(request.getPayAccount());
             if (user != null) {

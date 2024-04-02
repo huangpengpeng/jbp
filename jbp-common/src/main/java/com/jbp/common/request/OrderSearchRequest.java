@@ -61,5 +61,8 @@ public class OrderSearchRequest implements Serializable {
     @ApiModelProperty(value = "支付时间")
     private String payTime;
 
+    @ApiModelProperty(value = "用户id")
+    private Integer uid;
+
 
 }

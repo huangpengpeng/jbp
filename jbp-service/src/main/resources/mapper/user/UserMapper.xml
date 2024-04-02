@@ -14,6 +14,9 @@
             <if test="spreadid !=null ">
                 and u.spread_uid=#{spreadid}
             </if>
+            <if test="uid !=null">
+                and u.id=#{uid}
+            </if>
             <if test="phone != '' and phone != null ">
                 and u.phone = #{phone, jdbcType=VARCHAR}
             </if>
@@ -23,9 +26,9 @@
             <if test="tagIdSql != null and tagIdSql !='' ">
                 and ${tagIdSql}
             </if>
-                   <if test="openShop!=null">
-                       and u.open_shop=#{openShop}
-                   </if>
+            <if test="openShop!=null">
+                and u.open_shop=#{openShop}
+            </if>
             <if test="registerType != null and registerType !='' ">
                 and u.register_type = #{registerType, jdbcType=VARCHAR}
             </if>

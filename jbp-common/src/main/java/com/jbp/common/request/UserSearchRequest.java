@@ -72,4 +72,7 @@ public class UserSearchRequest implements Serializable {
     private String spreadAccount;
     @ApiModelProperty(value = "是否开启店铺")
     private Boolean openShop;
+
+    @ApiModelProperty(value = "用户id")
+    private Integer uid;
 }

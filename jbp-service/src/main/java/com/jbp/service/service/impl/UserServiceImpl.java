@@ -628,6 +628,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
             map.put("spreadid", user.getId());
         }
+        if (ObjectUtils.isNotEmpty(request.getUid())) {
+            map.put("uid",request.getUid());
+        }
         if (StrUtil.isNotEmpty(request.getNikename())) {
             String nikeName = URLUtil.decode(request.getNikename());
             map.put("nikename", nikeName);

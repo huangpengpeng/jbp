@@ -180,7 +180,11 @@ public class LoginServiceImpl implements LoginService {
         if (userList.size() == 1) {
             return commonLogin(userList.get(0), spreadPid);
         }
-        return commonLogin(userService.getByAccount(loginRequest.getAccount()), spreadPid);
+        User user = userService.getByAccount(loginRequest.getAccount());
+        if (!user.getStatus()) {
+            throw new CrmebException("当前帐户已禁用，请与管理员联系！");
+        }
+        return commonLogin(user, spreadPid);
     }
 
     @Override
