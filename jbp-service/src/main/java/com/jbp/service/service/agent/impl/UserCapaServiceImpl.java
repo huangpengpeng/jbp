@@ -27,6 +27,7 @@ import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,6 +143,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
 
     }
 
+    @Async
     @Override
     public void riseCapa(Integer uid) {
         UserCapa userCapa = getByUser(uid);// 用户等级
