@@ -15,7 +15,7 @@ public interface UserCapaXsService extends IService<UserCapaXs> {
 
     UserCapaXs saveOrUpdateCapa(Integer uid, Long capaXsId, Boolean ifFake, String remark, String description);
 
-    PageInfo<UserCapaXs> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest);
+    PageInfo<UserCapaXs> pageList(Integer uid, Long capaId, Boolean ifFake, PageParamRequest pageParamRequest);
 
     void riseCapaXs(Integer uid);
 

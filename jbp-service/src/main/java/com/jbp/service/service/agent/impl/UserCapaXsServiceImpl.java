@@ -112,9 +112,10 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     }
 
     @Override
-    public PageInfo<UserCapaXs> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest) {
+    public PageInfo<UserCapaXs> pageList(Integer uid, Long capaId, Boolean ifFake, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserCapaXs> userCapaXsLambdaQueryWrapper = new LambdaQueryWrapper<UserCapaXs>();
         userCapaXsLambdaQueryWrapper.eq(!ObjectUtil.isNull(uid), UserCapaXs::getUid, uid);
+        userCapaXsLambdaQueryWrapper.eq(ObjectUtil.isNotEmpty(ifFake),UserCapaXs::getIfFake,ifFake);
         userCapaXsLambdaQueryWrapper.eq(!ObjectUtil.isNull(capaId), UserCapaXs::getCapaId, capaId);
         Page<UserCapaXs> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapaXs> list = list(userCapaXsLambdaQueryWrapper);

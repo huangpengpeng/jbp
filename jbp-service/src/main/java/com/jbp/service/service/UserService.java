@@ -380,7 +380,7 @@ public interface UserService extends IService<User> {
     List<User> findByBirthday(String birthday);
 
 
-    void tradePassword(String phone, String code, String tradePassword);
+    void tradePassword( String code, String tradePassword);
 
     List<User> getNoChild();
 

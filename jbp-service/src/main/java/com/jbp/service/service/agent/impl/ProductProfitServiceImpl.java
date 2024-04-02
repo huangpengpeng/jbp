@@ -47,6 +47,6 @@ public class ProductProfitServiceImpl extends ServiceImpl<ProductProfitDao, Prod
 
     @Override
     public ProductProfit getByProductName(Integer productId, String name) {
-        return getOne(new QueryWrapper<ProductProfit>().lambda().eq(ProductProfit::getProductId , productId).eq(ProductProfit::getName,name));
+        return getOne(new QueryWrapper<ProductProfit>().lambda().eq(ProductProfit::getProductId , productId).eq(ProductProfit::getName,name).eq(ProductProfit::getStatus,true));
     }
 }

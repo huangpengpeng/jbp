@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
@@ -179,7 +180,11 @@ public class LoginServiceImpl implements LoginService {
         if (userList.size() == 1) {
             return commonLogin(userList.get(0), spreadPid);
         }
-        return commonLogin(userService.getByAccount(loginRequest.getAccount()), spreadPid);
+        User user = userService.getByAccount(loginRequest.getAccount());
+        if (!user.getStatus()) {
+            throw new CrmebException("当前帐户已禁用，请与管理员联系！");
+        }
+        return commonLogin(user, spreadPid);
     }
 
     @Override
@@ -252,6 +257,23 @@ public class LoginServiceImpl implements LoginService {
         }
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
         return commonLogin(user, spreadPid);
+    }
+
+    @Override
+    public void forgotPassword(String account, String password, String captcha, String phone) {
+        User user = userService.getByAccount(account);
+        if (ObjectUtil.isEmpty(user)) {
+            throw new CrmebException("暂无账号,请先注册");
+        }
+        if (!user.getPhone().equals(phone)) {
+            throw new CrmebException("与绑定手机号不符合");
+        }
+        checkValidateCode(phone ,captcha);
+        LambdaUpdateWrapper<User> luw=new LambdaUpdateWrapper<User>()
+                .eq(User::getId,user.getId())
+                .set(User::getPwd,CrmebUtil.encryptPassword(password));
+        userService.update(luw);
+
     }
 
     /**
@@ -496,7 +518,8 @@ public class LoginServiceImpl implements LoginService {
             if (StrUtil.isBlank(request.getCode())) {
                 throw new CrmebException("小程序获取手机号code不能为空");
             }
-            if (StrUtil.isBlank(request.getEncryptedData())) {
+            if (StrUtil.isBlank(request.
+                    getEncryptedData())) {
 //                throw new CrmebException("小程序获取手机号加密数据不能为空");
                 throw new CrmebException("请认证微信账号：获取手机号码失败");
             }

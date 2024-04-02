@@ -18,4 +18,8 @@ public class UserCapaRequest implements Serializable {
     private String account;
     @ApiModelProperty("等级ID")
     private Long capaId;
+
+    @ApiModelProperty("假星级")
+    private Boolean ifFake;
+
 }
