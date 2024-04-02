@@ -199,16 +199,15 @@ public class AsyncServiceImpl implements AsyncService {
      *
      * @param orderNo 订单号
      */
-    @Async
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void orderPaySuccessSplit(String orderNo) {
         Boolean task = redisTemplate.opsForValue().setIfAbsent("orderPaySuccessSplit" + orderNo, 1);
-        //2.设置锁的过期时间,防止死锁 避免卡在里面出不来
+        //1..设置锁的过期时间,防止死锁 避免卡在里面出不来
         if (!task) {
             //没有争抢(设置)到锁
             logger.info("锁住订单拆单退出");
-            return ;
+            return;
         }
         redisTemplate.expire("orderPaySuccessSplit" + orderNo, 1, TimeUnit.MINUTES);
 
@@ -236,9 +235,7 @@ public class AsyncServiceImpl implements AsyncService {
                 order = orderService.getByOrderNo(orderNo);
             }
         }
-        // 2. 处理收益【等级  星级 活跃 白名单 积分】
-        productProfitChain.orderSuccess(order);
-        // 3.更新扩展信息
+        // 2.更新扩展信息
         if (orderExt != null) {
             UserCapa userCapa = userCapaService.getByUser(order.getUid());
             if (userCapa != null) {
@@ -250,10 +247,30 @@ public class AsyncServiceImpl implements AsyncService {
             }
             orderExtService.updateById(orderExt);
         }
+        orderPaySuccessSplit2(order);
+        // 释放锁
+        redisTemplate.delete("orderPaySuccessSplit" + orderNo);
+    }
 
-        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
+
+    @Async
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Override
+    public void orderPaySuccessSplit2(Order order) {
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("orderPaySuccessSplit2" + order.getOrderNo(), 1);
+        //1..设置锁的过期时间,防止死锁 避免卡在里面出不来
+        if (!task) {
+            //没有争抢(设置)到锁
+            logger.info("锁住订单拆单退出");
+            return;
+        }
+        redisTemplate.expire("orderPaySuccessSplit2" + order.getOrderNo(), 1, TimeUnit.MINUTES);
+
+        // 1. 处理收益【等级  星级 活跃 白名单 积分】
+        productProfitChain.orderSuccess(order);
+        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(order.getOrderNo());
         if (CollUtil.isEmpty(merchantOrderList)) {
-            logger.error("异步——订单支付成功拆单处理 | 商户订单信息不存在,orderNo: {}", orderNo);
+            logger.error("异步——订单支付成功拆单处理 | 商户订单信息不存在,orderNo: {}", order.getOrderNo());
             return;
         }
         Boolean execute;
@@ -264,14 +281,12 @@ public class AsyncServiceImpl implements AsyncService {
             execute = manyMerchantOrderProcessing(order, merchantOrderList);
         }
         if (!execute) {
-            logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", orderNo);
+            logger.error("异步——订单支付成功拆单处理 | 拆单处理失败，orderNo: {}", order.getOrderNo());
             return;
         }
         orderSuccessMsgService.add(order.getOrderNo());
-        // 释放锁
-        redisTemplate.delete("orderPaySuccessSplit" + orderNo);
+        redisTemplate.delete("orderPaySuccessSplit2" + order.getOrderNo());
     }
-
 
     /**
      * 访问用户个人中心记录

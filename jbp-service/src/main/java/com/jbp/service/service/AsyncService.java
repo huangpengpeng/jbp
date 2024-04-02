@@ -2,6 +2,7 @@ package com.jbp.service.service;
 
 import java.util.List;
 
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.model.user.User;
 
@@ -38,6 +39,8 @@ public interface AsyncService {
      * @param orderNo 订单号
      */
     void orderPaySuccessSplit(String orderNo);
+
+    void orderPaySuccessSplit2(Order order);
 
     /**
      * 访问用户个人中心记录
