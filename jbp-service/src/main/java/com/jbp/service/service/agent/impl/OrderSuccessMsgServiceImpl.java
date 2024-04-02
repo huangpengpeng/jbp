@@ -65,7 +65,6 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
     @PostConstruct
     private void init(){
         redisTemplate.delete("OrderPaySuccessTask.orderPayAfter");
-        redisTemplate.delete("OrderSuccessRiseTask.rise");
         redisTemplate.delete("UserCapaTask.refreshUserCapa");
         redisTemplate.delete("UserCapaXsTask.refreshUserCapaXs");
     }

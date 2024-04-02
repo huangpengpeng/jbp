@@ -31,4 +31,6 @@ public class TaskConstants {
     public static final String ORDER_TASK_REDIS_KEY_AUTO_CANCEL_KEY = "order_auto_cancel_key";
     /** 秒杀商品回滚库存key **/
     public static final String TASK_SECKILL_PRODUCT_CALLBACK_KEY = "seckill_product_callback_list";
+
+    public static final String TASK_ORDER_SUCCESS_USER_RISE_KEY = "order_success_user_rise_key";
 }

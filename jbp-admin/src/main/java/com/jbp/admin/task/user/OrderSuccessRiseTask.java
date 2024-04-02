@@ -1,10 +1,13 @@
 package com.jbp.admin.task.user;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jbp.common.constants.TaskConstants;
 import com.jbp.common.model.agent.OrderSuccessMsg;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
+import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.OrderSuccessMsgService;
@@ -28,43 +31,36 @@ public class OrderSuccessRiseTask {
     //日志
     private static final Logger logger = LoggerFactory.getLogger(OrderSuccessRiseTask.class);
 
-    @Autowired
-    private OrderService orderService;
+
     @Autowired
     private UserCapaService userCapaService;
     @Autowired
     private UserCapaXsService userCapaXsService;
     @Autowired
-    private OrderSuccessMsgService orderSuccessMsgService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisUtil redisUtil;
 
     public void rise() {
-
-        // 1.加锁成功
-        Boolean task = redisTemplate.opsForValue().setIfAbsent("OrderSuccessRiseTask.rise", 1);
-        //2.设置锁的过期时间,防止死锁
-        if (!task) {
-            //没有争抢(设置)到锁
-            logger.info("OrderSuccessRiseTask.rise上一次任务未执行完成退出");
-            return;//方法结束
-        }
-        redisTemplate.expire("OrderSuccessRiseTask.rise", 10, TimeUnit.MINUTES);
-
-        // cron : 0 0 1 * * ?
         logger.info("---OrderSuccessRiseTask rise------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
-        try {
-            List<OrderSuccessMsg> list = orderSuccessMsgService.list(new QueryWrapper<OrderSuccessMsg>().lambda().orderByDesc(OrderSuccessMsg::getId).last(" limit 10"));
-            for (OrderSuccessMsg orderSuccessMsg : list) {
-                Order order = orderService.getByOrderNo(orderSuccessMsg.getOrdersSn());
-                userCapaService.asyncRiseCapa(order.getUid());
-                userCapaXsService.asyncRiseCapaXs(order.getUid());
+        String redisKey = TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY;
+        Long size = redisUtil.getListSize(redisKey);
+        logger.info("OrderSuccessRiseTask.rise | size:" + size);
+        if (size < 1) {
+            return;
+        }
+        for (int i = 0; i < size; i++) {
+            //如果10秒钟拿不到一个数据，那么退出循环
+            Object orderNoData = redisUtil.getRightPop(redisKey, 10L);
+            if (ObjectUtil.isNull(orderNoData)) {
+                continue;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("OrderSuccessRiseTask.rise" + " | msg : " + e.getMessage());
-        } finally {
-            redisTemplate.delete("OrderSuccessRiseTask.rise");
+            try {
+                userCapaService.asyncRiseCapa(Integer.valueOf(orderNoData.toString()));
+                userCapaXsService.asyncRiseCapaXs(Integer.valueOf(orderNoData.toString()));
+            } catch (Exception e) {
+                logger.error("订单成功升级错误：" + e.getMessage());
+                redisUtil.lPush(redisKey, orderNoData);
+            }
         }
     }
+
 }

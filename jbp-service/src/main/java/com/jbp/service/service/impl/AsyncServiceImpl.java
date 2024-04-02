@@ -284,6 +284,8 @@ public class AsyncServiceImpl implements AsyncService {
             return;
         }
         orderSuccessMsgService.add(order.getOrderNo());
+        // 发送用户升级
+        redisUtil.lPush(TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY, order.getUid());
         // 释放锁
         redisTemplate.delete("orderPaySuccessSplit" + order.getOrderNo());
     }
