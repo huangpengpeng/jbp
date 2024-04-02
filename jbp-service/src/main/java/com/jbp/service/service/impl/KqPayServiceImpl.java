@@ -63,7 +63,7 @@ public class KqPayServiceImpl implements KqPayService {
         params.setPayerId(payerId);
         params.setPayerIP(payerIP);
         params.setTerminalIp(kpInfo.getTerminalIp());
-        params.setTdpformName(kpInfo.getApplyName());
+        params.setTdpformName(URLEncoder.encode(kpInfo.getApplyName()));
         params.setOrderId(orderId);
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
         params.setProductName(productName);
@@ -86,7 +86,7 @@ public class KqPayServiceImpl implements KqPayService {
         KqHeadParams head = new KqHeadParams("1.0.0", "F0003", payInfo.getMerchantCode(), CrmebUtil.getOrderNo("KQQ_"));
         KqPayQueryParams body = new KqPayQueryParams();
         body.setOrderId(orderId);
-        body.setMerchantAcctId(payInfo.getMerchantCode() + "01");
+        body.setMerchantAcctId(payInfo.getMerchantId());
         JSONObject originalString = new JSONObject();
         originalString.put("head", head);
         originalString.put("requestBody", body);
@@ -179,6 +179,8 @@ public class KqPayServiceImpl implements KqPayService {
         }
     }
 
+
+
     private static String cashierAppendParam(KqCashierParams params) {
         String signMsgVal = "";
         signMsgVal = appendParam(signMsgVal, "inputCharset", params.getInputCharset());
@@ -193,6 +195,10 @@ public class KqPayServiceImpl implements KqPayService {
         signMsgVal = appendParam(signMsgVal, "merchantAcctId", params.getMerchantAcctId());
         signMsgVal = appendParam(signMsgVal, "payerId", params.getPayerId());
         signMsgVal = appendParam(signMsgVal, "payerIP", params.getPayerIP());
+        if (StringUtils.isNotEmpty(params.getSignMsg())) {
+            signMsgVal = appendParam(signMsgVal, "terminalIp", params.getTerminalIp());
+            signMsgVal = appendParam(signMsgVal, "tdpformName", params.getTdpformName());
+        }
         signMsgVal = appendParam(signMsgVal, "orderId", params.getOrderId());
         signMsgVal = appendParam(signMsgVal, "orderAmount", params.getOrderAmount());
         signMsgVal = appendParam(signMsgVal, "orderTime", params.getOrderTime());
