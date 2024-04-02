@@ -66,13 +66,7 @@ public class CapaRepairDifferenceHandler implements ConditionHandler {
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
         // 找最近的一笔平台订单
-        Order order = orderService.getOne(new QueryWrapper<Order>().lambda()
-                .eq(Order::getUid, uid).eq(Order::getPaid, true)
-                .eq(Order::getLevel, 0)
-                .eq(Order::getPlatform, "报单")
-                .orderByDesc(Order::getId)
-                .last(" limit 1"));
-
+        Order order = orderService.getLastOne(uid, "报单");
         if (order == null) {
             return false;
         }
