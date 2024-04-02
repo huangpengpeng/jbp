@@ -92,10 +92,12 @@ public class CapaXsIsolateLineHandler implements ConditionHandler {
             if (userCapaXs != null && userCapaXs.getCapaId().compareTo(rule.getIndeCapaXsId()) >= 0) {
                 userCapaXsList.add(userCapaXs);
             }
-            if (hasChild(userRelation.getUId(), userCapaXsList, rule.getIndeCapaXsNum())) {
+            if (hasChild(uid, userCapaXsList, rule.getIndeCapaXsNum())) {
                 indeCount++;
             }
         }
+
+
         if (indeCount >= rule.getIndeCount()) {
             return true;
         }
