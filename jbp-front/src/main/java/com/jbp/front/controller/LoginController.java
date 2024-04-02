@@ -65,9 +65,9 @@ public class LoginController {
         return CommonResult.success(account);
     }
 
-    @ApiOperation(value = "账号获取手机号")
-    @GetMapping( "/account/phone/list")
-    public CommonResult<String> accountPhoneList(String account) {
+    @ApiOperation(value = "校验账号")
+    @GetMapping( "/check/account")
+    public CommonResult<String> checkAccount(String account) {
         User user = userService.getByAccount(account);
         if (ObjectUtil.isEmpty(user)) {
             throw new CrmebException("暂无账号,请先注册");
@@ -75,7 +75,7 @@ public class LoginController {
         if (StringUtils.isEmpty(user.getPhone())) {
             throw new CrmebException("请联系管理员绑定手机号");
         }
-        return CommonResult.success(user.getPhone());
+        return CommonResult.success();
     }
     @ApiOperation(value = "手机号验证码登录")
     @RequestMapping(value = "/mobile/captcha", method = RequestMethod.POST)
@@ -150,7 +150,7 @@ public class LoginController {
     @ApiOperation(value = "忘记密码")
     @PostMapping(value = "/forgot/password")
     public CommonResult forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
-        loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha());
+        loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha(),request.getPhone());
         return CommonResult.success();
     }
 }

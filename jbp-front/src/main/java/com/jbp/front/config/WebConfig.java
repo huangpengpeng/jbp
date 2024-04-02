@@ -116,7 +116,7 @@ public class WebConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/api/front/community/note/discover/list/recommend/*")
 				.excludePathPatterns("/api/front/coupon/voucher/collection/center")
 				.excludePathPatterns("/api/front/login/forgot/password")
-				.excludePathPatterns("/api/front/login/account/phone/list")
+				.excludePathPatterns("/api/front/login/check/account")
 				.excludePathPatterns("/api/front/product/system/coupon/pro/list").
 
 				excludePathPatterns("/api/front/coupon/voucher/collection/center").

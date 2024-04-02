@@ -102,5 +102,5 @@ public interface LoginService {
 
     FrontIndividualCenterConfigResponse getIndividualCenterConfig();
 
-    void forgotPassword(String account, String password, String captcha);
+    void forgotPassword(String account, String password, String captcha, String phone);
 }

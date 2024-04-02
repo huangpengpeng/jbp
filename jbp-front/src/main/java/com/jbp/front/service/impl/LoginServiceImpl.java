@@ -256,12 +256,15 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void forgotPassword(String account, String password, String captcha) {
+    public void forgotPassword(String account, String password, String captcha, String phone) {
         User user = userService.getByAccount(account);
         if (ObjectUtil.isEmpty(user)) {
             throw new CrmebException("暂无账号,请先注册");
         }
-        checkValidateCode(user.getPhone() ,captcha);
+        if (!user.getPhone().equals(phone)) {
+            throw new CrmebException("与绑定手机号不符合");
+        }
+        checkValidateCode(phone ,captcha);
         LambdaUpdateWrapper<User> luw=new LambdaUpdateWrapper<User>()
                 .eq(User::getId,user.getId())
                 .set(User::getPwd,CrmebUtil.encryptPassword(password));
