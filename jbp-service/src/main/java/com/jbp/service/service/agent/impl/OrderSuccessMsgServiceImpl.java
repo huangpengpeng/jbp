@@ -147,8 +147,8 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         // 3.团队业绩
         invitationScoreService.orderSuccess(platOrder.getUid(), score, orderNo, platOrder.getPayTime(), productInfoList);
         // 4.个人升级
-//        userCapaService.riseCapa(platOrder.getUid());
-//        userCapaXsService.riseCapaXs(platOrder.getUid());
+        userCapaService.riseCapa(platOrder.getUid());
+        userCapaXsService.riseCapaXs(platOrder.getUid());
         // 5.分销佣金
         LinkedList<CommCalculateResult> commList = new LinkedList<>();
         productCommChain.orderSuccessCalculateAmt(platOrder, commList);

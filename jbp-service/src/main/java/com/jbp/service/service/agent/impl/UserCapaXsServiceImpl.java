@@ -22,6 +22,7 @@ import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserCapaXsSnapshotService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,6 +125,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         return CommonPage.copyPageInfo(page, list);
     }
 
+    @Async
     @Override
     public void riseCapaXs(Integer uid) {
         UserCapaXs userCapaXs = getByUser(uid);// 用户星级
