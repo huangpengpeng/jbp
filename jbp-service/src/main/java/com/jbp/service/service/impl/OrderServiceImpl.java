@@ -1198,6 +1198,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         return list(lqw);
     }
 
+    @Override
+    public Order getLastOne(Integer uid, String platform) {
+        return getOne(new QueryWrapper<Order>().lambda()
+                .eq(Order::getUid, uid)
+                .eq(Order::getPaid, true)
+                .eq(Order::getLevel, 0)
+                .eq(StringUtils.isEmpty(platform), Order::getPlatform, "报单")
+                .orderByDesc(Order::getId)
+                .last(" limit 1"));
+    }
+
     /**
      * 根据订单编号获取订单
      *

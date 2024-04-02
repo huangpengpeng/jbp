@@ -15,12 +15,16 @@ import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaSnapshot;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
+import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.dao.agent.UserCapaDao;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
@@ -34,15 +38,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> implements UserCapaService {
 
+    @Resource
+    private OrderService orderService;
     @Resource
     private CapaService capaService;
     @Resource
@@ -150,6 +156,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         Map<Long, Capa> capaMap = capaService.getCapaMap();
         Long capaId = userCapa == null ? capaService.getMinCapa().getId() : userCapa.getCapaId();
         Long riseCapaId = null;
+        Map<String, Boolean> riseMap = Maps.newConcurrentMap();
         do {
             // 检查当前等级满足
             Capa capa = capaMap.get(capaId);
@@ -167,6 +174,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             Boolean ifRise = capa.parser(map);
             if(BooleanUtils.isTrue(ifRise)){
                 riseCapaId = capa.getId();
+                riseMap = map;
             }
             capaId = capa.getPCapaId();
             if (capaId == null) {
@@ -180,9 +188,25 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         }
         // 升级
         if (userCapa == null || riseCapaId.compareTo(userCapa.getCapaId()) > 0) {
-            saveOrUpdateCapa(uid, riseCapaId, "", "满足升级条件升级");
+            String orderNo = "";
+            Boolean b = riseMap.get(ConditionEnum.单笔金额升级.getName());
+            if (b != null && BooleanUtils.isTrue(b)) {
+                Order order = orderService.getLastOne(uid, "");
+                if (order != null) {
+                    orderNo = order.getOrderNo();
+                }
+            }
+            b = riseMap.get(ConditionEnum.补差金额升级.getName());
+            if (b != null && BooleanUtils.isTrue(b)) {
+                Order order = orderService.getLastOne(uid, "报单");
+                if (order != null) {
+                    orderNo = order.getOrderNo();
+                }
+            }
+            Set<String> strings = riseMap.keySet();
+            String join = StringUtils.join(strings, ",");
+            saveOrUpdateCapa(uid, riseCapaId, join, orderNo);
         }
-
     }
 
     @Override

@@ -10,12 +10,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.*;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
+import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.dao.agent.UserCapaXsDao;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -30,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -46,6 +51,8 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     private ConditionChain conditionChain;
     @Resource
     private UserCapaXsDao userCapaXsDao;
+    @Resource
+    private OrderService orderService;
 
     @Override
     public UserCapaXs getByUser(Integer uid) {
@@ -132,6 +139,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         Map<Long, CapaXs> capaXsMap = capaXsService.getCapaXsMap();
         Long capaId = userCapaXs == null ? capaXsService.getMinCapa().getId() : userCapaXs.getCapaId();
         Long riseCapaId = null;
+        Map<String, Boolean> riseMap = Maps.newConcurrentMap();
         do {
             // 检查当前等级满足 更新非虚拟  不满足自己等级存在就是虚拟
             CapaXs capaXs = capaXsMap.get(capaId);
@@ -148,6 +156,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             Boolean ifRise = capaXs.parser(map);
             if (BooleanUtils.isTrue(ifRise)) {
                 riseCapaId = capaXs.getId();
+                riseMap = map;
             }
             capaId = capaXs.getPCapaId();
             if (capaId == null) {
@@ -164,7 +173,24 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             return;
         }
         if (userCapaXs == null || riseCapaId.compareTo(userCapaXs.getCapaId()) >= 0) {
-            saveOrUpdateCapa(uid, riseCapaId, false, "", "满足升级条件升级");
+            String orderNo = "";
+            Boolean b = riseMap.get(ConditionEnum.单笔金额升级.getName());
+            if(b != null && BooleanUtils.isTrue(b)){
+                Order order = orderService.getLastOne(uid, "");
+                if(order != null){
+                    orderNo = order.getOrderNo();
+                }
+            }
+            b = riseMap.get(ConditionEnum.补差金额升级.getName());
+            if(b != null && BooleanUtils.isTrue(b)) {
+                Order order = orderService.getLastOne(uid, "报单");
+                if (order != null) {
+                    orderNo = order.getOrderNo();
+                }
+            }
+            Set<String> strings = riseMap.keySet();
+            String join = StringUtils.join(strings, ",");
+            saveOrUpdateCapa(uid, riseCapaId, false, join, orderNo);
         }
     }
 
