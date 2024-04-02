@@ -14,6 +14,7 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.AsyncUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
@@ -53,6 +54,8 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     private UserCapaXsDao userCapaXsDao;
     @Resource
     private OrderService orderService;
+    @Resource
+    public AsyncUtils asyncUtils;
 
     @Override
     public UserCapaXs getByUser(Integer uid) {
@@ -133,9 +136,8 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         return CommonPage.copyPageInfo(page, list);
     }
 
-    @Async
     @Override
-    public void riseCapaXs(Integer uid) {
+    public void riseCapaXs(Integer uid)  {
         UserCapaXs userCapaXs = getByUser(uid);// 用户星级
         Map<Long, CapaXs> capaXsMap = capaXsService.getCapaXsMap();
         Long capaId = userCapaXs == null ? capaXsService.getMinCapa().getId() : userCapaXs.getCapaId();
@@ -147,7 +149,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             // 升级条件
             List<RiseCondition> conditionList = capaXs.getConditionList();
             Map<String, Boolean> map = Maps.newConcurrentMap();
-            if(CollectionUtils.isNotEmpty(conditionList)){
+            if (CollectionUtils.isNotEmpty(conditionList)) {
                 for (RiseCondition riseCondition : conditionList) {
                     Boolean ok = conditionChain.isOk(uid, riseCondition);
                     map.put(riseCondition.getName(), ok);
@@ -170,20 +172,20 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             return;
         }
         // 升级[等级相同也不是虚拟等级退出]
-        if(userCapaXs != null && riseCapaId.compareTo(userCapaXs.getCapaId()) == 0 && BooleanUtils.isFalse(userCapaXs.getIfFake())){
+        if (userCapaXs != null && riseCapaId.compareTo(userCapaXs.getCapaId()) == 0 && BooleanUtils.isFalse(userCapaXs.getIfFake())) {
             return;
         }
         if (userCapaXs == null || riseCapaId.compareTo(userCapaXs.getCapaId()) >= 0) {
             String orderNo = "";
             Boolean b = riseMap.get(ConditionEnum.单笔金额升级.getName());
-            if(b != null && BooleanUtils.isTrue(b)){
+            if (b != null && BooleanUtils.isTrue(b)) {
                 Order order = orderService.getLastOne(uid, "");
-                if(order != null){
+                if (order != null) {
                     orderNo = order.getOrderNo();
                 }
             }
             b = riseMap.get(ConditionEnum.补差金额升级.getName());
-            if(b != null && BooleanUtils.isTrue(b)) {
+            if (b != null && BooleanUtils.isTrue(b)) {
                 Order order = orderService.getLastOne(uid, "报单");
                 if (order != null) {
                     orderNo = order.getOrderNo();
@@ -193,6 +195,12 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             String join = StringUtils.join(strings, ",");
             saveOrUpdateCapa(uid, riseCapaId, false, join, orderNo);
         }
+    }
+
+
+    @Override
+    public  void asyncRiseCapaXs(Integer uid) {
+        asyncUtils.exec(uid, param -> riseCapaXs((Integer) param));
     }
 
     @Override

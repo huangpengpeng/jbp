@@ -31,5 +31,7 @@ public interface UserCapaService extends IService<UserCapa> {
 
     void riseCapa(Integer uid);
 
+    void  asyncRiseCapa(Integer uid);
+
     Map<Integer, UserCapa> getUidMap(List<Integer> uIdList);
 }

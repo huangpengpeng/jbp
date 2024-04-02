@@ -19,6 +19,8 @@ public interface UserCapaXsService extends IService<UserCapaXs> {
 
     void riseCapaXs(Integer uid);
 
+    void asyncRiseCapaXs(Integer uid);
+
     List<UserCapaXs> getRelationUnder(Integer uid, Long capaId);
 
     List<UserCapaXs> getInvitationUnder(Integer uid, Long capaId);

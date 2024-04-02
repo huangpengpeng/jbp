@@ -19,6 +19,7 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.AsyncUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
@@ -59,6 +60,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private UserService userService;
     @Resource
     private ConditionChain conditionChain;
+    @Resource
+    private AsyncUtils asyncUtils;
     @Resource
     private UserCapaDao dao;
 
@@ -149,7 +152,6 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
 
     }
 
-    @Async
     @Override
     public void riseCapa(Integer uid) {
         UserCapa userCapa = getByUser(uid);// 用户等级
@@ -207,6 +209,11 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             String join = StringUtils.join(strings, ",");
             saveOrUpdateCapa(uid, riseCapaId, join, orderNo);
         }
+    }
+
+    @Override
+    public void asyncRiseCapa(Integer uid) {
+        asyncUtils.exec(uid, param -> riseCapa((Integer) param));
     }
 
     @Override

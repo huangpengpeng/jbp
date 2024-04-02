@@ -1,6 +1,8 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,6 +40,10 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+         UserCapaXsService bean1 = run.getBean(UserCapaXsService.class);
+         bean1.asyncRiseCapaXs(1021205);
+         System.out.println("111");
 
 //
 //        KqPayService bean1 = run.getBean(KqPayService.class);
