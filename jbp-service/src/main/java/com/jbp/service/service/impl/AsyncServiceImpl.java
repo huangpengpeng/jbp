@@ -265,7 +265,15 @@ public class AsyncServiceImpl implements AsyncService {
             return;
         }
         redisTemplate.expire("orderPaySuccessSplit2" + order.getOrderNo(), 1, TimeUnit.MINUTES);
-
+        order = orderService.getByOrderNo(order.getOrderNo());
+        List<Order> shOrders = orderService.getByPlatOrderNo(order.getOrderNo());
+        if (CollectionUtils.isNotEmpty(shOrders)) {
+            return;
+        }
+        if (ObjectUtil.isNull(order)) {
+            logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", order.getOrderNo());
+            return;
+        }
         // 1. 处理收益【等级  星级 活跃 白名单 积分】
         productProfitChain.orderSuccess(order);
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(order.getOrderNo());
