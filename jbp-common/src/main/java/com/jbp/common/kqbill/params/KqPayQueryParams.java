@@ -19,6 +19,8 @@ public class KqPayQueryParams {
 
     private String queryType="0";
 
+    private String queryMode="1";
+
     /**
      * 订单ID
      */

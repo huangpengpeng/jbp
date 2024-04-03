@@ -89,7 +89,7 @@ public class KqPayServiceImpl implements KqPayService {
         body.setMerchantAcctId(payInfo.getMerchantId());
         JSONObject originalString = new JSONObject();
         originalString.put("head", head);
-        originalString.put("requestBody", body);
+        originalString.put("requestBody",JSONObject.parseObject(JSONObject.toJSONString(body)));
         log.info("交易查询快钱原始报文 = {}", originalString.toJSONString());
         try {
             String s = buildHttpsClient.requestKQ(originalString);
