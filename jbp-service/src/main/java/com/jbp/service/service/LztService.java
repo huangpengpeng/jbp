@@ -78,4 +78,10 @@ public interface LztService {
     */
    AcctSerialResult  queryAcctSerial(String oidPartner, String priKey, String userId, String userType, String dateStart, String endStart, String flagDc, String pageNo);
 
+   /**
+    * 短验二次确认
+    */
+   ValidationSmsResult validationSms(String oidPartner, String priKey, String payer_id, String txn_seqno, String total_amount, String token, String verify_code);
+
+
 }

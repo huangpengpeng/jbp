@@ -1,0 +1,38 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="轻养前台" type="DEPLOY_HOST_RUN_CONFIGURATION" factoryName="Deploy to Host">
+    <option name="accountModel" />
+    <option name="accountModels" />
+    <option name="address" />
+    <option name="afterCommand" value="rm -rf qyfront.jar &amp;&amp; mv  Jbp-front.jar  qyfront.jar &amp;&amp; ./startup.sh restart" />
+    <option name="alreadyReset" value="true" />
+    <option name="autoOpen" value="false" />
+    <option name="beforeCommand" value="su 12345Aa#" />
+    <option name="defaultTabIdx" value="0" />
+    <option name="ecsInstance">
+      <EcsInstance>
+        <option name="OSType" />
+        <option name="instanceId" />
+        <option name="instanceName" />
+        <option name="netType" />
+        <option name="privateIps" />
+        <option name="publicIps" />
+        <option name="regionId" />
+        <option name="tags" />
+      </EcsInstance>
+    </option>
+    <option name="ecsInstances" />
+    <option name="hostIds">
+      <list>
+        <option value="5" />
+      </list>
+    </option>
+    <option name="hostTagId" value="0" />
+    <option name="location" value="/opt/qy/front" />
+    <option name="pathOrUrl" value="$PROJECT_DIR$/jbp-front/target/Jbp-front.jar" />
+    <option name="tagId" value="0" />
+    <option name="terminalCommand" value="tail -f  /opt/qy/front/qyfront.log" />
+    <option name="type" value="HOST" />
+    <option name="uploadType" value="FILE" />
+    <method v="2" />
+  </configuration>
+</component>
