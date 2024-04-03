@@ -28,7 +28,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("api/admin/agent/lzt/withdrawal")
 @Api(tags = "来账通提现接口")
-public class                                                                                                                                                                                                                                                       LztWithdrawalController {
+public class LztWithdrawalController {
 
 
     @Resource
@@ -36,7 +36,7 @@ public class                                                                    
     @Resource
     private LztWithdrawalService lztWithdrawalService;
 
-//    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:create')")
+    //    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:create')")
     @ApiOperation(value = "来账通提现")
     @GetMapping(value = "/create")
     public CommonResult<LztWithdrawal> apply(HttpServletRequest request, String payeeId, String payCode,
@@ -51,12 +51,14 @@ public class                                                                    
         LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, postscript, pwd, randomKey, ip);
         return CommonResult.success(result);
     }
+
     @ApiOperation(value = "来账通提现刷新")
     @GetMapping(value = "/refresh")
     public CommonResult refresh(String accpTxno) {
         lztWithdrawalService.refresh(accpTxno);
         return CommonResult.success();
     }
+
     @PreAuthorize("hasAuthority('agent:lzt:withdrawal:page')")
     @ApiOperation(value = "分页")
     @GetMapping(value = "/page")
