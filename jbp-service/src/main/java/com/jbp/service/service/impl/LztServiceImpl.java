@@ -438,4 +438,35 @@ public class LztServiceImpl implements LztService {
             throw new CrmebException("获取资金流水失败:" + e.getMessage());
         }
     }
+
+    @Override
+    public ValidationSmsResult validationSms(String oidPartner, String priKey, String payer_id, String txn_seqno,
+                                             String total_amount, String token, String verify_code) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        ValidationSmsParams params = new ValidationSmsParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setPayer_type("USER");
+        params.setPayer_id(payer_id);
+        params.setTxn_seqno(txn_seqno);
+        params.setTotal_amount(total_amount);
+        params.setToken(token);
+        params.setVerify_code(verify_code);
+        String url = "https://accpapi.lianlianpay.com/v1/txn/validation-sms";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("短信二次验证失败" + payer_id);
+        }
+        try {
+            ValidationSmsResult result = JSON.parseObject(s, ValidationSmsResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("短信二次验证未成功：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("短信二次验证未成功:" + e.getMessage());
+        }
+    }
 }
