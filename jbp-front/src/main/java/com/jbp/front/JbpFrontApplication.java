@@ -55,8 +55,8 @@ public class JbpFrontApplication {
 //        String cashier = bean1.cashier("franky", "115.196.160.207", orderId, BigDecimal.valueOf(1), "11", now);
 //        System.out.println(cashier);
 
-//        KqPayQueryResult cs66084567814990 = bean1.queryPayResult("CS_66084567814990");
+        KqPayQueryResult cs66084567814990 = bean1.queryPayResult("CS_66084567814990");
 
-//        System.out.println(cs66084567814990);
+        System.out.println(cs66084567814990);
     }
 }
