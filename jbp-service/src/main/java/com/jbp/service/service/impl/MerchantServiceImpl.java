@@ -1055,7 +1055,8 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
             e.printStackTrace();
         }
         systemAdmin.setAccount(request.getPhone());
-        systemAdmin.setPwd(CrmebUtil.encryptPassword(pwd, request.getPhone()));
+        systemAdmin.setPhone(request.getPhone());
+        systemAdmin.setPwd(CrmebUtil.encryptPassword(pwd, systemAdmin.getAccount()));
         return transactionTemplate.execute(e -> {
             updateById(merchant);
             adminService.updateById(systemAdmin);

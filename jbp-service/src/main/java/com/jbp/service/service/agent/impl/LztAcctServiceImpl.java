@@ -116,6 +116,10 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             } else {
                 s.setMerName(merchant.getName());
             }
+            //查询用户用户信息
+            LztAcct bankAcctInfo=details(s.getUserId());
+            s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
+            s.setBankAcctInfoList(bankAcctInfo.getBankAcctInfoList());
         });
 
         return CommonPage.copyPageInfo(page, list);
