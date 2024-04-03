@@ -45,16 +45,6 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
-//        LztAcctController bean = run.getBean(LztAcctController.class);
-//        Date now = DateTimeUtils.getNow();
-//        String dateStart = DateTimeUtils.format(DateTimeUtils.addDays(now, -10), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-//        String endStart = DateTimeUtils.format(now, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-//        CommonResult<CommonPage<AcctBalList>> page = bean.serialPage("gz0002", dateStart, endStart, null, 1);
-
-//        LztTransferMorepyeeService bean = run.getBean(LztTransferMorepyeeService.class);
-////        final Map<String, Object> info = bean.info(4);
-////        System.out.println("ok");
-
     }
 
 }
