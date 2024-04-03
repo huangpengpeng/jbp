@@ -189,4 +189,23 @@ public class LztAcctController {
         page.setList(acctbalList);
         return CommonResult.success(page);
     }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:validationSms')")
+    @SneakyThrows
+    @ApiOperation(value = "短信二次校验")
+    @GetMapping(value = "/validationSms")
+    public CommonResult validationSms(String userId, String payCode, String amt, String token, String code) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, amt, token, code);
+        return CommonResult.success();
+    }
+
+
 }
