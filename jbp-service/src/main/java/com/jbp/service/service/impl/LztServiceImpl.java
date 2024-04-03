@@ -96,30 +96,23 @@ public class LztServiceImpl implements LztService {
         }
     }
 
-    @Override
-    public AcctInfoResult queryAcct(String oidPartner, String priKey, String userId, String userType) {
-        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
-        AcctInfoParams params = new AcctInfoParams();
-        params.setTimestamp(LLianPayDateUtils.getTimestamp());
-        params.setOid_partner(oidPartner);
-        params.setUser_id(userId);
-        params.setUser_type(userType);
-        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctinfo";
-        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
-        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        if (StringUtils.isEmpty(s)) {
-            throw new CrmebException("查询连连资金账户异常:" + userId);
-        }
-        try {
-            AcctInfoResult result = JSON.parseObject(s, AcctInfoResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
-                throw new CrmebException("查询连连资金账户异常：" + result == null ? "请求结果为空" : result.getRet_msg());
-            }
-            return result;
-        } catch (Exception e) {
-            throw new CrmebException("查询连连资金账户异常:" + s);
-        }
-    }
+	@Override
+	public AcctInfoResult queryAcct(String oidPartner, String priKey, String userId, String userType) {
+		LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+		AcctInfoParams params = new AcctInfoParams();
+		params.setTimestamp(LLianPayDateUtils.getTimestamp());
+		params.setOid_partner(oidPartner);
+		params.setUser_id(userId);
+		params.setUser_type(userType);
+		String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctinfo";
+		LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+		String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+		if (StringUtils.isEmpty(s)) {
+			throw new CrmebException("查询连连资金账户异常:" + userId);
+		}
+		AcctInfoResult result = JSON.parseObject(s, AcctInfoResult.class);
+		return result;
+	}
 
     @Override
     public LztOpenacctApplyResult createBankUser(String oidPartner, String priKey, String userId, String txnSeqno, String shopId, String shopName, String province, String city, String area, String address, String notifyUrl) {

@@ -1098,7 +1098,6 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
     @Override
     public Map<Integer, Merchant> getMapByIdList(List<Integer> merIdList) {
         LambdaQueryWrapper<Merchant> lqw = Wrappers.lambdaQuery();
-        lqw.select(Merchant::getId, Merchant::getName, Merchant::getIsSelf, Merchant::getTypeId, Merchant::getCategoryId, Merchant::getAvatar);
         lqw.in(Merchant::getId, merIdList);
         List<Merchant> merchantList = dao.selectList(lqw);
         Map<Integer, Merchant> merchantMap = CollUtil.newHashMap();
