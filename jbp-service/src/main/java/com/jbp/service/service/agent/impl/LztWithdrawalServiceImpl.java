@@ -2,13 +2,16 @@ package com.jbp.service.service.agent.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.lianlian.result.QueryLinkedAcctResult;
 import com.jbp.common.lianlian.result.QueryWithdrawalResult;
+import com.jbp.common.lianlian.result.WithdrawalCheckResult;
 import com.jbp.common.lianlian.result.WithdrawalResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransferMorepyee;
@@ -25,6 +28,7 @@ import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztWithdrawalService;
 import com.jbp.service.util.StringUtils;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -66,45 +70,78 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + drawNo;
+
+        String linked_acctno = "";
+        if(LianLianPayConfig.UserType.个人用户.name().equals(lztAcct.getUserType())){
+
+            QueryLinkedAcctResult queryLinkedAcctResult = lztService.queryLinkedAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
+            if(queryLinkedAcctResult == null || CollectionUtils.isEmpty(queryLinkedAcctResult.getLinked_acctlist())){
+                throw new RuntimeException("个人用户提现请先绑定银行卡");
+            }
+            linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
+        }
+        BigDecimal feeScale = payInfo.getFeeScale() == null ? BigDecimal.valueOf(0.0038) : payInfo.getFeeScale();
+        BigDecimal feeAmount = amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         WithdrawalResult orderResult = lztService.withdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), userId, drawNo,
-                amt, postscript, password, random_key, ip, notifyUrl);
-        BigDecimal feeAmount = orderResult.getFee_amount() == null ? BigDecimal.ZERO : BigDecimal.valueOf(orderResult.getFee_amount());
+                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno);
+
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt, feeAmount, postscript, orderResult);
         save(withdrawal);
         return withdrawal;
     }
 
     @Override
-    public void callBack(QueryWithdrawalResult result) {
-        String accpTxno = result.getAccp_txno();
-        LztWithdrawal withdrawal = getByAccpTxno(accpTxno);
+    public LztWithdrawal check(Long id, String checkReturn, String checkReason) {
+        LztWithdrawal lztWithdrawal = getById(id);
+        LztAcct lztAcct = lztAcctService.getByUserId(lztWithdrawal.getUserId());
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        lztService.withdrawalCheck(payInfo.getOidPartner(), payInfo.getPriKey(), lztWithdrawal.getTxnSeqno(),
+                lztWithdrawal.getAmt().toString(), checkReturn, checkReason, lztWithdrawal.getFeeAmount().toString());
+        return getById(id);
+    }
+
+    @SneakyThrows
+    @Override
+    public LztWithdrawal callBack(QueryWithdrawalResult result) {
+        if(result == null || result.getOrderInfo() == null || StringUtils.isEmpty(result.getOrderInfo().getTxn_seqno())){
+            return null;
+        }
+        String txnSeqno = result.getOrderInfo().getTxn_seqno();
+        LztWithdrawal withdrawal = getByTxnSeqno(txnSeqno);
         if (withdrawal == null) {
-            return;
+            return null;
         }
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(withdrawal.getTxnStatus())) {
-            return;
+            return withdrawal;
         }
         if(result.getTxn_status().equals(LianLianPayConfig.TxnStatus.交易成功.getCode())){
-            withdrawal.setFinishTime(DateTimeUtils.parseDate(result.getFinish_time()));
+            withdrawal.setFinishTime(DateTimeUtils.parseDate(result.getFinish_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         }
         withdrawal.setTxnStatus(LianLianPayConfig.TxnStatus.getName(result.getTxn_status()));
         withdrawal.setQueryRet(result);
         updateById(withdrawal);
+        return withdrawal;
     }
 
     @Override
-    public void refresh(String accpTxno) {
-        LztWithdrawal withdrawal = getByAccpTxno(accpTxno);
+    public LztWithdrawal refresh(String txnSeqno) {
+        LztWithdrawal withdrawal = getByTxnSeqno(txnSeqno);
         if (withdrawal == null) {
-            return;
+            return null;
         }
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(withdrawal.getTxnStatus())) {
-            return;
+            return withdrawal;
         }
         Merchant merchant = merchantService.getById(withdrawal.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        QueryWithdrawalResult result = lztService.queryWithdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), accpTxno);
-        callBack(result);
+        QueryWithdrawalResult result = lztService.queryWithdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno);
+
+        LztWithdrawal lztWithdrawal = callBack(result);
+        if (lztWithdrawal == null) {
+            return withdrawal;
+        }
+        return lztWithdrawal;
     }
 
     @Override
@@ -131,8 +168,11 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
                 s.setMerName("平台");
             } else {
                 s.setMerName(merchant.getName());
+                s = refresh(s.getTxnSeqno());
             }
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
+
 }

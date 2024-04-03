@@ -14,7 +14,7 @@ public interface LztFundTransferService extends IService<LztFundTransfer> {
     LztFundTransfer fundTransfer(Integer merId, String userId, String bankAccountNo, BigDecimal amt, String postscript);
 
 
-    void refresh(String accpTxno);
+    LztFundTransfer refresh(String txnSeqno);
 
     LztFundTransfer getByTxnSeqno(String txnSeqno);
 

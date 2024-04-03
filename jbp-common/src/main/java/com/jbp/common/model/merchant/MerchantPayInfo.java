@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -25,5 +26,6 @@ public class MerchantPayInfo implements Serializable {
     @ApiModelProperty(value = "连连私钥")
     private String priKey;
 
-
+    @ApiModelProperty(value = "手续费比例")
+    private BigDecimal feeScale;
 }

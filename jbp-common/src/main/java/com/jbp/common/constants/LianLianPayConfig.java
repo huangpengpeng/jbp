@@ -62,6 +62,10 @@ public class LianLianPayConfig {
         退汇("退汇", "TRADE_CANCEL"),
         预付完成("预付完成", "TRADE_PREPAID"),
 
+        待确认("待确认", "TRADE_CHECKING"),
+
+
+
 
         ;
 

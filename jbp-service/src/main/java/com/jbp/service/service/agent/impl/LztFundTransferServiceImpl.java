@@ -9,6 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.LztFundTransferResult;
 import com.jbp.common.lianlian.result.LztQueryFundTransferResult;
+import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztFundTransfer;
@@ -61,17 +62,18 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
     }
 
     @Override
-    public void refresh(String accpTxno) {
-        LztFundTransfer lztFundTransfer = getByAccpTxno(accpTxno);
+    public LztFundTransfer refresh(String txnSeqno) {
+        LztFundTransfer lztFundTransfer = getByTxnSeqno(txnSeqno);
         if (lztFundTransfer == null || lztFundTransfer.getStatus().equals(LianLianPayConfig.FundTransferStatus.成功.name())) {
-            return;
+            return lztFundTransfer;
         }
         Merchant merchant = merchantService.getById(lztFundTransfer.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        LztQueryFundTransferResult result = lztService.queryFundTransfer(payInfo.getOidPartner(), payInfo.getPriKey(), lztFundTransfer.getUserId(), accpTxno);
+        LztQueryFundTransferResult result = lztService.queryFundTransfer(payInfo.getOidPartner(), payInfo.getPriKey(), lztFundTransfer.getUserId(), txnSeqno);
         lztFundTransfer.setStatus(LianLianPayConfig.FundTransferStatus.getName(result.getTxn_status()));
         lztFundTransfer.setRetMsg(result.getRet_msg());
         updateById(lztFundTransfer);
+        return lztFundTransfer;
     }
 
     @Override
@@ -110,7 +112,9 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
                 s.setMerName("平台");
             } else {
                 s.setMerName(merchant.getName());
+
             }
+            s = refresh(s.getTxnSeqno());
         });
 
         return CommonPage.copyPageInfo(page, list);

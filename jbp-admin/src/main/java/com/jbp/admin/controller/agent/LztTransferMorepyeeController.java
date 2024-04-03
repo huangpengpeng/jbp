@@ -35,7 +35,7 @@ public class LztTransferMorepyeeController {
     @Resource
     private LztTransferMorepyeeService lztTransferMorepyeeService;
 
-//    @PreAuthorize("hasAuthority('agent:lzt:transfer:morepyee:create')")
+    @PreAuthorize("hasAuthority('agent:lzt:transfer:morepyee:create')")
     @ApiOperation(value = "来账通内部代发")
     @GetMapping(value = "/create")
     public CommonResult<LztTransferMorepyee> apply(HttpServletRequest request, String payerId, String payeeId, String payCode,

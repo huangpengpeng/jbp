@@ -23,13 +23,16 @@ import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import com.jbp.service.util.StringUtils;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -71,37 +74,51 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         return transferMorepyee;
     }
 
+    @SneakyThrows
     @Override
-    public void callBack(QueryPaymentResult paymentResult) {
-        String accpTxno = paymentResult.getAccp_txno();
-        LztTransferMorepyee transferMorepyee = getByAccpTxno(accpTxno);
+    public LztTransferMorepyee callBack(QueryPaymentResult paymentResult) {
+        if(paymentResult == null || paymentResult.getOrderInfo() == null ){
+            return null;
+        }
+        String txnSeqno = paymentResult.getOrderInfo().getTxn_seqno();
+        if(StringUtils.isEmpty(txnSeqno)){
+            return null;
+        }
+        LztTransferMorepyee transferMorepyee = getByTxnSeqno(txnSeqno);
         if (transferMorepyee == null) {
-            return;
+            return null;
         }
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(transferMorepyee.getTxnStatus())) {
-            return;
+            return transferMorepyee;
         }
         if (paymentResult.getTxn_status().equals(LianLianPayConfig.TxnStatus.交易成功.getCode())) {
-            transferMorepyee.setFinishTime(DateTimeUtils.parseDate(paymentResult.getFinish_time()));
+            transferMorepyee.setFinishTime(DateTimeUtils.parseDate(paymentResult.getFinish_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         }
         transferMorepyee.setTxnStatus(LianLianPayConfig.TxnStatus.getName(paymentResult.getTxn_status()));
         transferMorepyee.setQueryRet(paymentResult);
         updateById(transferMorepyee);
+        return transferMorepyee;
     }
 
+
+
     @Override
-    public void refresh(String accpTxno) {
-        LztTransferMorepyee lztTransferMorepyee = getByAccpTxno(accpTxno);
+    public LztTransferMorepyee refresh(String txnSeqno) {
+        LztTransferMorepyee lztTransferMorepyee = getByTxnSeqno(txnSeqno);
         if (lztTransferMorepyee == null) {
-            return;
+            return null;
         }
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(lztTransferMorepyee.getTxnStatus())) {
-            return;
+            return lztTransferMorepyee;
         }
         Merchant merchant = merchantService.getById(lztTransferMorepyee.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        QueryPaymentResult result = lztService.queryTransferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(), accpTxno);
-        callBack(result);
+        QueryPaymentResult result = lztService.queryTransferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno);
+        LztTransferMorepyee lztTransferMorepyee1 = callBack(result);
+        if (lztTransferMorepyee1 == null) {
+            return lztTransferMorepyee;
+        }
+        return lztTransferMorepyee1;
     }
 
     @Override
@@ -140,6 +157,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
                 s.setMerName("平台");
             } else {
                 s.setMerName(merchant.getName());
+                s=  refresh(s.getTxnSeqno());
             }
         });
         return CommonPage.copyPageInfo(page, list);

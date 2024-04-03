@@ -36,7 +36,7 @@ public class LztWithdrawalController {
     @Resource
     private LztWithdrawalService lztWithdrawalService;
 
-    //    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:create')")
+    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:create')")
     @ApiOperation(value = "来账通提现")
     @GetMapping(value = "/create")
     public CommonResult<LztWithdrawal> apply(HttpServletRequest request, String payeeId, String payCode,
@@ -49,6 +49,14 @@ public class LztWithdrawalController {
         }
         String ip = CrmebUtil.getClientIp(request);
         LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, postscript, pwd, randomKey, ip);
+        return CommonResult.success(result);
+    }
+
+    @PreAuthorize("hasAuthority('agent:lzt:withdrawal:affrim')")
+    @ApiOperation(value = "来账通提现确认")
+    @GetMapping(value = "/affrim")
+    public CommonResult<LztWithdrawal> affrim(Long id, String checkReturn, String checkReason) {
+        LztWithdrawal result = lztWithdrawalService.check(id, checkReturn, checkReason);
         return CommonResult.success(result);
     }
 

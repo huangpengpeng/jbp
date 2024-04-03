@@ -15,9 +15,9 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
                                          BigDecimal amt, String txnPurpose, String pwd,
                                          String randomKey, String payeeId, String ip, String postscript);
 
-    void callBack(QueryPaymentResult paymentResult);
+    LztTransferMorepyee callBack(QueryPaymentResult paymentResult);
 
-    void refresh(String accpTxno);
+    LztTransferMorepyee refresh(String txnSeqno);
 
     LztTransferMorepyee getByTxnSeqno(String txnSeqno);
 

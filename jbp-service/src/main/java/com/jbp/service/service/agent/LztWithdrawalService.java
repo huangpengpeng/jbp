@@ -19,10 +19,11 @@ public interface LztWithdrawalService extends IService<LztWithdrawal> {
     LztWithdrawal getByAccpTxno(String accpTxno);
 
     LztWithdrawal withdrawal(Integer merId, String userId, String drawNo, BigDecimal amt, String postscript, String password, String random_key, String ip);
+    LztWithdrawal check(Long id, String checkReturn, String checkReason);
 
-    void callBack(QueryWithdrawalResult result);
+    LztWithdrawal callBack(QueryWithdrawalResult result);
 
-    void refresh(String accpTxno);
+    LztWithdrawal refresh(String txnSeqno);
 
     PageInfo<LztWithdrawal> pageList(Integer merId, String userId, String txnSeqno, String accpTxno, String status, Date startTime, Date endTime, PageParamRequest pageParamRequest);
 }

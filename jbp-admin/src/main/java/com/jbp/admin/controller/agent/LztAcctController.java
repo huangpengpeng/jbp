@@ -8,6 +8,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.AcctBalList;
 import com.jbp.common.lianlian.result.AcctSerialResult;
 import com.jbp.common.lianlian.result.ApplyPasswordElementResult;
+import com.jbp.common.lianlian.result.ValidationSmsResult;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
@@ -118,7 +119,7 @@ public class LztAcctController {
         result.setPayCode(payCode);
         return CommonResult.success(result);
     }
-    @PreAuthorize("hasAuthority('agent:lzt:acct:purposeList')")
+
     @ApiOperation(value = "来账通账户代发资金用途")
     @GetMapping(value = "/purposeList")
     public CommonResult<List<String>> purposeList() {
@@ -190,7 +191,6 @@ public class LztAcctController {
         return CommonResult.success(page);
     }
 
-    @PreAuthorize("hasAuthority('agent:lzt:acct:validationSms')")
     @SneakyThrows
     @ApiOperation(value = "短信二次校验")
     @GetMapping(value = "/validationSms")
