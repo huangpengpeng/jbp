@@ -273,7 +273,7 @@ public class LztServiceImpl implements LztService {
         }
         try {
             TransferMorepyeeResult result = JSON.parseObject(s, TransferMorepyeeResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
+            if (result == null || !"8888".equals(result.getRet_code())) {
                 throw new CrmebException("内部转账异常：" + result == null ? "请求结果为空" : result.getRet_msg());
             }
             return result;
