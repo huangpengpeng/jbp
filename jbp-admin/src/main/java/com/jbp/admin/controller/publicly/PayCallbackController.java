@@ -167,19 +167,19 @@ public class PayCallbackController {
             if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通划拨资金.getPrefix())) {
                 LztFundTransfer lztFundTransfer = lztFundTransferService.getByTxnSeqno(txnSeqno);
                 if (lztFundTransfer != null) {
-                    lztFundTransferService.refresh(lztFundTransfer.getAccpTxno());
+                    lztFundTransferService.refresh(txnSeqno);
                 }
             }
             if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix())) {
                 LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(txnSeqno);
                 if (lztTransferMorepyee != null) {
-                    lztTransferMorepyeeService.refresh(lztTransferMorepyee.getAccpTxno());
+                    lztTransferMorepyeeService.refresh(txnSeqno);
                 }
             }
             if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix())) {
                 LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(txnSeqno);
                 if (lztWithdrawal != null) {
-                    lztWithdrawalService.refresh(lztWithdrawal.getAccpTxno());
+                    lztWithdrawalService.refresh(txnSeqno);
                 }
             }
 

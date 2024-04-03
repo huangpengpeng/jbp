@@ -98,6 +98,8 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         MerchantPayInfo payInfo = merchant.getPayInfo();
         lztService.withdrawalCheck(payInfo.getOidPartner(), payInfo.getPriKey(), lztWithdrawal.getTxnSeqno(),
                 lztWithdrawal.getAmt().toString(), checkReturn, checkReason, lztWithdrawal.getFeeAmount().toString());
+        lztWithdrawal.setTxnStatus("已复核");
+        updateById(lztWithdrawal);
         return getById(id);
     }
 
