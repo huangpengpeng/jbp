@@ -6,7 +6,7 @@
     <option name="afterCommand" value="./startup.sh restart" />
     <option name="alreadyReset" value="true" />
     <option name="autoOpen" value="false" />
-    <option name="beforeCommand" value="" />
+    <option name="beforeCommand" value="./startup.sh restart" />
     <option name="defaultTabIdx" value="0" />
     <option name="ecsInstance">
       <EcsInstance>
