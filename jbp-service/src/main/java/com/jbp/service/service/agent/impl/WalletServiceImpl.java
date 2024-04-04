@@ -3,8 +3,8 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -12,7 +12,6 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
-import com.jbp.common.model.order.Order;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -20,7 +19,6 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.WalletDao;
-import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletService;
@@ -28,6 +26,7 @@ import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.service.agent.WalletService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -201,22 +200,40 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         return getByUser(uid, walletConfig.getType());
     }
 
-    @Resource
-    private OrderService orderService;
     @Override
     public void init() {
-        QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Order::getLevel, 0);
-        List<Order> list = orderService.list(queryWrapper);
-        for (Order order : list) {
-            deduction(order.getPayUid(), order.getWalletDeductionList(), order.getOrderNo(), "下单抵扣");
-            log.info("正在初始化抵扣减少");
-        }
-        for (Order order : list) {
-            if (order.getStatus().equals(Integer.valueOf(9))) {
-                refundDeduction(order.getPayUid(), order.getOrderNo(), "取消回退");
-                log.info("正在初始化抵扣回退");
+
+        List<Map<String, Object>> maps = SqlRunner.db().selectList("select * from tmp_score where action='增加' and ifSuccess is false ");
+
+       int i = 0;
+        String externalNo = "CS_202404041703";
+        for (Map<String, Object> map : maps) {
+            Integer id = MapUtils.getInteger(map, "id");
+            Integer uid = MapUtils.getInteger(map, "uid");
+            String scoreType = MapUtils.getString(map, "scoreType");
+            BigDecimal score = BigDecimal.valueOf(MapUtils.getDouble(map, "score"));
+            Integer walletType = null;
+            if ("购物积分".equals(scoreType)) {
+                walletType = 1;
             }
+            if ("奖励积分".equals(scoreType)) {
+                walletType = 2;
+            }
+            if ("换购积分".equals(scoreType)) {
+                walletType = 3;
+            }
+            if ("福券积分".equals(scoreType)) {
+                walletType = 4;
+            }
+            if (walletType == null) {
+                continue;
+            }
+            platformWalletService.transferToUser(uid, walletType, score, WalletFlow.OperateEnum.调账.name(), externalNo, "CS");
+            SqlRunner.db().update("update tmp_score set ifSuccess = {0} where id= {1}", true, id);
+            i++;
+            log.info("增在执行增加积分操作，总数:{}, 当前条数:{}", maps.size(), i);
         }
+
+
     }
 }
