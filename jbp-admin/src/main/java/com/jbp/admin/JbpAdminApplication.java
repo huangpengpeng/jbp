@@ -37,7 +37,7 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
         WalletService walletService = run.getBean(WalletService.class);
-        walletService.init();
+        walletService.init2();
     }
 
 }

@@ -236,4 +236,39 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
 
     }
+
+    @Override
+    public void init2() {
+        List<Map<String, Object>> maps = SqlRunner.db().selectList("select * from tmp_score where action='减少' and ifSuccess is false ");
+        int i = 0;
+        String externalNo = "CS_202404041703";
+        for (Map<String, Object> map : maps) {
+            Integer id = MapUtils.getInteger(map, "id");
+            Integer uid = MapUtils.getInteger(map, "uid");
+            String scoreType = MapUtils.getString(map, "scoreType");
+            BigDecimal score = BigDecimal.valueOf(MapUtils.getDouble(map, "score"));
+            Integer walletType = null;
+            if ("购物积分".equals(scoreType)) {
+                walletType = 1;
+            }
+            if ("奖励积分".equals(scoreType)) {
+                walletType = 2;
+            }
+            if ("换购积分".equals(scoreType)) {
+                walletType = 3;
+            }
+            if ("福券积分".equals(scoreType)) {
+                walletType = 4;
+            }
+            i++;
+            if (walletType != null) {
+                Wallet wallet = getByUser(uid, walletType);
+                if(wallet != null && ArithmeticUtils.gte(wallet.getBalance(), score)){
+                    transferToPlatform(uid, walletType, score, WalletFlow.OperateEnum.调账.name(),  externalNo, "CS");
+                    SqlRunner.db().update("update tmp_score set ifSuccess = {0} where id= {1}", true, id);
+                }
+            }
+            log.info("增在执行减少积分操作，总数:{}, 当前条数:{}", maps.size(), i);
+        }
+    }
 }
