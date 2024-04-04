@@ -36,8 +36,6 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        WalletService walletService = run.getBean(WalletService.class);
-        walletService.init2();
     }
 
 }
