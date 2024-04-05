@@ -32,4 +32,6 @@ public interface WalletService extends IService<Wallet> {
     Wallet getCanPayByUser(Integer uid);
 
     void init();
+
+    void init2();
 }

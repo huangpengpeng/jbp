@@ -11,11 +11,13 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用户等级任务
@@ -27,13 +29,11 @@ public class UserCapaTask {
     private static final Logger logger = LoggerFactory.getLogger(UserCapaTask.class);
 
     @Autowired
-    private UserInvitationService invitationService;
-    @Autowired
     private UserService userService;
     @Autowired
     private UserCapaService userCapaService;
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 每天凌晨1点执行
@@ -41,28 +41,16 @@ public class UserCapaTask {
     public void refreshUserCapa() {
         // cron : 0 0 1 * * ?
         logger.info("---UserCapaTask refreshUserCapa------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
-//        if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshUserCapa"))){
-//            logger.info("---UserCapaTask refreshUserCapa-----未执行完成忽略本次", DateUtil.date());
-//            return;
-//        }
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("UserCapaTask.refreshUserCapa", 1);
+        //2.设置锁的过期时间,防止死锁
+        if (!task) {
+            //没有争抢(设置)到锁
+            logger.info("UserCapaTask.refreshUserCapa上一次任务未执行完成退出");
+            return;//方法结束
+        }
+        redisTemplate.expire("UserCapaTask.refreshUserCapa", 500, TimeUnit.MINUTES);
 
-        stringRedisTemplate.opsForValue().set("refreshUserCapa","1");
         try {
-            // 查询没下级的用户
-//            List<User> list = userService.getNoChild();
-//            // 所有的底层用户往上一次升级
-//            for (User user : list) {
-//                // 所有的上级
-//                List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
-//                if(CollectionUtils.isEmpty(allUpper)){
-//                    userCapaService.riseCapa(user.getId());
-//                }
-//                // 升级
-//                for (UserUpperDto upperDto : allUpper) {
-//                    userCapaService.riseCapa(upperDto.getUId());
-//                }
-//            }
-
             List<User> list = userService.list();
             for (User user : list) {
                 userCapaService.riseCapa(user.getId());
@@ -71,7 +59,7 @@ public class UserCapaTask {
             e.printStackTrace();
             logger.error("UserCapaTask.refreshUserCapa" + " | msg : " + e.getMessage());
         }finally {
-            stringRedisTemplate.delete("refreshUserCapa");
+            redisTemplate.delete("UserCapaTask.refreshUserCapa");
         }
     }
 }

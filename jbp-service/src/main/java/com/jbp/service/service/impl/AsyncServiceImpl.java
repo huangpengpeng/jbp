@@ -247,9 +247,8 @@ public class AsyncServiceImpl implements AsyncService {
             }
             orderExtService.updateById(orderExt);
         }
+        // 异步拆单
         orderPaySuccessSplit2(order);
-        // 释放锁
-        redisTemplate.delete("orderPaySuccessSplit" + orderNo);
     }
 
 
@@ -257,15 +256,15 @@ public class AsyncServiceImpl implements AsyncService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public void orderPaySuccessSplit2(Order order) {
-        Boolean task = redisTemplate.opsForValue().setIfAbsent("orderPaySuccessSplit2" + order.getOrderNo(), 1);
-        //1..设置锁的过期时间,防止死锁 避免卡在里面出不来
-        if (!task) {
-            //没有争抢(设置)到锁
-            logger.info("锁住订单拆单退出");
+        order = orderService.getByOrderNo(order.getOrderNo());
+        List<Order> shOrders = orderService.getByPlatOrderNo(order.getOrderNo());
+        if (CollectionUtils.isNotEmpty(shOrders)) {
             return;
         }
-        redisTemplate.expire("orderPaySuccessSplit2" + order.getOrderNo(), 1, TimeUnit.MINUTES);
-
+        if (ObjectUtil.isNull(order)) {
+            logger.error("异步——订单支付成功拆单处理 | 订单不存在，orderNo: {}", order.getOrderNo());
+            return;
+        }
         // 1. 处理收益【等级  星级 活跃 白名单 积分】
         productProfitChain.orderSuccess(order);
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(order.getOrderNo());
@@ -285,7 +284,10 @@ public class AsyncServiceImpl implements AsyncService {
             return;
         }
         orderSuccessMsgService.add(order.getOrderNo());
-        redisTemplate.delete("orderPaySuccessSplit2" + order.getOrderNo());
+        // 发送用户升级
+        redisUtil.lPush(TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY, order.getUid());
+        // 释放锁
+        redisTemplate.delete("orderPaySuccessSplit" + order.getOrderNo());
     }
 
     /**

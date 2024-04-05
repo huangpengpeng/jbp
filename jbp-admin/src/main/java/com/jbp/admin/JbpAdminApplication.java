@@ -5,6 +5,7 @@ import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration
 import com.jbp.admin.controller.publicly.OrderPullController;
 import com.jbp.common.request.ErpOrderShipSyncRequest;
 import com.jbp.service.service.LogisticService;
+import com.jbp.service.service.agent.WalletService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,6 +35,7 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
     }
 
 }
