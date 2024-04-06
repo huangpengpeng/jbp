@@ -89,8 +89,11 @@ public class MerchantAddRequest implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark;
 
-    @ApiModelProperty(value = "商户支付信息")
-    private MerchantPayInfo payInfo;
+    @ApiModelProperty(value = "连连商户号")
+    private String oidPartner;
+
+    @ApiModelProperty(value = "连连私钥")
+    private String priKey;
 
     @ApiModelProperty(value = "排序", required = true)
     @NotNull(message = "排序不能为空")

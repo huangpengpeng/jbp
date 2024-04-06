@@ -273,7 +273,12 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (StrUtil.isNotBlank(merchant.getQualificationPicture())) {
             merchant.setQualificationPicture(systemAttachmentService.clearPrefix(merchant.getQualificationPicture()));
         }
-        merchant.setPayInfo(request.getPayInfo());
+        
+        MerchantPayInfo payInfo=new MerchantPayInfo();
+        payInfo.setOidPartner(request.getOidPartner());
+        payInfo.setPriKey(request.getPriKey());
+        
+        merchant.setPayInfo(payInfo);
         merchant.setCreateType(createType);
         merchant.setCreateId(createId);
 
@@ -330,6 +335,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         systemAdmin.setStatus(true);
         systemAdmin.setRoles(RoleEnum.SUPER_MERCHANT.getValue().toString());
         systemAdmin.setType(RoleEnum.SUPER_MERCHANT.getValue());
+        systemAdmin.setPhone(account);
         return systemAdmin;
     }
 
@@ -402,6 +408,8 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         MerchantPlatformDetailResponse response = new MerchantPlatformDetailResponse();
         BeanUtils.copyProperties(merchant, response);
         response.setAccount(merchant.getPhone());
+        response.setOidPartner(merchant.getPayInfo().getOidPartner());
+        response.setPriKey(merchant.getPayInfo().getPriKey());
         return response;
     }
 

@@ -19,13 +19,12 @@ import java.math.BigDecimal;
 public class MerchantPayInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
 
     @ApiModelProperty(value = "连连商户号")
     private String oidPartner;
 
     @ApiModelProperty(value = "连连私钥")
     private String priKey;
-
-    @ApiModelProperty(value = "手续费比例")
-    private BigDecimal feeScale;
+  
 }

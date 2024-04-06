@@ -94,6 +94,9 @@ public class MerchantPlatformDetailResponse implements Serializable {
     @ApiModelProperty(value = "商户星级1-5")
     private Integer starLevel;
 
-    @ApiModelProperty(value = "商户支付信息")
-    private MerchantPayInfo payInfo;
+    @ApiModelProperty(value = "连连商户号")
+    private String oidPartner;
+
+    @ApiModelProperty(value = "连连私钥")
+    private String priKey;
 }

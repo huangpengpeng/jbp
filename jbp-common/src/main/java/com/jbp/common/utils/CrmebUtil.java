@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.exception.CrmebException;
 
@@ -140,8 +141,9 @@ public class CrmebUtil {
      * @param args String[] 字符串数组
      */
     public static void main(String[] args) throws Exception {
-        System.out.println(encryptPassword("123456", "15871898211"));
-//        System.out.println(decryptPassowrd("9n8S0bwrG6iXHK3vXWqppA==", "admin"));
+//        System.out.println(encryptPassword("123456", "15871898211"));
+//        System.out.println(decryptPassowrd("7iIl3H5zCinwrYbrxAR7cQ==", "demo"));
+    	
     }
 
     /**

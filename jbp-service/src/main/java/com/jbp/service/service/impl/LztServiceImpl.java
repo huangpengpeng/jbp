@@ -42,7 +42,7 @@ public class LztServiceImpl implements LztService {
         params.setTxn_seqno(txnSeqno);
         params.setTxn_time(timestamp);
         params.setFlag_chnl(flagChnl);
-        params.setReturn_url(payInfo.getHost() + returnUrl);
+        params.setReturn_url( returnUrl);
         params.setNotify_url(payInfo.getHost() + notifyUrl);
         params.setUser_type(userType);
         params.setCust_trade_serial_type("OpenNormalUser");
