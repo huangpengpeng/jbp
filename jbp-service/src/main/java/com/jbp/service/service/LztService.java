@@ -1,5 +1,6 @@
 package com.jbp.service.service;
 
+import com.jbp.common.lianlian.params.FindPasswordVerifyParams;
 import com.jbp.common.lianlian.result.*;
 
 import java.math.BigDecimal;
@@ -107,5 +108,14 @@ public interface LztService {
     ReceiptDownloadResult receiptDownload(String oidPartner, String priKey, String receipt_accp_txno, String token);
 
 
+    /**
+     * 找回密码申请
+     */
+    FindPasswordApplyResult findPasswordApply (String oidPartner, String priKey, String user_id, String linked_acctno, String ip);
+
+    /**
+     * 找回密码验证
+     */
+    FindPasswordVerifyResult findPasswordVerify (String oidPartner, String priKey, String user_id, String token, String verify_code, String random_key, String password);
 
 }

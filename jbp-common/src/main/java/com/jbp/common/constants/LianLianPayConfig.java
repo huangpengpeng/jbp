@@ -173,6 +173,8 @@ public class LianLianPayConfig {
         来账通划拨资金("LZT_FT_"),
         来账通内部代发("LZT_NDF_"),
         来账通提现("LZT_DW_"),
+
+        设置密码("LZT_SP_"),
         ;
 
         @Getter

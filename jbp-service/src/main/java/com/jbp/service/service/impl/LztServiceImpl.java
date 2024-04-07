@@ -572,4 +572,58 @@ public class LztServiceImpl implements LztService {
             throw new CrmebException("申请下载异常:" + e.getMessage());
         }
     }
+
+    @Override
+    public FindPasswordApplyResult findPasswordApply(String oidPartner, String priKey, String user_id, String linked_acctno, String ip) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        FindPasswordApplyParams params = new FindPasswordApplyParams(timestamp, oidPartner, user_id);
+        if (StringUtils.isNotEmpty(linked_acctno)) {
+            params.setLinked_acctno(linked_acctno);
+        }
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-apply";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("找回密码请求错误:" + user_id);
+        }
+        try {
+            FindPasswordApplyResult result = JSON.parseObject(s, FindPasswordApplyResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("找回密码请求异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("找回密码请求异常:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public FindPasswordVerifyResult findPasswordVerify(String oidPartner, String priKey, String user_id, String token,
+                                                       String verify_code, String random_key, String password) {
+
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        FindPasswordVerifyParams params = new FindPasswordVerifyParams(timestamp, oidPartner, user_id);
+        params.setToken(token);
+        params.setVerify_code(verify_code);
+        params.setRandom_key(random_key);
+        params.setPassword(password);
+
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/find-password-verify";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("找回密码验证请求错误:" + user_id);
+        }
+        try {
+            FindPasswordVerifyResult result = JSON.parseObject(s, FindPasswordVerifyResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("找回密码验证请求异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("找回密码验证请求异常:" + e.getMessage());
+        }
+    }
 }

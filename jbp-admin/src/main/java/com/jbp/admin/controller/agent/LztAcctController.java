@@ -5,10 +5,7 @@ import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.result.AcctBalList;
-import com.jbp.common.lianlian.result.AcctSerialResult;
-import com.jbp.common.lianlian.result.ApplyPasswordElementResult;
-import com.jbp.common.lianlian.result.ValidationSmsResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
@@ -18,10 +15,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.utils.SecurityUtil;
-import com.jbp.common.utils.StringUtils;
+import com.jbp.common.utils.*;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
@@ -36,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -110,6 +105,11 @@ public class LztAcctController {
                 scan = "cashout_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix());
                 break;
+            case "忘记密码":
+                scan = "setting_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.设置密码.getPrefix());
+                break;
+
         }
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
@@ -207,6 +207,53 @@ public class LztAcctController {
         MerchantPayInfo payInfo = merchant.getPayInfo();
         lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, amt, token, code);
         return CommonResult.success();
+    }
+
+
+
+    @SneakyThrows
+    @ApiOperation(value = "忘记密码发送验证码")
+    @GetMapping(value = "/findPwdSendCode")
+    public CommonResult<FindPasswordApplyResult> findPwdSendCode(String userId, HttpServletRequest request) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        String ip = CrmebUtil.getClientIp(request);
+        String linked_acctno = "";
+        if (LianLianPayConfig.UserType.个人用户.name().equals(lztAcct.getUserType())) {
+            QueryLinkedAcctResult queryLinkedAcctResult = lztService.queryLinkedAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
+            if (queryLinkedAcctResult != null && CollectionUtils.isNotEmpty(queryLinkedAcctResult.getLinked_acctlist())) {
+                linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
+            }
+        }
+        FindPasswordApplyResult passwordApply = lztService.findPasswordApply(payInfo.getOidPartner(),
+                payInfo.getPriKey(), userId, linked_acctno, ip);
+        if (passwordApply != null && "0000".equals(passwordApply.getRet_code())) {
+            passwordApply.setRegMsg("已发送至: " + passwordApply.getReg_phone() + " 请注意查收");
+        }
+        return CommonResult.success(passwordApply);
+    }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:findPwd')")
+    @SneakyThrows
+    @ApiOperation(value = "忘记密码")
+    @GetMapping(value = "/findPwd")
+    public CommonResult<FindPasswordVerifyResult> findPwd(String userId, String token, String verifyCode, String randomKey, String password) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        FindPasswordVerifyResult passwordVerify = lztService.findPasswordVerify(payInfo.getOidPartner(), payInfo.getPriKey(), userId, token, verifyCode, randomKey, password);
+        return CommonResult.success(passwordVerify);
     }
 
 
