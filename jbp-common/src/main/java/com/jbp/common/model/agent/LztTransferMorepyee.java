@@ -32,6 +32,8 @@ public class LztTransferMorepyee extends BaseModel {
         this.merId = merId;
         this.payerId = payerId;
         this.payeeId = payeeId;
+        this.payerName = payerName;
+        this.payeeName = payeeName;
         this.txnSeqno = txnSeqno;
         this.amt = amt;
         this.postscript = postscript;

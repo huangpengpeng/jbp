@@ -26,6 +26,12 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
         LztTransfer lztTransfer = new LztTransfer(merId, payerId, payerName, txnSeqno, accpTxno, amt, feeAmount, payeeType, bankAcctNo,
                 bankCode, bankAcctName, cnapsCode);
 
+//        lztService.transfer();
+
+
+
+
+
 
 
 

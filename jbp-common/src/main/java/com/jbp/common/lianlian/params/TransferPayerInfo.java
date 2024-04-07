@@ -9,6 +9,14 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class TransferPayerInfo implements Serializable {
 
+    public TransferPayerInfo(String payer_type, String payer_id, String payer_accttype, String password, String random_key) {
+        this.payer_type = payer_type;
+        this.payer_id = payer_id;
+        this.payer_accttype = payer_accttype;
+        this.password = password;
+        this.random_key = random_key;
+    }
+
     /**
      * 付款方类型。
      * 用户：USER

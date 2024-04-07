@@ -129,7 +129,8 @@ public interface LztService {
     /**
      * 代付
      */
-    LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String ip);
+    LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String txn_seqno,
+                               String amt, String feeAmt,String pwd, String random_key, String payee_type, String bank_acctno, String bank_code, String bank_acctname, String cnaps_code,   String ip);
 }
 
 

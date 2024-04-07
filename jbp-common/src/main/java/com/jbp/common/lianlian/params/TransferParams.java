@@ -44,10 +44,10 @@ public class TransferParams {
     /**
      * 付款方信息
      */
-    private TransferMorepyeePayerInfo payerInfo;
+    private TransferPayerInfo payerInfo;
 
     /**
      * 收款方信息
      */
-    private List<TransferMorepyeePayeeInfo> payeeInfo;
+    private TransferPayeeInfo payeeInfo;
 }

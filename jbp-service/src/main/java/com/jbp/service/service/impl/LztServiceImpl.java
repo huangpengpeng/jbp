@@ -634,7 +634,9 @@ public class LztServiceImpl implements LztService {
     }
 
     @Override
-    public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String ip) {
+    public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String txn_seqno,
+                                      String amt, String feeAmt,String pwd, String random_key, String payee_type,
+                                      String bank_acctno, String bank_code, String bank_acctname, String cnaps_code,   String ip) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
         TransferParams params = new TransferParams(timestamp, oidPartner);
@@ -644,10 +646,30 @@ public class LztServiceImpl implements LztService {
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
-
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+        TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose);
+        params.setOrderInfo(orderInfo);
+        TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,
+                "USEROWN", pwd, random_key);
+        params.setPayerInfo(payerInfo);
+        TransferPayeeInfo payeeInfo = new TransferPayeeInfo(payee_type, bank_acctno, bank_code, bank_acctname, cnaps_code);
+        params.setPayeeInfo(payeeInfo);
+        String url = "https://accpapi.lianlianpay.com/v1/txn/transfer";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("代发失败" + payerId);
+        }
+        try {
+            LztTransferResult result = JSON.parseObject(s, LztTransferResult.class);
+            if (result == null || !("8889".equals(result.getRet_code()) || "0000".equals(result.getRet_code()) ||
+                    "8888".equals(result.getRet_code()))) {
+                throw new CrmebException("代发失败失败：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("代发失败失败:" + e.getMessage());
+        }
 
-
-        return null;
     }
 }

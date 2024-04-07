@@ -7,6 +7,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TransferOrderInfo {
 
+    public TransferOrderInfo(String txn_seqno, String txn_time, Double total_amount, String txn_purpose) {
+        this.txn_seqno = txn_seqno;
+        this.txn_time = txn_time;
+        this.total_amount = total_amount;
+        this.txn_purpose = txn_purpose;
+    }
+
     /**
      * 商户系统唯一交易流水号。由商户自定义。
      */
