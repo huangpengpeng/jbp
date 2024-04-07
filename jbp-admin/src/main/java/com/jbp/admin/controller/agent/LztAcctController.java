@@ -92,14 +92,15 @@ public class LztAcctController {
         if (StringUtils.isEmpty(scan)) {
             throw new CrmebException("场景不能为空");
         }
-        if (amt == null || !ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-            throw new CrmebException("金额错误");
-        }
         String payCode = "";
         switch (scan) {
             case "转账":
                 scan = "pay_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
+                break;
+            case "代付":
+                scan = "pay_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通外部代发.getPrefix());
                 break;
             case "提现":
                 scan = "cashout_password";
