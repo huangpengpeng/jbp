@@ -116,14 +116,14 @@ public class KqPayServiceImpl implements KqPayService {
         KqPayInfoResult payInfo = get();
         KqHeadParams head = new KqHeadParams("1.0.0", "F0001", payInfo.getMerchantCode(), refundId);
         KqRefundParams body = new KqRefundParams();
-        body.setMerchantAcctId(payInfo.getMerchantId());
+        body.setMerchantAcctId(payInfo.getMerchantCode());
         body.setAmount(String.valueOf(amt.multiply(BigDecimal.valueOf(100)).intValue()));
         body.setEntryTime(DateTimeUtils.format(refundTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         body.setOrgOrderId(orderId);
 
         JSONObject originalString = new JSONObject();
         originalString.put("head", head);
-        originalString.put("requestBody", body);
+        originalString.put("requestBody", JSONObject.parseObject(JSONObject.toJSONString(body)));
         log.info("退款快钱原始报文 = {}", originalString.toJSONString());
         try {
             String s = buildHttpsClient.requestKQ(originalString);

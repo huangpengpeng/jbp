@@ -200,6 +200,11 @@ public class SysConfigConstants {
      * 连连支付状态
      */
     public static final String CONFIG_LIANLIAN_PAY_STATUS = "lianlian_pay_status";
+
+    /**
+     * 快钱支付状态
+     */
+    public static final String CONFIG_KQ_PAY_STATUS = "pk_status";
     /**
      * 积分支付状态
      */

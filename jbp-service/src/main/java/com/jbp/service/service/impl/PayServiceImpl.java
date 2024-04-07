@@ -176,14 +176,17 @@ public class PayServiceImpl implements PayService {
         String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);
         String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);
         String lianlianStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIAN_PAY_STATUS);
+        String kqPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KQ_PAY_STATUS);
         String walletPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_STATUS);
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_OPEN_PASSWORD);
+
         PayConfigResponse response = new PayConfigResponse();
         response.setYuePayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus));
         response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(payWxOpen));
         response.setAliPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(aliPayStatus));
         response.setLianLianStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianStatus));
         response.setWalletStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus));
+        response.setKqPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(kqPayStatus));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
