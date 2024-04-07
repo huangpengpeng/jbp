@@ -3,6 +3,7 @@ package com.jbp.common.model.system;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName("eb_jushuitan_config")
 @ApiModel(value = "JushuitanConfig对象", description = "聚水潭erp")
-public class JushuitanConfig implements Serializable {
+public class JushuitanConfig  extends BaseModel {
 
     public JushuitanConfig(String accessToken, String appKey, String appSecret, String cancelCallApi, Long expiresIn, String refreshToken, String refundCallApi,
                            String repCallApi, String scope, String shipCallApi, String shopId) {
@@ -36,9 +37,6 @@ public class JushuitanConfig implements Serializable {
     }
 
 
-    @ApiModelProperty(value = "id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
 
     @ApiModelProperty(value = "accessToken")
     private String accessToken;

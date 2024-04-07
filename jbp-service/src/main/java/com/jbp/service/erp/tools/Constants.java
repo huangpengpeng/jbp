@@ -2,14 +2,7 @@ package com.jbp.service.erp.tools;
 
 public final  class Constants {
 
-	/**
-	 * 聚水潭APPID
-	 */
-	public final static String APP_KEY="60fe53c33c1b4fbbb243f6990e852132";
-	/**
-	 * 聚水潭秘钥
-	 */
-	public final static String APP_SECRET="cad5739f959c4cbc94be68b493d9e194";
+
 	/**
 	 * 请求字符集
 	 */
