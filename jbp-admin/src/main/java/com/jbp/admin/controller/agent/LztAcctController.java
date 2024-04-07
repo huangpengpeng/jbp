@@ -81,7 +81,7 @@ public class LztAcctController {
     @ApiOperation(value = "银行虚拟户申请")
     @GetMapping(value = "/bank/apply")
     public CommonResult<LztAcctApply> apply(Integer merId, String userId, String shopId, String shopName, String province,
-                                            String city, String area, String address) {
+                                            String city, String area, String address, String openBank) {
         LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address);
         return CommonResult.success(apply);
     }
@@ -131,7 +131,9 @@ public class LztAcctController {
     public CommonResult<List<String>> userTypeList() {
         List<String> list = Lists.newArrayList();
         for (LianLianPayConfig.UserType value : LianLianPayConfig.UserType.values()) {
-            list.add(value.name());
+            if (!value.name().equals("商户")) {
+                list.add(value.name());
+            }
         }
         return CommonResult.success(list);
     }

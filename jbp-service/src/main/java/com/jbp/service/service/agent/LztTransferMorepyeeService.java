@@ -5,9 +5,11 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.LztTransferMorepyee;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.vo.MyRecord;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee> {
 
@@ -28,4 +30,5 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
                                            PageParamRequest pageParamRequest);
 
 
+    LztTransferMorepyee detail(Long id);
 }

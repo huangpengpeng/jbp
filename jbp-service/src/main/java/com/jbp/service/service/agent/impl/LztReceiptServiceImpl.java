@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.lianlian.result.ReceiptDownloadResult;
 import com.jbp.common.lianlian.result.ReceiptProduceResult;
 import com.jbp.common.model.agent.LztReceipt;
+import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.utils.DateTimeUtils;
@@ -13,6 +15,8 @@ import com.jbp.service.dao.agent.LztReceiptDao;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztReceiptService;
+import com.jbp.service.service.agent.LztTransferMorepyeeService;
+import com.jbp.service.service.agent.LztWithdrawalService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +35,10 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
     private LztService lztService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private LztWithdrawalService lztWithdrawalService;
+    @Resource
+    private LztTransferMorepyeeService lztTransferMorepyeeService;
 
     @Override
     public List<LztReceipt> getList(Integer merId, String tradeTxnSeqno, String memo) {
@@ -62,17 +70,52 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
         lztReceipt.setTradeAccpTxno(receiptProduceResult.getTrade_accp_txno());
         save(lztReceipt);
 
-        // 
+        // 提现记录
+        LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(tradeTxnSeqno);
+        if(lztWithdrawal != null){
+            lztWithdrawal.setReceiptStatus(1);
+            lztWithdrawal.setReceiptToken(lztReceipt.getToken());
+            lztWithdrawal.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
+            lztWithdrawalService.updateById(lztWithdrawal);
+        }
+        // 转账记录
+        LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(tradeTxnSeqno);
+        if(lztTransferMorepyee != null){
+            lztTransferMorepyee.setReceiptStatus(1);
+            lztTransferMorepyee.setReceiptToken(lztReceipt.getToken());
+            lztTransferMorepyee.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
+            lztTransferMorepyeeService.updateById(lztTransferMorepyee);
+        }
+
         return lztReceipt;
     }
 
     @Override
-    public ReceiptDownloadResult download(Long id) {
-        LztReceipt lztReceipt = getById(id);
-        Merchant merchant = merchantService.getById(lztReceipt.getMerId());
+    public ReceiptDownloadResult download(String tradeTxnSeqno) {
+        String token = null, receiptAccpTxno = null;
+        Integer merId = null;
+        // 提现记录
+        LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(tradeTxnSeqno);
+        if (lztWithdrawal != null) {
+            lztWithdrawal.setReceiptStatus(2);
+            lztWithdrawalService.updateById(lztWithdrawal);
+            merId = lztWithdrawal.getMerId();
+            token = lztWithdrawal.getReceiptToken();
+            receiptAccpTxno = lztWithdrawal.getReceiptAccpTxno();
+        }
+        // 转账记录
+        LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(tradeTxnSeqno);
+        if (lztTransferMorepyee != null) {
+            lztTransferMorepyee.setReceiptStatus(2);
+            lztTransferMorepyeeService.updateById(lztTransferMorepyee);
+            merId = lztTransferMorepyee.getMerId();
+            token = lztTransferMorepyee.getReceiptToken();
+            receiptAccpTxno = lztTransferMorepyee.getReceiptAccpTxno();
+        }
+        Merchant merchant = merchantService.getById(merId);
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        ReceiptDownloadResult receiptDownloadResult = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(), lztReceipt.getReceiptAccpTxno(), lztReceipt.getToken());
-
+        ReceiptDownloadResult receiptDownloadResult = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(),
+                receiptAccpTxno, token);
         return receiptDownloadResult;
     }
 

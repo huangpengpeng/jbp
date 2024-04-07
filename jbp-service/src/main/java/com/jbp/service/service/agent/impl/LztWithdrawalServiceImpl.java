@@ -181,5 +181,10 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         return CommonPage.copyPageInfo(page, list);
     }
 
-
+    @Override
+    public LztWithdrawal detail(Long id) {
+        LztWithdrawal withdrawal = getById(id);
+        refresh(withdrawal.getTxnSeqno());
+        return getById(id);
+    }
 }

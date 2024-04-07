@@ -17,6 +17,7 @@ import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.agent.LztTransferMorepyeeDao;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
@@ -163,5 +164,10 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         return CommonPage.copyPageInfo(page, list);
     }
 
-
+    @Override
+    public LztTransferMorepyee detail(Long id) {
+        LztTransferMorepyee lztTransferMorepyee = getById(id);
+        refresh(lztTransferMorepyee.getTxnSeqno()) ;
+        return getById(id);
+    }
 }

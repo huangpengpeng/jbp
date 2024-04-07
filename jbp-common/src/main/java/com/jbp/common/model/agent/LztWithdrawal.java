@@ -40,6 +40,7 @@ public class LztWithdrawal extends BaseModel {
         this.orderRet = orderRet;
         this.txnStatus = LianLianPayConfig.TxnStatus.交易处理中.getName();
         this.createTime = DateTimeUtils.getNow();
+        this.receiptStatus = 0;
     }
 
     @ApiModelProperty(value = "商户id")
@@ -73,6 +74,15 @@ public class LztWithdrawal extends BaseModel {
     @ApiModelProperty(value = "提现查询返回信息")
     @TableField(value = "queryRet", typeHandler = QueryWithdrawalResultHandler.class)
     private QueryWithdrawalResult queryRet;
+
+    @ApiModelProperty(value = "回执单状态 0  待申请  1 待下载  2 已下载 ")
+    private Integer receiptStatus;
+
+    @ApiModelProperty(value = "回执token")
+    private String receiptToken;
+
+    @ApiModelProperty(value = "电子回单流水号")
+    private String receiptAccpTxno;
 
     @ApiModelProperty(value = "结果")
     private String txnStatus;

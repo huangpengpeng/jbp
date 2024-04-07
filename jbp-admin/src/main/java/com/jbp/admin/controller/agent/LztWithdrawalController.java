@@ -80,4 +80,11 @@ public class LztWithdrawalController {
     }
 
 
+    @ApiOperation(value = "来账通提现详情")
+    @GetMapping(value = "/detail")
+    public CommonResult<LztWithdrawal> detail(Long id) {
+        return CommonResult.success(lztWithdrawalService.detail(id));
+    }
+
+
 }

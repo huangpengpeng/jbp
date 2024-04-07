@@ -48,7 +48,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
 
     @Override
     public LztAcctApply apply(Integer merId, String userId, String shopId, String shopName, String province,
-                              String city, String area, String address) {
+                              String city, String area, String address, String openBank) {
 
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
         if (lztAcct == null) {
@@ -62,7 +62,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix());
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
         LztOpenacctApplyResult result = lztService.createBankUser(payInfo.getOidPartner(), payInfo.getPriKey(),
-                userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl);
+                userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl, openBank);
         UserInfoResult userInfoResult = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
         LztAcctApply lztAcctApply = new LztAcctApply(merId, userId, lztAcct.getUserType(), userInfoResult.getOid_userno(), userInfoResult.getUser_name(),
                 txnSeqno, result.getAccp_txno(),

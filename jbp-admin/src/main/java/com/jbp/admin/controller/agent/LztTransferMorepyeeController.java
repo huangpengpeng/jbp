@@ -5,6 +5,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
@@ -73,6 +74,12 @@ public class LztTransferMorepyeeController {
         PageInfo<LztTransferMorepyee> page = lztTransferMorepyeeService.pageList(merId, payerId, payeeId, txnSeqno,
                 accpTxno, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
+    }
+
+    @ApiOperation(value = "来账通转账详情")
+    @GetMapping(value = "/detail")
+    public CommonResult<LztTransferMorepyee> detail(Long id) {
+        return CommonResult.success(lztTransferMorepyeeService.detail(id));
     }
 
 

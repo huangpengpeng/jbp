@@ -27,7 +27,7 @@ public interface LztService {
      * 银行账户申请
      */
     LztOpenacctApplyResult createBankUser(String oidPartner, String priKey, String userId, String txnSeqno, String shopId,
-                                          String shopName, String province, String city, String area, String address, String notifyUrl);
+                                          String shopName, String province, String city, String area, String address, String notifyUrl, String openBank);
 
 
     /**

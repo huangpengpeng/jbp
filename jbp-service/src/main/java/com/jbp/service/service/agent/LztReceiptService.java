@@ -12,6 +12,6 @@ public interface LztReceiptService extends IService<LztReceipt> {
 
     LztReceipt add(Integer merId, String tradeTxnSeqno, String memo, String tradeBillType, String totalAmount);
 
-    ReceiptDownloadResult download(Long id);
+    ReceiptDownloadResult download(String tradeTxnSeqno);
 
 }

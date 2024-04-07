@@ -51,4 +51,12 @@ public class LztAcctOpenController {
         Integer merId = systemAdmin.getMerId();
         return CommonResult.success(CommonPage.restPage(lztAcctOpenService.pageList(merId, userId, status, pageParamRequest)));
     }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:open:del')")
+    @ApiOperation(value = "开户记录删除")
+    @GetMapping(value = "/del")
+    public CommonResult del(Long id) {
+        lztAcctOpenService.del(id);
+        return CommonResult.success();
+    }
 }

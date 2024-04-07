@@ -94,6 +94,24 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     }
 
     @Override
+    public void del(Long id) {
+        LztAcctOpen lztAcctOpen = getById(id);
+        if (lztAcctOpen == null || lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+            throw new RuntimeException("当前记录已经开户完成不允许删除, 请联系管理员处理");
+        }
+        Merchant merchant = merchantService.getById(lztAcctOpen.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        UserInfoResult result = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctOpen.getUserId());
+        lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
+        lztAcctOpen.setRetMsg(result.getRet_msg());
+        updateById(lztAcctOpen);
+        if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+            throw new RuntimeException("当前记录已经开户完成不允许删除, 请联系管理员处理");
+        }
+        removeById(id);
+    }
+
+    @Override
     public LztAcctOpen getByTxnSeqno(String txnSeqno) {
         return getOne(new QueryWrapper<LztAcctOpen>().lambda().eq(LztAcctOpen::getTxnSeqno, txnSeqno));
     }
@@ -108,44 +126,44 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         return CollectionUtils.isNotEmpty(list(new QueryWrapper<LztAcctOpen>().lambda().eq(LztAcctOpen::getUserId, userId)));
     }
 
-	@Override
-	public PageInfo<LztAcctOpen> pageList(Integer merId, String userId, String status,
-			PageParamRequest pageParamRequest) {
-		LambdaQueryWrapper<LztAcctOpen> lqw = new LambdaQueryWrapper<LztAcctOpen>()
-				.eq(StringUtils.isNotEmpty(userId), LztAcctOpen::getUserId, userId)
-				.eq(StringUtils.isNotEmpty(status), LztAcctOpen::getStatus, status)
-				.eq(merId != null && merId > 0, LztAcctOpen::getMerId, merId).orderByDesc(LztAcctOpen::getId);
+    @Override
+    public PageInfo<LztAcctOpen> pageList(Integer merId, String userId, String status,
+                                          PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<LztAcctOpen> lqw = new LambdaQueryWrapper<LztAcctOpen>()
+                .eq(StringUtils.isNotEmpty(userId), LztAcctOpen::getUserId, userId)
+                .eq(StringUtils.isNotEmpty(status), LztAcctOpen::getStatus, status)
+                .eq(merId != null && merId > 0, LztAcctOpen::getMerId, merId).orderByDesc(LztAcctOpen::getId);
 
-		Page<LztAcctOpen> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-		List<LztAcctOpen> list = list(lqw);
-		if (CollectionUtils.isEmpty(list)) {
-			return CommonPage.copyPageInfo(page, list);
-		}
+        Page<LztAcctOpen> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<LztAcctOpen> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
 
-		List<Integer> merIdList = list.stream().map(LztAcctOpen::getMerId).collect(Collectors.toList());
-		Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
-		list.forEach(s -> {
-			Merchant merchant = merchantMap.get(s.getMerId());
-			if (merchant == null) {
-				s.setMerName("平台");
-			} else {
-				s.setMerName(merchant.getName());
-			}
-			// 检查第三方开户状态
-			if (s.getStatus().equals(LianLianPayConfig.UserStatus.待开户.name())) {
-					MerchantPayInfo payInfo = merchant.getPayInfo();
-					AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),
-							s.getUserId(), LianLianPayConfig.UserType.getCode(s.getUserType()));
+        List<Integer> merIdList = list.stream().map(LztAcctOpen::getMerId).collect(Collectors.toList());
+        Map<Integer, Merchant> merchantMap = merchantService.getMapByIdList(merIdList);
+        list.forEach(s -> {
+            Merchant merchant = merchantMap.get(s.getMerId());
+            if (merchant == null) {
+                s.setMerName("平台");
+            } else {
+                s.setMerName(merchant.getName());
+            }
+            // 检查第三方开户状态
+            if (s.getStatus().equals(LianLianPayConfig.UserStatus.待开户.name())) {
+                MerchantPayInfo payInfo = merchant.getPayInfo();
+                AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),
+                        s.getUserId(), LianLianPayConfig.UserType.getCode(s.getUserType()));
 
-					if (CollectionUtils.isNotEmpty(acctInfoResult.getAcctinfo_list())) {
-						String extStatus = acctInfoResult.getAcctinfo_list().get(0).getAcct_state();
-						if (extStatus.equals(LianLianPayConfig.UserStatus.正常.getCode())) {
-							refresh(s.getAccpTxno());
-						}
-					}
-			}
-		});
+                if (CollectionUtils.isNotEmpty(acctInfoResult.getAcctinfo_list())) {
+                    String extStatus = acctInfoResult.getAcctinfo_list().get(0).getAcct_state();
+                    if (extStatus.equals(LianLianPayConfig.UserStatus.正常.getCode())) {
+                        refresh(s.getAccpTxno());
+                    }
+                }
+            }
+        });
 
-		return CommonPage.copyPageInfo(page, list);
-	}
+        return CommonPage.copyPageInfo(page, list);
+    }
 }
