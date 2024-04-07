@@ -132,17 +132,17 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
 				s.setMerName(merchant.getName());
 			}
 			// 检查第三方开户状态
-			if (s.getStatus().equals(LianLianPayConfig.UserStatus.待开户.name())) {
-					MerchantPayInfo payInfo = merchant.getPayInfo();
-					AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),
-							s.getUserId(), LianLianPayConfig.UserType.getCode(s.getUserType()));
+			if (!s.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+				MerchantPayInfo payInfo = merchant.getPayInfo();
+				AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),
+						s.getUserId(), LianLianPayConfig.UserType.getCode(s.getUserType()));
 
-					if (CollectionUtils.isNotEmpty(acctInfoResult.getAcctinfo_list())) {
-						String extStatus = acctInfoResult.getAcctinfo_list().get(0).getAcct_state();
-						if (extStatus.equals(LianLianPayConfig.UserStatus.正常.getCode())) {
-							refresh(s.getAccpTxno());
-						}
+				if (CollectionUtils.isNotEmpty(acctInfoResult.getAcctinfo_list())) {
+					String extStatus = acctInfoResult.getAcctinfo_list().get(0).getAcct_state();
+					if (extStatus.equals(LianLianPayConfig.UserStatus.正常.getCode())) {
+						refresh(s.getAccpTxno());
 					}
+				}
 			}
 		});
 
