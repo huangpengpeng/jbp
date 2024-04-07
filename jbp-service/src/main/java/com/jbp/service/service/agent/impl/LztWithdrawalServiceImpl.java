@@ -154,6 +154,7 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
     @Override
     public PageInfo<LztWithdrawal> pageList(Integer merId, String userId, String txnSeqno, String accpTxno, String status, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztWithdrawal> lqw = new LambdaQueryWrapper<LztWithdrawal>()
+                .select(LztWithdrawal.class, info -> !info.getColumn().equals("receipt_zip"))
                 .eq(LztWithdrawal::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztWithdrawal::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(userId), LztWithdrawal::getUserId, userId)

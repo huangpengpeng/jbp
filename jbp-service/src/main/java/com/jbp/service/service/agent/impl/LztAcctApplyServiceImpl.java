@@ -66,10 +66,11 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         UserInfoResult userInfoResult = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
         LztAcctApply lztAcctApply = new LztAcctApply(merId, userId, lztAcct.getUserType(), userInfoResult.getOid_userno(), userInfoResult.getUser_name(),
                 txnSeqno, result.getAccp_txno(),
-                result.getGateway_url());
+                result.getGateway_url(), openBank);
         save(lztAcctApply);
 
         lztAcct.setIfOpenBankAcct(true);
+        lztAcct.setOpenBank(openBank);
         lztAcctService.updateById(lztAcct);
         return lztAcctApply;
     }

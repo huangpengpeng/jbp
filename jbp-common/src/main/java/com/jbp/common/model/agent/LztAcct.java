@@ -32,6 +32,7 @@ public class LztAcct extends BaseModel {
         this.username = username;
         this.bankAccount = bankAccount;
         this.ifOpenBankAcct = false;
+
     }
 
     @ApiModelProperty(value = "商户id")
@@ -54,6 +55,9 @@ public class LztAcct extends BaseModel {
 
     @ApiModelProperty(value = "开通银行虚拟户")
     private Boolean ifOpenBankAcct;
+
+    @ApiModelProperty(value = "开户银行")
+    private String openBank;
 
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)

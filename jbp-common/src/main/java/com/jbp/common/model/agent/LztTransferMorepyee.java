@@ -86,6 +86,9 @@ public class LztTransferMorepyee extends BaseModel {
     @ApiModelProperty(value = "电子回单流水号")
     private String receiptAccpTxno;
 
+    @ApiModelProperty(value = "回执文件")
+    private String receiptZip;
+
     @ApiModelProperty(value = "结果")
     private String txnStatus;
 

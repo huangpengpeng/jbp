@@ -118,7 +118,9 @@ public class LztServiceImpl implements LztService {
     }
 
     @Override
-    public LztOpenacctApplyResult createBankUser(String oidPartner, String priKey, String userId, String txnSeqno, String shopId, String shopName, String province, String city, String area, String address, String notifyUrl) {
+    public LztOpenacctApplyResult createBankUser(String oidPartner, String priKey, String userId, String txnSeqno, String shopId,
+                                                 String shopName, String province, String city,
+                                                 String area, String address, String notifyUrl, String openBank) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         LztOpenacctApplyParams params = new LztOpenacctApplyParams(userId, txnSeqno, notifyUrl, "USER", shopId, shopName, province, city, area, address);
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -128,6 +130,7 @@ public class LztServiceImpl implements LztService {
         params.setAcct_type("USEROWN");
         params.setTxn_time(timestamp);
         params.setNotify_url(lianLianInfo.getHost() + params.getNotify_url());
+        params.setOpen_bank(openBank);
 
         String url = "https://accpgw.lianlianpay.com/v1/acctmgr/lzt-openacct-apply";
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());

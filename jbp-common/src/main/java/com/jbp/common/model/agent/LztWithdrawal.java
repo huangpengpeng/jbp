@@ -75,7 +75,7 @@ public class LztWithdrawal extends BaseModel {
     @TableField(value = "queryRet", typeHandler = QueryWithdrawalResultHandler.class)
     private QueryWithdrawalResult queryRet;
 
-    @ApiModelProperty(value = "回执单状态 0  待申请  1 待下载  2 已下载 ")
+    @ApiModelProperty(value = "回执单状态 0  申请回执  1 下载回执")
     private Integer receiptStatus;
 
     @ApiModelProperty(value = "回执token")
@@ -83,6 +83,9 @@ public class LztWithdrawal extends BaseModel {
 
     @ApiModelProperty(value = "电子回单流水号")
     private String receiptAccpTxno;
+
+    @ApiModelProperty(value = "回执文件")
+    private String receiptZip;
 
     @ApiModelProperty(value = "结果")
     private String txnStatus;

@@ -82,7 +82,7 @@ public class LztAcctController {
     @GetMapping(value = "/bank/apply")
     public CommonResult<LztAcctApply> apply(Integer merId, String userId, String shopId, String shopName, String province,
                                             String city, String area, String address, String openBank) {
-        LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address);
+        LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address, openBank);
         return CommonResult.success(apply);
     }
     @ApiOperation(value = "来账通账户密码控件")

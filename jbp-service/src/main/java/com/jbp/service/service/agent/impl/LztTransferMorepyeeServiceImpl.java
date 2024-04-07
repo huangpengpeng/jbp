@@ -12,6 +12,7 @@ import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.lianlian.result.TransferMorepyeeResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -136,6 +137,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     public PageInfo<LztTransferMorepyee> pageList(Integer merId, String payerId, String payeeId, String txnSeqno, String accpTxno,
                                                   String status, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztTransferMorepyee> lqw = new LambdaQueryWrapper<LztTransferMorepyee>()
+                .select(LztTransferMorepyee.class, info -> !info.getColumn().equals("receipt_zip"))
                 .eq(LztTransferMorepyee::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztTransferMorepyee::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(payerId), LztTransferMorepyee::getPayerId, payeeId)
