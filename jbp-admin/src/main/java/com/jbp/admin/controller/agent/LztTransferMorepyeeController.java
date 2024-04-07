@@ -55,6 +55,8 @@ public class LztTransferMorepyeeController {
         LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, txnPurpose, pwd, randomKey, payeeId, ip, postscript);
         return CommonResult.success(result);
     }
+
+
     @ApiOperation(value = "来账通内部代发刷新")
     @GetMapping(value = "/refresh")
     public CommonResult refresh(String accpTxno) {
@@ -69,7 +71,6 @@ public class LztTransferMorepyeeController {
                                                             PageParamRequest pageParamRequest,
                                                             @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date startTime,
                                                             @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date endTime) {
-
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         PageInfo<LztTransferMorepyee> page = lztTransferMorepyeeService.pageList(merId, payerId, payeeId, txnSeqno,
@@ -82,6 +83,10 @@ public class LztTransferMorepyeeController {
     public CommonResult<LztTransferMorepyee> detail(Long id) {
         return CommonResult.success(lztTransferMorepyeeService.detail(id));
     }
+
+
+
+
 
 
 }

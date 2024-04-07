@@ -167,4 +167,7 @@ public class Merchant implements Serializable {
     @ApiModelProperty(value = "商户支付信息")
     @TableField(value = "payInfo", typeHandler = MerchantPayInfoHandler.class)
     private MerchantPayInfo payInfo;
+
+    @ApiModelProperty(value = "交易模型  0 转账（密码+验证码）+提现（密码+验证码）  1 转账（无密码+无验证码） 提现（验证码） 2 转账（无密码+无验证码）提现（无密码+无验证码）")
+    private Integer tradeModel;
 }

@@ -54,6 +54,10 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     @Override
     public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
                                                 String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String postscript) {
+        if(StringUtils.isEmpty(orderNo)){
+            orderNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
+        }
+
         if (getByTxnSeqno(orderNo) != null) {
             throw new CrmebException("单号已经被使用");
         }

@@ -26,5 +26,4 @@ public class MerchantPayInfo implements Serializable {
 
     @ApiModelProperty(value = "连连私钥")
     private String priKey;
-  
 }

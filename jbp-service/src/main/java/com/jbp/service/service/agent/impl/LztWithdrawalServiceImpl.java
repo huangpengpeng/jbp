@@ -64,6 +64,9 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
 
     @Override
     public LztWithdrawal withdrawal(Integer merId, String userId, String drawNo, BigDecimal amt, String postscript, String password, String random_key, String ip) {
+        if(StringUtils.isEmpty(drawNo)){
+            drawNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix());
+        }
         if (getByTxnSeqno(drawNo) != null) {
             throw new CrmebException("提现单号已经被使用");
         }

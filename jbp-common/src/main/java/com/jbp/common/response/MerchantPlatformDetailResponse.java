@@ -99,4 +99,7 @@ public class MerchantPlatformDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "连连私钥")
     private String priKey;
+
+    @ApiModelProperty(value = "交易模型")
+    private Integer tradeMode ;
 }
