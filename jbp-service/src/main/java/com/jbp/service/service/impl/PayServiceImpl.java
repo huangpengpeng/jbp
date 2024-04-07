@@ -151,6 +151,8 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private WalletService walletService;
     @Autowired
+    private KqPayService kqPayService;
+    @Autowired
     private LianLianPayService lianLianPayService;
     @Autowired
     private ProductCommChain productCommChain;
@@ -295,6 +297,14 @@ public class PayServiceImpl implements PayService {
             response.setLianLianCashierConfig(result);
             logger.info("连连支付 response : {}", JSON.toJSONString(response));
 
+            return response;
+        }
+        // 快钱支付
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
+            String result = kqCashierPay(order);
+            response.setStatus(true);
+            response.setKqGatewayUrl(result);
+            logger.info("快钱支付 response : {}", JSON.toJSONString(response));
             return response;
         }
         // 微信视频号下单 需要额外调用支付参数
@@ -1790,12 +1800,20 @@ public class PayServiceImpl implements PayService {
         CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), order.getOrderNo(), order.getPayPrice(),details.get(0).getProductName(), order.getIp());
         // 更新商户订单号
         order.setOutTradeNo(cashier.getAccp_txno());
-        order.setOutTradeNo(cashier.getAccp_txno());
         boolean b = orderService.updateById(order);
         if(!b){
             throw new RuntimeException("当前操作人数过多");
         }
         order = orderService.getById(order.getId());
+        return cashier;
+    }
+
+    private String kqCashierPay(Order order) {
+        User user = userService.getById(order.getPayUid());
+        List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
+        String cashier = kqPayService.cashier(user.getAccount(), order.getIp(), order.getOrderNo(),
+                order.getPayPrice(), details.get(0).getProductName(), order.getCreateTime());
+        // 更新商户订单号
         return cashier;
     }
 

@@ -54,6 +54,10 @@ public class PayConstants {
     /** 支付渠道-连连支付 */
     public static final String PAY_CHANNEL_LIANLIAN = "lianlian";
 
+
+    /** 支付渠道-快钱支付 */
+    public static final String PAY_CHANNEL_KQ = "kq";
+
     /** 支付渠道-wallet */
     public static final String PAY_CHANNEL_WALLET = "wallet";
 
