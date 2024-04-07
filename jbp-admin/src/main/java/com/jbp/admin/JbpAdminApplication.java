@@ -1,24 +1,7 @@
 package com.jbp.admin;
 
-import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.agent.LztAcctController;
-import com.jbp.common.lianlian.result.AcctBalList;
-import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
-import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
-import com.jbp.common.model.agent.LztFundTransfer;
-import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.merchant.MerchantPayInfo;
-import com.jbp.common.page.CommonPage;
-import com.jbp.common.response.AliBankcardResponse;
-import com.jbp.common.result.CommonResult;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.service.service.LztService;
-import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.agent.*;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -26,11 +9,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Map;
+import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 
 @EnableAsync //开启异步调用	
