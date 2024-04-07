@@ -20,6 +20,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztWithdrawalDao;
 import com.jbp.service.service.LianLianPayService;
@@ -81,10 +82,14 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
             linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
         }
         BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0038) : new BigDecimal(merchant.getHandlingFee());
-        BigDecimal feeAmount = amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        BigDecimal feeAmount = BigDecimal.ZERO;
+        feeScale = feeScale.subtract(BigDecimal.valueOf(0.0038));
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
         WithdrawalResult orderResult = lztService.withdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), userId, drawNo,
                 amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno);
-
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt, feeAmount, postscript, orderResult);
         save(withdrawal);
         return withdrawal;

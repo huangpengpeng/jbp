@@ -61,6 +61,8 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
         lztReceipt.setToken(receiptProduceResult.getToken());
         lztReceipt.setTradeAccpTxno(receiptProduceResult.getTrade_accp_txno());
         save(lztReceipt);
+
+        // 
         return lztReceipt;
     }
 
