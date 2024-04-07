@@ -636,7 +636,7 @@ public class LztServiceImpl implements LztService {
     @Override
     public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String txn_seqno,
                                       String amt, String feeAmt,String pwd, String random_key, String payee_type,
-                                      String bank_acctno, String bank_code, String bank_acctname, String cnaps_code,   String ip) {
+                                      String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
         TransferParams params = new TransferParams(timestamp, oidPartner);
@@ -647,7 +647,7 @@ public class LztServiceImpl implements LztService {
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
-        TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose);
+        TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose, postscript);
         params.setOrderInfo(orderInfo);
         TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,
                 "USEROWN", pwd, random_key);

@@ -48,5 +48,4 @@ public class SystemLoginResponse implements Serializable {
     @ApiModelProperty(value = "左上角缩回菜单logo")
     private String leftSquareLogo;
 
-    private Merchant merchant;
 }

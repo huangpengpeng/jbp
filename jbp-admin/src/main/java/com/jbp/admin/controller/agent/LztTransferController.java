@@ -4,15 +4,14 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztTransferMorepyee;
-import com.jbp.common.model.agent.LztWithdrawal;
+import com.jbp.common.model.agent.LztTransfer;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.agent.LztAcctService;
-import com.jbp.service.service.agent.LztTransferMorepyeeService;
+import com.jbp.service.service.agent.LztTransferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,56 +33,52 @@ public class LztTransferController {
     @Resource
     private LztAcctService lztAcctService;
     @Resource
-    private LztTransferMorepyeeService lztTransferMorepyeeService;
+    private LztTransferService lztTransferService;
 
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:create')")
     @ApiOperation(value = "来账通外部代付")
     @GetMapping(value = "/create")
-    public CommonResult<LztTransferMorepyee> apply(HttpServletRequest request, String payerId, String payeeId, String payCode,
-                                                   String pwd, BigDecimal amt, String randomKey, String txnPurpose, String postscript) {
+    public CommonResult<LztTransfer> apply(HttpServletRequest request, String payerId, String payCode, String payeeType,
+                                           String pwd, BigDecimal amt, String randomKey,
+                                           String txnPurpose, String postscript, String cnapsCode, String bankAcctNo,
+                                           String bankCode, String bankAcctName) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(payerId);
         if (acct == null || acct.getMerId() != merId) {
             throw new CrmebException("付款用户不存在");
         }
-        LztAcct acct2 = lztAcctService.getByUserId(payeeId);
-        if (acct2 == null) {
-            throw new CrmebException("收款款用户不存在");
-        }
         String ip = CrmebUtil.getClientIp(request);
-        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, txnPurpose, pwd, randomKey, payeeId, ip, postscript);
-        return CommonResult.success(result);
+        LztTransfer lztTransfer = lztTransferService.create(payerId, payCode, amt, payeeType, bankAcctNo,
+                bankCode, bankAcctName, cnapsCode, txnPurpose, pwd, randomKey, postscript, ip);
+        return CommonResult.success(lztTransfer);
     }
 
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:page')")
     @ApiOperation(value = "分页")
     @GetMapping(value = "/page")
-    public CommonResult<PageInfo<LztTransferMorepyee>> page(String payerId, String payeeId, String txnSeqno,
-                                                            String accpTxno, String status,
-                                                            PageParamRequest pageParamRequest,
-                                                            @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date startTime,
-                                                            @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date endTime) {
-
+    public CommonResult<PageInfo<LztTransfer>> page(String payerId, String txnSeqno, String status, String bankAcctNo, String bankAcctName,
+                                                    PageParamRequest pageParamRequest,
+                                                    @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date startTime,
+                                                    @DateTimeFormat(pattern = DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) Date endTime) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
-        PageInfo<LztTransferMorepyee> page = lztTransferMorepyeeService.pageList(merId, payerId, payeeId, txnSeqno,
-                accpTxno, status, startTime, endTime, pageParamRequest);
+        PageInfo<LztTransfer> page = lztTransferService.pageList(merId, payerId, txnSeqno,
+                bankAcctNo, bankAcctName, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
     }
 
     @ApiOperation(value = "外部代付详情")
     @GetMapping(value = "/detail")
-    public CommonResult<LztTransferMorepyee> detail(Long id) {
-        return CommonResult.success(lztTransferMorepyeeService.detail(id));
+    public CommonResult<LztTransfer> detail(Long id) {
+        return CommonResult.success(lztTransferService.detail(id));
     }
 
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:affrim')")
     @ApiOperation(value = "外部代付确认")
     @GetMapping(value = "/affrim")
-    public CommonResult<LztWithdrawal> affrim(Long id, String checkReturn, String checkReason) {
-
-        return CommonResult.success();
+    public CommonResult<LztTransfer> affrim(Long id, String checkReturn, String checkReason) {
+        return CommonResult.success(lztTransferService.check(id, checkReturn, checkReason));
     }
 
 

@@ -7,11 +7,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TransferOrderInfo {
 
-    public TransferOrderInfo(String txn_seqno, String txn_time, Double total_amount, String txn_purpose) {
+    public TransferOrderInfo(String txn_seqno, String txn_time, Double total_amount, String txn_purpose, String postscript) {
         this.txn_seqno = txn_seqno;
         this.txn_time = txn_time;
         this.total_amount = total_amount;
         this.txn_purpose = txn_purpose;
+        this.postscript = postscript;
     }
 
     /**
@@ -44,4 +45,6 @@ public class TransferOrderInfo {
      * 订单信息，在查询API和支付通知中原样返回，可作为自定义参数使用
      */
     private String order_info;
+
+    private String postscript;
 }

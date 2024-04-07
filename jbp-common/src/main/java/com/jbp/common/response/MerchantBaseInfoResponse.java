@@ -80,4 +80,13 @@ public class MerchantBaseInfoResponse implements Serializable {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @ApiModelProperty(value = "连连商户号")
+    private String oidPartner;
+
+    @ApiModelProperty(value = "连连私钥")
+    private String priKey;
+
+    @ApiModelProperty(value = "交易模型")
+    private Integer tradeModel ;
+
 }

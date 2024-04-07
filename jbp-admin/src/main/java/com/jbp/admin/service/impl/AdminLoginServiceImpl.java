@@ -172,7 +172,6 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         String token = tokenComponent.createToken(loginUser);
         SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
         systemAdminResponse.setToken(token);
-        systemAdminResponse.setMerchant(merchant);
         BeanUtils.copyProperties(systemAdmin, systemAdminResponse);
 
         // 更新最后登录信息

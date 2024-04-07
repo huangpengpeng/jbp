@@ -3,10 +3,10 @@ package com.jbp.common.model.agent;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.constants.LianLianPayConfig;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.common.lianlian.result.TransferMorepyeeResult;
+import com.jbp.common.lianlian.result.LztTransferResult;
+import com.jbp.common.lianlian.result.QueryWithdrawalResult;
 import com.jbp.common.model.BaseModel;
-import com.jbp.common.mybatis.QueryPaymentResultHandler;
+import com.jbp.common.mybatis.QueryWithdrawalResultHandler;
 import com.jbp.common.mybatis.TransferMorepyeeResultHandler;
 import com.jbp.common.utils.DateTimeUtils;
 import io.swagger.annotations.ApiModel;
@@ -29,7 +29,7 @@ public class LztTransfer extends BaseModel {
 
     public LztTransfer(Integer merId, String payerId, String payerName, String txnSeqno,
                        String accpTxno, BigDecimal amt, BigDecimal feeAmount, String payeeType, String bankAcctNo,
-                       String bankCode, String bankAcctName, String cnapsCode) {
+                       String bankCode, String bankAcctName, String cnapsCode, String postscript) {
         this.merId = merId;
         this.payerId = payerId;
         this.payerName = payerName;
@@ -42,6 +42,7 @@ public class LztTransfer extends BaseModel {
         this.bankCode = bankCode;
         this.bankAcctName = bankAcctName;
         this.cnapsCode = cnapsCode;
+        this.postscript = postscript;
         this.receiptStatus = 0;
         this.txnStatus = LianLianPayConfig.TxnStatus.交易处理中.getName();
         this.createTime = DateTimeUtils.getNow();
@@ -87,14 +88,17 @@ public class LztTransfer extends BaseModel {
     @ApiModelProperty(value = "大额行号")
     private String cnapsCode;
 
+    @ApiModelProperty(value = "附言")
+    private String postscript;
+
 
     @ApiModelProperty(value = "下单结果")
     @TableField(value = "orderRet", typeHandler = TransferMorepyeeResultHandler.class)
-    private TransferMorepyeeResult orderRet;
+    private LztTransferResult orderRet;
 
     @ApiModelProperty(value = "查询结果")
-    @TableField(value = "queryRet", typeHandler = QueryPaymentResultHandler.class)
-    private QueryPaymentResult queryRet;
+    @TableField(value = "queryRet", typeHandler = QueryWithdrawalResultHandler.class)
+    private QueryWithdrawalResult queryRet;
 
     @ApiModelProperty(value = "回执单状态 0  待申请  1 待下载")
     private Integer receiptStatus;
@@ -116,5 +120,9 @@ public class LztTransfer extends BaseModel {
 
     @ApiModelProperty(value = "完成时间")
     private Date finishTime;
+
+    @ApiModelProperty(value = "商户名称")
+    @TableField(exist = false)
+    private String merName;
 
 }

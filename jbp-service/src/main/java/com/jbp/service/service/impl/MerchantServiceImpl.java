@@ -622,6 +622,11 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         baseInfo.setMerCategory(merchantCategory.getName());
         baseInfo.setMerType(merchantType.getName());
         baseInfo.setReceiptPrintingSwitch(merchant.getReceiptPrintingSwitch());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        if(payInfo != null){
+            baseInfo.setOidPartner(payInfo.getOidPartner());
+            baseInfo.setPriKey(payInfo.getPriKey());
+        }
         return baseInfo;
     }
 
