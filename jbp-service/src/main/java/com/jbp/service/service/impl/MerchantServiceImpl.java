@@ -17,6 +17,8 @@ import com.jbp.common.constants.*;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.admin.SystemRole;
+import com.jbp.common.model.admin.SystemRoleMenu;
 import com.jbp.common.model.bill.MerchantDailyStatement;
 import com.jbp.common.model.bill.MerchantMonthStatement;
 import com.jbp.common.model.express.ShippingTemplates;
@@ -108,6 +110,10 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
     private RedisUtil redisUtil;
     @Autowired
     private GroupConfigService groupConfigService;
+    @Autowired
+    private SystemRoleService systemRoleService;
+    @Autowired
+    private SystemRoleMenuService systemRoleMenuService;
 
     /**
      * 商户分页列表
@@ -304,6 +310,42 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (!save) return Boolean.FALSE;
         merchant.setAdminId(merchantAdmin.getId());
         dao.updateById(merchant);
+        
+        
+		// 查询平台自营的商户权限，初始化给其他商户
+        SystemRole systemRole=new SystemRole();
+        systemRole.setMerId(merchant.getId());
+        systemRole.setRoleName("出纳员");
+        systemRole.setStatus(true);
+        systemRole.setLevel(0);
+        systemRole.setType(4);
+        systemRole.setRules("");
+        systemRoleService.save(systemRole);
+        List<Integer> menus=   systemRoleMenuService.getMenuListByRid(6);
+        for (Integer mId : menus) {
+        	SystemRoleMenu menu=new SystemRoleMenu();
+        	menu.setMenuId(mId);
+        	menu.setRid(systemRole.getId());
+        	systemRoleMenuService.save(menu);
+		}
+        
+        
+        systemRole=new SystemRole();
+        systemRole.setMerId(merchant.getId());
+        systemRole.setRoleName("复合员");
+        systemRole.setStatus(true);
+        systemRole.setLevel(0);
+        systemRole.setType(4);
+        systemRole.setRules("");
+        systemRoleService.save(systemRole);
+         menus=   systemRoleMenuService.getMenuListByRid(30);
+        for (Integer mId : menus) {
+        	SystemRoleMenu menu=new SystemRoleMenu();
+        	menu.setMenuId(mId);
+        	menu.setRid(systemRole.getId());
+        	systemRoleMenuService.save(menu);
+		}
+
 
         merchantInfo.setMerId(merchant.getId());
         save = merchantInfoService.save(merchantInfo);
