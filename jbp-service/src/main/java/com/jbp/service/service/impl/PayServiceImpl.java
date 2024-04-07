@@ -237,7 +237,7 @@ public class PayServiceImpl implements PayService {
         }
         if (order.getStatus() > OrderConstants.ORDER_STATUS_WAIT_PAY) {
             throw new CrmebException("订单状态异常");
-        }
+    }
         User user = userService.getInfo();
         userService.validPayPwd(user.getId(), orderPayRequest.getPwd());
         // 根据支付类型进行校验,更换支付类型
