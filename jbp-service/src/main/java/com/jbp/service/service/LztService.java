@@ -59,7 +59,7 @@ public interface LztService {
     /**
      * 来账通提现
      */
-    WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo, BigDecimal amt,  BigDecimal fee, String postscript,
+    WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo, BigDecimal amt, BigDecimal fee, String postscript,
                                 String password, String random_key, String ip, String notifyUrl, String linked_acctno);
 
     /**
@@ -111,17 +111,17 @@ public interface LztService {
     /**
      * 找回密码申请
      */
-    FindPasswordApplyResult findPasswordApply (String oidPartner, String priKey, String user_id, String linked_acctno, String ip);
+    FindPasswordApplyResult findPasswordApply(String oidPartner, String priKey, String user_id, String linked_acctno, String ip);
 
     /**
      * 找回密码验证
      */
-    FindPasswordVerifyResult findPasswordVerify (String oidPartner, String priKey, String user_id, String token, String verify_code, String random_key, String password);
+    FindPasswordVerifyResult findPasswordVerify(String oidPartner, String priKey, String user_id, String token, String verify_code, String random_key, String password);
 
 
     /**
      * 大额行号查询
-     *  https://accpapi.lianlianpay.com/v1/acctmgr/query-cnapscode
+     * https://accpapi.lianlianpay.com/v1/acctmgr/query-cnapscode
      */
     QueryCnapsCodeResult queryCnapsCode(String oidPartner, String priKey, String bank_code, String brabank_name, String city_code);
 
@@ -129,8 +129,8 @@ public interface LztService {
     /**
      * 代付
      */
-    LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String txn_seqno,
-                               String amt, String feeAmt,String pwd, String random_key, String payee_type, String bank_acctno, String bank_code, String bank_acctname, String cnaps_code,   String ip);
+    LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
+                               String amt, String feeAmt, String pwd, String random_key, String payee_type, String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String ip);
 }
 
 

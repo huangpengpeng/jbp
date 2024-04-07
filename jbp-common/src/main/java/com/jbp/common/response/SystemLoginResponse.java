@@ -1,6 +1,7 @@
 package com.jbp.common.response;
 
 
+import com.jbp.common.model.merchant.Merchant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -46,4 +47,6 @@ public class SystemLoginResponse implements Serializable {
 
     @ApiModelProperty(value = "左上角缩回菜单logo")
     private String leftSquareLogo;
+
+    private Merchant merchant;
 }

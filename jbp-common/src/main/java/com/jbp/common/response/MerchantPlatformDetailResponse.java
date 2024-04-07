@@ -101,5 +101,5 @@ public class MerchantPlatformDetailResponse implements Serializable {
     private String priKey;
 
     @ApiModelProperty(value = "交易模型")
-    private Integer tradeMode ;
+    private Integer tradeModel ;
 }

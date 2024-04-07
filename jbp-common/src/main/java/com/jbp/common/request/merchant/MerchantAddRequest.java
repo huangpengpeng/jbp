@@ -96,7 +96,7 @@ public class MerchantAddRequest implements Serializable {
     private String priKey;
 
     @ApiModelProperty(value = "交易模型")
-    private Integer tradeMode;
+    private Integer tradeModel;
 
     @ApiModelProperty(value = "排序", required = true)
     @NotNull(message = "排序不能为空")
