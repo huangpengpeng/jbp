@@ -81,12 +81,14 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-        List<LztQueryAcctInfo> list = result.getList();
-        if (CollectionUtils.isNotEmpty(list)) {
-            LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
-            lztAcctApply.setStatus(acctState.getCode());
+        if(result != null){
+            List<LztQueryAcctInfo> list = result.getList();
+            if (CollectionUtils.isNotEmpty(list)) {
+                LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
+                lztAcctApply.setStatus(acctState.getCode());
+            }
+            lztAcctApply.setRetMsg(result.getRet_msg());
         }
-        lztAcctApply.setRetMsg(result.getRet_msg());
         if(StringUtils.isNotEmpty(notifyInfo)){
             lztAcctApply.setNotifyInfo(notifyInfo);
         }

@@ -74,12 +74,14 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 userId, LianLianPayConfig.UserType.getCode(lztAcct.getUserType()));
         if (lztAcct.getIfOpenBankAcct()) {
             LztQueryAcctInfoResult bankAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-            List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
-            if (CollectionUtils.isNotEmpty(list)) {
-                for (LztQueryAcctInfo lztQueryAcctInfo : list) {
-                    lztQueryAcctInfo.setAcct_stat(LianLianPayConfig.AcctState.valueOf(lztQueryAcctInfo.getAcct_stat()).getCode());
+            if(bankAcctInfoResult != null){
+                List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
+                if (CollectionUtils.isNotEmpty(list)) {
+                    for (LztQueryAcctInfo lztQueryAcctInfo : list) {
+                        lztQueryAcctInfo.setAcct_stat(LianLianPayConfig.AcctState.valueOf(lztQueryAcctInfo.getAcct_stat()).getCode());
+                    }
+                    lztAcct.setBankAcctInfoList(bankAcctInfoResult.getList());
                 }
-                lztAcct.setBankAcctInfoList(bankAcctInfoResult.getList());
             }
         }
         List<AcctInfo> acctinfoList = acctInfoResult.getAcctinfo_list();

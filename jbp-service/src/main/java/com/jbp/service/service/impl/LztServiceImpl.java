@@ -153,15 +153,8 @@ public class LztServiceImpl implements LztService {
         if (StringUtils.isEmpty(s)) {
             throw new CrmebException("查询银行账户资金异常");
         }
-        try {
-            LztQueryAcctInfoResult result = JSON.parseObject(s, LztQueryAcctInfoResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
-                throw new CrmebException("查询银行账户资金异常：" + result == null ? "请求结果为空" : result.getRet_msg());
-            }
-            return result;
-        } catch (Exception e) {
-            throw new CrmebException("查询银行账户资金异常:" + s);
-        }
+        LztQueryAcctInfoResult result = JSON.parseObject(s, LztQueryAcctInfoResult.class);
+        return result;
     }
 
     @Override
