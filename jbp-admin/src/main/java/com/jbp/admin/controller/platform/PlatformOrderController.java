@@ -1,8 +1,9 @@
 package com.jbp.admin.controller.platform;
 
+import cn.hutool.core.util.StrUtil;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
-import com.jbp.common.model.order.Order;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
@@ -13,18 +14,20 @@ import com.jbp.common.response.PlatformOrderPageResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.service.service.OrderService;
-
 import com.jbp.service.service.PayService;
+import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 订单表 前端控制器
@@ -48,11 +51,34 @@ public class PlatformOrderController {
     private OrderService orderService;
     @Resource
     private PayService payService;
+    @Resource
+    private UserService userService;
 
     @PreAuthorize("hasAuthority('platform:order:page:list')")
     @ApiOperation(value = "平台端订单分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<PlatformOrderPageResponse>> getList(@Validated OrderSearchRequest request, @Validated PageParamRequest pageParamRequest) {
+        if (StrUtil.isNotEmpty(request.getUaccount())) {
+            request.setUid(-1);
+            User user = userService.getByAccount(request.getUaccount());
+            if (user != null) {
+                request.setUid(user.getId());
+            }
+        }
+        if (StrUtil.isNotEmpty(request.getPayAccount())) {
+            request.setPayUid(-1);
+            User user = userService.getByAccount(request.getPayAccount());
+            if (user != null) {
+                request.setPayUid(user.getId());
+            }
+        }
+        if (StrUtil.isNotEmpty(request.getPayPhone())) {
+            List<User> userList = userService.getByPhone(request.getPayPhone());
+            if (!CollectionUtils.isEmpty(userList)) {
+                List<Integer> collect = userList.stream().map(User::getId).collect(Collectors.toList());
+                request.setUidList(collect);
+            }
+        }
         return CommonResult.success(CommonPage.restPage(orderService.getPlatformAdminPage(request, pageParamRequest)));
     }
 
