@@ -118,4 +118,18 @@ public interface LztService {
      */
     FindPasswordVerifyResult findPasswordVerify (String oidPartner, String priKey, String user_id, String token, String verify_code, String random_key, String password);
 
+
+    /**
+     * 大额行号查询
+     *  https://accpapi.lianlianpay.com/v1/acctmgr/query-cnapscode
+     */
+    QueryCnapsCodeResult queryCnapsCode(String oidPartner, String priKey, String bank_code, String brabank_name, String city_code);
+
+
+    /**
+     * 代付
+     */
+    LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String ip);
 }
+
+

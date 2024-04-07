@@ -97,9 +97,11 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         Merchant merchant = merchantService.getById(lztAcctOpen.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         UserInfoResult result = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctOpen.getUserId());
-        lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
-        lztAcctOpen.setRetMsg(result.getRet_msg());
-        updateById(lztAcctOpen);
+        if(result != null && "0000".equals(result.getRet_code())){
+            lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
+            lztAcctOpen.setRetMsg(result.getRet_msg());
+            updateById(lztAcctOpen);
+        }
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
             throw new RuntimeException("当前记录已经开户完成不允许删除, 请联系管理员处理");
         }

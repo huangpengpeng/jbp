@@ -88,15 +88,8 @@ public class LztServiceImpl implements LztService {
         if (StringUtils.isEmpty(s)) {
             throw new CrmebException("查询用户信息异常");
         }
-        try {
-            UserInfoResult result = JSON.parseObject(s, UserInfoResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
-                throw new CrmebException("查询用户信息异常：" + result == null ? "请求结果为空" : result.getRet_msg());
-            }
-            return result;
-        } catch (Exception e) {
-            throw new CrmebException("查询用户信息异常:" + s);
-        }
+        UserInfoResult result = JSON.parseObject(s, UserInfoResult.class);
+        return result;
     }
 
     @Override
@@ -256,7 +249,7 @@ public class LztServiceImpl implements LztService {
         payeeInfo.setPayee_id(payeeId);
         payeeInfo.setPayee_amount(String.valueOf(amt));
         params.setPayeeInfo(Arrays.asList(payeeInfo));
-        // 测试风控参数
+        // 风控参数
         String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeId, "", registerTime, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
@@ -625,5 +618,43 @@ public class LztServiceImpl implements LztService {
         } catch (Exception e) {
             throw new CrmebException("找回密码验证请求异常:" + e.getMessage());
         }
+    }
+
+
+    @Override
+    public QueryCnapsCodeResult queryCnapsCode(String oidPartner, String priKey, String bank_code, String brabank_name, String city_code) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        QueryCnapsCodeParams params = new QueryCnapsCodeParams(timestamp, oidPartner);
+        params.setBank_code(bank_code);
+        params.setBrabank_name(brabank_name);
+        params.setCity_code(city_code);
+
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-cnapscode";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("未找到支持的联行号" + bank_code);
+        }
+        QueryCnapsCodeResult result = JSON.parseObject(s, QueryCnapsCodeResult.class);
+        return result;
+    }
+
+    @Override
+    public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String ip) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        TransferParams params = new TransferParams(timestamp, oidPartner);
+        // 风控参数
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payerId, "", registerTime, txnPurpose);
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setFrms_client_chnl("13");
+        riskItemInfo.setUser_auth_flag("1");
+
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+
+        return null;
     }
 }
