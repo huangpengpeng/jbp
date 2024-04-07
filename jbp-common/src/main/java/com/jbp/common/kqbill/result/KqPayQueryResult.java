@@ -56,4 +56,13 @@ public class KqPayQueryResult implements Serializable {
      * 快钱收取商户的手续费
      */
     private String fee;
+
+    private String payResult;
+
+   public Boolean  ifSuccess(){
+       if(this == null){
+           return false;
+       }
+       return "10".equals(this.payResult);
+   }
 }

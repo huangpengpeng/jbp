@@ -2,6 +2,7 @@ package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.kqbill.result.KqPayQueryResult;
+import com.jbp.common.kqbill.result.KqRefundResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.KqPayService;
@@ -54,9 +55,13 @@ public class JbpFrontApplication {
         System.out.println(DateTimeUtils.format(now, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
 //        String cashier = bean1.cashier("franky", "115.196.160.207", orderId, BigDecimal.valueOf(1), "11", now);
 //        System.out.println(cashier);
+//
+//        KqPayQueryResult CS_25886974931035 = bean1.queryPayResult("CS_25886974931035");
+//
+//        System.out.println(CS_25886974931035);
 
-        KqPayQueryResult cs66084567814990 = bean1.queryPayResult("CS_66084567814990");
 
-        System.out.println(cs66084567814990);
+        KqRefundResult refund = bean1.refund("CS_25886974931035", "CS_25886974931035_1", BigDecimal.valueOf(1), new Date());
+
     }
 }

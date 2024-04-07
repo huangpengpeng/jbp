@@ -116,7 +116,7 @@ public class KqPayServiceImpl implements KqPayService {
         KqPayInfoResult payInfo = get();
         KqHeadParams head = new KqHeadParams("1.0.0", "F0001", payInfo.getMerchantCode(), refundId);
         KqRefundParams body = new KqRefundParams();
-        body.setMerchantAcctId(head.getMemberCode());
+        body.setMerchantAcctId(payInfo.getMerchantId());
         body.setAmount(String.valueOf(amt.multiply(BigDecimal.valueOf(100)).intValue()));
         body.setEntryTime(DateTimeUtils.format(refundTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         body.setOrgOrderId(orderId);
@@ -128,11 +128,13 @@ public class KqPayServiceImpl implements KqPayService {
         try {
             String s = buildHttpsClient.requestKQ(originalString);
             if (StringUtils.isEmpty(s)) {
+                log.error("调用快钱退款失败单号:{0}, 退款单号:{1}", orderId, refundId);
                 return null;
             }
             JSONObject jsonObject = JSONObject.parseObject(s);
             JSONObject responseBody = jsonObject.getJSONObject("responseBody");
             if(responseBody == null){
+                log.error("调用快钱退款失败2单号:{0}, 退款单号:{1}", orderId, refundId);
                 return null;
             }
             return responseBody.toJavaObject(KqRefundResult.class);

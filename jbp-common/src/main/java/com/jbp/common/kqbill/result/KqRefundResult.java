@@ -23,4 +23,11 @@ public class KqRefundResult implements Serializable {
      * 商户编号
      */
     private String merchantAcctId;
+
+    public Boolean  ifSuccess(){
+        if(this == null){
+            return false;
+        }
+        return "0000".equals(this.bizResponseCode);
+    }
 }
