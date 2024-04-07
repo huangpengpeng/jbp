@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.jbp.common.annotation.StringContains;
 
@@ -63,6 +64,12 @@ public class OrderSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "用户id")
     private Integer uid;
+
+    @ApiModelProperty(value = "付款用户")
+    private Integer payUid;
+
+    @ApiModelProperty(value = "用户id列表")
+    private List<Integer> uidList;
 
 
 }
