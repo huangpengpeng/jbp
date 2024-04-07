@@ -27,6 +27,9 @@ public class PayConstants {
     /** 支付方式-支付宝支付 */
     public static final String PAY_TYPE_ALI_PAY = "alipay";
 
+    /** 支付方式-快钱 */
+    public static final String PAY_TYPE_KQ = "kq";
+
     /** 支付渠道-公众号 */
     public static final String PAY_CHANNEL_WECHAT_PUBLIC = "public";
     /** 支付渠道-小程序 */

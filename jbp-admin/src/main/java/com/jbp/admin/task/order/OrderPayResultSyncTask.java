@@ -1,15 +1,13 @@
 package com.jbp.admin.task.order;
 
 import com.jbp.common.constants.PayConstants;
+import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.StringUtils;
-import com.jbp.service.service.LianLianPayService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.PayCallbackService;
-import com.jbp.service.service.RechargeOrderService;
+import com.jbp.service.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -31,6 +29,8 @@ public class OrderPayResultSyncTask {
     private PayCallbackService payCallbackService;
     @Resource
     private RechargeOrderService rechargeOrderService;
+    @Resource
+    private KqPayService kqPayService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrderPayResultSyncTask.class);
 
@@ -45,6 +45,11 @@ public class OrderPayResultSyncTask {
                     if (result != null || "TRADE_SUCCESS".equals(result.getTxn_status())) {
                         payCallbackService.lianLianPayCallback(result);
                     }
+                } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
+                    KqPayQueryResult result = kqPayService.queryPayResult(order.getOrderNo());
+                    if (result.ifSuccess()) {
+                        payCallbackService.kqPayCallback(result);
+                    }
                 }
             }
             List<RechargeOrder> rechargeOrders = rechargeOrderService.getWaitPayList(3);
@@ -53,6 +58,11 @@ public class OrderPayResultSyncTask {
                     QueryPaymentResult result = lianLianPayService.queryPayResult(order.getOrderNo());
                     if (result != null || "TRADE_SUCCESS".equals(result.getTxn_status())) {
                         payCallbackService.lianLianPayCallback(result);
+                    }
+                } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
+                    KqPayQueryResult result = kqPayService.queryPayResult(order.getOrderNo());
+                    if (result.ifSuccess()) {
+                        payCallbackService.kqPayCallback(result);
                     }
                 }
             }
