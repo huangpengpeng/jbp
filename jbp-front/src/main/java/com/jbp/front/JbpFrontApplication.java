@@ -1,7 +1,9 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.common.kqbill.utils.Signature;
+import com.jbp.service.service.KqPayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,5 +43,14 @@ public class JbpFrontApplication {
         System.out.println("启动完成");
 
         Signature.signMsg("11");
+
+        KqPayService bean1 = run.getBean(KqPayService.class);
+
+        KqPayQueryResult CS_25886974931035 = bean1.queryPayResult("CS_25886974931035");
+
+        System.out.println(CS_25886974931035);
+
+
+
     }
 }
