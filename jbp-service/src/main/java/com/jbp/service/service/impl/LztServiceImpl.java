@@ -321,6 +321,7 @@ public class LztServiceImpl implements LztService {
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
 
         String url = "https://accpapi.lianlianpay.com/v1/txn/withdrawal";
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());

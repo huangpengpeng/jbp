@@ -40,7 +40,7 @@ public class LztTransferMorepyeeController {
     @ApiOperation(value = "来账通内部代发")
     @GetMapping(value = "/create")
     public CommonResult<LztTransferMorepyee> apply(HttpServletRequest request, String payerId, String payeeId, String payCode,
-                                                   String pwd, BigDecimal amt, String randomKey, String txnPurpose, String postscript) {
+                                                   String pwd, BigDecimal amt, String randomKey) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(payerId);
@@ -52,7 +52,7 @@ public class LztTransferMorepyeeController {
             throw new CrmebException("收款款用户不存在");
         }
         String ip = CrmebUtil.getClientIp(request);
-        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, txnPurpose, pwd, randomKey, payeeId, ip, postscript);
+        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, "服务费", pwd, randomKey, payeeId, ip, "服务费");
         return CommonResult.success(result);
     }
 

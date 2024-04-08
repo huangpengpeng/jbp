@@ -49,7 +49,7 @@ public class LztFundTransferController {
     @PreAuthorize("hasAuthority('agent:lzt:acct:transfer')")
     @ApiOperation(value = "来账通资金划拨")
     @GetMapping(value = "/transfer")
-    public CommonResult<LztFundTransfer> transfer(String userId, String bankAccountNo, BigDecimal amt, String postscript) {
+    public CommonResult<LztFundTransfer> transfer(String userId, String bankAccountNo, BigDecimal amt) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(userId);
@@ -59,7 +59,7 @@ public class LztFundTransferController {
         if (StringUtils.isEmpty(bankAccountNo)) {
             throw new CrmebException("付款款账户不存在");
         }
-        LztFundTransfer lztFundTransfer = lztFundTransferService.fundTransfer(merId, userId, bankAccountNo, amt, postscript);
+        LztFundTransfer lztFundTransfer = lztFundTransferService.fundTransfer(merId, userId, bankAccountNo, amt, "付款");
         return CommonResult.success(lztFundTransfer);
     }
 }

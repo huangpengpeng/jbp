@@ -92,6 +92,9 @@ public class LztAcctController {
         if (StringUtils.isEmpty(scan)) {
             throw new CrmebException("场景不能为空");
         }
+        if(!scan.equals("忘记密码") && (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO))){
+            throw new CrmebException("请先输入金额");
+        }
         String payCode = "";
         switch (scan) {
             case "转账":

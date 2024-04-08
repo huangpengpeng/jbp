@@ -50,8 +50,7 @@ public class LztTransferController {
     @ApiOperation(value = "来账通外部代付")
     @GetMapping(value = "/create")
     public CommonResult<LztTransfer> apply(HttpServletRequest request, String payerId, String payCode, String payeeType,
-                                           String pwd, BigDecimal amt, String randomKey,
-                                           String txnPurpose, String postscript, String cnapsCode, String bankAcctNo,
+                                           String pwd, BigDecimal amt, String randomKey, String cnapsCode, String bankAcctNo,
                                            String bankCode, String bankAcctName) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
@@ -61,7 +60,7 @@ public class LztTransferController {
         }
         String ip = CrmebUtil.getClientIp(request);
         LztTransfer lztTransfer = lztTransferService.create(payerId, payCode, amt, payeeType, bankAcctNo,
-                bankCode, bankAcctName, cnapsCode, txnPurpose, pwd, randomKey, postscript, ip);
+                bankCode, bankAcctName, cnapsCode, "服务费", pwd, randomKey, "服务费", ip);
         return CommonResult.success(lztTransfer);
     }
 

@@ -81,7 +81,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                     for (LztQueryAcctInfo lztQueryAcctInfo : list) {
                         lztQueryAcctInfo.setAcct_stat(LianLianPayConfig.AcctState.valueOf(lztQueryAcctInfo.getAcct_stat()).getCode());
                     }
-                    lztAcct.setBankAcctInfoList(bankAcctInfoResult.getList());
+                    lztAcct.setBankAcctInfoList(list);
                 }
             }
         }
