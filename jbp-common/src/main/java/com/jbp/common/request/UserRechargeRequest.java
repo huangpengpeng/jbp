@@ -41,14 +41,14 @@ public class UserRechargeRequest implements Serializable {
     @ApiModelProperty(value = "充值套餐id，与充值金额二选一")
     private Integer groupDataId;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay, lianlian", required = true)
+    @ApiModelProperty(value = "支付方式:weixin,alipay, lianlian, kq", required = true)
     @NotBlank(message = "支付方式不能为空")
-    @StringContains(limitValues = {"weixin", "alipay", "lianlian"}, message = "未知的支付方式")
+    @StringContains(limitValues = {"weixin", "alipay", "lianlian","kq"}, message = "未知的支付方式")
     private String payType;
 
-    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, lianlian", required = true)
+    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, lianlian,kq", required = true)
     @NotBlank(message = "支付渠道不能为空")
-    @StringContains(limitValues = {"public", "mini", "h5", "wechatIos", "wechatAndroid", "alipay", "alipayApp", "lianlian"}, message = "未知的支付渠道")
+    @StringContains(limitValues = {"public", "mini", "h5", "wechatIos", "wechatAndroid", "alipay", "alipayApp", "lianlian","kq"}, message = "未知的支付渠道")
     private String payChannel;
 
     @ApiModelProperty(value = "充值  yue（0） wallet （1 2 3  4  5）")
