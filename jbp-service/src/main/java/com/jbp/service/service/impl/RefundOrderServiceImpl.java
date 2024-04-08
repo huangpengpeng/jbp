@@ -1415,6 +1415,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             if (order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+            }
             if (order.getPayType().equals("confirmPay")) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
@@ -1432,7 +1435,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         });
         if (execute) {
             // 积分、佣金、优惠券等放入后置task中处理
-            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)|| order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
                 redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());
             }
         }
