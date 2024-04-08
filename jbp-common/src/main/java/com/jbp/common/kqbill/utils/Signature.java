@@ -23,7 +23,8 @@ public class Signature {
         String base64 = "";
         try {
             KeyStore ks = KeyStore.getInstance("PKCS12");
-            FileInputStream ksfis = new FileInputStream(Bill99ConfigInfo.DE_PRI_PATH);
+            String file = Signature.class.getResource("/certs/fny/20240329.3300000480031808.pfx").getPath().replaceAll("%20", " ");
+            FileInputStream ksfis = new FileInputStream(file);
             BufferedInputStream ksbufin = new BufferedInputStream(ksfis);
             char[] keyPwd = Bill99ConfigInfo.DE_PRI_PWD.toCharArray();
             ks.load(ksbufin, keyPwd);

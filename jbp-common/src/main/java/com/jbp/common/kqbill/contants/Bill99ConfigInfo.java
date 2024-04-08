@@ -1,6 +1,7 @@
 package com.jbp.common.kqbill.contants;
 
 
+import com.jbp.common.kqbill.utils.PropertiesLoader;
 import com.jbp.common.model.system.SystemConfig;
 import com.jbp.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.InputStream;
 
 @Component
 public class Bill99ConfigInfo {
@@ -15,19 +17,36 @@ public class Bill99ConfigInfo {
     @Autowired
     private Environment environment;
 
+    /**
+     * 加载快钱UMGW接口配置文件
+     */
+    private static PropertiesLoader propertiesLoader ;
+
+
     @PostConstruct
     private void init() {
-        Bill99ConfigInfo.UMGW_ENV = environment.getProperty("kq.env");
-        if(StringUtils.isEmpty(environment.getProperty("kq.env"))){
+        if(StringUtils.isEmpty(environment.getProperty("kq.config"))){
             return;
         }
-        Bill99ConfigInfo.DE_PRI_NAME = environment.getProperty("kq.privateKey.name");
-        Bill99ConfigInfo.DE_PRI_PWD = environment.getProperty("kq.privateKey.password");
-        Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getClassLoader().getResource(environment.getProperty("kq.privateKey.path")).getPath();
+        propertiesLoader = new PropertiesLoader("classpath:"+environment.getProperty("kq.config"));
 
-        Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getClassLoader().getResource(environment.getProperty("kq.publicKey.path")).getPath();
-        Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getClassLoader().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
-        Bill99ConfigInfo.SSL_PRI_PWD = environment.getProperty("kq.ssl.privateKey.password");
+//        Bill99ConfigInfo.DE_PRI_NAME = environment.getProperty("kq.privateKey.name");
+//        Bill99ConfigInfo.DE_PRI_PWD = environment.getProperty("kq.privateKey.password");
+//        final InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(environment.getProperty("kq.privateKey.path"));
+//        Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getClassLoader().getResourceAsStream(environment.getProperty("kq.privateKey.path")).getPath();
+//
+//        Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getClassLoader().getResourceAsStream(environment.getProperty("kq.publicKey.path")).getPath();
+//        Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getClassLoader().getResourceAsStream(environment.getProperty("kq.ssl.privateKey.path")).getPath();
+//        Bill99ConfigInfo.SSL_PRI_PWD = environment.getProperty("kq.ssl.privateKey.password");
+
+        Bill99ConfigInfo.UMGW_ENV = propertiesLoader.getProperty("kq.env");
+        Bill99ConfigInfo.DE_PRI_NAME = propertiesLoader.getProperty("kq.privateKey.name");
+        Bill99ConfigInfo.DE_PRI_PWD =propertiesLoader.getProperty("kq.privateKey.password");
+        Bill99ConfigInfo.DE_PRI_PATH = propertiesLoader.getProperty("kq.privateKey.path");
+        Bill99ConfigInfo.DE_PUB_PATH = propertiesLoader.getProperty("kq.publicKey.path");
+        Bill99ConfigInfo.SSL_PRI_PATH = propertiesLoader.getProperty("kq.ssl.privateKey.path");
+        Bill99ConfigInfo.SSL_PRI_PWD = propertiesLoader.getProperty("kq.ssl.privateKey.password");
+
     }
 
 
