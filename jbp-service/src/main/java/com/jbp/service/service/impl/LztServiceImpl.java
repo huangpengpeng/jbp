@@ -209,7 +209,9 @@ public class LztServiceImpl implements LztService {
     }
 
     @Override
-    public TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo, Double amt, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url) {
+    public TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
+                                                   Double amt, String txnPurpose, String pwd, String randomKey,
+                                                   String payeeId, String ip, String notify_url, String phone, Date registerTime) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         TransferMorepyeeParams params = new TransferMorepyeeParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -243,8 +245,8 @@ public class LztServiceImpl implements LztService {
         payeeInfo.setPayee_amount(String.valueOf(amt));
         params.setPayeeInfo(Arrays.asList(payeeInfo));
         // 风控参数
-        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeId, "", registerTime, txnPurpose);
+        String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeId, phone, registerTimeStr, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
@@ -286,7 +288,7 @@ public class LztServiceImpl implements LztService {
     @Override
     public WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo,
                                        BigDecimal amt, BigDecimal fee,String postscript, String password, String random_key, String ip,
-                                       String notifyUrl, String linked_acctno) {
+                                       String notifyUrl, String linked_acctno, String phone, Date registerTime) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         WithDrawalParams params = new WithDrawalParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -314,8 +316,8 @@ public class LztServiceImpl implements LztService {
         payerInfo.setRandom_key(random_key);
         params.setPayerInfo(payerInfo);
 
-        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeNo, "", registerTime, "提现");
+        String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeNo, phone, registerTimeStr, "提现");
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
@@ -636,18 +638,20 @@ public class LztServiceImpl implements LztService {
     @Override
     public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String txn_seqno,
                                       String amt, String feeAmt,String pwd, String random_key, String payee_type,
-                                      String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip) {
+                                      String bank_acctno, String bank_code, String bank_acctname,
+                                      String cnaps_code, String postscript, String ip, String phone, Date registerTime) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
         TransferParams params = new TransferParams(timestamp, oidPartner);
         // 风控参数
-        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payerId, "", registerTime, txnPurpose);
+        String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payerId, phone, registerTimeStr, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
         TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose, postscript);
+        orderInfo.setFee_amount(Double.valueOf(feeAmt));
         params.setOrderInfo(orderInfo);
         TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,
                 "USEROWN", pwd, random_key);
@@ -658,17 +662,17 @@ public class LztServiceImpl implements LztService {
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
         String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         if (StringUtils.isEmpty(s)) {
-            throw new CrmebException("代发失败" + payerId);
+            throw new CrmebException("代付失败" + payerId);
         }
         try {
             LztTransferResult result = JSON.parseObject(s, LztTransferResult.class);
             if (result == null || !("8889".equals(result.getRet_code()) || "0000".equals(result.getRet_code()) ||
                     "8888".equals(result.getRet_code()))) {
-                throw new CrmebException("代发失败失败：" + result == null ? "请求结果为空" : result.getRet_msg());
+                throw new CrmebException("代付失败：" + result == null ? "请求结果为空" : result.getRet_msg());
             }
             return result;
         } catch (Exception e) {
-            throw new CrmebException("代发失败失败:" + e.getMessage());
+            throw new CrmebException("代付失败:" + e.getMessage());
         }
 
     }

@@ -29,6 +29,10 @@ public class TransferOrderInfo {
      * 订单总金额，单位为元，精确到小数点后两位。
      */
     private Double total_amount;
+
+    private Double fee_amount;
+
+
     /**
      * 代发交易用途。
      * 服务费

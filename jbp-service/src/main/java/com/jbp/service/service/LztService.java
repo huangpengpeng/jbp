@@ -4,6 +4,7 @@ import com.jbp.common.lianlian.params.FindPasswordVerifyParams;
 import com.jbp.common.lianlian.result.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public interface LztService {
 
@@ -49,7 +50,9 @@ public interface LztService {
     /**
      * 来账通内部代发申请
      */
-    TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo, Double amt, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url);
+    TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
+                                            Double amt, String txnPurpose, String pwd, String randomKey,
+                                            String payeeId, String ip, String notify_url, String phone, Date registerTime);
 
     /**
      * 来账通内部代发结果查询
@@ -60,7 +63,7 @@ public interface LztService {
      * 来账通提现
      */
     WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo, BigDecimal amt, BigDecimal fee, String postscript,
-                                String password, String random_key, String ip, String notifyUrl, String linked_acctno);
+                                String password, String random_key, String ip, String notifyUrl, String linked_acctno, String phone, Date registerTime);
 
     /**
      * 来账通提现
@@ -131,7 +134,8 @@ public interface LztService {
      */
     LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
                                String amt, String feeAmt, String pwd, String random_key, String payee_type,
-                               String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip);
+                               String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
+                               String ip, String phone, Date registerTime);
 }
 
 
