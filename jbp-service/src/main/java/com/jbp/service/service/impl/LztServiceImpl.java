@@ -551,15 +551,8 @@ public class LztServiceImpl implements LztService {
         if (StringUtils.isEmpty(s)) {
             throw new CrmebException("申请下载异常:" + receipt_accp_txno);
         }
-        try {
-            ReceiptDownloadResult result = JSON.parseObject(s, ReceiptDownloadResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
-                throw new CrmebException("申请下载异常：" + result == null ? "请求结果为空" : result.getRet_msg());
-            }
-            return result;
-        } catch (Exception e) {
-            throw new CrmebException("申请下载异常:" + e.getMessage());
-        }
+        ReceiptDownloadResult result = JSON.parseObject(s, ReceiptDownloadResult.class);
+        return result;
     }
 
     @Override

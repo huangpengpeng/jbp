@@ -29,6 +29,7 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
                                        String accpTxno, String status, Date startTime, Date endTime,
                                            PageParamRequest pageParamRequest);
 
-
     LztTransferMorepyee detail(Long id);
+
+    List<LztTransferMorepyee> getWaitDownloadList();
 }

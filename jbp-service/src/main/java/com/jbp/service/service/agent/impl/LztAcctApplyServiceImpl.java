@@ -133,7 +133,9 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             if (StringUtils.isNotEmpty(s.getNotifyInfo())) {
                 try {
                     JSONObject jsonObject = new JSONObject(s.getNotifyInfo());
-                    s.setGateway_url2(jsonObject.get("gateway_url").toString());
+                    if(jsonObject.has("gateway_url")){
+                        s.setGateway_url2(jsonObject.getString("gateway_url"));
+                    }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }

@@ -10,6 +10,7 @@ import com.jbp.common.request.PageParamRequest;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 public interface LztTransferService extends IService<LztTransfer> {
 
@@ -29,4 +30,6 @@ public interface LztTransferService extends IService<LztTransfer> {
                                    PageParamRequest pageParamRequest);
 
     LztTransfer check(Long id, String checkReturn, String checkReason);
+
+    List<LztTransfer> getWaitDownloadList();
 }

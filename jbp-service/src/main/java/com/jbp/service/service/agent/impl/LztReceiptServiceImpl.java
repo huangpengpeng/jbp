@@ -111,7 +111,6 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
             MerchantPayInfo payInfo = merchant.getPayInfo();
             result = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(),
                     lztWithdrawal.getReceiptAccpTxno(), lztWithdrawal.getReceiptToken());
-
             lztWithdrawal.setReceiptZip(result.getReceipt_sum_file());
             lztWithdrawalService.updateById(lztWithdrawal);
         }

@@ -124,7 +124,7 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
                                           PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztTransfer> lqw = new LambdaQueryWrapper<LztTransfer>()
                 .select(LztTransfer.class, info -> !info.getColumn().equals("receipt_zip"))
-                .eq(LztTransfer::getMerId, merId)
+                .eq(merId != null && merId > 0,  LztTransfer::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztTransfer::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(payerId), LztTransfer::getPayerId, payerId)
                 .eq(StringUtils.isNotEmpty(txnSeqno), LztTransfer::getTxnSeqno, txnSeqno)
@@ -163,5 +163,12 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
         lztTransfer.setTxnStatus("已复核");
         updateById(lztTransfer);
         return getById(id);
+    }
+
+    @Override
+    public List<LztTransfer> getWaitDownloadList() {
+        QueryWrapper<LztTransfer> q = new QueryWrapper<>();
+        q.last("where receipt_token is not null and receipt_token !='' and ( receipt_zip is null or receipt_zip ='') ");
+        return list(q);
     }
 }

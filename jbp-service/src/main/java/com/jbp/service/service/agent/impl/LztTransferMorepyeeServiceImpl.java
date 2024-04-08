@@ -142,7 +142,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
                                                   String status, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztTransferMorepyee> lqw = new LambdaQueryWrapper<LztTransferMorepyee>()
                 .select(LztTransferMorepyee.class, info -> !info.getColumn().equals("receipt_zip"))
-                .eq(LztTransferMorepyee::getMerId, merId)
+                .eq(merId!= null && merId > 0,  LztTransferMorepyee::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztTransferMorepyee::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(payerId), LztTransferMorepyee::getPayerId, payeeId)
                 .eq(StringUtils.isNotEmpty(payeeId), LztTransferMorepyee::getPayeeId, payeeId)
@@ -175,5 +175,12 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         LztTransferMorepyee lztTransferMorepyee = getById(id);
         refresh(lztTransferMorepyee.getTxnSeqno()) ;
         return getById(id);
+    }
+
+    @Override
+    public List<LztTransferMorepyee> getWaitDownloadList() {
+        QueryWrapper<LztTransferMorepyee> q = new QueryWrapper<>();
+        q.last("where receipt_token is not null and receipt_token !='' and ( receipt_zip is null or receipt_zip ='') ");
+        return list(q);
     }
 }

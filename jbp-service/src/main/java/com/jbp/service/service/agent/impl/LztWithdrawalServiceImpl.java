@@ -158,7 +158,7 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
     public PageInfo<LztWithdrawal> pageList(Integer merId, String userId, String txnSeqno, String accpTxno, String status, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztWithdrawal> lqw = new LambdaQueryWrapper<LztWithdrawal>()
                 .select(LztWithdrawal.class, info -> !info.getColumn().equals("receipt_zip"))
-                .eq(LztWithdrawal::getMerId, merId)
+                .eq(merId != null && merId > 0,  LztWithdrawal::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztWithdrawal::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(userId), LztWithdrawal::getUserId, userId)
                 .eq(StringUtils.isNotEmpty(txnSeqno), LztWithdrawal::getTxnSeqno, txnSeqno)
@@ -190,5 +190,12 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         LztWithdrawal withdrawal = getById(id);
         refresh(withdrawal.getTxnSeqno());
         return getById(id);
+    }
+
+    @Override
+    public List<LztWithdrawal> getWaitDownloadList() {
+        QueryWrapper<LztWithdrawal> q = new QueryWrapper<>();
+        q.last("where receipt_token is not null and receipt_token !='' and ( receipt_zip is null or receipt_zip ='') ");
+        return list(q);
     }
 }
