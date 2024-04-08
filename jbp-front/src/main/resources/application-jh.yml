@@ -143,14 +143,14 @@ rsa:
 kq:
   env: prod
   privateKey:
-    path: classpath:certs/fny/20240329.3300000480031808.pfx
+    path: certs/fny/20240329.3300000480031808.pfx
     name: "20240329.3300000480031808"
     password: "Bcqd870122"
   publicKey:
-    path: classpath:certs/fny/99bill.RSA.cer
+    path: certs/fny/99bill.RSA.cer
   ssl:
     privateKey:
-      path: classpath:certs/fny/Client-10222278350@umgw.pfx
+      path: certs/fny/Client-10222278350@umgw.pfx
       password: "vpos123"
 
 historyOrder:

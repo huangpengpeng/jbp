@@ -23,9 +23,10 @@ public class Bill99ConfigInfo {
         }
         Bill99ConfigInfo.DE_PRI_NAME = environment.getProperty("kq.privateKey.name");
         Bill99ConfigInfo.DE_PRI_PWD = environment.getProperty("kq.privateKey.password");
-        Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.privateKey.path")).getPath();
-        Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getResource(environment.getProperty("kq.publicKey.path")).getPath();
-        Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
+        Bill99ConfigInfo.DE_PRI_PATH = this.getClass().getClassLoader().getResource(environment.getProperty("kq.privateKey.path")).getPath();
+
+        Bill99ConfigInfo.DE_PUB_PATH = this.getClass().getClassLoader().getResource(environment.getProperty("kq.publicKey.path")).getPath();
+        Bill99ConfigInfo.SSL_PRI_PATH = this.getClass().getClassLoader().getResource(environment.getProperty("kq.ssl.privateKey.path")).getPath();
         Bill99ConfigInfo.SSL_PRI_PWD = environment.getProperty("kq.ssl.privateKey.password");
     }
 
