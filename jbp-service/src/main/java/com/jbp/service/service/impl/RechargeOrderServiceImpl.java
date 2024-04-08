@@ -97,6 +97,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     private WalletService walletService;
     @Autowired
     private PlatformWalletService platformWalletService;
+    @Autowired
+    private KqPayService kqPayService;
+
 
     /**
      * 列表
@@ -219,6 +222,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             response.setLianLianCashierConfig(cashier);
             response.setPayType(PayConstants.PAY_TYPE_LIANLIAN);
             rechargeOrder.setOutTradeNo(cashier.getAccp_txno());
+        }
+        if (request.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
+            String cashier = kqPayService.cashier(user.getAccount(),  request.getIp(),rechargeNo,
+                    rechargePrice, "补差", new Date());
+            response.setStatus(true);
+            response.setKqGatewayUrl(cashier);
+            response.setPayType(PayConstants.PAY_TYPE_KQ);
         }
         rechargeOrder.setUid(user.getId());
         rechargeOrder.setOrderNo(rechargeNo);
