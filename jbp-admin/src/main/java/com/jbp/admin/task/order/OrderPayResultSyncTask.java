@@ -61,7 +61,7 @@ public class OrderPayResultSyncTask {
                     }
                 } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
                     KqPayQueryResult result = kqPayService.queryPayResult(order.getOrderNo());
-                    if (result.ifSuccess()) {
+                    if (result != null && result.ifSuccess()) {
                         payCallbackService.kqPayCallback(result);
                     }
                 }
