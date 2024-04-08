@@ -45,21 +45,21 @@ public class OrderPayResultSyncTask {
                     if (result != null || "TRADE_SUCCESS".equals(result.getTxn_status())) {
                         payCallbackService.lianLianPayCallback(result);
                     }
-                } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
+                } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
                     KqPayQueryResult result = kqPayService.queryPayResult(order.getOrderNo());
                     if (result.ifSuccess()) {
                         payCallbackService.kqPayCallback(result);
                     }
                 }
             }
-            List<RechargeOrder> rechargeOrders = rechargeOrderService.getWaitPayList(3);
+            List<RechargeOrder> rechargeOrders = rechargeOrderService.getWaitPayList(15);
             for (RechargeOrder order : rechargeOrders) {
                 if (order.getPayChannel().equals(PayConstants.PAY_TYPE_LIANLIAN) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
                     QueryPaymentResult result = lianLianPayService.queryPayResult(order.getOrderNo());
                     if (result != null || "TRADE_SUCCESS".equals(result.getTxn_status())) {
                         payCallbackService.lianLianPayCallback(result);
                     }
-                } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ) && StringUtils.isNotEmpty(order.getOutTradeNo())) {
+                } else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
                     KqPayQueryResult result = kqPayService.queryPayResult(order.getOrderNo());
                     if (result.ifSuccess()) {
                         payCallbackService.kqPayCallback(result);
