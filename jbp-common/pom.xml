@@ -391,26 +391,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<!-- directory 表示取该目录下的文件 -->
-				<directory>libs</directory>
-				<!--targetPath 指定打包到哪个目录下  默认是放到class目录下-->
-				<targetPath>/BOOT-INF/lib/</targetPath>
-				<!-- 取符合格式的所有文件  *代表全部 -->
-				<includes>
-					<include>**/*.jar</include>
-				</includes>
-			</resource>
-			<!-- 打包jar时解开下方的注释，如果是编译器运行项目时注释掉下方配置，
-       　　　　　　因为编译器运行项目时，项目会读取外部依赖包的配置文件，
-       　　　　　　项目本身的配置文件读不到   把src/main/resources下的所有配置文件加载到打包后的BOOT-INF/classes文件中 -->
-			<resource>
-               <directory>src/main/resources</directory>
-               <targetPath>BOOT-INF/classes</targetPath>
-            </resource>
-		</resources>
-
 
 	</build>
 
