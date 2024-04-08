@@ -154,7 +154,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             List<AcctInfo> acctInfoList = details.getAcctInfoList();
             if (CollectionUtils.isNotEmpty(acctInfoList)) {
                 for (AcctInfo acctInfo : acctInfoList) {
-                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getAmt_balaval()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getAmt_balaval());
+                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getAmt_balcur()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getAmt_balcur());
                     totalAmt = totalAmt.add(balance);
                 }
             }
