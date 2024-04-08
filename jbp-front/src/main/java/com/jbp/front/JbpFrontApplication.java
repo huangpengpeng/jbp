@@ -41,16 +41,5 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-        Signature.signMsg("11");
-
-        KqPayService bean1 = run.getBean(KqPayService.class);
-
-        KqPayQueryResult CS_25886974931035 = bean1.queryPayResult("CS_25886974931035");
-
-        System.out.println(CS_25886974931035);
-
-
-
     }
 }
