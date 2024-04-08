@@ -20,4 +20,6 @@ public interface LztAcctApplyService extends IService<LztAcctApply> {
     LztAcctApply getByTxnSeqno(String txnSeqno);
 
     PageInfo<LztAcctApply> pageList(Integer merId, String userId, String username, String status, PageParamRequest pageParamRequest);
+
+    void del(Long id);
 }

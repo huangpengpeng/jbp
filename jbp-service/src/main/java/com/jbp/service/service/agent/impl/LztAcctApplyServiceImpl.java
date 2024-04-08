@@ -138,8 +138,28 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                     throw new RuntimeException(e);
                 }
             }
-
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+
+    @Override
+    public void del(Long id) {
+        // 查询开户是否成功
+        LztAcctApply lztAcctApply = getById(id);
+        Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctApply.getUserId());
+        if (result != null && CollectionUtils.isNotEmpty(result.getList())) {
+            for (LztQueryAcctInfo acctInfo : result.getList()) {
+                if (!"FAIL".equals(acctInfo.getAcct_stat()) || !"CANCEL".equals(acctInfo.getAcct_stat())) {
+                    throw new RuntimeException("银行户已开户成功不能删除");
+                }
+            }
+        }
+        LztAcct lztAcct = lztAcctService.getByUserId(lztAcctApply.getUserId());
+        lztAcct.setIfOpenBankAcct(false);
+        lztAcctService.updateById(lztAcct);
+        removeById(id);
     }
 }
