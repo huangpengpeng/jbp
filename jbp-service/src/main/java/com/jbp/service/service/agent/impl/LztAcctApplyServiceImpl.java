@@ -84,6 +84,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         if(result != null){
             List<LztQueryAcctInfo> list = result.getList();
             if (CollectionUtils.isNotEmpty(list)) {
+                list =  list.stream().filter(s-> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
                 LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
                 lztAcctApply.setStatus(acctState.getCode());
             }
