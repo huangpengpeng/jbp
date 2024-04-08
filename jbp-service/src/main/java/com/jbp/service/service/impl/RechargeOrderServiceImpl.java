@@ -459,7 +459,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         bill.setMark(StrUtil.format("充值订单，用户充值金额{}元", rechargeOrder.getPrice()));
         Boolean execute = transactionTemplate.execute(e -> {
             // 订单变动
-            boolean updatePaid = updatePaid(rechargeOrder.getId(), rechargeOrder.getOrderNo());
+            boolean updatePaid = updatePaid(rechargeOrder.getId(), rechargeOrder.getOrderNo(), rechargeOrder.getPayMethod());
             if (!updatePaid) {
                 logger.warn("充值订单更新支付状态失败，orderNo = {}", rechargeOrder.getOrderNo());
                 e.setRollbackOnly();
@@ -486,10 +486,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     /**
      * 支付完成变动
      */
-    private boolean updatePaid(Integer id, String orderNo) {
+    private boolean updatePaid(Integer id, String orderNo, String payMethod) {
         LambdaUpdateWrapper<RechargeOrder> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(RechargeOrder::getPaid, true);
         wrapper.set(RechargeOrder::getPayTime, CrmebDateUtil.nowDateTime());
+        wrapper.set(RechargeOrder::getPayMethod, payMethod);
         wrapper.eq(RechargeOrder::getId, id);
         wrapper.eq(RechargeOrder::getOrderNo, orderNo);
         wrapper.eq(RechargeOrder::getPaid, false);
