@@ -141,17 +141,8 @@ rsa:
     key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo8jKuU2/N4zvyDVdvlLwUoPTW672DtbGV7Tvek1dlmaaxV4IiA2ZNIfpXfzD3ERzN9/MQii80YkmOkpDlAAPIAOHikMhhfbMqsy13tL/z9pQO5Icu6X2VfdHUdKDEOUTnD/lA0tRwu80dw/+VOkvzg7I3qDcT6gsRs9J92SN+KydMeulqk/AjZomP9/ISgz2i8gLi62jCswbCsvqg9kx7FMq4p/fHTqCXvDPt6ebEQbFh0FP2TmD/f7XISUeplD45u19yheYfPt1UvjePKZrbuHWTmB7YfNSdBv9rCREllxc/nQ6o4LB2alW7ZoGWc3PjlH1MwpTe0Q3Iopi6nT20QIDAQAB
 
 kq:
-  env: prod
-  privateKey:
-    path: "/certs/fny/20240329.3300000480031808.pfx"
-    name: "20240329.3300000480031808"
-    password: "Bcqd870122"
-  publicKey:
-    path: "/certs/fny/99bill.RSA.cer"
-  ssl:
-    privateKey:
-      path: "/certs/fny/Client-10222278350@umgw.pfx"
-      password: "vpos123"
+  config: fny1.properties
+
 
 historyOrder:
   ifOpenOrder: true

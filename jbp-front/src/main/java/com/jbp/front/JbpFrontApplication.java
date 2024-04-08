@@ -1,6 +1,9 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.kqbill.result.KqPayQueryResult;
+import com.jbp.common.kqbill.utils.Signature;
+import com.jbp.service.service.KqPayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

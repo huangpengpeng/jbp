@@ -1,10 +1,12 @@
 package com.jbp.common.kqbill.utils;
 
+import com.bill99.crypto.utils.FileLoader;
 import com.jbp.common.kqbill.contants.Bill99ConfigInfo;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -23,8 +25,9 @@ public class Signature {
         String base64 = "";
         try {
             KeyStore ks = KeyStore.getInstance("PKCS12");
-            FileInputStream ksfis = new FileInputStream(Bill99ConfigInfo.DE_PRI_PATH);
-            BufferedInputStream ksbufin = new BufferedInputStream(ksfis);
+
+            InputStream certFileStream = FileLoader.getCertFileStream(Bill99ConfigInfo.DE_PRI_PATH);
+            BufferedInputStream ksbufin = new BufferedInputStream(certFileStream);
             char[] keyPwd = Bill99ConfigInfo.DE_PRI_PWD.toCharArray();
             ks.load(ksbufin, keyPwd);
             PrivateKey priK = (PrivateKey) ks.getKey(Bill99ConfigInfo.DE_PRI_NAME, keyPwd);
