@@ -54,4 +54,8 @@ public class OrderPayResultResponse {
     @ApiModelProperty(value = "连连收银台")
     private CashierPayCreateResult lianLianCashierConfig;
 
+    @ApiModelProperty(value = "快钱收银台")
+    private String kqGatewayUrl;
+
+
 }

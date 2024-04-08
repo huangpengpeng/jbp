@@ -10,6 +10,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.alipay.AliPayCallback;
 import com.jbp.common.model.order.Order;
@@ -519,6 +520,74 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     redisTemplate.delete("PaySuccessCall" + orderNo);
                     logger.info("lianlian pay error : 支付回调订单状态未完成 ===》" + orderNo);
                     return "error";
+                }
+            }
+        }
+
+        redisTemplate.delete("PaySuccessCall" + orderNo);
+        return "Success";
+    }
+
+    @Override
+    public String kqPayCallback(KqPayQueryResult kqPayQueryResult) {
+
+        // 业务单号
+        String orderNo = kqPayQueryResult.getOrderId();
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("PaySuccessCall" + orderNo, 1);
+        //2.设置锁的过期时间,防止死锁
+        if (!task) {
+            //没有争抢(设置)到锁
+            logger.info("锁住订单回调退出");
+            return "error";
+        }
+        redisTemplate.expire("PaySuccessCall" + orderNo, 1, TimeUnit.MINUTES);
+        if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+            Order order = orderService.getByOrderNo(orderNo);
+            if (order != null) {
+                if (BooleanUtils.isTrue(order.getPaid())) {
+                    logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
+                    return "Success";
+                }
+                Boolean execute = transactionTemplate.execute(e -> {
+                    Boolean b = orderService.updatePaid(orderNo);
+                    if (!b) {
+                        e.setRollbackOnly();
+                        return Boolean.FALSE;
+                    }
+                    Order update = orderService.getByOrderNo(orderNo);
+                    update.setPayMethod(KqPayConfig.PayMethod.getName(kqPayQueryResult.getPayType()).getName());
+                    update.setPayType("kq");
+                    update.setPayTime(CrmebDateUtil.nowDateTime());
+                    update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                    boolean b1 = orderService.updateById(update);
+                    if (!b1) {
+                        throw new RuntimeException("当前操作人数过多");
+                    }
+                    return Boolean.TRUE;
+                });
+                if (!execute) {
+                    throw new CrmebException("订单回执失败" + orderNo);
+                }
+                order = orderService.getById(order.getId());
+                asyncService.orderPaySuccessSplit(order.getOrderNo());
+
+            }
+        }
+        if (orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+            RechargeOrder rechargeOrder = rechargeOrderService.getByOrderNo(orderNo);
+            // 充值
+            if (rechargeOrder != null) {
+                if (BooleanUtils.isTrue(rechargeOrder.getPaid())) {
+                    logger.info("lianlian pay error : 充值订单已支付 ===》" + orderNo);
+                    return "Success";
+                }
+                Boolean execute = transactionTemplate.execute(e -> {
+                    rechargeOrder.setPayMethod(KqPayConfig.PayMethod.getName(kqPayQueryResult.getPayType()).getName());
+                    rechargeOrderService.paySuccessAfter(rechargeOrder);
+                    return true;
+                });
+                if (!execute) {
+                    throw new CrmebException("充值订单回执失败" + orderNo);
                 }
             }
         }

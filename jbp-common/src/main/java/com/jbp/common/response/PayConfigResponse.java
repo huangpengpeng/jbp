@@ -43,6 +43,9 @@ public class PayConfigResponse implements Serializable {
     @ApiModelProperty(value = "连连支付")
     private Boolean lianLianStatus;
 
+    @ApiModelProperty(value = "快钱支付")
+    private Boolean kqPayStatus;
+
     @ApiModelProperty(value = "积分支付")
     private Boolean walletStatus;
 

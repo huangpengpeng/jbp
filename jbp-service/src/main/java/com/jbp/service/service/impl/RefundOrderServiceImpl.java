@@ -14,6 +14,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.kqbill.result.KqRefundResult;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.agent.WalletConfig;
@@ -47,6 +48,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -109,6 +111,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private ProductProfitChain productProfitChain;
     @Autowired
     private ProductCommChain productCommChain;
+    @Autowired
+    private KqPayService kqPayService;
 
     /**
      * 商户端退款订单分页列表
@@ -1354,6 +1358,16 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             }
         }
 
+        if (order.getPayType().equals(PayConstants.PAY_TYPE_KQ) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                kqPayService.refund(order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice, new Date());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CrmebException("快钱退款失败！" + e.getMessage());
+            }
+        }
+
+
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() - refundOrderInfo.getApplyRefundNum());
         orderDetail.setRefundNum(orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum());
 
@@ -1401,6 +1415,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             if (order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+            }
             if (order.getPayType().equals("confirmPay")) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
@@ -1418,7 +1435,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         });
         if (execute) {
             // 积分、佣金、优惠券等放入后置task中处理
-            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)|| order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
                 redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());
             }
         }

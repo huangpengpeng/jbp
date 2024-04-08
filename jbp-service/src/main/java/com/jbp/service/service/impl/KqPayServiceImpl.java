@@ -63,7 +63,7 @@ public class KqPayServiceImpl implements KqPayService {
         params.setPayerId(payerId);
         params.setPayerIP(payerIP);
         params.setTerminalIp(kpInfo.getTerminalIp());
-        params.setTdpformName(kpInfo.getApplyName());
+        params.setTdpformName(URLEncoder.encode(kpInfo.getApplyName()));
         params.setOrderId(orderId);
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
         params.setProductName(productName);
@@ -86,10 +86,10 @@ public class KqPayServiceImpl implements KqPayService {
         KqHeadParams head = new KqHeadParams("1.0.0", "F0003", payInfo.getMerchantCode(), CrmebUtil.getOrderNo("KQQ_"));
         KqPayQueryParams body = new KqPayQueryParams();
         body.setOrderId(orderId);
-        body.setMerchantAcctId(payInfo.getMerchantCode() + "01");
+        body.setMerchantAcctId(payInfo.getMerchantId());
         JSONObject originalString = new JSONObject();
         originalString.put("head", head);
-        originalString.put("requestBody", body);
+        originalString.put("requestBody",JSONObject.parseObject(JSONObject.toJSONString(body)));
         log.info("交易查询快钱原始报文 = {}", originalString.toJSONString());
         try {
             String s = buildHttpsClient.requestKQ(originalString);
@@ -116,23 +116,25 @@ public class KqPayServiceImpl implements KqPayService {
         KqPayInfoResult payInfo = get();
         KqHeadParams head = new KqHeadParams("1.0.0", "F0001", payInfo.getMerchantCode(), refundId);
         KqRefundParams body = new KqRefundParams();
-        body.setMerchantAcctId(head.getMemberCode());
+        body.setMerchantAcctId(payInfo.getMerchantCode());
         body.setAmount(String.valueOf(amt.multiply(BigDecimal.valueOf(100)).intValue()));
         body.setEntryTime(DateTimeUtils.format(refundTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         body.setOrgOrderId(orderId);
 
         JSONObject originalString = new JSONObject();
         originalString.put("head", head);
-        originalString.put("requestBody", body);
+        originalString.put("requestBody", JSONObject.parseObject(JSONObject.toJSONString(body)));
         log.info("退款快钱原始报文 = {}", originalString.toJSONString());
         try {
             String s = buildHttpsClient.requestKQ(originalString);
             if (StringUtils.isEmpty(s)) {
+                log.error("调用快钱退款失败单号:{0}, 退款单号:{1}", orderId, refundId);
                 return null;
             }
             JSONObject jsonObject = JSONObject.parseObject(s);
             JSONObject responseBody = jsonObject.getJSONObject("responseBody");
             if(responseBody == null){
+                log.error("调用快钱退款失败2单号:{0}, 退款单号:{1}", orderId, refundId);
                 return null;
             }
             return responseBody.toJavaObject(KqRefundResult.class);
@@ -179,6 +181,8 @@ public class KqPayServiceImpl implements KqPayService {
         }
     }
 
+
+
     private static String cashierAppendParam(KqCashierParams params) {
         String signMsgVal = "";
         signMsgVal = appendParam(signMsgVal, "inputCharset", params.getInputCharset());
@@ -193,6 +197,10 @@ public class KqPayServiceImpl implements KqPayService {
         signMsgVal = appendParam(signMsgVal, "merchantAcctId", params.getMerchantAcctId());
         signMsgVal = appendParam(signMsgVal, "payerId", params.getPayerId());
         signMsgVal = appendParam(signMsgVal, "payerIP", params.getPayerIP());
+        if (StringUtils.isNotEmpty(params.getSignMsg())) {
+            signMsgVal = appendParam(signMsgVal, "terminalIp", params.getTerminalIp());
+            signMsgVal = appendParam(signMsgVal, "tdpformName", params.getTdpformName());
+        }
         signMsgVal = appendParam(signMsgVal, "orderId", params.getOrderId());
         signMsgVal = appendParam(signMsgVal, "orderAmount", params.getOrderAmount());
         signMsgVal = appendParam(signMsgVal, "orderTime", params.getOrderTime());

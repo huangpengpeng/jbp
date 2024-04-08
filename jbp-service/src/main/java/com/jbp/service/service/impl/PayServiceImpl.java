@@ -151,6 +151,8 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private WalletService walletService;
     @Autowired
+    private KqPayService kqPayService;
+    @Autowired
     private LianLianPayService lianLianPayService;
     @Autowired
     private ProductCommChain productCommChain;
@@ -176,14 +178,17 @@ public class PayServiceImpl implements PayService {
         String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);
         String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);
         String lianlianStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIAN_PAY_STATUS);
+        String kqPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KQ_PAY_STATUS);
         String walletPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_STATUS);
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_OPEN_PASSWORD);
+
         PayConfigResponse response = new PayConfigResponse();
         response.setYuePayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus));
         response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(payWxOpen));
         response.setAliPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(aliPayStatus));
         response.setLianLianStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianStatus));
         response.setWalletStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus));
+        response.setKqPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(kqPayStatus));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
@@ -232,7 +237,7 @@ public class PayServiceImpl implements PayService {
         }
         if (order.getStatus() > OrderConstants.ORDER_STATUS_WAIT_PAY) {
             throw new CrmebException("订单状态异常");
-        }
+    }
         User user = userService.getInfo();
 
         if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
@@ -295,6 +300,14 @@ public class PayServiceImpl implements PayService {
             response.setLianLianCashierConfig(result);
             logger.info("连连支付 response : {}", JSON.toJSONString(response));
 
+            return response;
+        }
+        // 快钱支付
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
+            String result = kqCashierPay(order);
+            response.setStatus(true);
+            response.setKqGatewayUrl(result);
+            logger.info("快钱支付 response : {}", JSON.toJSONString(response));
             return response;
         }
         // 微信视频号下单 需要额外调用支付参数
@@ -1790,12 +1803,20 @@ public class PayServiceImpl implements PayService {
         CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), order.getOrderNo(), order.getPayPrice(),details.get(0).getProductName(), order.getIp());
         // 更新商户订单号
         order.setOutTradeNo(cashier.getAccp_txno());
-        order.setOutTradeNo(cashier.getAccp_txno());
         boolean b = orderService.updateById(order);
         if(!b){
             throw new RuntimeException("当前操作人数过多");
         }
         order = orderService.getById(order.getId());
+        return cashier;
+    }
+
+    private String kqCashierPay(Order order) {
+        User user = userService.getById(order.getPayUid());
+        List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
+        String cashier = kqPayService.cashier(user.getAccount(), order.getIp(), order.getOrderNo(),
+                order.getPayPrice(), details.get(0).getProductName(), order.getCreateTime());
+        // 更新商户订单号
         return cashier;
     }
 
