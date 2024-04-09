@@ -407,7 +407,9 @@ public class LztServiceImpl implements LztService {
         params.setUser_id(userId);
         params.setTxn_seqno(payCode);
         params.setPyee_name(pyee_name);
-        params.setAmount(amount.doubleValue());
+        if(amount != null){
+            params.setAmount(amount.doubleValue());
+        }
         params.setEncrypt_algorithm("SM2");
         params.setPassword_scene(scan);
         params.setFlag_chnl("PCH5");
