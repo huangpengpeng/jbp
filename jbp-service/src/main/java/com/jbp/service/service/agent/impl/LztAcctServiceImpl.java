@@ -120,9 +120,27 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 s.setMerName(merchant.getName());
             }
             //查询用户用户信息
-            LztAcct bankAcctInfo=details(s.getUserId());
+            LztAcct bankAcctInfo = details(s.getUserId());
             s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
             s.setBankAcctInfoList(bankAcctInfo.getBankAcctInfoList());
+            BigDecimal amtBalcur = BigDecimal.ZERO, amtBalaval = BigDecimal.ZERO, amtBankBalaval = BigDecimal.ZERO, amtBalfrz = BigDecimal.ZERO;
+            if (CollectionUtils.isNotEmpty(bankAcctInfo.getAcctInfoList())) {
+                for (AcctInfo acctInfo : bankAcctInfo.getAcctInfoList()) {
+                    amtBalcur = amtBalcur.add(StringUtils.isNotEmpty(acctInfo.getAmt_balcur()) ? new BigDecimal(acctInfo.getAmt_balcur()) : BigDecimal.ZERO);
+                    amtBalaval = amtBalaval.add(StringUtils.isNotEmpty(acctInfo.getAmt_balaval()) ? new BigDecimal(acctInfo.getAmt_balaval()) : BigDecimal.ZERO);
+                    amtBalfrz = amtBalfrz.add(StringUtils.isNotEmpty(acctInfo.getAmt_balfrz()) ? new BigDecimal(acctInfo.getAmt_balfrz()) : BigDecimal.ZERO);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(bankAcctInfo.getBankAcctInfoList())) {
+                for (LztQueryAcctInfo acctInfo : bankAcctInfo.getBankAcctInfoList()) {
+                    amtBankBalaval = amtBankBalaval.add(StringUtils.isNotEmpty(acctInfo.getBank_acct_balance()) ? new BigDecimal(acctInfo.getBank_acct_balance()) : BigDecimal.ZERO);
+                }
+            }
+            amtBalcur = amtBalcur.add(amtBankBalaval);
+            s.setAmtBalcur(amtBalcur);
+            s.setAmtBalaval(amtBalaval);
+            s.setAmtBankBalaval(amtBankBalaval);
+            s.setAmtBalfrz(amtBalfrz);
         });
 
         return CommonPage.copyPageInfo(page, list);

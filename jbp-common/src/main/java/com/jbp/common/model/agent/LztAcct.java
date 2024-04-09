@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -74,6 +75,22 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;
+
+    @ApiModelProperty(value = "资金余额")
+    @TableField(exist = false)
+    private BigDecimal amtBalcur;
+
+    @ApiModelProperty(value = "可用余额")
+    @TableField(exist = false)
+    private BigDecimal amtBalaval;
+
+    @ApiModelProperty(value = "银行账户余额")
+    @TableField(exist = false)
+    private BigDecimal amtBankBalaval;
+
+    @ApiModelProperty(value = "冻结金额")
+    @TableField(exist = false)
+    private BigDecimal amtBalfrz;
 
 
 }
