@@ -51,7 +51,7 @@ public class RechargeController {
     @ApiOperation(value = "生成用户充值订单")
     @RequestMapping(value = "/user/create", method = RequestMethod.POST)
     public CommonResult<OrderPayResultResponse> userRechargeOrderCreate(@RequestBody @Validated UserRechargeRequest request, HttpServletRequest httpRequest) {
-  //     request.setIp(IPUtil.getIpAddress(httpRequest));
+       request.setIp(IPUtil.getIpAddress(httpRequest));
         return CommonResult.success(rechargeOrderService.userRechargeOrderCreate(request));
     }
 

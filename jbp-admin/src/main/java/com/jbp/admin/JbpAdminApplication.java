@@ -1,13 +1,7 @@
 package com.jbp.admin;
 
-import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.publicly.OrderPullController;
-import com.jbp.common.request.ErpOrderShipSyncRequest;
-import com.jbp.service.service.LogisticService;
 import com.jbp.service.service.agent.InvitationScoreService;
-import com.jbp.service.service.agent.WalletService;
-import com.jbp.service.service.agent.impl.InvitationScoreServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,8 +13,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.List;
 
 
 @EnableAsync //开启异步调用	
@@ -40,6 +32,7 @@ public class JbpAdminApplication {
 
         InvitationScoreService bean1 = run.getBean(InvitationScoreService.class);
         bean1.init();
+
     }
 
 }

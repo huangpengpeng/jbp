@@ -235,12 +235,12 @@ public class UserController {
             throw new CrmebException("节点已被占用");
         }
         // 安置默认节点
-        if (invitationService.getNextList(rId).isEmpty()) {
-            UserRelation defaultRelation = relationService.getLeftMost(rId);
-            if (defaultRelation.getPId() != rId) {
-                throw new CrmebException("当前用户只能注册默认安置人");
-            }
-        }
+//        if (invitationService.getNextList(rId).isEmpty()) {
+//            UserRelation defaultRelation = relationService.getLeftMost(rId);
+//            if (defaultRelation.getPId() != rId) {
+//                throw new CrmebException("当前用户只能注册默认安置人");
+//            }
+//        }
         return CommonResult.success(true);
     }
 
