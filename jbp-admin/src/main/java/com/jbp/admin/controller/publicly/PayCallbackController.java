@@ -149,7 +149,7 @@ public class PayCallbackController {
             }
             log.info("[接收来自连连下发的异步通知] 签名源串为：" + stringBuilder.toString());
             if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通子商户.getPrefix())) {
-                LztAcctOpen lztAcctOpen = lztAcctOpenService.getByAccpTxno(txnSeqno);
+                LztAcctOpen lztAcctOpen = lztAcctOpenService.getByTxnSeqno(txnSeqno);
                 if (lztAcctOpen != null) {
                     lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
                 }

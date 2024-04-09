@@ -71,14 +71,15 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     @Override
     public void refresh(String accpTxno) {
         LztAcctOpen lztAcctOpen = getByAccpTxno(accpTxno);
-        if (lztAcctOpen == null || lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+        if (lztAcctOpen == null) {
             return;
         }
         Merchant merchant = merchantService.getById(lztAcctOpen.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         UserInfoResult result = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctOpen.getUserId());
+        lztAcctOpen.setQueryRet(result);
         lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
-        lztAcctOpen.setRetMsg(result.getRet_msg());
+        lztAcctOpen.setRetMsg(result.getRemark());
         updateById(lztAcctOpen);
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
             LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
