@@ -304,6 +304,10 @@ public class PayServiceImpl implements PayService {
         }
         // 快钱支付
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
+            boolean b = orderService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
             String result = kqCashierPay(order);
             response.setStatus(true);
             response.setKqGatewayUrl(result);
