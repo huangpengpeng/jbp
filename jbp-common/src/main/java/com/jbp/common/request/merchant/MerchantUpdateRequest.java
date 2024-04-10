@@ -33,7 +33,7 @@ import java.io.Serializable;
 @ApiModel(value="MerchantUpdateRequest对象", description="编辑商户请求对象")
 public class MerchantUpdateRequest implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "商户ID")
     @NotNull(message = "商户ID不能为空")
@@ -100,4 +100,12 @@ public class MerchantUpdateRequest implements Serializable {
     @ApiModelProperty(value = "资质图片")
     private String qualificationPicture;
 
+    @ApiModelProperty(value = "支付私钥")
+    private String priKey;
+
+    @ApiModelProperty(value = "支付商户号")
+    private String oidPartner;
+
+    @ApiModelProperty(value = "支付模式")
+    private Integer tradeModel;
 }
