@@ -34,7 +34,7 @@ public class AESUtil {
     }
 
     /**
-     * base 64 encode
+     * tank 64 encode
      * @param bytes 待编码的byte[]
      * @return 编码后的base 64 code
      */
@@ -44,7 +44,7 @@ public class AESUtil {
     }
 
     /**
-     * base 64 decode
+     * tank 64 decode
      * @param base64Code 待解码的base 64 code
      * @return 解码后的byte[]
      * @throws Exception

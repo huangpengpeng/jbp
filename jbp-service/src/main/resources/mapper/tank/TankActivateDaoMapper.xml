@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.TankActivateDao">
+
+    <select id="activateDay" resultType="java.lang.Integer">
+        select  count(1) from  tankactivate t
+		left join tankequipment te on te.id =  t.equipmentId
+		where te.storeId =  #{storeId}  and DATE_FORMAT( t.createdTime,'%Y-%m-%d') =  DATE_FORMAT( NOW(),'%Y-%m-%d')
+
+    </select>
+    <select id="activateWeeks" resultType="java.lang.Integer">
+        		select  count(1) from  tankactivate t
+		left join tankequipment te on te.id =  t.equipmentId
+		where te.storeId =  #{storeId}    and YEARWEEK(t.createdTime, 1) = YEARWEEK(CURDATE(), 1);
+    </select>
+    <select id="activateMonth" resultType="java.lang.Integer">
+        select  count(1) from  tankactivate t
+		left join tankequipment te on te.id =  t.equipmentId
+		where te.storeId =   #{storeId}    and DATE_FORMAT( t.createdTime,'%Y-%m') =  DATE_FORMAT( NOW(),'%Y-%m')
+    </select>
+    <select id="activateTotal" resultType="java.lang.Integer">
+        	select  count(1) from  tankactivate t
+		left join tankequipment te on te.id =  t.equipmentId
+		where te.storeId =  #{storeId}
+    </select>
+    <select id="activateRecent" resultType="java.lang.Integer">
+        	select  count(1) as count from  tankactivate t
+		left join tankequipment te on te.id =  t.equipmentId
+		where te.storeId =   #{storeId}
+		GROUP BY DATE_FORMAT( t.createdTime,'%Y-%m-%d')
+		ORDER BY t.createdTime desc
+		LIMIT 7
+    </select>
+    <select id="getactivateList" resultType="com.jbp.common.response.ActivateInfoResponse">
+
+			select t.operationSn,u.username,tq.imei,ts.name,t.createdTime,t.endTime ,t.`status` ,tq.name as tqname,tq.equipmentSn from tankactivate t
+		left join user u on u.id = t.activateUserId
+		left join tankequipment tq on tq.id = t.equipmentId
+		left join tankstore ts on ts.id = tq.storeId
+		where ts.userId =  #{userId}
+		order by t.createdTime desc
+
+	</select>
+</mapper>

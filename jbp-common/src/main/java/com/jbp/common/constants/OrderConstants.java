@@ -32,7 +32,10 @@ public class OrderConstants {
     public static final String CLOSING_ORDER_PREFIX_USER = "CU";
     /** 结算订单号前缀_商户 */
     public static final String CLOSING_ORDER_PREFIX_MERCHANT = "CM";
-
+    /** 共享仓订单号前缀 */
+    public static final String GXC_ORDER_PREFIX = "GXC";
+    /** 共享仓操作订单号前缀 */
+    public static final String C_GXC_ORDER_PREFIX = "CGXC";
 
     /** 订单状态-待支付 */
     public static final Integer ORDER_STATUS_WAIT_PAY = 0;

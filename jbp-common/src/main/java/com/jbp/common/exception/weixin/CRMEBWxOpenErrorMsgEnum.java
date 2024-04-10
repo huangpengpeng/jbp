@@ -3027,9 +3027,9 @@ public enum CRMEBWxOpenErrorMsgEnum {
   CODE_61028(61028, "component is unpublished"),
 
   /**
-   * component need republish with base category
+   * component need republish with tank category
    */
-  CODE_61029(61029, "component need republish with base category"),
+  CODE_61029(61029, "component need republish with tank category"),
 
   /**
    * component cancel authorization not allowed
@@ -3137,9 +3137,9 @@ public enum CRMEBWxOpenErrorMsgEnum {
   CODE_61200(61200, "product wording not set"),
 
   /**
-   * invalid base info
+   * invalid tank info
    */
-  CODE_61300(61300, "invalid base info"),
+  CODE_61300(61300, "invalid tank info"),
 
   /**
    * invalid detail info
@@ -3177,9 +3177,9 @@ public enum CRMEBWxOpenErrorMsgEnum {
   CODE_61307(61307, "invalid card id"),
 
   /**
-   * base info not exist
+   * tank info not exist
    */
-  CODE_61308(61308, "base info not exist"),
+  CODE_61308(61308, "tank info not exist"),
 
   /**
    * detail info not exist
