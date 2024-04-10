@@ -80,7 +80,7 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
                 bankCode, bankAcctName, cnapsCode, postscript);
         lztTransfer.setOrderRet(transferResult);
         save(lztTransfer);
-        return null;
+        return lztTransfer;
     }
 
     @SneakyThrows

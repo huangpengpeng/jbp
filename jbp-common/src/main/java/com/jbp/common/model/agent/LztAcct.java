@@ -92,5 +92,9 @@ public class LztAcct extends BaseModel {
     @TableField(exist = false)
     private BigDecimal amtBalfrz;
 
+    @ApiModelProperty(value = "银行卡号")
+    @TableField(exist = false)
+    private String bankAcctNo;
+
 
 }

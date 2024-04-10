@@ -154,7 +154,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctApply.getUserId());
         if (result != null && CollectionUtils.isNotEmpty(result.getList())) {
             for (LztQueryAcctInfo acctInfo : result.getList()) {
-                if (!"FAIL".equals(acctInfo.getAcct_stat()) || !"CANCEL".equals(acctInfo.getAcct_stat())) {
+                if (!"FAIL".equals(acctInfo.getAcct_stat()) && !"CANCEL".equals(acctInfo.getAcct_stat())) {
                     throw new RuntimeException("银行户已开户成功不能删除");
                 }
             }
