@@ -136,6 +136,13 @@ public interface LztService {
                                String amt, String feeAmt, String pwd, String random_key, String payee_type,
                                String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
                                String ip, String phone, Date registerTime);
+
+    /**
+     * 修改手机号
+     * 	https://accpapi.lianlianpay.com/v1/acctmgr/change-regphone-apply
+     */
+
+
 }
 
 
