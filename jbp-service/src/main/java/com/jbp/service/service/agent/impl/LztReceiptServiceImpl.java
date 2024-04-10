@@ -141,7 +141,7 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
             lztTransferService.updateById(lztTransfer);
         }
         if(lztTransfer != null){
-            result.setReceipt_sum_file(lztTransferMorepyee.getReceiptZip());
+            result.setReceipt_sum_file(lztTransfer.getReceiptZip());
         }
         return result;
     }

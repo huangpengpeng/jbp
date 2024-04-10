@@ -75,7 +75,7 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
         }
         LztTransferResult transferResult = lztService.transfer(payInfo.getOidPartner(), payInfo.getPriKey(), payerId, txnPurpose, txnSeqno,
                 amt.toString(), feeAmount.toString(), pwd, random_key, payeeType, bankAcctNo, bankCode, bankAcctName,
-                cnapsCode, postscript, ip, merchant.getPhone(), merchant.getCreateTime());
+                cnapsCode, postscript, ip, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
         LztTransfer lztTransfer = new LztTransfer(merchant.getId(), payerId, lztAcct.getUsername(), txnSeqno, transferResult.getAccp_txno(), amt, feeAmount, payeeType, bankAcctNo,
                 bankCode, bankAcctName, cnapsCode, postscript);
         lztTransfer.setOrderRet(transferResult);
@@ -96,13 +96,14 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
         Merchant merchant = merchantService.getById(lztTransfer.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         QueryWithdrawalResult result = lztService.queryWithdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno);
-
-        if (result.getTxn_status().equals(LianLianPayConfig.TxnStatus.交易成功.getCode())) {
-            lztTransfer.setFinishTime(DateTimeUtils.parseDate(result.getFinish_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        if(result != null && result.getTxn_status() != null){
+            if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(result.getTxn_status())) {
+                lztTransfer.setFinishTime(DateTimeUtils.parseDate(result.getFinish_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+            }
+            lztTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.getName(result.getTxn_status()));
+            lztTransfer.setQueryRet(result);
+            updateById(lztTransfer);
         }
-        lztTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.getName(result.getTxn_status()));
-        lztTransfer.setQueryRet(result);
-        updateById(lztTransfer);
         return lztTransfer;
     }
 

@@ -175,6 +175,8 @@ public class LianLianPayConfig {
         来账通外部代发("LZT_WDF_"),
         来账通提现("LZT_DW_"),
         设置密码("LZT_SP_"),
+
+        换绑卡("LZT_HBK_"),
         ;
 
         @Getter

@@ -134,6 +134,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             if (CollectionUtils.isNotEmpty(bankAcctInfo.getBankAcctInfoList())) {
                 for (LztQueryAcctInfo acctInfo : bankAcctInfo.getBankAcctInfoList()) {
                     amtBankBalaval = amtBankBalaval.add(StringUtils.isNotEmpty(acctInfo.getBank_acct_balance()) ? new BigDecimal(acctInfo.getBank_acct_balance()) : BigDecimal.ZERO);
+                    s.setBankAcctNo(acctInfo.getBank_acct_no());
                 }
             }
             amtBalcur = amtBalcur.add(amtBankBalaval);

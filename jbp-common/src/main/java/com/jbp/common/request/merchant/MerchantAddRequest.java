@@ -98,6 +98,10 @@ public class MerchantAddRequest implements Serializable {
     @ApiModelProperty(value = "交易模型")
     private Integer tradeModel;
 
+    @ApiModelProperty(value = "分控类目")
+    private String frmsWareCategory;
+
+
     @ApiModelProperty(value = "排序", required = true)
     @NotNull(message = "排序不能为空")
     @Range(min = 0, max = 9999, message = "排序的的范围为0-9999")

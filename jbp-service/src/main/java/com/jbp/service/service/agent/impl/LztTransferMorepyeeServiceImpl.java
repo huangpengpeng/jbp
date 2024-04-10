@@ -74,7 +74,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
 
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
         TransferMorepyeeResult result = lztService.transferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(),
-                payerId, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl, merchant.getPhone(), merchant.getCreateTime());
+                payerId, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
         LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno());
         save(transferMorepyee);
         return transferMorepyee;

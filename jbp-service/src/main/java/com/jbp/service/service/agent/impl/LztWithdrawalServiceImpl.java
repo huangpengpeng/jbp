@@ -92,7 +92,7 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
                     amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         }
         WithdrawalResult orderResult = lztService.withdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), userId, drawNo,
-                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno, merchant.getPhone(), merchant.getCreateTime());
+                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt, feeAmount, postscript, orderResult);
         save(withdrawal);
         return withdrawal;

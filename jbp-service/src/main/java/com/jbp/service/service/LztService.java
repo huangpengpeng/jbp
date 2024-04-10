@@ -52,7 +52,7 @@ public interface LztService {
      */
     TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
                                             Double amt, String txnPurpose, String pwd, String randomKey,
-                                            String payeeId, String ip, String notify_url, String phone, Date registerTime);
+                                            String payeeId, String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory);
 
     /**
      * 来账通内部代发结果查询
@@ -63,7 +63,7 @@ public interface LztService {
      * 来账通提现
      */
     WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo, BigDecimal amt, BigDecimal fee, String postscript,
-                                String password, String random_key, String ip, String notifyUrl, String linked_acctno, String phone, Date registerTime);
+                                String password, String random_key, String ip, String notifyUrl, String linked_acctno, String phone, Date registerTime, String frmsWareCategory);
 
     /**
      * 来账通提现
@@ -135,14 +135,14 @@ public interface LztService {
     LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
                                String amt, String feeAmt, String pwd, String random_key, String payee_type,
                                String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
-                               String ip, String phone, Date registerTime);
+                               String ip, String phone, Date registerTime, String frmsWareCategory);
 
     /**
      * 修改手机号
      *
      */
     ChangeRegPhoneApplyResult changeRegPhoneApply(String oidPartner, String priKey, String user_id, String reg_phone,
-                                                  String reg_phone_new, String password, String random_key, Date registerTime, String ip);
+                                                  String reg_phone_new, String password, String random_key, Date registerTime, String ip, String frmsWareCategory);
 
     /**
      * 绑定手机号校验

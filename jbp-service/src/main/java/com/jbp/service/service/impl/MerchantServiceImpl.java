@@ -400,7 +400,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (StrUtil.isNotBlank(tempMerchant.getQualificationPicture())) {
             tempMerchant.setQualificationPicture(systemAttachmentService.clearPrefix(tempMerchant.getQualificationPicture()));
         }
-
+        tempMerchant.setFrmsWareCategory(request.getFrmsWareCategory());
         tempMerchant.setTradeModel(request.getTradeModel());
         MerchantPayInfo payInfo = new MerchantPayInfo();
         payInfo.setOidPartner(request.getOidPartner());

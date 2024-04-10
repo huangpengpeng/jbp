@@ -108,4 +108,7 @@ public class MerchantUpdateRequest implements Serializable {
 
     @ApiModelProperty(value = "支付模式")
     private Integer tradeModel;
+
+    @ApiModelProperty(value = "分控类目")
+    private String frmsWareCategory;
 }

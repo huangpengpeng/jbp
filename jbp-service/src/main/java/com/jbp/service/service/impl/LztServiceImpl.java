@@ -210,7 +210,7 @@ public class LztServiceImpl implements LztService {
     @Override
     public TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
                                                    Double amt, String txnPurpose, String pwd, String randomKey,
-                                                   String payeeId, String ip, String notify_url, String phone, Date registerTime) {
+                                                   String payeeId, String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         TransferMorepyeeParams params = new TransferMorepyeeParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -245,7 +245,7 @@ public class LztServiceImpl implements LztService {
         params.setPayeeInfo(Arrays.asList(payeeInfo));
         // 风控参数
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeId, phone, registerTimeStr, txnPurpose);
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payeeId, phone, registerTimeStr, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
@@ -287,7 +287,7 @@ public class LztServiceImpl implements LztService {
     @Override
     public WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo,
                                        BigDecimal amt, BigDecimal fee, String postscript, String password, String random_key, String ip,
-                                       String notifyUrl, String linked_acctno, String phone, Date registerTime) {
+                                       String notifyUrl, String linked_acctno, String phone, Date registerTime, String frmsWareCategory) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         WithDrawalParams params = new WithDrawalParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -316,7 +316,7 @@ public class LztServiceImpl implements LztService {
         params.setPayerInfo(payerInfo);
 
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payeeNo, phone, registerTimeStr, "提现");
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payeeNo, phone, registerTimeStr, "提现");
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
@@ -634,13 +634,13 @@ public class LztServiceImpl implements LztService {
     public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
                                       String amt, String feeAmt, String pwd, String random_key, String payee_type,
                                       String bank_acctno, String bank_code, String bank_acctname,
-                                      String cnaps_code, String postscript, String ip, String phone, Date registerTime) {
+                                      String cnaps_code, String postscript, String ip, String phone, Date registerTime, String frmsWareCategory) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
         TransferParams params = new TransferParams(timestamp, oidPartner);
         // 风控参数
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", payerId, phone, registerTimeStr, txnPurpose);
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payerId, phone, registerTimeStr, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
@@ -674,7 +674,7 @@ public class LztServiceImpl implements LztService {
     @Override
     public ChangeRegPhoneApplyResult changeRegPhoneApply(String oidPartner, String priKey, String user_id,
                                                          String reg_phone, String reg_phone_new,
-                                                         String password, String random_key, Date registerTime, String ip) {
+                                                         String password, String random_key, Date registerTime, String ip, String frmsWareCategory) {
 
         ChangeRegPhoneApplyParams params = new ChangeRegPhoneApplyParams();
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
@@ -687,7 +687,7 @@ public class LztServiceImpl implements LztService {
         params.setTxn_time(timestamp);
         params.setNotify_url(lianLianInfo.getHost()+"/api/publicly/payment/callback/lianlian/lzt/" + txn_seqno);
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", user_id, reg_phone, registerTimeStr, "修改手机号");
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, user_id, reg_phone, registerTimeStr, "修改手机号");
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");

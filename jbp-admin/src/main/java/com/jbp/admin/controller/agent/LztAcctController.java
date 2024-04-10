@@ -94,11 +94,16 @@ public class LztAcctController {
         if (StringUtils.isEmpty(scan)) {
             throw new CrmebException("场景不能为空");
         }
-        if (!scan.equals("忘记密码") && (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO))) {
-            throw new CrmebException("请先输入金额");
+        if(!(scan.equals("换绑卡") || scan.equals("忘记密码"))) {
+            if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
+                throw new CrmebException("请先输入金额");
+            }
         }
+
         String payCode = "";
         switch (scan) {
+
+
             case "转账":
                 scan = "pay_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
@@ -115,6 +120,11 @@ public class LztAcctController {
                 scan = "setting_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.设置密码.getPrefix());
                 break;
+            case "换绑卡":
+                scan = "bind_card_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.换绑卡.getPrefix());
+                break;
+
 
         }
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
@@ -278,7 +288,7 @@ public class LztAcctController {
         MerchantPayInfo payInfo = merchant.getPayInfo();
         String ip = CrmebUtil.getClientIp(request);
         ChangeRegPhoneApplyResult result = lztService.changeRegPhoneApply(payInfo.getOidPartner(),
-                payInfo.getPriKey(), userId, regPhone, newPhone, pwd, randomKey, merchant.getCreateTime(), ip);
+                payInfo.getPriKey(), userId, regPhone, newPhone, pwd, randomKey, merchant.getCreateTime(), ip, merchant.getFrmsWareCategory());
 
         if (result != null && "0000".equals(result.getRet_code())) {
             result.setRegMsg("已发送至: " + newPhone + " 请注意查收");

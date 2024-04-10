@@ -6,6 +6,7 @@ import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.LztTransferResult;
 import com.jbp.common.lianlian.result.QueryWithdrawalResult;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.mybatis.LztTransferResultHandler;
 import com.jbp.common.mybatis.QueryWithdrawalResultHandler;
 import com.jbp.common.mybatis.TransferMorepyeeResultHandler;
 import com.jbp.common.utils.DateTimeUtils;
@@ -93,7 +94,7 @@ public class LztTransfer extends BaseModel {
 
 
     @ApiModelProperty(value = "下单结果")
-    @TableField(value = "orderRet", typeHandler = TransferMorepyeeResultHandler.class)
+    @TableField(value = "orderRet", typeHandler = LztTransferResultHandler.class)
     private LztTransferResult orderRet;
 
     @ApiModelProperty(value = "查询结果")
