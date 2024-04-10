@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tankActivate")
 @Api(tags = "共享仓启动详情控制器")
 public class TankActivateAct {

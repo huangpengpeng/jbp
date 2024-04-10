@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tankStoreClerk")
 @Api(tags = "共享仓店主店员关联控制器")
 public class TankStoreClerkAct {

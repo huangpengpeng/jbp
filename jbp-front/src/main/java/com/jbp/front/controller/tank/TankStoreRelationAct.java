@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tankStoreRelation")
 @Api(tags = "共享仓店主控制器")
 public class TankStoreRelationAct {

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tankEquipmentNumber")
 @Api(tags = "共享仓次数控制器")
 public class TankEquipmentNumberAct {

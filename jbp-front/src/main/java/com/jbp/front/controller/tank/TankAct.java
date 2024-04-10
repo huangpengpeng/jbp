@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tank")
 @Api(tags = "共享仓接口控制器")
 public class TankAct {

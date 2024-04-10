@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tankStore")
 @Api(tags = "共享仓订单控制器")
 public class TankStoreAct {

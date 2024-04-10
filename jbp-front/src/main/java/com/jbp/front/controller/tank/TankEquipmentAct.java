@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@RestController("tank")
+@RestController
 @RequestMapping("api/front/tankEquipment")
 @Api(tags = "共享仓设备控制器")
 public class TankEquipmentAct {
