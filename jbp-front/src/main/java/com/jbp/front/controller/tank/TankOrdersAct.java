@@ -1,10 +1,10 @@
 package com.jbp.front.controller.tank;
 
-import com.Jwebmall.core.entity.Config;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Maps;
 import com.jbp.common.constants.OrderConstants;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.response.TankStoreListResponse;
 import com.jbp.common.response.TankStoreRelationListResponse;
@@ -51,6 +51,8 @@ public class TankOrdersAct {
     @Resource
     private TankStoreService tankStoreService;
     @Resource
+    private SystemConfigService systemConfigService;
+    @Resource
     private UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(TankOrdersAct.class);
 
@@ -63,8 +65,10 @@ public class TankOrdersAct {
     @RequestMapping(value = "/addOrder", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult<TankOrders> addOrder(Integer number, Long storeUserId) {
 
-        Config config = configMng.getByName("共享仓次数金额");
-        JSONArray validArray = JSONArray.parseArray(config.getValue());
+
+       String json = systemConfigService.getValueByKey(SysConfigConstants.GXC_RECHARGE_NUMBER);
+
+        JSONArray validArray = JSONArray.parseArray(json);
         BigDecimal payPrice = BigDecimal.ZERO;
         for (Object object : validArray) {
             JSONObject validJSON = (JSONObject) object;
@@ -90,9 +94,8 @@ public class TankOrdersAct {
     @ResponseBody
     @RequestMapping(value = "/getNumberList", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult<String> getNumberList(BigDecimal score) {
-
-        Config config = configMng.getByName("共享仓次数金额");
-        return CommonResult.success(config);
+        String json = systemConfigService.getValueByKey(SysConfigConstants.GXC_RECHARGE_NUMBER);
+        return CommonResult.success(json);
     }
 
 

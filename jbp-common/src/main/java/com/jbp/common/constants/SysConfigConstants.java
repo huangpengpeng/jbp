@@ -751,5 +751,8 @@ public class SysConfigConstants {
      * 注册赠送活跃数值  day 天  month 月
      */
     public static final String CONFIG_REGISTER_ACTIVE_VALUE = "system_register_active_value";
-
+    /**
+     * 共享仓充值次数
+     */
+    public static final String GXC_RECHARGE_NUMBER = "gxc_recharge_number";
 }
