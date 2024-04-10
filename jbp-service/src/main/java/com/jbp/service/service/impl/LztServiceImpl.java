@@ -42,7 +42,7 @@ public class LztServiceImpl implements LztService {
         params.setTxn_seqno(txnSeqno);
         params.setTxn_time(timestamp);
         params.setFlag_chnl(flagChnl);
-        params.setReturn_url( returnUrl);
+        params.setReturn_url(returnUrl);
         params.setNotify_url(payInfo.getHost() + notifyUrl);
         params.setUser_type(userType);
         params.setCust_trade_serial_type("OpenNormalUser");
@@ -56,7 +56,6 @@ public class LztServiceImpl implements LztService {
         OpenacctApplyBusinessInfo businessInfo = new OpenacctApplyBusinessInfo();
         businessInfo.setBusiness_scope(businessScope);
         params.setBusinessInfo(businessInfo);
-
 
         String url = "https://accpgw.lianlianpay.com/v1/acctmgr/openacct-apply";
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, payInfo.getPubKey());
@@ -282,12 +281,12 @@ public class LztServiceImpl implements LztService {
         if (StringUtils.isEmpty(s)) {
             throw new CrmebException("内部转账查询异常");
         }
-        return  JSON.parseObject(s, QueryPaymentResult.class);
+        return JSON.parseObject(s, QueryPaymentResult.class);
     }
 
     @Override
     public WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo,
-                                       BigDecimal amt, BigDecimal fee,String postscript, String password, String random_key, String ip,
+                                       BigDecimal amt, BigDecimal fee, String postscript, String password, String random_key, String ip,
                                        String notifyUrl, String linked_acctno, String phone, Date registerTime) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         WithDrawalParams params = new WithDrawalParams();
@@ -407,7 +406,7 @@ public class LztServiceImpl implements LztService {
         params.setUser_id(userId);
         params.setTxn_seqno(payCode);
         params.setPyee_name(pyee_name);
-        if(amount != null){
+        if (amount != null) {
             params.setAmount(amount.doubleValue());
         }
         params.setEncrypt_algorithm("SM2");
@@ -632,8 +631,8 @@ public class LztServiceImpl implements LztService {
     }
 
     @Override
-    public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose,  String txn_seqno,
-                                      String amt, String feeAmt,String pwd, String random_key, String payee_type,
+    public LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
+                                      String amt, String feeAmt, String pwd, String random_key, String payee_type,
                                       String bank_acctno, String bank_code, String bank_acctname,
                                       String cnaps_code, String postscript, String ip, String phone, Date registerTime) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
@@ -670,6 +669,65 @@ public class LztServiceImpl implements LztService {
         } catch (Exception e) {
             throw new CrmebException("代付失败:" + e.getMessage());
         }
+    }
 
+    @Override
+    public ChangeRegPhoneApplyResult changeRegPhoneApply(String oidPartner, String priKey, String user_id,
+                                                         String reg_phone, String reg_phone_new,
+                                                         String password, String random_key, Date registerTime, String ip) {
+
+        ChangeRegPhoneApplyParams params = new ChangeRegPhoneApplyParams();
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setUser_id(user_id);
+         String txn_seqno = StringUtils.N_TO_10("CRP_");
+        params.setTxn_seqno(StringUtils.N_TO_10("CRP_"));
+        params.setTxn_time(timestamp);
+        params.setNotify_url(lianLianInfo.getHost()+"/api/publicly/payment/callback/lianlian/lzt/" + txn_seqno);
+        String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("2007", user_id, reg_phone, registerTimeStr, "修改手机号");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setFrms_client_chnl("13");
+        riskItemInfo.setUser_auth_flag("1");
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setReg_phone(reg_phone);
+        params.setReg_phone_new(reg_phone_new);
+        params.setPassword(password);
+        params.setRandom_key(random_key);
+
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/change-regphone-apply";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("申请手机号修改失败" + user_id);
+        }
+        ChangeRegPhoneApplyResult result = JSON.parseObject(s, ChangeRegPhoneApplyResult.class);
+        return result;
+    }
+
+
+    @Override
+    public ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
+                                                           String txn_seqno, String verify_code_new) {
+        ChangeRegPhoneVerifyParams params = new ChangeRegPhoneVerifyParams();
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setUser_id(user_id);
+        params.setTxn_seqno(txn_seqno);
+        params.setToken(token);
+        params.setVerify_code_new(verify_code_new);
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/change-regphone-verify";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("申请手机号验证失败" + user_id);
+        }
+        ChangeRegPhoneVerifyResult result = JSON.parseObject(s, ChangeRegPhoneVerifyResult.class);
+        return result;
     }
 }

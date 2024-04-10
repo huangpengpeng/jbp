@@ -139,9 +139,17 @@ public interface LztService {
 
     /**
      * 修改手机号
-     * 	https://accpapi.lianlianpay.com/v1/acctmgr/change-regphone-apply
+     *
      */
+    ChangeRegPhoneApplyResult changeRegPhoneApply(String oidPartner, String priKey, String user_id, String reg_phone,
+                                                  String reg_phone_new, String password, String random_key, Date registerTime, String ip);
 
+    /**
+     * 绑定手机号校验
+     *
+     */
+    ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
+                                                  String txn_seqno, String verify_code_new);
 
 }
 
