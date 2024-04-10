@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -58,6 +59,34 @@ public class TankEquipmentServiceImpl extends ServiceImpl<TankEquipmentDao, Tank
 
 
         return CommonPage.copyPageInfo(page, activateInfoResponses);
+    }
+
+    @Override
+    public Map<String, Object> getInfo(String equipmentSn) {
+
+        Map<String,Object> map =dao.getInfo(equipmentSn);
+
+        return map;
+    }
+
+    @Override
+    public Integer equipmentNumber() {
+        return dao.equipmentNumber(userService.getInfo().getId());
+    }
+
+    @Override
+    public Integer equipmentUseNumber() {
+        return dao.equipmentUseNumber(userService.getInfo().getId());
+    }
+
+    @Override
+    public Integer equipmentOnlineUnusedNumber() {
+        return dao.equipmentOnlineUnusedNumber(userService.getInfo().getId());
+    }
+
+    @Override
+    public Integer equipmentOfflinedNumber() {
+        return dao.equipmentOfflinedNumber(userService.getInfo().getId());
     }
 
 }

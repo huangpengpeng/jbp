@@ -3,8 +3,10 @@ package com.jbp.service.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.tank.TankStoreClerkRelation;
+import com.jbp.common.response.TankStoreClerkManagerListResponse;
 import com.jbp.service.dao.TankStoreClerkRelationDao;
 import com.jbp.service.service.TankStoreClerkRelationService;
+import com.jbp.service.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,11 @@ public class TankStoreClerkRelationServiceImpl extends ServiceImpl<TankStoreCler
 
     @Resource
     private TankStoreClerkRelationDao dao;
-
+    @Resource
+    private UserService userService;
 
     @Override
-    public TankStoreClerkRelation getClerkUserId(Long clerkUserId){
+    public TankStoreClerkRelation getClerkUserId(Integer clerkUserId){
         return  dao.selectOne(new QueryWrapper<TankStoreClerkRelation>().lambda().eq(TankStoreClerkRelation::getClerkUserId,clerkUserId));
     }
 
@@ -34,6 +37,11 @@ public class TankStoreClerkRelationServiceImpl extends ServiceImpl<TankStoreCler
     public List<TankStoreClerkRelation> getStoreId(Long storeId) {
         return  dao.selectList(new QueryWrapper<TankStoreClerkRelation>().lambda().eq(TankStoreClerkRelation::getStoreId,storeId));
 
+    }
+
+    @Override
+    public List<TankStoreClerkManagerListResponse> getClerkList() {
+        return dao.getClerkList(userService.getInfo().getId());
     }
 
 }

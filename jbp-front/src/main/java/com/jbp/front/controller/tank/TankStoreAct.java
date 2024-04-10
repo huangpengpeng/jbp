@@ -1,151 +1,127 @@
 package com.jbp.front.controller.tank;
 
-import com.Jwebmall.tank.entity.TankEquipment;
-import com.Jwebmall.tank.entity.TankStore;
-import com.Jwebmall.tank.entity.TankStoreClerkRelation;
-import com.Jwebmall.tank.entity.TankStoreRelation;
-import com.Jwebmall.tank.manager.TankEquipmentMng;
-import com.Jwebmall.tank.manager.TankStoreClerkRelationMng;
-import com.Jwebmall.tank.manager.TankStoreMng;
-import com.Jwebmall.tank.manager.TankStoreRelationMng;
-import com.Jwebmall.user.entity.User;
-import com.Jwebmall.user.manager.CapacityMng;
-import com.Jwebmall.user.manager.UserMng;
-import com.common.api.ResponseForT;
-import com.common.jdbc.template.TxMng;
-import com.common.jdbc.template.UnifiedJDBCMng;
-import com.common.web.util.WebUtils;
+import com.jbp.common.model.tank.TankEquipment;
+import com.jbp.common.model.tank.TankStore;
+import com.jbp.common.model.tank.TankStoreClerkRelation;
+import com.jbp.common.model.tank.TankStoreRelation;
+import com.jbp.common.model.user.User;
+import com.jbp.common.response.TankStoreManageListResponse;
+import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.*;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import springfox.documentation.annotations.ApiIgnore;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 
-@Slf4j
-@Controller
+@RestController("tank")
+@RequestMapping("api/front/tankStore")
+@Api(tags = "共享仓订单控制器")
 public class TankStoreAct {
 
-
     @Resource
-    private TankStoreMng tankStoreMng;
-
+    private TankStoreService tankStoreService;
     @Resource
-    private TankStoreRelationMng tankStoreRelationMng;
+    private TankStoreRelationService tankStoreRelationService;
     @Resource
-    private CapacityMng capacityMng;
-
+    private TankStoreClerkRelationService tankStoreClerkRelationService;
     @Resource
-    private TankStoreClerkRelationMng tankStoreClerkRelationMng;
-
+    private TankEquipmentService tankEquipmentService;
     @Resource
-    private TankEquipmentMng tankEquipmentMng;
-
-    @Resource
-    private UnifiedJDBCMng unifiedJDBCMng;
-    @Autowired
-    private TxMng txMng;
-    @Resource
-    private UserMng userMng;
+    private UserService userService;
 
     @ApiOperation(value = "舱主绑定店主", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankStore/addStoreRelation", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT addOrder(String name,String phone,@ApiIgnore ResponseForT response) {
+    @RequestMapping(value = "/addStoreRelation", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult addOrder(String name, String phone) {
 
-      User user =  userMng.getByPhone(phone);
 
-      if(user == null){
-          String secrt = UUID.randomUUID().toString().replace("-", "");
-          user = userMng.add(name, null, null,
-                  capacityMng.getDefault().getId(), phone,null,
-               null, 0, null, secrt);
-      }
+        List<User> users = userService.getByPhone(phone);
+        User user = new User();
+        if (users.isEmpty()) {
+            user = userService.registerPhone(name, phone, 0);
+        } else {
+            user = users.get(0);
+        }
 
-        TankStoreRelation tankStoreRelation = tankStoreRelationMng.getStoreUserId(user.getId());
-        if(tankStoreRelation != null){
+        TankStoreRelation tankStoreRelation = tankStoreRelationService.getStoreUserId(user.getId().longValue());
+        if (tankStoreRelation != null) {
             throw new IllegalStateException("店主已被绑定，请选择其他店主");
         }
 
-        tankStoreRelationMng.add(WebUtils.getIdForLogin(),user.getId(),new Date());
+        TankStoreRelation tankStoreRelation1 = new TankStoreRelation();
+        tankStoreRelation1.setCreatedTime(new Date());
+        tankStoreRelation1.setTankUserId(userService.getInfo().getId().longValue());
+        tankStoreRelation1.setStoreUserId(user.getId().longValue());
 
-       return response.SUCCESS();
+        tankStoreRelationService.save(tankStoreRelation1);
+
+        return CommonResult.success();
     }
 
 
     @ApiOperation(value = "门店管理列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankStore/getStoreList", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT getStoreList(@ApiIgnore ResponseForT response) {
+    @RequestMapping(value = "/getStoreList", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<List<TankStoreManageListResponse>> getStoreList() {
 
-        List<?> list = unifiedJDBCMng.query(new String[] { "userId"},
-                new Object[] { WebUtils.getIdForLogin() }, "门店管理列表");
-
-        return response.SUCCESS(list);
+        return CommonResult.success(tankStoreService.getStoreManageList());
     }
 
 
     @ApiOperation(value = "删除门店", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankStore/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT delete(Long id, @ApiIgnore ResponseForT response) {
+    @RequestMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult delete(Long id) {
 
 
-        TankStore tankStore =  tankStoreMng.getId(id);
-
-        List<TankEquipment> tankEquipment =  tankEquipmentMng.getStoreId(tankStore.getId());
-
-        if(!tankEquipment.isEmpty()){
+        TankStore tankStore = tankStoreService.getById(id);
+        List<TankEquipment> tankEquipment = tankEquipmentService.getStoreId(tankStore.getId());
+        if (!tankEquipment.isEmpty()) {
             throw new RuntimeException("门店存在设备，无法删除");
         }
-
-        TankStoreRelation tankStoreRelation = tankStoreRelationMng.getStoreUserId(tankStore.getUserId());
-        if(tankStoreRelation != null) {
-            tankStoreRelationMng.delete(tankStoreRelation.getId());
+        TankStoreRelation tankStoreRelation = tankStoreRelationService.getStoreUserId(tankStore.getUserId());
+        if (tankStoreRelation != null) {
+            tankStoreRelationService.removeById(tankStoreRelation.getId());
         }
-
-        List<TankStoreClerkRelation>  list =  tankStoreClerkRelationMng.getStoreUserId(tankStore.getUserId());
-        for(TankStoreClerkRelation tankStoreClerkRelation :list){
-            tankStoreClerkRelationMng.delete(tankStoreClerkRelation.getId());
+        List<TankStoreClerkRelation> list = tankStoreClerkRelationService.getStoreUserId(tankStore.getUserId());
+        for (TankStoreClerkRelation tankStoreClerkRelation : list) {
+            tankStoreClerkRelationService.removeById(tankStoreClerkRelation.getId());
         }
-        tankStoreMng.delete(id);
+        tankStoreService.removeById(id);
 
-        return response.SUCCESS();
+        return CommonResult.success();
     }
-
 
 
     @ApiOperation(value = "用户身份", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/tankStore/getUserStanding", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT getUserStanding(@ApiIgnore ResponseForT response) {
+    public CommonResult<String> getUserStanding() {
 
         String standing = "";
-       TankStoreRelation tankStoreRelation =  tankStoreRelationMng.getStoreUserId( WebUtils.getIdForLogin());
-        List<TankStoreRelation> list =  tankStoreRelationMng.getTankUserId( WebUtils.getIdForLogin());
-       if(tankStoreRelation != null){
-           standing = "店主";
-
-       }
-        if(!list.isEmpty()){
-            standing =standing+ ",舱主";
-
+        User user = userService.getInfo();
+        TankStoreRelation tankStoreRelation = tankStoreRelationService.getStoreUserId(user.getId().longValue());
+        List<TankStoreRelation> list = tankStoreRelationService.getTankUserId(user.getId());
+        if (tankStoreRelation != null) {
+            standing = "店主";
+        }
+        if (!list.isEmpty()) {
+            standing = standing + ",舱主";
         }
 
-        TankStoreClerkRelation tankStoreClerkRelation =  tankStoreClerkRelationMng.getClerkUserId( WebUtils.getIdForLogin());
-        if(tankStoreClerkRelation != null){
-            standing =standing+ ",店员";
+        TankStoreClerkRelation tankStoreClerkRelation = tankStoreClerkRelationService.getClerkUserId(user.getId());
+        if (tankStoreClerkRelation != null) {
+            standing = standing + ",店员";
         }
 
-        return response.SUCCESS(standing);
+        return CommonResult.success(standing);
     }
 
 }

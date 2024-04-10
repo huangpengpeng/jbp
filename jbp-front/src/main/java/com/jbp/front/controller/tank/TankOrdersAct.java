@@ -1,39 +1,32 @@
 package com.jbp.front.controller.tank;
 
 import com.Jwebmall.core.entity.Config;
-import com.Jwebmall.core.manager.ConfigMng;
-import com.Jwebmall.order.entity.FundClearing;
-import com.Jwebmall.order.manager.FundClearingMng;
-import com.Jwebmall.plugins.xs.entity.XsCapa;
-import com.Jwebmall.plugins.xs.entity.XsUserCapa;
-import com.Jwebmall.plugins.xs.manager.XsCapaMng;
-import com.Jwebmall.plugins.xs.manager.XsUserCapaMng;
-import com.Jwebmall.tools.CacheKeyUtils;
-import com.Jwebmall.user.entity.User;
-import com.Jwebmall.user.manager.UserMng;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Maps;
-import com.common.api.ResponseForT;
-import com.common.jdbc.template.TxMng;
-import com.common.jdbc.template.UnifiedJDBCMng;
-import com.common.util.ArithmeticUtils;
-import com.common.util.DateTimeUtils;
-import com.common.web.ResponseUtils;
-import com.common.web.util.WebUtils;
+import com.jbp.common.constants.OrderConstants;
+import com.jbp.common.model.tank.TankOrders;
+import com.jbp.common.response.TankStoreListResponse;
+import com.jbp.common.response.TankStoreRelationListResponse;
+import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.service.*;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
@@ -43,41 +36,32 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
-@Slf4j
-@Controller
+@RestController("tank")
+@RequestMapping("api/front/tankOrder")
+@Api(tags = "共享仓订单控制器")
 public class TankOrdersAct {
 
 
     @Resource
-    private ConfigMng configMng;
+    private TankOrdersService tankOrdersService;
     @Resource
-    private TankOrdersMng tankOrdersMng;
+    private TankEquipmentNumberService tankEquipmentNumberService;
     @Resource
-    private TankEquipmentNumberMng tankEquipmentNumberMng;
+    private TankStoreRelationService tankStoreRelationService;
     @Resource
-    private XsCapaMng xsCapaMng;
+    private TankStoreService tankStoreService;
     @Resource
-    private TankStoreRelationMng tankStoreRelationMng;
-    @Resource
-    private UnifiedJDBCMng unifiedJDBCMng;
-    @Autowired
-    private TxMng txMng;
-    @Resource
-    private TankStoreMng tankStoreMng;
-    @Resource
-    private UserMng userMng;
-    @Resource
-    private FundClearingMng fundClearingMng;
-    @Resource
-    private XsUserCapaMng xsUserCapaMng;
+    private UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(TankOrdersAct.class);
 
+    @Autowired
+    private Environment environment;
 
 
     @ApiOperation(value = "充值下单", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankOrder/addOrder", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT addOrder(Integer number, Long storeUserId, @ApiIgnore ResponseForT response) {
+    @RequestMapping(value = "/addOrder", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<TankOrders> addOrder(Integer number, Long storeUserId) {
 
         Config config = configMng.getByName("共享仓次数金额");
         JSONArray validArray = JSONArray.parseArray(config.getValue());
@@ -85,136 +69,107 @@ public class TankOrdersAct {
         for (Object object : validArray) {
             JSONObject validJSON = (JSONObject) object;
             Integer number1 = validJSON.getInteger("number");
-            if (number.equals(number1) ) {
+            if (number.equals(number1)) {
                 payPrice = validJSON.getBigDecimal("price");
             }
         }
 
-        TankOrders tankOrders = tankOrdersMng.add(WebUtils.getIdForLogin(), storeUserId, com.common.util.StringUtils.N_TO_10("GXC"), TankOrders.Constants.未支付.toString(), number, payPrice, null, new Date());
-        return response.SUCCESS(tankOrders);
+        TankOrders tankOrders = new TankOrders();
+        tankOrders.setUserId(userService.getInfo().getId().longValue());
+        tankOrders.setStoreUserId(storeUserId);
+        tankOrders.setOrderSn(CrmebUtil.getOrderNo(OrderConstants.GXC_ORDER_PREFIX));
+        tankOrders.setStatus("未支付");
+        tankOrders.setNumber(number);
+        tankOrders.setPayPrice(payPrice);
+        tankOrders.setCreatedTime(new Date());
+        tankOrdersService.save(tankOrders);
+        return CommonResult.success(tankOrders);
     }
 
     @ApiOperation(value = "充值次数选择", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankOrder/getNumberList", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT getNumberList(BigDecimal score, @ApiIgnore ResponseForT response) {
+    @RequestMapping(value = "/getNumberList", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<String> getNumberList(BigDecimal score) {
 
         Config config = configMng.getByName("共享仓次数金额");
-        return response.SUCCESS(config.getValue());
+        return CommonResult.success(config);
     }
 
 
     @ApiOperation(value = "舱主关联店主列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankOrder/getTankStoreRelationList", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT getTankStoreRelation(@ApiIgnore ResponseForT response) {
-
-
-        List<?> list = unifiedJDBCMng.query(new String[]{"userId"},
-                new Object[]{WebUtils.getIdForLogin()}, "舱主关联店主列表");
-
-        return response.SUCCESS(list);
-    }
-
-
-    @ApiOperation(value = "删除店主", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @RequestMapping(value = "/tankStoreRelation/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT delete(Long id, @ApiIgnore ResponseForT response) {
-
-        TankStoreRelation tankStoreRelation = tankStoreRelationMng.getId(id);
-        List<TankStore> tankStore = tankStoreMng.getStoreUserId(tankStoreRelation.getStoreUserId());
-        if (!tankStore.isEmpty()) {
-            throw new RuntimeException("店主存在门店，无法删除");
-        }
-        tankStoreRelationMng.delete(id);
-        return response.SUCCESS();
+    @RequestMapping(value = "/getTankStoreRelationList", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<List<TankStoreRelationListResponse>> getTankStoreRelation() {
+        return CommonResult.success(tankStoreRelationService.getRelationList());
     }
 
 
     @ApiOperation(value = "店主门店列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankOrder/getTankStoreList", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseForT getTankStoreList(Long storeUserId, @ApiIgnore ResponseForT response) {
+    @RequestMapping(value = "/getTankStoreList", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<List<TankStoreListResponse>> getTankStoreList(Integer storeUserId) {
 
-        List<?> list = unifiedJDBCMng.query(new String[]{"storeUserId"},
-                new Object[]{storeUserId}, "店主门店列表");
-
-        return response.SUCCESS(list);
+        return CommonResult.success(tankStoreService.getStoreList(storeUserId));
     }
 
 
     @ApiOperation(value = "充值次数成功回调", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RequestMapping(value = "/tankOrder/callapi", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void callapi(@RequestParam Map<String, Object> params, @ApiIgnore HttpServletResponse response,
-                        ModelMap model) throws Exception {
+    @RequestMapping(value = "/callapi", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<String> callapi(@RequestParam Map<String, Object> params, @ApiIgnore HttpServletResponse response,
+                                        ModelMap model) throws Exception {
         try {
             JSONObject queryJSON = JSONObject.parseObject(JSONObject.toJSONString(params));
-            {
-                log.info("/tankOrder/callapi {}", JSONObject.toJSONString(params));
-            }
+
             String orderNo = queryJSON.getString("orderNo");
             if (StringUtils.isBlank(orderNo)) {
-                {
-                    log.info("/order/callapi 1  {}", JSONObject.toJSONString(params));
-                }
-                ResponseUtils.renderText(response, "SUCCESS");
-                return;
+                return CommonResult.success("SUCCESS");
             }
 
-            TankOrders tankOrders = tankOrdersMng.getOrderSn(orderNo);
-            if (StringUtils.equals(tankOrders.getStatus(), TankOrders.Constants.已支付.toString())) {
-                ResponseUtils.renderText(response, "SUCCESS");
-                return;
+            TankOrders tankOrders = tankOrdersService.getOrderSn(orderNo);
+            if (StringUtils.equals(tankOrders.getStatus(), "已支付")) {
+                return CommonResult.success("SUCCESS");
             }
 
-
-            Config config = configMng.getByName("支付结果查询接口");
-            String url = StringUtils.replace(config.getValue(), "{domain}", CacheKeyUtils.getDomainServer());
+            String url = environment.getProperty("gxc.url");
             Map<String, String> queryMap = Maps.newLinkedHashMap();
             queryMap.put("orderNo", orderNo);
             String responseText = "{}";
-            if (config != null) {
-                URIBuilder uriBuilder = new URIBuilder(url);
-                {
-                    log.info("uriBuilder:{}", uriBuilder.toString());
-                }
-                HttpRequest httpRequest = HttpRequest.get(uriBuilder.toString()).query(queryMap);
-                HttpResponse httpResponse = httpRequest.send();
-                responseText = StringUtils.toString(httpResponse.bodyBytes(), "utf-8");
-            }
+            URIBuilder uriBuilder = new URIBuilder(url);
             {
-                log.info("responseText:{}", responseText);
+                logger.info("uriBuilder:{}", uriBuilder.toString());
+            }
+            HttpRequest httpRequest = HttpRequest.get(uriBuilder.toString()).query(queryMap);
+            HttpResponse httpResponse = httpRequest.send();
+            responseText = StringUtils.toString(httpResponse.bodyBytes(), "utf-8");
+            {
+                logger.info("responseText:{}", responseText);
             }
             JSONObject orderJSON = JSONObject.parseObject(responseText);
             Boolean ifSuccess = orderJSON.getBoolean("ifSuccess");
             {
-                log.info("ifSuccess:{}", ifSuccess);
+                logger.info("ifSuccess:{}", ifSuccess);
             }
 
             synchronized (orderNo.intern()) {
                 if (ifSuccess) {
-                    txMng.doCall(new TxMng.VoidCall() {
-                        @Override
-                        public void handleEvet() {
-                            tankOrders.setStatus(TankOrders.Constants.已支付.toString());
-                            tankOrders.setPayTime(new Date());
-                            tankOrdersMng.updateByUpdater(tankOrders);
-                            tankEquipmentNumberMng.increase(tankOrders.getStoreUserId(), tankOrders.getNumber(), tankOrders.getOrderSn(),null);
 
-                            //发放佣金
-                            //      fuxiao(tankOrders);
-                            bole(tankOrders);
+                    tankOrders.setStatus("已支付");
+                    tankOrders.setPayTime(new Date());
+                    tankOrdersService.updateById(tankOrders);
+                    tankEquipmentNumberService.increase(tankOrders.getStoreUserId(), tankOrders.getNumber(), tankOrders.getOrderSn(), null);
 
-                        }
-                    });
+                    //发放佣金
+                    //      fuxiao(tankOrders);
+                    //    bole(tankOrders);
+
                 }
             }
 
-            ResponseUtils.renderText(response, "SUCCESS");
+            return CommonResult.success("SUCCESS");
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
+        return CommonResult.success("SUCCESS");
     }
 
 
@@ -337,168 +292,162 @@ public class TankOrdersAct {
 //            }
 //
 
-
-    //伯乐  团队奖
-    public void bole(TankOrders tankOrders) {
-
-
-//        fundClearingMng.add(null, tankOrders.getOrderSn(),
-//                FundClearing.FundClearingType.货款.toString() + "[" + tankOrders.getOrderSn() + "]",
-//                tankOrders.getPayPrice(), DateTimeUtils.getNow(), tankOrders.getOrderSn(),
-//                DateTimeUtils.getNow(),
-//                FundClearing.FundClearingType.货款.toString());
-
-        Config jinConfig = configMng.getByName("紧缩订单号");
-
-        TankStoreRelation tankStoreRelation = tankStoreRelationMng.getStoreUserId(tankOrders.getStoreUserId());
-        if (tankStoreRelation == null) {
-            return;
-        }
-        User createUser = userMng.get(tankStoreRelation.getTankUserId());
-        if (createUser == null) {
-            return;
-        }
-        if (createUser.getParentId() == null) {
-            return;
-        }
-
-        BigDecimal mangeCommAmt = BigDecimal.ZERO;
-        JSONObject remarkJSON = new JSONObject();
-
-
-        BigDecimal orderAmt = tankOrders.getPayPrice();
-
-
-        User user = userMng.get(createUser.getParentId());
-        XsUserCapa xsUserCapa = null;
-        BigDecimal amtbl = BigDecimal.ZERO;
-        do {
-
-            XsUserCapa currentUserCapa = xsUserCapaMng.getByUser(user.getId());
-
-            // 伯乐奖只有3星以上才有
-            if (xsUserCapa != null && (currentUserCapa != null && currentUserCapa.getXsCapaId() >= 3)) {
-                // 增加伯乐奖
-                if (ArithmeticUtils.gt(amtbl, BigDecimal.ZERO)) {
-                    {
-                        eachb(createUser, user, tankOrders, amtbl);
-                    }
-                    {
-                        remarkJSON.put("userId", user.getId());
-                        remarkJSON.put("username", user.getUsername());
-                        remarkJSON.put("amtbl", amtbl);
-                        remarkJSON.put("type", FundClearing.FundClearingType.教育培训费.toString());
-                        mangeCommAmt = mangeCommAmt.add(amtbl);
-                    }
-                    {
-                        amtbl = BigDecimal.ZERO;
-                    }
-                }
-            }
-
-            // 如果上级没到3星 伯乐奖则部分
-            // 条件满足 设置为0说明不紧缩，不设置为0 则金额存在 就会继续找下个满足条件的人，则叫紧缩
-            if ((jinConfig == null || !StringUtils.equals(jinConfig.getValue(), "1"))) {
-                amtbl = BigDecimal.ZERO;
-                {
-                    log.info("此订单没有参与紧缩：{}", tankOrders.getOrderSn());
-                }
-            } else {
-                log.info("此订单参与了紧缩：{}", tankOrders.getOrderSn());
-            }
-
-            // 增加管理奖 管理奖 是递归算差价 currentUserCapa 不等于空 最低要是董事
-            if (currentUserCapa != null) {
-                if (xsUserCapa == null || currentUserCapa.getXsCapaId() > xsUserCapa.getXsCapaId()) {
-
-                    XsCapa xsCapa = xsUserCapa == null ? null : xsCapaMng.get(xsUserCapa.getXsCapaId());
-                    XsCapa currentXsCapa = xsCapaMng.get(currentUserCapa.getXsCapaId());
-
-                    BigDecimal scale = currentXsCapa.getScale();
-                    if (xsCapa != null) {
-                        scale = currentXsCapa.getScale().subtract(xsCapa.getScale());
-                    }
-
-                    BigDecimal amt = orderAmt.multiply(scale.divide(new BigDecimal("100")));
-
-                    // 增加佣金
-                    fundClearingMng.add(user.getId(),
-                            "G" + tankOrders.getOrderSn() + user.getId() ,
-                            createUser.getUsername() + "[充值共享仓次数]"
-                                    + FundClearing.FundClearingType.店务补贴.toString(),
-                            amt, DateTimeUtils.getNow(), tankOrders.getOrderSn(),
-                            DateTimeUtils.getNow() ,
-                            FundClearing.FundClearingType.店务补贴.toString());
-
-                    remarkJSON.put("userId2", user.getId());
-                    remarkJSON.put("username2", user.getUsername());
-                    remarkJSON.put("amt", amt);
-                    remarkJSON.put("type2", FundClearing.FundClearingType.店务补贴.toString());
-                    mangeCommAmt = mangeCommAmt.add(amt);
-
-                    // 本次管理提成奖 设置为一下次的伯乐奖
-                    amtbl = amtbl.add(amt);
-                    xsUserCapa = currentUserCapa;
-                }
-            }
-
-            if (user.getParentId() == null) {
-                break;
-            }
-
-            user = userMng.get(user.getParentId());
-            {
-            }
-        } while (true);
-
-
-    }
-
-    protected void eachb(User createUser, User user, TankOrders order, BigDecimal amtb) {
-
-        BigDecimal amt = BigDecimal.ZERO;
-        {
-            amt = amtb.multiply(new BigDecimal("0.15")).setScale(2, BigDecimal.ROUND_DOWN);
-            fundClearingMng.add(user.getId(), "B" + order.getOrderSn() + user.getId() ,
-                    createUser.getUsername() + "[充值共享仓]"
-                            + FundClearing.FundClearingType.培训基金.toString(),
-                    amt, DateTimeUtils.getNow(), order.getOrderSn(),
-                    DateTimeUtils.getNow() ,
-                    FundClearing.FundClearingType.培训基金.toString());
-        }
-        Integer J = 2;
-        do {
-            if (user.getParentId() == null) {
-                break;
-            }
-            if (J == 2) {
-                amt = amtb.multiply(new BigDecimal("0.15")).setScale(2, BigDecimal.ROUND_DOWN);
-            } else if (J >= 3 && J <= 4) {
-                amt = amtb.multiply(new BigDecimal("0.1")).setScale(2, BigDecimal.ROUND_DOWN);
-                ;
-            } else if (J >= 5 && J <= 10) {
-                amt = amtb.multiply(new BigDecimal("0.05")).setScale(2, BigDecimal.ROUND_DOWN);
-                ;
-            } else if (J >= 11 && J <= 18) {
-                amt = amtb.multiply(new BigDecimal("0.025")).setScale(2, BigDecimal.ROUND_DOWN);
-                ;
-            }
-            user = userMng.get(user.getParentId());
-            XsUserCapa currentUserCapa = xsUserCapaMng.getByUser(user.getId());
-            // 伯乐奖只有3星以上才有
-            if (currentUserCapa != null && currentUserCapa.getXsCapaId() >= 3) {
-                {
-                    fundClearingMng.add(user.getId(),
-                            "B" + order.getOrderSn() + user.getId() + "_" + J,
-                            createUser.getUsername() + "[充值共享仓次数]"
-                                    + FundClearing.FundClearingType.培训基金.toString(),
-                            amt, DateTimeUtils.getNow(), order.getOrderSn(),
-                            DateTimeUtils.getNow() ,
-                            FundClearing.FundClearingType.培训基金.toString());
-                }
-                J++;
-            }
-        } while (J <= 18);
-    }
+//
+//    //伯乐  团队奖
+//    public void bole(TankOrders tankOrders) {
+//
+//
+//        Config jinConfig = configMng.getByName("紧缩订单号");
+//
+//        TankStoreRelation tankStoreRelation = tankStoreRelationService.getStoreUserId(tankOrders.getStoreUserId());
+//        if (tankStoreRelation == null) {
+//            return;
+//        }
+//        User createUser = userMng.get(tankStoreRelation.getTankUserId());
+//        if (createUser == null) {
+//            return;
+//        }
+//        if (createUser.getParentId() == null) {
+//            return;
+//        }
+//
+//        BigDecimal mangeCommAmt = BigDecimal.ZERO;
+//        JSONObject remarkJSON = new JSONObject();
+//
+//
+//        BigDecimal orderAmt = tankOrders.getPayPrice();
+//
+//
+//        User user = userMng.get(createUser.getParentId());
+//        XsUserCapa xsUserCapa = null;
+//        BigDecimal amtbl = BigDecimal.ZERO;
+//        do {
+//
+//            XsUserCapa currentUserCapa = xsUserCapaMng.getByUser(user.getId());
+//
+//            // 伯乐奖只有3星以上才有
+//            if (xsUserCapa != null && (currentUserCapa != null && currentUserCapa.getXsCapaId() >= 3)) {
+//                // 增加伯乐奖
+//                if (ArithmeticUtils.gt(amtbl, BigDecimal.ZERO)) {
+//                    {
+//                        eachb(createUser, user, tankOrders, amtbl);
+//                    }
+//                    {
+//                        remarkJSON.put("userId", user.getId());
+//                        remarkJSON.put("username", user.getUsername());
+//                        remarkJSON.put("amtbl", amtbl);
+//                        remarkJSON.put("type", FundClearing.FundClearingType.教育培训费.toString());
+//                        mangeCommAmt = mangeCommAmt.add(amtbl);
+//                    }
+//                    {
+//                        amtbl = BigDecimal.ZERO;
+//                    }
+//                }
+//            }
+//
+//            // 如果上级没到3星 伯乐奖则部分
+//            // 条件满足 设置为0说明不紧缩，不设置为0 则金额存在 就会继续找下个满足条件的人，则叫紧缩
+//            if ((jinConfig == null || !StringUtils.equals(jinConfig.getValue(), "1"))) {
+//                amtbl = BigDecimal.ZERO;
+//                {
+//                    log.info("此订单没有参与紧缩：{}", tankOrders.getOrderSn());
+//                }
+//            } else {
+//                log.info("此订单参与了紧缩：{}", tankOrders.getOrderSn());
+//            }
+//
+//            // 增加管理奖 管理奖 是递归算差价 currentUserCapa 不等于空 最低要是董事
+//            if (currentUserCapa != null) {
+//                if (xsUserCapa == null || currentUserCapa.getXsCapaId() > xsUserCapa.getXsCapaId()) {
+//
+//                    XsCapa xsCapa = xsUserCapa == null ? null : xsCapaMng.get(xsUserCapa.getXsCapaId());
+//                    XsCapa currentXsCapa = xsCapaMng.get(currentUserCapa.getXsCapaId());
+//
+//                    BigDecimal scale = currentXsCapa.getScale();
+//                    if (xsCapa != null) {
+//                        scale = currentXsCapa.getScale().subtract(xsCapa.getScale());
+//                    }
+//
+//                    BigDecimal amt = orderAmt.multiply(scale.divide(new BigDecimal("100")));
+//
+//                    // 增加佣金
+//                    fundClearingMng.add(user.getId(),
+//                            "G" + tankOrders.getOrderSn() + user.getId(),
+//                            createUser.getUsername() + "[充值共享仓次数]"
+//                                    + FundClearing.FundClearingType.店务补贴.toString(),
+//                            amt, DateTimeUtils.getNow(), tankOrders.getOrderSn(),
+//                            DateTimeUtils.getNow(),
+//                            FundClearing.FundClearingType.店务补贴.toString());
+//
+//                    remarkJSON.put("userId2", user.getId());
+//                    remarkJSON.put("username2", user.getUsername());
+//                    remarkJSON.put("amt", amt);
+//                    remarkJSON.put("type2", FundClearing.FundClearingType.店务补贴.toString());
+//                    mangeCommAmt = mangeCommAmt.add(amt);
+//
+//                    // 本次管理提成奖 设置为一下次的伯乐奖
+//                    amtbl = amtbl.add(amt);
+//                    xsUserCapa = currentUserCapa;
+//                }
+//            }
+//
+//            if (user.getParentId() == null) {
+//                break;
+//            }
+//
+//            user = userMng.get(user.getParentId());
+//            {
+//            }
+//        } while (true);
+//
+//
+//    }
+//
+//    protected void eachb(User createUser, User user, TankOrders order, BigDecimal amtb) {
+//
+//        BigDecimal amt = BigDecimal.ZERO;
+//        {
+//            amt = amtb.multiply(new BigDecimal("0.15")).setScale(2, BigDecimal.ROUND_DOWN);
+//            fundClearingMng.add(user.getId(), "B" + order.getOrderSn() + user.getId(),
+//                    createUser.getUsername() + "[充值共享仓]"
+//                            + FundClearing.FundClearingType.培训基金.toString(),
+//                    amt, DateTimeUtils.getNow(), order.getOrderSn(),
+//                    DateTimeUtils.getNow(),
+//                    FundClearing.FundClearingType.培训基金.toString());
+//        }
+//        Integer J = 2;
+//        do {
+//            if (user.getParentId() == null) {
+//                break;
+//            }
+//            if (J == 2) {
+//                amt = amtb.multiply(new BigDecimal("0.15")).setScale(2, BigDecimal.ROUND_DOWN);
+//            } else if (J >= 3 && J <= 4) {
+//                amt = amtb.multiply(new BigDecimal("0.1")).setScale(2, BigDecimal.ROUND_DOWN);
+//                ;
+//            } else if (J >= 5 && J <= 10) {
+//                amt = amtb.multiply(new BigDecimal("0.05")).setScale(2, BigDecimal.ROUND_DOWN);
+//                ;
+//            } else if (J >= 11 && J <= 18) {
+//                amt = amtb.multiply(new BigDecimal("0.025")).setScale(2, BigDecimal.ROUND_DOWN);
+//                ;
+//            }
+//            user = userMng.get(user.getParentId());
+//            XsUserCapa currentUserCapa = xsUserCapaMng.getByUser(user.getId());
+//            // 伯乐奖只有3星以上才有
+//            if (currentUserCapa != null && currentUserCapa.getXsCapaId() >= 3) {
+//                {
+//                    fundClearingMng.add(user.getId(),
+//                            "B" + order.getOrderSn() + user.getId() + "_" + J,
+//                            createUser.getUsername() + "[充值共享仓次数]"
+//                                    + FundClearing.FundClearingType.培训基金.toString(),
+//                            amt, DateTimeUtils.getNow(), order.getOrderSn(),
+//                            DateTimeUtils.getNow(),
+//                            FundClearing.FundClearingType.培训基金.toString());
+//                }
+//                J++;
+//            }
+//        } while (J <= 18);
+//    }
 
 }

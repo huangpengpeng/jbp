@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.TankStoreDao">
+    <select id="getStoreList" resultType="com.jbp.common.response.TankStoreListResponse">
+        	select  u.username ,u.mobile ,t.name from tankstore t
+		left join user u on u.id = t.userId
+		where t.userId = #{storeUserId}
+    </select>
+    <select id="getStoreManageList" resultType="com.jbp.common.response.TankStoreManageListResponse">
+
+        select t.`name`,count(tq.id) as enumber,count(ta.id) as number ,t.address ,t.id from tankstore t
+		left join tankequipment tq on tq.storeId = t.id
+		left join tankactivate ta on ta.equipmentId = tq.id
+		where t.userId =#{userId}
+		group by t.id
+
+    </select>
 </mapper>

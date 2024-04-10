@@ -7,6 +7,7 @@ import com.jbp.common.response.EquipmentListResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TankEquipmentDao extends BaseMapper<TankEquipment> {
 
@@ -14,4 +15,15 @@ public interface TankEquipmentDao extends BaseMapper<TankEquipment> {
 
     List<EquipmentListResponse> getPageList(@Param("userId") Integer  userId,@Param("type") String type);
 
+
+    Map<String,Object> getInfo(String equipmentSn);
+
+
+    Integer equipmentNumber(Integer userId);
+
+    Integer equipmentUseNumber(Integer userId);
+
+    Integer equipmentOnlineUnusedNumber(Integer userId);
+
+    Integer equipmentOfflinedNumber(Integer userId);
 }

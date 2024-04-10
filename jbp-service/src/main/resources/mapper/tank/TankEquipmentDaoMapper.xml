@@ -26,4 +26,26 @@
 
 
     </select>
+    <select id="getInfo" resultType="java.util.Map">
+        select ts.name,t.equipmentSn,t.id ,t.imei ,ts.nest ,t.prohibitStatus from tankequipment t
+		left join tankstore ts on ts.id = t.storeId
+		where t.equipmentSn =  #{equipmentSn}
+
+    </select>
+    <select id="equipmentNumber" resultType="java.lang.Integer">
+        	select  count(1) from  tankequipment t
+		where t.storeUserId =   #{userId}
+    </select>
+    <select id="equipmentUseNumber" resultType="java.lang.Integer">
+        	select  count(1) from  tankequipment t
+		where t.storeUserId =   #{userId}	and status = 0 and activateStatus = 1 and onlineStatus = 1 and useStatus = 1
+    </select>
+    <select id="equipmentOnlineUnusedNumber" resultType="java.lang.Integer">
+        		select  count(1) from  tankequipment t
+		where t.storeUserId =   #{userId}  and status = 0 and activateStatus = 0 and onlineStatus = 1 and useStatus = 1
+    </select>
+    <select id="equipmentOfflinedNumber" resultType="java.lang.Integer">
+        	select  count(1) from  tankequipment t
+		where t.storeUserId =  #{userId}  and onlineStatus = 0
+    </select>
 </mapper>

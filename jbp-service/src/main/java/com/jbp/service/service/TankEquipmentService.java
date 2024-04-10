@@ -8,6 +8,7 @@ import com.jbp.common.response.ActivateInfoResponse;
 import com.jbp.common.response.EquipmentListResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TankEquipmentService extends IService<TankEquipment> {
 
@@ -20,4 +21,15 @@ public interface TankEquipmentService extends IService<TankEquipment> {
 
     PageInfo<EquipmentListResponse> getPageList(String type,PageParamRequest pageParamRequest);
 
+
+    Map<String,Object> getInfo(String equipmentSn);
+
+
+    Integer equipmentNumber();
+
+    Integer equipmentUseNumber();
+
+    Integer equipmentOnlineUnusedNumber();
+
+    Integer equipmentOfflinedNumber();
 }

@@ -3,8 +3,10 @@ package com.jbp.service.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.tank.TankStoreRelation;
+import com.jbp.common.response.TankStoreRelationListResponse;
 import com.jbp.service.dao.TankStoreRelationDao;
 import com.jbp.service.service.TankStoreRelationService;
+import com.jbp.service.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,8 @@ public class TankStoreRelationServiceImpl extends ServiceImpl<TankStoreRelationD
 
     @Resource
     private TankStoreRelationDao dao;
-
+    @Resource
+    private UserService userService;
 
 
     @Override
@@ -27,11 +30,14 @@ public class TankStoreRelationServiceImpl extends ServiceImpl<TankStoreRelationD
     }
 
     @Override
-    public List<TankStoreRelation> getTankUserId(Long userId) {
+    public List<TankStoreRelation> getTankUserId(Integer userId) {
         return  dao.selectList(new QueryWrapper<TankStoreRelation>().lambda().eq(TankStoreRelation::getTankUserId,userId));
     }
 
-
+    @Override
+    public List<TankStoreRelationListResponse> getRelationList() {
+        return dao.getRelationList(userService.getInfo().getId());
+    }
 
 
 }
