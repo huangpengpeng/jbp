@@ -10,7 +10,7 @@ import java.util.List;
 public interface TankStoreDao  extends BaseMapper<TankStore> {
 
 
-    List<TankStoreListResponse> getStoreList(Long storeUserId);
+    List<TankStoreListResponse> getStoreList(Integer storeUserId);
 
 
     List<TankStoreManageListResponse> getStoreManageList(Integer userId);
