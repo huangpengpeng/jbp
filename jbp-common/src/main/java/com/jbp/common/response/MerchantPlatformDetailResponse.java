@@ -102,4 +102,7 @@ public class MerchantPlatformDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "交易模型")
     private Integer tradeModel ;
+
+    @ApiModelProperty(value = "分控类目")
+    private String frmsWareCategory;
 }
