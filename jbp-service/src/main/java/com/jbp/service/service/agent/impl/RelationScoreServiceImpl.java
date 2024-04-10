@@ -231,7 +231,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
             User zorouser = userService.getById(userRelation.getUId());
             relationScoreResponse.setNickname(zorouser.getNickname());
             relationScoreResponse.setAccount(zorouser.getAccount());
-            relationScoreResponse.setTotalScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()));
+            relationScoreResponse.setTotalScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()).add(relationScore.getFakeScore()));
             relationScoreResponse.setUsableScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore());
         }
 
@@ -240,7 +240,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
             User zorouser = userService.getById(userRelation2.getUId());
             relationScoreResponse.setNickname2(zorouser.getNickname());
             relationScoreResponse.setAccount2(zorouser.getAccount());
-            relationScoreResponse.setTotalScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()));
+            relationScoreResponse.setTotalScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()).add(relationScore.getFakeScore()));
             relationScoreResponse.setUsableScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore());
         }
 
