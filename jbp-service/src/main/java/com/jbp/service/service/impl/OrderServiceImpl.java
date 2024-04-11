@@ -1199,6 +1199,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 .last(" limit 1"));
     }
 
+    @Override
+    public List<Order> getSuccessList(Date startTime, Date endTime) {
+        LambdaQueryWrapper<Order> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Order::getPaid, true)
+                .eq(Order::getLevel, 0)
+                .eq(Order::getRefundStatus, 0)
+                .ge(Order::getPayTime, startTime)
+                .lt(Order::getPayTime, endTime);
+        return list(lqw);
+    }
+
     /**
      * 根据订单编号获取订单
      *

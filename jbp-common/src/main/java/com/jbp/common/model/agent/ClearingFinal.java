@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,6 +30,14 @@ public class ClearingFinal extends BaseModel {
     @ApiModelProperty("佣金名称")
     @TableField("commName")
     private String commName;
+
+    @ApiModelProperty("总业绩")
+    @TableField("totalScore")
+    private BigDecimal totalScore;
+
+    @ApiModelProperty("总金额")
+    @TableField("totalAmt")
+    private BigDecimal totalAmt;
 
     @ApiModelProperty("开始时间")
     @TableField("startTime")

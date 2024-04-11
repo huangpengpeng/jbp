@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDao, ClearingFinal> implements ClearingFinalService {
@@ -22,7 +24,7 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
             throw new CrmebException(commName + "结算开始-结束,时间周期已经存在请勿重复操作");
         }
         clearingFinal = ClearingFinal.builder().name(name).commName(commName).startTime(startTime)
-                .endTime(endTime).status(ClearingFinal.Constants.待结算.name()).build();
+                .endTime(endTime).status(ClearingFinal.Constants.待结算.name()).totalScore(BigDecimal.ZERO).totalAmt(BigDecimal.ZERO).build();
         save(clearingFinal);
         return clearingFinal;
     }
@@ -30,5 +32,10 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
     @Override
     public ClearingFinal getByName(String name) {
         return getOne(new QueryWrapper<ClearingFinal>().lambda().eq(ClearingFinal::getName, name));
+    }
+
+    @Override
+    public ClearingFinal getLastOne(Long id) {
+        return getOne(new QueryWrapper<ClearingFinal>().lambda().lt(ClearingFinal::getId, id).last(" limit 1"));
     }
 }

@@ -8,4 +8,9 @@ public interface ClearingFinalService extends IService<ClearingFinal> {
     ClearingFinal create(String commName, String startTime, String endTime);
 
     ClearingFinal getByName(String name);
+
+    /**
+     * 获取上一次结算
+     */
+    ClearingFinal getLastOne(Long id);
 }

@@ -44,4 +44,10 @@ public interface ClearingUserService extends IService<ClearingUser> {
      */
     Boolean edit(Long id, Long capaId, Long capaXsId);
 
+    List<ClearingUser> getByClearing(Long clearingId);
+
+
+
+
+
 }

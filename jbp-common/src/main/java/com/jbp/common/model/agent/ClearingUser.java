@@ -24,19 +24,19 @@ public class ClearingUser extends BaseModel {
     @TableField("clearingId")
     private Long clearingId;
 
-    @ApiModelProperty("得奖用户")
+    @ApiModelProperty("用户")
     @TableField("uid")
     private Integer uid;
 
-    @ApiModelProperty("得奖账户")
+    @ApiModelProperty("账户")
     @TableField("accountNo")
     private String accountNo;
 
-    @ApiModelProperty("结算级别")
+    @ApiModelProperty("级别")
     @TableField("level")
     private Long level;
 
-    @ApiModelProperty("结算级别名称")
+    @ApiModelProperty("级别名称")
     @TableField("levelName")
     private String levelName;
 

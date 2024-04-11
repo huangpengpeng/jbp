@@ -1,19 +1,23 @@
 package com.jbp.service.service.agent.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.ClearingUserImportDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.ClearingUser;
+import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.service.dao.agent.ClearingUserDao;
+import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.ClearingUserService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +37,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private UserService userService;
     @Resource
     private ClearingFinalService clearingFinalService;
+
 
     @Override
     public Boolean importUserList(Long clearingId, List<ClearingUserImportDto> list) {
@@ -73,6 +78,36 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
 
     @Override
     public Boolean init(Long clearingId) {
+        ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
+        if (clearingFinal.getCommName().equals(ProductCommEnum.拓展佣金.getName())) {
+            // 获取上一次的名单
+            ClearingFinal lastOne = clearingFinalService.getLastOne(clearingId);
+            if (lastOne == null) {
+                throw new CrmebException("拓展佣金首次结算请导入名单");
+            }
+            List<ClearingUser> clearingUsers = getByClearing(clearingId);
+            if (CollectionUtils.isEmpty(clearingUsers)) {
+                throw new CrmebException("历史结算名单为空请重新导入结算名单");
+            }
+            List<ClearingUser> insertBatchList = Lists.newArrayList();
+            for (ClearingUser clearingUser : clearingUsers) {
+                ClearingUser newUser = new ClearingUser();
+                BeanUtils.copyProperties(clearingUser, newUser, "id", "clearingId");
+                newUser.setClearingId(clearingId);
+                insertBatchList.add(newUser);
+            }
+            clearingUserDao.insertBatch(insertBatchList);
+        }
+
+        if (clearingFinal.getCommName().equals(ProductCommEnum.培育佣金.getName())) {
+
+
+
+
+
+
+
+        }
         return null;
     }
 
@@ -99,5 +134,10 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     @Override
     public Boolean edit(Long id, Long capaId, Long capaXsId) {
         return null;
+    }
+
+    @Override
+    public List<ClearingUser> getByClearing(Long clearingId) {
+        return list(new QueryWrapper<ClearingUser>().lambda().eq(ClearingUser::getClearingId, clearingId));
     }
 }
