@@ -84,8 +84,8 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
             }
             linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
         }
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : new BigDecimal(merchant.getHandlingFee());
-        BigDecimal feeAmount = BigDecimal.ZERO;
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
         feeScale = feeScale.subtract(BigDecimal.valueOf(0.0008));
         if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
             feeAmount =

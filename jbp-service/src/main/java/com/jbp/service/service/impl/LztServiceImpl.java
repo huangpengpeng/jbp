@@ -443,17 +443,9 @@ public class LztServiceImpl implements LztService {
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
         String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         if (StringUtils.isEmpty(s)) {
-            throw new CrmebException("获取资金流水失败" + userId);
+            return new AcctSerialResult();
         }
-        try {
-            AcctSerialResult result = JSON.parseObject(s, AcctSerialResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
-                throw new CrmebException("获取资金流水失败：" + result == null ? "请求结果为空" : result.getRet_msg());
-            }
-            return result;
-        } catch (Exception e) {
-            throw new CrmebException("获取资金流水失败:" + e.getMessage());
-        }
+        return JSON.parseObject(s, AcctSerialResult.class);
     }
 
     @Override

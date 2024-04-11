@@ -57,7 +57,7 @@ public class Merchant implements Serializable {
     private String phone;
 
     @ApiModelProperty(value = "手续费(%)")
-    private Integer handlingFee;
+    private BigDecimal handlingFee;
 
     @ApiModelProperty(value = "商户关键字")
     private String keywords;

@@ -1515,7 +1515,7 @@ public class PayServiceImpl implements PayService {
         // 商户收入 = 订单应付 - 商户优惠 -平台手续费 - 佣金
         BigDecimal orderPrice = merchantOrder.getPayPrice().add(merchantOrder.getIntegralPrice()).add(merchantOrder.getPlatCouponPrice()).subtract(merchantOrder.getPayPostage()).subtract(merchantOrder.getWalletDeductionFee());
         // 平台手续费
-        BigDecimal platFee = orderPrice.multiply(new BigDecimal(merchant.getHandlingFee())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_UP);
+        BigDecimal platFee = orderPrice.multiply(merchant.getHandlingFee()).divide(new BigDecimal(100), 2, BigDecimal.ROUND_UP);
         // 商户收入金额
         BigDecimal merchantFee = orderPrice.subtract(platFee).subtract(merchantOrder.getFirstBrokerage()).subtract(merchantOrder.getSecondBrokerage());
         OrderProfitSharing orderProfitSharing = new OrderProfitSharing();
