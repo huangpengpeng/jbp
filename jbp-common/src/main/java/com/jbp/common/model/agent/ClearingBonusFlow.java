@@ -22,13 +22,9 @@ import java.util.Date;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "eb_clearing_bonus", autoResultMap = true)
-@ApiModel(value="ClearingBonus对象", description="业绩结算奖金记录")
-public class ClearingBonus extends VersionModel {
-
-    public static enum Constants {
-        待审核, 已审核, 已取消
-    }
+@TableName(value = "eb_clearing_bonus_flow", autoResultMap = true)
+@ApiModel(value="ClearingBonusFlow对象", description="业绩结算奖金明细")
+public class ClearingBonusFlow extends VersionModel {
 
     @ApiModelProperty("得奖用户")
     @TableField("uid")
@@ -50,10 +46,6 @@ public class ClearingBonus extends VersionModel {
     @TableField("batchNo")
     private String batchNo;
 
-    @ApiModelProperty("流水单号")
-    @TableField("uniqueNo")
-    private String uniqueNo;
-
     @ApiModelProperty("佣金名称")
     @TableField("commName")
     private String commName;
@@ -65,18 +57,6 @@ public class ClearingBonus extends VersionModel {
     @ApiModelProperty("描述")
     @TableField("description")
     private String description;
-
-    @ApiModelProperty("结算时间")
-    @TableField("clearTime")
-    private Date clearTime;
-
-    @ApiModelProperty("结算状态 待审核  已审核")
-    @TableField("status")
-    private String status;
-
-    @ApiModelProperty("备注")
-    @TableField("remark")
-    private String remark;
 
     @ApiModelProperty("创建时间")
     @TableField("createTime")
