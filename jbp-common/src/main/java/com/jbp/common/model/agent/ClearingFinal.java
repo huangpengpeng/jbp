@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value="ClearingFinal对象", description="结算信息")
 public class ClearingFinal extends BaseModel {
     public static enum Constants {
-        待审核, 已审核
+        待结算, 已结算, 已出款
     }
 
     @ApiModelProperty("结算名称")

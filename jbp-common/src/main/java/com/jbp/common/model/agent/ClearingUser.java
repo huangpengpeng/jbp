@@ -32,21 +32,13 @@ public class ClearingUser extends BaseModel {
     @TableField("accountNo")
     private String accountNo;
 
-    @ApiModelProperty("等级")
-    @TableField("capaId")
-    private Long capaId;
+    @ApiModelProperty("结算级别")
+    @TableField("level")
+    private Long level;
 
-    @ApiModelProperty("等级名称")
-    @TableField("capaName")
-    private String capaName;
-
-    @ApiModelProperty("星级")
-    @TableField("capaXsId")
-    private Long capaXsId;
-
-    @ApiModelProperty("星级名称")
-    @TableField("capaXsName")
-    private String capaXsName;
+    @ApiModelProperty("结算级别名称")
+    @TableField("levelName")
+    private String levelName;
 
     @ApiModelProperty("得奖规则")
     @TableField("rule")
