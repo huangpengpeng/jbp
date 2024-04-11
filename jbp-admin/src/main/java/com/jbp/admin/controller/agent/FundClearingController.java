@@ -148,7 +148,6 @@ public class FundClearingController {
     @PostMapping("/save")
     @ApiOperation("增加自定义佣金")
     public CommonResult save(@RequestBody @Validated FundClearingSaveRequest request) {
-
         User user = userService.getByAccount(request.getAccount());
         if (user == null) {
             throw new CrmebException("账号信息错误");
