@@ -110,5 +110,10 @@
     <select id="getNoChild" resultType="com.jbp.common.model.user.User" parameterType="Map">
         SELECT u.* FROM eb_user AS u where u.id not in(select * from ( select IFNULL(mId, pId) as p from eb_user_invitation)t where p is not null) ORDER BY u.id asc
     </select>
+    <select id="getUserPlatfromInfo" resultType="com.jbp.common.response.UserPlatformInfoResponse">
+			select  *,( select  value as platfornLogo from #{dbName}.eb_system_config  where name = 'mobile_top_logo' ) as imgUrl ,
+			(select  value as platform from #{dbName}.eb_system_config  where name = 'site_name' ) as platform ,(select  value as appId from  #{dbName}.eb_system_config  where name = 'routine_appid') as appId from #{dbName}.eb_user where phone = #{phone}
+
+    </select>
 
 </mapper>

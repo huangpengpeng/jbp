@@ -2,17 +2,13 @@ package com.jbp.front.controller;
 
 
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.RelationScore;
-import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
-import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
-
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
@@ -22,15 +18,16 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -61,6 +58,8 @@ public class UserController {
     private CapaService capaService;
     @Autowired
     private RelationScoreService relationScoreService;
+    @Autowired
+    private Environment environment;
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -157,7 +156,7 @@ public class UserController {
         if (rUser == null) {
             throw new RuntimeException("服务人账户错误");
         }
-        if(node == null || node > 1 || node < 0){
+        if (node == null || node > 1 || node < 0) {
             throw new RuntimeException("节点错误");
         }
 
@@ -174,7 +173,7 @@ public class UserController {
                 return CommonResult.success();
             }
             // 当前位置有人
-            UserRelation leftMost  = relationService.getLeftMost(userRelation.getUId());
+            UserRelation leftMost = relationService.getLeftMost(userRelation.getUId());
             if (leftMost == null) {
                 return CommonResult.success();
             }
@@ -188,8 +187,8 @@ public class UserController {
             return CommonResult.success();
         }
 
-        if(relationList.size() == 2){
-            UserRelation leftMost  = relationService.getLeftMost(userRelation.getUId());
+        if (relationList.size() == 2) {
+            UserRelation leftMost = relationService.getLeftMost(userRelation.getUId());
             if (leftMost == null) {
                 return CommonResult.success();
             }
@@ -198,8 +197,8 @@ public class UserController {
             return CommonResult.success(response);
         }
 
-        if(relationList.size() == 1){
-            UserRelation leftMost  = relationService.getLeftMost(relationList.get(0).getUId());
+        if (relationList.size() == 1) {
+            UserRelation leftMost = relationService.getLeftMost(relationList.get(0).getUId());
             if (leftMost == null) {
                 return CommonResult.success();
             }
@@ -254,8 +253,6 @@ public class UserController {
     }
 
 
-
-
     @ApiOperation(value = "获取用户的邀请关系")
     @RequestMapping(value = "/getInvite", method = RequestMethod.GET)
     public CommonResult<CommonPage<UserInviteResponse>> getInvite(@ModelAttribute @Validated UserInviteRequest request) {
@@ -286,18 +283,53 @@ public class UserController {
     }
 
 
-
     @ApiOperation(value = "账号获取用户信息")
     @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
     public CommonResult<UserInviteResponse> getAccountUser(String account) {
-        User user =  userService.getByAccount(account);
-        if(user == null){
+        User user = userService.getByAccount(account);
+        if (user == null) {
             throw new CrmebException("账号不存在");
         }
-        UserInviteResponse userInviteResponse =new UserInviteResponse();
-        BeanUtils.copyProperties(user , userInviteResponse);
+        UserInviteResponse userInviteResponse = new UserInviteResponse();
+        BeanUtils.copyProperties(user, userInviteResponse);
         return CommonResult.success(userInviteResponse);
     }
+
+
+    @ApiOperation(value = "获取平台登录账号", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/getPlatformUserInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<List<UserPlatformInfoResponse>> getPlatformUserInfo(String mobile, Long parentId, String appId, Boolean ifregister) {
+
+        String dbName = environment.getProperty("platform.dbName");
+        String[] platforms = dbName.split(",");
+        List<UserPlatformInfoResponse> userList = new ArrayList<>();
+        for (String platform : platforms) {
+
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platform);
+            if (userPlatformInfoResponse != null) {
+                userList.add(userPlatformInfoResponse);
+            }
+        }
+        //判断appid在列表中是否存在
+        Boolean ifInclude = userList.stream().anyMatch(dto -> dto.getAppId().equals(appId));
+        //判断是否邀请的用户
+        if (ifregister && !ifInclude) {
+            String wxConfig = environment.getProperty("platform.appId");
+            List<String> wxPlatforms = Arrays.asList(wxConfig.split(","));
+            List<String> platformsConfig = Arrays.asList(wxConfig.split(","));
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platformsConfig.get(wxPlatforms.indexOf(appId)));
+            userPlatformInfoResponse.setInvite(true);
+            userList.add(userPlatformInfoResponse);
+        }
+
+        if (parentId == 0 && userList.isEmpty()) {
+            throw new RuntimeException("您暂未注册平台账号，请联系您的邀请人完成注册后登录。");
+        }
+
+        return CommonResult.success(userList);
+    }
+
 
 }
 

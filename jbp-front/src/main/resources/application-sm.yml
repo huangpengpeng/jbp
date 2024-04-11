@@ -152,4 +152,7 @@ internal:
 
 gxc:
   url: https://wkp42271043176625.kkyp.vip
-  
+
+platform:
+  appId: wxd31ac9192643b903,wx225294ae84eb02f6,wx73e7a53cd7f554e6
+  dbName: wkp42271043176625,tf138940740527575,jymall

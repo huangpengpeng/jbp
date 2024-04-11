@@ -2,7 +2,9 @@ package com.jbp.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.user.User;
+import com.jbp.common.response.UserPlatformInfoResponse;
 import com.jbp.common.response.UserSpreadPeopleItemResponse;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -28,4 +30,7 @@ public interface UserDao extends BaseMapper<User> {
     List<UserSpreadPeopleItemResponse> getSpreadPeopleList(Map<String, Object> map);
 
     List<User> getNoChild();
+
+    UserPlatformInfoResponse getUserPlatfromInfo(@Param("phone")String phone, @Param("dbName")String dbName);
+
 }

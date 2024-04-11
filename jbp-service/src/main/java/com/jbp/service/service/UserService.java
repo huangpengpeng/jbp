@@ -400,4 +400,7 @@ public interface UserService extends IService<User> {
     String getPhone(String account);
 
     void validPayPwd(Integer uid, String pwd);
+
+    UserPlatformInfoResponse getUserPlatfromInfo(String dbName);
+
 }
