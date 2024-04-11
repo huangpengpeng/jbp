@@ -9,4 +9,20 @@
 		where t.tankUserId =  #{userId}
 
     </select>
+	<select id="getAdminPageList" resultType="com.jbp.common.response.TankStoreRelationAdminListResponse">
+
+		select t.id, t.tankUserId  ,u.username,t.storeUserId,u2.username as storeusername,u2.mobile ,t.createdTime from tankstorerelation t
+		left join user u on u.id = t.tankUserId
+		left join user u2 on u2.id = t.storeUserId
+		where 1=1
+
+		<if test="username != null and username !=''">
+			AND  ( u.username =  #{username} or u.id =  #{username} )
+		</if>
+		<if test="storeusername != null and storeusername !=''">
+			AND  u2.username =   #{storeusername}
+		</if>
+
+		order by t.createdTime desc
+	</select>
 </mapper>
