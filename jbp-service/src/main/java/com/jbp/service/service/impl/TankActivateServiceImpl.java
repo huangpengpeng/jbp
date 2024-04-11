@@ -13,6 +13,7 @@ import com.jbp.common.model.tank.TankEquipment;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.ActivateAdminListResponse;
 import com.jbp.common.response.ActivateInfoResponse;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.dao.TankActivateDao;
@@ -123,6 +124,15 @@ public class TankActivateServiceImpl extends ServiceImpl<TankActivateDao, TankAc
 
         Page<ActivateInfoResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ActivateInfoResponse> activateInfoResponses = dao.getactivateList(userService.getInfo().getId());
+        return CommonPage.copyPageInfo(page, activateInfoResponses);
+    }
+
+    @Override
+    public PageInfo<ActivateAdminListResponse> getadminActivateList(String username,  String name,  String status,PageParamRequest pageParamRequest) {
+        Page<ActivateAdminListResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ActivateAdminListResponse> activateInfoResponses = dao.getadminActivateList(username,name,status);
+
+
         return CommonPage.copyPageInfo(page, activateInfoResponses);
     }
 

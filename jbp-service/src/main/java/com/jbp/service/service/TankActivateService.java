@@ -5,7 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.tank.TankActivate;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.ActivateAdminListResponse;
 import com.jbp.common.response.ActivateInfoResponse;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -28,5 +30,9 @@ public interface TankActivateService extends IService<TankActivate> {
 
 
     PageInfo<ActivateInfoResponse> getactivateList(PageParamRequest pageParamRequest);
+
+
+    PageInfo<ActivateAdminListResponse> getadminActivateList(String username,  String name,  String status, PageParamRequest pageParamRequest);
+
 
 }

@@ -3,4 +3,14 @@
 <mapper namespace="com.jbp.service.dao.TankEquipmentNumberDao">
 
 
+    <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentNumberAdminListResponse">
+
+        	select  u.id ,u.username, t.number from tankequipmentnumber t
+		left join user u on u.id = t.storeUserId
+		where 1=1
+        <if test="username != null and username !=''">
+            AND  ( u.username =  #{username} or u.id =  #{username} )
+        </if>
+
+    </select>
 </mapper>

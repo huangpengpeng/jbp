@@ -10,4 +10,22 @@
 
 
     </select>
+    <select id="getAdminPageList" resultType="com.jbp.common.response.TankStoreClerkAdminListResponse">
+
+		select tc.id,t.name,t.userId, u.username , cu.username as cusername ,cu.mobile as cmobile ,tc.createdTime from tankstore t
+		left join user u on u.id = t.userId
+		left join tankstoreclerkrelation tc on tc.storeUserId = t.userId and tc.storeId = t.id
+		left join user cu on cu.id = tc.clerkUserId
+		where 1=1
+
+		<if test="username != null and username !=''">
+			AND  ( u.username =  #{username} or u.id =  #{username} )
+		</if>
+		<if test="name != null and name !=''">
+			AND  t.name = #{name}
+		</if>
+
+		order by tc.createdTime desc
+
+	</select>
 </mapper>

@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.tank.TankEquipment;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.EquipmentAdminListResponse;
 import com.jbp.common.response.EquipmentListResponse;
 import com.jbp.service.dao.TankEquipmentDao;
 import com.jbp.service.service.TankEquipmentService;
@@ -87,6 +88,16 @@ public class TankEquipmentServiceImpl extends ServiceImpl<TankEquipmentDao, Tank
     @Override
     public Integer equipmentOfflinedNumber() {
         return dao.equipmentOfflinedNumber(userService.getInfo().getId());
+    }
+
+    @Override
+    public PageInfo<EquipmentAdminListResponse> getAdminPageList(String username,String name,PageParamRequest pageParamRequest) {
+
+
+        Page<EquipmentAdminListResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<EquipmentAdminListResponse> activateInfoResponses = dao.getAdminPageList(username,name);
+
+        return CommonPage.copyPageInfo(page, activateInfoResponses);
     }
 
 }

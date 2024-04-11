@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.tank.TankEquipment;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ActivateInfoResponse;
+import com.jbp.common.response.EquipmentAdminListResponse;
 import com.jbp.common.response.EquipmentListResponse;
 
 import java.util.List;
@@ -32,4 +33,8 @@ public interface TankEquipmentService extends IService<TankEquipment> {
     Integer equipmentOnlineUnusedNumber();
 
     Integer equipmentOfflinedNumber();
+
+    PageInfo<EquipmentAdminListResponse> getAdminPageList(String username,String name, PageParamRequest pageParamRequest);
+
+
 }

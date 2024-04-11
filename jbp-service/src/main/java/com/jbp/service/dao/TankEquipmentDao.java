@@ -3,6 +3,7 @@ package com.jbp.service.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.tank.TankEquipment;
 import com.jbp.common.response.ActivateInfoResponse;
+import com.jbp.common.response.EquipmentAdminListResponse;
 import com.jbp.common.response.EquipmentListResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,4 +27,10 @@ public interface TankEquipmentDao extends BaseMapper<TankEquipment> {
     Integer equipmentOnlineUnusedNumber(Integer userId);
 
     Integer equipmentOfflinedNumber(Integer userId);
+
+
+
+    List<EquipmentAdminListResponse> getAdminPageList(@Param("username") String  username, @Param("type") String name);
+
+
 }

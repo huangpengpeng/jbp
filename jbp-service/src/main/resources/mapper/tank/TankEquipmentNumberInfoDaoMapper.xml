@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.TankEquipmentNumberInfoDao">
 
+    <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentNumberInfoAdminListResponse">
+        select u.id ,u.username,t.type,t.number,ta.operationSn,t.createdTime,t.remark from tankequipmentnumberinfo t
+		left join user u on u.id = t.storeUserId
+		left join tankactivate ta on ta.id = t.activateId
+		where 1=1 and t.storeUserId = #{id}
+		order by t.createdTime desc
+    </select>
 </mapper>

@@ -15,4 +15,21 @@
 		group by t.id
 
     </select>
+    <select id="getAdminPageList" resultType="com.jbp.common.response.TankStoreAdminListResponse">
+		select t.* , u.username from tankstore t
+		left join user u on u.id = t.userId
+		where 1=1
+
+		<if test="username != null and username !=''">
+			AND  ( u.username =  #{username} or u.id =  #{username} )
+		</if>
+		<if test="name != null and name !=''">
+			AND  t.name = #{name}
+		</if>
+
+
+		order by t.createdTime desc
+
+
+	</select>
 </mapper>

@@ -41,4 +41,26 @@
 		order by t.createdTime desc
 
 	</select>
+    <select id="getadminActivateList" resultType="com.jbp.common.response.ActivateAdminListResponse">
+
+		select  t.operationSn,te.storeId,u.username as storeusername,ts.name as storename,te.name,te.imei,u2.username ,t.createdTime,t.endTime,t.`status` from  tankactivate t
+		left join tankequipment te on te.id = t.equipmentId
+		left join tankstore ts on ts.id = te.storeId
+		left join user u on u.id = ts.userId
+		left join user u2 on u2.id = t.activateUserId
+		where 1=1
+		<if test="username != null and username !=''">
+			AND  ( u.username =  #{username} or u.id =  #{username} )
+		</if>
+
+		<if test="name != null and name !=''">
+			AND ts.name =   #{name}
+		</if>
+		<if test="status != null and status !=''">
+			AND t.`status` = #{status}
+		</if>
+
+		order by t.createdTime desc
+
+	</select>
 </mapper>

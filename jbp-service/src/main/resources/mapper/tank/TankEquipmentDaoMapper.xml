@@ -48,4 +48,46 @@
         	select  count(1) from  tankequipment t
 		where t.storeUserId =  #{userId}  and onlineStatus = 0
     </select>
+    <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentAdminListResponse">
+
+        SELECT
+		t.equipmentSn,
+		t.orderbondactivateId,
+		ta.tankUserId AS userId,
+		u.username,
+		t.storeUserId,
+		u2.username AS storeusername,
+		s.NAME AS storename,
+		t.NAME AS quipmentname,
+		t.imei,
+		t.createdTime,
+		t.type,
+		t.`status`,
+		t.activateStatus,
+		t.onlineStatus,
+		t.useStatus,
+		t.prohibitStatus,
+		t.id
+		FROM
+		tankequipment t
+		LEFT JOIN orderbondactivate o ON o.id = t.orderbondactivateId
+		LEFT JOIN USER u2 ON u2.id = t.storeUserId
+		LEFT JOIN tankstore s ON s.id = t.storeId
+		LEFT JOIN tankstorerelation ta ON ta.storeUserId = s.userId
+		LEFT JOIN USER u ON u.id = ta.tankUserId
+		WHERE
+		1 = 1
+
+        <if test="username != null and username !=''">
+            AND  ( u.username =  #{username} or u.id =  #{username} )
+        </if>
+
+
+        <if test="name != null and name !=''">
+            AND s.name =   #{name}
+        </if>
+
+		order by t.createdTime desc
+
+    </select>
 </mapper>
