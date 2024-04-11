@@ -102,7 +102,7 @@ public class TankStoreAct {
 
     @ApiOperation(value = "用户身份", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @RequestMapping(value = "/tankStore/getUserStanding", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getUserStanding", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult<String> getUserStanding() {
 
         String standing = "";
