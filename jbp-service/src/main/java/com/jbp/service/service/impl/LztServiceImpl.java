@@ -7,6 +7,7 @@ import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
@@ -304,7 +305,9 @@ public class LztServiceImpl implements LztService {
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(amt.doubleValue());
         orderInfo.setFee_amount(fee.doubleValue());
-        orderInfo.setPostscript(postscript);
+        if(ArithmeticUtils.gte(amt, BigDecimal.valueOf(49999))){
+            orderInfo.setPostscript("提现");
+        }
         params.setOrderInfo(orderInfo);
 
         // 设置付款方信息
@@ -637,6 +640,9 @@ public class LztServiceImpl implements LztService {
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+        if(ArithmeticUtils.lessEquals(new BigDecimal(amt), BigDecimal.valueOf(49999))){
+            postscript = "";
+        }
         TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose, postscript);
         orderInfo.setFee_amount(Double.valueOf(feeAmt));
         params.setOrderInfo(orderInfo);
