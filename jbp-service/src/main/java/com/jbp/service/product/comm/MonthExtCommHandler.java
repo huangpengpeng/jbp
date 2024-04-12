@@ -75,17 +75,7 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
     @Override
     public void clearing(ClearingFinal clearingFinal) {
         Long clearingId = clearingFinal.getId();
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            throw new CrmebException("当前佣金配置未开启请联系管理员");
-        }
-        if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
-            throw new CrmebException("佣金状态不是待结算不允许结算");
-        }
         List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingId);
-        if (CollectionUtils.isEmpty(clearingUsers)) {
-            throw new CrmebException("请导入结算名单");
-        }
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
         List<Order> successList = orderService.getSuccessList(startTime, endTime);

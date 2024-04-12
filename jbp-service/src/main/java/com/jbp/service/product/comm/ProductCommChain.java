@@ -5,12 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.alipay.service.schema.util.StringUtil;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.OrderConstants;
-import com.jbp.common.model.agent.ClearingFinal;
-import com.jbp.common.model.agent.FundClearing;
-import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.service.service.agent.ClearingUserService;
 import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.ProductCommConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeansException;
@@ -37,7 +38,11 @@ import java.util.stream.Collectors;
 public class ProductCommChain implements ApplicationContextAware {
 
     @Resource
+    private ClearingUserService clearingUserService;
+    @Resource
     private FundClearingService fundClearingService;
+    @Resource
+    private ProductCommConfigService productCommConfigService;
 
 
     private LinkedList<AbstractProductCommHandler> handlers = new LinkedList<>();
@@ -78,6 +83,17 @@ public class ProductCommChain implements ApplicationContextAware {
     public void clearing(ClearingFinal clearingFinal) {
         Map<Integer, AbstractProductCommHandler> handlerMap = FunctionUtil.keyValueMap(handlers, AbstractProductCommHandler::getType);
         AbstractProductCommHandler handler = handlerMap.get(clearingFinal.getCommType());
+        ProductCommConfig productCommConfig = productCommConfigService.getByType(clearingFinal.getCommType());
+        if (!productCommConfig.getIfOpen()) {
+            throw new CrmebException(clearingFinal.getCommName() + ":配置未开启请联系管理员");
+        }
+        if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
+            throw new CrmebException(clearingFinal.getName() + ":状态不是待结算不允许结算");
+        }
+        List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingFinal.getId());
+        if (CollectionUtils.isEmpty(clearingUsers)) {
+            throw new CrmebException("请导入结算名单");
+        }
         handler.clearing(clearingFinal);
     }
 
