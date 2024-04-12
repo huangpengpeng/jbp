@@ -13,12 +13,20 @@ import java.math.BigDecimal;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "eb_clearing_user", autoResultMap = true)
 @ApiModel(value="ClearingUser对象", description="结算名单")
 public class ClearingUser extends BaseModel {
+
+    public ClearingUser(Long clearingId, Integer uid, String accountNo, Long level, String levelName, String rule) {
+        this.clearingId = clearingId;
+        this.uid = uid;
+        this.accountNo = accountNo;
+        this.level = level;
+        this.levelName = levelName;
+        this.rule = rule;
+    }
 
     @ApiModelProperty("结算ID")
     @TableField("clearingId")

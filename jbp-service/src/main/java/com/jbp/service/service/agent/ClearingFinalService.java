@@ -12,5 +12,5 @@ public interface ClearingFinalService extends IService<ClearingFinal> {
     /**
      * 获取上一次结算
      */
-    ClearingFinal getLastOne(Long id);
+    ClearingFinal getLastOne(Long id, Integer commType);
 }

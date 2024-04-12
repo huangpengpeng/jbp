@@ -17,12 +17,7 @@ public interface ClearingUserService extends IService<ClearingUser> {
     /**
      * 初始化结算名单
      */
-    Boolean init(Long clearingId);
-
-    /**
-     * 查询执行进度
-     */
-    BigDecimal progress(Long clearingId);
+    Boolean create(Long clearingId);
 
     /**
      * 批量删除
@@ -37,12 +32,8 @@ public interface ClearingUserService extends IService<ClearingUser> {
     /**
      * 新增
      */
-    Boolean add(String account);
+    Boolean add(String account, Long clearingId, Long level, String levelName, BigDecimal weight);
 
-    /**
-     * 编辑
-     */
-    Boolean edit(Long id, Long capaId, Long capaXsId);
 
     List<ClearingUser> getByClearing(Long clearingId);
 

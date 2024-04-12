@@ -35,7 +35,8 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
     }
 
     @Override
-    public ClearingFinal getLastOne(Long id) {
-        return getOne(new QueryWrapper<ClearingFinal>().lambda().lt(ClearingFinal::getId, id).last(" limit 1"));
+    public ClearingFinal getLastOne(Long id, Integer commType) {
+        return getOne(new QueryWrapper<ClearingFinal>().lambda().lt(ClearingFinal::getId, id)
+                .eq(ClearingFinal::getCommType, commType).last(" limit 1"));
     }
 }
