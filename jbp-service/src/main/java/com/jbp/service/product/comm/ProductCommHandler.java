@@ -1,5 +1,6 @@
 package com.jbp.service.product.comm;
 
+import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
 
@@ -26,4 +27,5 @@ public interface ProductCommHandler {
      */
      void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList);
 
+     void clearing(ClearingFinal clearingFinal);
 }

@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,4 +23,7 @@ public class ClearingUserImportDto implements Serializable {
 
     @ApiModelProperty("级别名称")
     private String levelName;
+
+    @ApiModelProperty("权重")
+    private BigDecimal weight;
 }

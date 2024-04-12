@@ -17,13 +17,13 @@ import java.math.BigDecimal;
 public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDao, ClearingFinal> implements ClearingFinalService {
 
     @Override
-    public ClearingFinal create(String commName, String startTime, String endTime) {
+    public ClearingFinal create(String commName, Integer commType, String startTime, String endTime) {
         String name = commName + "_" + startTime + "-" + endTime;
         ClearingFinal clearingFinal = getByName(name);
         if (clearingFinal != null) {
             throw new CrmebException(commName + "结算开始-结束,时间周期已经存在请勿重复操作");
         }
-        clearingFinal = ClearingFinal.builder().name(name).commName(commName).startTime(startTime)
+        clearingFinal = ClearingFinal.builder().name(name).commName(commName).commType(commType).startTime(startTime)
                 .endTime(endTime).status(ClearingFinal.Constants.待结算.name()).totalScore(BigDecimal.ZERO).totalAmt(BigDecimal.ZERO).build();
         save(clearingFinal);
         return clearingFinal;

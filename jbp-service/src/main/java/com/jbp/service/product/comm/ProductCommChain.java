@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.alipay.service.schema.util.StringUtil;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.OrderConstants;
+import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.agent.FundClearingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,6 +70,15 @@ public class ProductCommChain implements ApplicationContextAware {
                 handler.orderSuccessCalculateAmt(order, resultList);
             }
         }
+    }
+
+    /**
+     * 奖金结算
+     */
+    public void clearing(ClearingFinal clearingFinal) {
+        Map<Integer, AbstractProductCommHandler> handlerMap = FunctionUtil.keyValueMap(handlers, AbstractProductCommHandler::getType);
+        AbstractProductCommHandler handler = handlerMap.get(clearingFinal.getCommType());
+        handler.clearing(clearingFinal);
     }
 
     /**

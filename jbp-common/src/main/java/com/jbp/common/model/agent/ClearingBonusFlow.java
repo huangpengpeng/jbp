@@ -3,7 +3,9 @@ package com.jbp.common.model.agent;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.BaseModel;
 import com.jbp.common.model.VersionModel;
+import com.jbp.common.utils.DateTimeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -23,8 +25,24 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "eb_clearing_bonus_flow", autoResultMap = true)
-@ApiModel(value="ClearingBonusFlow对象", description="业绩结算奖金明细")
-public class ClearingBonusFlow extends VersionModel {
+@ApiModel(value="ClearingBonusFlow对象", description="结算奖金明细")
+public class ClearingBonusFlow extends BaseModel {
+
+    public ClearingBonusFlow(Integer uid, String accountNo, Long level, String levelName,
+                             Long clearingId, String name, String commName,
+                             BigDecimal commAmt, String postscript, String rule) {
+        this.uid = uid;
+        this.accountNo = accountNo;
+        this.level = level;
+        this.levelName = levelName;
+        this.clearingId = clearingId;
+        this.name = name;
+        this.commName = commName;
+        this.commAmt = commAmt;
+        this.postscript = postscript;
+        this.rule = rule;
+        this.createTime = DateTimeUtils.getNow();
+    }
 
     @ApiModelProperty("得奖用户")
     @TableField("uid")
@@ -34,17 +52,21 @@ public class ClearingBonusFlow extends VersionModel {
     @TableField("accountNo")
     private String accountNo;
 
-    @ApiModelProperty("等级")
-    @TableField("capaId")
-    private Long capaId;
+    @ApiModelProperty("级别")
+    @TableField("level")
+    private Long level;
 
-    @ApiModelProperty("星级")
-    @TableField("capaXsId")
-    private Long capaXsId;
+    @ApiModelProperty("级别名称")
+    @TableField("levelName")
+    private String levelName;
 
-    @ApiModelProperty("批次号")
-    @TableField("batchNo")
-    private String batchNo;
+    @ApiModelProperty("结算ID")
+    @TableField("clearingId")
+    private Long clearingId;
+
+    @ApiModelProperty("结算名称")
+    @TableField("name")
+    private String name;
 
     @ApiModelProperty("佣金名称")
     @TableField("commName")
@@ -54,9 +76,13 @@ public class ClearingBonusFlow extends VersionModel {
     @TableField("commAmt")
     private BigDecimal commAmt;
 
-    @ApiModelProperty("描述")
-    @TableField("description")
-    private String description;
+    @ApiModelProperty("凭证")
+    @TableField("postscript")
+    private String postscript;
+
+    @ApiModelProperty("得奖规则")
+    @TableField("rule")
+    private String rule;
 
     @ApiModelProperty("创建时间")
     @TableField("createTime")

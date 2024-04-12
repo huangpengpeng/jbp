@@ -27,6 +27,10 @@ public class ClearingFinal extends BaseModel {
     @TableField("name")
     private String name;
 
+    @ApiModelProperty("佣金类型")
+    @TableField("commType")
+    private Integer commType;
+
     @ApiModelProperty("佣金名称")
     @TableField("commName")
     private String commName;
