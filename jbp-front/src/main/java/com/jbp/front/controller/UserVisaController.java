@@ -67,15 +67,14 @@ public class UserVisaController {
 
 
 	// 双生国际
-	@ApiOperation(value = "法大大创建元气舱经营公约声明-签署任务", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "法大大创建-签署任务", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@RequestMapping(value = "/createWithTemplate", method = {
 			RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public CommonResult<String> createWithTemplate(HttpServletRequest req, String realName, String idCard ,String signTemplateId,String signTaskSubject)
 			throws Exception {
 
-		signTemplateId = "1709904070308155948";
-		signTaskSubject= "元气舱经营公约声明";
+
 		Integer userId = userService.getUserId();
 		UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid,userService.getUserId()));
 		OpenApiClient openApiClient = new OpenApiClient("00001068", "NADTNIHUU0DQSENC95LGM2GGZUJSFGOM", "https://api.fadada.com/api/v5/");
