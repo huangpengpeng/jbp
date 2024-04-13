@@ -4,6 +4,7 @@ package com.jbp.common.model.agent;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.model.VersionModel;
 import com.jbp.common.utils.DateTimeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,12 +24,13 @@ import java.util.Date;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "eb_clearing_bonus", autoResultMap = true)
-@ApiModel(value="ClearingBonus对象", description="结算奖金")
-public class ClearingBonus extends BaseModel {
+@TableName(value = "eb_clearing_bonus_flow", autoResultMap = true)
+@ApiModel(value="ClearingBonusFlow对象", description="结算奖金明细")
+public class ClearingBonusFlow extends BaseModel {
 
-    public ClearingBonus(Integer uid, String accountNo, Long level, String levelName,
-                         Long clearingId, String name, String commName, String uniqueNo, BigDecimal commAmt) {
+    public ClearingBonusFlow(Integer uid, String accountNo, Long level, String levelName,
+                             Long clearingId, String name, String commName,
+                             BigDecimal commAmt, String postscript, String rule) {
         this.uid = uid;
         this.accountNo = accountNo;
         this.level = level;
@@ -36,8 +38,9 @@ public class ClearingBonus extends BaseModel {
         this.clearingId = clearingId;
         this.name = name;
         this.commName = commName;
-        this.uniqueNo = uniqueNo;
         this.commAmt = commAmt;
+        this.postscript = postscript;
+        this.rule = rule;
         this.createTime = DateTimeUtils.getNow();
     }
 
@@ -69,13 +72,17 @@ public class ClearingBonus extends BaseModel {
     @TableField("commName")
     private String commName;
 
-    @ApiModelProperty("流水单号")
-    @TableField("uniqueNo")
-    private String uniqueNo;
-
     @ApiModelProperty("佣金")
     @TableField("commAmt")
     private BigDecimal commAmt;
+
+    @ApiModelProperty("凭证")
+    @TableField("postscript")
+    private String postscript;
+
+    @ApiModelProperty("得奖规则")
+    @TableField("rule")
+    private String rule;
 
     @ApiModelProperty("创建时间")
     @TableField("createTime")

@@ -72,6 +72,7 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
 
     @Override
     public PageInfo<UserRelationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest) {
+<<<<<<< HEAD
         LambdaQueryWrapper<UserRelationFlow> lqw = new LambdaQueryWrapper<UserRelationFlow>()
                 .eq(!ObjectUtil.isNull(uid), UserRelationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserRelationFlow::getPId, pid)
@@ -108,5 +109,8 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             e.setPCapaXsName(pUserCapaXs != null ? pUserCapaXs.getCapaName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
+=======
+        z
+>>>>>>> main-py
     }
 }
