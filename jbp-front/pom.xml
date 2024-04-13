@@ -34,6 +34,11 @@
             <version>4.4.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fadada.api</groupId>
+            <artifactId>fasc-openapi-java-sdk</artifactId>
+            <version>5.4.0.0229</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.UserVisaDao">
+
+    <select id="getVisaTask" resultType="com.jbp.common.response.UserVisaResponse">
+
+
+			select * from (
+		select *,"sm" as platform from wkp42271043176625.uservisa
+		union
+		select *,"yk" as platform from jymall.uservisa
+		) as a
+		where a.taskId = #{signTaskId}
+    </select>
+</mapper>
