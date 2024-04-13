@@ -51,4 +51,7 @@ public class OrderExt extends BaseModel {
     @ApiModelProperty(value = "下单注册账号注册信息")
     @TableField(value = "order_register", typeHandler = OrderRegisterHandler.class)
     private OrderRegister orderRegister;
+
+    @ApiModelProperty(value = "服务码")
+    private String serverSn;
 }
