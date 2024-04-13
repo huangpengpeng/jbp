@@ -96,5 +96,5 @@ public interface FundClearingService extends IService<FundClearing> {
 
     boolean hasCreate(String orderNo, String commName);
 
-    BigDecimal getSendCommAmt(Integer uid, String commName, Date start, Date end);
+    BigDecimal getSendCommAmt(Integer uid, Date start, Date end, String ...commName);
 }

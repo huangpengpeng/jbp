@@ -395,16 +395,16 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public BigDecimal getSendCommAmt(Integer uid, String commName, Date start, Date end) {
+    public BigDecimal getSendCommAmt(Integer uid, Date start, Date end, String ...commName) {
         QueryWrapper<FundClearing> lw = new QueryWrapper<>();
         lw.select("SUM(comm_amt) AS send_amt ");
         lw.lambda()
                 .eq(FundClearing::getUid, uid)
-                .eq(FundClearing::getCommName, commName)
                 .eq(FundClearing::getIfRefund, false)
-                .ge(FundClearing::getCreateTime, start)
-                .le(FundClearing::getCreateTime, end)
-                .notIn(FundClearing::getStatus, Lists.newArrayList(FundClearing.Constants.已取消.toString(), FundClearing.Constants.已拦截.toString()) )
+                .ge(start != null, FundClearing::getCreateTime, start)
+                .le(end != null, FundClearing::getCreateTime, end)
+                .in(FundClearing::getCommName, commName)
+                .notIn(FundClearing::getStatus, Lists.newArrayList(FundClearing.Constants.已取消.toString(), FundClearing.Constants.已拦截.toString()))
         ;
         FundClearing one = getOne(lw);
         return one == null ? BigDecimal.ZERO : one.getSendAmt();

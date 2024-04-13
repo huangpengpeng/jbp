@@ -11,10 +11,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.Capa;
-import com.jbp.common.model.agent.RiseCondition;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaSnapshot;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -25,13 +22,15 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.dao.agent.UserCapaDao;
+import com.jbp.service.event.EventPublisherContext;
+import com.jbp.service.event.UserCapaUpdateEvent;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.CapaService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserCapaSnapshotService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -47,6 +46,7 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> implements UserCapaService {
+
 
     @Resource
     private OrderService orderService;
@@ -64,6 +64,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private AsyncUtils asyncUtils;
     @Resource
     private UserCapaDao dao;
+    @Resource
+    private EventPublisherContext eventPublisherContext;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -85,10 +87,13 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         }
         // 新增等级
         String type = "";
+        Long  orgCapaId = 0L;
+        Long  tagCapaId = capaId;
         if (userCapa == null) {
             userCapa = UserCapa.builder().uid(uid).capaId(capaId).build();
             type = UserCapaSnapshot.Constants.升级.toString();
         } else {
+            orgCapaId = userCapa.getCapaId();
             type = NumberUtil.compare(userCapa.getCapaId(), capaId) > 0 ? UserCapaSnapshot.Constants.降级.toString()
                     : UserCapaSnapshot.Constants.升级.toString();
             userCapa.setCapaId(capaId);
@@ -99,6 +104,9 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
                 .description(description).build();
         snapshotService.save(snapshot);
 
+        // 发送等级变更消息
+        UserCapaUpdateEvent event = new UserCapaUpdateEvent(new UserCapaUpdateEvent.EventDto(orgCapaId, tagCapaId, userCapa));
+        eventPublisherContext.publishEvent(event);
         return getByUser(uid);
     }
 

@@ -5,6 +5,7 @@ import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserInvitationJumpService;
 import com.jbp.service.service.agent.UserInvitationService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,8 @@ public class CapaInviteOneLevelHandler implements ConditionHandler {
 
     @Resource
     private UserCapaService userCapaService;
+    @Resource
+    private UserInvitationJumpService invitationJumpService;
     @Resource
     private UserInvitationService userInvitationService;
 
@@ -58,7 +61,9 @@ public class CapaInviteOneLevelHandler implements ConditionHandler {
         for (UserInvitation userInvitation : nextList) {
             UserCapa userCapa = userCapaService.getByUser(userInvitation.getUId());
             if (userCapa != null && userCapa.getCapaId().compareTo(rule.getCapaId()) >= 0) {
-                num++;
+                if(!invitationJumpService.ifJump(userInvitation.getUId())){
+                    num++;
+                }
             }
             if (num >= rule.getNum()) {
                 return true;
