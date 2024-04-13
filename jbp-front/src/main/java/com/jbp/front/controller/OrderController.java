@@ -1,5 +1,8 @@
 package com.jbp.front.controller;
 
+import com.beust.jcommander.internal.Lists;
+import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
@@ -9,18 +12,26 @@ import com.jbp.common.utils.IPUtil;
 import com.jbp.common.vo.DeclUserInfoResultVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.front.service.FrontOrderService;
+import com.jbp.service.service.OrderExtService;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * H5端订单操作
@@ -44,6 +55,11 @@ public class OrderController {
     private FrontOrderService orderService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private OrderService service;
+    @Autowired
+    private OrderExtService orderExtService;
+
 
     @ApiOperation(value = "预下单")
     @RequestMapping(value = "/pre/order", method = RequestMethod.POST)
@@ -147,4 +163,20 @@ public class OrderController {
     public CommonResult<List<HashMap<String, Object>>> getOrderStatusImage() {
         return CommonResult.success(orderService.getOrderStatusImage());
     }
+
+
+
+    @ApiOperation(value = "查看订单服务码", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/goodsRepGet", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<OrderExt> goodsRepGet(String orderSn, ModelMap model) {
+        ;
+        if (StringUtils.isBlank(orderSn)) {
+            throw new RuntimeException("参数异常");
+        }
+        OrderExt orderExt = orderExtService.getByOrder(orderSn);
+        return CommonResult.success(orderExt);
+    }
+
+
 }
