@@ -14,7 +14,6 @@ import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.*;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -164,8 +162,14 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
         // 更新结算信息
         clearingFinal.setTotalScore(totalScore);
         clearingFinal.setTotalAmt(totalFee);
-        clearingFinal.setStatus(ClearingFinal.Constants.已结算.name());
+        clearingFinal.setStatus(ClearingFinal.Constants.待出款.name());
         clearingFinalService.updateById(clearingFinal);
+    }
+
+    @Override
+    public void del4Clearing(ClearingFinal clearingFinal) {
+        clearingBonusService.del4Clearing(clearingFinal.getId());
+        clearingBonusFlowService.del4Clearing(clearingFinal.getId());
     }
 }
 

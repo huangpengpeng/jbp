@@ -28,4 +28,6 @@ public interface ProductCommHandler {
      void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList);
 
      void clearing(ClearingFinal clearingFinal);
+
+     void del4Clearing(ClearingFinal clearingFinal);
 }

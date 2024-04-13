@@ -97,6 +97,12 @@ public class ProductCommChain implements ApplicationContextAware {
         handler.clearing(clearingFinal);
     }
 
+    public void del4Clearing(ClearingFinal clearingFinal) {
+        Map<Integer, AbstractProductCommHandler> handlerMap = FunctionUtil.keyValueMap(handlers, AbstractProductCommHandler::getType);
+        AbstractProductCommHandler handler = handlerMap.get(clearingFinal.getCommType());
+        handler.clearing(clearingFinal);
+    }
+
     /**
      * 订单退款拦截佣金
      */

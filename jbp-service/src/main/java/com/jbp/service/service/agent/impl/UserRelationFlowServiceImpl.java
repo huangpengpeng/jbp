@@ -75,43 +75,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
 
     @Override
     public PageInfo<UserRelationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<UserRelationFlow> lqw = new LambdaQueryWrapper<UserRelationFlow>()
-                .eq(!ObjectUtil.isNull(uid), UserRelationFlow::getUId, uid)
-                .eq(!ObjectUtil.isNull(pid), UserRelationFlow::getPId, pid)
-                .eq(!ObjectUtil.isNull(level), UserRelationFlow::getLevel, level)
-                .orderByDesc(UserRelationFlow::getId)
-                .orderByAsc(UserRelationFlow::getNode);
-        Page<UserRelationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<UserRelationFlow> list = list(lqw);
-        if (CollectionUtils.isEmpty(list)) {
-            return CommonPage.copyPageInfo(page, list);
-        }
-        List<Integer> uIdList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
-        List<Integer> pIdList = list.stream().map(UserRelationFlow::getPId).collect(Collectors.toList());
-        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
-        //等级
-        Map<Integer, UserCapa> capaUidMapList = userCapaService.getUidMap(uIdList);
-        Map<Integer, UserCapa> capaPidMapList = userCapaService.getUidMap(pIdList);
-        //星级
-        Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
-        Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
-        list.forEach(e -> {
-            User uUser = uidMapList.get(e.getUId());
-            e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            e.setUNickName(uUser != null ? uUser.getNickname() : "");
-            UserCapa uUserCapa = capaUidMapList.get(e.getUId());
-            e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
-            UserCapa pUserCapa = capaPidMapList.get(e.getPId());
-            e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
-            User pUser = pidMapList.get(e.getPId());
-            e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setPNickName(pUser != null ? pUser.getNickname() : "");
-            UserCapaXs uUserCapaXs = capaXsUidMapList.get(e.getUId());
-            e.setUCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
-            UserCapaXs pUserCapaXs = capaXsPidMapList.get(e.getPId());
-            e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
-        });
-        return CommonPage.copyPageInfo(page, list);
+        z
     }
 }

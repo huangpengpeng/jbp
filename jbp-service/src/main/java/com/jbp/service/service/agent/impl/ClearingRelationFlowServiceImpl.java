@@ -1,23 +1,24 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ClearingFinal;
-import com.jbp.common.model.agent.ClearingRelationFlow;
-import com.jbp.common.model.agent.ClearingUser;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingRelationFlowDao;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.ClearingFinalService;
-import com.jbp.service.service.agent.ClearingRelationFlowService;
-import com.jbp.service.service.agent.ClearingUserService;
-import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,17 @@ import javax.annotation.Resource;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<ClearingRelationFlowDao, ClearingRelationFlow> implements ClearingRelationFlowService {
 
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
     @Resource
     private ClearingFinalService clearingFinalService;
     @Resource
@@ -103,5 +109,33 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
     public List<ClearingRelationFlow> getByPUser(Integer pid) {
         return list(new QueryWrapper<ClearingRelationFlow>().lambda().eq(ClearingRelationFlow::getPId, pid)
                 .orderByAsc(ClearingRelationFlow::getLevel));
+    }
+
+    @Override
+    public PageInfo<ClearingRelationFlow> pageList(Integer uid, Integer pid, Long clearingId, Integer level, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<ClearingRelationFlow> lqw = new LambdaQueryWrapper<ClearingRelationFlow>()
+                .eq(!ObjectUtil.isNull(uid), ClearingRelationFlow::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), ClearingRelationFlow::getPId, pid)
+                .eq(!ObjectUtil.isNull(clearingId), ClearingRelationFlow::getClearingId, clearingId)
+                .eq(!ObjectUtil.isNull(level), ClearingRelationFlow::getLevel, level)
+                .orderByDesc(ClearingRelationFlow::getId)
+                .orderByAsc(ClearingRelationFlow::getNode);
+        Page<UserRelationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ClearingRelationFlow> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(ClearingRelationFlow::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Integer> pIdList = list.stream().map(ClearingRelationFlow::getPId).collect(Collectors.toList());
+        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        list.forEach(e -> {
+            User uUser = uidMapList.get(e.getUId());
+            e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            User pUser = pidMapList.get(e.getPId());
+            e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            e.setPNickName(pUser != null ? pUser.getNickname() : "");
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 }

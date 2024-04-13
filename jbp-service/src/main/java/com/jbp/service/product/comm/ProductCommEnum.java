@@ -1,6 +1,10 @@
 package com.jbp.service.product.comm;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public enum ProductCommEnum {
@@ -67,5 +71,13 @@ public enum ProductCommEnum {
             }
         }
         return null;
+    }
+
+    public static List<ProductCommEnum> getByNames(String... names ) {
+        List<ProductCommEnum> list = Lists.newArrayList();
+        for (String name : names) {
+            list.add(ProductCommEnum.valueOf(name));
+        }
+        return list;
     }
 }

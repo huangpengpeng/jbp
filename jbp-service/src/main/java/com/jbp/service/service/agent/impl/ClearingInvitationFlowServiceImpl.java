@@ -1,24 +1,27 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ClearingFinal;
-import com.jbp.common.model.agent.ClearingInvitationFlow;
-import com.jbp.common.model.agent.ClearingRelationFlow;
-import com.jbp.common.model.agent.ClearingUser;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingInvitationFlowDao;
+import com.jbp.service.dao.agent.UserInvitationFlowDao;
 import com.jbp.service.product.comm.ProductCommEnum;
+import com.jbp.service.service.TeamService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.ClearingFinalService;
-import com.jbp.service.service.agent.ClearingInvitationFlowService;
-import com.jbp.service.service.agent.ClearingUserService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -44,6 +48,10 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     private UserService userService;
     @Resource
     private ClearingInvitationFlowDao clearingInvitationFlowDao;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
 
     @Override
     public Boolean create(Long clearingId) {
@@ -106,5 +114,35 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     public List<ClearingInvitationFlow> getByPUser(Integer pid) {
         return list(new QueryWrapper<ClearingInvitationFlow>().lambda().eq(ClearingInvitationFlow::getPId, pid)
                 .orderByAsc(ClearingInvitationFlow::getLevel));
+    }
+
+    @Override
+    public PageInfo<ClearingInvitationFlow> pageList(Integer uid, Integer pid, Integer level, Long clearingId, PageParamRequest pageParamRequest) {
+        LambdaQueryWrapper<ClearingInvitationFlow> lqw = new LambdaQueryWrapper<ClearingInvitationFlow>()
+                .eq(!ObjectUtil.isNull(uid), ClearingInvitationFlow::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), ClearingInvitationFlow::getPId, pid)
+                .eq(!ObjectUtil.isNull(level), ClearingInvitationFlow::getLevel, level)
+                .eq(!ObjectUtil.isNull(clearingId), ClearingInvitationFlow::getClearingId, clearingId)
+                .orderByDesc(ClearingInvitationFlow::getId);
+        Page<ClearingInvitationFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ClearingInvitationFlow> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(ClearingInvitationFlow::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Integer> pIdList = list.stream().map(ClearingInvitationFlow::getPId).collect(Collectors.toList());
+        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+
+        list.forEach(e -> {
+            User uUser = uidMapList.get(e.getUId());
+            e.setUAccount(uUser != null ? uUser.getAccount() : "");
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
+            User pUser = pidMapList.get(e.getPId());
+            e.setPAccount(pUser != null ? pUser.getAccount() : "");
+            e.setUNickName(pUser != null ? pUser.getNickname() : "");
+
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 }

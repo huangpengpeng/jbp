@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @ApiModel(value="ClearingFinal对象", description="结算信息")
 public class ClearingFinal extends BaseModel {
     public static enum Constants {
-        待结算, 已结算, 已出款
+        待结算, 待出款, 已出款
     }
 
     @ApiModelProperty("结算名称")
@@ -54,4 +54,8 @@ public class ClearingFinal extends BaseModel {
     @ApiModelProperty("结算状态 待审核  已审核")
     @TableField("status")
     private String status;
+
+    @ApiModelProperty("结算日志")
+    @TableField("logs")
+    private String logs;
 }

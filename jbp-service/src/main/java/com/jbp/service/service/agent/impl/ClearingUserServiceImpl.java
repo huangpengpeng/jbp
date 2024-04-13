@@ -1,21 +1,26 @@
 package com.jbp.service.service.agent.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.ClearingUserImportDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ClearingFinal;
-import com.jbp.common.model.agent.ClearingUser;
-import com.jbp.common.model.agent.ProductComm;
-import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ClearingPreUserRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingUserDao;
 import com.jbp.service.product.comm.MonthPyCommHandler;
 import com.jbp.service.product.comm.ProductCommEnum;
@@ -75,13 +80,16 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         if (clearingFinal.getCommName().equals(ProductCommEnum.培育佣金.getName())) {
             throw new CrmebException("暂不支持名单导入请初始化结算名单");
         }
-
         if (clearingFinal == null || !clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
             throw new CrmebException("名单只能在待结算状态下导入");
         }
         if (CollectionUtils.isEmpty(list)) {
             throw new CrmebException("名单不能为空");
         }
+        // 导入名单结算不需要预设
+        delPerUser();
+        // 培育佣金规则
+        Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
         // 批量插入用户
         List<ClearingUser> insetBatchList = Lists.newArrayList();
         Map<String, ClearingUserImportDto> userMap = Maps.newConcurrentMap();
@@ -96,19 +104,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             if (user == null) {
                 throw new CrmebException(dto.getAccount() + "账号不存在");
             }
-            ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(1L).levelName("默认").build();
-            if (clearingFinal.getCommName().equals(ProductCommEnum.拓展佣金.getName())) {
-                if (dto.getWeight() == null || ArithmeticUtils.lessEquals(dto.getWeight(), BigDecimal.ZERO)) {
-                    throw new CrmebException(dto.getAccount() + ProductCommEnum.拓展佣金.getName() + "权重不能为空");
-                }
-                JSONObject rule = new JSONObject();
-                rule.put("weight", dto.getWeight());
-                clearingUser.setRule(rule.toJSONString());
-            }
-            // todo 其他佣金如果导入名单可以根据级别配置系统规则保存  ProductCommConfig 规则进行系统配置
-            insetBatchList.add(clearingUser);
+            importUserSet(user.getId(), clearingFinal.getId(), clearingFinal.getCommType(), dto, insetBatchList, ruleMap);
         }
-
         List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
         for (List<ClearingUser> clearingUsers : partition) {
             clearingUserDao.insertBatch(clearingUsers);
@@ -116,34 +113,111 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         return true;
     }
 
+
+    @Override
+    public Boolean preImportUser(ClearingPreUserRequest request) {
+        if (request.getCommType() == null || StringUtils.isEmpty(request.getCommName())) {
+            throw new CrmebException("佣金信息不能为空");
+        }
+        List<ClearingUserImportDto> list = request.getUserList();
+        if (CollectionUtils.isEmpty(list)) {
+            throw new CrmebException("名单不能为空");
+        }
+        // 删除历史的预设名单
+        delPerUser();
+        // 培育佣金规则
+        Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
+        // 批量插入用户
+        List<ClearingUser> insetBatchList = Lists.newArrayList();
+        Map<String, ClearingUserImportDto> userMap = Maps.newConcurrentMap();
+        for (ClearingUserImportDto dto : list) {
+            if (StringUtils.isAnyEmpty(dto.getAccount(), dto.getLevelName()) || dto.getLevel() == null) {
+                throw new CrmebException("表格不能有空格");
+            }
+            if (userMap.get(dto.getAccount()) != null) {
+                throw new CrmebException(dto.getAccount() + "重复");
+            }
+            User user = userService.getByAccount(dto.getAccount());
+            if (user == null) {
+                throw new CrmebException(dto.getAccount() + "账号不存在");
+            }
+            // 设置导入用户信息
+            importUserSet(user.getId(), -1L, request.getCommType(), dto, insetBatchList, ruleMap);
+        }
+        List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
+        for (List<ClearingUser> clearingUsers : partition) {
+            clearingUserDao.insertBatch(clearingUsers);
+        }
+        return true;
+    }
+
+
     @Override
     public Boolean create(Long clearingId) {
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
         if (clearingFinal == null || !clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
             throw new CrmebException("结算状态不是待结算不允许生成名单");
         }
-
         // 获取上一次的名单
         ClearingFinal lastOne = clearingFinalService.getLastOne(clearingId, clearingFinal.getCommType());
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
-        if (clearingFinal.getCommName().equals(ProductCommEnum.拓展佣金.getName())) {
-            if (lastOne == null) {
-                throw new CrmebException("拓展佣金首次结算请导入名单");
-            }
-            List<ClearingUser> clearingUsers = getByClearing(clearingId);
-            if (CollectionUtils.isEmpty(clearingUsers)) {
-                throw new CrmebException("历史结算名单为空请重新导入结算名单");
-            }
-            List<ClearingUser> insertBatchList = Lists.newArrayList();
-            for (ClearingUser clearingUser : clearingUsers) {
-                ClearingUser newUser = new ClearingUser();
-                BeanUtils.copyProperties(clearingUser, newUser, "id", "clearingId");
-                newUser.setClearingId(clearingId);
-                insertBatchList.add(newUser);
-            }
-            clearingUserDao.insertBatch(insertBatchList);
-        }
+        // 获取预设名单
+        List<ClearingUser> perUserList = getPerUserList();
+        Map<Integer, ClearingUser> perMap = FunctionUtil.keyValueMap(perUserList, ClearingUser::getUid);
+        // 扩展结算名单
+        createKuoZhanUser(clearingId, clearingFinal, lastOne, perMap);
+        // 培育结算名单
+        createPeiYuUser(clearingId, clearingFinal, startTime, endTime, perMap);
+        // 删除预设名单
+        delPerUser();
+        return true;
+    }
+
+
+    @Override
+    public Boolean del4Clearing(Long clearingId) {
+        QueryWrapper<ClearingUser> w = new QueryWrapper<>();
+        w.lambda().eq(ClearingUser::getClearingId, clearingId);
+        return remove(w);
+    }
+
+    @Override
+    public Boolean delPerUser() {
+        QueryWrapper<ClearingUser> w = new QueryWrapper<>();
+        w.lambda().eq(ClearingUser::getClearingId, -1L);
+        return remove(w);
+    }
+
+    @Override
+    public List<ClearingUser> getPerUserList() {
+        QueryWrapper<ClearingUser> w = new QueryWrapper<>();
+        w.lambda().eq(ClearingUser::getClearingId, -1L);
+        return list(w);
+    }
+
+    @Override
+    public Boolean del(Long id) {
+        return removeById(id);
+    }
+
+    @Override
+    public List<ClearingUser> getByClearing(Long clearingId) {
+        return list(new QueryWrapper<ClearingUser>().lambda().eq(ClearingUser::getClearingId, clearingId));
+    }
+
+    @Override
+    public PageInfo<ClearingUser> pageList(Integer uid, String account, Long clearingId, PageParamRequest pageParamRequest) {
+        Page<ClearingUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<ClearingUser> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(clearingId != null, ClearingUser::getClearingId, clearingId);
+        lqw.eq(uid != null, ClearingUser::getUid, uid);
+        lqw.eq(StringUtils.isNotEmpty(account), ClearingUser::getAccountNo, account);
+        lqw.orderByDesc(ClearingUser::getId);
+        return CommonPage.copyPageInfo(page, list(lqw));
+    }
+
+    private void createPeiYuUser(Long clearingId, ClearingFinal clearingFinal, Date startTime, Date endTime, Map<Integer, ClearingUser> perMap) {
         if (clearingFinal.getCommName().equals(ProductCommEnum.培育佣金.getName())) {
             // 查询购买成功的订单里面包含培育商品计算出每个用户购买金额汇总
             List<Order> successList = orderService.getSuccessList(startTime, endTime);
@@ -173,7 +247,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             // 遍历业绩
             userPayMap.forEach((k, v) -> {
                 UserCapa userCapa = userCapaService.getByUser(k);
-                if (userCapa != null) {
+                ClearingUser perUser = perMap.get(k);
+                if (perUser == null && userCapa != null) {
                     Long level = 0L;
                     for (MonthPyCommHandler.Rule rule : ruleList) {
                         if (NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) >= 0 && ArithmeticUtils.gte(v, rule.getPayPrice())) {
@@ -191,62 +266,92 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     }
                 }
             });
+
+            if(!perMap.isEmpty()) {
+                perMap.forEach((uid, perUser) -> {
+                    try {
+                        JSONObject rule = JSONObject.parseObject(perUser.getRule());
+                        if (rule == null) {
+                            throw new RuntimeException("预设名单不是当前佣金结算，请清空再次结算");
+                        }
+                        rule.toJavaObject(MonthPyCommHandler.Rule.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                    ClearingUser newUser = new ClearingUser();
+                    BeanUtils.copyProperties(perUser, newUser, "id", "clearingId");
+                    newUser.setClearingId(clearingId);
+                    clearingUserList.add(newUser);
+                });
+            }
             clearingUserDao.insertBatch(clearingUserList);
         }
-        return true;
     }
 
-    @Override
-    public Boolean del4Clearing(Long clearingId) {
-        QueryWrapper<ClearingUser> w = new QueryWrapper<>();
-        w.lambda().eq(ClearingUser::getClearingId, clearingId);
-        return remove(w);
-    }
-
-    @Override
-    public Boolean del(Long id) {
-        return removeById(id);
-    }
-
-    @Override
-    public Boolean add(String account, Long clearingId, Long level, String levelName, BigDecimal weight) {
-        ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
-        String ruleStr = "";
-        if (clearingFinal.getCommType().intValue() == ProductCommEnum.拓展佣金.getType()) {
-            if (weight == null || ArithmeticUtils.lessEquals(weight, BigDecimal.ZERO)) {
-                throw new CrmebException("扩展佣金权重必须大于0");
+    private void createKuoZhanUser(Long clearingId, ClearingFinal clearingFinal, ClearingFinal lastOne, Map<Integer, ClearingUser> perMap) {
+        if (clearingFinal.getCommName().equals(ProductCommEnum.拓展佣金.getName())) {
+            if (lastOne == null) {
+                throw new CrmebException("拓展佣金首次结算请导入名单");
             }
-            level = 1L;
-            levelName = "默认";
+            List<ClearingUser> clearingUsers = getByClearing(lastOne.getId());
+            if (CollectionUtils.isEmpty(clearingUsers)) {
+                throw new CrmebException("历史结算名单为空请重新导入结算名单");
+            }
+            List<ClearingUser> insertBatchList = Lists.newArrayList();
+
+            for (ClearingUser clearingUser : clearingUsers) {
+                ClearingUser perUser = perMap.get(clearingUser.getUid());
+                if(perUser == null){
+                    ClearingUser newUser = new ClearingUser();
+                    BeanUtils.copyProperties(clearingUser, newUser, "id", "clearingId");
+                    newUser.setClearingId(clearingId);
+                    insertBatchList.add(newUser);
+                }
+            }
+
+            if(!perMap.isEmpty()) {
+                perMap.forEach((uid, perUser) -> {
+                    try {
+                        JSONObject rule = JSONObject.parseObject(perUser.getRule());
+                        if (!rule.containsKey("weight") || rule.getBigDecimal("weight") == null || ArithmeticUtils.lessEquals(rule.getBigDecimal("weight"), BigDecimal.ZERO)) {
+                            throw new RuntimeException("预设名单不是当前佣金结算，请清空再次结算");
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                    ClearingUser newUser = new ClearingUser();
+                    BeanUtils.copyProperties(perUser, newUser, "id", "clearingId");
+                    newUser.setClearingId(clearingId);
+                    insertBatchList.add(newUser);
+                });
+            }
+            clearingUserDao.insertBatch(insertBatchList);
+        }
+    }
+
+    private static void importUserSet(Integer uid, Long clearingId, Integer commType, ClearingUserImportDto dto,
+                                      List<ClearingUser> insetBatchList, Map<Long, MonthPyCommHandler.Rule> ruleMap) {
+        if (commType.equals(ProductCommEnum.拓展佣金.getType())) {
+            ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(uid).level(1L).levelName("默认").build();
+            if (dto.getWeight() == null || ArithmeticUtils.lessEquals(dto.getWeight(), BigDecimal.ZERO)) {
+                throw new CrmebException(dto.getAccount() + ProductCommEnum.拓展佣金.getName() + "权重不能为空");
+            }
             JSONObject rule = new JSONObject();
-            rule.put("weight", weight);
-            ruleStr = rule.toJSONString();
+            rule.put("weight", dto.getWeight());
+            clearingUser.setRule(rule.toJSONString());
+            insetBatchList.add(clearingUser);
         }
-        if (clearingFinal.getCommType().intValue() == ProductCommEnum.拓展佣金.getType()) {
-            if (level == null || StringUtils.isEmpty(levelName)) {
-                throw new CrmebException("结算级别不能为空");
+        if (commType.equals(ProductCommEnum.培育佣金.getType())) {
+            if (ruleMap == null || ruleMap.isEmpty()) {
+                throw new CrmebException("请联系管理员设置培育佣金结算级别规则");
             }
-            Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
-            if (ruleMap.get(level) == null) {
-                throw new CrmebException("结算级别不存在");
+            ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(uid).level(dto.getLevel()).levelName(dto.getLevelName()).build();
+            MonthPyCommHandler.Rule rule = ruleMap.get(dto.getLevel());
+            if (rule == null) {
+                throw new CrmebException("培育佣金结算级编号不存在");
             }
-            ruleStr = JSONObject.toJSONString(ruleMap.get(level));
+            clearingUser.setRule(JSONObject.toJSONString(rule));
+            insetBatchList.add(clearingUser);
         }
-        User user = userService.getByAccount(account);
-        if (user == null) {
-            throw new CrmebException("账户不存在");
-        }
-        ClearingUser clearingUser = new ClearingUser(clearingId, user.getId(), user.getAccount(),
-                level, levelName, ruleStr);
-
-        //  删除历史
-        remove(new QueryWrapper<ClearingUser>().lambda().eq(ClearingUser::getClearingId, clearingId).eq(ClearingUser::getUid, user.getId()));
-        save(clearingUser);
-        return true;
-    }
-
-    @Override
-    public List<ClearingUser> getByClearing(Long clearingId) {
-        return list(new QueryWrapper<ClearingUser>().lambda().eq(ClearingUser::getClearingId, clearingId));
     }
 }

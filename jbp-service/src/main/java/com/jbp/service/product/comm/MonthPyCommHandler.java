@@ -2,7 +2,6 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPatch;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -292,10 +291,15 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
         // 更新结算信息
         clearingFinal.setTotalScore(totalScore);
         clearingFinal.setTotalAmt(totalFee);
-        clearingFinal.setStatus(ClearingFinal.Constants.已结算.name());
+        clearingFinal.setStatus(ClearingFinal.Constants.待出款.name());
         clearingFinalService.updateById(clearingFinal);
     }
 
+    @Override
+    public void del4Clearing(ClearingFinal clearingFinal) {
+        clearingBonusService.del4Clearing(clearingFinal.getId());
+        clearingBonusFlowService.del4Clearing(clearingFinal.getId());
+    }
 
     @Data
     @NoArgsConstructor

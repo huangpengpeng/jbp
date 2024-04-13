@@ -30,4 +30,9 @@ public abstract class AbstractProductCommHandler implements ProductCommHandler {
     public void clearing(ClearingFinal clearingFinal) {
 
     }
+
+    @Override
+    public void del4Clearing(ClearingFinal clearingFinal) {
+
+    }
 }

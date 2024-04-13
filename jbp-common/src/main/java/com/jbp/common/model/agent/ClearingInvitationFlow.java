@@ -55,20 +55,4 @@ public class ClearingInvitationFlow extends BaseModel {
     @ApiModelProperty("上级用户昵称")
     @TableField(exist = false)
     private String pNickName;
-
-    @ApiModelProperty("等级ID")
-    @TableField(exist = false)
-    private String uCapaName;
-
-    @ApiModelProperty("星级ID")
-    @TableField(exist = false)
-    private String uCapaXsName;
-
-    @ApiModelProperty("上级等级")
-    @TableField(exist = false)
-    private String pCapaName;
-
-    @ApiModelProperty("上级星级")
-    @TableField(exist = false)
-    private String pCapaXsName;
 }

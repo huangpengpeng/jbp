@@ -4,9 +4,7 @@ package com.jbp.common.model.agent;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
-import com.jbp.common.model.VersionModel;
 import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.utils.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -40,13 +38,7 @@ public class ClearingBonus extends BaseModel {
         this.commName = commName;
         this.uniqueNo = uniqueNo;
         this.commAmt = commAmt;
-        this.status = Constants.待出款.name();
         this.createTime = DateTimeUtils.getNow();
-
-    }
-
-    public static enum Constants {
-        待出款, 已出款, 已取消
     }
 
     @ApiModelProperty("得奖用户")
@@ -85,19 +77,7 @@ public class ClearingBonus extends BaseModel {
     @TableField("commAmt")
     private BigDecimal commAmt;
 
-    @ApiModelProperty("结算状态 已结算  已出款")
-    @TableField("status")
-    private String status;
-
-    @ApiModelProperty("备注")
-    @TableField("remark")
-    private String remark;
-
     @ApiModelProperty("创建时间")
     @TableField("createTime")
     private Date createTime;
-
-    @ApiModelProperty("结算时间")
-    @TableField("clearTime")
-    private Date clearTime;
 }
