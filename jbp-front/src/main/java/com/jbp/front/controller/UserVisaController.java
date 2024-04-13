@@ -52,12 +52,29 @@ public class UserVisaController {
 
 
 
+
+	@ApiOperation(value = "增加用户签署法大大", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@RequestMapping(value = "/save", produces = MediaType.APPLICATION_JSON_VALUE)
+	public CommonResult sava(String phone,String contract) {
+
+		UserVisa userVisa  =new UserVisa();
+		userVisa.setContract(contract);
+		userVisa.setUid(userService.getUserId());
+		userVisa.setPhone(phone);
+		userVisa.setVisa(false);
+		userVisaService.save(userVisa);
+		return CommonResult.success();
+	}
+
+
+
 	@ApiOperation(value = "获取用户是否签署法大大", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@RequestMapping(value = "/getUserVisa", produces = MediaType.APPLICATION_JSON_VALUE)
-	public CommonResult<Boolean> getUserVisa(ModelMap model) {
+	public CommonResult<Boolean> getUserVisa(String contract) {
 
-		UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid,userService.getUserId()));
+		UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid,userService.getUserId()).eq(UserVisa::getContract,contract));
 		if(userVisa == null ){
 			return CommonResult.success(true);
 		}
@@ -187,8 +204,8 @@ public class UserVisaController {
 
 	@ApiOperation(value = "法大大回调", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	@RequestMapping(value = "/user/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
-	public CommonResult<String>  getUserVisa(String bizContent) {
+	@RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
+	public CommonResult<String>  userVisaCallback(String bizContent) {
 
 		if(bizContent == null){
 			  return CommonResult.success("SUCCESS");

@@ -34,7 +34,8 @@ public class UserVisa extends BaseModel {
 
     @ApiModelProperty(value = "法大大id")
     private String taskId;
-
+    @ApiModelProperty(value = "手机号")
+    private String phone;
 
 
 }
