@@ -91,4 +91,9 @@ public class OrderFrontDataResponse implements Serializable {
     @ApiModelProperty(value = "支付方式: -1 统一支付 0 在线支付 1 积分支付")
     private Integer payGateway;
 
+    @ApiModelProperty(value = "服务码")
+    private String serverSn;
+
+
+
 }

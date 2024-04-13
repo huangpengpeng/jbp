@@ -1448,6 +1448,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 infoResponse.setCancelTime(cancelTime.getTime());
             }
 
+            OrderExt orderExt =  orderExtService.getByOrder(order.getOrderNo());
+            infoResponse.setServerSn(orderExt.getServerSn());
             infoResponse.setPayGateway(order.getPayGateway());
             responseList.add(infoResponse);
         }
