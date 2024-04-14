@@ -93,8 +93,9 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         }
         Wallet wallet = getByUser(uid, type);
         if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), amt)) {
-            User user = userService.getById(wallet.getUId());
-            throw new CrmebException(user.getAccount() + "用户余额不足" + "应减少:" + amt + "可用:" + wallet.getBalance());
+            User user = userService.getById(uid);
+            BigDecimal balance = wallet == null ? BigDecimal.ZERO : wallet.getBalance();
+            throw new CrmebException(user.getAccount() + "用户余额不足" + "应减少:" + amt + "可用:" + balance);
         }
         BigDecimal orgBalance = wallet.getBalance();
         wallet.setBalance(wallet.getBalance().subtract(amt));
