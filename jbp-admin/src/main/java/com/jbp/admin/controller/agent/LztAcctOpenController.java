@@ -36,13 +36,6 @@ public class LztAcctOpenController {
         return CommonResult.success(lztAcctOpen);
     }
 
-    @ApiOperation(value = "来账通账户刷新")
-    @GetMapping(value = "/refresh")
-    public CommonResult refresh(String accpTxno) {
-        lztAcctOpenService.refresh(accpTxno);
-        return CommonResult.success();
-    }
-
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:page')")
     @ApiOperation(value = "开户记录列表")
     @GetMapping(value = "/page")
