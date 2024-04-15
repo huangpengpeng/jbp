@@ -400,4 +400,10 @@ public interface UserService extends IService<User> {
     String getPhone(String account);
 
     void validPayPwd(Integer uid, String pwd);
+
+    User register(String username, String phone, String account, Boolean ifOpenShop);
+
+    Boolean importUser(List<UserImportRequest> list);
+
+
 }

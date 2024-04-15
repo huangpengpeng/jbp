@@ -10,7 +10,6 @@ import com.jbp.common.response.UserAdminDetailResponse;
 import com.jbp.common.response.UserResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
-import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 平台端用户控制器
@@ -122,6 +123,15 @@ public class PlatformUserController {
         userService.updateUser(request.getId(), request.getPwd(), request.getSex(), request.getNickname(), request.getPhone(), request.getCountry(), request.getProvince(), request.getCity(), request.getDistrict(), request.getAddress(), request.getPayPwd(),request.getOpenShop());
         return CommonResult.success();
     }
+
+    @PreAuthorize("hasAuthority('platform:user:import:user')")
+    @PostMapping("/import")
+    @ApiOperation("用户导入")
+    public CommonResult importUser(@RequestBody @Validated List<UserImportRequest> request) {
+        userService.importUser(request);
+        return CommonResult.success();
+    }
+
 }
 
 

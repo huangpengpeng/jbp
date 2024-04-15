@@ -16,6 +16,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -48,6 +49,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -135,6 +138,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private UserService userService;
     @Resource
     private WalletConfigService walletConfigService;
+    @Resource
+    private RelationScoreService relationScoreService;
+    @Resource
+    private PlatformWalletService platformWalletService;
 
 
     /**
@@ -928,6 +935,183 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             wrapper.apply(StrUtil.format(" now_money - {} >= 0", price));
         }
         return update(wrapper);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Override
+    public User register(String username, String phone, String account, Boolean ifOpenShop) {
+        User user = new User();
+        user.setAccount(account);
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
+            throw new CrmebException("手机号重复");
+        }
+        user.setPhone(phone);
+        user.setOpenShop(ifOpenShop);
+        user.setRegisterType(UserConstants.REGISTER_TYPE_H5);
+        user.setNickname(com.jbp.common.utils.StringUtils.filterEmoji(username));
+        user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
+        Date nowDate = CrmebDateUtil.nowDateTime();
+        user.setCreateTime(nowDate);
+        user.setLastLoginTime(nowDate);
+        user.setPwd(CrmebUtil.encryptPassword("123456"));
+        if (!ObjectUtil.isNull(phone)) {
+            user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
+        }
+        user.setLevel(1);
+        // 设置活跃时间
+        setActiveTime(user);
+        // 推广人
+        user.setSpreadUid(0);
+        save(user);
+        // 增加代理等级
+        userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
+        return user;
+    }
+
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Override
+    public Boolean importUser(List<UserImportRequest> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            throw new CrmebException("导入用户数据不能为空");
+        }
+        // 校验
+        Map<String, UserImportRequest> userMap = Maps.newConcurrentMap();
+        for (UserImportRequest importUser : list) {
+            String account = importUser.getAccount();
+            if (com.jbp.common.utils.StringUtils.isEmpty(account)) {
+                throw new CrmebException("账号不能为空");
+            }
+            account = com.jbp.common.utils.StringUtils.trim(account);
+            if (userMap.get(account) != null) {
+                throw new CrmebException("导入表格账号重复:" + account);
+            }
+            userMap.put(account, importUser);
+            if (getByAccount(importUser.getAccount()) != null) {
+                throw new CrmebException(importUser.getAccount() + ":账号已经存在");
+            }
+            if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getNickname())) {
+                throw new CrmebException("昵称不能为空");
+            }
+            if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getMobile())) {
+                throw new CrmebException("手机号不能为空");
+            }
+            if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getPaccount())) {
+                throw new CrmebException("销售账号不能为空");
+            }
+            if(importUser.getAccount().equals(importUser.getPaccount())){
+                throw new CrmebException("销售账号不能是注册账号");
+            }
+            if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getOpenShop())) {
+                throw new CrmebException("是否开店不能为空");
+            }
+            if (!importUser.getOpenShop().equals("是") && !importUser.getOpenShop().equals("否")) {
+                throw new CrmebException("是否开店只能填写是|否");
+            }
+            if (importUser.getCapaId() == null) {
+                throw new CrmebException("等级编号不能为空");
+            }
+            if (capaService.getById(importUser.getCapaId()) == null) {
+                throw new CrmebException("等级编号不存在");
+            }
+            if (importUser.getCapaXsId() != null) {
+                if (capaXsService.getById(importUser.getCapaXsId()) == null) {
+                    throw new CrmebException("星级编号不存在");
+                }
+            }
+            if (com.jbp.common.utils.StringUtils.isNotEmpty(importUser.getRaccount())) {
+                if(importUser.getAccount().equals(importUser.getRaccount())){
+                    throw new CrmebException("服务账号不能是注册账号");
+                }
+                if (importUser.getNode() == null) {
+                    throw new CrmebException("存在服务上级必须填写安置节点");
+                }
+                if (importUser.getNode().intValue() != 0 && importUser.getNode().intValue() != 1) {
+                    throw new CrmebException("存在服务上级必须填写安置节点且只能填写0或1");
+                }
+            }
+            if (ObjectUtils.anyNull(importUser.getUsableScore(), importUser.getUsedScore(), importUser.getGouWu(), importUser.getJiangLi(), importUser.getHuangGou(), importUser.getFuQuan())) {
+                throw new CrmebException("积分数字不能为空，没有则录入0");
+            }
+        }
+
+        // 保存用户
+        for (UserImportRequest importUser : list) {
+            register(importUser.getNickname(), importUser.getMobile(), importUser.getAccount(), importUser.getOpenShop().equals("是"));
+        }
+        // 绑定销售上级
+        for (UserImportRequest importUser : list) {
+            User pUser = getByAccount(importUser.getPaccount());
+            if (pUser == null) {
+                throw new RuntimeException("销售上级账户不存在");
+            }
+            String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
+            User user = getByAccount(account);
+            invitationService.band(user.getId(), pUser.getId(), false, true, true);
+        }
+        // 绑定服务上级
+        for (UserImportRequest importUser : list) {
+            if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getRaccount())) {
+                continue;
+            }
+            User rUser = getByAccount(importUser.getRaccount());
+            if (rUser == null) {
+                throw new RuntimeException("服务上级账户不存在");
+            }
+            String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
+            User user = getByAccount(account);
+            if (relationService.getByPid(rUser.getId(), importUser.getNode()) != null) {
+                throw new CrmebException(importUser.getRaccount() + "位置:" + importUser.getNode() + "安置重复，请检查表格是否存在重复或者已经安置过");
+            }
+            relationService.band(user.getId(), rUser.getId(), null, importUser.getNode());
+        }
+
+        // 处理业绩 自己的业绩+给安置上级
+        for (UserImportRequest importUser : list) {
+            if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getRaccount())) {
+                continue;
+            }
+            User rUser = getByAccount(importUser.getRaccount());
+            if (ArithmeticUtils.gt(importUser.getUsableScore(), BigDecimal.ZERO)) {
+                relationScoreService.operateUsable(rUser.getId(), importUser.getUsableScore(),
+                        importUser.getNode(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), DateTimeUtils.getNow(), "导入初始化", true);
+            }
+            if (ArithmeticUtils.gt(importUser.getUsedScore(), BigDecimal.ZERO)) {
+                relationScoreService.operateUsed(rUser.getId(), importUser.getUsedScore(),
+                        importUser.getNode(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), DateTimeUtils.getNow(), "导入初始化", true);
+            }
+        }
+
+        // 处理自己的积分
+        for (UserImportRequest importUser : list) {
+            String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
+            User user = getByAccount(account);
+            if (ArithmeticUtils.gt(importUser.getGouWu(), BigDecimal.ZERO)) {
+                WalletConfig walletConfig = walletConfigService.getByName(WalletConfig.NameEnum.购物积分.name());
+                if (walletConfig != null) {
+                    platformWalletService.transferToUser(user.getId(), walletConfig.getType(), importUser.getGouWu(), WalletFlow.OperateEnum.调账.name(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), "后台导入名单初始化");
+                }
+            }
+            if (ArithmeticUtils.gt(importUser.getJiangLi(), BigDecimal.ZERO)) {
+                WalletConfig walletConfig = walletConfigService.getByName(WalletConfig.NameEnum.奖励积分.name());
+                if (walletConfig != null) {
+                    platformWalletService.transferToUser(user.getId(), walletConfig.getType(), importUser.getJiangLi(), WalletFlow.OperateEnum.调账.name(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), "后台导入名单初始化");
+                }
+            }
+            if (ArithmeticUtils.gt(importUser.getHuangGou(), BigDecimal.ZERO)) {
+                WalletConfig walletConfig = walletConfigService.getByName(WalletConfig.NameEnum.换购积分.name());
+                if (walletConfig != null) {
+                    platformWalletService.transferToUser(user.getId(), walletConfig.getType(), importUser.getHuangGou(), WalletFlow.OperateEnum.调账.name(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), "后台导入名单初始化");
+                }
+            }
+            if (ArithmeticUtils.gt(importUser.getFuQuan(), BigDecimal.ZERO)) {
+                WalletConfig walletConfig = walletConfigService.getByName(WalletConfig.NameEnum.福券积分.name());
+                if (walletConfig != null) {
+                    platformWalletService.transferToUser(user.getId(), walletConfig.getType(), importUser.getFuQuan(), WalletFlow.OperateEnum.调账.name(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), "后台导入名单初始化");
+                }
+            }
+        }
+        return true;
     }
 
     /**
