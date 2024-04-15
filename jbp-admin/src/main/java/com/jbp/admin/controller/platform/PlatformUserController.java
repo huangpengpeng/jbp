@@ -3,6 +3,7 @@ package com.jbp.admin.controller.platform;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
@@ -10,14 +11,21 @@ import com.jbp.common.response.UserAdminDetailResponse;
 import com.jbp.common.response.UserResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.UUID;
 
 /**
  * 平台端用户控制器
@@ -39,6 +47,9 @@ import org.springframework.web.bind.annotation.*;
 public class PlatformUserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserCapaXsService userCapaXsService;
 
     @PreAuthorize("hasAuthority('platform:user:page:list')")
     @ApiOperation(value = "平台端用户分页列表")
@@ -122,6 +133,56 @@ public class PlatformUserController {
         userService.updateUser(request.getId(), request.getPwd(), request.getSex(), request.getNickname(), request.getPhone(), request.getCountry(), request.getProvince(), request.getCity(), request.getDistrict(), request.getAddress(), request.getPayPwd(),request.getOpenShop());
         return CommonResult.success();
     }
+
+
+
+
+
+
+    @PreAuthorize("hasAuthority('platform:user:update:saveVitalityXscapeUser')")
+    @ApiOperation(value = "增加合伙人账号", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/saveVitalityXscapeUser", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult saveVitalityXscapeUser( String numberCode) {
+
+        User user = userService.getByAccount(numberCode);
+        if(user == null){
+            throw new RuntimeException("用户编号错误");
+        }
+
+
+
+                for(int i=0;i<3 ;i++){
+                    //增加3个1星账号
+                    String userName = user.getNickname() + "_"+i;
+                    String number = 8 + RandomStringUtils.random(4, "0123456789");
+
+
+                    User user1 = userService.registerPhone(userName,number,user.getId());
+                    UserCapaXs userCapaXs  =new UserCapaXs();
+                    userCapaXs.setUid(user1.getId());
+                    userCapaXs.setCapaId(1L);
+                    userCapaXsService.save(userCapaXs);
+
+
+                    String userName2 = user1.getNickname() + "_"+ i;
+                    String number2 = 8 + RandomStringUtils.random(4, "0123456789");
+                    User user2 = userService.registerPhone(userName2,number2,user1.getId());
+
+                    UserCapaXs userCapaXs2  =new UserCapaXs();
+                    userCapaXs2.setUid(user2.getId());
+                    userCapaXs2.setCapaId(1L);
+                    userCapaXsService.save(userCapaXs2);
+
+                }
+
+
+
+
+
+        return CommonResult.success();
+    }
+
 }
 
 
