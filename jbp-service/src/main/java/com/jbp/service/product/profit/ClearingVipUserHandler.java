@@ -112,7 +112,7 @@ public class ClearingVipUserHandler implements ProductProfitHandler {
             }
 
             StringBuilder profitPostscript = new StringBuilder();
-            profitPostscript.append("增加平台分红,等级编号【" + rule.getLevel() + "】").append("等级名称【" + rule.getLevelName() + "】");
+            profitPostscript.append("增加平台分红名单,等级编号【" + rule.getLevel() + "】").append("等级名称【" + rule.getLevelName() + "】").append("份额【"+payNum+"】");
             orderProductProfitService.save(order.getId(), order.getOrderNo(), productProfit.getProductId(), getType(),
                     ProductProfitEnum.平台分红.getName(), productProfit.getRule(), profitPostscript.toString());
         }
