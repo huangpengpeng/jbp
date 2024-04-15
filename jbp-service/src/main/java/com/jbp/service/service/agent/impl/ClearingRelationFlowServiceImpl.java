@@ -66,6 +66,10 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
             log.info("拓展佣金:不需要生成结算销售关系");
             return true;
         }
+        if (clearingFinal.getCommType().intValue() == ProductCommEnum.平台分红.getType()) {
+            log.info("平台分红:不需要生成结算销售关系");
+            return true;
+        }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.培育佣金.getType()) {
             // 删除上一次的结算关系网
             ClearingFinal lastOne = clearingFinalService.getLastOne(clearingId, ProductCommEnum.培育佣金.getType());

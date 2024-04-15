@@ -4,6 +4,7 @@ import cn.hutool.core.util.BooleanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jbp.common.model.agent.ClearingVipUser;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.order.Order;
@@ -30,6 +31,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,16 +105,21 @@ public class ClearingVipUserHandler implements ProductProfitHandler {
             OrderDetail orderDetail = detailMap.get(productProfit.getProductId());
             Integer payNum = orderDetail.getPayNum();
             Rule rule = getRule(productProfit.getRule());
-
             PingTaiCommHandler.Rule commRule = commRuleMap.get(rule.getLevel());
-            for (Integer i = 0; i < payNum; i++) {
-                clearingVipUserService.create(order.getUid(), user.getAccount(), rule.getLevel(), rule.getLevelName(),
-                        ProductCommEnum.平台分红.getType(), ProductCommEnum.平台分红.getName(),
-                        commRule.getMaxFee(), JSONObject.toJSONString(commRule), "单号:" + order.getOrderNo() + "产品:" + orderDetail.getProductName());
-            }
+            PingTaiCommHandler.Rule orgCommRule = commRuleMap.get(commRule.getRefLevel());
+            BigDecimal maxFee = commRule.getMaxFee().multiply(BigDecimal.valueOf(payNum));
 
+            ClearingVipUser clearingVipUser = clearingVipUserService.getByUser(order.getUid(), orgCommRule.getLevel(), ProductCommEnum.平台分红.getType());
+            if(clearingVipUser == null){
+                clearingVipUserService.create(order.getUid(), user.getAccount(), orgCommRule.getLevel(), orgCommRule.getLevelName(),
+                        ProductCommEnum.平台分红.getType(), ProductCommEnum.平台分红.getName(),
+                        maxFee, JSONObject.toJSONString(orgCommRule), "单号:" + order.getOrderNo() + "产品:" + orderDetail.getProductName());
+            }else{
+                clearingVipUser.setMaxAmount(clearingVipUser.getMaxAmount().add(maxFee));
+                clearingVipUserService.updateById(clearingVipUser);
+            }
             StringBuilder profitPostscript = new StringBuilder();
-            profitPostscript.append("增加平台分红名单,等级编号【" + rule.getLevel() + "】").append("等级名称【" + rule.getLevelName() + "】").append("份额【"+payNum+"】");
+            profitPostscript.append("增加平台分红名单,等级编号【" + rule.getLevel() + "】").append("等级名称【" + rule.getLevelName() + "】").append("新增额度【"+maxFee+"】");
             orderProductProfitService.save(order.getId(), order.getOrderNo(), productProfit.getProductId(), getType(),
                     ProductProfitEnum.平台分红.getName(), productProfit.getRule(), profitPostscript.toString());
         }

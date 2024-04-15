@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.model.agent.ClearingVipUser;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.service.dao.agent.ClearingVipUserDao;
@@ -21,4 +22,8 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         return user;
     }
 
+    @Override
+    public ClearingVipUser getByUser(Integer uid, Long level, Integer commType) {
+        return getOne(new LambdaQueryWrapper<ClearingVipUser>().eq(ClearingVipUser::getUid, uid).eq(ClearingVipUser::getLevel, level).eq(ClearingVipUser::getCommType, commType));
+    }
 }

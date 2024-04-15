@@ -14,4 +14,5 @@ public interface UserCapaSnapshotService extends IService<UserCapaSnapshot> {
 
     PageInfo<UserCapaSnapshot> pageList(Integer uid, Long capaId, String type, PageParamRequest pageParamRequest);
 
+    UserCapaSnapshot getByFirst(Integer uid, Long capaId);
 }

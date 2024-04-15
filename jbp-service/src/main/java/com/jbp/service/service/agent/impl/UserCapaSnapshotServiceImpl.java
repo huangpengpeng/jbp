@@ -64,4 +64,9 @@ public class UserCapaSnapshotServiceImpl extends ServiceImpl<UserCapaSnapshotDao
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
+    @Override
+    public UserCapaSnapshot getByFirst(Integer uid, Long capaId) {
+        return getOne(new QueryWrapper<UserCapaSnapshot>().lambda().eq(UserCapaSnapshot::getCapaId, capaId).orderByAsc(UserCapaSnapshot::getId).last(" limit 1"));
+    }
 }

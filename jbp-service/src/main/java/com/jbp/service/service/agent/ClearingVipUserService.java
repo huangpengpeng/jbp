@@ -10,6 +10,8 @@ public interface ClearingVipUserService extends IService<ClearingVipUser> {
     ClearingVipUser create(Integer uid, String accountNo, Long level, String levelName,
                            Integer commType, String commName, BigDecimal maxAmount, String rule, String description);
 
+    ClearingVipUser getByUser(Integer uid, Long level, Integer commType);
+
 
 
 

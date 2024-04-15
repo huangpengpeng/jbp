@@ -23,14 +23,12 @@ import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingUserDao;
 import com.jbp.service.product.comm.MonthPyCommHandler;
+import com.jbp.service.product.comm.PingTaiCommHandler;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.ClearingFinalService;
-import com.jbp.service.service.agent.ClearingUserService;
-import com.jbp.service.service.agent.ProductCommService;
-import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -53,6 +51,12 @@ import java.util.stream.Collectors;
 public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao, ClearingUser> implements ClearingUserService {
 
     @Resource
+    private FundClearingService fundClearingService;
+    @Resource
+    private UserCapaSnapshotService userCapaSnapshotService;
+    @Resource
+    private CapaService capaService;
+    @Resource
     private UserCapaService userCapaService;
     @Resource
     private ProductCommService productCommService;
@@ -68,6 +72,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private ClearingFinalService clearingFinalService;
     @Resource
     private MonthPyCommHandler monthPyCommHandler;
+    @Resource
+    private PingTaiCommHandler pingTaiCommHandler;
 
 
     @Override
@@ -77,9 +83,6 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             throw new CrmebException("结算信息不能为空");
         }
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
-        if (clearingFinal.getCommName().equals(ProductCommEnum.培育佣金.getName())) {
-            throw new CrmebException("暂不支持名单导入请初始化结算名单");
-        }
         if (clearingFinal == null || !clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
             throw new CrmebException("名单只能在待结算状态下导入");
         }
@@ -88,8 +91,6 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         }
         // 导入名单结算不需要预设
         delPerUser();
-        // 培育佣金规则
-        Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
         // 批量插入用户
         List<ClearingUser> insetBatchList = Lists.newArrayList();
         Map<String, ClearingUserImportDto> userMap = Maps.newConcurrentMap();
@@ -104,12 +105,9 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             if (user == null) {
                 throw new CrmebException(dto.getAccount() + "账号不存在");
             }
-            importUserSet(user.getId(), clearingFinal.getId(), clearingFinal.getCommType(), dto, insetBatchList, ruleMap);
         }
-        List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
-        for (List<ClearingUser> clearingUsers : partition) {
-            clearingUserDao.insertBatch(clearingUsers);
-        }
+        // 导入名单设置
+        importUserSet(list,  clearingId, clearingFinal.getCommType());
         return true;
     }
 
@@ -141,13 +139,9 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             if (user == null) {
                 throw new CrmebException(dto.getAccount() + "账号不存在");
             }
-            // 设置导入用户信息
-            importUserSet(user.getId(), -1L, request.getCommType(), dto, insetBatchList, ruleMap);
         }
-        List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
-        for (List<ClearingUser> clearingUsers : partition) {
-            clearingUserDao.insertBatch(clearingUsers);
-        }
+        // 设置导入用户信息
+        importUserSet(list, -1L, request.getCommType());
         return true;
     }
 
@@ -169,6 +163,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         createKuoZhanUser(clearingId, clearingFinal, lastOne, perMap);
         // 培育结算名单
         createPeiYuUser(clearingId, clearingFinal, startTime, endTime, perMap);
+        // 平台分红名单
+        createPingTaiUser(clearingId, clearingFinal, endTime, perMap);
         // 删除预设名单
         delPerUser();
         return true;
@@ -215,6 +211,72 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         lqw.eq(StringUtils.isNotEmpty(account), ClearingUser::getAccountNo, account);
         lqw.orderByDesc(ClearingUser::getId);
         return CommonPage.copyPageInfo(page, list(lqw));
+    }
+
+
+    private void createPingTaiUser(Long clearingId, ClearingFinal clearingFinal,  Date endTime, Map<Integer, ClearingUser> perMap) {
+        if (clearingFinal.getCommName().equals(ProductCommEnum.平台分红.getName())) {
+            Capa maxCapa = capaService.getMaxCapa();
+            List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
+            if(CollectionUtils.isEmpty(ruleList)){
+               throw new CrmebException("平台分红规则为空请联系管理员");
+            }
+            ruleList = ruleList.stream().filter(s->s.getRefLevel()== null).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(ruleList)){
+                throw new CrmebException("平台分红规则为空请联系管理员2");
+            }
+            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, maxCapa.getId()));
+            List<ClearingUser> clearingUserList = Lists.newArrayList();
+            for (UserCapa userCapa : userCapaList) {
+                ClearingUser perUser = perMap.get(userCapa.getUid());
+                if (perUser != null) {
+                    continue;
+                }
+                Date scoreStart = null;
+                UserCapaSnapshot snapshot = userCapaSnapshotService.getByFirst(userCapa.getUid(), userCapa.getCapaId());
+                if (snapshot == null) {
+                    User user = userService.getById(snapshot.getUid());
+                    scoreStart = user.getCreateTime();
+                } else {
+                    scoreStart = snapshot.getGmtCreated();
+                }
+                BigDecimal sendCommAmt = fundClearingService.getSendCommAmt(userCapa.getUid(), scoreStart, endTime, ProductCommEnum.报单佣金.getName(), ProductCommEnum.零售佣金.getName());
+                Long level = 0L;
+                PingTaiCommHandler.Rule tagRule = null;
+                for (PingTaiCommHandler.Rule rule : ruleList) {
+                    if (ArithmeticUtils.gt(sendCommAmt, rule.getMinScore()) && NumberUtils.compare(rule.getLevel(), level) > 0) {
+                        level = rule.getLevel();
+                        tagRule = rule;
+                    }
+                }
+                // 说明满足结算条件
+                if (NumberUtils.compare(level, 0L) > 0) {
+                    User user = userService.getById(userCapa.getUid());
+                    ClearingUser clearingUser = new ClearingUser(clearingId, userCapa.getUid(), user.getAccount(),
+                            level, tagRule.getLevelName(), JSONObject.toJSONString(tagRule));
+                    clearingUserList.add(clearingUser);
+                }
+            }
+            // 处理预设名单
+            if (!perMap.isEmpty()) {
+                perMap.forEach((uid, perUser) -> {
+                    try {
+                        JSONObject rule = JSONObject.parseObject(perUser.getRule());
+                        if (rule == null) {
+                            throw new RuntimeException("预设名单不是当前佣金结算，请清空再次结算");
+                        }
+                        rule.toJavaObject(MonthPyCommHandler.Rule.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                    ClearingUser newUser = new ClearingUser();
+                    BeanUtils.copyProperties(perUser, newUser, "id", "clearingId");
+                    newUser.setClearingId(clearingId);
+                    clearingUserList.add(newUser);
+                });
+            }
+            clearingUserDao.insertBatch(clearingUserList);
+        }
     }
 
     private void createPeiYuUser(Long clearingId, ClearingFinal clearingFinal, Date startTime, Date endTime, Map<Integer, ClearingUser> perMap) {
@@ -329,29 +391,59 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         }
     }
 
-    private static void importUserSet(Integer uid, Long clearingId, Integer commType, ClearingUserImportDto dto,
-                                      List<ClearingUser> insetBatchList, Map<Long, MonthPyCommHandler.Rule> ruleMap) {
+    private void importUserSet(List<ClearingUserImportDto> userList, Long clearingId, Integer commType) {
+        List<ClearingUser> insetBatchList = Lists.newArrayList();
         if (commType.equals(ProductCommEnum.拓展佣金.getType())) {
-            ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(uid).level(1L).levelName("默认").build();
-            if (dto.getWeight() == null || ArithmeticUtils.lessEquals(dto.getWeight(), BigDecimal.ZERO)) {
-                throw new CrmebException(dto.getAccount() + ProductCommEnum.拓展佣金.getName() + "权重不能为空");
+            for (ClearingUserImportDto dto : userList) {
+                User user = userService.getByAccount(dto.getAccount());
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(1L).levelName("默认").build();
+                if (dto.getWeight() == null || ArithmeticUtils.lessEquals(dto.getWeight(), BigDecimal.ZERO)) {
+                    throw new CrmebException(dto.getAccount() + ProductCommEnum.拓展佣金.getName() + "权重不能为空");
+                }
+                JSONObject rule = new JSONObject();
+                rule.put("weight", dto.getWeight());
+                clearingUser.setRule(rule.toJSONString());
+                insetBatchList.add(clearingUser);
             }
-            JSONObject rule = new JSONObject();
-            rule.put("weight", dto.getWeight());
-            clearingUser.setRule(rule.toJSONString());
-            insetBatchList.add(clearingUser);
         }
         if (commType.equals(ProductCommEnum.培育佣金.getType())) {
+            Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
             if (ruleMap == null || ruleMap.isEmpty()) {
                 throw new CrmebException("请联系管理员设置培育佣金结算级别规则");
             }
-            ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(uid).level(dto.getLevel()).levelName(dto.getLevelName()).build();
-            MonthPyCommHandler.Rule rule = ruleMap.get(dto.getLevel());
-            if (rule == null) {
-                throw new CrmebException("培育佣金结算级编号不存在");
+            for (ClearingUserImportDto dto : userList) {
+                User user = userService.getByAccount(dto.getAccount());
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
+                MonthPyCommHandler.Rule rule = ruleMap.get(dto.getLevel());
+                if (rule == null) {
+                    throw new CrmebException("培育佣金结算级编号不存在");
+                }
+                clearingUser.setRule(JSONObject.toJSONString(rule));
+                insetBatchList.add(clearingUser);
             }
-            clearingUser.setRule(JSONObject.toJSONString(rule));
-            insetBatchList.add(clearingUser);
+        }
+
+        if (commType.equals(ProductCommEnum.平台分红.getType())) {
+            List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
+            if (CollectionUtils.isEmpty(ruleList)) {
+                throw new CrmebException("请联系管理员设置平台分红结算级别规则");
+            }
+            Map<Long, PingTaiCommHandler.Rule> ruleMap = FunctionUtil.keyValueMap(ruleList, PingTaiCommHandler.Rule::getLevel);
+            for (ClearingUserImportDto dto : userList) {
+                User user = userService.getByAccount(dto.getAccount());
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
+                PingTaiCommHandler.Rule rule = ruleMap.get(dto.getLevel());
+                if (rule == null) {
+                    throw new CrmebException("培育佣金结算级编号不存在");
+                }
+                clearingUser.setRule(JSONObject.toJSONString(rule));
+                insetBatchList.add(clearingUser);
+            }
+        }
+        // 保存数据
+        List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
+        for (List<ClearingUser> clearingUsers : partition) {
+            clearingUserDao.insertBatch(clearingUsers);
         }
     }
 }
