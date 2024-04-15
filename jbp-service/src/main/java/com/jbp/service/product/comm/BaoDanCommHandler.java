@@ -1,6 +1,5 @@
 package com.jbp.service.product.comm;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.beust.jcommander.internal.Lists;
@@ -8,7 +7,9 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -23,11 +24,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * 报单佣金
@@ -43,8 +42,6 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
     private OrderDetailService orderDetailService;
     @Resource
     private UserService userService;
-    @Resource
-    private UserCapaXsService userCapaXsService;
     @Resource
     private UserInvitationService invitationService;
     @Resource
@@ -131,7 +128,6 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
             if (oneId == null) {
                 continue;
             }
-
             BigDecimal oneFee = totalPv.multiply(rule.getOneRatio());
             FundClearing oneFun = new FundClearing();
             oneFun.setUid(oneId);
@@ -141,12 +137,15 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
             // 分给直推的培育人
             UserInvitation oneUserInvitation = invitationService.getByUser(oneId);
             if (oneUserInvitation.getMId() != null) {
-                BigDecimal threeFee = totalPv.multiply(rule.getThreeRatio());
-                FundClearing threeFund = new FundClearing();
-                threeFund.setUid(oneUserInvitation.getMId());
-                threeFund.setCommName("培育");
-                threeFund.setCommAmt(threeFee);
-                list.add(threeFund);
+                UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getMId());
+                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0) {
+                    BigDecimal threeFee = totalPv.multiply(rule.getThreeRatio());
+                    FundClearing threeFund = new FundClearing();
+                    threeFund.setUid(oneUserInvitation.getMId());
+                    threeFund.setCommName("培育");
+                    threeFund.setCommAmt(threeFee);
+                    list.add(threeFund);
+                }
             }
             // 找下一个分钱人
             uid = oneId;
@@ -175,8 +174,37 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
         }
 
         // 相同用户相同佣金类型合并发放
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        User orderUser = userService.getById(order.getUid());
+        Map<Integer, List<FundClearing>> fundClearingMap = FunctionUtil.valueMap(list, FundClearing::getUid);
+        fundClearingMap.forEach((uid, fundClearingList) -> {
+            String description = "";
+            Map<BigDecimal, List<FundClearing>> map = FunctionUtil.valueMap(fundClearingList, FundClearing::getCommAmt);
+            BigDecimal totalAmt = BigDecimal.ZERO;
+            List<FundClearing> fundClearings1 = map.get("直推");
+            if (CollectionUtils.isNotEmpty(fundClearings1)) {
+                BigDecimal commAmt = fundClearings1.stream().map(FundClearing::getCommAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalAmt = totalAmt.add(commAmt);
+                description = description + "直推获奖:" + totalAmt;
+            }
+            List<FundClearing> fundClearings2 = map.get("间推");
+            if (CollectionUtils.isNotEmpty(fundClearings2)) {
+                BigDecimal commAmt = fundClearings2.stream().map(FundClearing::getCommAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalAmt = totalAmt.add(commAmt);
+                description = description + "间推获奖:" + totalAmt;
+            }
+            List<FundClearing> fundClearings3 = map.get("培育");
 
-
+            if (CollectionUtils.isNotEmpty(fundClearings3)) {
+                BigDecimal commAmt = fundClearings3.stream().map(FundClearing::getCommAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalAmt = totalAmt.add(commAmt);
+                description = description + "培育获奖:" + totalAmt;
+            }
+            fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.报单佣金.getName(),
+                    totalAmt, null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
+        });
     }
 
     @Data
@@ -207,5 +235,10 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
          * 培育比例
          */
         private BigDecimal threeRatio;
+
+        /**
+         * 被培育人等级
+         */
+        private Long threeCapaId;
     }
 }
