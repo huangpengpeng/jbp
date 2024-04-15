@@ -137,7 +137,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
             // 分给直推的培育人
             UserInvitation oneUserInvitation = invitationService.getByUser(oneId);
             if (oneUserInvitation.getMId() != null) {
-                UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getMId());
+                UserCapa userCapa = userCapaService.getByUser(oneId);
                 if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0) {
                     BigDecimal threeFee = totalPv.multiply(rule.getThreeRatio());
                     FundClearing threeFund = new FundClearing();

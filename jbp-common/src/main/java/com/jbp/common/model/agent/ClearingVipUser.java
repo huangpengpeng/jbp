@@ -20,6 +20,21 @@ import java.math.BigDecimal;
 @ApiModel(value="ClearingVipUser对象", description="结算VIP名单特殊用户")
 public class ClearingVipUser extends BaseModel {
 
+    public ClearingVipUser(Integer uid, String accountNo, Long level, String levelName, Integer commType, String commName,
+                           BigDecimal maxAmount, String rule, String description) {
+        this.uid = uid;
+        this.accountNo = accountNo;
+        this.commType = commType;
+        this.commName = commName;
+        this.level = level;
+        this.levelName = levelName;
+        this.usedAmount = BigDecimal.ZERO;
+        this.maxAmount = maxAmount;
+        this.rule = rule;
+        this.status = 0;
+        this.description = description;
+    }
+
     @ApiModelProperty("用户")
     @TableField("uid")
     private Integer uid;
@@ -27,6 +42,14 @@ public class ClearingVipUser extends BaseModel {
     @ApiModelProperty("账户")
     @TableField("accountNo")
     private String accountNo;
+
+    @ApiModelProperty("佣金类型")
+    @TableField("commType")
+    private Integer commType;
+
+    @ApiModelProperty("佣金名称")
+    @TableField("commName")
+    private String commName;
 
     @ApiModelProperty("级别")
     @TableField("level")
@@ -40,6 +63,10 @@ public class ClearingVipUser extends BaseModel {
     @TableField("usedAmount")
     private BigDecimal usedAmount;
 
+    @ApiModelProperty("最大金额")
+    @TableField("maxAmount")
+    private BigDecimal maxAmount;
+
     @ApiModelProperty("得奖规则 比例  上限")
     @TableField("rule")
     private String rule;
@@ -47,4 +74,8 @@ public class ClearingVipUser extends BaseModel {
     @ApiModelProperty("状态 0有效 -1失效")
     @TableField("status")
     private Integer status;
+
+    @ApiModelProperty("描述")
+    @TableField("description")
+    private String description;
 }

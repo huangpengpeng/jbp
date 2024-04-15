@@ -20,6 +20,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ import java.util.Map;
 /**
  * @Component
  */
+@Component
 public class LingShouCommHandler extends AbstractProductCommHandler {
 
     @Resource
@@ -197,7 +199,5 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
          * 间推最小比例
          */
         private Long twoCapaId;
-
-
     }
 }
