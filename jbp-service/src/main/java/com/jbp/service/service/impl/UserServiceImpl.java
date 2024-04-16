@@ -976,6 +976,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("导入用户数据不能为空");
         }
         // 校验
+        int i = 1;
         Map<String, UserImportRequest> userMap = Maps.newConcurrentMap();
         for (UserImportRequest importUser : list) {
             String account = importUser.getAccount();
@@ -1033,13 +1034,19 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             if (ObjectUtils.anyNull(importUser.getUsableScore(), importUser.getUsedScore(), importUser.getGouWu(), importUser.getJiangLi(), importUser.getHuangGou(), importUser.getFuQuan())) {
                 throw new CrmebException("积分数字不能为空，没有则录入0:"+ importUser.getAccount());
             }
+            logger.info("正在检查导入数据基础信息:" + i + "###总条数:" + list.size());
+            i++;
         }
 
         // 保存用户
+        i = 1;
         for (UserImportRequest importUser : list) {
             register(importUser.getNickname(), importUser.getMobile(), importUser.getAccount(), importUser.getOpenShop().equals("是"));
+            logger.info("正在注册新用户信息:" + i + "###总条数:" + list.size());
+            i++;
         }
         // 绑定销售上级
+        i = 1;
         for (UserImportRequest importUser : list) {
             User pUser = getByAccount(importUser.getPaccount());
             if (pUser == null) {
@@ -1048,8 +1055,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
             User user = getByAccount(account);
             invitationService.band(user.getId(), pUser.getId(), false, true, true);
+            logger.info("正在绑定销售上级信息:" + i + "###总条数:" + list.size());
+            i++;
         }
         // 绑定服务上级
+        i = 1;
         for (UserImportRequest importUser : list) {
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getRaccount())) {
                 continue;
@@ -1064,9 +1074,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 throw new CrmebException(importUser.getRaccount() + "位置:" + importUser.getNode() + "安置重复，请检查表格是否存在重复或者已经安置过");
             }
             relationService.band(user.getId(), rUser.getId(), null, importUser.getNode());
+            logger.info("正在绑定销售服务信息:" + i + "###总条数:" + list.size());
+            i++;
         }
 
         // 处理业绩 自己的业绩+给安置上级
+        i=1;
         for (UserImportRequest importUser : list) {
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getRaccount())) {
                 continue;
@@ -1080,9 +1093,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 relationScoreService.operateUsed(rUser.getId(), importUser.getUsedScore(),
                         importUser.getNode(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), DateTimeUtils.getNow(), "导入初始化", true);
             }
+            logger.info("正在处理业绩信息:" + i + "###总条数:" + list.size());
+            i++;
         }
 
         // 处理自己的积分
+        i = 1;
         for (UserImportRequest importUser : list) {
             String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
             User user = getByAccount(account);
@@ -1110,6 +1126,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     platformWalletService.transferToUser(user.getId(), walletConfig.getType(), importUser.getFuQuan(), WalletFlow.OperateEnum.调账.name(), com.jbp.common.utils.StringUtils.N_TO_10("DR_"), "后台导入名单初始化");
                 }
             }
+            logger.info("正在处理积分信息:" + i + "###总条数:" + list.size());
+            i++;
         }
         return true;
     }
