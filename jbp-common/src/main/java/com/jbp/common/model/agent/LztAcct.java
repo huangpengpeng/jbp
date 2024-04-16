@@ -60,6 +60,12 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "开户银行")
     private String openBank;
 
+    @ApiModelProperty(value = "绑定手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "替换手机号")
+    private String changePhone;
+
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)
     private String  gatewayUrl;

@@ -293,6 +293,8 @@ public class LztAcctController {
         if (result != null && "0000".equals(result.getRet_code())) {
             result.setRegMsg("已发送至: " + newPhone + " 请注意查收");
         }
+        lztAcct.setChangePhone(newPhone);
+        lztAcctService.updateById(lztAcct);
         return CommonResult.success(result);
     }
 
@@ -312,6 +314,8 @@ public class LztAcctController {
         ChangeRegPhoneVerifyResult result = lztService.changeRegPhoneVerify(payInfo.getOidPartner(),
                 payInfo.getPriKey(), userId, token, txn_seqno, code);
         if ("0000".equals(result.getRet_code())) {
+            lztAcct.setPhone(lztAcct.getChangePhone());
+            lztAcctService.updateById(lztAcct);
             return CommonResult.success();
         }
         return CommonResult.failed(result.getRet_msg());

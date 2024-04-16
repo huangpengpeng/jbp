@@ -99,4 +99,8 @@ public class LztWithdrawal extends BaseModel {
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;
+
+    @ApiModelProperty(value = "返回消息")
+    @TableField(exist = false)
+    private String regMsg;
 }
