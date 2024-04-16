@@ -93,8 +93,9 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         }
         Wallet wallet = getByUser(uid, type);
         if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), amt)) {
-            User user = userService.getById(wallet.getUId());
-            throw new CrmebException(user.getAccount() + "用户余额不足" + "应减少:" + amt + "可用:" + wallet.getBalance());
+            User user = userService.getById(uid);
+            BigDecimal balance = wallet == null ? BigDecimal.ZERO : wallet.getBalance();
+            throw new CrmebException(user.getAccount() + "用户余额不足" + "应减少:" + amt + "可用:" + balance);
         }
         BigDecimal orgBalance = wallet.getBalance();
         wallet.setBalance(wallet.getBalance().subtract(amt));
@@ -206,7 +207,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         List<Map<String, Object>> maps = SqlRunner.db().selectList("select * from tmp_score where action='增加' and ifSuccess is false ");
 
        int i = 0;
-        String externalNo = "CS_202404041703";
+        String externalNo = "CS_202404092333";
         for (Map<String, Object> map : maps) {
             Integer id = MapUtils.getInteger(map, "id");
             Integer uid = MapUtils.getInteger(map, "uid");
@@ -241,7 +242,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     public void init2() {
         List<Map<String, Object>> maps = SqlRunner.db().selectList("select * from tmp_score where action='减少' and ifSuccess is false ");
         int i = 0;
-        String externalNo = "CS_202404041703";
+        String externalNo = "CS_202404092333";
         for (Map<String, Object> map : maps) {
             Integer id = MapUtils.getInteger(map, "id");
             Integer uid = MapUtils.getInteger(map, "uid");

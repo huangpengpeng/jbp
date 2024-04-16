@@ -28,4 +28,6 @@ public interface WalletConfigService extends IService<WalletConfig> {
     List<UserWalletInfoResponse> getUserWalletInfo();
 
     Boolean hasPwd();
+
+    WalletConfig getByName(String name);
 }

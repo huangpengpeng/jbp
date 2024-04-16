@@ -3,10 +3,12 @@ package com.jbp.service.condition;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaSnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 单笔支付升级
@@ -24,7 +27,7 @@ public class CapaPaymentHandler implements ConditionHandler {
     @Resource
     private OrderService orderService;
     @Resource
-    private UserCapaService userCapaService;
+    private UserCapaSnapshotService snapshotService;
 
 
     @Override
@@ -56,6 +59,10 @@ public class CapaPaymentHandler implements ConditionHandler {
         // 找最近的一笔平台订单
         Order order = orderService.getLastOne(uid, "");
         if (order == null) {
+            return false;
+        }
+        List<UserCapaSnapshot> snapshots = snapshotService.getByDescription(order.getOrderNo());
+        if (!snapshots.isEmpty()) {
             return false;
         }
         Rule rule = getRule(riseCondition);

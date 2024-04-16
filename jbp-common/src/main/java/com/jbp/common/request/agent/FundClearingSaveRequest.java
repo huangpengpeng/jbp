@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,7 +30,7 @@ public class FundClearingSaveRequest implements Serializable {
     private String type;
 
     @ApiModelProperty("佣金金额")
-    @NotEmpty(message = "佣金金额不能为空")
+    @NotNull(message = "佣金金额不能为空")
     private BigDecimal clearingFee;
 
     @ApiModelProperty("佣金描述")

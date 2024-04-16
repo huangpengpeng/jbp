@@ -144,4 +144,9 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_OPEN_PASSWORD);
         return Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
     }
+
+    @Override
+    public WalletConfig getByName(String name) {
+        return getOne(new LambdaQueryWrapper<WalletConfig>().eq(WalletConfig::getName, name));
+    }
 }

@@ -403,4 +403,8 @@ public interface UserService extends IService<User> {
 
     UserPlatformInfoResponse getUserPlatfromInfo(String dbName);
 
+    User register(String username, String phone, String account, Boolean ifOpenShop);
+
+    Boolean importUser(List<UserImportRequest> list);
+
 }

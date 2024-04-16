@@ -219,32 +219,21 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         relationScoreFlowService.save(flow);
     }
 
-    @Override
-    public RelationScoreResponse getUserResult() {
-        RelationScoreResponse relationScoreResponse = new RelationScoreResponse();
-        User user = userService.getInfo();
-        UserRelation userRelation = userRelationService.getByPid(user.getId(), 0);
-        UserRelation userRelation2 = userRelationService.getByPid(user.getId(), 1);
+        @Override
+        public RelationScoreResponse getUserResult() {
+            RelationScoreResponse relationScoreResponse = new RelationScoreResponse();
+            User user = userService.getInfo();
 
-        if (userRelation != null) {
             RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()).eq(RelationScore::getNode,0));
-            User zorouser = userService.getById(userRelation.getUId());
-            relationScoreResponse.setNickname(zorouser.getNickname());
-            relationScoreResponse.setAccount(zorouser.getAccount());
+
             relationScoreResponse.setTotalScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()));
             relationScoreResponse.setUsableScore(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore());
+
+            RelationScore relationScore2= getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()).eq(RelationScore::getNode,1));
+            relationScoreResponse.setTotalScore2(relationScore2 == null ? BigDecimal.ZERO : relationScore2.getUsableScore().add(relationScore2.getUsedScore()));
+            relationScoreResponse.setUsableScore2(relationScore2 == null ? BigDecimal.ZERO : relationScore2.getUsableScore());
+
+            return relationScoreResponse;
         }
 
-        if (userRelation2 != null) {
-            RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()).eq(RelationScore::getNode,1));
-            User zorouser = userService.getById(userRelation2.getUId());
-            relationScoreResponse.setNickname2(zorouser.getNickname());
-            relationScoreResponse.setAccount2(zorouser.getAccount());
-            relationScoreResponse.setTotalScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore().add(relationScore.getUsedScore()));
-            relationScoreResponse.setUsableScore2(relationScore == null ? BigDecimal.ZERO : relationScore.getUsableScore());
-        }
-
-
-        return relationScoreResponse;
-    }
 }

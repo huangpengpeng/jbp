@@ -1193,6 +1193,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 .eq(Order::getUid, uid)
                 .eq(Order::getPaid, true)
                 .eq(Order::getLevel, 0)
+                .eq(Order::getRefundStatus, 0)
                 .eq(StringUtils.isEmpty(platform), Order::getPlatform, "报单")
                 .orderByDesc(Order::getId)
                 .last(" limit 1"));

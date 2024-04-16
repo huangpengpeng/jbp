@@ -58,4 +58,8 @@ public class WalletConfig {
     @ApiModelProperty("兑换比例 ")
     @TableField(value = "change_scale", updateStrategy = FieldStrategy.IGNORED)
     private BigDecimal changeScale;
+
+    public static enum NameEnum {
+        购物积分, 奖励积分,福券积分,换购积分
+    }
 }

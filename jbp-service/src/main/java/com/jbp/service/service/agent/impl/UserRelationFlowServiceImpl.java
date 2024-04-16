@@ -9,10 +9,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
-import com.jbp.common.model.agent.UserRelation;
-import com.jbp.common.model.agent.UserRelationFlow;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -87,30 +84,28 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
-        List<Integer> pIdList = list.stream().map(UserRelationFlow::getPId).collect(Collectors.toList());
-        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        uIdList.addAll(list.stream().map(UserRelationFlow::getPId).collect(Collectors.toList()));
+        Map<Integer, User> userMap = userService.getUidMapList(uIdList);
         //等级
-        Map<Integer, UserCapa> capaUidMapList = userCapaService.getUidMap(uIdList);
-        Map<Integer, UserCapa> capaPidMapList = userCapaService.getUidMap(pIdList);
-        //星级
-        Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
-        Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
+        Map<Integer, UserCapa> capaMapList = userCapaService.getUidMap(uIdList);
+        Map<Integer, UserCapaXs> capaXsMapList = userCapaXsService.getUidMap(uIdList);
+
         list.forEach(e -> {
-            User uUser = uidMapList.get(e.getUId());
+            User uUser = userMap.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
             e.setUNickName(uUser != null ? uUser.getNickname() : "");
-            UserCapa uUserCapa = capaUidMapList.get(e.getUId());
+            UserCapa uUserCapa = capaMapList.get(e.getUId());
             e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
-            UserCapa pUserCapa = capaPidMapList.get(e.getPId());
-            e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
-            User pUser = pidMapList.get(e.getPId());
+            UserCapaXs uUserCapaXs = capaXsMapList.get(e.getUId());
+            e.setUCapaXsName(uUserCapaXs != null ? uUserCapaXs.getCapaName() : "");
+
+            User pUser = userMap.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
             e.setPNickName(pUser != null ? pUser.getNickname() : "");
-            UserCapaXs uUserCapaXs = capaXsUidMapList.get(e.getUId());
-            e.setUCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
-            UserCapaXs pUserCapaXs = capaXsPidMapList.get(e.getPId());
-            e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
+            UserCapa pUserCapa = capaMapList.get(e.getPId());
+            e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
+            UserCapaXs pUserCapaXs = capaXsMapList.get(e.getPId());
+            e.setPCapaXsName(pUserCapaXs != null ? pUserCapaXs.getCapaName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -27,6 +27,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.UUID;
 
+import java.util.List;
+
 /**
  * 平台端用户控制器
  * +----------------------------------------------------------------------
@@ -146,40 +148,42 @@ public class PlatformUserController {
     public CommonResult saveVitalityXscapeUser( String numberCode) {
 
         User user = userService.getByAccount(numberCode);
-        if(user == null){
+        if (user == null) {
             throw new RuntimeException("用户编号错误");
         }
 
 
+        for (int i = 0; i < 3; i++) {
+            //增加3个1星账号
+            String userName = user.getNickname() + "_" + i;
+            String number = 8 + RandomStringUtils.random(4, "0123456789");
 
-                for(int i=0;i<3 ;i++){
-                    //增加3个1星账号
-                    String userName = user.getNickname() + "_"+i;
-                    String number = 8 + RandomStringUtils.random(4, "0123456789");
+            User user1 = userService.registerPhone(userName, number, user.getId());
+            UserCapaXs userCapaXs = new UserCapaXs();
+            userCapaXs.setUid(user1.getId());
+            userCapaXs.setCapaId(1L);
+            userCapaXsService.save(userCapaXs);
 
+            String userName2 = user1.getNickname() + "_" + i;
+            String number2 = 8 + RandomStringUtils.random(4, "0123456789");
+            User user2 = userService.registerPhone(userName2, number2, user1.getId());
 
-                    User user1 = userService.registerPhone(userName,number,user.getId());
-                    UserCapaXs userCapaXs  =new UserCapaXs();
-                    userCapaXs.setUid(user1.getId());
-                    userCapaXs.setCapaId(1L);
-                    userCapaXsService.save(userCapaXs);
+            UserCapaXs userCapaXs2 = new UserCapaXs();
+            userCapaXs2.setUid(user2.getId());
+            userCapaXs2.setCapaId(1L);
+            userCapaXsService.save(userCapaXs2);
 
-
-                    String userName2 = user1.getNickname() + "_"+ i;
-                    String number2 = 8 + RandomStringUtils.random(4, "0123456789");
-                    User user2 = userService.registerPhone(userName2,number2,user1.getId());
-
-                    UserCapaXs userCapaXs2  =new UserCapaXs();
-                    userCapaXs2.setUid(user2.getId());
-                    userCapaXs2.setCapaId(1L);
-                    userCapaXsService.save(userCapaXs2);
-
-                }
-
+        }
+        return CommonResult.success();
+    }
 
 
 
-
+    @PreAuthorize("hasAuthority('platform:user:import:user')")
+    @PostMapping("/import")
+    @ApiOperation("用户导入")
+    public CommonResult importUser(@RequestBody @Validated List<UserImportRequest> request) {
+        userService.importUser(request);
         return CommonResult.success();
     }
 
