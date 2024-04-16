@@ -234,7 +234,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             } while (true);
         }
 
-        for (AcctBalList acctBal : yesterdayList) {
+        for (AcctBalList acctBal : todayList) {
             // 出账
             if ("DEBIT".equals(acctBal.getFlag_dc())) {
                 todayOutAmt = todayOutAmt.add(new BigDecimal(acctBal.getAmt()));
