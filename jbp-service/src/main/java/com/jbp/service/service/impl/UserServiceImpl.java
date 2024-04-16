@@ -1043,7 +1043,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         for (UserImportRequest importUser : list) {
             User pUser = getByAccount(importUser.getPaccount());
             if (pUser == null) {
-                throw new RuntimeException("销售上级账户不存在");
+                throw new RuntimeException("销售上级账户不存在"+ importUser.getPaccount());
             }
             String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
             User user = getByAccount(account);
@@ -1056,7 +1056,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
             User rUser = getByAccount(importUser.getRaccount());
             if (rUser == null) {
-                throw new RuntimeException("服务上级账户不存在");
+                throw new RuntimeException("服务上级账户不存在"+importUser.getRaccount());
             }
             String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
             User user = getByAccount(account);
