@@ -119,6 +119,10 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             } else {
                 s.setMerName(merchant.getName());
             }
+            if(StringUtils.isNotEmpty(s.getPhone())){
+                String phone = s.getPhone();
+                s.setPhone(phone.substring(0, 3) + "****" + phone.substring(7, phone.length()));
+            }
             //查询用户用户信息
             LztAcct bankAcctInfo = details(s.getUserId());
             s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
