@@ -1449,6 +1449,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
 
             infoResponse.setPayGateway(order.getPayGateway());
+
+            if(order.getUid().intValue() != order.getPayUid().intValue() && userId.equals(order.getUid())){
+                infoResponse.setPayPrice(order.getPayPrice() .add(order.getWalletDeductionFee()));
+            }
+
             responseList.add(infoResponse);
         }
         //查询历史订单
