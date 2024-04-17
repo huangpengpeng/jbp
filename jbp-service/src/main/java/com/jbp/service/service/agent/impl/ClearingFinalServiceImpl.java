@@ -14,6 +14,7 @@ import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ClearingRequest;
+import com.jbp.common.utils.AsyncUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.dao.agent.ClearingFinalDao;
@@ -51,12 +52,18 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
     private ProductCommChain productCommChain;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    public AsyncUtils asyncUtils;
 
+
+    @Override
+    public void syncOneKeyClearing(ClearingRequest clearingRequest) {
+        asyncUtils.exec(clearingRequest, param -> oneKeyClearing((ClearingRequest) param));
+    }
 
     /**
      * 一键结算
      */
-    @Async
     @Override
     public ClearingFinal oneKeyClearing(ClearingRequest clearingRequest) {
         redisUtil.delete("clearing_final");

@@ -48,10 +48,6 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     private UserService userService;
     @Resource
     private ClearingInvitationFlowDao clearingInvitationFlowDao;
-    @Resource
-    private UserCapaService userCapaService;
-    @Resource
-    private UserCapaXsService userCapaXsService;
 
     @Override
     public Boolean create(Long clearingId) {

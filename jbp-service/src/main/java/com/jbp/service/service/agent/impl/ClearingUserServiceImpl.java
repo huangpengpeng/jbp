@@ -22,9 +22,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingUserDao;
-import com.jbp.service.product.comm.MonthPyCommHandler;
-import com.jbp.service.product.comm.PingTaiCommHandler;
-import com.jbp.service.product.comm.ProductCommEnum;
+import com.jbp.service.product.comm.*;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
@@ -71,9 +69,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     @Resource
     private ClearingFinalService clearingFinalService;
     @Resource
-    private MonthPyCommHandler monthPyCommHandler;
-    @Resource
-    private PingTaiCommHandler pingTaiCommHandler;
+    private ProductCommChain productCommChain;
 
 
     @Override
@@ -124,6 +120,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         // 删除历史的预设名单
         delPerUser();
         // 培育佣金规则
+        AbstractProductCommHandler monthPyCommHandler = productCommChain.handlers.get(ProductCommEnum.培育佣金.getType());
         Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
         // 批量插入用户
         List<ClearingUser> insetBatchList = Lists.newArrayList();
@@ -217,6 +214,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private void createPingTaiUser(Long clearingId, ClearingFinal clearingFinal,  Date endTime, Map<Integer, ClearingUser> perMap) {
         if (clearingFinal.getCommName().equals(ProductCommEnum.平台分红.getName())) {
             Capa maxCapa = capaService.getMaxCapa();
+            AbstractProductCommHandler pingTaiCommHandler = productCommChain.handlers.get(ProductCommEnum.平台分红.getType());
             List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
             if(CollectionUtils.isEmpty(ruleList)){
                throw new CrmebException("平台分红规则为空请联系管理员");
@@ -303,6 +301,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     userPayMap.put(order.getUid(), fee);
                 }
             }
+            AbstractProductCommHandler monthPyCommHandler = productCommChain.handlers.get(ProductCommEnum.培育佣金.getType());
             Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
             List<MonthPyCommHandler.Rule> ruleList = ruleMap.values().stream().collect(Collectors.toList());
             List<ClearingUser> clearingUserList = Lists.newArrayList();
@@ -407,6 +406,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             }
         }
         if (commType.equals(ProductCommEnum.培育佣金.getType())) {
+            AbstractProductCommHandler monthPyCommHandler = productCommChain.handlers.get(ProductCommEnum.培育佣金.getType());
             Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
             if (ruleMap == null || ruleMap.isEmpty()) {
                 throw new CrmebException("请联系管理员设置培育佣金结算级别规则");
@@ -424,6 +424,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         }
 
         if (commType.equals(ProductCommEnum.平台分红.getType())) {
+            AbstractProductCommHandler pingTaiCommHandler = productCommChain.handlers.get(ProductCommEnum.平台分红.getType());
             List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
             if (CollectionUtils.isEmpty(ruleList)) {
                 throw new CrmebException("请联系管理员设置平台分红结算级别规则");

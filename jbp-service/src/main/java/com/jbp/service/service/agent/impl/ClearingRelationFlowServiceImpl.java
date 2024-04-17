@@ -9,7 +9,10 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.ClearingFinal;
+import com.jbp.common.model.agent.ClearingRelationFlow;
+import com.jbp.common.model.agent.ClearingUser;
+import com.jbp.common.model.agent.UserRelationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
@@ -18,7 +21,10 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingRelationFlowDao;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.*;
+import com.jbp.service.service.agent.ClearingFinalService;
+import com.jbp.service.service.agent.ClearingRelationFlowService;
+import com.jbp.service.service.agent.ClearingUserService;
+import com.jbp.service.service.agent.UserRelationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -26,7 +32,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,10 +41,6 @@ import java.util.stream.Collectors;
 @Service
 public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<ClearingRelationFlowDao, ClearingRelationFlow> implements ClearingRelationFlowService {
 
-    @Resource
-    private UserCapaService userCapaService;
-    @Resource
-    private UserCapaXsService userCapaXsService;
     @Resource
     private ClearingFinalService clearingFinalService;
     @Resource

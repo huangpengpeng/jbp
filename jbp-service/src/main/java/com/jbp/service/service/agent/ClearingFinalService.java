@@ -11,6 +11,8 @@ public interface ClearingFinalService extends IService<ClearingFinal> {
 
     ClearingFinal oneKeyClearing(ClearingRequest clearingRequest);
 
+    void syncOneKeyClearing(ClearingRequest clearingRequest);
+
     Boolean oneKeyDel(Long clearingId);
 
     Boolean oneKeySend(Long clearingId);

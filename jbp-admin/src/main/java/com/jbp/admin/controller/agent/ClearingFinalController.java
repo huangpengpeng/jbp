@@ -74,7 +74,7 @@ public class ClearingFinalController {
             new CrmebException("正在进行结算不允许重复操作");
         }
         try{
-            clearingFinalService.oneKeyClearing(request);
+            clearingFinalService.syncOneKeyClearing(request);
         }catch (Exception e){
             redisUtil.delete("clearing_final");
             return CommonResult.failed(e.getMessage());

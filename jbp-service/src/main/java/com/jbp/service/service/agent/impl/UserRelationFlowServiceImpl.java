@@ -9,7 +9,9 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserRelationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -72,7 +74,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
 
     @Override
     public PageInfo<UserRelationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest) {
-<<<<<<< HEAD
         LambdaQueryWrapper<UserRelationFlow> lqw = new LambdaQueryWrapper<UserRelationFlow>()
                 .eq(!ObjectUtil.isNull(uid), UserRelationFlow::getUId, uid)
                 .eq(!ObjectUtil.isNull(pid), UserRelationFlow::getPId, pid)
@@ -109,8 +110,5 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             e.setPCapaXsName(pUserCapaXs != null ? pUserCapaXs.getCapaName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
-=======
-        z
->>>>>>> main-py
     }
 }
