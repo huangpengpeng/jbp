@@ -1,0 +1,80 @@
+package com.jbp.service.service.impl;
+
+import com.jbp.common.utils.JacksonTool;
+import com.jbp.common.utils.StringUtils;
+import com.jbp.common.yop.BaseYopRequest;
+import com.jbp.common.yop.BaseYopResponse;
+import com.jbp.common.yop.params.AccountBalanceQueryParams;
+import com.jbp.common.yop.params.BankAccountBalanceQueryParams;
+import com.jbp.common.yop.params.BankAccountQueryParams;
+import com.jbp.common.yop.result.AccountBalanceQueryResult;
+import com.jbp.common.yop.result.BankAccountBalanceQueryResult;
+import com.jbp.common.yop.result.BankAccountQueryResult;
+import com.jbp.service.service.YopService;
+import com.yeepay.yop.sdk.service.common.YopClient;
+import com.yeepay.yop.sdk.service.common.request.YopRequest;
+import com.yeepay.yop.sdk.service.common.response.YopResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.Map;
+
+@Slf4j
+@Service
+public class YopServiceImpl implements YopService {
+
+    @Resource
+    private YopClient yopClient;
+
+    @Override
+    public BankAccountQueryResult bankAccountQuery(String merchantNo, String requestNo) {
+        BankAccountQueryParams params = new BankAccountQueryParams();
+        params.setRequestNo(requestNo);
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        return send("/rest/v1.0/account/account-manage/bank-account/query", "GET", params, BankAccountQueryResult.class);
+    }
+
+    @Override
+    public BankAccountBalanceQueryResult bankAccountBalanceQuery(String merchantNo, String bankCode, String accountNo) {
+        BankAccountBalanceQueryParams params = new BankAccountBalanceQueryParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setBankCode(bankCode);
+        params.setAccountNo(accountNo);
+        return send("/rest/v1.0/recharge/bank-account/query", "GET", params, BankAccountBalanceQueryResult.class);
+    }
+
+    @Override
+    public AccountBalanceQueryResult accountBalanceQuery(String merchantNo) {
+        AccountBalanceQueryParams params = new AccountBalanceQueryParams();
+        params.setMerchantNo(merchantNo);
+        return send("/rest/v1.0/account/balance/query", "GET", params, AccountBalanceQueryResult.class);
+    }
+
+    public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
+        //生成易宝请求
+        YopRequest request = new YopRequest(url, method);
+        //设置参数
+        Map<String, Object> mapObj = JacksonTool.objectToMap(parameters);
+        for (Map.Entry<String, Object> entry : mapObj.entrySet()) {
+            if (entry.getValue() != null) {
+                request.addParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        String requestText = JacksonTool.toJsonString(request.getParameters().asMap());
+        log.info("易宝请求参数" + requestText);
+        try {
+            YopResponse response = yopClient.request(request);
+            String responseText = JacksonTool.toJsonString(response);
+            log.info("易宝返回参数" + responseText);
+            //结果转换成对应的response
+            BaseYopResponse resp = (BaseYopResponse) JacksonTool.toObject(response.getStringResult(), responseClass);
+            return (T) resp;
+        } catch (Exception e) {
+            log.error("易宝请求异常:" + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+}

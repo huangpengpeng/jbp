@@ -1,0 +1,26 @@
+{
+  "app_key": "app_10089066338",
+  "aes_secret_key": "",
+  "server_root": "https://openapi.yeepay.com/yop-center",
+  "yop_public_key": [
+    {
+      "store_type": "string",
+      "cert_type": "RSA2048",
+      "value": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6p0XWjscY+gsyqKRhw9MeLsEmhFdBRhT2emOck/F1Omw38ZWhJxh9kDfs5HzFJMrVozgU+SJFDONxs8UB0wMILKRmqfLcfClG9MyCNuJkkfm0HFQv1hRGdOvZPXj3Bckuwa7FrEXBRYUhK7vJ40afumspthmse6bs6mZxNn/mALZ2X07uznOrrc2rk41Y2HftduxZw6T4EmtWuN2x4CZ8gwSyPAW5ZzZJLQ6tZDojBK4GZTAGhnn3bg5bBsBlw2+FLkCQBuDsJVsFPiGh/b6K/+zGTvWyUcu+LUj2MejYQELDO3i2vQXVDk7lVi2/TcUYefvIcssnzsfCfjaorxsuwIDAQAB"
+    }
+  ],
+  "isv_private_key": [
+    {
+      "store_type": "string",
+      "cert_type": "RSA2048",
+      "value": "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCccn7+/zVkSQT6Jvlt8JrB3wTuiFG8xO385NVjsPl+SHdjxjV171+AIZK+S0bm9vcFQWnVQ8o5i145oaiR2Ye7j/dC5YziweHyUuotWzCVCK6GJmxxfA8pbxA8ZhsSUec5neoTu+bNH6WAuj7zbU1TcqROytK1Ck2jLNGQiam2AjvLwo4Ee2eOOXYks3Dwm0vboWLpa9rrUZm7BAr8uydWvTrH0RPdcRBNxL75bRttP7p/8QuPoK8zS7Z8EFMemS1UPL+MmmGi9piTsQEonoFZgIStuRjyvQaaOCAz4J2PzNqWqFhox3mm8fIx4vQNmuLzxcT5z1leuXey+JOIsemdAgMBAAECggEALGPyc+EvIZ70ahRP9ulrx/HDYPlOE/1et8CoaaqICFSAh89wUN/UXbNpA1SxsAxIJ/YZFPmwsiZA3KJphcTO1iHx20nt8VNpDIyJRMhYnxkBCDBz2bmFRdDtLu4b5VVXAgq0JdhNk0tU9xMhlImhhLmFNJQpOFRNliy748Kj5HAJHxdcCXfrpPUuzFoUwJYSTwWOcorgfQDm1oinndittvBN9QOKr5LWGApJUaNkcG+UxPZNaNfGzKPsVSV3+JmLHex09IOpd3xMAB3pAWR6wpuFQ0VqjV6kIH50Ejqn/YxK7gNQo1mB8Tg6g7JmjMsmCSLJU4lQUYJT6vb4CEiXEwKBgQC/TUL8TIJpVXwMK0gWgqY+KOlcGjFjElh0Nw7gMtIYcbazoYK3sBnKIZ2RepMvA1X1iPalT6YAE6O3GCyYqmAf6rR5llsCKlPLpAKpo6wdtA6u93jWOZov4je0pqPn2mjJWrU8xjNp6+sVnF7V5iS++TTnJDNceVK2A7fmamcKHwKBgQDRW476tpp5yXcomjB6a9NosfhtkDTfHR7JfguCL+I43i7i+78CxGkH67urBaADMzlxFxFGUN5WGhrsSa/vpdoUT1HCL8/LI52YzXxPzkaXcw3uXv6oUy09VZwC4ycGLCqsiG11Quk7gXq2c3xdG18ccAM9zFJbuVwGwV1InExMwwKBgQCEdHl5+XuedTsDrgAm3eU/StJxHA2v/CbUqL6bC3UeybVn4N+CUeM5alcQQJ+iQJwG+wNT6LcWfIKxpoJSXj1aPAcj3LA86pPEf1X8oT/t/RrhmKXJJm8U0nwhj/QS983wBOdSIiW9JEVMXE3pqoUs2Z4AoLcTQ0m6jw6I8olPnwKBgB41B7xE/KT13KuPE8+WHzrL8vxcAkTu/rIz7ZUrM4jhBgLaMAVGMaFi8gELHrtXeMJIgcWThYEG4zuUpj39wCmOCE3seB7nVKXngDhDmwvfHfN24WeIGM7wu0HvZIIPfVjHloOE1AIx/HK21wrYGDESOGWCRZ/WbuDKpZsEcj3hAoGAUod2XKj+MmOg4lIiVZ4RyElis603MunPbs88KMMmfZul52h5PTHc0LRMvCQOZQxlWMml0fZ9hI+G/MSvivHlopCYJ6JOLKvKrtnLTJff/K7oIBs3q3hVpXVmHq3fdkXZDhgWA1Gsfaots+XcjdmQ66si6ixC7ymlCPqtwc3/aeI=",
+      "password": "qwer"
+    }
+  ],
+  "http_client": {
+    "connect_timeout": 10000,
+    "read_timeout": 30000,
+    "max_conn_total": 200,
+    "max_conn_per_route": 100
+  }
+}
