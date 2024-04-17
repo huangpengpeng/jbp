@@ -1006,7 +1006,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getOpenShop())) {
                 throw new CrmebException("是否开店不能为空"+ importUser.getAccount());
             }
-            if (!importUser.getOpenShop().equals("是") && !importUser.getOpenShop().equals("否")) {
+            if (!("是".equals(importUser.getOpenShop()) || "否".equals(importUser.getOpenShop()))) {
                 throw new CrmebException("是否开店只能填写是|否"+ importUser.getAccount());
             }
             if (importUser.getCapaId() == null) {
