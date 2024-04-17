@@ -1,15 +1,11 @@
 package com.jbp.service.service.impl;
 
 import com.jbp.common.utils.JacksonTool;
-import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.BaseYopRequest;
 import com.jbp.common.yop.BaseYopResponse;
-import com.jbp.common.yop.params.AccountBalanceQueryParams;
-import com.jbp.common.yop.params.BankAccountBalanceQueryParams;
-import com.jbp.common.yop.params.BankAccountQueryParams;
-import com.jbp.common.yop.result.AccountBalanceQueryResult;
-import com.jbp.common.yop.result.BankAccountBalanceQueryResult;
-import com.jbp.common.yop.result.BankAccountQueryResult;
+import com.jbp.common.yop.dto.ExtParams4BankPay;
+import com.jbp.common.yop.params.*;
+import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 import com.yeepay.yop.sdk.service.common.YopClient;
 import com.yeepay.yop.sdk.service.common.request.YopRequest;
@@ -51,6 +47,45 @@ public class YopServiceImpl implements YopService {
         AccountBalanceQueryParams params = new AccountBalanceQueryParams();
         params.setMerchantNo(merchantNo);
         return send("/rest/v1.0/account/balance/query", "GET", params, AccountBalanceQueryResult.class);
+    }
+
+    @Override
+    public WithdrawCardQueryResult withdrawCardQuery(String merchantNo) {
+        WithdrawCardQueryParams params = new WithdrawCardQueryParams();
+        params.setMerchantNo(merchantNo);
+        return send("/rest/v1.0/account/withdraw/card/query", "GET", params, WithdrawCardQueryResult.class);
+    }
+
+    @Override
+    public WithdrawOrderResult withdrawOrder(String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl) {
+        WithdrawOrderParams params = new WithdrawOrderParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        params.setBankCardId(bankCardId);
+        params.setOrderAmount(orderAmount);
+        params.setNotifyUrl(notifyUrl);
+        return send("/rest/v1.0/account/withdraw/order", "POST", params, WithdrawOrderResult.class);
+    }
+
+    @Override
+    public WithdrawOrderQueryResult withdrawOrderQuery(String merchantNo, String requestNo) {
+        WithdrawOrderQueryParams params = new WithdrawOrderQueryParams();
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        return send("/rest/v1.0/account/withdraw/system/query", "GET", params, WithdrawOrderQueryResult.class);
+    }
+
+    @Override
+    public AccountRechargeResult accountRecharge(String merchantNo, String requestNo, String amount, String bankCode, String bankAccountNo, String userRequestIP) {
+        AccountRechargeParams params = new AccountRechargeParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        params.setAmount(amount);
+        ExtParams4BankPay ext = new ExtParams4BankPay(bankCode, userRequestIP, bankAccountNo);
+        params.setRequestExtParams4BankPay(ext);
+        return send("/rest/v1.0/account/recharge", "POST", params, AccountRechargeResult.class);
     }
 
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
