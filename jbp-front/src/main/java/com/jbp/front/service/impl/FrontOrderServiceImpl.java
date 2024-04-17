@@ -1522,6 +1522,13 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
+
+        //报单用户看到的金额不展示优惠金额
+        if(order.getUid().intValue() != order.getPayUid().intValue() && currentUser.getId().equals(order.getUid())){
+            order.setPayPrice(order.getPayPrice() .add(order.getWalletDeductionFee()));
+            order.setWalletDeductionFee(BigDecimal.ZERO);
+        }
+
         BeanUtils.copyProperties(order, response);
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orderNo);
