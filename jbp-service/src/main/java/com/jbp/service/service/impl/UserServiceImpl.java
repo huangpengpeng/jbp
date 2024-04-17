@@ -985,54 +985,54 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
             account = com.jbp.common.utils.StringUtils.trim(account);
             if (userMap.get(account) != null) {
-                throw new RuntimeException("导入表格账号重复:" + account);
+                throw new CrmebException("导入表格账号重复:" + account);
             }
             userMap.put(account, importUser);
             if (getByAccount(importUser.getAccount()) != null) {
-                throw new RuntimeException(importUser.getAccount() + ":账号已经存在");
+                throw new CrmebException(importUser.getAccount() + ":账号已经存在");
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getNickname())) {
-                throw new RuntimeException("昵称不能为空"+ importUser.getAccount());
+                throw new CrmebException("昵称不能为空"+ importUser.getAccount());
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getMobile())) {
-                throw new RuntimeException("手机号不能为空"+ importUser.getAccount());
+                throw new CrmebException("手机号不能为空"+ importUser.getAccount());
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getPaccount())) {
-                throw new RuntimeException("销售账号不能为空"+ importUser.getAccount());
+                throw new CrmebException("销售账号不能为空"+ importUser.getAccount());
             }
             if(importUser.getAccount().equals(importUser.getPaccount())){
-                throw new RuntimeException("销售账号不能是注册账号"+ importUser.getPaccount());
+                throw new CrmebException("销售账号不能是注册账号"+ importUser.getPaccount());
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getOpenShop())) {
-                throw new RuntimeException("是否开店不能为空"+ importUser.getAccount());
+                throw new CrmebException("是否开店不能为空"+ importUser.getAccount());
             }
             if (!("是".equals(importUser.getOpenShop()) || "否".equals(importUser.getOpenShop()))) {
-                throw new RuntimeException("是否开店只能填写是|否"+ importUser.getAccount());
+                throw new CrmebException("是否开店只能填写是|否"+ importUser.getAccount());
             }
             if (importUser.getCapaId() == null) {
-                throw new RuntimeException("等级编号不能为空"+ importUser.getAccount());
+                throw new CrmebException("等级编号不能为空"+ importUser.getAccount());
             }
             if (capaService.getById(importUser.getCapaId()) == null) {
-                throw new RuntimeException("等级编号不存在"+ importUser.getAccount());
+                throw new CrmebException("等级编号不存在"+ importUser.getAccount());
             }
             if (importUser.getCapaXsId() != null) {
                 if (capaXsService.getById(importUser.getCapaXsId()) == null) {
-                    throw new RuntimeException("星级编号不存在"+ importUser.getAccount());
+                    throw new CrmebException("星级编号不存在"+ importUser.getAccount());
                 }
             }
             if (com.jbp.common.utils.StringUtils.isNotEmpty(importUser.getRaccount())) {
                 if(importUser.getAccount().equals(importUser.getRaccount())){
-                    throw new RuntimeException("服务账号不能是注册账号:"+ importUser.getRaccount());
+                    throw new CrmebException("服务账号不能是注册账号:"+ importUser.getRaccount());
                 }
                 if (importUser.getNode() == null) {
-                    throw new RuntimeException("存在服务上级必须填写安置节点"+ importUser.getAccount());
+                    throw new CrmebException("存在服务上级必须填写安置节点"+ importUser.getAccount());
                 }
                 if (importUser.getNode().intValue() != 0 && importUser.getNode().intValue() != 1) {
-                    throw new RuntimeException("存在服务上级必须填写安置节点且只能填写0或1"+ importUser.getAccount());
+                    throw new CrmebException("存在服务上级必须填写安置节点且只能填写0或1"+ importUser.getAccount());
                 }
             }
             if (ObjectUtils.anyNull(importUser.getUsableScore(), importUser.getUsedScore(), importUser.getGouWu(), importUser.getJiangLi(), importUser.getHuangGou(), importUser.getFuQuan())) {
-                throw new RuntimeException("积分数字不能为空，没有则录入0:"+ importUser.getAccount());
+                throw new CrmebException("积分数字不能为空，没有则录入0:"+ importUser.getAccount());
             }
             logger.info("正在检查导入数据基础信息:" + i + "###总条数:" + list.size());
             i++;
