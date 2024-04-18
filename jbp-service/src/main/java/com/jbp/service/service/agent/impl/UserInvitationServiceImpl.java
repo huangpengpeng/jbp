@@ -117,6 +117,9 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     @Override
     public Boolean hasChild(Integer uId, Integer pId) {
         List<UserUpperDto> allUpper = getAllUpper(uId);
+        if(allUpper.isEmpty()){
+            return false;
+        }
         return !ListUtils.emptyIfNull(allUpper).stream().filter(u -> pId.intValue() == u.getPId().intValue()).collect(Collectors.toList()).isEmpty();
     }
 
