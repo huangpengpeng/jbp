@@ -20,8 +20,6 @@ public class UserVisa extends BaseModel {
 
     private static final long serialVersionUID=1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
 
     @ApiModelProperty(value = "用户uid")
     private Integer uid;

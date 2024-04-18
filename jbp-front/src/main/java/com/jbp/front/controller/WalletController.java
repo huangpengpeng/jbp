@@ -185,10 +185,20 @@ public class WalletController {
         if (!walletConfig.getCanTransfer()) {
             throw new CrmebException("类型积分不可转账");
         }
-        // 转账用户
-        User receiveUser = userService.getByAccount(request.getAccount());
+        // 转账用户 账号手机号兼容
+        List<User> phoneList  = userService.getByPhone(request.getAccount());
+        if(phoneList.size()>1){
+            throw new CrmebException("手机号重复，请输入账号");
+        }
+        User receiveUser ;
+        if(!phoneList.isEmpty()){
+            receiveUser = phoneList.get(0);
+        }else{
+            receiveUser = userService.getByAccount(request.getAccount());
+        }
+
         if (ObjectUtil.isNull(receiveUser)) {
-            throw new CrmebException("账号不存在");
+            throw new CrmebException("账号/手机号不存在");
         }
         walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt(), request.getType(), request.getPostscript());
         return CommonResult.success();

@@ -920,6 +920,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return   dao.getUserPlatfromInfo(user.getPhone(),dbName);
     }
 
+    @Override
+    public UserPlatformInfoResponse getUserPlatfromInfo() {
+        User user = getById(getUserId());
+        return   dao.getUserPlatfromInfo2(user.getPhone());
+    }
+
     /**
      * 更新余额
      *

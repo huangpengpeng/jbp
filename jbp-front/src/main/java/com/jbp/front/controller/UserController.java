@@ -301,9 +301,14 @@ public class UserController {
     @RequestMapping(value = "/getPlatformUserInfo", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult<List<UserPlatformInfoResponse>> getPlatformUserInfo(String mobile, Long parentId, String appId, Boolean ifregister) {
 
-        String dbName = environment.getProperty("platform.dbName");
-        String[] platforms = dbName.split(",");
         List<UserPlatformInfoResponse> userList = new ArrayList<>();
+        String dbName = environment.getProperty("platform.dbName");
+        if(StringUtils.isBlank(dbName)){
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo();
+            userList.add(userPlatformInfoResponse);
+            return CommonResult.success(userList);
+        }
+        String[] platforms = dbName.split(",");
         for (String platform : platforms) {
 
             UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platform);
