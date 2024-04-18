@@ -77,6 +77,8 @@ public class WalletController {
         JSONObject json = new JSONObject();
         json.put("card", channelCardService.getByUser(info.getId(), channelName));
         json.put("identity", channelIdentityService.getByUser(info.getId(), channelName));
+        String commissionScale = systemConfigService.getValueByKey("wallet_withdraw_commission");
+        json.put("wallet_withdraw_commission", commissionScale);
         return CommonResult.success(json);
     }
 
