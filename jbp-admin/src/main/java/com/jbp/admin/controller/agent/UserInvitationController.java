@@ -119,4 +119,25 @@ public class UserInvitationController {
         userInvitationService.del(user.getId());
         return CommonResult.success();
     }
+
+
+
+
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "销售关系上下级删除挂载上级")
+    @GetMapping("/delmId")
+    @ApiOperation("删除")
+    public CommonResult delmId(Integer uid) {
+        if (uid == null) {
+            throw new CrmebException("账户信息不能为空");
+        }
+        User user = userService.getById(uid);
+        if (user == null) {
+            throw new CrmebException("账户不存在");
+        }
+        UserInvitation userInvitation = userInvitationService.getByUser(uid);
+        userInvitation.setMId(null);
+        userInvitationService.updateById(userInvitation);
+        return CommonResult.success();
+    }
 }
