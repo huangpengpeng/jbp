@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
@@ -135,9 +137,10 @@ public class UserInvitationController {
         if (user == null) {
             throw new CrmebException("账户不存在");
         }
-        UserInvitation userInvitation = userInvitationService.getByUser(uid);
-        userInvitation.setMId(null);
-        userInvitationService.updateById(userInvitation);
+        UpdateWrapper<UserInvitation> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("uid", uid);
+        updateWrapper.set("mid", null);
+        userInvitationService.update(null, updateWrapper);
         return CommonResult.success();
     }
 }
