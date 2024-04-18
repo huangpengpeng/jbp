@@ -296,22 +296,25 @@ public class UserController {
     }
 
 
-    @ApiOperation(value = "获取平台登录账号", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @RequestMapping(value = "/getPlatformUserInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @ApiOperation(value = "获取平台登录账号")
+    @RequestMapping(value = "/getPlatformUserInfo", method = RequestMethod.GET)
     public CommonResult<List<UserPlatformInfoResponse>> getPlatformUserInfo(String mobile, Long parentId, String appId, Boolean ifregister) {
 
         List<UserPlatformInfoResponse> userList = new ArrayList<>();
         String dbName = environment.getProperty("platform.dbName");
         if(StringUtils.isBlank(dbName)){
-            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo();
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(mobile);
+            if(userPlatformInfoResponse == null){
+                return CommonResult.success();
+            }
             userList.add(userPlatformInfoResponse);
             return CommonResult.success(userList);
         }
         String[] platforms = dbName.split(",");
         for (String platform : platforms) {
 
-            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platform);
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platform,mobile);
             if (userPlatformInfoResponse != null) {
                 userList.add(userPlatformInfoResponse);
             }

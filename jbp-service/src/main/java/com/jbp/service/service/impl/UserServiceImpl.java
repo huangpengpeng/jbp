@@ -915,15 +915,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public UserPlatformInfoResponse getUserPlatfromInfo(String dbName) {
-       User user = getById(getUserId());
-        return   dao.getUserPlatfromInfo(user.getPhone(),dbName);
+    public UserPlatformInfoResponse getUserPlatfromInfo(String dbName,String mobile) {
+        return   dao.getUserPlatfromInfo(mobile,dbName);
     }
 
     @Override
-    public UserPlatformInfoResponse getUserPlatfromInfo() {
-        User user = getById(getUserId());
-        return   dao.getUserPlatfromInfo2(user.getPhone());
+    public UserPlatformInfoResponse getUserPlatfromInfo(String mobile) {
+        return   dao.getUserPlatfromInfo2(mobile);
     }
 
     /**

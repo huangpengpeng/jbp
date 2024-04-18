@@ -401,9 +401,9 @@ public interface UserService extends IService<User> {
 
     void validPayPwd(Integer uid, String pwd);
 
-    UserPlatformInfoResponse getUserPlatfromInfo(String dbName);
+    UserPlatformInfoResponse getUserPlatfromInfo(String dbName,String mobile);
 
-    UserPlatformInfoResponse getUserPlatfromInfo();
+    UserPlatformInfoResponse getUserPlatfromInfo(String mobile);
 
     User register(String username, String phone, String account, Boolean ifOpenShop);
 

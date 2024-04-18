@@ -141,6 +141,7 @@ crmeb:
     - /actuator/**
     - /druid/**
     - api/front/pagediy/info
+    - /**/getPlatformUserInfo
 
 # 配置端口
 server:
