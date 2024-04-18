@@ -214,6 +214,13 @@ public class SysConfigConstants {
      * 积分支付开启密码
      */
     public static final String CONFIG_WALLET_PAY_OPEN_PASSWORD = "wallet_pay_open_password";
+
+
+    /**
+     * 积分显示倍数
+     */
+    public static final String WALLET_PAY_INTEGRAl = "wallet_pay_integral";
+
     /**
      * 网站名称
      */

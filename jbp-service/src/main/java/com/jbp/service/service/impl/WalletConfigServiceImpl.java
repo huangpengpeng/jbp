@@ -132,7 +132,9 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
             UserWalletInfoResponse userWalletInfoResponse = new UserWalletInfoResponse();
             userWalletInfoResponse.setWalletConfig(e);
             Wallet wallet = walletService.getByUser(user.getId(), e.getType());
-            userWalletInfoResponse.setBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance());
+            BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
+            //乘以积分倍数展示
+            userWalletInfoResponse.setBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance().multiply(wallet_pay_integral));
             userWalletInfoResponseList.add(userWalletInfoResponse);
         });
 

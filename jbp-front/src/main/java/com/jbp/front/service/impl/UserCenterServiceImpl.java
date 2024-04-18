@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
@@ -37,10 +39,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -104,9 +103,29 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     @Override
     public UserCenterResponse getUserCenterInfo() {
         Integer uid = userService.getUserId();
+       UserCapa userCapa =  userCapaService.getByUser(uid);
         UserCenterResponse response = new UserCenterResponse();
         response.setCenterBanner(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_BANNER));
-        response.setCenterMenu(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_MENU));
+
+        List<HashMap<String, Object>> hashMapList =  systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_MENU);
+
+        for(int i=0;i<hashMapList.size();i++){
+            HashMap<String,Object> map = hashMapList.get(i);
+            JSONArray ifCapa =JSONObject.parseArray(map.get("capaId").toString());
+
+            if(ifCapa.isEmpty()){
+                continue;
+            }
+            Boolean ifext =  ifCapa.contains(userCapa.getCapaId().intValue());
+            if(!ifext){
+                hashMapList.remove(i);
+            }
+        }
+
+
+        response.setCenterMenu(hashMapList);
+
+
         response.setOrderMenu(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_ORDER));
 
         if (uid <= 0) {

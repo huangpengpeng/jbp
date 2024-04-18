@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Wallet;
@@ -96,7 +97,14 @@ public class WalletController {
             return CommonResult.failed("状态已禁用");
         }
         User info = userService.getInfo();
-        return CommonResult.success(walletService.getByUser(info.getId(), type));
+        Wallet wallet= walletService.getByUser(info.getId(), type);
+
+        if(wallet == null){
+            return CommonResult.success();
+        }
+        BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
+        wallet.setBalance(wallet.getBalance().multiply(wallet_pay_integral));
+        return CommonResult.success(wallet);
     }
 
 

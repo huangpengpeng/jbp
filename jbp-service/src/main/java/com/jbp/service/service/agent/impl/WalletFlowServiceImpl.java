@@ -7,6 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -16,6 +17,7 @@ import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.dao.agent.WalletFlowDao;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.WalletFlowService;
@@ -39,6 +41,8 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     WalletConfigService walletConfigService;
     @Resource
     UserService userService;
+    @Resource
+    SystemConfigService systemConfigService;
 
     @Override
     public WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
@@ -100,6 +104,14 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                 .orderByDesc(WalletFlow::getId);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WalletFlow> list = list(walletLambdaQueryWrapper);
+
+        BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
+
+        list.forEach(e ->{
+            e.setAmt(e.getAmt().multiply(wallet_pay_integral));
+            e.setOrgBalance(e.getOrgBalance().multiply(wallet_pay_integral));
+            e.setTagBalance(e.getTagBalance().multiply(wallet_pay_integral));
+        });
 
         return CommonPage.copyPageInfo(page, list);
     }

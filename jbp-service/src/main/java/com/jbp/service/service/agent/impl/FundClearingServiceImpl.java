@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
@@ -352,22 +353,27 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
     @Override
     public Map<String, Object> totalGet(Integer uid) {
+
+
+        BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
         Map<String, Object> map = new HashMap<>();
         LambdaQueryWrapper<FundClearing> issue = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid)
                 .in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
         BigDecimal count = list(issue).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        map.put("issue", count);
+        map.put("issue", count.multiply(wallet_pay_integral));
         LambdaQueryWrapper<FundClearing> completed = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid)
                 .eq(FundClearing::getStatus, FundClearing.Constants.已出款);
         BigDecimal completedCount = list(completed).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-        map.put("completed", completedCount);
+        map.put("completed", completedCount.multiply(wallet_pay_integral));
         return map;
     }
 
     @Override
     public PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest) {
+        BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
+
         LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<>();
         setFundClearingWrapperByStatus(lqw, uid, headerStatus);
         lqw.orderByDesc(FundClearing::getId);
@@ -380,10 +386,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         walletMap.put(-1, new WalletConfig().setName("管理费"));
         walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
+            e.setSendAmt(e.getSendAmt().multiply(wallet_pay_integral));
             e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
             for (FundClearingItem item : e.getItems()) {
                 WalletConfig walletConfig = walletMap.get(item.getWalletType());
                 item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
+                item.setAmt(item.getAmt().multiply(wallet_pay_integral));
             }
         });
         return CommonPage.copyPageInfo(page, list);
