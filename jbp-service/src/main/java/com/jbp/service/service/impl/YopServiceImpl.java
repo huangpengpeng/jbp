@@ -88,6 +88,62 @@ public class YopServiceImpl implements YopService {
         return send("/rest/v1.0/account/recharge", "POST", params, AccountRechargeResult.class);
     }
 
+    @Override
+    public AccountRechargeQueryResult accountRechargeQuery(String merchantNo, String requestNo) {
+        AccountRechargeQueryParams params = new AccountRechargeQueryParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        return send("/rest/v1.0/account/recharge/query", "GET", params, AccountRechargeQueryResult.class);
+    }
+
+    @Override
+    public AccountTransferOrderResult transferB2bOrder(String requestNo, String fromMerchantNo, String toMerchantNo, String orderAmount, String notifyUrl) {
+        AccountTransferOrderParams params = new AccountTransferOrderParams();
+        params.setParentMerchantNo("10089066338");
+        params.setRequestNo(requestNo);
+        params.setFromMerchantNo(fromMerchantNo);
+        params.setToMerchantNo(toMerchantNo);
+        params.setOrderAmount(orderAmount);
+        params.setNotifyUrl(notifyUrl);
+        return send("/rest/v1.0/account/transfer/b2b/order", "GET", params, AccountTransferOrderResult.class);
+    }
+
+    @Override
+    public AccountTransferOrderQueryResult transferB2bOrderQuery(String merchantNo, String requestNo) {
+        AccountTransferOrderQueryParams params = new AccountTransferOrderQueryParams();
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        return send("/rest/v1.0/account/transfer/system/query", "GET", params, AccountTransferOrderQueryResult.class);
+    }
+
+    @Override
+    public AccountPayOrderResult accountPayOrder(String merchantNo, String requestNo, String orderAmount,
+                                                 String receiverAccountName,
+                                                 String receiverAccountNo, String receiverBankCode, String bankAccountType,
+                                                 String branchBankCode, String notifyUrl) {
+        AccountPayOrderParams params = new AccountPayOrderParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        params.setOrderAmount(orderAmount);
+        params.setReceiverAccountName(receiverAccountName);
+        params.setReceiverAccountNo(receiverAccountNo);
+        params.setReceiverBankCode(receiverBankCode);
+        params.setBankAccountType(bankAccountType);
+        params.setBranchBankCode(branchBankCode);
+        params.setNotifyUrl(notifyUrl);
+        return send("/rest/v1.0/account/pay/order", "POST", params, AccountPayOrderResult.class);
+    }
+
+    @Override
+    public AccountPayOrderQueryResult accountPayOrderQuery(String merchantNo, String requestNo) {
+        AccountPayOrderQueryParams params = new AccountPayOrderQueryParams();
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        return send("/rest/v1.0/account/pay/system/query", "GET", params, AccountPayOrderQueryResult.class);
+    }
+
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);

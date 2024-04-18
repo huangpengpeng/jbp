@@ -39,6 +39,17 @@ import java.util.regex.Pattern;
  */
 public class CrmebUtil {
 
+    /**
+     * 密码工具
+     *
+     * @param args String[] 字符串数组
+     */
+    public static void main(String[] args) throws Exception {
+//        System.out.println(encryptPassword("123456", "15871898211"));
+        System.out.println(decryptPassowrd("0g98reb4gO4=", "15618417068"));
+
+    }
+
     public static String encryptPassword(String pwd, String key) {
         try {
             Security.addProvider(new com.sun.crypto.provider.SunJCE());
@@ -135,16 +146,7 @@ public class CrmebUtil {
     }
 
 
-    /**
-     * 密码工具
-     *
-     * @param args String[] 字符串数组
-     */
-    public static void main(String[] args) throws Exception {
-//        System.out.println(encryptPassword("123456", "15871898211"));
-        System.out.println(decryptPassowrd("kS2IqUkx0vI=", "18444010100"));
-    	
-    }
+
 
     /**
      * map合并

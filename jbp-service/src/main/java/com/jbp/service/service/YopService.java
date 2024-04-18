@@ -1,5 +1,6 @@
 package com.jbp.service.service;
 
+import com.jbp.common.yop.params.AccountPayOrderParams;
 import com.jbp.common.yop.result.*;
 
 public interface YopService {
@@ -35,9 +36,52 @@ public interface YopService {
     WithdrawOrderQueryResult withdrawOrderQuery(String merchantNo, String requestNo);
 
     /**
-     * 划拨
+     * 充值 --- 划拨
      */
     AccountRechargeResult accountRecharge(String merchantNo, String requestNo, String amount, String bankCode, String bankAccountNo, String userRequestIP);
+
+    /**
+     * 充值 --- 划拨 查询
+     */
+    AccountRechargeQueryResult accountRechargeQuery(String merchantNo, String requestNo);
+
+    /**
+     * 转账
+     */
+    AccountTransferOrderResult transferB2bOrder(String requestNo, String fromMerchantNo, String toMerchantNo, String orderAmount, String notifyUrl);
+
+    /**
+     * 转账查询
+     */
+    AccountTransferOrderQueryResult transferB2bOrderQuery(String merchantNo, String requestNo);
+
+    /**
+     * 代付
+     *
+     */
+
+    AccountPayOrderResult accountPayOrder(String merchantNo, String requestNo,
+                                          String orderAmount, String receiverAccountName,
+                                          String receiverAccountNo, String receiverBankCode,
+                                          String bankAccountType, String branchBankCode, String notifyUrl);
+
+
+    /**
+     * 代付查询
+     *
+     */
+    AccountPayOrderQueryResult accountPayOrderQuery(String merchantNo, String requestNo);
+
+    /**
+     * 资金流水
+     * /rest/v1.0/std/bill/fundbill/flow/query
+     */
+
+
+
+    /**
+     * 回执下载
+     */
 
 
 }
