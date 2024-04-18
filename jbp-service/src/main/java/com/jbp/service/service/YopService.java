@@ -1,6 +1,5 @@
 package com.jbp.service.service;
 
-import com.jbp.common.yop.params.AccountPayOrderParams;
 import com.jbp.common.yop.result.*;
 
 public interface YopService {
@@ -65,7 +64,6 @@ public interface YopService {
                                           String receiverAccountNo, String receiverBankCode,
                                           String bankAccountType, String branchBankCode, String notifyUrl);
 
-
     /**
      * 代付查询
      *
@@ -74,14 +72,16 @@ public interface YopService {
 
     /**
      * 资金流水
-     * /rest/v1.0/std/bill/fundbill/flow/query
      */
-
+    FundBillFlowQueryResult fundBillFlowQuery(String startDate, String endDate, String merchantNo, Integer page, Integer size);
 
 
     /**
      * 回执下载
      */
+    AccountReceiptResult accountReceiptGet(String merchantNo, String requestNo, String tradeType);
+
+
 
 
 }

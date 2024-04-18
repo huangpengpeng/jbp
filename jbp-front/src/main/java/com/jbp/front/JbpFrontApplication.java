@@ -1,6 +1,7 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.yop.result.BankAccountQueryResult;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
@@ -39,8 +40,10 @@ public class JbpFrontApplication {
         System.out.println("ok");
 
         YopService yopService = run.getBean(YopService.class);
-//        yopService.bankAccountQuery("10090224584", "2db2ab44dd70468a9bbf6a54e8ccb1f9");
-//        yopService.bankAccountBalanceQuery("10090225827", "HXBXB", "9000012701039001001370000613");
+        BankAccountQueryResult result = yopService.bankAccountQuery("10090108498", "682def8556e946ed9c06d9c73eb3e792");
+        System.out.println(result);
+
+        //        yopService.bankAccountBalanceQuery("10090225827", "HXBXB", "9000012701039001001370000613");
 
 //        yopService.accountBalanceQuery("10090224584");
 

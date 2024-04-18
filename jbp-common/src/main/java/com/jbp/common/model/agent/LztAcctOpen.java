@@ -76,6 +76,9 @@ public class LztAcctOpen extends BaseModel {
     @ApiModelProperty(value = "通知信息")
     private String notifyInfo;
 
+    @ApiModelProperty(value = "支付渠道  默认  连连  易宝")
+    private String payChannel;
+
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;

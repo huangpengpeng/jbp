@@ -173,4 +173,7 @@ public class Merchant implements Serializable {
 
     @ApiModelProperty(value = "风控类目")
     private String frmsWareCategory;
+
+    @ApiModelProperty(value = "支付渠道  默认  连连  易宝")
+    private String payChannel;
 }

@@ -144,6 +144,29 @@ public class YopServiceImpl implements YopService {
         return send("/rest/v1.0/account/pay/system/query", "GET", params, AccountPayOrderQueryResult.class);
     }
 
+    @Override
+    public FundBillFlowQueryResult fundBillFlowQuery(String startDate, String endDate, String merchantNo,
+                                                     Integer page, Integer size) {
+        FundBillFlowQueryParams params = new FundBillFlowQueryParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setStartDate(startDate);
+        params.setEndDate(endDate);
+        params.setPage(page);
+        params.setSize(size);
+        return send("/rest/v1.0/std/bill/fundbill/flow/query", "GET", params, FundBillFlowQueryResult.class);
+    }
+
+    @Override
+    public AccountReceiptResult accountReceiptGet(String merchantNo, String requestNo, String tradeType) {
+        AccountReceiptParams params = new AccountReceiptParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setRequestNo(requestNo);
+        params.setTradeType(tradeType);
+        return send("/rest/v1.0/account/receipt/get", "GET", params, AccountReceiptResult.class);
+    }
+
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);

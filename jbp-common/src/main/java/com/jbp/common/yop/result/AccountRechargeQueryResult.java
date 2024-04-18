@@ -49,11 +49,9 @@ public class AccountRechargeQueryResult extends BaseYopResponse {
 
     private String remitComment; // 汇款备注码
 
-
     private String bankCode; // 银行编码 示例值：为保证充值正常入账，银行汇款时务必在附言或备注处填写此码；
 
     private String bankName; // 银行名称
-
 
     private String payerAccountNo; // 付款方账号
 
