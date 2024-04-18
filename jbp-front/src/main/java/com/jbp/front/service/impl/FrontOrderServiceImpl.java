@@ -1451,6 +1451,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             OrderExt orderExt =  orderExtService.getByOrder(order.getOrderNo());
             infoResponse.setServerSn(orderExt.getServerSn());
             infoResponse.setPayGateway(order.getPayGateway());
+
+            if(order.getUid().intValue() != order.getPayUid().intValue() && userId.equals(order.getUid())){
+                infoResponse.setPayPrice(order.getPayPrice() .add(order.getWalletDeductionFee()));
+            }
+
             responseList.add(infoResponse);
         }
         //查询历史订单
@@ -1524,6 +1529,13 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
+
+        //报单用户看到的金额不展示优惠金额
+        if(order.getUid().intValue() != order.getPayUid().intValue() && currentUser.getId().equals(order.getUid())){
+            order.setPayPrice(order.getPayPrice() .add(order.getWalletDeductionFee()));
+            order.setWalletDeductionFee(BigDecimal.ZERO);
+        }
+
         BeanUtils.copyProperties(order, response);
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNo);
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orderNo);

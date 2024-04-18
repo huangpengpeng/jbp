@@ -40,6 +40,5 @@ public class CartRequest {
 
     @ApiModelProperty(value = "商品数量", required = true)
     @NotNull(message = "请选择商品数量")
-    @Range(min = 1, max = 99, message = "单次可添加商品数量范围为 1~99")
     private Integer cartNum;
 }
