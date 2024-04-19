@@ -79,7 +79,7 @@ public class AuthorizeAct {
 	
 	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
 	@RequestMapping(value = "/jushuitan/callApi1", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi1(@RequestBody JSONObject jsonObject, HttpServletResponse response, ModelMap model) {
+	public void erpcallApi1(JSONObject jsonObject, HttpServletResponse response) {
 		{
 			log.info("jushuitancallApi:{} jsonObject:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()),
 					jsonObject.toJSONString());
@@ -127,7 +127,7 @@ public class AuthorizeAct {
 	}
 	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
 	@RequestMapping(value = "/jushuitan/callApi2", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi2(@RequestBody JSONObject jsonObject,HttpServletResponse response, ModelMap model) {
+	public void erpcallApi2(JSONObject jsonObject,HttpServletResponse response) {
 		{
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
@@ -157,7 +157,7 @@ public class AuthorizeAct {
 	}
 	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
 	@RequestMapping(value = "/jushuitan/callApi4", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi4(@RequestBody JSONObject jsonObject,HttpServletResponse response, ModelMap model) {
+	public void erpcallApi4(JSONObject jsonObject,HttpServletResponse response) {
 		{
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
