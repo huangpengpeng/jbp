@@ -164,7 +164,7 @@ public class LztAcctController {
         return CommonResult.success(lztAcctService.list(query));
     }
 
-    @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
+//    @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
     @SneakyThrows
     @ApiOperation(value = "账户资金明细 flagDc-> DEBIT：出账 CREDIT：入账 时间格式 yyyyMMddHHmmss")
     @GetMapping(value = "/serialPage")
@@ -200,6 +200,12 @@ public class LztAcctController {
                 acctBalList.setTxn_type(LianLianPayConfig.SerialTxnType.getName(acctBalList.getTxn_type()));
                 acctBalList.setFlag_dc("CREDIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
                 acctBalList.setTxn_time(DateTimeUtils.format(DateTimeUtils.parseDate(acctBalList.getTxn_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
+                if(StringUtils.isNotEmpty(acctBalList.getJno_acct())){
+                    AcctSerialDetailResult acctSerialDetailResult = lztService.acctSerialDetail(payInfo.getOidPartner(), payInfo.getPriKey(), acctBalList.getUserId(),
+                            LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), acctBalList.getJno_acct());
+                    acctBalList.setDetail(acctSerialDetailResult);
+                }
             }
         }
         page.setPage(result.getPage_no());

@@ -86,7 +86,6 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         }
         BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
         BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
-        feeScale = feeScale.subtract(BigDecimal.valueOf(0.0008));
         if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
             feeAmount =
                     amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);

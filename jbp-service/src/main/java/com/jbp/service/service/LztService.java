@@ -151,6 +151,13 @@ public interface LztService {
     ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
                                                   String txn_seqno, String verify_code_new);
 
+
+
+
+    /**
+     * 资金流水详情
+     */
+    AcctSerialDetailResult acctSerialDetail(String oidPartner, String priKey, String user_id, String user_type, String jno_acct);
 }
 
 
