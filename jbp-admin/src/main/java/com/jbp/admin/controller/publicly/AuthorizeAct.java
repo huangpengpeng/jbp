@@ -84,7 +84,7 @@ public class AuthorizeAct {
 	@RequestMapping(value = "/jushuitan/callApi1")
 	public void erpcallApi1(String jsonObject,HttpServletResponse response) {
 
-
+		response.setContentType("text/html;charset=UTF-8");
 		if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
@@ -145,7 +145,7 @@ public class AuthorizeAct {
 		{
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
-
+		response.setContentType("text/html;charset=UTF-8");
 
 		if(StringUtils.isBlank(jsonObject)){
 			try {
@@ -164,6 +164,7 @@ public class AuthorizeAct {
 		//退款
 //		ordersMng.refund(orders.getId(), refundMark, "聚水潭", "聚水潭通知");
 		try {
+
 			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -175,6 +176,7 @@ public class AuthorizeAct {
 		{
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
+		response.setContentType("text/html;charset=UTF-8");
 		try {
 			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
 		} catch (IOException e) {
@@ -187,6 +189,7 @@ public class AuthorizeAct {
 		{
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
+		response.setContentType("text/html;charset=UTF-8");
 		if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
