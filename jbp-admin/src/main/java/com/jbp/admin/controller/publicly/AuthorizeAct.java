@@ -85,6 +85,9 @@ public class AuthorizeAct {
 	public void erpcallApi1(String jsonObject,HttpServletResponse response) {
 
 		response.setContentType("text/html;charset=UTF-8");
+		response.setHeader("Pragma", "No-cache");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setDateHeader("Expires", 0L);
 		if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
@@ -146,6 +149,9 @@ public class AuthorizeAct {
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
 		response.setContentType("text/html;charset=UTF-8");
+		response.setHeader("Pragma", "No-cache");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setDateHeader("Expires", 0L);
 
 		if(StringUtils.isBlank(jsonObject)){
 			try {
@@ -177,6 +183,9 @@ public class AuthorizeAct {
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
 		response.setContentType("text/html;charset=UTF-8");
+		response.setHeader("Pragma", "No-cache");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setDateHeader("Expires", 0L);
 		try {
 			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
 		} catch (IOException e) {
@@ -190,6 +199,9 @@ public class AuthorizeAct {
 			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
 		}
 		response.setContentType("text/html;charset=UTF-8");
+		response.setHeader("Pragma", "No-cache");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setDateHeader("Expires", 0L);
 		if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
