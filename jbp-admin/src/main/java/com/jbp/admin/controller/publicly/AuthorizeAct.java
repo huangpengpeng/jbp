@@ -88,58 +88,58 @@ public class AuthorizeAct {
 		response.setHeader("Pragma", "No-cache");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setDateHeader("Expires", 0L);
-		if(StringUtils.isBlank(jsonObject)){
+//		if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
 				return;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		{
-			log.info("jushuitancallApi:{} jsonObject:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()),
-					jsonObject);
-		}
-			JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
-
-		{
-			String orderSn = jsonObject1.getString("so_id");
-			String shipName = jsonObject1.getString("logistics_company");
-			String shipSn = jsonObject1.getString("l_id");
-			Order orders = orderService.getByOrderNo(orderSn);
-			if (!orders.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING)) {
-				throw new RuntimeException(orders.getOrderNo() + "状态错误");
-			}
-			Express express =  expressService.getByName(shipName);
-
-			OrderSendRequest orderSendRequest = new OrderSendRequest();
-			orderSendRequest.setOrderNo(orders.getOrderNo());
-			orderSendRequest.setDeliveryType("express");
-			orderSendRequest.setExpressCode(express.getCode());
-			orderSendRequest.setIsSplit(false);
-			orderSendRequest.setExpressNumber(shipSn);
-			orderSendRequest.setExpressRecordType(1);
-			MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orders.getOrderNo());
-			orderSendRequest.setToName(merchantOrder.getRealName());
-			orderSendRequest.setToTel(merchantOrder.getUserPhone());
-			orderSendRequest.setToAddr(merchantOrder.getUserAddress());
-			List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orders.getOrderNo());
-			List<SplitOrderSendDetailRequest> list = new ArrayList<>();
-			for (OrderDetail orderDetail : orderDetailList) {
-				SplitOrderSendDetailRequest splitOrderSendDetailRequest = new SplitOrderSendDetailRequest();
-				splitOrderSendDetailRequest.setNum(orderDetail.getPayNum());
-				splitOrderSendDetailRequest.setOrderDetailId(orderDetail.getId());
-				list.add(splitOrderSendDetailRequest);
-			}
-			orderSendRequest.setDetailList(list);
-			orderSendRequest.setExpressTempId(shipSn);
-			try {
-				orderService.send(orderSendRequest);
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		//}
+//		{
+//			log.info("jushuitancallApi:{} jsonObject:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()),
+//					jsonObject);
+//		}
+//			JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
+//
+//		{
+//			String orderSn = jsonObject1.getString("so_id");
+//			String shipName = jsonObject1.getString("logistics_company");
+//			String shipSn = jsonObject1.getString("l_id");
+//			Order orders = orderService.getByOrderNo(orderSn);
+//			if (!orders.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING)) {
+//				throw new RuntimeException(orders.getOrderNo() + "状态错误");
+//			}
+//			Express express =  expressService.getByName(shipName);
+//
+//			OrderSendRequest orderSendRequest = new OrderSendRequest();
+//			orderSendRequest.setOrderNo(orders.getOrderNo());
+//			orderSendRequest.setDeliveryType("express");
+//			orderSendRequest.setExpressCode(express.getCode());
+//			orderSendRequest.setIsSplit(false);
+//			orderSendRequest.setExpressNumber(shipSn);
+//			orderSendRequest.setExpressRecordType(1);
+//			MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orders.getOrderNo());
+//			orderSendRequest.setToName(merchantOrder.getRealName());
+//			orderSendRequest.setToTel(merchantOrder.getUserPhone());
+//			orderSendRequest.setToAddr(merchantOrder.getUserAddress());
+//			List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orders.getOrderNo());
+//			List<SplitOrderSendDetailRequest> list = new ArrayList<>();
+//			for (OrderDetail orderDetail : orderDetailList) {
+//				SplitOrderSendDetailRequest splitOrderSendDetailRequest = new SplitOrderSendDetailRequest();
+//				splitOrderSendDetailRequest.setNum(orderDetail.getPayNum());
+//				splitOrderSendDetailRequest.setOrderDetailId(orderDetail.getId());
+//				list.add(splitOrderSendDetailRequest);
+//			}
+//			orderSendRequest.setDetailList(list);
+//			orderSendRequest.setExpressTempId(shipSn);
+//			try {
+//				orderService.send(orderSendRequest);
+//			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -153,28 +153,28 @@ public class AuthorizeAct {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setDateHeader("Expires", 0L);
 
-		if(StringUtils.isBlank(jsonObject)){
+		//if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
 				return;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
-
-		String orderSn = jsonObject1.getString("so_id");
-		String refundMark= jsonObject1.getString("remark");
-
-		Order orders = orderService.getByOrderNo(orderSn);
-		//退款
-//		ordersMng.refund(orders.getId(), refundMark, "聚水潭", "聚水潭通知");
-		try {
-
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		}
+//		JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
+//
+//		String orderSn = jsonObject1.getString("so_id");
+//		String refundMark= jsonObject1.getString("remark");
+//
+//		Order orders = orderService.getByOrderNo(orderSn);
+//		//退款
+////		ordersMng.refund(orders.getId(), refundMark, "聚水潭", "聚水潭通知");
+//		try {
+//
+//			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
 	@RequestMapping(value = "/jushuitan/callApi3", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -202,26 +202,26 @@ public class AuthorizeAct {
 		response.setHeader("Pragma", "No-cache");
 		response.setHeader("Cache-Control", "no-cache");
 		response.setDateHeader("Expires", 0L);
-		if(StringUtils.isBlank(jsonObject)){
+	//	if(StringUtils.isBlank(jsonObject)){
 			try {
 				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
 				return;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
-		String orderSn = jsonObject1.getString("so_id");
-		String refundMark= jsonObject1.getString("remark");
+//		}
+//		JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
+//		String orderSn = jsonObject1.getString("so_id");
+//		String refundMark= jsonObject1.getString("remark");
 
 		//退款
 //		Orders orders=ordersMng.getByOrderSn(orderSn);
 //		ordersMng.refund(orders.getId(), refundMark, "聚水潭", "聚水潭通知");
-		try {
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 
