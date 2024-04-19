@@ -40,6 +40,8 @@ public class JbpFrontApplication {
         System.out.println("ok");
 
         YopService yopService = run.getBean(YopService.class);
+
+//        yopService.accountRecharge();
         BankAccountQueryResult result = yopService.bankAccountQuery("10090108498", "682def8556e946ed9c06d9c73eb3e792");
         System.out.println(result);
 
