@@ -1045,6 +1045,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             logger.info("正在注册新用户信息:" + i + "###总条数:" + list.size());
             i++;
         }
+        i = 1;
+        for (UserImportRequest importUser : list) {
+            User user = getByAccount(importUser.getAccount());
+            userCapaService.saveOrUpdateCapa(user.getId(), importUser.getCapaId(), "导入", "导入");
+            if (importUser.getCapaXsId() != null) {
+                userCapaXsService.saveOrUpdateCapa(user.getId(), importUser.getCapaXsId(), false, "导入", "导入");
+            }
+            logger.info("正在处理用户等级信息:" + i + "###总条数:" + list.size());
+            i++;
+        }
         // 绑定销售上级
         i = 1;
         for (UserImportRequest importUser : list) {
