@@ -24,6 +24,7 @@ crmeb:
       - /druid/**
       - api/admin/platform/pagediy/info
       - /jmreport/**
+      - /jushuitan/**
 # 配置端口
 server:
   port: 8181
