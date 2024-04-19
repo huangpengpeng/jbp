@@ -124,7 +124,8 @@ public class WebConfig implements WebMvcConfigurer {
 				excludePathPatterns("/api/front/pc/home/**").excludePathPatterns("/api/front/merchant/pc/**").
 
 				excludePathPatterns("/api/front/pagediy/**").
-				excludePathPatterns("/api/front/user/getPlatformUserInfo")
+				excludePathPatterns("/api/front/user/getPlatformUserInfo").
+				excludePathPatterns("/api/front/jushuitan/**")
 				.excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
 		registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
 		registry.addInterceptor(new SignInterceptor()).addPathPatterns("/**");

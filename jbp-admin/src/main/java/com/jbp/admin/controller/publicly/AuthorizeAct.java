@@ -54,7 +54,7 @@ public class AuthorizeAct {
 		params.put("app_key",  environment.getProperty("jushuitan.appKey"));
 	    params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
 		params.put("charset", Constants.CHARSET);
-		String state = JushuitanCallSvc.getLocation(request).replace("go", "callApi");
+		String state = environment.getProperty("jushuitan.url");
 		params.put("state", state);
 		String sign = SignUtil.getSign(environment.getProperty("jushuitan.appSecret"), params);
 		/**
@@ -66,18 +66,7 @@ public class AuthorizeAct {
 		return "redirect:"+url;
 	}
 
-	@ApiOperation(value = "erp 授权", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/auth/callApi", produces = MediaType.APPLICATION_JSON_VALUE)
-	public String callApi(String code, HttpServletResponse response, ModelMap model) {
-		{
-			log.info("code:", code);
-		}
-		{
-			callSvc.getAccessToken(code);
-		}
-		return  "授权成功";
 
-	}
 
 
 

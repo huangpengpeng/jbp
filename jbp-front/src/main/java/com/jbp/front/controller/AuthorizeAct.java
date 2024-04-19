@@ -189,6 +189,20 @@ public class AuthorizeAct {
 	}
 
 
+	@ApiOperation(value = "erp 授权", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/auth/callApi", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String callApi(String code, HttpServletResponse response, ModelMap model) {
+		{
+			log.info("code:", code);
+		}
+		{
+			callSvc.getAccessToken(code);
+		}
+		return  "授权成功";
+
+	}
+
+
 
 
 
