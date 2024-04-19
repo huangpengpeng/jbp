@@ -82,7 +82,7 @@ public class JushuitanOrderSvc {
                 for (OrderDetail g : orderDetailList) {
                     JSONObject item = new JSONObject();
                     item.put("sku_id", g.getBarCode());
-                    item.put("shop_sku_id", g.getProductId());
+                    item.put("shop_sku_id", g.getProductId().toString());
                     item.put("amount", g.getPayPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
                     item.put("base_price", g.getPrice());
                     item.put("qty", g.getPayNum());
