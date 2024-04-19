@@ -26,6 +26,7 @@ public class FundBillFlowDto implements Serializable {
     private String orderId; // 商户订单号
 
     private String fee; // 手续费(元),
+
     private String income; // 收入金额(元)
 
     private String expenditure; //  支出金额(元)
@@ -39,20 +40,18 @@ public class FundBillFlowDto implements Serializable {
 
     private String accountType; // 账户类型
 
-
     private String orgOrderId; // 原商户订单号 本次业务对应的原商户请求号
-
 
     private String bankOrderId; // 银行单号
 
     private String paymentNo;//  支付单号
+
 
     private String payerAccountName;// 付款方账户名称
 
     private String payerTel;// 付款方手机号
 
     private String payerAccountNo; // 付款方账号
-
 
     private String payerBankAccType; // 付款方账户类型
 

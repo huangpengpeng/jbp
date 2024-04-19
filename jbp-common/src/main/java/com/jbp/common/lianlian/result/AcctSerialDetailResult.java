@@ -15,9 +15,7 @@ public class AcctSerialDetailResult {
 
     private String date_acct; // 账务日期。交易账期，格式：yyyyMMdd
 
-    private String
-
-            oid_acctno; // 账户号
+    private String  oid_acctno; // 账户号
 
     private String jno_acct;// 资金流水号。ACCP账务系统资金流水唯一标识。
 

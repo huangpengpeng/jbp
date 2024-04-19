@@ -21,6 +21,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctOpenDao;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctOpenService;
@@ -49,6 +50,8 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     private LztAcctService lztAcctService;
     @Resource
     private LztPayChannelService lztPayChannelService;
+    @Resource
+    private DegreePayService degreePayService;
 
     @Override
     public LztAcctOpen apply(Integer merId, String userId, String userType, String returnUrl, String businessScope, Long payChannelId) {
@@ -175,10 +178,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
 			}
 			// 检查第三方开户状态
 			if (!s.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
-				MerchantPayInfo payInfo = merchant.getPayInfo();
-				AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),
-						s.getUserId(), LianLianPayConfig.UserType.getCode(s.getUserType()));
-
+                AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcctService.getByUserId(s.getUserId()));
 				if (CollectionUtils.isNotEmpty(acctInfoResult.getAcctinfo_list())) {
 					String extStatus = acctInfoResult.getAcctinfo_list().get(0).getAcct_state();
 					if (extStatus.equals(LianLianPayConfig.UserStatus.正常.getCode())) {

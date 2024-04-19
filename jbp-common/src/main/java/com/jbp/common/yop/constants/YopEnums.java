@@ -115,6 +115,55 @@ public class YopEnums {
         }
     }
 
+    public enum TrxCodeEnum {
+        收单("1001"),
+        分账("1002"),
+        分账退回("1003"),
+        退款("1004"),
+
+        充值("1005"),
+        转账("1006"),
+        退款撤销("1010"),
+
+        提现("2004"),
+        企业付款("2005"),
+        收费("2006"),
+        收费撤销("2007"),
+
+        支付账户支付("2009"),
+        日结通("2011"),
+        快速实名认证("2012"),
+        划拨("2026"),
+        资金归集("2027"),
+        营销账户退款("2028"),
+        营销账户支付("2029"),
+
+        补贴商户入账("2035"),
+        OCR识别("2037"),
+        OCR识别撤销("2038"),
+        结算("4001"),
+        ;
+        @Getter
+        private String value;
+
+        TrxCodeEnum(String value) {
+            this.value = value;
+        }
+
+        public static TrxCodeEnum getByValue(String value) {
+            for (TrxCodeEnum trxCodeEnum : TrxCodeEnum.values()) {
+                if (trxCodeEnum.value.equals(value)) {
+                    return trxCodeEnum;
+                }
+            }
+            return null;
+        }
+    }
+
+
+
+
+
 
 
 }

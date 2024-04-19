@@ -18,6 +18,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.*;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
@@ -56,6 +57,8 @@ public class LztAcctController {
     private LztTransferService lztTransferService;
     @Resource
     private LztWithdrawalService lztWithdrawalService;
+    @Resource
+    private DegreePayService degreePayService;
 
     @GetMapping("/add")
     @ApiOperation("新增账户")
@@ -186,9 +189,9 @@ public class LztAcctController {
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
     @SneakyThrows
-    @ApiOperation(value = "账户资金明细 flagDc-> DEBIT：出账 CREDIT：入账 时间格式 yyyyMMddHHmmss")
+    @ApiOperation(value = "账户资金明细 入账 时间格式 yyyyMMddHHmmss")
     @GetMapping(value = "/serialPage")
-    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, String flagDc, Integer pageNo) {
+    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, Integer pageNo) {
         if (StringUtils.isEmpty(userId)) {
             throw new CrmebException("请选择账号查询");
         }
@@ -208,8 +211,7 @@ public class LztAcctController {
         }
         MerchantPayInfo payInfo = merchant.getPayInfo();
         CommonPage<AcctBalList> page = new CommonPage();
-        AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), userId,
-                LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), dateStart, endStart, flagDc, pageNo.toString());
+        AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, dateStart, endStart, pageNo);
         List<AcctBalList> acctbalList = result.getAcctbal_list();
         if (CollectionUtils.isNotEmpty(acctbalList)) {
             for (AcctBalList acctBalList : acctbalList) {
@@ -220,8 +222,7 @@ public class LztAcctController {
                 acctBalList.setTxn_type(LianLianPayConfig.SerialTxnType.getName(acctBalList.getTxn_type()));
                 acctBalList.setFlag_dc("CREDIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
                 acctBalList.setTxn_time(DateTimeUtils.format(DateTimeUtils.parseDate(acctBalList.getTxn_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
-
-                if(StringUtils.isNotEmpty(acctBalList.getJno_acct())){
+                if(StringUtils.isNotEmpty(acctBalList.getJno_acct()) && "连连".equals(lztAcct.getPayChannelType())){
                     AcctSerialDetailResult acctSerialDetailResult = lztService.acctSerialDetail(payInfo.getOidPartner(), payInfo.getPriKey(), acctBalList.getUserId(),
                             LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), acctBalList.getJno_acct());
                     acctBalList.setDetail(acctSerialDetailResult);
@@ -229,19 +230,20 @@ public class LztAcctController {
                     if(StringUtils.equals("内部代发", acctBalList.getTxn_type())){
                         acctBalList.setTxn_type("转账");
                     }
-                    if(StringUtils.equals("外部代发", acctBalList.getTxn_type())){
+                    if(StringUtils.equals("外部代发", acctBalList.getTxn_type())  && acctBalList.getFeeAmount() == null){
                         acctBalList.setTxn_type("代付");
                         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
-                        if(lztTransfer != null){
+                        if(lztTransfer != null ){
                             acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
                         }
                     }
-                    if(StringUtils.equals("账户提现", acctBalList.getTxn_type())){
+                    if(StringUtils.equals("账户提现", acctBalList.getTxn_type()) &&  acctBalList.getFeeAmount() == null){
                         LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(acctBalList.getJno_cli());
                         if(lztWithdrawal != null){
                             acctBalList.setFeeAmount(lztWithdrawal.getFeeAmount());
                         }
                     }
+
                 }
             }
         }

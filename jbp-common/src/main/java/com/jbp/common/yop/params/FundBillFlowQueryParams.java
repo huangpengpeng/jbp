@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class FundBillFlowQueryParams extends BaseYopRequest {
 
-    private String startDate;
+    private String startDate; // yyyy-MM-dd
 
     private String endDate;
 

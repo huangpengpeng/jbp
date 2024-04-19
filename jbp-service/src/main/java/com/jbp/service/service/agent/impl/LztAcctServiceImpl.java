@@ -196,8 +196,12 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         Date now = DateTimeUtils.getNow();
         BigDecimal yesterdayInAmt = BigDecimal.ZERO;
         BigDecimal yesterdayOutAmt = BigDecimal.ZERO;
+
+
         String yesterdayStart = DateTimeUtils.format(DateTimeUtils.getStartDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         String yesterdayEnd = DateTimeUtils.format(DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+
+
         List<AcctBalList> yesterdayList = Lists.newArrayList();
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
@@ -223,6 +227,9 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         }
         response.setYesterdayInAmt(yesterdayInAmt);
         response.setYesterdayOutAmt(yesterdayOutAmt);
+
+
+
 
         // 今天
         BigDecimal todayOutAmt = BigDecimal.ZERO;
