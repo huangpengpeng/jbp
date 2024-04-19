@@ -706,7 +706,6 @@ public class LztServiceImpl implements LztService {
         return result;
     }
 
-
     @Override
     public ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
                                                            String txn_seqno, String verify_code_new) {
@@ -726,6 +725,27 @@ public class LztServiceImpl implements LztService {
             throw new CrmebException("申请手机号验证失败" + user_id);
         }
         ChangeRegPhoneVerifyResult result = JSON.parseObject(s, ChangeRegPhoneVerifyResult.class);
+        return result;
+    }
+
+    @Override
+    public AcctSerialDetailResult acctSerialDetail(String oidPartner, String priKey, String user_id, String user_type, String jno_acct) {
+        AcctSerialDetailParams params = new AcctSerialDetailParams();
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setUser_id(user_id);
+        params.setUser_type(user_type);
+        params.setJno_acct(jno_acct);
+
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserialdetail";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("获取资金流水详情" + user_id);
+        }
+        AcctSerialDetailResult result = JSON.parseObject(s, AcctSerialDetailResult.class);
         return result;
     }
 }

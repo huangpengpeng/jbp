@@ -88,5 +88,7 @@ public class AcctBalList {
 
     private String userType;
 
+    private AcctSerialDetailResult detail;
+
 
 }
