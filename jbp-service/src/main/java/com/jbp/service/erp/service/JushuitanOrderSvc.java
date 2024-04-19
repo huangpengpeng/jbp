@@ -57,14 +57,14 @@ public class JushuitanOrderSvc {
 
                 User user = userService.getById(o.getUid());
                 jsonObject.put("shop_id", Integer.parseInt(jushuitanConfig.getShopId()));
-                jsonObject.put("so_id", o.getOrderNo());
+                jsonObject.put("so_id", o.getPlatOrderNo());
                 jsonObject.put("order_date",
                         DateTimeUtils.format(o.getPayTime() == null ? o.getCreateTime() : o.getPayTime(),
                                 DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
                 jsonObject.put("shop_status", "WAIT_SELLER_SEND_GOODS");
 
                 jsonObject.put("shop_buyer_id", user.getNickname() + "/" + user.getPhone());
-                MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(o.getOrderNo());
+                MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(o.getPlatOrderNo());
                 jsonObject.put("receiver_state", merchantOrder.getProvince());
                 jsonObject.put("receiver_city", merchantOrder.getCity());
                 jsonObject.put("receiver_district", merchantOrder.getDistrict());
@@ -78,7 +78,7 @@ public class JushuitanOrderSvc {
                 jsonObject.put("buyer_message", merchantOrder.getUserRemark());
                 JSONArray items = new JSONArray();
 
-                List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(o.getOrderNo());
+                List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(o.getPlatOrderNo());
                 for (OrderDetail g : orderDetailList) {
                     JSONObject item = new JSONObject();
                     item.put("sku_id", g.getBarCode());
@@ -94,7 +94,7 @@ public class JushuitanOrderSvc {
 
                 Integer pid = userInvitationService.getPid(user.getId());
                 JSONObject pay = new JSONObject();
-                pay.put("outer_pay_id", o.getOrderNo());
+                pay.put("outer_pay_id", o.getPlatOrderNo());
                 pay.put("pay_date", DateTimeUtils.format(o.getPayTime() == null ? o.getCreateTime() : o.getPayTime(),
                         DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
                 pay.put("payment", "线上支付");
@@ -119,7 +119,7 @@ public class JushuitanOrderSvc {
                 o.setIfPull(true);
                 orderService.updateById(o);
             } catch (Exception e) {
-                error.add(o.getOrderNo());
+                error.add(o.getPlatOrderNo());
                 log.error(e.getMessage(), e);
             }
         }
