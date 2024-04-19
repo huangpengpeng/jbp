@@ -9,6 +9,8 @@ import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.agent.LztTransfer;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -20,6 +22,8 @@ import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.agent.LztTransferService;
+import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
@@ -48,6 +52,10 @@ public class LztAcctController {
     private LztService lztService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private LztTransferService lztTransferService;
+    @Resource
+    private LztWithdrawalService lztWithdrawalService;
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:info')")
     @GetMapping("/info")
@@ -205,6 +213,23 @@ public class LztAcctController {
                     AcctSerialDetailResult acctSerialDetailResult = lztService.acctSerialDetail(payInfo.getOidPartner(), payInfo.getPriKey(), acctBalList.getUserId(),
                             LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), acctBalList.getJno_acct());
                     acctBalList.setDetail(acctSerialDetailResult);
+
+                    if(StringUtils.equals("内部代发", acctBalList.getTxn_type())){
+                        acctBalList.setTxn_type("转账");
+                    }
+                    if(StringUtils.equals("外部代发", acctBalList.getTxn_type())){
+                        acctBalList.setTxn_type("代付");
+                        LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
+                        if(lztTransfer != null){
+                            acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
+                        }
+                    }
+                    if(StringUtils.equals("账户提现", acctBalList.getTxn_type())){
+                        LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(acctBalList.getJno_cli());
+                        if(lztWithdrawal != null){
+                            acctBalList.setFeeAmount(lztWithdrawal.getFeeAmount());
+                        }
+                    }
                 }
             }
         }
