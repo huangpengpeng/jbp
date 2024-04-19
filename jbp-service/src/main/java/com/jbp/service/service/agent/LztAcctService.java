@@ -12,7 +12,7 @@ public interface LztAcctService extends IService<LztAcct> {
 
     LztAcct getByUserId(String userId);
 
-    LztAcct create(Integer merId, String userId, String userType, String userNo, String username, String bankAccount);
+    LztAcct create(Integer merId, String userId, String userType, String userNo, String username, String bankAccount, Long payChannelId);
 
     LztAcct details(String userId);
 

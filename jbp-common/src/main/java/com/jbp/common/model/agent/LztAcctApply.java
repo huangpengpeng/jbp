@@ -20,7 +20,7 @@ public class LztAcctApply extends BaseModel {
 
     public LztAcctApply(Integer merId, String userId, String userType, String userNo, String username,
                         String txnSeqno, String accpTxno,
-                        String gatewayUrl, String openBank) {
+                        String gatewayUrl, String openBank, Long payChannelId, String payChannelName, String payChannelType) {
         this.merId = merId;
         this.userId = userId;
         this.userType = userType;
@@ -31,6 +31,9 @@ public class LztAcctApply extends BaseModel {
         this.gatewayUrl = gatewayUrl;
         this.status = "待开户";
         this.openBank = openBank;
+        this.payChannelId = payChannelId;
+        this.payChannelName = payChannelName;
+        this.payChannelType = payChannelType;
     }
 
     @ApiModelProperty(value = "商户ID")
@@ -65,6 +68,15 @@ public class LztAcctApply extends BaseModel {
 
     @ApiModelProperty(value = "开户返回消息")
     private String retMsg;
+
+    @ApiModelProperty(value = "支付渠道编号")
+    private Long payChannelId;
+
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelName;
+
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelType;
 
     /**
      *k {\"accp_txno\":\"20240305000060693242\",\"acct_status\":\"WAIT_SIGN\",\"bank_acct_no\":\"\",\"bank_code\":\"03580000\",\"brbank_no\":\"323651066666\",\"gateway_url\":\"https://openweb.lianlianpay.com/lzt?token=e6ca73cb21c1bdd9e29ce33ef777c57f\",\"oid_partner\":\"402402220000016691\",\"oid_userno\":\"2024030577141027\",\"remar\":\"\",\"txn_seqno\":\"LZT_BKH_59240261148734\",\"user_id\":\"gz0002\"}"

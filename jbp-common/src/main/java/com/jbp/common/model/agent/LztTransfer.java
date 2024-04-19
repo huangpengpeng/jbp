@@ -122,6 +122,9 @@ public class LztTransfer extends BaseModel {
     @ApiModelProperty(value = "完成时间")
     private Date finishTime;
 
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelType;
+
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;

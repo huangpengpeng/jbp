@@ -57,6 +57,9 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         if (BooleanUtils.isTrue(lztAcct.getIfOpenBankAcct())) {
             throw new CrmebException("银行虚拟户已申请");
         }
+        if (!lztAcct.getPayChannelType().equals("连连")) {
+            throw new CrmebException("支付渠道连连才允许开通");
+        }
         Merchant merchant = merchantService.getById(merId);
         MerchantPayInfo payInfo = merchant.getPayInfo();
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix());
@@ -66,7 +69,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         UserInfoResult userInfoResult = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
         LztAcctApply lztAcctApply = new LztAcctApply(merId, userId, lztAcct.getUserType(), userInfoResult.getOid_userno(), userInfoResult.getUser_name(),
                 txnSeqno, result.getAccp_txno(),
-                result.getGateway_url(), openBank);
+                result.getGateway_url(), openBank, lztAcct.getPayChannelId(), lztAcct.getPayChannelName(), lztAcct.getPayChannelType());
         save(lztAcctApply);
 
         lztAcct.setIfOpenBankAcct(true);

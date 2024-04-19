@@ -8,6 +8,8 @@ import com.jbp.common.encryptapi.SignInterceptor;
 import com.jbp.common.interceptor.ResultInterceptor;
 import com.jbp.common.interceptor.SwaggerInterceptor;
 
+import com.yeepay.yop.sdk.service.common.YopClient;
+import com.yeepay.yop.sdk.service.common.YopClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -97,5 +99,10 @@ public class WebConfig implements WebMvcConfigurer {
     @ConditionalOnProperty(name = "swagger.basic.enable", havingValue = "true")
     public MappedInterceptor getMappedInterceptor() {
         return new MappedInterceptor(new String[]{"/doc.html", "/webjars/**"}, new SwaggerInterceptor(username, password, check));
+    }
+
+    @Bean
+    public YopClient yopClient(){
+        return YopClientBuilder.builder().build();
     }
 }

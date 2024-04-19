@@ -8,7 +8,7 @@ import com.jbp.common.request.PageParamRequest;
 
 public interface LztAcctOpenService extends IService<LztAcctOpen> {
 
-    LztAcctOpen apply(Integer merId, String userId,  String userType, String returnUrl, String businessScope);
+    LztAcctOpen apply(Integer merId, String userId,  String userType, String returnUrl, String businessScope, Long payChannelId);
 
 
     void refresh(String accpTxno);

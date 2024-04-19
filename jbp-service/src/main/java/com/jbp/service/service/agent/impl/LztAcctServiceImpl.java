@@ -11,7 +11,7 @@ import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
-import com.jbp.common.model.agent.LztAcctOpen;
+import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -19,11 +19,13 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctDao;
-import com.jbp.service.service.LianLianPayService;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,6 +49,12 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     private LztService lztService;
     @Resource
     private LztAcctApplyService lztAcctApplyService;
+    @Resource
+    private LztPayChannelService lztPayChannelService;
+    @Resource
+    private YopService yopService;
+    @Resource
+    private DegreePayService degreePayService;
 
     @Override
     public LztAcct getByUserId(String userId) {
@@ -55,8 +62,13 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     }
 
     @Override
-    public LztAcct create(Integer merId, String userId, String userType, String userNo, String username, String bankAccount) {
+    public LztAcct create(Integer merId, String userId, String userType, String userNo, String username, String bankAccount, Long payChannelId) {
         LztAcct lztAcct = new LztAcct(merId, userId, userType, userNo, username, bankAccount);
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(payChannelId);
+        lztAcct.setPayChannelId(payChannelId);
+        lztAcct.setPayChannelName(lztPayChannel.getName());
+        lztAcct.setPayChannelType(lztPayChannel.getType());
+        lztAcct.setHandlingFee(lztPayChannel.getHandlingFee());
         save(lztAcct);
         return lztAcct;
     }
@@ -68,16 +80,13 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         if (lztAcctApply != null) {
             lztAcct.setGatewayUrl(lztAcctApply.getGatewayUrl());
         }
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        AcctInfoResult acctInfoResult = lztService.queryAcct(payInfo.getOidPartner(), payInfo.getPriKey(),
-                userId, LianLianPayConfig.UserType.getCode(lztAcct.getUserType()));
+        AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcct);
         if (lztAcct.getIfOpenBankAcct()) {
-            LztQueryAcctInfoResult bankAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-            if(bankAcctInfoResult != null){
+            LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcct);
+            if (bankAcctInfoResult != null) {
                 List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
                 if (CollectionUtils.isNotEmpty(list)) {
-                    list =  list.stream().filter(s-> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
+                    list = list.stream().filter(s -> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
                     for (LztQueryAcctInfo lztQueryAcctInfo : list) {
                         lztQueryAcctInfo.setAcct_stat(LianLianPayConfig.AcctState.valueOf(lztQueryAcctInfo.getAcct_stat()).getCode());
                     }
@@ -85,6 +94,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 }
             }
         }
+
         List<AcctInfo> acctinfoList = acctInfoResult.getAcctinfo_list();
         if (CollectionUtils.isNotEmpty(acctinfoList)) {
             for (AcctInfo acctInfo : acctinfoList) {
@@ -95,7 +105,6 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         }
         return lztAcct;
     }
-
 
     @Override
     public PageInfo<LztAcct> pageList(Integer merId, String userId, String username, PageParamRequest pageParamRequest) {

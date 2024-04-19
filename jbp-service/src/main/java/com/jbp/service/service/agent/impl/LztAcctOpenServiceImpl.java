@@ -14,6 +14,7 @@ import com.jbp.common.lianlian.result.OpenacctApplyResult;
 import com.jbp.common.lianlian.result.UserInfoResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctOpen;
+import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -24,6 +25,7 @@ import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -45,9 +47,11 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     private MerchantService merchantService;
     @Resource
     private LztAcctService lztAcctService;
+    @Resource
+    private LztPayChannelService lztPayChannelService;
 
     @Override
-    public LztAcctOpen apply(Integer merId, String userId, String userType, String returnUrl, String businessScope) {
+    public LztAcctOpen apply(Integer merId, String userId, String userType, String returnUrl, String businessScope, Long payChannelId) {
         if (has(userId)) {
             throw new CrmebException("当前账户已存在，建议使用企业全拼加序号");
         }
@@ -62,8 +66,9 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
         OpenacctApplyResult result = lztService.createUser(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno,
                 userId, code, notifyUrl, returnUrl, "H5", businessScope);
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(payChannelId);
         LztAcctOpen lztAcctOpen = new LztAcctOpen(merId, userId, txnSeqno, result.getAccp_txno(),
-                userType, flagChnl, DateTimeUtils.getNow(), result.getGateway_url());
+                userType, flagChnl, DateTimeUtils.getNow(), result.getGateway_url(), payChannelId, lztPayChannel.getName(), lztPayChannel.getType());
         save(lztAcctOpen);
         return lztAcctOpen;
     }
@@ -86,7 +91,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
             if (lztAcct == null) {
-                lztAcct = lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account());
+                lztAcct = lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account(), lztAcctOpen.getPayChannelId());
             }
         }
         // 通知手机号吗

@@ -34,6 +34,11 @@ public class LztQueryAcctInfo {
      * 账户银行余额bank_acct_balance
      */
     private String bank_acct_balance;
+
+    /**
+     * 冻结金额
+     */
+    private String bank_acct_frz_balance;
     /**
      * 银行编码
      */

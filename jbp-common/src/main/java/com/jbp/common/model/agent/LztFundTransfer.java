@@ -69,6 +69,9 @@ public class LztFundTransfer extends BaseModel {
     @ApiModelProperty(value = "返回消息")
     private String retMsg;
 
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelType;
+
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;

@@ -35,7 +35,7 @@ public class LztPayChannel extends BaseModel {
     @ApiModelProperty(value = "渠道名称 显示给用户")
     private String name;
 
-    @ApiModelProperty(value = "渠道类型 易宝  连连")
+    @ApiModelProperty(value = "渠道类型 易宝  连连  苏宁")
     private String type;
 
     @ApiModelProperty(value = "商户编号")

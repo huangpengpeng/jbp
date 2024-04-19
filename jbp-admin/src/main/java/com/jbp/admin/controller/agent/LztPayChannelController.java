@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.StringUtils;
@@ -23,6 +24,12 @@ public class LztPayChannelController {
     @ApiOperation("支付渠道列表")
     public CommonResult<List<LztPayChannel>> list(Integer merId) {
         return CommonResult.success(lztPayChannelService.getByMer(merId));
+    }
+
+    @GetMapping("/typeList")
+    @ApiOperation("渠道类型")
+    public CommonResult<List<String>> typeList() {
+        return CommonResult.success(Lists.newArrayList("连连", "易宝", "苏宁"));
     }
 
     @PostMapping("/saveOrUpdate")

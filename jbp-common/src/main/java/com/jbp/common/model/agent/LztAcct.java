@@ -51,7 +51,7 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "连连账户名称")
     private String username;
 
-    @ApiModelProperty(value = "ACS银行账户")
+    @ApiModelProperty(value = "银行账户")
     private String bankAccount;
 
     @ApiModelProperty(value = "开通银行虚拟户")
@@ -65,6 +65,18 @@ public class LztAcct extends BaseModel {
 
     @ApiModelProperty(value = "替换手机号")
     private String changePhone;
+
+    @ApiModelProperty(value = "支付渠道编号")
+    private Long payChannelId;
+
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelName;
+
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelType;
+
+    @ApiModelProperty(value = "手续费(%)")
+    private BigDecimal handlingFee;
 
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)

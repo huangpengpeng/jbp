@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +28,8 @@ import java.util.List;
 public class LztAcctOpen extends BaseModel {
 
     public LztAcctOpen(Integer merId, String userId, String txnSeqno, String accpTxno,
-                       String userType, String flagChnl, Date txnTime, String gatewayUrl) {
+                       String userType, String flagChnl, Date txnTime, String gatewayUrl,
+                       Long payChannelId, String payChannelName, String payChannelType) {
         this.merId = merId;
         this.userId = userId;
         this.txnSeqno = txnSeqno;
@@ -37,6 +39,9 @@ public class LztAcctOpen extends BaseModel {
         this.txnTime = txnTime;
         this.gatewayUrl = gatewayUrl;
         this.status = "待开户";
+        this.payChannelId = payChannelId;
+        this.payChannelName = payChannelName;
+        this.payChannelType = payChannelType;
     }
 
     @ApiModelProperty(value = "商户ID")
@@ -76,8 +81,14 @@ public class LztAcctOpen extends BaseModel {
     @ApiModelProperty(value = "通知信息")
     private String notifyInfo;
 
-    @ApiModelProperty(value = "支付渠道  默认  连连  易宝")
-    private String payChannel;
+    @ApiModelProperty(value = "支付渠道编号")
+    private Long payChannelId;
+
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelName;
+
+    @ApiModelProperty(value = "支付渠道名称")
+    private String payChannelType;
 
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
