@@ -93,7 +93,7 @@ public class UserServerSnHandler implements ProductProfitHandler {
             TeamUser teamUser = teamUserService.getByUser(order.getUid());
 
             String channel = environment.getProperty("spring.profiles.active");
-            String serverSns = order.getOrderNo() + "_" + channel + "_" + teamUser == null ? "0" : teamUser.getTid() + "_" + i;
+            String serverSns = order.getOrderNo() + "_" + channel + "_" + (teamUser == null ? "0" : teamUser.getTid()) + "_" + i;
             serverSn = serverSn + "," + serverSns;
         }
 
