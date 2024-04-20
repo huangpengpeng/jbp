@@ -55,4 +55,8 @@ public interface OrderDetailDao extends BaseMapper<OrderDetail> {
 
     Integer getBuySuccessCount(@Param("uid") Integer uid, @Param("proId")  Integer proId,
                                @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+
+    public List<OrderDetail> getNextOrderGoods(@Param(value = "pid") Integer pid, @Param(value = "goodsId")  String goodsId, @Param(value = "capaId")  Long capaId);
+
 }

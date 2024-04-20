@@ -3,6 +3,7 @@ package com.jbp.service.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.order.Order;
 
+import com.jbp.common.model.order.OrderDetail;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -31,4 +32,6 @@ public interface OrderDao extends BaseMapper<Order> {
      * @param searchMap 搜索参数
      */
     List<Order> findFrontList(Map<String, Object> searchMap);
+
+
 }

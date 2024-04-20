@@ -2,6 +2,7 @@ package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.request.CommonSearchRequest;
 import com.jbp.common.request.PageParamRequest;
@@ -125,4 +126,7 @@ public interface OrderDetailService extends IService<OrderDetail> {
      * @return
      */
     Integer getBuySuccessCount(Integer uid, Integer proId, Date startTime, Date endTime);
+
+     List<OrderDetail> getNextOrderGoods(Integer pid, String goodsId,Long capaId);
+
 }

@@ -232,5 +232,11 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
     public Integer getBuySuccessCount(Integer uid, Integer proId, Date startTime, Date endTime) {
         return dao.getBuySuccessCount(uid, proId, startTime, endTime);
     }
+
+    @Override
+    public List<OrderDetail> getNextOrderGoods(Integer pid, String goodsId,Long capaId) {
+        return dao.getNextOrderGoods(pid,goodsId,capaId);
+
+    }
 }
 

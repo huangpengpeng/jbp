@@ -333,4 +333,6 @@ public interface OrderService extends IService<Order> {
     List<Order> getWaitPullList();
 
     Order getLastOne(Integer uid, String platform);
+
+
 }
