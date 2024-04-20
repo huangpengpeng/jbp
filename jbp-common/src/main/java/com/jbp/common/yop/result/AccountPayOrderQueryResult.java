@@ -53,7 +53,6 @@ public class AccountPayOrderQueryResult extends BaseYopResponse {
      */
     private String receiveType; // 到账类型
 
-
     private String receiverAccountNo; // 返回收款账户-银行账号
 
     private String receiverAccountName; //  收款方开户名

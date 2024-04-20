@@ -46,8 +46,6 @@ public class LztReceiptAct {
     @GetMapping("/down")
     @ApiOperation("下载")
     public CommonResult<ReceiptDownloadResult> down(String  tradeTxnSeqno) {
-
-
         ReceiptDownloadResult download = lztReceiptService.download(tradeTxnSeqno);
         return CommonResult.success(download);
     }

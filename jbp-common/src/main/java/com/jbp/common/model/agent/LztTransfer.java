@@ -30,7 +30,7 @@ public class LztTransfer extends BaseModel {
 
     public LztTransfer(Integer merId, String payerId, String payerName, String txnSeqno,
                        String accpTxno, BigDecimal amt, BigDecimal feeAmount, String payeeType, String bankAcctNo,
-                       String bankCode, String bankAcctName, String cnapsCode, String postscript) {
+                       String bankCode, String bankAcctName, String cnapsCode, String postscript, String payChannelType) {
         this.merId = merId;
         this.payerId = payerId;
         this.payerName = payerName;
@@ -47,6 +47,7 @@ public class LztTransfer extends BaseModel {
         this.receiptStatus = 0;
         this.txnStatus = LianLianPayConfig.TxnStatus.交易处理中.getName();
         this.createTime = DateTimeUtils.getNow();
+        this.payChannelType = payChannelType;
     }
 
     @ApiModelProperty(value = "商户id")

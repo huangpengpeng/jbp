@@ -14,6 +14,7 @@ import com.jbp.common.lianlian.result.QueryWithdrawalResult;
 import com.jbp.common.lianlian.result.WithdrawalCheckResult;
 import com.jbp.common.lianlian.result.WithdrawalResult;
 import com.jbp.common.model.agent.LztAcct;
+import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.agent.LztTransferMorepyee;
 import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
@@ -23,10 +24,12 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztWithdrawalDao;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.service.agent.LztWithdrawalService;
 import com.jbp.service.util.StringUtils;
 import lombok.SneakyThrows;
@@ -51,6 +54,10 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
     private LztAcctService lztAcctService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private DegreePayService degreePayService;
+    @Resource
+    private LztPayChannelService lztPayChannelService;
 
     @Override
     public LztWithdrawal getByTxnSeqno(String txnSeqno) {
@@ -64,35 +71,23 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
 
     @Override
     public LztWithdrawal withdrawal(Integer merId, String userId, String drawNo, BigDecimal amt, String postscript, String password, String random_key, String ip) {
-        if(StringUtils.isEmpty(drawNo)){
+        if (StringUtils.isEmpty(drawNo)) {
             drawNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix());
         }
         if (getByTxnSeqno(drawNo) != null) {
             throw new CrmebException("提现单号已经被使用");
         }
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + drawNo;
-
-        String linked_acctno = "";
-        if(LianLianPayConfig.UserType.个人用户.name().equals(lztAcct.getUserType())){
-
-            QueryLinkedAcctResult queryLinkedAcctResult = lztService.queryLinkedAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-            if(queryLinkedAcctResult == null || CollectionUtils.isEmpty(queryLinkedAcctResult.getLinked_acctlist())){
-                throw new RuntimeException("个人用户提现请先绑定银行卡");
-            }
-            linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
-        }
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeScale = lztAcct.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : lztAcct.getHandlingFee();
         BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
         if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
             feeAmount =
                     amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         }
-        WithdrawalResult orderResult = lztService.withdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), userId, drawNo,
-                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
-        LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt, feeAmount, postscript, orderResult);
+        WithdrawalResult orderResult = degreePayService.withdrawal(lztAcct, drawNo, amt, feeAmount, postscript, password, random_key, ip, notifyUrl);
+        LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt,
+                feeAmount, postscript, orderResult, lztAcct.getPayChannelType());
         save(withdrawal);
         return withdrawal;
     }
@@ -101,9 +96,8 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
     public LztWithdrawal check(Long id, String checkReturn, String checkReason) {
         LztWithdrawal lztWithdrawal = getById(id);
         LztAcct lztAcct = lztAcctService.getByUserId(lztWithdrawal.getUserId());
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        lztService.withdrawalCheck(payInfo.getOidPartner(), payInfo.getPriKey(), lztWithdrawal.getTxnSeqno(),
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        lztService.withdrawalCheck(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztWithdrawal.getTxnSeqno(),
                 lztWithdrawal.getAmt().toString(), checkReturn, checkReason, lztWithdrawal.getFeeAmount().toString());
         lztWithdrawal.setTxnStatus("已复核");
         updateById(lztWithdrawal);
@@ -142,10 +136,8 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(withdrawal.getTxnStatus())) {
             return withdrawal;
         }
-        Merchant merchant = merchantService.getById(withdrawal.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        QueryWithdrawalResult result = lztService.queryWithdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno);
-
+        LztAcct lztAcct = lztAcctService.getByUserId(withdrawal.getUserId());
+        QueryWithdrawalResult result = degreePayService.queryWithdrawal( lztAcct, txnSeqno);
         LztWithdrawal lztWithdrawal = callBack(result);
         if (lztWithdrawal == null) {
             return withdrawal;

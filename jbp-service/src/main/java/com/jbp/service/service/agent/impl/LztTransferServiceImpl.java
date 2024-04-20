@@ -21,6 +21,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztTransferDao;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
@@ -50,6 +51,8 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
     private LztService lztService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private DegreePayService degreePayService;
 
 
     @Override
@@ -64,20 +67,16 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
             throw new CrmebException("转账单号已经被使用");
         }
         LztAcct lztAcct = lztAcctService.getByUserId(payerId);
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeScale = lztAcct.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : lztAcct.getHandlingFee();
         BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
         if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
-            feeAmount =
-                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+            feeAmount = amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         }
-        LztTransferResult transferResult = lztService.transfer(payInfo.getOidPartner(), payInfo.getPriKey(), payerId, txnPurpose, txnSeqno,
+        LztTransferResult transferResult = degreePayService.transfer(lztAcct, txnPurpose, txnSeqno,
                 amt.toString(), feeAmount.toString(), pwd, random_key, payeeType, bankAcctNo, bankCode, bankAcctName,
-                cnapsCode, postscript, ip, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
-        LztTransfer lztTransfer = new LztTransfer(merchant.getId(), payerId, lztAcct.getUsername(), txnSeqno, transferResult.getAccp_txno(), amt, feeAmount, payeeType, bankAcctNo,
-                bankCode, bankAcctName, cnapsCode, postscript);
+                cnapsCode, postscript, ip);
+        LztTransfer lztTransfer = new LztTransfer(lztAcct.getMerId(), payerId, lztAcct.getUsername(), txnSeqno, transferResult.getAccp_txno(), amt, feeAmount, payeeType, bankAcctNo,
+                bankCode, bankAcctName, cnapsCode, postscript, lztAcct.getPayChannelType());
         lztTransfer.setOrderRet(transferResult);
         save(lztTransfer);
         return lztTransfer;
@@ -93,9 +92,8 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(lztTransfer.getTxnStatus())) {
             return lztTransfer;
         }
-        Merchant merchant = merchantService.getById(lztTransfer.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        QueryWithdrawalResult result = lztService.queryWithdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno);
+        LztAcct lztAcct = lztAcctService.getByUserId(lztTransfer.getPayerId());
+        QueryWithdrawalResult result = degreePayService.transferQuery(lztAcct, txnSeqno);
         if(result != null && result.getTxn_status() != null){
             if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(result.getTxn_status())) {
                 lztTransfer.setFinishTime(DateTimeUtils.parseDate(result.getFinish_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));

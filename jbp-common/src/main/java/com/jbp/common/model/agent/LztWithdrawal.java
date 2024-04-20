@@ -28,7 +28,9 @@ import java.util.Date;
 @NoArgsConstructor
 public class LztWithdrawal extends BaseModel {
 
-    public LztWithdrawal(Integer merId, String userId, String username, String txnSeqno, String accpTxno, BigDecimal amt, BigDecimal feeAmount, String postscript, WithdrawalResult orderRet) {
+    public LztWithdrawal(Integer merId, String userId, String username, String txnSeqno,
+                         String accpTxno, BigDecimal amt, BigDecimal feeAmount, String postscript,
+                         WithdrawalResult orderRet, String payChannelType) {
         this.merId = merId;
         this.userId = userId;
         this.username = username;
@@ -41,6 +43,7 @@ public class LztWithdrawal extends BaseModel {
         this.txnStatus = LianLianPayConfig.TxnStatus.交易处理中.getName();
         this.createTime = DateTimeUtils.getNow();
         this.receiptStatus = 0;
+        this.payChannelType = payChannelType;
     }
 
     @ApiModelProperty(value = "商户id")

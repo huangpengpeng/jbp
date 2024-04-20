@@ -9,18 +9,15 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.LztFundTransferResult;
 import com.jbp.common.lianlian.result.LztQueryFundTransferResult;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztFundTransfer;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztFundTransferDao;
 import com.jbp.service.service.DegreePayService;
-import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztFundTransferService;
@@ -42,8 +39,6 @@ import java.util.stream.Collectors;
 public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, LztFundTransfer> implements LztFundTransferService {
 
     @Resource
-    private LztService lztService;
-    @Resource
     private LztAcctService lztAcctService;
     @Resource
     private MerchantService merchantService;
@@ -54,12 +49,9 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
     public LztFundTransfer fundTransfer(Integer merId, String userId, String bankAccountNo, BigDecimal amt, String postscript) {
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通划拨资金.getPrefix());
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
-        LztFundTransferResult result = lztService.fundTransfer(payInfo.getOidPartner(), payInfo.getPriKey(),
-                txnSeqno, userId, bankAccountNo, amt.toString(), notifyUrl);
-        LztFundTransfer lztFundTransfer = new LztFundTransfer(merId, userId, lztAcct.getUsername(), txnSeqno, amt, DateTimeUtils.getNow(), bankAccountNo, postscript, result.getAccp_txno());
+        LztFundTransferResult result = degreePayService.fundTransfer(lztAcct, txnSeqno, bankAccountNo, amt.toString(), notifyUrl);
+        LztFundTransfer lztFundTransfer = new LztFundTransfer(merId, userId, lztAcct.getUsername(), txnSeqno, amt, DateTimeUtils.getNow(), bankAccountNo, postscript, result.getAccp_txno(), lztAcct.getPayChannelType());
         save(lztFundTransfer);
         return lztFundTransfer;
     }

@@ -20,6 +20,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.agent.LztTransferMorepyeeDao;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
@@ -50,14 +51,15 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     private LztAcctService lztAcctService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private DegreePayService degreePayService;
 
     @Override
     public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
                                                 String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String postscript) {
-        if(StringUtils.isEmpty(orderNo)){
+        if (StringUtils.isEmpty(orderNo)) {
             orderNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
         }
-
         if (getByTxnSeqno(orderNo) != null) {
             throw new CrmebException("单号已经被使用");
         }
@@ -69,13 +71,9 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         if (payeeAcct == null) {
             throw new CrmebException("收款账户不存在");
         }
-        Merchant merchant = merchantService.getById(payerAcct.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
-        TransferMorepyeeResult result = lztService.transferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(),
-                payerId, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
-        LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno());
+        TransferMorepyeeResult result = degreePayService.transferMorepyee(payerAcct, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
+        LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno(), payerAcct.getPayChannelType());
         save(transferMorepyee);
         return transferMorepyee;
     }
@@ -117,9 +115,8 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         if (LianLianPayConfig.TxnStatus.交易成功.getName().equals(lztTransferMorepyee.getTxnStatus())) {
             return lztTransferMorepyee;
         }
-        Merchant merchant = merchantService.getById(lztTransferMorepyee.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        QueryPaymentResult result = lztService.queryTransferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno);
+        LztAcct lztAcct = lztAcctService.getByUserId(lztTransferMorepyee.getPayerId());
+        QueryPaymentResult result = degreePayService.queryTransferMorepyee(lztAcct, txnSeqno);
         LztTransferMorepyee lztTransferMorepyee1 = callBack(result);
         if (lztTransferMorepyee1 == null) {
             return lztTransferMorepyee;

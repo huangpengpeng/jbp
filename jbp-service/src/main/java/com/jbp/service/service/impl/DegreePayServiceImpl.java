@@ -2,6 +2,9 @@ package com.jbp.service.service.impl;
 
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.LianLianPayConfig;
+import com.jbp.common.lianlian.params.QueryPaymentOrderInfo;
+import com.jbp.common.lianlian.params.QueryPaymentPayeeInfo;
+import com.jbp.common.lianlian.params.QueryPaymentPayerInfo;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztPayChannel;
@@ -132,7 +135,7 @@ public class DegreePayServiceImpl implements DegreePayService {
                 result.setAcctbal_list(list);
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -171,6 +174,9 @@ public class DegreePayServiceImpl implements DegreePayService {
                 if ("INIT".equals(yopResult.getStatus())) {
                     result.setTxn_status("CREATE");
                 }
+                if ("ACCOUNTING_EXCEPTION".equals(yopResult.getStatus()) || "FAIL".equals(yopResult.getStatus()) || "CANCELED".equals(yopResult.getStatus())) {
+                    result.setTxn_status("FAIL");
+                }
                 if ("ACCOUNTING".equals(yopResult.getStatus())) {
                     result.setTxn_status("PROCESS");
                 }
@@ -182,6 +188,238 @@ public class DegreePayServiceImpl implements DegreePayService {
         return result;
     }
 
+    @Override
+    public LztTransferResult transfer(LztAcct lztAcct, String txnPurpose, String txn_seqno,
+                                      String amt, String feeAmt, String pwd, String random_key, String payee_type, String bank_acctno,
+                                      String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip) {
+        LztTransferResult result = new LztTransferResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+             result = lztService.transfer(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(), txnPurpose, txn_seqno,
+                    amt, feeAmt, pwd, random_key, payee_type, bank_acctno, bank_code, bank_acctname,
+                     cnaps_code, postscript, ip, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            if ("BANKACCT_PRI".equals(payee_type)) {
+                payee_type = "DEBIT_CARD";
+            }
+            if ("BANKACCT_PUB".equals(payee_type)) {
+                payee_type = "PUBLIC_CARD";
+            }
+            yopService.accountPayOrder(lztAcct.getUserId(), txn_seqno,
+                    amt, bank_acctname, bank_acctno, bank_code, payee_type, cnaps_code, null);
+        }
+        return result;
+    }
+
+    @Override
+    public QueryWithdrawalResult transferQuery(LztAcct lztAcct, String txnSeqno) {
+        QueryWithdrawalResult result = new QueryWithdrawalResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.queryWithdrawal(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), txnSeqno);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            AccountPayOrderQueryResult yopResult = yopService.accountPayOrderQuery(lztAcct.getUserId(), txnSeqno);
+            if (yopResult != null && yopResult.validate()) {
+                result.setLinked_acctno(yopResult.getReceiverBankCode());
+                if (StringUtils.isNotEmpty(yopResult.getOrderTime())) {
+                    result.setAccounting_date(DateTimeUtils.format(DateTimeUtils.parseDate(yopResult.getOrderTime()), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                }
+                if (StringUtils.isNotEmpty(yopResult.getFinishTime())) {
+                    result.setFinish_time(DateTimeUtils.format(DateTimeUtils.parseDate(yopResult.getFinishTime()), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                }
+                result.setAccp_txno(yopResult.getOrderNo());
+
+                QueryWithdrawalOrderInfo orderInfo = new QueryWithdrawalOrderInfo();
+                orderInfo.setTxn_seqno(yopResult.getRequestNo());
+                if (StringUtils.isNotEmpty(yopResult.getOrderAmount())) {
+                    orderInfo.setTotal_amount(Double.valueOf(yopResult.getOrderAmount()));
+                }
+                if (StringUtils.isNotEmpty(yopResult.getFee())) {
+                    orderInfo.setFee_amount(Double.valueOf(yopResult.getFee()));
+                }
+                orderInfo.setTxn_time(yopResult.getOrderTime());
+                result.setOrderInfo(orderInfo);
+
+                QueryWithdrawalPayerInfo payerInfo = new QueryWithdrawalPayerInfo();
+                payerInfo.setPayer_id(yopResult.getMerchantNo());
+                payerInfo.setPayer_type("USER");
+                result.setPayerInfo(payerInfo);
+                if ("REQUEST_RECEIVE".equals(yopResult.getStatus()) || "REQUEST_ACCEPT".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_WAIT_PAY");
+                }
+                if ("REMITING".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_PREPAID");
+                }
+                if ("SUCCESS".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_SUCCESS");
+                }
+                if ("CANCELED".equals(yopResult.getStatus()) || "FAIL".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_FAILURE");
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public TransferMorepyeeResult transferMorepyee(LztAcct lztAcct, String orderNo, Double amt, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url) {
+        TransferMorepyeeResult result = new TransferMorepyeeResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.transferMorepyee(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
+                    lztAcct.getUserId(), orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notify_url, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            AccountTransferOrderResult yopResult = yopService.transferB2bOrder(orderNo, lztAcct.getUserId(), payeeId, amt.toString(), null);
+            if(yopResult != null && yopResult.validate()){
+                result.setAccounting_date(DateTimeUtils.format(new Date(), DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN2));
+                result.setTxn_seqno(yopResult.getRequestNo());
+                result.setAccp_txno(yopResult.getOrderNo());
+                result.setTotal_amount(Double.valueOf(yopResult.getOrderAmount()));
+                result.setRet_code("0000");
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public QueryPaymentResult queryTransferMorepyee(LztAcct lztAcct, String txnSeqno) {
+        QueryPaymentResult result = new QueryPaymentResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.queryTransferMorepyee(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), txnSeqno);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            AccountTransferOrderQueryResult yopResult = yopService.transferB2bOrderQuery(lztAcct.getUserId(), txnSeqno);
+            if (yopResult != null && yopResult.validate()) {
+                if (StringUtils.isNotEmpty(yopResult.getFinishTime())) {
+                    result.setFinish_time(DateTimeUtils.format(DateTimeUtils.parseDate(yopResult.getFinishTime()), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                }
+                if ("REQUEST_RECEIVE".equals(yopResult.getTransferStatus())) {
+                    result.setTxn_status("TRADE_WAIT_PAY");
+                }
+                if ("SUCCESS".equals(yopResult.getTransferStatus())) {
+                    result.setTxn_status("TRADE_SUCCESS");
+                }
+                if ("FAIL".equals(yopResult.getTransferStatus())) {
+                    result.setTxn_status("TRADE_CLOSE");
+                }
+                if ("WAIT_AUDIT".equals(yopResult.getTransferStatus())) {
+                    result.setTxn_status("TRADE_WAIT_PAY");
+                }
+                result.setTxn_type("INNER_FUND_EXCHANGE");
+                QueryPaymentOrderInfo paymentOrderInfo = new QueryPaymentOrderInfo();
+
+                paymentOrderInfo.setTxn_seqno(yopResult.getRequestNo());
+                paymentOrderInfo.setTotal_amount(Double.valueOf(yopResult.getOrderAmount()));
+                paymentOrderInfo.setTxn_time(yopResult.getCreateTime());
+                result.setOrderInfo(paymentOrderInfo);
+
+                QueryPaymentPayerInfo payerInfo = new QueryPaymentPayerInfo();
+                payerInfo.setPayer_type("USER");
+                payerInfo.setPayer_id(lztAcct.getUserId());
+                payerInfo.setMethod(yopResult.getTransferType());
+                payerInfo.setAmount(Double.valueOf(yopResult.getOrderAmount()));
+                result.setPayerInfo(Lists.newArrayList(payerInfo));
+
+                QueryPaymentPayeeInfo payeeInfo = new QueryPaymentPayeeInfo();
+                payeeInfo.setAmount(yopResult.getOrderAmount());
+                payeeInfo.setPayee_id(yopResult.getToMerchantNo());
+                payeeInfo.setPayee_type("USER");
+                result.setPayeeInfo(Lists.newArrayList(payeeInfo));
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public WithdrawalResult withdrawal(LztAcct lztAcct, String drawNo, BigDecimal amt, BigDecimal fee, String postscript, String password, String random_key, String ip, String notifyUrl) {
+        WithdrawalResult result = new WithdrawalResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            String linked_acctno = "";
+            if(LianLianPayConfig.UserType.个人用户.name().equals(lztAcct.getUserType())){
+                QueryLinkedAcctResult queryLinkedAcctResult = lztService.queryLinkedAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId());
+                if(queryLinkedAcctResult == null || CollectionUtils.isEmpty(queryLinkedAcctResult.getLinked_acctlist())){
+                    throw new RuntimeException("个人用户提现请先绑定银行卡");
+                }
+                linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
+            }
+            result = lztService.withdrawal(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(), drawNo,
+                    amt, fee, postscript, password, random_key, ip, notifyUrl, linked_acctno, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            WithdrawCardQueryResult card = yopService.withdrawCardQuery(lztAcct.getUserId());
+            if (card == null || !card.validate()) {
+                throw new RuntimeException("请绑定银行卡信息");
+            }
+            WithdrawOrderResult yopResult = yopService.withdrawOrder(lztAcct.getUserId(), drawNo, card.getBankCardAccountList().get(0).getBindCardId(), amt.toString(), null);
+            if(yopResult != null && yopResult.validate()){
+                result.setRet_code("0000");
+                result.setUser_id(lztAcct.getUserId());
+                result.setTxn_seqno(drawNo);
+                result.setAccp_txno(yopResult.getOrderNo());
+                result.setTotal_amount(amt.doubleValue());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public QueryWithdrawalResult queryWithdrawal(LztAcct lztAcct, String txnSeqno) {
+        QueryWithdrawalResult result = new QueryWithdrawalResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.queryWithdrawal(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), txnSeqno);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            WithdrawOrderQueryResult yopResult = yopService.withdrawOrderQuery(lztAcct.getUserId(), txnSeqno);
+            if (yopResult != null && yopResult.validate()) {
+                result.setLinked_acctno(yopResult.getAccountNo());
+                if (StringUtils.isNotEmpty(yopResult.getOrderTime())) {
+                    result.setAccounting_date(DateTimeUtils.format(DateTimeUtils.parseDate(yopResult.getOrderTime()), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                }
+                if (StringUtils.isNotEmpty(yopResult.getFinishTime())) {
+                    result.setFinish_time(DateTimeUtils.format(DateTimeUtils.parseDate(yopResult.getFinishTime()), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                }
+                result.setAccp_txno(yopResult.getOrderNo());
+
+                QueryWithdrawalOrderInfo orderInfo = new QueryWithdrawalOrderInfo();
+                orderInfo.setTxn_seqno(yopResult.getRequestNo());
+                if (StringUtils.isNotEmpty(yopResult.getOrderAmount())) {
+                    orderInfo.setTotal_amount(Double.valueOf(yopResult.getOrderAmount()));
+                }
+                if (StringUtils.isNotEmpty(yopResult.getFee())) {
+                    orderInfo.setFee_amount(Double.valueOf(yopResult.getFee()));
+                }
+                orderInfo.setTxn_time(yopResult.getOrderTime());
+                result.setOrderInfo(orderInfo);
+
+                QueryWithdrawalPayerInfo payerInfo = new QueryWithdrawalPayerInfo();
+                payerInfo.setPayer_id(yopResult.getMerchantNo());
+                payerInfo.setPayer_type("USER");
+                result.setPayerInfo(payerInfo);
+                if ("REQUEST_RECEIVE".equals(yopResult.getStatus()) || "REQUEST_ACCEPT".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_WAIT_PAY");
+                }
+                if ("REMITING".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_PREPAID");
+                }
+                if ("SUCCESS".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_SUCCESS");
+                }
+                if ("CANCELED".equals(yopResult.getStatus()) || "FAIL".equals(yopResult.getStatus())) {
+                    result.setTxn_status("TRADE_FAILURE");
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno, String token, String tradeType) {

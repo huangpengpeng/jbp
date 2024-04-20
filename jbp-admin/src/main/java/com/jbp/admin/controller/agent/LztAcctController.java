@@ -2,6 +2,7 @@ package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin/agent/lzt/acct")
@@ -373,7 +375,7 @@ public class LztAcctController {
     }
 
     @ApiOperation(value = "发送验证码")
-    @GetMapping(value = "/yop/changePhone")
+    @GetMapping(value = "/yop/changePhoneSend")
     public CommonResult<String> changePhone(String userId) {
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
         String phone = lztAcct.getPhone();
@@ -399,4 +401,30 @@ public class LztAcctController {
         return CommonResult.success();
     }
 
+    @ApiOperation(value = "获取易宝银行编码")
+    @GetMapping(value = "/yop/bankList")
+    public CommonResult<List<Map<String, Object>>> bankList(String name) {
+        List<Map<String, Object>> maps = Lists.newArrayList();
+        if(StringUtils.isEmpty(name)){
+            maps = SqlRunner.db().selectList("select * from yop_bank_code where 1=1 ");
+        }else{
+            maps= SqlRunner.db().selectList("select * from yop_bank_code where name like '%"+name+"%' ");
+        }
+        return CommonResult.success(maps);
+    }
+
+    @ApiOperation(value = "获取易宝支行编码")
+    @GetMapping(value = "/yop/bankBarList")
+    public CommonResult<List<Map<String, Object>>> bankBarList(String bankCode, String name) {
+        if(StringUtils.isEmpty(bankCode)){
+            throw new CrmebException("请选择开户银行信息");
+        }
+        List<Map<String, Object>> maps = Lists.newArrayList();
+        if(StringUtils.isEmpty(name)){
+            maps = SqlRunner.db().selectList("select * from yop_bank_bar_code where bankCode='"+bankCode+"'");
+        }else{
+            maps= SqlRunner.db().selectList("select * from yop_bank_bar_code where bankCode='"+bankCode+"' and name like  '%"+name+"%'");
+        }
+        return CommonResult.success(maps);
+    }
 }

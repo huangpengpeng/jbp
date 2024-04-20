@@ -23,7 +23,7 @@ import java.util.Date;
 public class LztFundTransfer extends BaseModel {
 
     public LztFundTransfer(Integer merId, String userId, String username, String txnSeqno, BigDecimal amt, Date txnTime,
-                           String bankAccountNo, String postscript, String accpTxno) {
+                           String bankAccountNo, String postscript, String accpTxno, String payChannelType) {
         this.merId = merId;
         this.userId = userId;
         this.username = username;
@@ -34,6 +34,7 @@ public class LztFundTransfer extends BaseModel {
         this.postscript = postscript;
         this.accpTxno = accpTxno;
         this.status = LianLianPayConfig.FundTransferStatus.创建.name();
+        this.payChannelType = payChannelType;
     }
 
     @ApiModelProperty(value = "商户id")

@@ -11,6 +11,7 @@ import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
@@ -22,6 +23,7 @@ import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
+import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.util.StringUtils;
@@ -245,5 +247,55 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         response.setTodayInAmt(todayInAmt);
         response.setTodayOutAmt(todayOutAmt);
         return response;
+    }
+
+
+
+    @Resource
+    private LztAcctOpenService lztAcctOpenService;
+
+    public void init(){
+        List<Merchant> merchants = merchantService.list();
+        for (Merchant merchant : merchants) {
+            LztPayChannel lztPayChannel = new LztPayChannel();
+            lztPayChannel.setName("连连" + "_" + merchant.getName());
+            lztPayChannel.setType("连连");
+            lztPayChannel.setMerId(merchant.getId());
+            MerchantPayInfo payInfo = merchant.getPayInfo();
+            if (payInfo != null) {
+                lztPayChannel.setPartnerId(payInfo.getOidPartner());
+                lztPayChannel.setPriKey(payInfo.getPriKey());
+            }
+            lztPayChannel.setTradeModel(merchant.getTradeModel());
+            lztPayChannel.setHandlingFee(merchant.getHandlingFee());
+            lztPayChannel.setFrmsWareCategory(merchant.getFrmsWareCategory());
+            lztPayChannelService.add(lztPayChannel);
+        }
+         List<LztAcct> acctList = list();
+        for (LztAcct lztAcct : acctList) {
+            LztPayChannel lztPayChannel = lztPayChannelService.getByMer(lztAcct.getMerId()).get(0);
+            lztAcct.setPayChannelId(lztPayChannel.getId());
+            lztAcct.setHandlingFee(lztPayChannel.getHandlingFee());
+            lztAcct.setPayChannelName(lztPayChannel.getName());
+            lztAcct.setPayChannelType("连连");
+            updateById(lztAcct);
+        }
+        List<LztAcctApply> acctApplies = lztAcctApplyService.list();
+        for (LztAcctApply lztAcctApply : acctApplies) {
+            LztPayChannel lztPayChannel = lztPayChannelService.getByMer(lztAcctApply.getMerId()).get(0);
+            lztAcctApply.setPayChannelId(lztPayChannel.getId());
+            lztAcctApply.setPayChannelName(lztPayChannel.getName());
+            lztAcctApply.setPayChannelType(lztPayChannel.getType());
+            lztAcctApplyService.updateById(lztAcctApply);
+        }
+        List<LztAcctOpen> lztAcctOpens = lztAcctOpenService.list();
+        for (LztAcctOpen lztAcctOpen : lztAcctOpens) {
+            LztPayChannel lztPayChannel = lztPayChannelService.getByMer(lztAcctOpen.getMerId()).get(0);
+            lztAcctOpen.setPayChannelId(lztPayChannel.getId());
+            lztAcctOpen.setPayChannelName(lztPayChannel.getName());
+            lztAcctOpen.setPayChannelType(lztPayChannel.getType());
+            lztAcctOpenService.updateById(lztAcctOpen);
+        }
+
     }
 }
