@@ -87,15 +87,14 @@ public class UserServerSnHandler implements ProductProfitHandler {
             return;
         }
         Rule rule  =  getRule(productProfitList.get(0).getRule());
-        rule.setNum(rule.getNum() + 1);
         String serverSn = "";
         for (int i = 0; i < rule.getNum(); i++) {
 
             TeamUser teamUser = teamUserService.getByUser(order.getUid());
 
             String channel = environment.getProperty("spring.profiles.active");
-            String serverSns = order.getOrderNo() + "_" + channel + "_" + teamUser.getTid() + "_" + i;
-            serverSn = serverSns + "," + serverSns;
+            String serverSns = order.getOrderNo() + "_" + channel + "_" + teamUser == null ? "0" : teamUser.getTid() + "_" + i;
+            serverSn = serverSn + "," + serverSns;
         }
 
         OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
