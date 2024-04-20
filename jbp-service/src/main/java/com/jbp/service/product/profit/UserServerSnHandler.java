@@ -87,7 +87,7 @@ public class UserServerSnHandler implements ProductProfitHandler {
             return;
         }
         Rule rule  =  getRule(productProfitList.get(0).getRule());
-
+        rule.setNum(rule.getNum() + 1);
         String serverSn = "";
         for (int i = 0; i < rule.getNum(); i++) {
 
