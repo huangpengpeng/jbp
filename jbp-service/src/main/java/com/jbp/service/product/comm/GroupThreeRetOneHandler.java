@@ -121,7 +121,7 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
                 continue;
             }
             GroupThreeRetOneHandler.Rule rule = getRule(productComm);
-            Map<String, Object> map = productCommService.getMap(new QueryWrapper<ProductComm>().select(" group_concat(product_id) as product_id ").last("  type = " + getType() + " and  JSON_EXTRACT(rule, '$.amt') = " + rule.getAmt() + ""));
+            Map<String, Object> map = productCommService.getMap(new QueryWrapper<ProductComm>().select(" group_concat(product_id) as product_id ").last(" where  type = " + getType() + " and  JSON_EXTRACT(rule, '$.amt') = " + rule.getAmt() + ""));
 
             // 计算历史单数
             List<OrderDetail> orderList = orderDetailService.getNextOrderGoods(pid, map.get("product_id").toString(), userCapa.getCapaId());

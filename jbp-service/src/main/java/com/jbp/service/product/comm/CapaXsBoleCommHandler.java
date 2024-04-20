@@ -123,7 +123,7 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
                     if (pCapaXs != null && pCapaXs.getCapaId().intValue() >= rule.getCapaXsId().intValue()) {
                         // 算钱
                         BigDecimal ratio = ratioMap.get(i).getRatio();
-                        BigDecimal amt = ratio.multiply(calculateResult.getAmt()).setScale(2, BigDecimal.ROUND_DOWN);
+                        BigDecimal amt = ratio.multiply(calculateResult.getAmt()).multiply(rule.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                             fundClearingService.create(upperDto.getPId(), order.getOrderNo(), ProductCommEnum.级差伯乐佣金.getName(), amt,
                                      null, user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
@@ -190,6 +190,10 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
          */
         private List<LevelRatio> levelRatios;
 
+        /**
+         * 比例
+         */
+        private BigDecimal scale;
     }
 
 
