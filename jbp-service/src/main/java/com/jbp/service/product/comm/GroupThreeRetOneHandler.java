@@ -128,13 +128,13 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
 
 
             int remainder = orderList.size() % rule.getGroupComm().size();
-            
+
             if(remainder == 0){
                 remainder = 1;
             }
 
             GroupThreeRetOneHandler.Comm commList = rule.getGroupComm().get(remainder - 1);
-            BigDecimal totalAmt = rule.getAmt().multiply(commList.getRatio());
+            BigDecimal totalAmt = rule.getAmt().multiply(commList.getRatio()).multiply(productComm.getScale());
 
             FundClearingProduct clearingProduct = new FundClearingProduct(orderDetail.getProductId(), orderDetail.getProductName(), rule.getAmt(),
                     orderDetail.getPayNum(), commList.getRatio(), totalAmt);
