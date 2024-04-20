@@ -11,9 +11,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ExtParams4BankPay implements Serializable {
 
-    public ExtParams4BankPay(String bankCode, String userRequestIP, String bankAccountNo) {
+    public ExtParams4BankPay(String bankCode, String bankAccountNo) {
         this.bankCode = bankCode;
-        this.userRequestIP = userRequestIP;
+//        this.userRequestIP = userRequestIP;
         this.bankAccountNo = bankAccountNo;
     }
 
@@ -33,7 +33,7 @@ public class ExtParams4BankPay implements Serializable {
     /**
      * 请求IP
      */
-    private String userRequestIP;
+//    private String userRequestIP;
 
     /**
      * 银行账户号

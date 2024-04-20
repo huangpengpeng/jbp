@@ -37,7 +37,7 @@ public interface YopService {
     /**
      * 充值 --- 划拨
      */
-    AccountRechargeResult accountRecharge(String merchantNo, String requestNo, String amount, String bankCode, String bankAccountNo, String userRequestIP);
+    AccountRechargeResult accountRecharge(String merchantNo, String requestNo, String amount, String bankCode, String bankAccountNo);
 
     /**
      * 充值 --- 划拨 查询

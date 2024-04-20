@@ -1,9 +1,11 @@
 package com.jbp.admin.controller.agent;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
+import com.jbp.common.constants.SmsConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -18,9 +20,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.*;
-import com.jbp.service.service.DegreePayService;
-import com.jbp.service.service.LztService;
-import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferService;
@@ -59,6 +59,12 @@ public class LztAcctController {
     private LztWithdrawalService lztWithdrawalService;
     @Resource
     private DegreePayService degreePayService;
+    @Resource
+    private SmsService smsService;
+    @Resource
+    private SystemConfigService systemConfigService;
+    @Resource
+    private RedisUtil redisUtil;
 
     @GetMapping("/add")
     @ApiOperation("新增账户")
@@ -119,7 +125,7 @@ public class LztAcctController {
         if (StringUtils.isEmpty(scan)) {
             throw new CrmebException("场景不能为空");
         }
-        if(!(scan.equals("换绑卡") || scan.equals("忘记密码"))) {
+        if (!(scan.equals("换绑卡") || scan.equals("忘记密码"))) {
             if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
                 throw new CrmebException("请先输入金额");
             }
@@ -222,24 +228,24 @@ public class LztAcctController {
                 acctBalList.setTxn_type(LianLianPayConfig.SerialTxnType.getName(acctBalList.getTxn_type()));
                 acctBalList.setFlag_dc("CREDIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
                 acctBalList.setTxn_time(DateTimeUtils.format(DateTimeUtils.parseDate(acctBalList.getTxn_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
-                if(StringUtils.isNotEmpty(acctBalList.getJno_acct()) && "连连".equals(lztAcct.getPayChannelType())){
+                if (StringUtils.isNotEmpty(acctBalList.getJno_acct()) && "连连".equals(lztAcct.getPayChannelType())) {
                     AcctSerialDetailResult acctSerialDetailResult = lztService.acctSerialDetail(payInfo.getOidPartner(), payInfo.getPriKey(), acctBalList.getUserId(),
                             LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), acctBalList.getJno_acct());
                     acctBalList.setDetail(acctSerialDetailResult);
 
-                    if(StringUtils.equals("内部代发", acctBalList.getTxn_type())){
+                    if (StringUtils.equals("内部代发", acctBalList.getTxn_type())) {
                         acctBalList.setTxn_type("转账");
                     }
-                    if(StringUtils.equals("外部代发", acctBalList.getTxn_type())  && acctBalList.getFeeAmount() == null){
+                    if (StringUtils.equals("外部代发", acctBalList.getTxn_type()) && acctBalList.getFeeAmount() == null) {
                         acctBalList.setTxn_type("代付");
                         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
-                        if(lztTransfer != null ){
+                        if (lztTransfer != null) {
                             acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
                         }
                     }
-                    if(StringUtils.equals("账户提现", acctBalList.getTxn_type()) &&  acctBalList.getFeeAmount() == null){
+                    if (StringUtils.equals("账户提现", acctBalList.getTxn_type()) && acctBalList.getFeeAmount() == null) {
                         LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(acctBalList.getJno_cli());
-                        if(lztWithdrawal != null){
+                        if (lztWithdrawal != null) {
                             acctBalList.setFeeAmount(lztWithdrawal.getFeeAmount());
                         }
                     }
@@ -364,6 +370,33 @@ public class LztAcctController {
             return CommonResult.success();
         }
         return CommonResult.failed(result.getRet_msg());
+    }
+
+    @ApiOperation(value = "发送验证码")
+    @GetMapping(value = "/yop/changePhone")
+    public CommonResult<String> changePhone(String userId) {
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        String phone = lztAcct.getPhone();
+        if (StringUtils.isEmpty(phone)) {
+            return CommonResult.failed("当前账户未绑定手机号请联系管理员");
+        }
+        Boolean b = smsService.sendCommonCode(phone);
+        if (b) {
+            return CommonResult.success("短信已发送至: " + phone.substring(0, 3) + "****" + phone.substring(7, phone.length()) + " 请注意查收");
+        }
+        return CommonResult.failed("短信发送失败请联系管理员");
+    }
+
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:changePhone')")
+    @ApiOperation(value = "易宝手机号修改")
+    @GetMapping(value = "/yop/changePhone")
+    public CommonResult changePhone(String userId, String code, String phone) {
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        smsService.checkValidateCode(lztAcct.getPhone(), code);
+        lztAcct.setPhone(phone);
+        lztAcctService.updateById(lztAcct);
+        return CommonResult.success();
     }
 
 }

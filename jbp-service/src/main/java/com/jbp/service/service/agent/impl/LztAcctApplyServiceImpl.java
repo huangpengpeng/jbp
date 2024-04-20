@@ -8,19 +8,23 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.result.*;
+import com.jbp.common.lianlian.result.LztOpenacctApplyResult;
+import com.jbp.common.lianlian.result.LztQueryAcctInfo;
+import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
+import com.jbp.common.lianlian.result.UserInfoResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.LztAcctApplyDao;
-import com.jbp.service.service.LianLianPayService;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -45,6 +49,10 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     private LztAcctService lztAcctService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private LztPayChannelService lztPayChannelService;
+    @Resource
+    private DegreePayService degreePayService;
 
     @Override
     public LztAcctApply apply(Integer merId, String userId, String shopId, String shopName, String province,
@@ -60,13 +68,13 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         if (!lztAcct.getPayChannelType().equals("连连")) {
             throw new CrmebException("支付渠道连连才允许开通");
         }
-        Merchant merchant = merchantService.getById(merId);
-        MerchantPayInfo payInfo = merchant.getPayInfo();
+
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix());
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
-        LztOpenacctApplyResult result = lztService.createBankUser(payInfo.getOidPartner(), payInfo.getPriKey(),
+        LztOpenacctApplyResult result = lztService.createBankUser(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
                 userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl, openBank);
-        UserInfoResult userInfoResult = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
+        UserInfoResult userInfoResult = lztService.queryUserInfo(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), userId);
         LztAcctApply lztAcctApply = new LztAcctApply(merId, userId, lztAcct.getUserType(), userInfoResult.getOid_userno(), userInfoResult.getUser_name(),
                 txnSeqno, result.getAccp_txno(),
                 result.getGateway_url(), openBank, lztAcct.getPayChannelId(), lztAcct.getPayChannelName(), lztAcct.getPayChannelType());
@@ -81,19 +89,18 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     @Override
     public LztAcctApply refresh(String userId, String notifyInfo) {
         LztAcctApply lztAcctApply = getByUserId(userId);
-        Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-        if(result != null){
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcctApply.getPayChannelId());
+        LztQueryAcctInfoResult result = lztService.queryBankAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), userId);
+        if (result != null) {
             List<LztQueryAcctInfo> list = result.getList();
             if (CollectionUtils.isNotEmpty(list)) {
-                list =  list.stream().filter(s-> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
+                list = list.stream().filter(s -> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
                 LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
                 lztAcctApply.setStatus(acctState.getCode());
             }
             lztAcctApply.setRetMsg(result.getRet_msg());
         }
-        if(StringUtils.isNotEmpty(notifyInfo)){
+        if (StringUtils.isNotEmpty(notifyInfo)) {
             lztAcctApply.setNotifyInfo(notifyInfo);
         }
         updateById(lztAcctApply);
@@ -152,9 +159,8 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     public void del(Long id) {
         // 查询开户是否成功
         LztAcctApply lztAcctApply = getById(id);
-        Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctApply.getUserId());
+        LztAcct lztAcct = lztAcctService.getByUserId(lztAcctApply.getUserId());
+        LztQueryAcctInfoResult result = degreePayService.queryBankAcct(lztAcct);
         if (result != null && CollectionUtils.isNotEmpty(result.getList())) {
             for (LztQueryAcctInfo acctInfo : result.getList()) {
                 if (!"FAIL".equals(acctInfo.getAcct_stat()) && !"CANCEL".equals(acctInfo.getAcct_stat()) && !"PENDING".equals(acctInfo.getAcct_stat())) {
@@ -162,7 +168,6 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                 }
             }
         }
-        LztAcct lztAcct = lztAcctService.getByUserId(lztAcctApply.getUserId());
         lztAcct.setIfOpenBankAcct(false);
         lztAcctService.updateById(lztAcct);
         removeById(id);

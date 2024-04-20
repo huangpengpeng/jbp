@@ -20,9 +20,7 @@ import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.DegreePayService;
-import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
@@ -46,13 +44,9 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     @Resource
     private MerchantService merchantService;
     @Resource
-    private LztService lztService;
-    @Resource
     private LztAcctApplyService lztAcctApplyService;
     @Resource
     private LztPayChannelService lztPayChannelService;
-    @Resource
-    private YopService yopService;
     @Resource
     private DegreePayService degreePayService;
 
@@ -163,11 +157,6 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     @Override
     public LztInfoResponse lztInfo(Integer merId) {
         LztInfoResponse response = new LztInfoResponse();
-        Merchant merchant = merchantService.getById(merId);
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        if (payInfo == null || StringUtils.isAnyEmpty(payInfo.getOidPartner(), payInfo.getPriKey())) {
-            throw new RuntimeException("商户信息未配置完成请联系管理员");
-        }
         //  账户数量
         List<LztAcct> lztAcctList = list(new QueryWrapper<LztAcct>().lambda().eq(LztAcct::getMerId, merId));
         response.setAccountNum(lztAcctList.size());
@@ -197,17 +186,14 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         BigDecimal yesterdayInAmt = BigDecimal.ZERO;
         BigDecimal yesterdayOutAmt = BigDecimal.ZERO;
 
-
         String yesterdayStart = DateTimeUtils.format(DateTimeUtils.getStartDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         String yesterdayEnd = DateTimeUtils.format(DateTimeUtils.getFinallyDate(DateTimeUtils.addDays(now, -1)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-
 
         List<AcctBalList> yesterdayList = Lists.newArrayList();
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
             do {
-                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
-                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), yesterdayStart, yesterdayEnd, null, pageNo.toString());
+                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, yesterdayStart, yesterdayEnd, pageNo);
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }
@@ -228,9 +214,6 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         response.setYesterdayInAmt(yesterdayInAmt);
         response.setYesterdayOutAmt(yesterdayOutAmt);
 
-
-
-
         // 今天
         BigDecimal todayOutAmt = BigDecimal.ZERO;
         BigDecimal todayInAmt = BigDecimal.ZERO;
@@ -240,8 +223,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
             do {
-                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
-                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), todayStart, todayEnd, null, pageNo.toString());
+                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, todayStart, todayEnd, pageNo);
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }

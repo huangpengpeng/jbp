@@ -19,6 +19,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztFundTransferDao;
+import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
@@ -46,6 +47,8 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
     private LztAcctService lztAcctService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private DegreePayService degreePayService;
 
     @Override
     public LztFundTransfer fundTransfer(Integer merId, String userId, String bankAccountNo, BigDecimal amt, String postscript) {
@@ -67,9 +70,8 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
         if (lztFundTransfer == null || lztFundTransfer.getStatus().equals(LianLianPayConfig.FundTransferStatus.成功.name())) {
             return lztFundTransfer;
         }
-        Merchant merchant = merchantService.getById(lztFundTransfer.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        LztQueryFundTransferResult result = lztService.queryFundTransfer(payInfo.getOidPartner(), payInfo.getPriKey(), lztFundTransfer.getUserId(), txnSeqno);
+        LztAcct lztAcct = lztAcctService.getByUserId(lztFundTransfer.getUserId());
+        LztQueryFundTransferResult result = degreePayService.queryFundTransfer(lztAcct, txnSeqno);
         lztFundTransfer.setStatus(LianLianPayConfig.FundTransferStatus.getName(result.getTxn_status()));
         lztFundTransfer.setRetMsg(result.getRet_msg());
         updateById(lztFundTransfer);

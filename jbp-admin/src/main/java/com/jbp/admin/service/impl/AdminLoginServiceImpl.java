@@ -202,7 +202,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
      * @param phone 手机号
      * @param code  验证码
      */
-    private void checkValidateCode(String phone, String code) {
+    public void checkValidateCode(String phone, String code) {
         String value = systemConfigService.getValueByKey("sms_code_valid_open");
         if (StringUtils.isNotEmpty(value) && "0".equals(value)) {
             return;

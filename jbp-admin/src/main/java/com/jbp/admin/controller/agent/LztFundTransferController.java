@@ -46,6 +46,7 @@ public class LztFundTransferController {
                 accpTxno, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
     }
+
     @PreAuthorize("hasAuthority('agent:lzt:acct:transfer')")
     @ApiOperation(value = "来账通资金划拨")
     @GetMapping(value = "/transfer")

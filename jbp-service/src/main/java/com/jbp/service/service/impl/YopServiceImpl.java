@@ -77,13 +77,13 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
-    public AccountRechargeResult accountRecharge(String merchantNo, String requestNo, String amount, String bankCode, String bankAccountNo, String userRequestIP) {
+    public AccountRechargeResult accountRecharge(String merchantNo, String requestNo, String amount, String bankCode, String bankAccountNo) {
         AccountRechargeParams params = new AccountRechargeParams();
         params.setParentMerchantNo("10089066338");
         params.setMerchantNo(merchantNo);
         params.setRequestNo(requestNo);
         params.setAmount(amount);
-        ExtParams4BankPay ext = new ExtParams4BankPay(bankCode, userRequestIP, bankAccountNo);
+        ExtParams4BankPay ext = new ExtParams4BankPay(bankCode, bankAccountNo);
         params.setRequestExtParams4BankPay(ext);
         return send("/rest/v1.0/account/recharge", "POST", params, AccountRechargeResult.class);
     }

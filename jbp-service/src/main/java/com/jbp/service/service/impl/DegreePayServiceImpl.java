@@ -9,9 +9,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.yop.constants.YopEnums;
 import com.jbp.common.yop.dto.FundBillFlowDto;
-import com.jbp.common.yop.result.AccountBalanceQueryResult;
-import com.jbp.common.yop.result.BankAccountBalanceQueryResult;
-import com.jbp.common.yop.result.FundBillFlowQueryResult;
+import com.jbp.common.yop.result.*;
 import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.YopService;
@@ -137,9 +135,68 @@ public class DegreePayServiceImpl implements DegreePayService {
         return null;
     }
 
-    public static void main(String[] args) {
-        String startTime = "20240419";
-        System.out.println(11/10);
+    @Override
+    public LztFundTransferResult fundTransfer(LztAcct lztAcct, String txnSeqno, String bankAccountNo, String amt, String notifyUrl) {
+        LztFundTransferResult result = new LztFundTransferResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.fundTransfer(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
+                    txnSeqno, lztAcct.getUserId(), bankAccountNo, amt, notifyUrl);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            AccountRechargeResult yopResult = yopService.accountRecharge(lztAcct.getUserId(), txnSeqno, amt, lztAcct.getOpenBank(), lztAcct.getBankAccount());
+            if (yopResult != null && yopResult.validate()) {
+                result.setRet_code("0000");
+                result.setRet_msg("交易成功");
+                result.setTxn_seqno(txnSeqno);
+                result.setAccp_txno(yopResult.getOrderNo());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public LztQueryFundTransferResult queryFundTransfer(LztAcct lztAcct, String txnSeqno) {
+        LztQueryFundTransferResult result = new LztQueryFundTransferResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.queryFundTransfer(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(), txnSeqno);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            AccountRechargeQueryResult yopResult = yopService.accountRechargeQuery(lztAcct.getUserId(), txnSeqno);
+            if (yopResult != null && yopResult.validate()) {
+                result.setRet_code("0000");
+                result.setAccp_txno(yopResult.getOrderNo());
+                result.setAmt(yopResult.getOrderAmount());
+                if ("INIT".equals(yopResult.getStatus())) {
+                    result.setTxn_status("CREATE");
+                }
+                if ("ACCOUNTING".equals(yopResult.getStatus())) {
+                    result.setTxn_status("PROCESS");
+                }
+                if ("SUCCESS".equals(yopResult.getStatus())) {
+                    result.setTxn_status("SUCCESS");
+                }
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno, String token, String tradeType) {
+        ReceiptDownloadResult result = new ReceiptDownloadResult();
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            result = lztService.receiptDownload(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
+                    receipt_accp_txno, token);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            AccountReceiptResult yopResult = yopService.accountReceiptGet(lztAcct.getUserId(), txnSeqno, tradeType);
+            result.setReceipt_sum_file(yopResult.getData());
+
+        }
+        return result;
     }
 
 

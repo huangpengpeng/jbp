@@ -63,6 +63,24 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
     @Autowired
     private SystemNotificationService systemNotificationService;
 
+
+    @Override
+    public void checkValidateCode(String phone, String code) {
+        String value = systemConfigService.getValueByKey("sms_code_valid_open");
+        if(org.apache.commons.lang3.StringUtils.isNotEmpty(value) && "0".equals(value)){
+            return;
+        }
+        Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
+        if (ObjectUtil.isNull(validateCode)) {
+            throw new CrmebException("验证码已过期");
+        }
+        if (!validateCode.toString().equals(code)) {
+            throw new CrmebException("验证码错误");
+        }
+        //删除验证码
+        redisUtil.delete(SmsConstants.SMS_VALIDATE_PHONE + phone);
+    }
+
     /**
      * 修改签名
      */
