@@ -64,7 +64,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
         Rule rule = getRule(productComm);
-        if (rule.getCapaXsId() == null || rule.getXcComm() == null) {
+        if (rule.getCapaXsId() == null || rule.getXsComm() == null) {
             throw new CrmebException(ProductCommEnum.星级见点佣金.getName() + "参数不完整");
         }
         // 删除数据库的信息
@@ -121,7 +121,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
                     continue;
                 }
 
-                CapaXsPointCommHandler.Comm comm = rule.getXcComm().get(i);
+                CapaXsPointCommHandler.Comm comm = rule.getXsComm().get(i);
                 BigDecimal amount = totalPv.multiply(comm.getRatio()).multiply(new BigDecimal(orderDetail.getPayNum()));
                 List<FundClearingProduct> fundClearingProducts = new ArrayList<>();
                 FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
@@ -132,7 +132,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
                         fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级见点佣金.getName(), "");
                 pid = invitationService.getPid(pid);
                 i++;
-            } while (i < rule.getXcComm().size());
+            } while (i < rule.getXsComm().size());
 
 
         }
@@ -145,7 +145,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
     @AllArgsConstructor
     public static class Rule {
         private Integer capaXsId;
-        private List<CapaXsPointCommHandler.Comm> xcComm;
+        private List<CapaXsPointCommHandler.Comm> xsComm;
     }
 
     /**
