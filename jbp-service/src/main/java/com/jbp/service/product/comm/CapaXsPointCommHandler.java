@@ -79,8 +79,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
     @Override
     public Rule getRule(ProductComm productComm) {
         try {
-            ProductCommConfig config = productCommConfigService.getByType(getType());
-            CapaXsPointCommHandler.Rule rules = JSONObject.parseObject(config.getRatioJson(), CapaXsPointCommHandler.Rule.class);
+            CapaXsPointCommHandler.Rule rules = JSONObject.parseObject(productComm.getRule(), CapaXsPointCommHandler.Rule.class);
             return rules;
         } catch (Exception e) {
             throw new CrmebException(getType() + ":佣金格式解析失败:" + productComm.getRule());

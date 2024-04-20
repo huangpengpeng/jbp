@@ -66,6 +66,6 @@
         left join eb_user_capa c on c.uid = u.pid
         where od.product_id in (${goodsId}) and o.paid = 1 and o.refund_status = 0
         and u.pid = #{pid}  and c.capa_id >  #{capaId}
-
+        group by od.order_no
     </select>
 </mapper>

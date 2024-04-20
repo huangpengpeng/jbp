@@ -1,25 +1,23 @@
 package com.jbp.service.product.comm;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.FundClearingProduct;
+import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.ProductCommConfig;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.FunctionUtil;
-import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +51,6 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
     private UserCapaService userCapaService;
 
 
-
     @Override
     public Integer getType() {
         return ProductCommEnum.分组推三返一.getType();
@@ -71,17 +68,17 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
             throw new CrmebException(ProductCommEnum.分组推三返一.getName() + "参数不完整");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
-        List<Rule> rules = getRule(productComm);
-        if (CollectionUtils.isEmpty(rules)) {
+        Rule rules = getRule(productComm);
+        if (rules == null) {
             throw new CrmebException(ProductCommEnum.分组推三返一.getName() + "参数不完整");
         }
-        for (Rule rule : rules) {
-            if (rule.getNum()== null ||  ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO) || ArithmeticUtils.lessEquals(rule.getAmt(), BigDecimal.ZERO)) {
+        for (Comm rule : rules.getGroupComm()) {
+            if (rule.getNum() == null || rule.getRatio() == null) {
                 throw new CrmebException(ProductCommEnum.分组推三返一.getName() + "参数不完整");
             }
         }
-        Set<Integer> set = rules.stream().map(Rule::getNum).collect(Collectors.toSet());
-        if (set.size() != rules.size()) {
+        Set<Integer> set = rules.getGroupComm().stream().map(Comm::getNum).collect(Collectors.toSet());
+        if (set.size() != rules.getGroupComm().size()) {
             throw new CrmebException("单数不能重复");
         }
         // 删除数据库的信息
@@ -94,9 +91,9 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public List<Rule> getRule(ProductComm productComm) {
+    public Rule getRule(ProductComm productComm) {
         try {
-            List<Rule> rules = JSONArray.parseArray(productComm.getRule(), Rule.class);
+            GroupThreeRetOneHandler.Rule rules = JSONObject.parseObject(productComm.getRule(), GroupThreeRetOneHandler.Rule.class);
             return rules;
         } catch (Exception e) {
             throw new CrmebException(getType() + ":佣金格式解析失败:" + productComm.getRule());
@@ -110,66 +107,77 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
             return;
         }
 
-
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
-        orderDetails.forEach(e->{
-        });
-
-
-        Integer pid = invitationService.getPid(order.getUid());
-        UserCapa userCapa =  userCapaService.getByUser(pid);
-        if (pid == null) {
-            return;
-        }
-        BigDecimal totalAmt = BigDecimal.ZERO;
+        List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
 
-//
-//        Rule rule= getRule().get(0);
+        Integer pid = invitationService.getPid(order.getUid());
+        UserCapa userCapa = userCapaService.getByUser(pid);
 
-        //计算所有推三返一商品
-        List<ProductComm> productCommList = productCommService.list(new QueryWrapper<ProductComm>().lambda().eq(ProductComm::getType,getType()));
-        String goodsId = "";
-        productCommList.forEach(e ->{
-            List<Rule> rules = JSONArray.parseArray(e.getRule(), Rule.class);
-//            if(!rules.isEmpty() && rules.get(0).getAmt().compareTo() == 0){
-//
-//            }
+        for (OrderDetail orderDetail : orderDetailList) {
 
-        });
+            ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
+            if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
+                continue;
+            }
+            GroupThreeRetOneHandler.Rule rule = getRule(productComm);
+            Map<String, Object> map = productCommService.getMap(new QueryWrapper<ProductComm>().select(" group_concat(product_id) as product_id ").last("  type = " + getType() + " and  JSON_EXTRACT(rule, '$.amt') = " + rule.getAmt() + ""));
 
-        // 计算单数
-        List<OrderDetail> orderList= orderDetailService.getNextOrderGoods(pid,goodsId,userCapa.getCapaId());
+            // 计算历史单数
+            List<OrderDetail> orderList = orderDetailService.getNextOrderGoods(pid, map.get("product_id").toString(), userCapa.getCapaId());
 
 
-        // 按订单保存佣金
-//        totalAmt = totalAmt.setScale(2, BigDecimal.ROUND_DOWN);
-//        if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
-//            User orderUser = userService.getById(order.getUid());
-//            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推三返一.getName(), totalAmt,
-//                     productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.推三返一.getName(), "");
-//        }
+            int remainder = orderList.size() % rule.getGroupComm().size();
+            
+            if(remainder == 0){
+                remainder = 1;
+            }
+
+            GroupThreeRetOneHandler.Comm commList = rule.getGroupComm().get(remainder - 1);
+            BigDecimal totalAmt = rule.getAmt().multiply(commList.getRatio());
+
+            FundClearingProduct clearingProduct = new FundClearingProduct(orderDetail.getProductId(), orderDetail.getProductName(), rule.getAmt(),
+                    orderDetail.getPayNum(), commList.getRatio(), totalAmt);
+            productList.add(clearingProduct);
+
+            User orderUser = userService.getById(order.getUid());
+            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.分组推三返一.getName(), totalAmt,
+                    productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.分组推三返一.getName(), "");
+            //一笔订单只计算一次推三返一
+            break;
+
+        }
+
+
+        if (pid == null) {
+            return;
+        }
+
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
+        private BigDecimal amt;
+        private List<GroupThreeRetOneHandler.Comm> groupComm;
 
+    }
+
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Comm {
         /**
          * 单数
          */
         private Integer num;
+
         /**
          * 比例
          */
         private BigDecimal ratio;
-        /**
-         * 分组金额
-         */
-        private BigDecimal amt;
-
     }
 
 }
