@@ -83,7 +83,7 @@ public class UserServerSnHandler implements ProductProfitHandler {
         productProfitList = ListUtils.emptyIfNull(productProfitList).stream().filter(p -> p.getType() == getType()
                 && BooleanUtil.isTrue(p.getStatus())).collect(Collectors.toList());
 
-        if (CollectionUtils.isEmpty(productProfitList)) {
+        if (CollectionUtils.isEmpty(productProfitList) || !BooleanUtil.isTrue(productProfitList.get(0).getStatus()) ) {
             return;
         }
         Rule rule  =  getRule(productProfitList.get(0).getRule());
