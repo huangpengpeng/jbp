@@ -1,6 +1,10 @@
 package com.jbp.service.product.comm;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public enum ProductCommEnum {
@@ -20,8 +24,16 @@ public enum ProductCommEnum {
     星级级差佣金(13, "星级级差佣金", false,"根据下单人(不考虑下单人星级)往上找到指定星级用户根据配置比例进行分钱"),
     级差伯乐佣金(14, "级差伯乐佣金", true,"根据获得星级级差将的用户往上找指定等级规定人数按照配置的比例获得佣金"),
     推荐店铺佣金(15, "推荐店铺佣金", true, "获得店铺佣金的上级用户店铺佣金指定比例金额"),
-    分组推三返一(16, "分组推三返一", false,"（艾培生）每直接推荐一单设置分组推三返一的商品，根据分组不同商品推荐单数三单一循环获取商品推三返一的佣金"),
-    星级见点佣金(17, "星级见点佣金", false,"按照星级来获取佣金资格，往上找指定代数，获取佣金比例，紧缩"),
+
+
+    拓展佣金(16, "拓展佣金", true, "月度结算指定用户参与全网设置促销佣金商品进行分红"),
+    培育佣金(17, "培育佣金", true, "月度结算对设置培育佣金的商品全网结算，购买关联培育佣金的商品赠送活跃"),
+    报单佣金(18, "报单佣金", true, "用户报单分佣给直接推荐人间接推荐人紧缩关系"),
+    零售佣金(19, "零售佣金", true, "用户自主购买最近店长分佣，最近店长关联的培育店长分佣"),
+    平台分红(20, "平台分红", true, "获得相关资质的用户可以获得平台销售业绩指定比例加各自权限分红"),
+
+    分组推三返一(21, "分组推三返一", false,"（艾培生）每直接推荐一单设置分组推三返一的商品，根据分组不同商品推荐单数三单一循环获取商品推三返一的佣金"),
+    星级见点佣金(22, "星级见点佣金", false,"按照星级来获取佣金资格，往上找指定代数，获取佣金比例，紧缩"),
 
     ;
     /**
@@ -64,5 +76,13 @@ public enum ProductCommEnum {
             }
         }
         return null;
+    }
+
+    public static List<ProductCommEnum> getByNames(String... names ) {
+        List<ProductCommEnum> list = Lists.newArrayList();
+        for (String name : names) {
+            list.add(ProductCommEnum.valueOf(name));
+        }
+        return list;
     }
 }

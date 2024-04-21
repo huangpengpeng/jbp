@@ -199,7 +199,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         //绑定用户账号
         if (spreadUid != null && spreadUid > 0) {
-            invitationService.band( user.getId(),spreadUid, false, true, false);
+            invitationService.band(user.getId(), spreadUid, false, true, false);
         }
         return user;
     }
@@ -1053,6 +1053,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         for (UserImportRequest importUser : list) {
             register(importUser.getNickname(), importUser.getMobile(), importUser.getAccount(), importUser.getOpenShop().equals("是"));
             logger.info("正在注册新用户信息:" + i + "###总条数:" + list.size());
+            i++;
+        }
+        i = 1;
+        for (UserImportRequest importUser : list) {
+            User user = getByAccount(importUser.getAccount());
+            userCapaService.saveOrUpdateCapa(user.getId(), importUser.getCapaId(), "导入", "导入");
+            if (importUser.getCapaXsId() != null) {
+                userCapaXsService.saveOrUpdateCapa(user.getId(), importUser.getCapaXsId(), false, "导入", "导入");
+            }
+            logger.info("正在处理用户等级信息:" + i + "###总条数:" + list.size());
             i++;
         }
         // 绑定销售上级

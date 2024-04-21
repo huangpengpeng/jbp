@@ -9,6 +9,7 @@ import com.jbp.common.response.*;
 import com.jbp.common.vo.LogisticsResultVo;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -334,5 +335,5 @@ public interface OrderService extends IService<Order> {
 
     Order getLastOne(Integer uid, String platform);
 
-
+    List<Order> getSuccessList(Date startTime, Date endTime);
 }
