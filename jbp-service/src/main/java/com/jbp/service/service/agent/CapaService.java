@@ -23,6 +23,8 @@ public interface CapaService extends IService<Capa> {
 
     Capa getNext(Long capaId);
 
+    List<Capa> getPre(Long capaId);
+
     Capa getByName(String name);
 
     Capa getByRankNum(Integer rankNum);

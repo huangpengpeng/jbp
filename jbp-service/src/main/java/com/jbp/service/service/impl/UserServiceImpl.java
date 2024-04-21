@@ -199,7 +199,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         //绑定用户账号
         if (spreadUid != null && spreadUid > 0) {
-            invitationService.band( user.getId(),spreadUid, false, true, false);
+            invitationService.band(user.getId(), spreadUid, false, true, false);
         }
         return user;
     }

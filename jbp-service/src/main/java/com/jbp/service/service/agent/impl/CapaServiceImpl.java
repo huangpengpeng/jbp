@@ -115,6 +115,14 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     }
 
     @Override
+    public List<Capa> getPre(Long capaId) {
+        if (capaId == null) {
+            return Lists.newArrayList();
+        }
+        return list(new LambdaQueryWrapper<Capa>().eq(Capa::getPCapaId, capaId));
+    }
+
+    @Override
     public Capa getByName(String name) {
         return getOne(new QueryWrapper<Capa>().lambda().eq(Capa::getName, name));
     }

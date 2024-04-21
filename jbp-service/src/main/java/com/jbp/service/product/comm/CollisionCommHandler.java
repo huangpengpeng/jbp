@@ -209,7 +209,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
                     Date now = DateTimeUtils.getNow();
                     Date start = DateTimeUtils.getStartDate(now);
                     Date end = DateTimeUtils.getFinallyDate(now);
-                    BigDecimal usedAmt = fundClearingService.getSendCommAmt(uid, ProductCommEnum.渠道佣金.getName(), start, end);
+                    BigDecimal usedAmt = fundClearingService.getSendCommAmt(uid, start, end, ProductCommEnum.渠道佣金.getName());
                     BigDecimal usableAmt = maxAmt.subtract(usedAmt);
                     if (ArithmeticUtils.lessEquals(usableAmt, BigDecimal.ZERO)) {
                         amt = BigDecimal.ZERO;

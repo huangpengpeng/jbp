@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.RelationScore;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
@@ -13,10 +14,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.service.UserService;
 
-import com.jbp.service.service.agent.CapaService;
-import com.jbp.service.service.agent.RelationScoreService;
-import com.jbp.service.service.agent.UserInvitationService;
-import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +59,8 @@ public class UserController {
     private CapaService capaService;
     @Autowired
     private RelationScoreService relationScoreService;
+    @Autowired
+    private UserCapaService userCapaService;
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -234,13 +234,6 @@ public class UserController {
         if (relationService.getByPid(rId, request.getNode()) != null) {
             throw new CrmebException("节点已被占用");
         }
-        // 安置默认节点
-//        if (invitationService.getNextList(rId).isEmpty()) {
-//            UserRelation defaultRelation = relationService.getLeftMost(rId);
-//            if (defaultRelation.getPId() != rId) {
-//                throw new CrmebException("当前用户只能注册默认安置人");
-//            }
-//        }
         return CommonResult.success(true);
     }
 
@@ -266,8 +259,6 @@ public class UserController {
     @ApiOperation(value = "校验交易密码")
     @RequestMapping(value = "/verifyPayPwd", method = RequestMethod.GET)
     public CommonResult<Boolean> verifyPayPwd(String payPwd) throws Exception {
-
-
         return CommonResult.success(userService.verifyPayPwd(payPwd));
     }
 
@@ -281,11 +272,8 @@ public class UserController {
     @ApiOperation(value = "用户左右区业绩")
     @RequestMapping(value = "/getPerformance", method = RequestMethod.GET)
     public CommonResult<RelationScoreResponse> getPerformance() {
-
         return CommonResult.success(relationScoreService.getUserResult());
     }
-
-
 
     @ApiOperation(value = "账号获取用户信息")
     @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
@@ -297,6 +285,22 @@ public class UserController {
         UserInviteResponse userInviteResponse =new UserInviteResponse();
         BeanUtils.copyProperties(user , userInviteResponse);
         return CommonResult.success(userInviteResponse);
+    }
+
+    @ApiOperation(value = "邀请码+手机号 注册")
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public CommonResult register(String phone, String code, String pAccount) {
+        User pUser = userService.getByAccount(pAccount);
+        if (pUser == null) {
+            throw new CrmebException("上级账号不存在");
+        }
+        UserCapa userCapa = userCapaService.getByUser(pUser.getId());
+        Long minCapaId = capaService.getMinCapa().getId();
+        if (userCapa == null || NumberUtils.compare(userCapa.getCapaId(), minCapaId) <= 0) {
+            throw new CrmebException("当前上级账号级别不允许邀请");
+        }
+        User user = userService.registerPhone(phone, code, pUser.getId());
+        return CommonResult.success(user);
     }
 
 }
