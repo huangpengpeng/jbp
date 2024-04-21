@@ -37,7 +37,7 @@ public class ProductCommConfigServiceImpl extends ServiceImpl<ProductCommConfigD
      * 获取佣金策略信息, 保存佣金配置 以供用户开启关闭
      * 多平台佣金名称不能暴露不在自动生成 开发者自己去数据库添加
      */
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         for (ProductCommEnum value : ProductCommEnum.values()) {
             if (getByType(value.getType()) == null) {
