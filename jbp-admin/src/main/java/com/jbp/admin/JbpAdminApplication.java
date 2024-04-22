@@ -32,11 +32,16 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 
-        GroupThreeRetOneHandler groupThreeRetOneHandler = run.getBean(GroupThreeRetOneHandler.class);
+//        GroupThreeRetOneHandler groupThreeRetOneHandler = run.getBean(GroupThreeRetOneHandler.class);
+//
+//        OrderService orderService = run.getBean(OrderService.class);
+//
+//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT434171379135267789373"),null);
+//
 
-        OrderService orderService = run.getBean(OrderService.class);
-
-        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT226171378573417149696"),null);
     }
+
+
+
 
 }
