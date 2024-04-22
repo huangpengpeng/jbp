@@ -3,8 +3,7 @@ package com.jbp.front;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
-import com.jbp.common.yop.result.BankAccountQueryResult;
-import com.jbp.common.yop.result.OnlineBankOrderResult;
+import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
@@ -43,20 +42,13 @@ public class JbpFrontApplication {
         System.out.println("ok");
 
         YopService yopService = run.getBean(YopService.class);
+//        AccountBalanceQueryResult accountBalanceQueryResult = yopService.accountBalanceQuery("10090108498");
 
-        String requestNo = StringUtils.N_TO_10("CZ_");
-        OnlineBankOrderParams params = new OnlineBankOrderParams("10090108498", requestNo, "2", "B2C", "ABC");
-         OnlineBankOrderResult onlineBankOrderResult = yopService.onlineBankOrder(params);
-
-
-//        yopService.accountRecharge();
-        BankAccountQueryResult result = yopService.bankAccountQuery("10089066338", "682def8556e946ed9c06d9c73eb3e792");
-        System.out.println(result);
-
-        //        yopService.bankAccountBalanceQuery("10090225827", "HXBXB", "9000012701039001001370000613");
-
-//        yopService.accountBalanceQuery("10090224584");
-
+        String requestNo = StringUtils.N_TO_10("LZT_NDF_");
+        System.out.println(requestNo);
+        AccountTransferOrderResult accountTransferOrderResult = yopService.transferB2bOrder(requestNo, "10090108498", "10090224584", "0.02", null);
+        AccountTransferOrderQueryResult accountTransferOrderQueryResult = yopService.transferB2bOrderQuery("10090108498", requestNo);
+        System.out.println("111");
     }
 
 
