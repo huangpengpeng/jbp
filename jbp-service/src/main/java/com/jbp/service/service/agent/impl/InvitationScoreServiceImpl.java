@@ -154,7 +154,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 invitationScore.setScore(invitationScore.getScore().add(score));
                 invitationScoreList.add(invitationScore);
                 // 明细
-                InvitationScoreFlow flow = new InvitationScoreFlow(uid, uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
+                InvitationScoreFlow flow = new InvitationScoreFlow(upperDto.getPId(), uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
                 list.add(flow);
             }
         }

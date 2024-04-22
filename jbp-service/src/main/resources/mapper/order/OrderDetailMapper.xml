@@ -64,7 +64,7 @@
         left join eb_order o on o.order_no = od.order_no
         left join eb_user_invitation u on u.uid = o.uid
         left join eb_user_capa c on c.uid = u.pid
-        where od.product_id in (${goodsId}) and o.paid = 1 and o.refund_status = 0
+        where od.product_id in (${goodsId}) and o.paid = 1 and o.refund_status = 0  and o.is_del = 0
         and u.pid = #{pid}  and c.capa_id >=  #{capaId}
         group by od.order_no
     </select>
