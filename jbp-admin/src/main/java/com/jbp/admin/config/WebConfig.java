@@ -2,12 +2,10 @@ package com.jbp.admin.config;
 
 import com.jbp.admin.filter.ResponseFilter;
 import com.jbp.common.config.CrmebConfig;
-import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.encryptapi.SignInterceptor;
 import com.jbp.common.interceptor.ResultInterceptor;
 import com.jbp.common.interceptor.SwaggerInterceptor;
-
 import com.yeepay.yop.sdk.service.common.YopClient;
 import com.yeepay.yop.sdk.service.common.YopClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,4 +103,6 @@ public class WebConfig implements WebMvcConfigurer {
     public YopClient yopClient(){
         return YopClientBuilder.builder().build();
     }
+
+
 }

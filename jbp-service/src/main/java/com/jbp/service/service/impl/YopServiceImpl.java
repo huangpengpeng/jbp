@@ -113,7 +113,7 @@ public class YopServiceImpl implements YopService {
         params.setToMerchantNo(toMerchantNo);
         params.setOrderAmount(orderAmount);
         params.setNotifyUrl(notifyUrl);
-        return send("/rest/v1.0/account/transfer/b2b/order", "GET", params, AccountTransferOrderResult.class);
+        return send("/rest/v1.0/account/transfer/b2b/order", "POST", params, AccountTransferOrderResult.class);
     }
 
     @Override
