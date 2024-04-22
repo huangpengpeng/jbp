@@ -17,6 +17,7 @@ import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.LianLianPayService;
@@ -247,5 +248,19 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         response.setTodayInAmt(todayInAmt);
         response.setTodayOutAmt(todayOutAmt);
         return response;
+    }
+
+
+    @Override
+    public BigDecimal getFee(String userId, BigDecimal amt) {
+        LztAcct lztAcct = getByUserId(userId);
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
+        return feeAmount;
     }
 }

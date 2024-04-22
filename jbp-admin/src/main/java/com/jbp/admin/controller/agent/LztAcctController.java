@@ -352,4 +352,19 @@ public class LztAcctController {
         return CommonResult.failed(result.getRet_msg());
     }
 
+
+    @ApiOperation(value = "获取手续分")
+    @GetMapping(value = "/feeGet")
+    public CommonResult<BigDecimal> apply(BigDecimal amount, String userId) {
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amount).setScale(2, BigDecimal.ROUND_UP);
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amount.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
+        return CommonResult.success(feeAmount);
+    }
+
 }
