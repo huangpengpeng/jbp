@@ -284,7 +284,19 @@ public class UserController {
     @ApiOperation(value = "账号获取用户信息")
     @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
     public CommonResult<UserInviteResponse> getAccountUser(String account) {
-        User user = userService.getByAccount(account);
+
+        List<User> phoneList  = userService.getByPhone(account);
+        if(phoneList.size()>1){
+            throw new CrmebException("手机号重复，请输入账号");
+        }
+
+        User user;
+        if(!phoneList.isEmpty()){
+            user = phoneList.get(0);
+        }else{
+            user = userService.getByAccount(account);
+        }
+
         if (user == null) {
             throw new CrmebException("账号不存在");
         }
