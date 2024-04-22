@@ -1,8 +1,19 @@
 package com.jbp.service.service;
 
+import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.result.*;
 
 public interface YopService {
+
+
+    /**
+     * 充值下单
+     *
+     */
+
+    OnlineBankOrderResult onlineBankOrder(OnlineBankOrderParams params);
+
+
 
     /**
      * 开户进度查询

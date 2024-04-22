@@ -23,6 +23,13 @@ public class YopServiceImpl implements YopService {
     @Resource
     private YopClient yopClient;
 
+
+    @Override
+    public OnlineBankOrderResult onlineBankOrder(OnlineBankOrderParams params) {
+        params.setParentMerchantNo("10089066338");
+        return send("/rest/v1.0/account/recharge/onlinebank/order", "POST", params, OnlineBankOrderResult.class);
+    }
+
     @Override
     public BankAccountQueryResult bankAccountQuery(String merchantNo, String requestNo) {
         BankAccountQueryParams params = new BankAccountQueryParams();

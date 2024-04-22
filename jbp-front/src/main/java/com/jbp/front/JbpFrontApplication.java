@@ -1,7 +1,10 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.utils.StringUtils;
+import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.result.BankAccountQueryResult;
+import com.jbp.common.yop.result.OnlineBankOrderResult;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
@@ -41,8 +44,13 @@ public class JbpFrontApplication {
 
         YopService yopService = run.getBean(YopService.class);
 
+        String requestNo = StringUtils.N_TO_10("CZ_");
+        OnlineBankOrderParams params = new OnlineBankOrderParams("10090108498", requestNo, "2", "B2C", "ABC");
+         OnlineBankOrderResult onlineBankOrderResult = yopService.onlineBankOrder(params);
+
+
 //        yopService.accountRecharge();
-        BankAccountQueryResult result = yopService.bankAccountQuery("10090108498", "682def8556e946ed9c06d9c73eb3e792");
+        BankAccountQueryResult result = yopService.bankAccountQuery("10089066338", "682def8556e946ed9c06d9c73eb3e792");
         System.out.println(result);
 
         //        yopService.bankAccountBalanceQuery("10090225827", "HXBXB", "9000012701039001001370000613");
