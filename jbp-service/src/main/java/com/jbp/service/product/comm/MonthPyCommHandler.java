@@ -98,6 +98,12 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
     @Override
     public void clearing(ClearingFinal clearingFinal) {
         List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingFinal.getId());
+        if (CollectionUtils.isEmpty(clearingUsers)) {
+            log.error(clearingFinal.getName() + "结算名单为空");
+            clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
+            clearingFinalService.updateById(clearingFinal);
+            return;
+        }
         Map<Integer, ClearingUser> cleaingUserMap = FunctionUtil.keyValueMap(clearingUsers, ClearingUser::getUid);
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());

@@ -33,6 +33,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +71,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private ClearingFinalService clearingFinalService;
     @Resource
     private ProductCommChain productCommChain;
+    @Resource
+    private RedisTemplate redisTemplate;
 
 
     @Override
@@ -109,6 +112,10 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
 
     @Override
     public Boolean preImportUser(ClearingPreUserRequest request) {
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if(!task){
+            throw new RuntimeException("正在结算中请勿设置名单");
+        }
         if (request.getCommType() == null || StringUtils.isEmpty(request.getCommName())) {
             throw new CrmebException("佣金信息不能为空");
         }
@@ -176,6 +183,10 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
 
     @Override
     public Boolean delPerUser() {
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if(!task){
+            throw new RuntimeException("正在结算中请勿删除名单");
+        }
         QueryWrapper<ClearingUser> w = new QueryWrapper<>();
         w.lambda().eq(ClearingUser::getClearingId, -1L);
         return remove(w);

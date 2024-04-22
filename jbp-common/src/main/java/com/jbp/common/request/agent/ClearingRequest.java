@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public class ClearingRequest implements Serializable {
     @ApiModelProperty("导入名单")
     private List<ClearingUserImportDto> userList;
 
-    private Set<String> logSet;
+    private LinkedList<String> logSet;
 
     private ClearingFinal clearingFinal;
 

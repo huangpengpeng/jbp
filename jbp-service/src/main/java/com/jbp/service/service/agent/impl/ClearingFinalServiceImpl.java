@@ -21,6 +21,7 @@ import com.jbp.service.dao.agent.ClearingFinalDao;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -28,10 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -53,20 +51,24 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
     @Resource
     private RedisUtil redisUtil;
     @Resource
+    private RedisTemplate redisTemplate;
+    @Resource
     public AsyncUtils asyncUtils;
 
 
     @Override
     public void syncOneKeyClearing(ClearingRequest clearingRequest) {
-        redisUtil.delete("clearing_final");
-        Set<String> logSet = new HashSet<>();
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "-结算任务开始创建");
-        redisUtil.set("clearing_final", logSet);
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if (!task) {
+            throw new RuntimeException("正在结算中请勿重复操作");
+        }
+        LinkedList<String> logSet = new LinkedList<>();
         // 1.创建结算记录
         ClearingFinal clearingFinal = create(clearingRequest.getCommName(), clearingRequest.getCommType(),
                 clearingRequest.getStartTime(), clearingRequest.getEndTime());
+        redisUtil.delete("clearing_final" + clearingFinal.getId());
         logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算任务完成创建");
-        redisUtil.set("clearing_final", logSet);
+        redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
         clearingRequest.setLogSet(logSet);
         clearingRequest.setClearingFinal(clearingFinal);
         asyncUtils.exec(clearingRequest, param -> oneKeyClearing((ClearingRequest) param));
@@ -77,47 +79,54 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
      */
     @Override
     public ClearingFinal oneKeyClearing(ClearingRequest clearingRequest) {
-        Set<String> logSet = clearingRequest.getLogSet();
-        ClearingFinal clearingFinal = clearingRequest.getClearingFinal();
-        // 2.生成结算名单
-        if (clearingRequest.getIfImportUser()) {
-            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单开始导入");
-            redisUtil.set("clearing_final", logSet);
-            clearingUserService.importUserList(clearingFinal.getId(), clearingRequest.getUserList());
-            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单完成导入");
-            redisUtil.set("clearing_final", logSet);
-        }else{
-            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单开始创建");
-            redisUtil.set("clearing_final", logSet);
-            clearingUserService.create(clearingFinal.getId());
-            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单完成创建");
-            redisUtil.set("clearing_final", logSet);
+        LinkedList<String> logSet = clearingRequest.getLogSet();
+        try {
+            ClearingFinal clearingFinal = clearingRequest.getClearingFinal();
+            // 2.生成结算名单
+            if (clearingRequest.getIfImportUser()) {
+                logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单开始导入");
+                redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+                clearingUserService.importUserList(clearingFinal.getId(), clearingRequest.getUserList());
+                logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单完成导入");
+                redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+            } else {
+                logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单开始创建");
+                redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+                clearingUserService.create(clearingFinal.getId());
+                logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单完成创建");
+                redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+            }
+            // 3.生成结算关系
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算销售关系开始紧缩");
+            redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+            invitationFlowService.create(clearingFinal.getId());
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算销售关系完成紧缩");
+            redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+
+
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算服务关系开始紧缩");
+            redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+            relationFlowService.create(clearingFinal.getId());
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算服务关系完成紧缩");
+            redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+
+            // 计算佣金
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算佣金开始计算");
+            redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+            productCommChain.clearing(clearingFinal);
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算佣金完成计算");
+            redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
+            clearingFinal = getById(clearingFinal.getId());
+            clearingFinal.setLogs(JSONArray.toJSONString(logSet));
+            updateById(clearingFinal);
+            redisUtil.delete("clearing_final" + clearingFinal.getId());
+            return clearingFinal;
+        } catch (Exception e) {
+            logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算失败");
+            redisUtil.set("clearing_final" + clearingRequest.getClearingFinal().getId(), logSet);
+            redisTemplate.delete("ClearingFinalRunning");
+            throw new RuntimeException("结算失败" + clearingRequest.getClearingFinal().getId());
         }
-        // 3.生成结算关系
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算销售关系开始紧缩");
-        redisUtil.set("clearing_final", logSet);
-        invitationFlowService.create(clearingFinal.getId());
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算销售关系完成紧缩");
-        redisUtil.set("clearing_final", logSet);
-
-
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算服务关系开始紧缩");
-        redisUtil.set("clearing_final", logSet);
-        relationFlowService.create(clearingFinal.getId());
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算服务关系完成紧缩");
-        redisUtil.set("clearing_final", logSet);
-
-        // 计算佣金
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算佣金开始计算");
-        redisUtil.set("clearing_final", logSet);
-        productCommChain.clearing(clearingFinal);
-        logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算佣金完成计算");
-        redisUtil.set("clearing_final", logSet);
-        clearingFinal = getById(clearingFinal.getId());
-        clearingFinal.setLogs(JSONArray.toJSONString(logSet));
-        updateById(clearingFinal);
-        redisUtil.delete("clearing_final");
-        return clearingFinal;
     }
 
     /**
@@ -125,6 +134,11 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
      */
     @Override
     public Boolean oneKeyDel(Long clearingId) {
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if (!task) {
+            throw new RuntimeException("正在结算中请勿重复删除");
+        }
+        redisUtil.delete("clearing_final" + clearingId);
         ClearingFinal clearingFinal = getById(clearingId);
         if (clearingFinal.getStatus().equals(ClearingFinal.Constants.已出款.name())) {
             throw new CrmebException("已出款不允许删除");

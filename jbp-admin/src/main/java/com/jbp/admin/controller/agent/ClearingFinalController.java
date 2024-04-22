@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,47 +72,27 @@ public class ClearingFinalController {
     @PostMapping("/oneKeyClearing")
     @ApiOperation("一键结算")
     public CommonResult<ClearingFinal> create(@RequestBody ClearingRequest request) {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if (set != null && set.size() > 0) {
-            new CrmebException("正在进行结算不允许重复操作");
-        }
-        try {
-            clearingFinalService.syncOneKeyClearing(request);
-        } catch (Exception e) {
-            redisUtil.delete("clearing_final");
-            return CommonResult.failed(e.getMessage());
-        }
+        clearingFinalService.syncOneKeyClearing(request);
         return CommonResult.success();
     }
 
     @GetMapping("/oneKeyDel")
     @ApiOperation("一键删除")
     public CommonResult<Boolean> del(Long clearingId) {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if (set != null && set.size() > 0) {
-            new CrmebException("正在进行结算不允许删除");
-        }
         return CommonResult.success(clearingFinalService.oneKeyDel(clearingId));
     }
 
     @PostMapping("/preImportUser")
     @ApiOperation("预设名单")
     public CommonResult<Boolean> preImportUser(@RequestBody ClearingPreUserRequest request) {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if (set != null && set.size() > 0) {
-            new CrmebException("正在进行结算不允许设置");
-        }
         return CommonResult.success(clearingUserService.preImportUser(request));
     }
 
     @GetMapping("/preDelUser")
     @ApiOperation("预设名单删除")
     public CommonResult<Boolean> preDelUser() {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if (set != null && set.size() > 0) {
-            new CrmebException("正在进行结算不允许删除");
-        }
-        return CommonResult.success(clearingUserService.delPerUser());
+        clearingUserService.delPerUser();
+        return CommonResult.success();
     }
 
     @GetMapping("/send")
@@ -124,7 +105,7 @@ public class ClearingFinalController {
     @ApiOperation("结算任务详情")
     public CommonResult<ClearingFinal> detail(Long clearingId) {
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
-        Set<Object> set = redisUtil.sGet("clearing_final");
+        LinkedList set = redisUtil.get("clearing_final" + clearingId);
         if (set != null && set.size() > 0) {
             clearingFinal.setLogs(JSONArray.toJSONString(set));
         }

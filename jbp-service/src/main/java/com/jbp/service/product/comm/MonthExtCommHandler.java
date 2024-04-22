@@ -14,6 +14,7 @@ import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
@@ -74,6 +75,12 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
     public void clearing(ClearingFinal clearingFinal) {
         Long clearingId = clearingFinal.getId();
         List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingId);
+        if (CollectionUtils.isEmpty(clearingUsers)) {
+            log.error(clearingFinal.getName() + "结算名单为空");
+            clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
+            clearingFinalService.updateById(clearingFinal);
+            return;
+        }
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
         List<Order> successList = orderService.getSuccessList(startTime, endTime);
