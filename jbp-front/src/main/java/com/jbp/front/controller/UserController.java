@@ -64,8 +64,9 @@ public class UserController {
     private CapaService capaService;
     @Autowired
     private RelationScoreService relationScoreService;
-
+    @Autowired
     private Environment environment;
+    @Autowired
     private UserCapaService userCapaService;
 
     @ApiOperation(value = "登录密码修改")
