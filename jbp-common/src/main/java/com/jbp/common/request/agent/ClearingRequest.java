@@ -1,11 +1,13 @@
 package com.jbp.common.request.agent;
 
 import com.jbp.common.dto.ClearingUserImportDto;
+import com.jbp.common.model.agent.ClearingFinal;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class ClearingRequest implements Serializable {
@@ -27,5 +29,9 @@ public class ClearingRequest implements Serializable {
 
     @ApiModelProperty("导入名单")
     private List<ClearingUserImportDto> userList;
+
+    private Set<String> logSet;
+
+    private ClearingFinal clearingFinal;
 
 }

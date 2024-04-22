@@ -58,18 +58,7 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
 
     @Override
     public void syncOneKeyClearing(ClearingRequest clearingRequest) {
-        asyncUtils.exec(clearingRequest, param -> oneKeyClearing((ClearingRequest) param));
-    }
-
-    /**
-     * 一键结算
-     */
-    @Override
-    public ClearingFinal oneKeyClearing(ClearingRequest clearingRequest) {
         redisUtil.delete("clearing_final");
-        Map<Object, Object> logMap = Maps.newConcurrentMap();
-
-
         Set<String> logSet = new HashSet<>();
         logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "-结算任务开始创建");
         redisUtil.set("clearing_final", logSet);
@@ -78,8 +67,18 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
                 clearingRequest.getStartTime(), clearingRequest.getEndTime());
         logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算任务完成创建");
         redisUtil.set("clearing_final", logSet);
+        clearingRequest.setLogSet(logSet);
+        clearingRequest.setClearingFinal(clearingFinal);
+        asyncUtils.exec(clearingRequest, param -> oneKeyClearing((ClearingRequest) param));
+    }
 
-
+    /**
+     * 一键结算
+     */
+    @Override
+    public ClearingFinal oneKeyClearing(ClearingRequest clearingRequest) {
+        Set<String> logSet = clearingRequest.getLogSet();
+        ClearingFinal clearingFinal = clearingRequest.getClearingFinal();
         // 2.生成结算名单
         if (clearingRequest.getIfImportUser()) {
             logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算名单开始导入");
@@ -117,7 +116,6 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
         clearingFinal = getById(clearingFinal.getId());
         clearingFinal.setLogs(JSONArray.toJSONString(logSet));
         updateById(clearingFinal);
-
         redisUtil.delete("clearing_final");
         return clearingFinal;
     }

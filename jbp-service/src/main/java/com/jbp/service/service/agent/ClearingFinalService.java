@@ -7,6 +7,8 @@ import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ClearingRequest;
 
+import java.util.Set;
+
 public interface ClearingFinalService extends IService<ClearingFinal> {
 
     ClearingFinal oneKeyClearing(ClearingRequest clearingRequest);
