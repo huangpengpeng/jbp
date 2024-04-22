@@ -228,6 +228,22 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
         clearingBonusFlowService.del4Clearing(clearingFinal.getId());
     }
 
+    public static void main(String[] args) {
+
+        List<Rule> ruleList = Lists.newArrayList();
+        for (int i = 0; i < 4 ; i++) {
+            Rule rule = new Rule();
+            rule.setLevel(Long.valueOf(i));
+            rule.setLevelName("平台分红级别"+i);
+            rule.setRatio(BigDecimal.valueOf(i).divide(BigDecimal.valueOf(100)));
+            ruleList.add(rule);
+        }
+
+        System.out.println(JSONArray.toJSONString(ruleList));
+
+
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

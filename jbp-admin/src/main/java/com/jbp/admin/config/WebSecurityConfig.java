@@ -136,7 +136,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/captcha/get", "/captcha/check").anonymous()
                 .antMatchers("/api/admin/payment/callback/**").anonymous()
                 .antMatchers("/api/public/**").anonymous()
-                .antMatchers("/api/admin/agent/clearing/**").anonymous()
+//                .antMatchers("/api/admin/agent/clearing/**").anonymous()
 
 
 

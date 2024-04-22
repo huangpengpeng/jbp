@@ -88,7 +88,6 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         // 导入名单结算不需要预设
         delPerUser();
         // 批量插入用户
-        List<ClearingUser> insetBatchList = Lists.newArrayList();
         Map<String, ClearingUserImportDto> userMap = Maps.newConcurrentMap();
         for (ClearingUserImportDto dto : list) {
             if (StringUtils.isAnyEmpty(dto.getAccount(), dto.getLevelName()) || dto.getLevel() == null) {

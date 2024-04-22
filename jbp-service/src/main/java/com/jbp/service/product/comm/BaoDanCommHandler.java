@@ -207,6 +207,20 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
         });
     }
 
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        rule.setOneRatio(BigDecimal.ONE);
+        rule.setOneCapaId(1L);
+
+        rule.setTwoRatio(BigDecimal.ONE);
+        rule.setTwoCapaId(2L);
+
+        rule.setThreeRatio(BigDecimal.ONE);
+        rule.setThreeCapaId(3L);
+
+        System.out.println(JSONObject.toJSONString(rule));
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

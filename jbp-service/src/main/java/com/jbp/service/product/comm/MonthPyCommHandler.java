@@ -301,22 +301,58 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
         clearingBonusFlowService.del4Clearing(clearingFinal.getId());
     }
 
+
+    public static void main(String[] args) {
+
+        List<Rule> list = Lists.newArrayList();
+        for (int i = 1; i <= 3 ; i++) {
+            Rule rule = new Rule();
+            rule.setLevel(Long.valueOf(i));
+            if (i == 1) {
+                rule.setCapaId(1L);
+                rule.setPayPrice(BigDecimal.valueOf(100));
+                rule.setLevelName("创客当月复购100元");
+                rule.setUpperRelationNum(2);
+                rule.setUpperInvitationNum(2);
+                rule.setUpperScale(BigDecimal.valueOf(0.01));
+                rule.setUnderRelationNum(25);
+                rule.setUnderInvitationNum(25);
+                rule.setUnderScale(BigDecimal.valueOf(0.05));
+            }
+            if (i == 2) {
+                rule.setCapaId(2L);
+                rule.setPayPrice(BigDecimal.valueOf(100));
+                rule.setLevelName("VIP以上复购100元");
+                rule.setUpperRelationNum(5);
+                rule.setUpperInvitationNum(5);
+                rule.setUpperScale(BigDecimal.valueOf(0.01));
+                rule.setUnderRelationNum(25);
+                rule.setUnderInvitationNum(25);
+                rule.setUnderScale(BigDecimal.valueOf(0.05));
+            }
+            if (i == 3) {
+                rule.setCapaId(2L);
+                rule.setPayPrice(BigDecimal.valueOf(200));
+                rule.setLevelName("VIP以上复购300元");
+                rule.setUpperRelationNum(10);
+                rule.setUpperInvitationNum(10);
+                rule.setUpperScale(BigDecimal.valueOf(0.01));
+                rule.setUnderRelationNum(25);
+                rule.setUnderInvitationNum(25);
+                rule.setUnderScale(BigDecimal.valueOf(0.05));
+            }
+            list.add(rule);
+        }
+
+        System.out.println(JSONArray.toJSONString(list));
+
+
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
-
-        /**
-         * 级别名称
-         */
-        private Long capaId;
-
-
-        /**
-         * 付款金额
-         */
-        private BigDecimal payPrice;
-
 
         /**
          * 结算级别  1   2  3
@@ -330,6 +366,16 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
          * 3. VIP以上复购300元
          */
         private String levelName;
+
+        /**
+         * 级别名称
+         */
+        private Long capaId;
+
+        /**
+         * 付款金额
+         */
+        private BigDecimal payPrice;
 
         /**
          * 获取服务上级多少层的业绩分红
