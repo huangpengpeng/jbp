@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 public class ProductProfitConfigServiceImpl extends ServiceImpl<ProductProfitConfigDao, ProductProfitConfig> implements ProductProfitConfigService {
 
-//    @PostConstruct
+    @PostConstruct
     public void init(){
         for (ProductProfitEnum value : ProductProfitEnum.values()) {
             if (getByType(value.getType()) == null) {
