@@ -82,17 +82,19 @@ public class ClearingFinalController {
     @GetMapping("/oneKeyDel")
     @ApiOperation("一键删除")
     public CommonResult<Boolean> del(Long clearingId) {
-        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
-        if(!task){
-            throw new RuntimeException("正在结算中请勿删除名单");
-        }
         return CommonResult.success(clearingFinalService.oneKeyDel(clearingId));
     }
 
     @PostMapping("/preImportUser")
     @ApiOperation("预设名单")
     public CommonResult<Boolean> preImportUser(@RequestBody ClearingPreUserRequest request) {
-        return CommonResult.success(clearingUserService.preImportUser(request));
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if (!task) {
+            throw new RuntimeException("正在结算中请勿删除名单");
+        }
+        clearingUserService.preImportUser(request);
+        redisTemplate.delete("ClearingFinalRunning");
+        return CommonResult.success();
     }
 
     @GetMapping("/preDelUser")
