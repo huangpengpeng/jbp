@@ -211,11 +211,15 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingRelationFlow clearingRelationFlow : clearingRelationFlows) {
                         ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getUId());
+                        if(clearingUser == null){
+                            continue;
+                        }
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                         if (rule.getUpperRelationNum() >= i) {
                             usableList.add(clearingUser);
                         }
                     }
+
                     if (CollectionUtils.isNotEmpty(usableList)) {
                         BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_UP);
                         if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
@@ -248,6 +252,9 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingInvitationFlow clearingInvitationFlow : clearingInvitationFlows) {
                         ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getUId());
+                        if(clearingUser == null){
+                            continue;
+                        }
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                         if (rule.getUpperInvitationNum() >= i) {
                             usableList.add(clearingUser);

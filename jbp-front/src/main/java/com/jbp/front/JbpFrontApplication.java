@@ -47,7 +47,7 @@ public class JbpFrontApplication {
 //        req.setCommType(17);
 //        req.setCommName("培育佣金");
 //        req.setStartTime("20240401");
-//        req.setEndTime("20240405");
+//        req.setEndTime("20240410");
 //        req.setIfImportUser(false);
 //        clearingFinalService.syncOneKeyClearing(req);
 
