@@ -126,10 +126,6 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         // 删除历史的预设名单
         delPerUser();
         // 培育佣金规则
-        AbstractProductCommHandler monthPyCommHandler = productCommChain.handlers.get(ProductCommEnum.培育佣金.getType());
-        Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
-        // 批量插入用户
-        List<ClearingUser> insetBatchList = Lists.newArrayList();
         Map<String, ClearingUserImportDto> userMap = Maps.newConcurrentMap();
         for (ClearingUserImportDto dto : list) {
             if (StringUtils.isAnyEmpty(dto.getAccount(), dto.getLevelName()) || dto.getLevel() == null) {
@@ -145,6 +141,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         }
         // 设置导入用户信息
         importUserSet(list, -1L, request.getCommType());
+
+        redisTemplate.delete("ClearingFinalRunning");
         return true;
     }
 
