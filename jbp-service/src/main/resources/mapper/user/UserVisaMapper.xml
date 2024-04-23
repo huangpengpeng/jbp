@@ -12,4 +12,15 @@
 		) as a
 		where a.taskId = #{signTaskId}
     </select>
+    <select id="getAdminPageList" resultType="com.jbp.common.response.UserVisaRecordResponse">
+
+		select e.uid, u.nickName,e.task_id,e.visa,e.contract from eb_user_visa e
+		left join eb_user u on u.id  = e.uid
+		where 1=1
+		<if test="account !=null">
+			and u.account=#{account}
+		</if>
+
+
+	</select>
 </mapper>

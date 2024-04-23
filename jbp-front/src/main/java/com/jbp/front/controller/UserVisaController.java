@@ -83,8 +83,7 @@ public class UserVisaController {
 
 
 
-	// 双生国际
-	@ApiOperation(value = "法大大创建-签署任务", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "法大大创建-签署任务元气舱经营公约声明", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	@RequestMapping(value = "/createWithTemplate", method = {
 			RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +92,7 @@ public class UserVisaController {
 
 
 		Integer userId = userService.getUserId();
-		UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid,userService.getUserId()));
+		UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid,userService.getUserId()).eq(UserVisa::getContract,signTaskSubject));
 		OpenApiClient openApiClient = new OpenApiClient("00001068", "NADTNIHUU0DQSENC95LGM2GGZUJSFGOM", "https://api.fadada.com/api/v5/");
 		try {
 			//获取签章
@@ -130,12 +129,6 @@ public class UserVisaController {
 			actor.setCertType("id_card");
 			actor.setCertNoForMatch(idCard);
 			actor.setClientUserId(userId.toString());
-//			actor.setSendNotification(true);
-//			List<String> notifyType =new ArrayList<>();
-//			notifyType.add("finish");
-//			actor.setNotifyType(notifyType);
-//			actor.setNotifyAddress(req.getServletPath());
-
 
 			addActorsTempInfo.setActor(actor);
 
@@ -192,6 +185,111 @@ public class UserVisaController {
 		}
 		return CommonResult.success();
 	}
+
+
+
+
+
+
+	@ApiOperation(value = "法大大创建-签署任务生物共振元气芯片舱机租赁合同", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@RequestMapping(value = "/createWithTemplate2", method = {
+			RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public CommonResult<String> createWithTemplate2(HttpServletRequest req, String realName, String idCard ,String signTemplateId,String signTaskSubject)
+			throws Exception {
+
+
+		Integer userId = userService.getUserId();
+		UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid,userService.getUserId()).eq(UserVisa::getContract,signTaskSubject));
+		OpenApiClient openApiClient = new OpenApiClient("00001068", "NADTNIHUU0DQSENC95LGM2GGZUJSFGOM", "https://api.fadada.com/api/v5/");
+		try {
+			//获取签章
+			HttpConfig httpConfig = new HttpConfig();
+			httpConfig.setConnectTimeout(1000000);
+			httpConfig.setReadTimeout(1000000);
+			openApiClient.setHttpConfig(httpConfig);
+			SignTaskClient signTaskClient = new SignTaskClient(openApiClient);
+
+			String token = getAccessToken(openApiClient);
+
+			List<String> permissions = new ArrayList<>();
+			permissions.add("sign");
+
+			CreateWithTemplateReq createWithTemplateReq = new CreateWithTemplateReq();
+			createWithTemplateReq.setAccessToken(token);
+			OpenId openId = new OpenId();
+			openId.setIdType("corp");
+			openId.setOpenId("d9557276be92474a905d99a818182209");
+			createWithTemplateReq.setSignTaskSubject(signTaskSubject);
+			createWithTemplateReq.setInitiator(openId);
+			createWithTemplateReq.setSignTemplateId(signTemplateId);
+			createWithTemplateReq.setAutoStart(true);
+			createWithTemplateReq.setAutoFillFinalize(true);
+
+			List<AddActorsTempInfo> list = new ArrayList<>();
+			AddActorsTempInfo addActorsTempInfo = new AddActorsTempInfo();
+			Actor actor = new Actor();
+			actor.setActorId("乙方");
+			actor.setActorType("person");
+			actor.setActorName(realName);
+			actor.setPermissions(permissions);
+			actor.setIdentNameForMatch(realName);
+			actor.setCertType("id_card");
+			actor.setCertNoForMatch(idCard);
+			actor.setClientUserId(userId.toString());
+
+			addActorsTempInfo.setActor(actor);
+
+			TemplateSignConfigInfoReq templateSignConfigInfoReq = new TemplateSignConfigInfoReq();
+			List<String> verifyMethods = new ArrayList<>();
+			verifyMethods.add("audio_video");
+			templateSignConfigInfoReq.setVerifyMethods(verifyMethods);
+			templateSignConfigInfoReq.setSignerSignMethod("ai_hand_write");
+
+			addActorsTempInfo.setSignConfigInfo(templateSignConfigInfoReq);
+
+			list.add(addActorsTempInfo);
+			createWithTemplateReq.setActors(list);
+
+			log.info("法大大请求：{}", JSONObject.toJSONString(createWithTemplateReq));
+
+			//创建签署任务
+			BaseRes<CreateSignTaskRes> baseRes = signTaskClient.createWithTemplate(createWithTemplateReq);
+			if (!baseRes.getCode().equals("100000")) {
+				throw new RuntimeException(baseRes.getMsg());
+			}
+
+			userVisa.setTaskId(baseRes.getData().getSignTaskId());
+			userVisaService.updateById(userVisa);
+
+			//获取签署链接
+			SignTaskActorGetUrlReq signTaskActorGetUrlReq = new SignTaskActorGetUrlReq();
+			signTaskActorGetUrlReq.setAccessToken(token);
+			signTaskActorGetUrlReq.setSignTaskId(baseRes.getData().getSignTaskId());
+			signTaskActorGetUrlReq.setActorId("乙方");
+			signTaskActorGetUrlReq.setRedirectMiniAppUrl("/pages/index/index");
+
+			log.info("法大大请求2：{}", JSONObject.toJSONString(signTaskActorGetUrlReq));
+
+			BaseRes<SignTaskActorGetUrlRes> signTaskActorGetUrlResBaseRes = signTaskClient.signTaskActorGetUrl(signTaskActorGetUrlReq);
+			if (!signTaskActorGetUrlResBaseRes.getCode().equals("100000")) {
+				throw new RuntimeException(signTaskActorGetUrlResBaseRes.getMsg());
+			}
+
+			log.info("法大大响应：{}", JSONObject.toJSONString(signTaskActorGetUrlResBaseRes.getData().getActorSignTaskEmbedUrl()));
+
+			return CommonResult.success(signTaskActorGetUrlResBaseRes.getData().getActorSignTaskEmbedUrl());
+		} catch (ApiException e) {
+			e.printStackTrace();
+		}
+		return CommonResult.success();
+	}
+
+
+
+
+
+
 
 
 	private String getAccessToken(OpenApiClient openApiClient) throws ApiException {
