@@ -16,10 +16,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingInvitationFlowDao;
-import com.jbp.service.dao.agent.UserInvitationFlowDao;
 import com.jbp.service.product.comm.ProductCommEnum;
-import com.jbp.service.service.TeamService;
-import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +44,7 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     @Resource
     private UserService userService;
     @Resource
-    private ClearingInvitationFlowDao clearingInvitationFlowDao;
+    private ClearingInvitationFlowDao dao;
 
     @Override
     public Boolean create(Long clearingId) {
@@ -87,7 +84,9 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
                         flowList.add(flow);
                     }
                 }
-                clearingInvitationFlowDao.insertBatch(flowList);
+                if(!flowList.isEmpty()){
+                    dao.insertBatch(flowList);
+                }
             }
         }
         return true;

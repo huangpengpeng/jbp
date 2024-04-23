@@ -89,7 +89,9 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
                         flowList.add(flow);
                     }
                 }
-                dao.insertBatch(flowList);
+                if(!flowList.isEmpty()){
+                    dao.insertBatch(flowList);
+                }
             }
         }
         return true;

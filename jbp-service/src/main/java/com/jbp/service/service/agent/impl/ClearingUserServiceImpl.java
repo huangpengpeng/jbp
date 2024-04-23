@@ -110,7 +110,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             }
         }
         // 导入名单设置
-        importUserSet(list,  clearingId, clearingFinal.getCommType());
+        importUserSet(list, clearingId, clearingFinal.getCommType());
         return true;
     }
 
@@ -118,7 +118,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     @Override
     public Boolean preImportUser(ClearingPreUserRequest request) {
         Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
-        if(!task){
+        if (!task) {
             throw new RuntimeException("正在结算中请勿设置名单");
         }
         if (request.getCommType() == null || StringUtils.isEmpty(request.getCommName())) {
@@ -220,15 +220,15 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     }
 
 
-    private void createPingTaiUser(Long clearingId, ClearingFinal clearingFinal,  Date endTime, Map<Integer, ClearingUser> perMap) {
+    private void createPingTaiUser(Long clearingId, ClearingFinal clearingFinal, Date endTime, Map<Integer, ClearingUser> perMap) {
         if (clearingFinal.getCommName().equals(ProductCommEnum.平台分红.getName())) {
             Capa maxCapa = capaService.getMaxCapa();
             List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
-            if(CollectionUtils.isEmpty(ruleList)){
-               throw new CrmebException("平台分红规则为空请联系管理员");
+            if (CollectionUtils.isEmpty(ruleList)) {
+                throw new CrmebException("平台分红规则为空请联系管理员");
             }
-            ruleList = ruleList.stream().filter(s->s.getRefLevel()== null).collect(Collectors.toList());
-            if(CollectionUtils.isEmpty(ruleList)){
+            ruleList = ruleList.stream().filter(s -> s.getRefLevel() == null).collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(ruleList)) {
                 throw new CrmebException("平台分红规则为空请联系管理员2");
             }
             List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, maxCapa.getId()));
@@ -298,7 +298,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     ProductComm productComm = map.get(orderDetail.getProductId());
                     if (productComm == null) {
                         productComm = productCommService.getByProduct(orderDetail.getProductId(), ProductCommEnum.培育佣金.getType());
-                        if(productComm != null){
+                        if (productComm != null) {
                             map.put(orderDetail.getProductId(), productComm);
                         }
                     }
@@ -337,7 +337,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 }
             });
 
-            if(!perMap.isEmpty()) {
+            if (!perMap.isEmpty()) {
                 perMap.forEach((uid, perUser) -> {
                     try {
                         JSONObject rule = JSONObject.parseObject(perUser.getRule());
@@ -371,7 +371,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
 
             for (ClearingUser clearingUser : clearingUsers) {
                 ClearingUser perUser = perMap.get(clearingUser.getUid());
-                if(perUser == null){
+                if (perUser == null) {
                     ClearingUser newUser = new ClearingUser();
                     BeanUtils.copyProperties(clearingUser, newUser, "id", "clearingId");
                     newUser.setClearingId(clearingId);
@@ -379,7 +379,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 }
             }
 
-            if(!perMap.isEmpty()) {
+            if (!perMap.isEmpty()) {
                 perMap.forEach((uid, perUser) -> {
                     try {
                         JSONObject rule = JSONObject.parseObject(perUser.getRule());
@@ -449,9 +449,11 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             }
         }
         // 保存数据
-        List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
-        for (List<ClearingUser> clearingUsers : partition) {
-            clearingUserDao.insertBatch(clearingUsers);
+        if(!insetBatchList.isEmpty()){
+            List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
+            for (List<ClearingUser> clearingUsers : partition) {
+                clearingUserDao.insertBatch(clearingUsers);
+            }
         }
     }
 }
