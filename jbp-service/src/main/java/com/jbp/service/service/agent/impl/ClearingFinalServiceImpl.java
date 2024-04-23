@@ -141,7 +141,6 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
         if (!task) {
             throw new RuntimeException("正在结算中请勿重复删除");
         }
-        redisUtil.delete("clearing_final" + clearingId);
         ClearingFinal clearingFinal = getById(clearingId);
         if (clearingFinal.getStatus().equals(ClearingFinal.Constants.已出款.name())) {
             throw new CrmebException("已出款不允许删除");
@@ -151,7 +150,10 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
         invitationFlowService.del4Clearing(clearingId);
         relationFlowService.del4Clearing(clearingId);
         productCommChain.del4Clearing(clearingFinal);
-        return null;
+
+        redisTemplate.delete("ClearingFinalRunning");
+        redisUtil.delete("clearing_final" + clearingId);
+        return true;
     }
 
     @Override
