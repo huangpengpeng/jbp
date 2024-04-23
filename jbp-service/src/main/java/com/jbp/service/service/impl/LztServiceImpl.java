@@ -440,6 +440,7 @@ public class LztServiceImpl implements LztService {
                                             String dateStart, String endStart, String flagDc, String pageNo) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
+
         AcctSerialParams params = new AcctSerialParams(timestamp, oidPartner, userId, userType, "USEROWN_AVAILABLE",
                 dateStart, endStart, flagDc, pageNo, "10", "DESC");
         String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";

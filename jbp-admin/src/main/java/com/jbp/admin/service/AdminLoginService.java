@@ -34,6 +34,8 @@ public interface AdminLoginService {
      */
     SystemLoginResponse merchantLogin(SystemAdminLoginRequest request, String ip);
 
+    SystemLoginResponse merchantLogin(Integer id, String ip);
+
     /**
      * 用户登出
      */

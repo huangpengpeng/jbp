@@ -3,12 +3,18 @@ package com.jbp.admin.controller.merchant;
 
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.admin.SystemAdminRef;
+import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.response.MerchantBaseInfoResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.MerchantConfigInfoVo;
 import com.jbp.common.vo.MerchantSettlementInfoVo;
 import com.jbp.service.service.MerchantService;
 
+import com.jbp.service.service.SystemAdminRefService;
+import com.jbp.service.service.SystemAdminService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 商户端商户信息控制器
@@ -41,12 +49,28 @@ public class MerchantInfoController {
 
     @Autowired
     private MerchantService merchantService;
+    @Autowired
+    private SystemAdminRefService systemAdminRefService;
+    @Autowired
+    private SystemAdminService systemAdminService;
 
 //    @PreAuthorize("hasAuthority('merchant:base:info')")
     @ApiOperation(value = "商户端商户基础信息")
     @RequestMapping(value = "/base/info", method = RequestMethod.GET)
     public CommonResult<MerchantBaseInfoResponse> getBaseInfo() {
         return CommonResult.success(merchantService.getBaseInfo());
+    }
+
+    @ApiOperation(value = "关联账户")
+    @RequestMapping(value = "/ref/list", method = RequestMethod.GET)
+    public CommonResult<List<SystemAdminRef>> refList() {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        List<SystemAdminRef> list = systemAdminRefService.getList(systemAdmin.getMerId());
+        for (SystemAdminRef systemAdminRef : list) {
+            Merchant merchant = merchantService.getById(systemAdminRef.getSId());
+            systemAdminRef.setName(merchant.getName());
+        }
+        return CommonResult.success(list);
     }
 
     @PreAuthorize("hasAuthority('merchant:config:info')")

@@ -5,8 +5,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.admin.SystemAdminRef;
+import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.LoginUserVo;
+import com.jbp.service.service.SystemAdminRefService;
 import com.jbp.service.service.SystemAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,6 +59,8 @@ public class MerchantLoginController {
     private AdminLoginService loginService;
     @Autowired
     private SystemAdminService systemAdminService;
+    @Autowired
+    private SystemAdminRefService systemAdminRefService;
 
     @ApiOperation(value="登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -62,7 +69,39 @@ public class MerchantLoginController {
         SystemLoginResponse systemAdminResponse = loginService.merchantLogin(systemAdminLoginRequest, ip);
         return CommonResult.success(systemAdminResponse);
     }
-    
+
+
+    @ApiOperation(value="登录")
+    @RequestMapping(value = "/login2", method = RequestMethod.POST)
+    public CommonResult<SystemLoginResponse> login(Integer sId, HttpServletRequest request) {
+        String ip = CrmebUtil.getClientIp(request);
+        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+        if (loginUserVo == null || loginUserVo.getUser() == null) {
+            throw new RuntimeException("当前账户未登录");
+        }
+        SystemAdmin user = loginUserVo.getUser();
+        user = systemAdminService.getById(user.getId());
+        List<SystemAdminRef> list = systemAdminRefService.getList(user.getMerId());
+        if (CollectionUtils.isEmpty(list)) {
+            throw new RuntimeException("未设置关联关系");
+        }
+        Boolean isRef = false;
+        for (SystemAdminRef systemAdminRef : list) {
+            if (systemAdminRef.getSId().intValue() == sId.intValue()) {
+                isRef = true;
+                break;
+            }
+        }
+        if (!isRef) {
+            throw new RuntimeException("未设置关联关系2");
+        }
+
+        user.setMerId(sId);
+        systemAdminService.updateById(user);
+
+        SystemLoginResponse systemAdminResponse = loginService.merchantLogin(user.getId(), ip);
+        return CommonResult.success(systemAdminResponse);
+    }
 
     @PreAuthorize("hasAuthority('merchant:logout')")
     @ApiOperation(value="登出")
