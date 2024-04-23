@@ -4,12 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserCapaXsSnapshot;
@@ -31,8 +35,7 @@ import com.jbp.front.service.FrontOrderService;
 import com.jbp.front.service.UserCenterService;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.service.agent.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,6 +96,18 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     private UserCapaService userCapaService;
     @Resource
     private UserCapaXsService userCapaXsService;
+    @Resource
+    private WhiteUserService whiteUserService;
+    @Resource
+    private UserInvitationService userInvitationService;
+    @Resource
+    private UserRelationService userRelationService;
+    @Resource
+    private TeamUserService teamUserService;
+    @Resource
+    private LimitTempService limitTempService;
+
+
 
 
     /**
@@ -103,24 +118,46 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     @Override
     public UserCenterResponse getUserCenterInfo() {
         Integer uid = userService.getUserId();
-       UserCapa userCapa =  userCapaService.getByUser(uid);
         UserCenterResponse response = new UserCenterResponse();
         response.setCenterBanner(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_BANNER));
 
         List<HashMap<String, Object>> hashMapList =  systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_MENU);
 
-        for(int i=0;i<hashMapList.size();i++){
-            HashMap<String,Object> map = hashMapList.get(i);
-            JSONArray ifCapa =JSONObject.parseArray(map.get("capaId").toString());
+//
+//
+//        // 显示权益
+//        Integer pId = null, rId = null;
+//        List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
+//
+//        Integer currentUser = userService.getUserId();
+//        if (currentUser != 0) {
+//            whiteIdList = whiteUserService.getByUser(currentUser);
+//            TeamUser teamUser = teamUserService.getByUser(currentUser);
+//            if (teamUser != null) {
+//                teamIdList.add(Long.valueOf(teamUser.getTid()));
+//            }
+//            pId = userInvitationService.getPid(currentUser);
+//            rId = userRelationService.getPid(currentUser);
+//
+//            UserCapa userCapa = userCapaService.getByUser(currentUser);
+//            UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser);
+//            List<Long> tempIds = limitTempService.hasLimits(userCapa == null ? null : userCapa.getCapaId(), userCapaXs == null ? null : userCapaXs.getCapaId(), whiteIdList, teamIdList, pId, rId);
+//
+//            for(int i= 0 ;i<hashMapList.size();i++) {
+//                Map<String, Object> map = hashMapList.get(i);
+//
+//                if (map.get("capaId") != null) {
+//                    if (!tempIds.contains(map.get("capaId"))) {
+//                        hashMapList.remove(i);
+//                    }
+//
+//                }
+//            }
+//        }
+//
+//
 
-            if(ifCapa.isEmpty()){
-                continue;
-            }
-            Boolean ifext =  ifCapa.contains(userCapa.getCapaId().intValue());
-            if(!ifext){
-                hashMapList.remove(i);
-            }
-        }
+
 
 
         response.setCenterMenu(hashMapList);
