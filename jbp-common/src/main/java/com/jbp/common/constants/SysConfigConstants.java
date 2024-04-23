@@ -258,6 +258,10 @@ public class SysConfigConstants {
     public static final String TOURIST_LOGIN_OPEN = "tourist_login_open";
 
 
+    /**
+     *  验证码是否使用身份证后6位
+     */
+    public static final String IPHON_CODE_CARD = "iphon_code_card";
 
     /**
      * 用户默认头像

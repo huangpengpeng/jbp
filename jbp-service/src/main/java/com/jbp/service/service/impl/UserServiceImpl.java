@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -142,6 +143,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private RelationScoreService relationScoreService;
     @Resource
     private PlatformWalletService platformWalletService;
+    @Resource
+    private ChannelIdentityService channelIdentityService;
+
+
 
 
     /**
@@ -812,8 +817,30 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("验证码已过期");
         }
 
-        if (!validateCode.toString().equals(code)) {
-            throw new CrmebException("验证码错误");
+        List<User> user =  userService.getByPhone(phone);
+        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
+        Boolean ifBooleand = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        channelName = com.jbp.service.util.StringUtils.isEmpty(channelName) ? "平台" : channelName;
+
+        if(ifBooleand){
+            if(user.isEmpty() && !validateCode.toString().equals(code)) {
+              throw new CrmebException("验证码错误");
+            }
+            if(!user.isEmpty()){
+               ChannelIdentity channelIdentity = channelIdentityService.getByUser(user.get(0).getId(), channelName);
+                if(channelIdentity == null && !validateCode.toString().equals(code)){
+                    throw new CrmebException("验证码错误");
+                }
+                //验证码兼容身份证后6位
+                if(channelIdentity != null && !validateCode.toString().equals(code) && !channelIdentity.getIdCardNo().substring(channelIdentity.getIdCardNo().length() - 6).equals(code)){
+                   throw new CrmebException("验证码错误");
+                }
+            }
+        }
+
+        if(!ifBooleand && !validateCode.toString().equals(code)){
+          throw new CrmebException("验证码错误");
         }
         redisUtil.delete(getValidateCodeRedisKey(phone));
     }
