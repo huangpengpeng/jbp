@@ -123,42 +123,35 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
 
         List<HashMap<String, Object>> hashMapList =  systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_CENTER_MENU);
 
-//
-//
-//        // 显示权益
-//        Integer pId = null, rId = null;
-//        List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
-//
-//        Integer currentUser = userService.getUserId();
-//        if (currentUser != 0) {
-//            whiteIdList = whiteUserService.getByUser(currentUser);
-//            TeamUser teamUser = teamUserService.getByUser(currentUser);
-//            if (teamUser != null) {
-//                teamIdList.add(Long.valueOf(teamUser.getTid()));
-//            }
-//            pId = userInvitationService.getPid(currentUser);
-//            rId = userRelationService.getPid(currentUser);
-//
-//            UserCapa userCapa = userCapaService.getByUser(currentUser);
-//            UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser);
-//            List<Long> tempIds = limitTempService.hasLimits(userCapa == null ? null : userCapa.getCapaId(), userCapaXs == null ? null : userCapaXs.getCapaId(), whiteIdList, teamIdList, pId, rId);
-//
-//            for(int i= 0 ;i<hashMapList.size();i++) {
-//                Map<String, Object> map = hashMapList.get(i);
-//
-//                if (map.get("capaId") != null) {
-//                    if (!tempIds.contains(map.get("capaId"))) {
-//                        hashMapList.remove(i);
-//                    }
-//
-//                }
-//            }
-//        }
-//
-//
+        // 显示权益
+        Integer pId = null, rId = null;
+        List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
 
+        Integer currentUser = userService.getUserId();
+        if (currentUser != 0) {
+            whiteIdList = whiteUserService.getByUser(currentUser);
+            TeamUser teamUser = teamUserService.getByUser(currentUser);
+            if (teamUser != null) {
+                teamIdList.add(Long.valueOf(teamUser.getTid()));
+            }
+            pId = userInvitationService.getPid(currentUser);
+            rId = userRelationService.getPid(currentUser);
 
+            UserCapa userCapa = userCapaService.getByUser(currentUser);
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser);
+            List<Long> tempIds = limitTempService.hasLimits(userCapa == null ? null : userCapa.getCapaId(), userCapaXs == null ? null : userCapaXs.getCapaId(), whiteIdList, teamIdList, pId, rId);
 
+            for(int i= 0 ;i<hashMapList.size();i++) {
+                Map<String, Object> map = hashMapList.get(i);
+
+                if (StringUtils.isNotBlank(map.get("capaId").toString())) {
+                    if (!tempIds.contains(Long.valueOf(map.get("capaId").toString()))) {
+                        hashMapList.remove(i);
+                    }
+
+                }
+            }
+        }
 
         response.setCenterMenu(hashMapList);
 
