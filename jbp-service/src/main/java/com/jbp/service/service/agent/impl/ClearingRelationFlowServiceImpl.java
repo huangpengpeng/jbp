@@ -78,7 +78,10 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
                 del4Clearing(lastOne.getId());
             }
             List<User> list = userService.list();
+            int i = 1;
             for (User user : list) {
+                log.info("正在处理销售关系紧缩, 当前:{}, 总数:{}", i, list.size());
+                i++;
                 List<UserUpperDto> allUpper = relationService.getAllUpper(user.getId());
                 List<ClearingRelationFlow> flowList = Lists.newArrayList();
                 int level = 1;
