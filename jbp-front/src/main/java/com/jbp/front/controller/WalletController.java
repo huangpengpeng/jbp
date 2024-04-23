@@ -143,8 +143,15 @@ public class WalletController {
         if (!walletConfig.getCanWithdraw()) {
             throw new CrmebException("类型积分不可提现");
         }
+
+        BigDecimal wallet_pay_minimum_mat = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_MINIMUM_MAT));
+        if(request.getAmt().compareTo(wallet_pay_minimum_mat) == -1){
+            throw new CrmebException("提现金额需要大于"+ wallet_pay_minimum_mat+"元");
+        }
+
+        BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
         WalletWithdraw walletWithdraw = walletWithdrawService.create(user.getId(), user.getAccount(), walletConfig.getType(),
-                walletConfig.getName(), request.getAmt(), request.getPostscript());
+                walletConfig.getName(), request.getAmt().multiply(wallet_pay_integral), request.getPostscript());
         return CommonResult.success(walletWithdraw);
     }
 

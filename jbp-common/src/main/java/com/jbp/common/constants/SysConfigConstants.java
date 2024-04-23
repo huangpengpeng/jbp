@@ -220,6 +220,10 @@ public class SysConfigConstants {
      * 积分显示倍数
      */
     public static final String WALLET_PAY_INTEGRAl = "wallet_pay_integral";
+    /**
+     * 提现最低金额
+     */
+    public static final String WALLET_PAY_MINIMUM_MAT = "wallet_pay_minimum_mat";
 
     /**
      * 网站名称
