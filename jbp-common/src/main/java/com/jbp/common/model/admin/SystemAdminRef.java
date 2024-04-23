@@ -34,6 +34,10 @@ public class SystemAdminRef implements Serializable {
     @TableField("sId")
     private Integer sId;
 
+    @ApiModelProperty(value = "自己名称")
+    @TableField(exist = false)
+    private String selfName;
+
 
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)

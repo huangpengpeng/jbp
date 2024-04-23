@@ -1,14 +1,19 @@
 package com.jbp.admin.controller.merchant;
 
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.jbp.admin.service.AdminLoginService;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.admin.SystemAdminRef;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.response.MerchantBaseInfoResponse;
+import com.jbp.common.response.SystemLoginResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MerchantConfigInfoVo;
 import com.jbp.common.vo.MerchantSettlementInfoVo;
 import com.jbp.service.service.MerchantService;
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -53,6 +59,9 @@ public class MerchantInfoController {
     private SystemAdminRefService systemAdminRefService;
     @Autowired
     private SystemAdminService systemAdminService;
+    @Autowired
+    private AdminLoginService loginService;
+
 
 //    @PreAuthorize("hasAuthority('merchant:base:info')")
     @ApiOperation(value = "商户端商户基础信息")
@@ -65,13 +74,48 @@ public class MerchantInfoController {
     @RequestMapping(value = "/ref/list", method = RequestMethod.GET)
     public CommonResult<List<SystemAdminRef>> refList() {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        systemAdmin = systemAdminService.getById(systemAdmin.getId());
         List<SystemAdminRef> list = systemAdminRefService.getList(systemAdmin.getMerId());
         for (SystemAdminRef systemAdminRef : list) {
+            systemAdminRef.setSelfName(merchantService.getById(systemAdminRef.getMId()).getName());
             Merchant merchant = merchantService.getById(systemAdminRef.getSId());
             systemAdminRef.setName(merchant.getName());
         }
         return CommonResult.success(list);
     }
+
+
+    @RequestMapping(value = "/check", method = RequestMethod.GET)
+    public CommonResult<SystemLoginResponse> check(Integer sId, HttpServletRequest request) {
+        String ip = CrmebUtil.getClientIp(request);
+        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+        if (loginUserVo == null || loginUserVo.getUser() == null) {
+            throw new RuntimeException("当前账户未登录");
+        }
+        SystemAdmin user = loginUserVo.getUser();
+        user = systemAdminService.getById(user.getId());
+        List<SystemAdminRef> list = systemAdminRefService.getList(user.getMerId());
+        if (CollectionUtils.isEmpty(list)) {
+            throw new RuntimeException("未设置关联关系");
+        }
+        Boolean isRef = false;
+        for (SystemAdminRef systemAdminRef : list) {
+            if (systemAdminRef.getSId().intValue() == sId.intValue()) {
+                isRef = true;
+                break;
+            }
+        }
+        if (!isRef) {
+            throw new RuntimeException("未设置关联关系2");
+        }
+
+        user.setMerId(sId);
+        systemAdminService.updateById(user);
+        loginService.logout();
+        SystemLoginResponse systemAdminResponse = loginService.merchantLogin(user.getId(), ip);
+        return CommonResult.success(systemAdminResponse);
+    }
+
 
     @PreAuthorize("hasAuthority('merchant:config:info')")
     @ApiOperation(value = "商户端商户配置信息")
