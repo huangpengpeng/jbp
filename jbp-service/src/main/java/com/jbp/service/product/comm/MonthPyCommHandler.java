@@ -210,7 +210,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     }
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingRelationFlow clearingRelationFlow : clearingRelationFlows) {
-                        ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getPId());
+                        ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getUId());
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                         if (rule.getUpperRelationNum() >= i) {
                             usableList.add(clearingUser);
@@ -223,7 +223,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                                 ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
                                         clearingUser.getLevel(), clearingUser.getLevelName(),
                                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                                        commFee, "服务上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
+                                        clearingFee, "服务上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
                                 clearingBonusFlowList.add(clearingBonusFlow);
                             }
                         }
@@ -247,7 +247,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     }
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingInvitationFlow clearingInvitationFlow : clearingInvitationFlows) {
-                        ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getPId());
+                        ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getUId());
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                         if (rule.getUpperInvitationNum() >= i) {
                             usableList.add(clearingUser);
@@ -260,7 +260,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                                 ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
                                         clearingUser.getLevel(), clearingUser.getLevelName(),
                                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                                        commFee, "销售上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
+                                        clearingFee, "销售上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
                                 clearingBonusFlowList.add(clearingBonusFlow);
                             }
                         }
