@@ -3,6 +3,7 @@ package com.jbp.admin.controller.agent;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.FundClearingItemConfig;
+import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -14,6 +15,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.FundClearingItemConfigService;
+import com.jbp.service.service.agent.ProductCommConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,9 @@ public class FundClearingItemConfigController {
     @Resource
     private FundClearingItemConfigService fundClearingItemConfigService;
 
+    @Resource
+    private ProductCommConfigService productCommConfigService;
+
     @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:page')")
     @GetMapping("/page")
     @ApiOperation("佣金发放配置列表")
@@ -64,7 +69,10 @@ public class FundClearingItemConfigController {
     @PostMapping("/comm/list")
     public CommonResult commList() {
         List<String> list = Lists.newArrayList();
-        for (ProductCommEnum value : ProductCommEnum.values()) {
+
+        List<ProductCommConfig> list1 =   productCommConfigService.getOpenList();
+
+        for (ProductCommConfig  value: list1) {
             list.add(value.getName());
         }
         list.add("销售佣金");
