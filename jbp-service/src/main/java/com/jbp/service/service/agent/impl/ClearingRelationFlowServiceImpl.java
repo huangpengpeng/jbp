@@ -163,13 +163,15 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ClearingRelationFlow::getUId).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(ClearingRelationFlow::getPId).collect(Collectors.toList());
-        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        uIdList.addAll(pIdList);
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            User pUser = pidMapList.get(e.getPId());
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
+            User pUser = uidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
             e.setPNickName(pUser != null ? pUser.getNickname() : "");
         });

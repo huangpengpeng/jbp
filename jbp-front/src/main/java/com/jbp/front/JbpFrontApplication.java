@@ -41,15 +41,5 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-//        ClearingFinalService clearingFinalService = run.getBean(ClearingFinalService.class);
-//        ClearingRequest req = new ClearingRequest();
-//        req.setCommType(17);
-//        req.setCommName("培育佣金");
-//        req.setStartTime("20240401");
-//        req.setEndTime("20240410");
-//        req.setIfImportUser(false);
-//        clearingFinalService.syncOneKeyClearing(req);
-
     }
 }

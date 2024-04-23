@@ -161,17 +161,17 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ClearingInvitationFlow::getUId).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(ClearingInvitationFlow::getPId).collect(Collectors.toList());
-        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        uIdList.addAll(pIdList);
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
 
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
             e.setUNickName(uUser != null ? uUser.getNickname() : "");
-            User pUser = pidMapList.get(e.getPId());
+            User pUser = uidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setUNickName(pUser != null ? pUser.getNickname() : "");
+            e.setPNickName(pUser != null ? pUser.getNickname() : "");
 
         });
         return CommonPage.copyPageInfo(page, list);
