@@ -17,6 +17,7 @@ import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.ClearingUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,8 @@ public class ClearingFinalController {
     private ClearingUserService clearingUserService;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @PreAuthorize("hasAuthority('agent:clearing:final:page')")
     @GetMapping("/page")
@@ -79,6 +82,10 @@ public class ClearingFinalController {
     @GetMapping("/oneKeyDel")
     @ApiOperation("一键删除")
     public CommonResult<Boolean> del(Long clearingId) {
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if(!task){
+            throw new RuntimeException("正在结算中请勿删除名单");
+        }
         return CommonResult.success(clearingFinalService.oneKeyDel(clearingId));
     }
 

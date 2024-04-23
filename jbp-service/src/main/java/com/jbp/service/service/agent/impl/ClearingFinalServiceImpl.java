@@ -58,6 +58,7 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
 
     @Override
     public void syncOneKeyClearing(ClearingRequest clearingRequest) {
+        redisTemplate.delete("ClearingFinalRunning");
         Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
         if (!task) {
             throw new RuntimeException("正在结算中请勿重复操作");
