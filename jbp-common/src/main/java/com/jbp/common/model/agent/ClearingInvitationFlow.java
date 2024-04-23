@@ -55,4 +55,8 @@ public class ClearingInvitationFlow extends BaseModel {
     @ApiModelProperty("上级用户昵称")
     @TableField(exist = false)
     private String pNickName;
+
+    @ApiModelProperty("结算名称")
+    @TableField(exist = false)
+    private String clearingName;
 }

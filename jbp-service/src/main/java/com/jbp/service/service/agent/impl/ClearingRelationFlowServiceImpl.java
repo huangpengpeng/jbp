@@ -167,6 +167,10 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
         uIdList.addAll(pIdList);
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
 
+        List<Long> clearingList = list.stream().map(ClearingRelationFlow::getClearingId).collect(Collectors.toList());
+        List<ClearingFinal> clearingFinalList = clearingFinalService.list(new LambdaQueryWrapper<ClearingFinal>().in(ClearingFinal::getId, clearingList));
+        Map<Long, String> clearingNameMap = FunctionUtil.keyValueMap(clearingFinalList, ClearingFinal::getId, ClearingFinal::getName);
+
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
@@ -174,6 +178,7 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
             User pUser = uidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
             e.setPNickName(pUser != null ? pUser.getNickname() : "");
+            e.setClearingName(clearingNameMap.get(e.getClearingId()));
         });
         return CommonPage.copyPageInfo(page, list);
     }

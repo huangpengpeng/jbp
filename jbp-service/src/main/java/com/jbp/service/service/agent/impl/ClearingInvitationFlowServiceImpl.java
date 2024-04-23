@@ -164,6 +164,9 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
         List<Integer> pIdList = list.stream().map(ClearingInvitationFlow::getPId).collect(Collectors.toList());
         uIdList.addAll(pIdList);
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Long> clearingList = list.stream().map(ClearingInvitationFlow::getClearingId).collect(Collectors.toList());
+        List<ClearingFinal> clearingFinalList = clearingFinalService.list(new LambdaQueryWrapper<ClearingFinal>().in(ClearingFinal::getId, clearingList));
+        Map<Long, String> clearingNameMap = FunctionUtil.keyValueMap(clearingFinalList, ClearingFinal::getId, ClearingFinal::getName);
 
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
@@ -172,6 +175,7 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
             User pUser = uidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
             e.setPNickName(pUser != null ? pUser.getNickname() : "");
+            e.setClearingName(clearingNameMap.get(e.getClearingId()));
 
         });
         return CommonPage.copyPageInfo(page, list);
