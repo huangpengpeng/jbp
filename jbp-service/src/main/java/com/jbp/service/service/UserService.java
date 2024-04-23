@@ -409,4 +409,6 @@ public interface UserService extends IService<User> {
 
     Boolean importUser(List<UserImportRequest> list);
 
+   void checkValidateCode(String phone,String captcha);
+
 }

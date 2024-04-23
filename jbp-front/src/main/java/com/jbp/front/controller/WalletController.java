@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
@@ -190,7 +191,18 @@ public class WalletController {
     @ApiOperation("转账")
     public CommonResult transfer(@RequestBody @Validated WalletTransferRequest request) {
         User user = userService.getInfo();
-        userService.validPayPwd(user.getId(), request.getPwd());
+
+        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
+        Boolean ifBooleand = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
+
+        if(walletConfigService.hasPwd()){
+            userService.validPayPwd(user.getId(), request.getPwd());
+        }else if(ifBooleand){
+            userService.checkValidateCode(user.getPhone(), request.getPwd());
+        }
+
+
+
         WalletConfig walletConfig = walletConfigService.getByType(request.getType());
         if (!walletConfig.getCanTransfer()) {
             throw new CrmebException("类型积分不可转账");

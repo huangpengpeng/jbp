@@ -811,7 +811,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @param phone 手机号
      * @param code  验证码
      */
-    private void checkValidateCode(String phone, String code) {
+    public void checkValidateCode(String phone, String code) {
         Object validateCode = redisUtil.get(getValidateCodeRedisKey(phone));
         if (validateCode == null) {
             throw new CrmebException("验证码已过期");
