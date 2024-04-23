@@ -125,7 +125,10 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
             logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算失败");
             redisUtil.set("clearing_final" + clearingRequest.getClearingFinal().getId(), logSet);
             redisTemplate.delete("ClearingFinalRunning");
+            e.printStackTrace();
             throw new RuntimeException("结算失败" + clearingRequest.getClearingFinal().getId());
+        }finally {
+            redisTemplate.delete("ClearingFinalRunning");
         }
     }
 
