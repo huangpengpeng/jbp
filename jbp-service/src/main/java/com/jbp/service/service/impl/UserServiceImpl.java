@@ -256,7 +256,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 }
                 invitationService.band(user.getId(), pid, false, true, false);
             }
-            if (userCapaTemplateRequest.getCapaId()!=0) {
+            if (userCapaTemplateRequest != null && userCapaTemplateRequest.getCapaId()!=0) {
                 userCapaService.saveOrUpdateCapa(user.getId(), userCapaTemplateRequest.getCapaId(),
                         userCapaTemplateRequest.getRemark(), userCapaTemplateRequest.getDescription());
             }else {
