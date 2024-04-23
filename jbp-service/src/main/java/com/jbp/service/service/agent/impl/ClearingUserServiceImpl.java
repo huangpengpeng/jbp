@@ -155,8 +155,11 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     @Override
     public Boolean create(Long clearingId) {
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
-        if (clearingFinal == null || !clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
-            throw new CrmebException("结算状态不是待结算不允许生成名单");
+        if (clearingFinal == null ) {
+            throw new CrmebException("结算状态不是待结算不允许生成名单1");
+        }
+        if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
+            throw new CrmebException("结算状态不是待结算不允许生成名单2");
         }
         // 获取上一次的名单
         ClearingFinal lastOne = clearingFinalService.getLastOne(clearingId, clearingFinal.getCommType());
