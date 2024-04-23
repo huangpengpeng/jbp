@@ -292,7 +292,6 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
             clearingBonusService.insertBatchList(clearingBonuses);
         }
         // 保存奖金明细
-        clearingBonusService.insertBatchList(clearingBonusList);
         for (List<ClearingBonusFlow> clearingBonusFlows : Lists.partition(clearingBonusFlowList, 2000)) {
             clearingBonusFlowService.insertBatchList(clearingBonusFlows);
         }
