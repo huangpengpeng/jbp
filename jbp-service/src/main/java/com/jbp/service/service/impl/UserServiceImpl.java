@@ -813,9 +813,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      */
     public void checkValidateCode(String phone, String code) {
         Object validateCode = redisUtil.get(getValidateCodeRedisKey(phone));
-        if (validateCode == null) {
-            throw new CrmebException("验证码已过期");
-        }
+//        if (validateCode == null) {
+//            throw new CrmebException("验证码已过期");
+//        }
 
         List<User> user =  userService.getByPhone(phone);
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
