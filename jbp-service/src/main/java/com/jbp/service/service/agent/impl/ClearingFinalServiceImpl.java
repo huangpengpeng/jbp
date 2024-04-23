@@ -72,6 +72,12 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
         redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
         clearingRequest.setLogSet(logSet);
         clearingRequest.setClearingFinal(clearingFinal);
+
+        try {
+            Thread.currentThread().sleep(20000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         asyncUtils.exec(clearingRequest, param -> oneKeyClearing((ClearingRequest) param));
     }
 
