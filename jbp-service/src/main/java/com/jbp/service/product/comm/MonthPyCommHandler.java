@@ -125,7 +125,9 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                 ProductComm productComm = map.get(orderDetail.getProductId());
                 if (productComm == null) {
                     productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
-                    map.put(orderDetail.getProductId(), productComm);
+                    if(productComm != null){
+                        map.put(orderDetail.getProductId(), productComm);
+                    }
                 }
                 // 佣金不存在或者关闭直接忽略
                 if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
