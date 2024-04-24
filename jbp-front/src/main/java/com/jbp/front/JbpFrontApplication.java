@@ -1,9 +1,6 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.request.agent.ClearingRequest;
-import com.jbp.service.service.agent.ClearingFinalService;
-import com.jbp.service.service.agent.ClearingUserService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

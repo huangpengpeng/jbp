@@ -98,6 +98,9 @@ public class KqPayServiceImpl implements KqPayService {
             }
             JSONObject jsonObject = JSONObject.parseObject(s);
             JSONObject responseBody = jsonObject.getJSONObject("responseBody");
+            if(responseBody == null){
+                return null;
+            }
             JSONArray resultList = responseBody.getJSONArray("resultList");
             if (resultList == null || resultList.isEmpty()) {
                 return null;

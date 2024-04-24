@@ -33,8 +33,6 @@ import java.util.Map;
 public class MonthExtCommHandler extends AbstractProductCommHandler {
 
     @Resource
-    private ProductCommConfigService productCommConfigService;
-    @Resource
     private ProductCommService productCommService;
     @Resource
     private ClearingFinalService clearingFinalService;
@@ -106,7 +104,7 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
                 totalScore = totalScore.add(realScore);
             }
         }
-
+        totalScore = totalScore.multiply(BigDecimal.valueOf(0.1));
         if (ArithmeticUtils.lessEquals(totalScore, BigDecimal.ZERO)) {
             log.error(clearingFinal.getName() + "结算积分为0");
             clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
