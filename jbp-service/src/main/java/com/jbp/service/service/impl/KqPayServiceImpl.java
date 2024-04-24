@@ -67,7 +67,7 @@ public class KqPayServiceImpl implements KqPayService {
         params.setOrderId(orderId);
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
         params.setProductName(productName);
-        params.setExt1(kpInfo.getApplyName());
+        params.setExt1(URLEncoder.encode(kpInfo.getApplyName()));
         params.setOrderTime(DateTimeUtils.format(orderTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         params.setOrderTimestamp(params.getOrderTime());
 
