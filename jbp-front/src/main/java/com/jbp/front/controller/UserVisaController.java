@@ -284,7 +284,7 @@ public class UserVisaController {
 
             TemplateSignConfigInfoReq templateSignConfigInfoReq = new TemplateSignConfigInfoReq();
             List<String> verifyMethods = new ArrayList<>();
-            verifyMethods.add("audio_video");
+            verifyMethods.add("face");
             templateSignConfigInfoReq.setVerifyMethods(verifyMethods);
             templateSignConfigInfoReq.setSignerSignMethod("ai_hand_write");
 
