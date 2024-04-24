@@ -1209,9 +1209,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             return list;
         }
         // 退款商户订单过滤出来
-        List<String> refundList = list.stream().filter(o -> 1 == o.getLevel().intValue() && 0 != o.getRefundStatus().intValue()).map(Order::getPlatOrderNo).collect(Collectors.toList());
+        List<String> refundList = list.stream().filter(o -> Integer.valueOf(1).equals(o.getLevel()) && !Integer.valueOf(0).equals(o.getRefundStatus())).map(Order::getPlatOrderNo).collect(Collectors.toList());
         //  支付成功的平台订单 商户订单没有退款
-        List<Order> platList = list.stream().filter(o -> 0 == o.getLevel().intValue() && !refundList.contains(o.getOrderNo())).collect(Collectors.toList());
+        List<Order> platList = list.stream().filter(o -> Integer.valueOf(0).equals(o.getLevel()) && !refundList.contains(o.getOrderNo())).collect(Collectors.toList());
         return CollectionUtils.isEmpty(platList) ? Lists.newArrayList() : platList;
     }
 
