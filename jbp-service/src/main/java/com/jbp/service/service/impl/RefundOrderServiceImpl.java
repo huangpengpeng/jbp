@@ -16,9 +16,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.kqbill.result.KqRefundResult;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.ProductProfitConfig;
-import com.jbp.common.model.agent.WalletConfig;
-import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantAddress;
 import com.jbp.common.model.order.*;
@@ -38,6 +36,8 @@ import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.product.profit.ProductProfitHandler;
 import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.InvitationScoreFlowService;
+import com.jbp.service.service.agent.InvitationScoreService;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.ProductProfitService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -113,7 +113,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private ProductCommChain productCommChain;
     @Autowired
     private KqPayService kqPayService;
-
+    @Autowired
+    private InvitationScoreFlowService invitationScoreFlowService;
+    @Autowired
+    private InvitationScoreService invitationScoreService;
     /**
      * 商户端退款订单分页列表
      *
@@ -1424,6 +1427,19 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
             productProfitChain.orderRefund(order, refundOrder);
+
+            //退还销售积分
+            List<InvitationScoreFlow> list = invitationScoreFlowService.list(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getOrderNo()));
+            invitationScoreFlowService.remove(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getOrderNo()));
+            if(!list.isEmpty()){
+                for(InvitationScoreFlow invitationScoreFlow : list){
+                    InvitationScore invitationScore  =   invitationScoreService.getByUser(invitationScoreFlow.getUid());
+                    BigDecimal score = invitationScore.getScore().multiply(invitationScoreFlow.getScore());
+                    invitationScore.setScore(score);
+                    invitationScoreService.updateById(invitationScore);
+                }
+            }
+
             productCommChain.orderRefundIntercept(order);
 
             settingOrderStatus(order);
