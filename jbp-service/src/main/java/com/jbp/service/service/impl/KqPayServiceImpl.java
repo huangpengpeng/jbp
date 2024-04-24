@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -66,7 +68,7 @@ public class KqPayServiceImpl implements KqPayService {
         params.setTdpformName(URLEncoder.encode(kpInfo.getApplyName()));
         params.setOrderId(orderId);
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
-        params.setProductName(URLEncoder.encode(productName));
+        params.setProductName(formatStr(productName));
         params.setExt1(kpInfo.getApplyName());
         params.setOrderTime(DateTimeUtils.format(orderTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         params.setOrderTimestamp(params.getOrderTime());
@@ -229,5 +231,18 @@ public class KqPayServiceImpl implements KqPayService {
         }
         return returns;
     }
+
+    private String formatStr(String str){
+        String regEx="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
+        String aa = "";//这里是将特殊字符换为aa字符串,""代表直接去掉
+
+        Pattern p = Pattern.compile(regEx);
+
+        Matcher m = p.matcher("UA1290益生菌固体饮料+UJA1290石榴饮");//这里把想要替换的字符串传进来
+
+        String newString = m.replaceAll(aa).trim();
+        return newString;
+    }
+
 
 }
