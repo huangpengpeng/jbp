@@ -39,7 +39,7 @@ public class UserVisaOrderController {
     @RequestMapping(value = "/record/list", method = RequestMethod.GET)
     public CommonResult<List<UserVisaOrderListResponse>> getList(String status ) {
         List<UserVisaOrderListResponse> infoResponse=new ArrayList<>();
-        List<UserVisaOrder> list =   userVisaOrderService.list(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getUid,userService.getUserId()).eq(status != "全部",UserVisaOrder::getStatus,status).orderByDesc(UserVisaOrder::getGmtCreated));
+        List<UserVisaOrder> list =   userVisaOrderService.list(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getUid,userService.getUserId()).eq(!status.equals("全部"),UserVisaOrder::getStatus,status).orderByDesc(UserVisaOrder::getGmtCreated));
         for(UserVisaOrder userVisaOrder : list){
             UserVisaOrderListResponse userVisaOrderListResponse =new UserVisaOrderListResponse();
             BeanUtils.copyProperties(userVisaOrder, userVisaOrderListResponse);

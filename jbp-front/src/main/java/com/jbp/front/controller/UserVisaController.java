@@ -24,15 +24,20 @@ import com.fasc.open.api.v5_1.res.signtask.CreateSignTaskRes;
 import com.fasc.open.api.v5_1.res.signtask.SignTaskActorGetUrlRes;
 import com.fasc.open.api.v5_1.res.template.AppSignTemplateDetailRes;
 import com.fasc.open.api.v5_1.res.template.SignTemplateDetailRes;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.UserVisa;
 import com.jbp.common.model.user.UserVisaOrder;
 import com.jbp.common.request.UserViseSaveRequest;
 import com.jbp.common.response.UserVisaResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.UserVisaOrderService;
 import com.jbp.service.service.UserVisaService;
 
+import com.jbp.service.service.agent.ChannelIdentityService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jodd.http.HttpRequest;
@@ -60,6 +65,12 @@ public class UserVisaController {
     private UserService userService;
     @Autowired
     private UserVisaOrderService userVisaOrderService;
+    @Autowired
+    private ChannelIdentityService channelIdentityService;
+    @Autowired
+    private SystemConfigService systemConfigService;
+
+
 
 
     @ApiOperation(value = "增加用户签署法大大", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -116,6 +127,18 @@ public class UserVisaController {
 
         Integer userId = userService.getUserId();
         UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid, userService.getUserId()).eq(UserVisa::getContract, userViseSaveRequest.getSignTaskSubject()));
+
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        channelName = StringUtils.isEmpty(channelName) ? "平台" : channelName;
+        ChannelIdentity channelIdentity = channelIdentityService.getByUser(userService.getUserId(), channelName);
+        if(channelIdentity == null){
+            throw new CrmebException("未开户，请先去开户");
+        }
+        channelIdentity.setRealName(userViseSaveRequest.getRealName());
+        channelIdentity.setIdCardNo(userViseSaveRequest.getIdCard());
+        channelIdentityService.updateById(channelIdentity);
+
+
         OpenApiClient openApiClient = new OpenApiClient("00001068", "NADTNIHUU0DQSENC95LGM2GGZUJSFGOM", "https://api.fadada.com/api/v5/");
         try {
             //获取签章
@@ -219,9 +242,18 @@ public class UserVisaController {
 
 
         Integer userId = userService.getUserId();
-
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        channelName = StringUtils.isEmpty(channelName) ? "平台" : channelName;
         UserVisaOrder userVisaOrders = userVisaOrderService.getOne(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getUid, userService.getUserId()).eq(UserVisaOrder::getOrderNo, userViseSaveRequest.getOrderNo()));
         UserVisa userVisa = userVisaService.getById(userVisaOrders.getVisaId());
+
+        ChannelIdentity channelIdentity = channelIdentityService.getByUser(userService.getUserId(), channelName);
+        if(channelIdentity == null){
+            throw new CrmebException("未开户，请先去开户");
+        }
+        channelIdentity.setRealName(userViseSaveRequest.getRealName());
+        channelIdentity.setIdCardNo(userViseSaveRequest.getIdCard());
+        channelIdentityService.updateById(channelIdentity);
 
         OpenApiClient openApiClient = new OpenApiClient("00001068", "NADTNIHUU0DQSENC95LGM2GGZUJSFGOM", "https://api.fadada.com/api/v5/");
         try {
