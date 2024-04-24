@@ -37,10 +37,14 @@ public class UserVisaOrderController {
 
     @ApiOperation(value = "签到记录列表")
     @RequestMapping(value = "/record/list", method = RequestMethod.GET)
-    public CommonResult<List<UserVisaOrderListResponse>> getList() {
+    public CommonResult<List<UserVisaOrderListResponse>> getList(String status ) {
         List<UserVisaOrderListResponse> infoResponse=new ArrayList<>();
-        List<UserVisaOrder> list =   userVisaOrderService.list(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getUid,userService.getUserId()).orderByDesc(UserVisaOrder::getGmtCreated));
-        BeanUtils.copyProperties(list, infoResponse);
+        List<UserVisaOrder> list =   userVisaOrderService.list(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getUid,userService.getUserId()).eq(status != "全部",UserVisaOrder::getStatus,status).orderByDesc(UserVisaOrder::getGmtCreated));
+        for(UserVisaOrder userVisaOrder : list){
+            UserVisaOrderListResponse userVisaOrderListResponse =new UserVisaOrderListResponse();
+            BeanUtils.copyProperties(userVisaOrder, userVisaOrderListResponse);
+            infoResponse.add(userVisaOrderListResponse);
+        }
 
         infoResponse.forEach(e ->{
           List<OrderDetail> o = orderDetailService.getByOrderNo(e.getOrderNo());
