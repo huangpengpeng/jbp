@@ -66,8 +66,8 @@ public class KqPayServiceImpl implements KqPayService {
         params.setTdpformName(URLEncoder.encode(kpInfo.getApplyName()));
         params.setOrderId(orderId);
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
-        params.setProductName(productName);
-//        params.setExt1(kpInfo.getApplyName());
+        params.setProductName(URLEncoder.encode(productName));
+        params.setExt1(kpInfo.getApplyName());
         params.setOrderTime(DateTimeUtils.format(orderTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         params.setOrderTimestamp(params.getOrderTime());
 
@@ -210,7 +210,7 @@ public class KqPayServiceImpl implements KqPayService {
         signMsgVal = appendParam(signMsgVal, "orderTime", params.getOrderTime());
         signMsgVal = appendParam(signMsgVal, "orderTimestamp", params.getOrderTimestamp());
         signMsgVal = appendParam(signMsgVal, "productName", params.getProductName());
-//        signMsgVal = appendParam(signMsgVal, "ext1", params.getExt1());
+        signMsgVal = appendParam(signMsgVal, "ext1", params.getExt1());
         signMsgVal = appendParam(signMsgVal, "payType", params.getPayType());
         signMsgVal = appendParam(signMsgVal, "redoFlag", params.getRedoFlag());
         signMsgVal = appendParam(signMsgVal, "mobileGateway", params.getMobileGateway());
