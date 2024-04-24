@@ -31,7 +31,7 @@ public class UserVisaOrder extends BaseModel {
     @ApiModelProperty(value = "备注")
     private String mark;
     @ApiModelProperty(value = "签约订单")
-    private Integer visaId;
+    private Long visaId;
 
 
 }
