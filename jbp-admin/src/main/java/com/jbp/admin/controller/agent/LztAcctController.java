@@ -251,9 +251,11 @@ public class LztAcctController {
         if (lztAcct == null || lztAcct.getMerId() != merId) {
             throw new CrmebException("账户不存在");
         }
+        BigDecimal fee = lztAcctService.getFee(userId, new BigDecimal(amt));
+        BigDecimal totalAmt = new BigDecimal(amt).add(fee);
         Merchant merchant = merchantService.getById(merId);
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, amt, token, code);
+        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, totalAmt.toString(), token, code);
         return CommonResult.success();
     }
 

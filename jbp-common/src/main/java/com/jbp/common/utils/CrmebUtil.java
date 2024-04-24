@@ -142,7 +142,7 @@ public class CrmebUtil {
      */
     public static void main(String[] args) throws Exception {
 //        System.out.println(encryptPassword("123456", "15871898211"));
-        System.out.println(decryptPassowrd("4ysdecKQPHw=", "17724245745"));
+        System.out.println(decryptPassowrd("0ngdPxVkYyu7WNvMaHACcA==", "18929560630"));
     	
     }
 
