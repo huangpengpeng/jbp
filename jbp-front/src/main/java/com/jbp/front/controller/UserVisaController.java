@@ -265,18 +265,18 @@ public class UserVisaController {
             List<AddFillFieldInfo> fillFields = new ArrayList<>();
             AddFillFieldInfo fillField = new AddFillFieldInfo();
             fillField.setFieldDocId("32120153");
-            fillField.setFieldId("0884951046");
+            fillField.setFieldId("5376155058");
             fillField.setFieldValue(userViseSaveRequest.getIdCard());
             fillFields.add(fillField);
 
             AddFillFieldInfo fillField2 = new AddFillFieldInfo();
             fillField2.setFieldDocId("32120153");
-            fillField2.setFieldId("2740983788");
+            fillField2.setFieldId("2345857392");
             fillField2.setFieldValue(userViseSaveRequest.getOrderNo());
             fillFields.add(fillField2);
             AddFillFieldInfo fillField3 = new AddFillFieldInfo();
             fillField3.setFieldDocId("32120153");
-            fillField3.setFieldId("1976441880");
+            fillField3.setFieldId("2636528450");
             fillField3.setFieldValue(userId.toString());
             fillFields.add(fillField3);
 
