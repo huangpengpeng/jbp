@@ -177,6 +177,15 @@ public class LoginServiceImpl implements LoginService {
         if (userList.size() > 1 && StringUtils.isEmpty(loginRequest.getAccount())) {
             throw new CrmebException("当前手机号存在多个账号, 请选择账号在进行登录");
         }
+
+        UserCapa userCapa  = userCapaService.getByUser(userList.get(0).getId());
+        if (spreadPid != null && spreadPid > 0) {
+            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
+            //邀请配置 配置关闭时默认强绑定
+            userInvitationService.band(userList.get(0).getId(), spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
+
+        }
         if (userList.size() == 1) {
             return commonLogin(userList.get(0), spreadPid);
         }
@@ -447,7 +456,11 @@ public class LoginServiceImpl implements LoginService {
 
                 userService.save(finalUser);
                 if (spreadPid > 0) {
-                    userInvitationService.band(finalUser.getId(), spreadPid, false, true, false);
+
+                    String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+                    String capaId =  systemConfigService.getValueByKey("capaId");
+                   userInvitationService.band(finalUser.getId(), spreadPid, false, ifOpen.equals("2")?true:Long.valueOf(capaId).equals(capaService.getMinCapa().getId()), false);
+
                 }
 
                 userCapaService.saveOrUpdateCapa(finalUser.getId(), capaService.getMinCapa().getId(), null, request.getType() + ":注册");

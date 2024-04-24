@@ -204,7 +204,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         //绑定用户账号
         if (spreadUid != null && spreadUid > 0) {
-            invitationService.band(user.getId(), spreadUid, false, true, false);
+
+            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+            String capaId =  systemConfigService.getValueByKey("capaId");
+            //邀请配置 配置关闭时默认强绑定
+             invitationService.band(user.getId(), spreadUid, false, ifOpen.equals("2")?true: Long.valueOf(capaId).equals(capaService.getMinCapa().getId()), false);
+
         }
         return user;
     }
