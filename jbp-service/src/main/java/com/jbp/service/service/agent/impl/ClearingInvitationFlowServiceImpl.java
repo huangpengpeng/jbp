@@ -16,10 +16,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingInvitationFlowDao;
-import com.jbp.service.dao.agent.UserInvitationFlowDao;
 import com.jbp.service.product.comm.ProductCommEnum;
-import com.jbp.service.service.TeamService;
-import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +26,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,7 +45,7 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     @Resource
     private UserService userService;
     @Resource
-    private ClearingInvitationFlowDao clearingInvitationFlowDao;
+    private ClearingInvitationFlowDao dao;
 
     @Override
     public Boolean create(Long clearingId) {
@@ -76,9 +74,16 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
                 del4Clearing(lastOne.getId());
             }
             List<User> list = userService.list();
+
+            List<UserInvitation> userInvitations = invitationService.list();
+            Map<Integer, Integer> integerMap = FunctionUtil.keyValueMap(userInvitations, UserInvitation::getUId, UserInvitation::getPId);
+
+            List<ClearingInvitationFlow> flowList = Lists.newArrayList();
+            int i = 1;
             for (User user : list) {
-                List<UserUpperDto> allUpper = invitationService.getAllUpper(user.getId());
-                List<ClearingInvitationFlow> flowList = Lists.newArrayList();
+                log.info("正在处理销售关系紧缩, 当前:{}, 总数:{}", i, list.size());
+                i++;
+                List<UserUpperDto> allUpper = getAllUpper(user.getId(), integerMap);
                 int level = 1;
                 for (UserUpperDto upperDto : allUpper) {
                     if (upperDto.getPId() != null && clearingUserMap.get(upperDto.getPId()) != null) {
@@ -87,11 +92,37 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
                         flowList.add(flow);
                     }
                 }
-                clearingInvitationFlowDao.insertBatch(flowList);
+            }
+            List<List<ClearingInvitationFlow>> partition = Lists.partition(flowList, 5000);
+            for (List<ClearingInvitationFlow> clearingInvitationFlows : partition) {
+                dao.insertBatch(clearingInvitationFlows);
             }
         }
         return true;
     }
+
+    private List<UserUpperDto> getAllUpper(Integer uid, Map<Integer, Integer> integerMap) {
+        Integer self = uid;
+        LinkedList<UserUpperDto> list = new LinkedList<>();
+        int level = 1;
+        do {
+            Integer pid = integerMap.get(uid);
+            if (pid != null) {
+                UserUpperDto dto = new UserUpperDto();
+                dto.setUId(self);
+                dto.setPId(pid);
+                dto.setLevel(level);
+                level++;
+                list.add(dto);
+            }
+            if (pid == null) {
+                break;
+            }
+            uid = pid;
+        } while (true);
+        return list;
+    }
+
 
 
     @Override
@@ -130,17 +161,21 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ClearingInvitationFlow::getUId).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(ClearingInvitationFlow::getPId).collect(Collectors.toList());
-        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        uIdList.addAll(pIdList);
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<Long> clearingList = list.stream().map(ClearingInvitationFlow::getClearingId).collect(Collectors.toList());
+        List<ClearingFinal> clearingFinalList = clearingFinalService.list(new LambdaQueryWrapper<ClearingFinal>().in(ClearingFinal::getId, clearingList));
+        Map<Long, String> clearingNameMap = FunctionUtil.keyValueMap(clearingFinalList, ClearingFinal::getId, ClearingFinal::getName);
 
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
             e.setUNickName(uUser != null ? uUser.getNickname() : "");
-            User pUser = pidMapList.get(e.getPId());
+            User pUser = uidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
-            e.setUNickName(pUser != null ? pUser.getNickname() : "");
+            e.setPNickName(pUser != null ? pUser.getNickname() : "");
+            e.setClearingName(clearingNameMap.get(e.getClearingId()));
 
         });
         return CommonPage.copyPageInfo(page, list);

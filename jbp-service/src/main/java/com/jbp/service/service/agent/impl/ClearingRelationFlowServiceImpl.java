@@ -9,10 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ClearingFinal;
-import com.jbp.common.model.agent.ClearingRelationFlow;
-import com.jbp.common.model.agent.ClearingUser;
-import com.jbp.common.model.agent.UserRelationFlow;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
@@ -32,6 +29,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,9 +76,16 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
                 del4Clearing(lastOne.getId());
             }
             List<User> list = userService.list();
+            List<UserRelation> relationList = relationService.list();
+            Map<Integer, UserRelation> relationMap = FunctionUtil.keyValueMap(relationList, UserRelation::getUId);
+
+            List<ClearingRelationFlow> flowList = Lists.newArrayList();
+            int i = 1;
             for (User user : list) {
-                List<UserUpperDto> allUpper = relationService.getAllUpper(user.getId());
-                List<ClearingRelationFlow> flowList = Lists.newArrayList();
+                log.info("正在处理销售关系紧缩, 当前:{}, 总数:{}", i, list.size());
+                i++;
+                List<UserUpperDto> allUpper = getAllUpper(user.getId(), relationMap);
+
                 int level = 1;
                 for (UserUpperDto upperDto : allUpper) {
                     if (upperDto.getPId() != null && clearingUserMap.get(upperDto.getPId()) != null) {
@@ -89,10 +94,37 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
                         flowList.add(flow);
                     }
                 }
-                dao.insertBatch(flowList);
+            }
+            List<List<ClearingRelationFlow>> partition = Lists.partition(flowList, 5000);
+            for (List<ClearingRelationFlow> clearingRelationFlows : partition) {
+                dao.insertBatch(clearingRelationFlows);
             }
         }
         return true;
+    }
+
+
+    private List<UserUpperDto> getAllUpper(Integer uid, Map<Integer, UserRelation> relationMap) {
+        Integer self = uid;
+        LinkedList<UserUpperDto> list = new LinkedList<>();
+        int level = 1;
+        do {
+            UserRelation p = relationMap.get(uid);
+            if (p != null) {
+                UserUpperDto dto = new UserUpperDto();
+                dto.setUId(self);
+                dto.setPId(p.getPId());
+                dto.setNode(p.getNode());
+                dto.setLevel(level);
+                level++;
+                list.add(dto);
+            }
+            if (p == null) {
+                break;
+            }
+            uid = p.getPId();
+        } while (true);
+        return list;
     }
 
     @Override
@@ -131,15 +163,22 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(ClearingRelationFlow::getUId).collect(Collectors.toList());
-        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         List<Integer> pIdList = list.stream().map(ClearingRelationFlow::getPId).collect(Collectors.toList());
-        Map<Integer, User> pidMapList = userService.getUidMapList(pIdList);
+        uIdList.addAll(pIdList);
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+
+        List<Long> clearingList = list.stream().map(ClearingRelationFlow::getClearingId).collect(Collectors.toList());
+        List<ClearingFinal> clearingFinalList = clearingFinalService.list(new LambdaQueryWrapper<ClearingFinal>().in(ClearingFinal::getId, clearingList));
+        Map<Long, String> clearingNameMap = FunctionUtil.keyValueMap(clearingFinalList, ClearingFinal::getId, ClearingFinal::getName);
+
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
-            User pUser = pidMapList.get(e.getPId());
+            e.setUNickName(uUser != null ? uUser.getNickname() : "");
+            User pUser = uidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
             e.setPNickName(pUser != null ? pUser.getNickname() : "");
+            e.setClearingName(clearingNameMap.get(e.getClearingId()));
         });
         return CommonPage.copyPageInfo(page, list);
     }

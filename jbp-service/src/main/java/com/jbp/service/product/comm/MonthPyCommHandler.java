@@ -98,6 +98,12 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
     @Override
     public void clearing(ClearingFinal clearingFinal) {
         List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingFinal.getId());
+        if (CollectionUtils.isEmpty(clearingUsers)) {
+            log.error(clearingFinal.getName() + "结算名单为空");
+            clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
+            clearingFinalService.updateById(clearingFinal);
+            return;
+        }
         Map<Integer, ClearingUser> cleaingUserMap = FunctionUtil.keyValueMap(clearingUsers, ClearingUser::getUid);
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
@@ -119,7 +125,9 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                 ProductComm productComm = map.get(orderDetail.getProductId());
                 if (productComm == null) {
                     productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
-                    map.put(orderDetail.getProductId(), productComm);
+                    if(productComm != null){
+                        map.put(orderDetail.getProductId(), productComm);
+                    }
                 }
                 // 佣金不存在或者关闭直接忽略
                 if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
@@ -202,12 +210,16 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     }
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingRelationFlow clearingRelationFlow : clearingRelationFlows) {
-                        ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getPId());
+                        ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getUId());
+                        if(clearingUser == null){
+                            continue;
+                        }
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                         if (rule.getUpperRelationNum() >= i) {
                             usableList.add(clearingUser);
                         }
                     }
+
                     if (CollectionUtils.isNotEmpty(usableList)) {
                         BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_UP);
                         if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
@@ -215,7 +227,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                                 ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
                                         clearingUser.getLevel(), clearingUser.getLevelName(),
                                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                                        commFee, "服务上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
+                                        clearingFee, "服务上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
                                 clearingBonusFlowList.add(clearingBonusFlow);
                             }
                         }
@@ -239,7 +251,10 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     }
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingInvitationFlow clearingInvitationFlow : clearingInvitationFlows) {
-                        ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getPId());
+                        ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getUId());
+                        if(clearingUser == null){
+                            continue;
+                        }
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                         if (rule.getUpperInvitationNum() >= i) {
                             usableList.add(clearingUser);
@@ -252,7 +267,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                                 ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
                                         clearingUser.getLevel(), clearingUser.getLevelName(),
                                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                                        commFee, "销售上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
+                                        clearingFee, "销售上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
                                 clearingBonusFlowList.add(clearingBonusFlow);
                             }
                         }
@@ -284,7 +299,6 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
             clearingBonusService.insertBatchList(clearingBonuses);
         }
         // 保存奖金明细
-        clearingBonusService.insertBatchList(clearingBonusList);
         for (List<ClearingBonusFlow> clearingBonusFlows : Lists.partition(clearingBonusFlowList, 2000)) {
             clearingBonusFlowService.insertBatchList(clearingBonusFlows);
         }
@@ -301,22 +315,58 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
         clearingBonusFlowService.del4Clearing(clearingFinal.getId());
     }
 
+
+    public static void main(String[] args) {
+
+        List<Rule> list = Lists.newArrayList();
+        for (int i = 1; i <= 3 ; i++) {
+            Rule rule = new Rule();
+            rule.setLevel(Long.valueOf(i));
+            if (i == 1) {
+                rule.setCapaId(1L);
+                rule.setPayPrice(BigDecimal.valueOf(100));
+                rule.setLevelName("创客当月复购100元");
+                rule.setUpperRelationNum(2);
+                rule.setUpperInvitationNum(2);
+                rule.setUpperScale(BigDecimal.valueOf(0.01));
+                rule.setUnderRelationNum(25);
+                rule.setUnderInvitationNum(25);
+                rule.setUnderScale(BigDecimal.valueOf(0.05));
+            }
+            if (i == 2) {
+                rule.setCapaId(2L);
+                rule.setPayPrice(BigDecimal.valueOf(100));
+                rule.setLevelName("VIP以上复购100元");
+                rule.setUpperRelationNum(5);
+                rule.setUpperInvitationNum(5);
+                rule.setUpperScale(BigDecimal.valueOf(0.01));
+                rule.setUnderRelationNum(25);
+                rule.setUnderInvitationNum(25);
+                rule.setUnderScale(BigDecimal.valueOf(0.05));
+            }
+            if (i == 3) {
+                rule.setCapaId(2L);
+                rule.setPayPrice(BigDecimal.valueOf(200));
+                rule.setLevelName("VIP以上复购300元");
+                rule.setUpperRelationNum(10);
+                rule.setUpperInvitationNum(10);
+                rule.setUpperScale(BigDecimal.valueOf(0.01));
+                rule.setUnderRelationNum(25);
+                rule.setUnderInvitationNum(25);
+                rule.setUnderScale(BigDecimal.valueOf(0.05));
+            }
+            list.add(rule);
+        }
+
+        System.out.println(JSONArray.toJSONString(list));
+
+
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
-
-        /**
-         * 级别名称
-         */
-        private Long capaId;
-
-
-        /**
-         * 付款金额
-         */
-        private BigDecimal payPrice;
-
 
         /**
          * 结算级别  1   2  3
@@ -330,6 +380,16 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
          * 3. VIP以上复购300元
          */
         private String levelName;
+
+        /**
+         * 级别名称
+         */
+        private Long capaId;
+
+        /**
+         * 付款金额
+         */
+        private BigDecimal payPrice;
 
         /**
          * 获取服务上级多少层的业绩分红

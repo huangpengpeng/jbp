@@ -33,6 +33,8 @@
     <option name="terminalCommand" value="tail -f  /opt/jbp/admin/Jbp-admin.log" />
     <option name="type" value="HOST" />
     <option name="uploadType" value="FILE" />
-    <method v="2" />
+    <method v="2">
+      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="clean install" />
+    </method>
   </configuration>
 </component>

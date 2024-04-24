@@ -111,7 +111,9 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
                 ProductComm productComm = map.get(orderDetail.getProductId());
                 if (productComm == null) {
                     productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
-                    map.put(orderDetail.getProductId(), productComm);
+                    if(productComm != null){
+                        map.put(orderDetail.getProductId(), productComm);
+                    }
                 }
                 // 佣金不存在或者关闭直接忽略
                 if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
@@ -226,6 +228,22 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
     public void del4Clearing(ClearingFinal clearingFinal) {
         clearingBonusService.del4Clearing(clearingFinal.getId());
         clearingBonusFlowService.del4Clearing(clearingFinal.getId());
+    }
+
+    public static void main(String[] args) {
+
+        List<Rule> ruleList = Lists.newArrayList();
+        for (int i = 0; i < 4 ; i++) {
+            Rule rule = new Rule();
+            rule.setLevel(Long.valueOf(i));
+            rule.setLevelName("平台分红级别"+i);
+            rule.setRatio(BigDecimal.valueOf(i).divide(BigDecimal.valueOf(100)));
+            ruleList.add(rule);
+        }
+
+        System.out.println(JSONArray.toJSONString(ruleList));
+
+
     }
 
     @Data

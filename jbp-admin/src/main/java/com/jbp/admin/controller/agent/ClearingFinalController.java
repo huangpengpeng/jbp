@@ -3,6 +3,7 @@ package com.jbp.admin.controller.agent;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.page.CommonPage;
@@ -16,11 +17,14 @@ import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.ClearingUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -34,6 +38,8 @@ public class ClearingFinalController {
     private ClearingUserService clearingUserService;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @PreAuthorize("hasAuthority('agent:clearing:final:page')")
     @GetMapping("/page")
@@ -69,47 +75,33 @@ public class ClearingFinalController {
     @PostMapping("/oneKeyClearing")
     @ApiOperation("一键结算")
     public CommonResult<ClearingFinal> create(@RequestBody ClearingRequest request) {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if(set != null && set.size() > 0){
-            new CrmebException("正在进行结算不允许重复操作");
-        }
-        try{
-            clearingFinalService.syncOneKeyClearing(request);
-        }catch (Exception e){
-            redisUtil.delete("clearing_final");
-            return CommonResult.failed(e.getMessage());
-        }
+        clearingFinalService.syncOneKeyClearing(request);
         return CommonResult.success();
     }
 
     @GetMapping("/oneKeyDel")
     @ApiOperation("一键删除")
     public CommonResult<Boolean> del(Long clearingId) {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if(set != null && set.size() > 0){
-            new CrmebException("正在进行结算不允许删除");
-        }
         return CommonResult.success(clearingFinalService.oneKeyDel(clearingId));
     }
 
     @PostMapping("/preImportUser")
     @ApiOperation("预设名单")
     public CommonResult<Boolean> preImportUser(@RequestBody ClearingPreUserRequest request) {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if(set != null && set.size() > 0){
-            new CrmebException("正在进行结算不允许设置");
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("ClearingFinalRunning", 1); // 正在结算
+        if (!task) {
+            throw new RuntimeException("正在结算中请勿删除名单");
         }
-        return CommonResult.success(clearingUserService.preImportUser(request));
+        clearingUserService.preImportUser(request);
+        redisTemplate.delete("ClearingFinalRunning");
+        return CommonResult.success();
     }
 
     @GetMapping("/preDelUser")
     @ApiOperation("预设名单删除")
     public CommonResult<Boolean> preDelUser() {
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if(set != null && set.size() > 0){
-            new CrmebException("正在进行结算不允许删除");
-        }
-        return CommonResult.success(clearingUserService.delPerUser());
+        clearingUserService.delPerUser();
+        return CommonResult.success();
     }
 
     @GetMapping("/send")
@@ -122,16 +114,30 @@ public class ClearingFinalController {
     @ApiOperation("结算任务详情")
     public CommonResult<ClearingFinal> detail(Long clearingId) {
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
-        Set<Object> set = redisUtil.sGet("clearing_final");
-        if(set != null && set.size() > 0){
+        LinkedList set = redisUtil.get("clearing_final" + clearingId);
+        if (set != null && set.size() > 0) {
             clearingFinal.setLogs(JSONArray.toJSONString(set));
         }
         return CommonResult.success(clearingFinal);
     }
 
     @ApiOperation("结算任务下拉选")
+    @GetMapping("/clearingList")
     public CommonResult<List<ClearingFinal>> list() {
         return CommonResult.success(clearingFinalService.list());
+    }
+
+    @ApiOperation("结算佣金下拉选")
+    @GetMapping("/commList")
+    public CommonResult<List<Map<Integer, String>>> commList() {
+        List<ProductCommEnum> list = Lists.newArrayList(ProductCommEnum.拓展佣金, ProductCommEnum.培育佣金, ProductCommEnum.平台分红);
+        List<Map<Integer, String>> result = Lists.newArrayList();
+        for (ProductCommEnum commEnum : list) {
+            Map<Integer, String> map = Maps.newConcurrentMap();
+            map.put(commEnum.getType(), commEnum.getName());
+            result.add(map);
+        }
+        return CommonResult.success(result);
     }
 
 }
