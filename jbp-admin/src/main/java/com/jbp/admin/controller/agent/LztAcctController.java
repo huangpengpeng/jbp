@@ -176,7 +176,10 @@ public class LztAcctController {
     @SneakyThrows
     @ApiOperation(value = "账户资金明细 flagDc-> DEBIT：出账 CREDIT：入账 时间格式 yyyyMMddHHmmss")
     @GetMapping(value = "/serialPage")
-    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, String flagDc, Integer pageNo) {
+    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, String flagDc, Integer pageNo, Integer limit) {
+        if(limit == null){
+            limit = 10;
+        }
         if (StringUtils.isEmpty(userId)) {
             throw new CrmebException("请选择账号查询");
         }
@@ -197,7 +200,7 @@ public class LztAcctController {
         MerchantPayInfo payInfo = merchant.getPayInfo();
         CommonPage<AcctBalList> page = new CommonPage();
         AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), userId,
-                LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), dateStart, endStart, flagDc, pageNo.toString());
+                LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), dateStart, endStart, flagDc, pageNo, limit);
         List<AcctBalList> acctbalList = result.getAcctbal_list();
         if (CollectionUtils.isNotEmpty(acctbalList)) {
             for (AcctBalList acctBalList : acctbalList) {

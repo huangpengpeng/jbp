@@ -84,7 +84,8 @@ public interface LztService {
     /**
      * 资金流水
      */
-    AcctSerialResult queryAcctSerial(String oidPartner, String priKey, String userId, String userType, String dateStart, String endStart, String flagDc, String pageNo);
+    AcctSerialResult queryAcctSerial(String oidPartner, String priKey, String userId, String userType, String dateStart,
+                                     String endStart, String flagDc, Integer pageNo, Integer limit);
 
     /**
      * 短验二次确认
