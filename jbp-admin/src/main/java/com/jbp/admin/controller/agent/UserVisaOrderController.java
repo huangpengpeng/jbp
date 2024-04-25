@@ -56,6 +56,7 @@ public class UserVisaOrderController {
         userVisaOrder.setApplyTime(request.getApplyTime());
         userVisaOrder.setInterviewTime(request.getInterviewTime());
         userVisaOrder.setExaminationTime(request.getExaminationTime());
+        userVisaOrder.setOpenTime(request.getOpenTime());
         userVisaOrderService.updateById(userVisaOrder);
         return CommonResult.success();
     }
