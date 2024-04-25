@@ -948,6 +948,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Override
     public OrderNoResponse createOrder(CreateOrderRequest orderRequest) {
         User payUser = userService.getInfo();
+
+        //变更关系
+         UserCapa userCapa =  userCapaService.getByUser(payUser.getId());
+        if(orderRequest.getShardUid() != null && orderRequest.getShardUid()>0){
+            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
+            //邀请配置 配置关闭时默认强绑定
+            invitationService.band(payUser.getId(), orderRequest.getShardUid(), false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
+        }
+
+
         // 通过缓存获取预下单对象
         String key = OrderConstants.PRE_ORDER_CACHE_PREFIX + orderRequest.getPreOrderNo();
         boolean exists = redisUtil.exists(key);
