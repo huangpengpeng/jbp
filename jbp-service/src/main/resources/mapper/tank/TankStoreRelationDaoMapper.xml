@@ -11,7 +11,7 @@
     </select>
 	<select id="getAdminPageList" resultType="com.jbp.common.response.TankStoreRelationAdminListResponse">
 
-		select t.id, t.tank_user_id  ,u.nickName,t.store_user_id,u2.nickName as storeusername,u2.mobile ,t.created_time from eb_tank_store_relation t
+		select t.id, t.tank_user_id  ,u.nickName,t.store_user_id,u2.nickName as storeusername,u2.phone ,t.created_time from eb_tank_store_relation t
 		left join eb_user u on u.id = t.tank_user_id
 		left join eb_user u2 on u2.id = t.store_user_id
 		where 1=1

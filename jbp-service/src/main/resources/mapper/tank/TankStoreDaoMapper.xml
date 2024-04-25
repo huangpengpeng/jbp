@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.TankStoreDao">
     <select id="getStoreList" resultType="com.jbp.common.response.TankStoreListResponse">
-        	select  u.nickName ,u.mobile ,t.name from eb_tank_store t
+        	select  u.nickName ,u.phone ,t.name from eb_tank_store t
 		left join eb_user u on u.id = t.user_Id
 		where t.user_id = #{storeUserId}
     </select>
