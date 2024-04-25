@@ -124,13 +124,17 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     public void validBand(Integer uId, Integer pId) {
         // 没有上级直接通过
         if (pId == null) {
-            throw new RuntimeException("上级不能为空");
+            User user = userService.getById(uId);
+            throw new RuntimeException("上级不能为空:"+ user.getAccount());
         }
         if (uId.intValue() == pId.intValue()) {
-            throw new RuntimeException("自己不能绑定自己");
+            User user = userService.getById(uId);
+            throw new RuntimeException("自己不能绑定自己:"+ user.getAccount());
         }
         if (hasChild(pId, uId)) {
-            throw new RuntimeException("关系链条的上级不能绑定给自己");
+            User user = userService.getById(uId);
+            User puser = userService.getById(pId);
+            throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户: "+user.getAccount()+"|"+puser.getAccount());
         }
     }
 
