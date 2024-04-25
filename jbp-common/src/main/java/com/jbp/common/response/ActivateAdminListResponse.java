@@ -11,10 +11,19 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @ApiModel(value="AccountCapaResponse对象", description="账户等级对象")
 public class ActivateAdminListResponse {
-    @ApiModelProperty(value = "账户")
-    private String account;
-    @ApiModelProperty(value = "等级编号")
-    private Integer capaId;
-    @ApiModelProperty(value = "等级图标地址")
-    private String iconUrl;
+    private String operationSn;
+    private String storeId;
+    private String storeusername;
+
+    private String storename;
+    private String name;
+    private String imei;
+    private String nickName;
+
+    private String createdTime;
+    private String endTime;
+    private String status;
+
+
+
 }

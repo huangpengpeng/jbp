@@ -5,7 +5,7 @@
 
     <select id="getAdminPageList" resultType="com.jbp.common.response.UserVisaOrderRecordResponse">
 
-		select e.uid, u.nickName,e.order_no,e.`status`,e.mark,e.gmt_created from eb_user_visa_order e
+		select  u.nickName,e.* from eb_user_visa_order e
 		left join eb_user u on u.id  = e.uid
 		where 1=1
 		<if test="account !=null">

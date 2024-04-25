@@ -30,7 +30,7 @@ public interface TankEquipmentDao extends BaseMapper<TankEquipment> {
 
 
 
-    List<EquipmentAdminListResponse> getAdminPageList(@Param("username") String  username, @Param("type") String name);
+    List<EquipmentAdminListResponse> getAdminPageList(@Param("username") String  username, @Param("name") String name);
 
 
 }

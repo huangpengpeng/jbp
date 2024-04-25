@@ -3,6 +3,7 @@ package com.jbp.admin.controller.agent;
 import com.jbp.common.model.user.UserVisaOrder;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.UserVisaOrderRequest;
 import com.jbp.common.response.UserVisaOrderRecordResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
@@ -42,11 +43,19 @@ public class UserVisaOrderController {
     @ApiOperation(value = "修改签约订单", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult update(Integer id, String status,String mark) {
+    public CommonResult update(UserVisaOrderRequest request) {
 
-        UserVisaOrder userVisaOrder = userVisaOrderService.getById(id);
-        userVisaOrder.setStatus(status);
-        userVisaOrder.setMark(mark);
+        UserVisaOrder userVisaOrder = userVisaOrderService.getById(request.getId());
+
+        userVisaOrder.setStatus(request.getStatus());
+        userVisaOrder.setMark(request.getMark());
+        userVisaOrder.setInterview(request.getInterview());
+        userVisaOrder.setExamination(request.getExamination());
+        userVisaOrder.setVitalityId(request.getVitalityId());
+
+        userVisaOrder.setApplyTime(request.getApplyTime());
+        userVisaOrder.setInterviewTime(request.getInterviewTime());
+        userVisaOrder.setExaminationTime(request.getExaminationTime());
         userVisaOrderService.updateById(userVisaOrder);
         return CommonResult.success();
     }

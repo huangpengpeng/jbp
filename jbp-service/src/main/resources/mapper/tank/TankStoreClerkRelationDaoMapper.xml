@@ -14,7 +14,7 @@
 
 		select tc.id,t.name,t.user_id, u.nickName , cu.nickName as cusername ,cu.phone as cmobile ,tc.created_time from eb_tank_store t
 		left join eb_user u on u.id = t.user_id
-		left join eb_tank_store_clerk_relation tc on tc.store_userId = t.user_id and tc.store_id = t.id
+		left join eb_tank_store_clerk_relation tc on tc.store_user_id = t.user_id and tc.store_id = t.id
 		left join eb_user cu on cu.id = tc.clerk_user_id
 		where 1=1
 
