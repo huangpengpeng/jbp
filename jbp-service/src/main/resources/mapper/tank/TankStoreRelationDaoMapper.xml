@@ -4,25 +4,25 @@
 
     <select id="getRelationList" resultType="com.jbp.common.response.TankStoreRelationListResponse">
 
-        	select u.username , t.storeUserId ,t.createdTime ,t.id from tankstorerelation t
-		left join user u on u.id = t.storeUserId
-		where t.tankUserId =  #{userId}
+        	select u.nickName , t.store_userId ,t.created_time ,t.id from eb_tank_store_relation t
+		left join eb_user u on u.id = t.store_userId
+		where t.tank_userId =  #{userId}
 
     </select>
 	<select id="getAdminPageList" resultType="com.jbp.common.response.TankStoreRelationAdminListResponse">
 
-		select t.id, t.tankUserId  ,u.username,t.storeUserId,u2.username as storeusername,u2.mobile ,t.createdTime from tankstorerelation t
-		left join user u on u.id = t.tankUserId
-		left join user u2 on u2.id = t.storeUserId
+		select t.id, t.tank_user_id  ,u.nickName,t.store_user_id,u2.nickName as storeusername,u2.mobile ,t.created_time from eb_tank_store_relation t
+		left join eb_user u on u.id = t.tank_user_id
+		left join eb_user u2 on u2.id = t.store_user_id
 		where 1=1
 
 		<if test="username != null and username !=''">
-			AND  ( u.username =  #{username} or u.id =  #{username} )
+			AND  ( u.nickName =  #{username} or u.id =  #{username} )
 		</if>
 		<if test="storeusername != null and storeusername !=''">
-			AND  u2.username =   #{storeusername}
+			AND  u2.nickName =   #{storeusername}
 		</if>
 
-		order by t.createdTime desc
+		order by t.created_time desc
 	</select>
 </mapper>

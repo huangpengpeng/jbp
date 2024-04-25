@@ -5,11 +5,11 @@
 
     <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentNumberAdminListResponse">
 
-        	select  u.id ,u.username, t.number from tankequipmentnumber t
-		left join user u on u.id = t.storeUserId
+        	select  u.id ,u.nickName, t.number from eb_tank_equipment_number t
+		left join eb_user u on u.id = t.store_user_id
 		where 1=1
         <if test="username != null and username !=''">
-            AND  ( u.username =  #{username} or u.id =  #{username} )
+            AND  ( u.nickName =  #{username} or u.id =  #{username} )
         </if>
 
     </select>

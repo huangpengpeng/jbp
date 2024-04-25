@@ -3,10 +3,10 @@
 <mapper namespace="com.jbp.service.dao.TankEquipmentNumberInfoDao">
 
     <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentNumberInfoAdminListResponse">
-        select u.id ,u.username,t.type,t.number,ta.operationSn,t.createdTime,t.remark from tankequipmentnumberinfo t
-		left join user u on u.id = t.storeUserId
-		left join tankactivate ta on ta.id = t.activateId
-		where 1=1 and t.storeUserId = #{id}
-		order by t.createdTime desc
+        select u.id ,u.nickName,t.type,t.number,ta.operation_sn,t.created_time,t.remark from eb_tank_equipment_number_info t
+		left join eb_user u on u.id = t.store_user_id
+		left join eb_tank_activate ta on ta.id = t.activate_id
+		where 1=1 and t.store_user_id = #{id}
+		order by t.created_time desc
     </select>
 </mapper>

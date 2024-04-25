@@ -4,27 +4,27 @@
 
     <select id="getAdminPageList" resultType="com.jbp.common.response.TankOrderAdminListResponse">
 
-        select o.*,u.username ,u2.username as storeusername from tankorders  o
-		left join user u on u.id = o.userId
-		left join user u2 on u2.id = o.storeUserId
+        select o.*,u.nickName ,u2.nickName as storeusername from eb_tank_orders  o
+		left join eb_user u on u.id = o.user_id
+		left join eb_user u2 on u2.id = o.store_user_id
 		where 1=1
 
         <if test="username != null and username !=''">
-            AND  ( u2.username =  #{username} or u2.id =  #{username} )
+            AND  ( u2.nickName =  #{username} or u2.id =  #{username} )
         </if>
         <if test="status != null and status !=''">
             AND   o.status =   #{status}
         </if>
 
         <if test="startCreateTime != null and startCreateTime !=''">
-            AND   o.payTime >=  #{startCreateTime}
+            AND   o.pay_time >=  #{startCreateTime}
         </if>
 
         <if test="endCreateTime != null and endCreateTime !=''">
-            AND   o.payTime <![CDATA[ <=  ]]>  #{endCreateTime}
+            AND   o.pay_time <![CDATA[ <=  ]]>  #{endCreateTime}
         </if>
 
-		order by o.createdTime desc
+		order by o.created_time desc
 
     </select>
 </mapper>

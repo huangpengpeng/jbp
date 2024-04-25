@@ -6,19 +6,19 @@
     <select id="getPageList" resultType="com.jbp.common.response.EquipmentListResponse">
 
 
-      	select t.equipmentSn,t.imei,ts.`name`,t.activateStatus,t.onlineStatus,t.useStatus,ifnull(t.prohibitStatus,0) as prohibitStatus , t.`status` from tankequipment t
-		left join tankstore ts on ts.id = t.storeId
+      	select t.equipment_sn,t.imei,ts.`name`,t.activate_status,t.online_status,t.use_status,ifnull(t.prohibit_status,0) as prohibitStatus , t.`status` from eb_tank_equipment t
+		left join eb_tank_store ts on ts.id = t.store_id
 		where ts.userId =  #{userId}
         <if test="type != null and type !=''">
          <if test="type == 使用中">
-            and status = 0 and activateStatus = 1 and onlineStatus = 1 and useStatus = 1
+            and status = 0 and activate_status = 1 and online_status = 1 and use_status = 1
          </if>
             <if test="type == 在线未用">
-                and status = 0 and activateStatus = 0 and onlineStatus = 1 and useStatus = 1
+                and status = 0 and activate_status = 0 and online_status = 1 and use_status = 1
             </if>
 
             <if test="type == 离线">
-                and  onlineStatus = 0
+                and  online_status = 0
             </if>
 
         </if>
@@ -27,59 +27,59 @@
 
     </select>
     <select id="getInfo" resultType="java.util.Map">
-        select ts.name,t.equipmentSn,t.id ,t.imei ,ts.nest ,t.prohibitStatus from tankequipment t
-		left join tankstore ts on ts.id = t.storeId
-		where t.equipmentSn =  #{equipmentSn}
+        select ts.name,t.equipment_sn,t.id ,t.imei ,ts.nest ,t.prohibit_status from eb_tank_equipment t
+		left join eb_tank_store ts on ts.id = t.store_id
+		where t.equipment_sn =  #{equipmentSn}
 
     </select>
     <select id="equipmentNumber" resultType="java.lang.Integer">
-        	select  count(1) from  tankequipment t
-		where t.storeUserId =   #{userId}
+        	select  count(1) from  eb_tank_equipment t
+		where t.store_userId =   #{userId}
     </select>
     <select id="equipmentUseNumber" resultType="java.lang.Integer">
-        	select  count(1) from  tankequipment t
-		where t.storeUserId =   #{userId}	and status = 0 and activateStatus = 1 and onlineStatus = 1 and useStatus = 1
+        	select  count(1) from  eb_tank_equipment t
+		where t.store_userId =   #{userId}	and status = 0 and activate_status = 1 and online_status = 1 and use_status = 1
     </select>
     <select id="equipmentOnlineUnusedNumber" resultType="java.lang.Integer">
-        		select  count(1) from  tankequipment t
-		where t.storeUserId =   #{userId}  and status = 0 and activateStatus = 0 and onlineStatus = 1 and useStatus = 1
+        		select  count(1) from  eb_tank_equipment t
+		where t.store_userId =   #{userId}  and status = 0 and activate_status = 0 and online_status = 1 and use_status = 1
     </select>
     <select id="equipmentOfflinedNumber" resultType="java.lang.Integer">
-        	select  count(1) from  tankequipment t
-		where t.storeUserId =  #{userId}  and onlineStatus = 0
+        	select  count(1) from  eb_tank_equipment t
+		where t.store_userId =  #{userId}  and online_status = 0
     </select>
     <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentAdminListResponse">
 
         SELECT
-		t.equipmentSn,
-		t.orderbondactivateId,
-		ta.tankUserId AS userId,
-		u.username,
-		t.storeUserId,
-		u2.username AS storeusername,
+		t.equipment_sn,
+		t.orderbondactivate_id,
+		ta.tank_user_id AS userId,
+		u.nickName,
+		t.store_user_id,
+		u2.nickName AS storeusername,
 		s.NAME AS storename,
 		t.NAME AS quipmentname,
 		t.imei,
-		t.createdTime,
+		t.created_time,
 		t.type,
 		t.`status`,
-		t.activateStatus,
-		t.onlineStatus,
-		t.useStatus,
-		t.prohibitStatus,
+		t.activate_status,
+		t.online_status,
+		t.use_status,
+		t.prohibit_status,
 		t.id
 		FROM
-		tankequipment t
-		LEFT JOIN orderbondactivate o ON o.id = t.orderbondactivateId
-		LEFT JOIN USER u2 ON u2.id = t.storeUserId
-		LEFT JOIN tankstore s ON s.id = t.storeId
-		LEFT JOIN tankstorerelation ta ON ta.storeUserId = s.userId
-		LEFT JOIN USER u ON u.id = ta.tankUserId
+		eb_tank_equipment t
+		LEFT JOIN eb_order_bond_activate o ON o.id = t.orderbondactivate_id
+		LEFT JOIN eb_user u2 ON u2.id = t.store_user_id
+		LEFT JOIN eb_tank_store s ON s.id = t.store_id
+		LEFT JOIN eb_tank_store_relation ta ON ta.store_user_id = s.user_id
+		LEFT JOIN eb_user u ON u.id = ta.tank_user_id
 		WHERE
 		1 = 1
 
         <if test="username != null and username !=''">
-            AND  ( u.username =  #{username} or u.id =  #{username} )
+            AND  ( u.nickName =  #{username} or u.id =  #{username} )
         </if>
 
 
@@ -87,7 +87,7 @@
             AND s.name =   #{name}
         </if>
 
-		order by t.createdTime desc
+		order by t.created_time desc
 
     </select>
 </mapper>

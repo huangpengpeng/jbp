@@ -3,54 +3,54 @@
 <mapper namespace="com.jbp.service.dao.TankActivateDao">
 
     <select id="activateDay" resultType="java.lang.Integer">
-        select  count(1) from  tankactivate t
-		left join tankequipment te on te.id =  t.equipmentId
-		where te.storeId =  #{storeId}  and DATE_FORMAT( t.createdTime,'%Y-%m-%d') =  DATE_FORMAT( NOW(),'%Y-%m-%d')
+        select  count(1) from  eb_tank_activate t
+		left join eb_tank_equipment te on te.id =  t.equipment_id
+		where te.store_id =  #{storeId}  and DATE_FORMAT( t.created_time,'%Y-%m-%d') =  DATE_FORMAT( NOW(),'%Y-%m-%d')
 
     </select>
     <select id="activateWeeks" resultType="java.lang.Integer">
-        		select  count(1) from  tankactivate t
-		left join tankequipment te on te.id =  t.equipmentId
-		where te.storeId =  #{storeId}    and YEARWEEK(t.createdTime, 1) = YEARWEEK(CURDATE(), 1);
+        		select  count(1) from  eb_tank_activate t
+		left join eb_tank_equipment te on te.id =  t.equipment_id
+		where te.store_id =  #{storeId}    and YEARWEEK(t.created_time, 1) = YEARWEEK(CURDATE(), 1);
     </select>
     <select id="activateMonth" resultType="java.lang.Integer">
-        select  count(1) from  tankactivate t
-		left join tankequipment te on te.id =  t.equipmentId
-		where te.storeId =   #{storeId}    and DATE_FORMAT( t.createdTime,'%Y-%m') =  DATE_FORMAT( NOW(),'%Y-%m')
+        select  count(1) from  eb_tank_activate t
+		left join eb_tank_equipment te on te.id =  t.equipment_id
+		where te.store_id =   #{storeId}    and DATE_FORMAT( t.created_time,'%Y-%m') =  DATE_FORMAT( NOW(),'%Y-%m')
     </select>
     <select id="activateTotal" resultType="java.lang.Integer">
-        	select  count(1) from  tankactivate t
-		left join tankequipment te on te.id =  t.equipmentId
-		where te.storeId =  #{storeId}
+        	select  count(1) from  eb_tank_activate t
+		left join eb_tank_equipment te on te.id =  t.equipment_id
+		where te.store_id =  #{storeId}
     </select>
     <select id="activateRecent" resultType="java.lang.Integer">
-        	select  count(1) as count from  tankactivate t
-		left join tankequipment te on te.id =  t.equipmentId
-		where te.storeId =   #{storeId}
-		GROUP BY DATE_FORMAT( t.createdTime,'%Y-%m-%d')
-		ORDER BY t.createdTime desc
+        	select  count(1) as count from  eb_tank_activate t
+		left join eb_tank_equipment te on te.id =  t.equipment_id
+		where te.store_id =   #{storeId}
+		GROUP BY DATE_FORMAT( t.created_time,'%Y-%m-%d')
+		ORDER BY t.created_time desc
 		LIMIT 7
     </select>
     <select id="getactivateList" resultType="com.jbp.common.response.ActivateInfoResponse">
 
-			select t.operationSn,u.username,tq.imei,ts.name,t.createdTime,t.endTime ,t.`status` ,tq.name as tqname,tq.equipmentSn from tankactivate t
-		left join user u on u.id = t.activateUserId
-		left join tankequipment tq on tq.id = t.equipmentId
-		left join tankstore ts on ts.id = tq.storeId
-		where ts.userId =  #{userId}
-		order by t.createdTime desc
+			select t.operation_sn,u.nickName,tq.imei,ts.name,t.created_time,t.end_time ,t.`status` ,tq.name as tqname,tq.equipment_sn from eb_tank_activate t
+		left join user u on u.id = t.activate_user_id
+		left join eb_tank_equipment tq on tq.id = t.equipment_id
+		left join eb_tank_store ts on ts.id = tq.store_id
+		where ts.user_id =  #{userId}
+		order by t.created_time desc
 
 	</select>
     <select id="getadminActivateList" resultType="com.jbp.common.response.ActivateAdminListResponse">
 
-		select  t.operationSn,te.storeId,u.username as storeusername,ts.name as storename,te.name,te.imei,u2.username ,t.createdTime,t.endTime,t.`status` from  tankactivate t
-		left join tankequipment te on te.id = t.equipmentId
-		left join tankstore ts on ts.id = te.storeId
-		left join user u on u.id = ts.userId
-		left join user u2 on u2.id = t.activateUserId
+		select  t.operation_sn,te.store_id,u.nickName as storeusername,ts.name as storename,te.name,te.imei,u2.nickName ,t.created_time,t.end_time,t.`status` from  eb_tank_activate t
+		left join eb_tank_equipment te on te.id = t.equipment_id
+		left join eb_tank_store ts on ts.id = te.store_id
+		left join eb_user u on u.id = ts.user_id
+		left join eb_user u2 on u2.id = t.activate_user_id
 		where 1=1
 		<if test="username != null and username !=''">
-			AND  ( u.username =  #{username} or u.id =  #{username} )
+			AND  ( u.nickName =  #{username} or u.id =  #{username} )
 		</if>
 
 		<if test="name != null and name !=''">
@@ -60,7 +60,7 @@
 			AND t.`status` = #{status}
 		</if>
 
-		order by t.createdTime desc
+		order by t.created_time desc
 
 	</select>
 </mapper>
