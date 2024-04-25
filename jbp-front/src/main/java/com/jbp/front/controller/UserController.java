@@ -11,6 +11,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.RelationScoreService;
@@ -68,6 +69,9 @@ public class UserController {
     private Environment environment;
     @Autowired
     private UserCapaService userCapaService;
+    @Autowired
+    private SystemConfigService systemConfigService;
+
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -364,6 +368,28 @@ public class UserController {
         User user = userService.registerPhone(phone, code, pUser.getId());
         return CommonResult.success(user);
     }
+
+
+    @ApiOperation(value = "用户修改绑定关系")
+    @RequestMapping(value = "/updateInvitation", method = RequestMethod.GET)
+    public CommonResult updateInvitation(Integer spreadPid ) {
+
+        Integer uid=  userService.getUserId();
+        if(uid == 0) {
+            return CommonResult.success();
+        }
+
+        UserCapa userCapa =  userCapaService.getByUser(uid);
+        if(spreadPid != null && spreadPid>0){
+            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
+            //邀请配置 配置关闭时默认强绑定
+            invitationService.band(uid, spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
+        }
+
+        return CommonResult.success();
+    }
+
 
 }
 
