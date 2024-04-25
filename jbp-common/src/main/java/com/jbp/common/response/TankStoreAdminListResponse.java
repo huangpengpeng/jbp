@@ -14,11 +14,10 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "TankStoreAdminListResponse对象", description = "共享仓门店列表对象")
-public class TankStoreAdminListResponse implements Serializable {
+public class TankStoreAdminListResponse extends TankStore {
 
     private static final long serialVersionUID = 1L;
 
-    private TankStore order;
     private String username;
 
 

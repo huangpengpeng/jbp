@@ -57,7 +57,7 @@ public class TankStoreAct {
     @ApiOperation(value = "增加门店", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/save", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult delete(HttpServletRequest request, ModelMap model, Long userId ,String address,String name ) {
+    public CommonResult delete( Long userId ,String address,String name ) {
 
        TankStoreRelation tankStoreRelation =  tankStoreRelationService.getStoreUserId(userId);
        if(tankStoreRelation== null){
