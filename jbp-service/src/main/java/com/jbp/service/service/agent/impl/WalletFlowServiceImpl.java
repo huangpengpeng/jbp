@@ -39,9 +39,11 @@ import java.util.stream.Collectors;
 @Service
 public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow> implements WalletFlowService {
     @Resource
-    WalletConfigService walletConfigService;
+    private WalletConfigService walletConfigService;
     @Resource
-    UserService userService;
+    private UserService userService;
+    @Resource
+    private WalletFlowDao dao;
 
     @Override
     public WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
@@ -153,6 +155,8 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     public void init() {
         int i = 0;
         List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_"));
+
+        List<WalletFlow> updateList = Lists.newArrayList();
         for (WalletFlow walletFlow : list) {
             Integer uid = null;
             if (walletFlow.getAction().equals("收入")) {
@@ -167,11 +171,12 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             if (uid != null) {
                 User receiveUser = userService.getById(uid);
                 walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
-                updateById(walletFlow);
             }
+
+            updateList.add(walletFlow);
             i++;
             log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
         }
-
+        dao.updateBatch(updateList);
     }
 }
