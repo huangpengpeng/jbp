@@ -50,7 +50,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://wkp2.cqrfkonij3bk.ap-southeast-1.rds.amazonaws.com:3306/qy?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://wkp2.cqrfkonij3bk.ap-southeast-1.rds.amazonaws.com:3306/qy?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     username: root
     password: smbs8888#
   # quartz
