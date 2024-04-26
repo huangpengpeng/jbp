@@ -155,7 +155,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     @Override
     public void init() {
         int i = 0;
-        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_"));
+        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_").last(" limit 10"));
 
         Map<Integer, User> uidMapList = userService.getUidMapList(list.stream().map(WalletFlow::getUid).collect(Collectors.toList()));
 
@@ -178,10 +178,9 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             i++;
             log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
         }
-        List<List<WalletFlow>> partition = Lists.partition(updateList, 500);
-        for (List<WalletFlow> walletFlows : partition) {
-            updateBatchById(walletFlows);
-        }
+        dao.updateBatch(updateList);
+
+        System.out.println(111);
 
     }
 }
