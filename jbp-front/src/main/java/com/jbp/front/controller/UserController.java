@@ -338,9 +338,9 @@ public class UserController {
         //判断是否邀请的用户
         if (ifregister && !ifInclude) {
             String wxConfig = environment.getProperty("platform.appId");
-            List<String> wxPlatforms = Arrays.asList(wxConfig.split(","));
-            List<String> platformsConfig = Arrays.asList(wxConfig.split(","));
-            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platformsConfig.get(wxPlatforms.indexOf(appId)));
+//            List<String> wxPlatforms = Arrays.asList(wxConfig.split(","));
+//            List<String> platformsConfig = Arrays.asList(wxConfig.split(","));
+            UserPlatformInfoResponse userPlatformInfoResponse = new UserPlatformInfoResponse();
             userPlatformInfoResponse.setInvite(true);
             userList.add(userPlatformInfoResponse);
         }
