@@ -39,7 +39,10 @@ public class JbpAdminApplication {
 
 
         TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
-//        groupThreeRetOneHandler.aa_3968();
+        groupThreeRetOneHandler.aa_3968();
+        groupThreeRetOneHandler.aa_15866();
+        groupThreeRetOneHandler.aa_3174_4();
+        groupThreeRetOneHandler.aa_12692_8();
 
 //        OrderService orderService = run.getBean(OrderService.class);
 //

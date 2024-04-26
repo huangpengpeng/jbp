@@ -116,10 +116,17 @@ public class TankStoreRelationAct {
                     "\t\n" +
                     "\t"
             );
+
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (156,191,196,239,241,285,287,313,323,328,331,349,357,377,426)"
+            );
+
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
+            Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
+
             ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
             threeBackOneInit.setAmt(new BigDecimal(3968));
-            threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue());
+            threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
             list.add(threeBackOneInit);
         }
 
@@ -128,6 +135,130 @@ public class TankStoreRelationAct {
     }
 
 
+
+
+    public void aa_15866() {
+
+        String name = "wkp42271043176625";
+
+        List<User> userList = userService.list(new QueryWrapper<>());
+        List<ThreeBackOneInit> list = new ArrayList<>();
+        for (User user : userList) {
+
+            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
+            if(userInvitation == null){
+                continue;
+            }
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
+                    "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`=" +userInvitation.getPId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.id IN (\n" +
+                    "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(274,275,286,312,324,327,329,351,352,353,354,359,370,425)\n" +
+                    "\t\t\t)"
+            );
+
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (274,275,286,312,324,327,329,351,352,353,354,359,370,425)"
+            );
+
+            Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
+            Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
+
+            ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+            threeBackOneInit.setAmt(new BigDecimal(15866));
+            threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
+            list.add(threeBackOneInit);
+        }
+
+        threeBackOneInitService.saveBatch(list);
+
+    }
+
+
+    public void aa_3174_4() {
+
+        String name = "wkp42271043176625";
+
+        List<User> userList = userService.list(new QueryWrapper<>());
+        List<ThreeBackOneInit> list = new ArrayList<>();
+        for (User user : userList) {
+
+            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
+            if(userInvitation == null){
+                continue;
+            }
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
+                    "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`=" +userInvitation.getPId() + "  AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28,36))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\n" +
+                    "\t\t\tAND o.id IN (\n" +
+                    "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(439,453)\n" +
+                    "\t\t\t)\n" +
+                    "\t"
+            );
+
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (439,453)"
+            );
+
+            Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
+            Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
+
+            ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+            threeBackOneInit.setAmt(new BigDecimal(3174.4));
+            threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
+            list.add(threeBackOneInit);
+        }
+
+        threeBackOneInitService.saveBatch(list);
+
+    }
+
+
+
+    public void aa_12692_8() {
+
+        String name = "wkp42271043176625";
+
+        List<User> userList = userService.list(new QueryWrapper<>());
+        List<ThreeBackOneInit> list = new ArrayList<>();
+        for (User user : userList) {
+
+            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
+            if(userInvitation == null){
+                continue;
+            }
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
+                    "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`={parentId} AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.id IN (\n" +
+                    "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(440,445)\n" +
+                    "\t\t\t)\n" +
+                    "\t"
+            );
+
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (440,445)"
+            );
+
+            Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
+            Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
+
+            ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+            threeBackOneInit.setAmt(new BigDecimal(12692.8));
+            threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
+            list.add(threeBackOneInit);
+        }
+
+        threeBackOneInitService.saveBatch(list);
+
+    }
 
 
 
