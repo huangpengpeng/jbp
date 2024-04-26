@@ -14,6 +14,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.dao.agent.WalletFlowDao;
@@ -156,9 +157,21 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
         int i = 0;
         List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_"));
 
+        Map<Integer, User> uidMapList = userService.getUidMapList(list.stream().map(WalletFlow::getUid).collect(Collectors.toList()));
+
+        Map<String, List<WalletFlow>> flowMap = FunctionUtil.valueMap(list, WalletFlow::getExternalNo);
+
         List<WalletFlow> updateList = Lists.newArrayList();
         for (WalletFlow walletFlow : list) {
+
+            List<WalletFlow> walletFlows = flowMap.get(walletFlow.getExternalNo());
             Integer uid = null;
+            for (WalletFlow flow : walletFlows) {
+                if (flow.getUid().intValue() != walletFlow.getUid().intValue()) {
+                    uid = flow.getUid();
+                }
+            }
+
             if (walletFlow.getAction().equals("收入")) {
                 WalletFlow f = getOne(new QueryWrapper<WalletFlow>().lambda().eq(WalletFlow::getAction, "支出").eq(WalletFlow::getExternalNo, walletFlow.getExternalNo()));
                 uid = f.getUid();
@@ -168,10 +181,8 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                 uid = f.getUid();
             }
 
-            if (uid != null) {
-                User receiveUser = userService.getById(uid);
-                walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
-            }
+            User receiveUser = uidMapList.get(uid);
+            walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
 
             updateList.add(walletFlow);
             i++;
