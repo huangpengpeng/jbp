@@ -180,7 +180,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
         }
         List<List<WalletFlow>> partition = Lists.partition(updateList, 1000);
         for (List<WalletFlow> walletFlows : partition) {
-            dao.updateBatch(updateList);
+            dao.updateBatch(walletFlows);
         }
 
     }
