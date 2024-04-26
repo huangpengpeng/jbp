@@ -25,7 +25,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="UserPlatformInfoResponse对象", description="用户各平台账号信息响应对象")
-public class UserPlatformInfoResponse implements Serializable {
+public class UserPlatformInfoResponse extends User {
 
     private static final long serialVersionUID = 1387727608277207652L;
 
