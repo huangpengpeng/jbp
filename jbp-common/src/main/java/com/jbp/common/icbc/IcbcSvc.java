@@ -15,9 +15,14 @@ import com.icbc.api.response.CardbusinessAggregatepayB2cOnlineRefundqryResponseV
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static io.netty.util.internal.StringUtil.byteToHexString;
 
 /**
  * 工行api
@@ -27,9 +32,9 @@ import java.util.Date;
 public class IcbcSvc {
 
     // 1、网关公钥
-    protected static final String APIGW_PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCwFgHD4kzEVPdOj03ctKM7KV+16bWZ5BMNgvEeuEQwfQYkRVwI9HFOGkwNTMn5hiJXHnlXYCX+zp5r6R52MY0O7BsTCLT7aHaxsANsvI9ABGx3OaTVlPB59M6GPbJh0uXvio0m1r/lTW3Z60RU6Q3oid/rNhP3CiNgg0W6O3AGqwIDAQAB";
+    protected static final String APIGW_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuCk62VzCuecgF7/g6H9v7xDM09JgvKHkMyW5ZnkCLKE3mtN+xKYSPsn3HfKlQAmEOqZoHAF5pzO0owU9KzOyi5nCN/+tlSHceX3oNDV4rEg/768RiuC2mJh+db83mWYqZzH/5g7oxWwLYmfIuzyMuW31o2rC2PgXwtnn6Zua1GrFOkz57eKJgn67Nv8NL6qM75jsOGuBAMx4dIGHYte3nR0wHhy//OAtE+rhqb2aF2nBC5O7A8pPbfnjMLEswqENhApWXyNDmj+wqFDmd4IBPnDukwgXno4MwmXnZdi/ZzGsuZNJpbRrPWn8rcicSF4B/IGbUTMXiYXBAS/oG+0MlQIDAQAB";
     // 2、密钥对认证方式，公钥在API平台登记，此处为私钥
-    protected static final String MY_PRIVATE_KEY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDfV8piJL/5Pc/ZdCMBcX1mVrLQo6rRBdqLOnYkU9xnVp1EdhMkx1wcP1BDWTo0SqupMFwZlsTH5t6ywdlD4sXvkyfCkuSSShg+ZGGLRKmDPoLOEP1KZ/SFwnIGb6hj30OXyhsmArVYfYr7qAlo0GqfQrDUAC2ZbasESLHlVvqMy48ssp2QcOPtZoWW/diQY1HJR+RMS9Kjg9oZr/dU5UloZQsDQVXmYBuAqU4RcBfEqV56dFu/suJkGrw0LenDPxI2QLJ5c51rkhx9lC7xBZigfWOnDLH6xoT1ChdcY9bP5xt/GjP5NYuI8xI2sGGTUPoUKxdrH6aiI9jp728+K1y5AgMBAAECggEAbJQsktwU7GHti2UXo5r+AOPDWQVIhQfYgHlyeCTA8Qg9usvAcM/u6tio96UIU+W9YKpfDB2tGxYVTEhLjOJRojAjU0fAkZIuCR8aAO/njSO1yeKekS7KxMCMWK6t6afgH4ok+qy0ZwnZqJC/ylIQk86DUv2nLYEQdCu3OKy5b/qZ1qA7yaCiG/D4HBThgiOifV2Yq1TCtvC2iv5mcuhH4iTXexeOQcbZepZlQnyXiVAlTYRAeo+ng8ub01NJZ4njPe9boKeqrpmMAOLN/gRTjh6yZ+90+hniXLgznOVPg+GxUbff8pVDd01POGVsid0f5Gr/TvEnixJV9nM70SCp0QKBgQD1C/oCC0mC9T8yZrrzkKZ5gsWpxElGYFvU/S1LdDsfGioRLLBJ8k4PvQcJN+pB1Ea2b8s01HQKWarXGYKQmu+dGsULbv9UpaVwH3Of+gt35Wo2+Fuh0bhcS58Ct41IGQh5leI5ckNq9iB9/x6zWQFeAEpUnXqIwFYkNCZIPbgmRQKBgQDpU3YAvKXDCesL9W4JhoWhyGBJ94frOq8hiH3vbr1xUpqDkJ9aovMDWy5f77E5Vuva/mEDxIpQrFTSA4clKj6T8E6CBiEMStP2DWLQsyC3AxDKv3g5lXab3IH4KtxjNCwadp+TRmRHWG09FLdt14AeS4El14xdhlGx6FsYncst5QKBgFBGHR9gTTOeXZaIOsQhZbe2lEQZ7hsk49BxI85tBBUbQB6iMhn3S4UyWkS10YLBJG0NUFc9JcpiN2oBjFkMuGQR6ezl7rTvErQZSYploi4jtFjPoUzwY+GwUCXWtWyh7rnN1O8WtGksudYspgUAqkb991uivwpfX5i6kLPnrBS1AoGALe8WXhLFd14ufc41eX6YND9kZWtrwK1u6OUcFdTxSqv+a0Q/evJ1cQW0XYKsmyM3j4dgxgMdT8B9elLjejeU1j8K1aIrQ2Y/0ELWX0vEdwMNfTywiHWaQhjpJVgaxxTwUc1koPPMrhcEem/npKI2QMCQjkifA5J75tBdjr0R0NkCgYEA1eUVZW1zEXB79xf2GREbPi1UeQVfIvTqOQK8fa3O0Xdrdd//BFHy44eqSrg5eG0t78wbFtkwYHUIbQZOd0L9qp6yPIk2bqldKoqUxiXPjGX4QR1XgenbWjc+cLr//EN2zRqTLrd3K2e0V/Hx+6cL14/0DB73Ma7oyZ6rMKR2JYU=";
+    protected static final String MY_PRIVATE_KEY = "MIIEpAIBAAKCAQEAuCk62VzCuecgF7/g6H9v7xDM09JgvKHkMyW5ZnkCLKE3mtN+xKYSPsn3HfKlQAmEOqZoHAF5pzO0owU9KzOyi5nCN/+tlSHceX3oNDV4rEg/768RiuC2mJh+db83mWYqZzH/5g7oxWwLYmfIuzyMuW31o2rC2PgXwtnn6Zua1GrFOkz57eKJgn67Nv8NL6qM75jsOGuBAMx4dIGHYte3nR0wHhy//OAtE+rhqb2aF2nBC5O7A8pPbfnjMLEswqENhApWXyNDmj+wqFDmd4IBPnDukwgXno4MwmXnZdi/ZzGsuZNJpbRrPWn8rcicSF4B/IGbUTMXiYXBAS/oG+0MlQIDAQABAoIBAQCaV0uP0bMM9Iwr+06169/WnuDbAay7Sn6i8xHPtMjCuJaOdoP+sSQHZWJqweoGojMkqEQGfKIFJEtWeNSL+XbAkqt4HRrQKqHJXGEYKFwrHx4edT2hg7TkbKFHc2tYb4xIElph58rjciqUXWCYsyVJXsOIIriL+FiJn/BCE3wOWsTZtjA6vwzoMlqrk0tZMsyQp9YMHVA5NTyacIF/hvzzLT1dHf0GE34VlT7lTuwr3Wm8VOdwg5g1OENKfkevU4cNszctjqBnWVMe";
     // 3、appid
     protected static final String APP_ID = "xxxxxxxxx";
 
@@ -47,6 +52,55 @@ public class IcbcSvc {
     // 工行appid
     private static final String ICBC_APP_ID="";
 
+    // 270606e0ec7002eb6ec4e82547a27673
+
+    public static void main(String[] args) {
+        getKey();
+    }
+    /**
+     * 随机生成秘钥
+     */
+    public static void getKey() {
+        try {
+            KeyGenerator kg = KeyGenerator.getInstance("AES");
+            kg.init(128);
+            //要生成多少位，只需要修改这里即可128, 192或256
+            SecretKey sk = kg.generateKey();
+            byte[] b = sk.getEncoded();
+            String s = byteToHexString(b);
+            System.out.println(s);
+            System.out.println("十六进制密钥长度为"+s.length());
+            System.out.println("二进制密钥的长度为"+s.length()*4);
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            System.out.println("没有此算法。");
+        }
+    }
+
+    /**
+     * byte数组转化为16进制字符串
+     * @param bytes
+     * @return
+     */
+    public static String byteToHexString(byte[] bytes) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            String strHex=Integer.toHexString(bytes[i]);
+            if(strHex.length() > 3) {
+                sb.append(strHex.substring(6));
+            } else {
+                if(strHex.length() < 2) {
+                    sb.append("0" + strHex);
+                } else {
+                    sb.append(strHex);
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+
 
     /**
      * 线上POS聚合消费下单接口
@@ -55,7 +109,7 @@ public class IcbcSvc {
      */
     public void payOrder(String orderId, String payMode, String goodsName, String userIp, BigDecimal orderAmount) {
         //1.请求客户端
-        DefaultIcbcClient client = new DefaultIcbcClient(APP_ID, IcbcConstants.SIGN_TYPE_RSA, MY_PRIVATE_KEY, APIGW_PUBLIC_KEY);
+        DefaultIcbcClient client = new DefaultIcbcClient(APP_ID, IcbcConstants.SIGN_TYPE_RSA2, MY_PRIVATE_KEY, APIGW_PUBLIC_KEY);
         // 2.返回结果
         CardbusinessAggregatepayB2cOnlineConsumepurchaseRequestV1 request = new CardbusinessAggregatepayB2cOnlineConsumepurchaseRequestV1();
         // 3.请求url
