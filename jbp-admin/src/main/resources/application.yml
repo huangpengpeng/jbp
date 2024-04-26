@@ -39,4 +39,4 @@
 
   spring:
     profiles:
-      active: qy
+      active: sm

@@ -3,6 +3,7 @@ package com.jbp.admin;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
+import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.model.user.User;
 import com.jbp.service.product.comm.GroupThreeRetOneHandler;
 import com.jbp.service.service.OrderService;
@@ -48,10 +49,9 @@ public class JbpAdminApplication {
 //
 //        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT434171379135267789373"),null);
 
-
-
-
-
+//        OrderPaySuccessTask bean1 = run.getBean(OrderPaySuccessTask.class);
+//
+//        bean1.orderPayAfter();
     }
 
 
