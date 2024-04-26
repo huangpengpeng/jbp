@@ -318,7 +318,12 @@ public class UserController {
         List<UserPlatformInfoResponse> userList = new ArrayList<>();
         String dbName = environment.getProperty("platform.dbName");
         if(StringUtils.isBlank(dbName)){
-            return CommonResult.success();
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(mobile);
+            if(userPlatformInfoResponse == null){
+                return CommonResult.success();
+            }
+            userList.add(userPlatformInfoResponse);
+            return CommonResult.success(userList);
         }
         String[] platforms = dbName.split(",");
         for (String platform : platforms) {
