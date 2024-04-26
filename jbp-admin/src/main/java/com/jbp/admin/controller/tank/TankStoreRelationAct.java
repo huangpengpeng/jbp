@@ -98,6 +98,7 @@ public class TankStoreRelationAct {
 
         List<User> userList = userService.list(new QueryWrapper<>());
         List<ThreeBackOneInit> list = new ArrayList<>();
+        int i = 0;
         for (User user : userList) {
 
             UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
@@ -128,6 +129,8 @@ public class TankStoreRelationAct {
             threeBackOneInit.setAmt(new BigDecimal(3968));
             threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
             list.add(threeBackOneInit);
+            i++;
+            log.info("3968"+i);
         }
 
         threeBackOneInitService.saveBatch(list);
@@ -140,7 +143,7 @@ public class TankStoreRelationAct {
     public void aa_15866() {
 
         String name = "wkp42271043176625";
-
+    int i = 0;
         List<User> userList = userService.list(new QueryWrapper<>());
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
@@ -170,6 +173,8 @@ public class TankStoreRelationAct {
             threeBackOneInit.setAmt(new BigDecimal(15866));
             threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
             list.add(threeBackOneInit);
+            i++;
+            log.info("15866"+i);
         }
 
         threeBackOneInitService.saveBatch(list);
@@ -180,7 +185,7 @@ public class TankStoreRelationAct {
     public void aa_3174_4() {
 
         String name = "wkp42271043176625";
-
+int i=0;
         List<User> userList = userService.list(new QueryWrapper<>());
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
@@ -212,6 +217,8 @@ public class TankStoreRelationAct {
             threeBackOneInit.setAmt(new BigDecimal(3174.4));
             threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
             list.add(threeBackOneInit);
+            i++;
+            log.info("3174.4"+i);
         }
 
         threeBackOneInitService.saveBatch(list);
@@ -224,6 +231,7 @@ public class TankStoreRelationAct {
 
         String name = "wkp42271043176625";
 
+        int i = 0;
         List<User> userList = userService.list(new QueryWrapper<>());
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
@@ -254,6 +262,8 @@ public class TankStoreRelationAct {
             threeBackOneInit.setAmt(new BigDecimal(12692.8));
             threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
             list.add(threeBackOneInit);
+            i++;
+            log.info("12692.8"+i);
         }
 
         threeBackOneInitService.saveBatch(list);
