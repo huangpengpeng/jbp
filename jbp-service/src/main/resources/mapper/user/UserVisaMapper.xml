@@ -6,11 +6,11 @@
 
 
 			select * from (
-		select *,"sm" as platform from wkp42271043176625.uservisa
+		select *,"sm" as platform from sm.eb_user_visa
 		union
-		select *,"yk" as platform from jymall.uservisa
+		select *,"yk" as platform from yk.eb_user_visa
 		) as a
-		where a.taskId = #{signTaskId}
+		where a.task_id = #{signTaskId}
     </select>
     <select id="getAdminPageList" resultType="com.jbp.common.response.UserVisaRecordResponse">
 

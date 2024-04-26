@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -43,7 +45,7 @@ public class UserVisaOrder extends BaseModel {
     private String vitalityId;
 
     @ApiModelProperty(value = "合同签订时间")
-    private String signTime;
+    private Date signTime;
 
     @ApiModelProperty(value = "申请时间")
     private String applyTime;

@@ -1,29 +1,19 @@
 package com.jbp.front.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasc.open.api.bean.base.BaseReq;
 import com.fasc.open.api.bean.base.BaseRes;
-import com.fasc.open.api.bean.base.HttpInfoRes;
 import com.fasc.open.api.bean.common.Actor;
 import com.fasc.open.api.bean.common.OpenId;
 import com.fasc.open.api.config.HttpConfig;
 import com.fasc.open.api.exception.ApiException;
-import com.fasc.open.api.utils.http.HttpUtil;
-import com.fasc.open.api.utils.json.ParameterizedTypeBaseRes;
 import com.fasc.open.api.v5_1.client.OpenApiClient;
 import com.fasc.open.api.v5_1.client.ServiceClient;
 import com.fasc.open.api.v5_1.client.SignTaskClient;
-import com.fasc.open.api.v5_1.client.TemplateClient;
 import com.fasc.open.api.v5_1.req.signtask.*;
-import com.fasc.open.api.v5_1.req.template.SignTemplateDetailReq;
-import com.fasc.open.api.v5_1.req.voucher.VoucherSignTaskCreateReq;
 import com.fasc.open.api.v5_1.res.service.AccessTokenRes;
 import com.fasc.open.api.v5_1.res.signtask.CreateSignTaskRes;
 import com.fasc.open.api.v5_1.res.signtask.SignTaskActorGetUrlRes;
-import com.fasc.open.api.v5_1.res.template.AppSignTemplateDetailRes;
-import com.fasc.open.api.v5_1.res.template.SignTemplateDetailRes;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.UserVisa;
@@ -31,26 +21,23 @@ import com.jbp.common.model.user.UserVisaOrder;
 import com.jbp.common.request.UserViseSaveRequest;
 import com.jbp.common.response.UserVisaResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.UserVisaOrderService;
 import com.jbp.service.service.UserVisaService;
-
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import jodd.http.HttpRequest;
-import jodd.http.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.util.*;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -69,8 +56,6 @@ public class UserVisaController {
     private ChannelIdentityService channelIdentityService;
     @Autowired
     private SystemConfigService systemConfigService;
-
-
 
 
     @ApiOperation(value = "增加用户签署法大大", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -131,7 +116,7 @@ public class UserVisaController {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         channelName = StringUtils.isEmpty(channelName) ? "平台" : channelName;
         ChannelIdentity channelIdentity = channelIdentityService.getByUser(userService.getUserId(), channelName);
-        if(channelIdentity == null){
+        if (channelIdentity == null) {
             throw new CrmebException("未开户，请先去开户");
         }
         channelIdentity.setRealName(userViseSaveRequest.getRealName());
@@ -248,7 +233,7 @@ public class UserVisaController {
         UserVisa userVisa = userVisaService.getById(userVisaOrders.getVisaId());
 
         ChannelIdentity channelIdentity = channelIdentityService.getByUser(userService.getUserId(), channelName);
-        if(channelIdentity == null){
+        if (channelIdentity == null) {
             throw new CrmebException("未开户，请先去开户");
         }
         channelIdentity.setRealName(userViseSaveRequest.getRealName());
@@ -384,11 +369,20 @@ public class UserVisaController {
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
-                    platfrom = "wkp42271043176625";
+                    platfrom = "sm";
                 } else if (userVisa.getPlatfrom().equals("yk")) {
-                    platfrom = "jymall";
+                    platfrom = "yk";
                 }
                 userVisaService.updateVisa(userVisa.getId(), platfrom);
+
+                UserVisaOrder userVisaOrder = userVisaOrderService.getOne(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getVisaId, userVisa.getId()));
+                if (userVisaOrder != null) {
+                    userVisaOrder.setSignTime(DateTimeUtils.getNow());
+                    userVisaOrderService.updateById(userVisaOrder);
+
+                }
+
+
             }
         }
         ;
