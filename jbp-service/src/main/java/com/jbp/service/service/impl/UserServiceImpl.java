@@ -952,8 +952,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public UserPlatformInfoResponse getUserPlatfromInfo(String mobile) {
-        return   dao.getUserPlatfromInfo2(mobile);
+    public UserPlatformInfoResponse getPlatfromInfo() {
+        return   dao.getPlatfromInfo();
     }
 
     /**

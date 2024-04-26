@@ -33,5 +33,5 @@ public interface UserDao extends BaseMapper<User> {
 
     UserPlatformInfoResponse getUserPlatfromInfo(@Param("phone")String phone, @Param("dbName")String dbName);
 
-    UserPlatformInfoResponse getUserPlatfromInfo2(@Param("phone")String phone);
+    UserPlatformInfoResponse getPlatfromInfo();
 }

@@ -403,7 +403,7 @@ public interface UserService extends IService<User> {
 
     UserPlatformInfoResponse getUserPlatfromInfo(String dbName,String mobile);
 
-    UserPlatformInfoResponse getUserPlatfromInfo(String mobile);
+    UserPlatformInfoResponse getPlatfromInfo();
 
     User register(String username, String phone, String account, Boolean ifOpenShop);
 

@@ -318,12 +318,7 @@ public class UserController {
         List<UserPlatformInfoResponse> userList = new ArrayList<>();
         String dbName = environment.getProperty("platform.dbName");
         if(StringUtils.isBlank(dbName)){
-            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(mobile);
-            if(userPlatformInfoResponse == null){
-                return CommonResult.success();
-            }
-            userList.add(userPlatformInfoResponse);
-            return CommonResult.success(userList);
+            return CommonResult.success();
         }
         String[] platforms = dbName.split(",");
         for (String platform : platforms) {
@@ -337,10 +332,7 @@ public class UserController {
         Boolean ifInclude = userList.stream().anyMatch(dto -> dto.getAppId().equals(appId));
         //判断是否邀请的用户
         if (ifregister && !ifInclude) {
-            String wxConfig = environment.getProperty("platform.appId");
-//            List<String> wxPlatforms = Arrays.asList(wxConfig.split(","));
-//            List<String> platformsConfig = Arrays.asList(wxConfig.split(","));
-            UserPlatformInfoResponse userPlatformInfoResponse = new UserPlatformInfoResponse();
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getPlatfromInfo();
             userPlatformInfoResponse.setInvite(true);
             userList.add(userPlatformInfoResponse);
         }
