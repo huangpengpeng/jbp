@@ -178,6 +178,10 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             i++;
             log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
         }
-        dao.updateBatch(updateList);
+        List<List<WalletFlow>> partition = Lists.partition(updateList, 1000);
+        for (List<WalletFlow> walletFlows : partition) {
+            dao.updateBatch(updateList);
+        }
+
     }
 }
