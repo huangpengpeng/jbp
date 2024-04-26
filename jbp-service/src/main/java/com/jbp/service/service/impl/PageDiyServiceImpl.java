@@ -272,7 +272,7 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
                 JSONObject jsonObject2 =  jsonObject.getJSONObject(key);
                 JSONObject jsonObject1 =  jsonObject2.getJSONObject("showLimitTemp");
                 if(jsonObject1 != null){
-                   if(StringUtils.isNotBlank(jsonObject1.getString("activeValue")) && !tempIds.contains(jsonObject1.getLongValue("activeValue"))){
+                   if( StringUtils.isNotBlank(jsonObject1.getString("activeValue"))  && !jsonObject1.getString("activeValue").equals("[]") && !tempIds.contains(jsonObject1.getLongValue("activeValue"))){
                        jsonValue.remove(key);
                    }
 
