@@ -118,7 +118,7 @@ public class TankStoreRelationAct {
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (156,191,196,239,241,285,287,313,323,328,331,349,357,377,426)"
             );
 
@@ -162,7 +162,7 @@ public class TankStoreRelationAct {
                     "\t\t\t)"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (274,275,286,312,324,327,329,351,352,353,354,359,370,425)"
             );
 
@@ -206,7 +206,7 @@ int i=0;
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (439,453)"
             );
 
@@ -251,7 +251,7 @@ int i=0;
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (440,445)"
             );
 
