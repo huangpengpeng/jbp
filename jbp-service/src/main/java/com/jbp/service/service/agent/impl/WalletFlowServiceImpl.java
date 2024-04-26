@@ -165,7 +165,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
         for (WalletFlow walletFlow : list) {
 
             List<WalletFlow> walletFlows = flowMap.get(walletFlow.getExternalNo());
-            Integer uid = null;
+            Integer uid = walletFlow.getUid();
             for (WalletFlow flow : walletFlows) {
                 if (flow.getUid().intValue() != walletFlow.getUid().intValue()) {
                     uid = flow.getUid();
