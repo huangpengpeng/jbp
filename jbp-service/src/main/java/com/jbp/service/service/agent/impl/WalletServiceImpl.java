@@ -153,8 +153,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         String externalNo = StringUtils.N_TO_10("ZZ_");
         User receiveUser = userService.getById(receiveUserId);
         User user = userService.getById(uid);
-        reduce(uid, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript + "【接收账户:" + receiveUser.getAccount() + "】");
-        increase(receiveUserId, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript + "【转出账户:" + user.getAccount() + "】");
+        reduce(uid, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
+        increase(receiveUserId, type, amt, WalletFlow.OperateEnum.转账.name(), externalNo, postscript + "【对手账户:" + user.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
         return true;
     }
 

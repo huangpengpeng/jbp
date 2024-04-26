@@ -22,4 +22,6 @@ public interface WalletFlowService extends IService<WalletFlow> {
     List<WalletFlow> details(Integer uid, String action);
 
     List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action);
+
+    void init();
 }
