@@ -12,6 +12,7 @@ import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.RelationScoreFlow;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -23,9 +24,7 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.RelationScoreVo;
 import com.jbp.service.dao.agent.RelationScoreDao;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.RelationScoreFlowService;
-import com.jbp.service.service.agent.RelationScoreService;
-import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.BeanUtils;
@@ -49,6 +48,10 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     private RelationScoreFlowService relationScoreFlowService;
     @Resource
     private UserRelationService userRelationService;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private CapaService capaService;
 
     @Override
     public RelationScore getByUser(Integer uId, Integer node) {
@@ -223,6 +226,28 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         public RelationScoreResponse getUserResult() {
             RelationScoreResponse relationScoreResponse = new RelationScoreResponse();
             User user = userService.getInfo();
+
+
+            UserRelation userRelation = userRelationService.getByPid(user.getId(), 0);
+            UserRelation userRelation2 = userRelationService.getByPid(user.getId(), 1);
+
+            if(userRelation!= null) {
+                User user1 = userService.getById(userRelation.getUId()) ;
+                UserCapa userCapa = userCapaService.getByUser(userRelation.getUId());
+
+                relationScoreResponse.setNickname(user1.getNickname());
+                relationScoreResponse.setAccount(user1.getAccount());
+                relationScoreResponse.setUserUrl(user1.getAvatar());
+                relationScoreResponse.setCapaImg(userCapa.getCapaUrl());
+            }
+            if(userRelation2!= null) {
+                User user1 = userService.getById(userRelation2.getUId()) ;
+                UserCapa userCapa = userCapaService.getByUser(userRelation2.getUId());
+                relationScoreResponse.setNickname2(user1.getNickname());
+                relationScoreResponse.setAccount2(user1.getAccount());
+                relationScoreResponse.setUserUrl2(user1.getAvatar());
+                relationScoreResponse.setCapaImg2(userCapa.getCapaUrl());
+            }
 
             RelationScore relationScore = getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, user.getId()).eq(RelationScore::getNode,0));
 

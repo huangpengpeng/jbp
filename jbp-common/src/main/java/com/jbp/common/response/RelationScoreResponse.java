@@ -39,4 +39,14 @@ public class RelationScoreResponse implements Serializable {
     private String nickname2;
     @ApiModelProperty(value = "二区账号")
     private String account2;
+
+    @ApiModelProperty(value = "一区头像")
+    private String userUrl;
+    @ApiModelProperty(value = "一区等级图标")
+    private String capaImg;
+
+    @ApiModelProperty(value = "二区头像")
+    private String userUrl2;
+    @ApiModelProperty(value = "二区等级图标")
+    private String capaImg2;
 }
