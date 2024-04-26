@@ -112,13 +112,13 @@
     </select>
     <select id="getUserPlatfromInfo" resultType="com.jbp.common.response.UserPlatformInfoResponse">
 			select  *,( select  value as platfornLogo from ${dbName}.eb_system_config  where name = 'mobile_top_logo' ) as imgUrl ,
-			(select  value as platform from ${dbName}.eb_system_config  where name = 'site_name' ) as platform ,(select  value as appId from  ${dbName}.eb_system_config  where name = 'routine_appid') as appId from ${dbName}.eb_user where phone = #{phone}
+			(select  value as platform from ${dbName}.eb_system_config  where name = 'site_name' ) as platform ,(select  value as appId from  ${dbName}.eb_system_config  where name = 'wechat_app_appid') as appId from ${dbName}.eb_user where phone = #{phone}
 
     </select>
     <select id="getUserPlatfromInfo2" resultType="com.jbp.common.response.UserPlatformInfoResponse">
 
         	select  *,( select  value as platfornLogo from eb_system_config  where name = 'mobile_top_logo' ) as imgUrl ,
-			(select  value as platform from eb_system_config  where name = 'site_name' ) as platform ,(select  value as appId from  eb_system_config  where name = 'routine_appid') as appId from eb_user where phone = #{phone}
+			(select  value as platform from eb_system_config  where name = 'site_name' ) as platform ,(select  value as appId from  eb_system_config  where name = 'wechat_app_appid') as appId from eb_user where phone = #{phone}
 
 
     </select>
