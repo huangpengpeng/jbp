@@ -171,16 +171,6 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                     uid = flow.getUid();
                 }
             }
-
-            if (walletFlow.getAction().equals("收入")) {
-                WalletFlow f = getOne(new QueryWrapper<WalletFlow>().lambda().eq(WalletFlow::getAction, "支出").eq(WalletFlow::getExternalNo, walletFlow.getExternalNo()));
-                uid = f.getUid();
-            }
-            if (walletFlow.getAction().equals("支出")) {
-                WalletFlow f = getOne(new QueryWrapper<WalletFlow>().lambda().eq(WalletFlow::getAction, "收入").eq(WalletFlow::getExternalNo, walletFlow.getExternalNo()));
-                uid = f.getUid();
-            }
-
             User receiveUser = uidMapList.get(uid);
             walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
 
