@@ -126,7 +126,7 @@ public class TankStoreRelationAct {
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
 
 
-            if(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue() >0){
+            if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0){
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
                 threeBackOneInit.setAmt(new BigDecimal(3968));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
@@ -172,7 +172,7 @@ public class TankStoreRelationAct {
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
-            if(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue() >0) {
+            if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
                 threeBackOneInit.setAmt(new BigDecimal(15866));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
@@ -217,7 +217,7 @@ int i=0;
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
-            if(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue() >0) {
+            if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
                 threeBackOneInit.setAmt(new BigDecimal(3174.4));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
@@ -263,7 +263,7 @@ int i=0;
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
-            if(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue() >0) {
+            if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
                 threeBackOneInit.setAmt(new BigDecimal(12692.8));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
