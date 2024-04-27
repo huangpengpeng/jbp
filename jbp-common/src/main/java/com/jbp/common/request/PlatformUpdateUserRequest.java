@@ -53,20 +53,20 @@ public class PlatformUpdateUserRequest implements Serializable {
     @ApiModelProperty(value = "是否开店")
     private Boolean openShop;
 
-    public void setPhone(String phone) {
-        if (phone != null && phone.matches("^1\\d{2}\\*{4}\\d{4}$")) {
-            // 如果是假数据，则将其设置为null
-            this.phone = null;
-        } else if (isValidPhoneNumber(phone)) {
-            // 如果手机号码格式正确，则将其设置为输入的值
-            this.phone = phone;
-        } else {
-            throw new CrmebException("手机号格式错误");
-        }
-    }
+//    public void setPhone(String phone) {
+//        if (phone != null && phone.matches("^1\\d{2}\\*{4}\\d{4}$")) {
+//            // 如果是假数据，则将其设置为null
+//         //   this.phone = null;
+//        } else if (isValidPhoneNumber(phone)) {
+//            // 如果手机号码格式正确，则将其设置为输入的值
+//            this.phone = phone;
+//        } else {
+//            throw new CrmebException("手机号格式错误");
+//        }
+//    }
 
-    private boolean isValidPhoneNumber(String phone) {
-        // 此处可以编写更复杂的逻辑以验证手机号格式，例如正则表达式等
-        return phone != null && phone.matches("^(?:1[3-9]\\d{9}|)$");
-    }
+//    private boolean isValidPhoneNumber(String phone) {
+//        // 此处可以编写更复杂的逻辑以验证手机号格式，例如正则表达式等
+//        return phone != null && phone.matches("^(?:1[3-9]\\d{9}|)$");
+//    }
 }
