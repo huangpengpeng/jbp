@@ -1429,8 +1429,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             productProfitChain.orderRefund(order, refundOrder);
 
             //退还销售积分
-            List<InvitationScoreFlow> list = invitationScoreFlowService.list(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getOrderNo()));
-            invitationScoreFlowService.remove(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getOrderNo()));
+            List<InvitationScoreFlow> list = invitationScoreFlowService.list(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getPlatOrderNo()));
+            invitationScoreFlowService.remove(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getPlatOrderNo()));
             if(!list.isEmpty()){
                 for(InvitationScoreFlow invitationScoreFlow : list){
                     InvitationScore invitationScore  =   invitationScoreService.getByUser(invitationScoreFlow.getUid());
