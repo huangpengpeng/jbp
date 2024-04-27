@@ -36,10 +36,7 @@ import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.product.profit.ProductProfitHandler;
 import com.jbp.service.service.*;
 
-import com.jbp.service.service.agent.InvitationScoreFlowService;
-import com.jbp.service.service.agent.InvitationScoreService;
-import com.jbp.service.service.agent.PlatformWalletService;
-import com.jbp.service.service.agent.ProductProfitService;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +114,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private InvitationScoreFlowService invitationScoreFlowService;
     @Autowired
     private InvitationScoreService invitationScoreService;
+    @Autowired
+    private SelfScoreService selfScoreService;
+    @Autowired
+    private SelfScoreFlowService selfScoreFlowService;
+
     /**
      * 商户端退款订单分页列表
      *
@@ -1434,11 +1436,25 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             if(!list.isEmpty()){
                 for(InvitationScoreFlow invitationScoreFlow : list){
                     InvitationScore invitationScore  =   invitationScoreService.getByUser(invitationScoreFlow.getUid());
-                    BigDecimal score = invitationScore.getScore().multiply(invitationScoreFlow.getScore());
+                    BigDecimal score = invitationScore.getScore().subtract(invitationScoreFlow.getScore());
                     invitationScore.setScore(score);
                     invitationScoreService.updateById(invitationScore);
                 }
             }
+
+            //退还个人业绩
+            List<SelfScoreFlow> selfList = selfScoreFlowService.list(new QueryWrapper<SelfScoreFlow>().lambda().eq(SelfScoreFlow::getOrdersSn,order.getPlatOrderNo()));
+            selfScoreFlowService.remove(new QueryWrapper<SelfScoreFlow>().lambda().eq(SelfScoreFlow::getOrdersSn,order.getPlatOrderNo()));
+
+            if(!selfList.isEmpty()){
+                for(SelfScoreFlow selfScoreFlow : selfList){
+                    SelfScore selfScore = selfScoreService.getByUser(selfScoreFlow.getUid());
+                    BigDecimal score = selfScore.getScore().subtract(selfScoreFlow.getScore());
+                    selfScore.setScore(score);
+                    selfScoreService.updateById(selfScore);
+                }
+            }
+
 
             productCommChain.orderRefundIntercept(order);
 
