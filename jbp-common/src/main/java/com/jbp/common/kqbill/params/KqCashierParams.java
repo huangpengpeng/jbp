@@ -64,6 +64,8 @@ public class KqCashierParams {
     //商品名称，不可为空。
     private String productName;
 
+    private String ext1;
+
     //支付方式，一般为00
     private String payType = "00";
 

@@ -85,14 +85,18 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     @Override
     public void validBand(Integer uId, Integer pId, Integer operateId, Integer node) {
         if (uId.intValue() == pId.intValue()) {
-            throw new RuntimeException("自己不能绑定自己");
+            User user = userService.getById(uId);
+            throw new RuntimeException("自己不能绑定自己:"+ user.getAccount());
         }
         UserRelation receiverUser = getByPid(pId, node);
         if (receiverUser != null) {
-            throw new RuntimeException("服务人节点被占用:账号为" + pId + "点位:" + node);
+            User user = userService.getById(pId);
+            throw new RuntimeException("服务人节点被占用:账号为" + user.getAccount() + "点位:" + node);
         }
         if (hasChild(pId, uId)) {
-            throw new RuntimeException("接受人不能是被安置人的下级, 被安置人:" + uId + "接受人:" + pId);
+            User user = userService.getById(uId);
+            User puser = userService.getById(pId);
+            throw new RuntimeException("接受人不能是被安置人的下级, 被安置人:" + user.getAccount() + "接受人:" + puser.getAccount());
         }
         if (operateId != null) {
             if (!hasChild(pId, operateId)) {

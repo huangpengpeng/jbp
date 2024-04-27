@@ -40,3 +40,4 @@
   spring:
     profiles:
       active: sm
+

@@ -33,8 +33,6 @@ import java.util.Map;
 public class MonthExtCommHandler extends AbstractProductCommHandler {
 
     @Resource
-    private ProductCommConfigService productCommConfigService;
-    @Resource
     private ProductCommService productCommService;
     @Resource
     private ClearingFinalService clearingFinalService;
@@ -106,7 +104,7 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
                 totalScore = totalScore.add(realScore);
             }
         }
-
+        totalScore = totalScore.multiply(BigDecimal.valueOf(0.1));
         if (ArithmeticUtils.lessEquals(totalScore, BigDecimal.ZERO)) {
             log.error(clearingFinal.getName() + "结算积分为0");
             clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
@@ -122,7 +120,7 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
             clearingFinalService.updateById(clearingFinal);
         }
         // 一份多少钱
-        BigDecimal divide = totalScore.divide(sum, 2, BigDecimal.ROUND_UP);
+        BigDecimal divide = totalScore.divide(sum, 2, BigDecimal.ROUND_DOWN);
         // 明细
         List<ClearingBonusFlow> clearingBonusFlowList = Lists.newArrayList();
         // 个人佣金汇总
@@ -135,7 +133,7 @@ public class MonthExtCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.lessEquals(weight, BigDecimal.ZERO)) {
                 continue;
             }
-            BigDecimal commFee = divide.multiply(weight).setScale(2, BigDecimal.ROUND_UP);
+            BigDecimal commFee = divide.multiply(weight).setScale(2, BigDecimal.ROUND_DOWN);
             totalFee = totalFee.add(commFee);
             // 新增明细
             JSONObject json = new JSONObject();

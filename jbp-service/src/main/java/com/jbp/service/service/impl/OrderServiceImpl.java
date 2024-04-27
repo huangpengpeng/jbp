@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
@@ -1202,12 +1203,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     @Override
     public List<Order> getSuccessList(Date startTime, Date endTime) {
         LambdaQueryWrapper<Order> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(Order::getPaid, true)
-                .eq(Order::getLevel, 0)
-                .eq(Order::getRefundStatus, 0)
-                .ge(Order::getPayTime, startTime)
-                .lt(Order::getPayTime, endTime);
-        return list(lqw);
+        lqw.eq(Order::getPaid, true).ge(Order::getPayTime, startTime).lt(Order::getPayTime, endTime);
+        List<Order> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return list;
+        }
+        // 退款商户订单过滤出来
+        List<String> refundList = list.stream().filter(o -> Integer.valueOf(1).equals(o.getLevel()) && !Integer.valueOf(0).equals(o.getRefundStatus())).map(Order::getPlatOrderNo).collect(Collectors.toList());
+        //  支付成功的平台订单 商户订单没有退款
+        List<Order> platList = list.stream().filter(o -> Integer.valueOf(0).equals(o.getLevel()) && !refundList.contains(o.getOrderNo())).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(platList) ? Lists.newArrayList() : platList;
     }
 
     /**

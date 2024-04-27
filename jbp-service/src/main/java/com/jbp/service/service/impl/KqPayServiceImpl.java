@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -66,7 +68,8 @@ public class KqPayServiceImpl implements KqPayService {
         params.setTdpformName(URLEncoder.encode(kpInfo.getApplyName()));
         params.setOrderId(orderId);
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
-        params.setProductName(productName);
+        params.setProductName(formatStr(productName));
+        params.setExt1(kpInfo.getApplyName());
         params.setOrderTime(DateTimeUtils.format(orderTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         params.setOrderTimestamp(params.getOrderTime());
 
@@ -98,6 +101,9 @@ public class KqPayServiceImpl implements KqPayService {
             }
             JSONObject jsonObject = JSONObject.parseObject(s);
             JSONObject responseBody = jsonObject.getJSONObject("responseBody");
+            if(responseBody == null){
+                return null;
+            }
             JSONArray resultList = responseBody.getJSONArray("resultList");
             if (resultList == null || resultList.isEmpty()) {
                 return null;
@@ -206,6 +212,7 @@ public class KqPayServiceImpl implements KqPayService {
         signMsgVal = appendParam(signMsgVal, "orderTime", params.getOrderTime());
         signMsgVal = appendParam(signMsgVal, "orderTimestamp", params.getOrderTimestamp());
         signMsgVal = appendParam(signMsgVal, "productName", params.getProductName());
+        signMsgVal = appendParam(signMsgVal, "ext1", params.getExt1());
         signMsgVal = appendParam(signMsgVal, "payType", params.getPayType());
         signMsgVal = appendParam(signMsgVal, "redoFlag", params.getRedoFlag());
         signMsgVal = appendParam(signMsgVal, "mobileGateway", params.getMobileGateway());
@@ -224,5 +231,18 @@ public class KqPayServiceImpl implements KqPayService {
         }
         return returns;
     }
+
+    private String formatStr(String str){
+        String regEx="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
+        String aa = "";//这里是将特殊字符换为aa字符串,""代表直接去掉
+
+        Pattern p = Pattern.compile(regEx);
+
+        Matcher m = p.matcher("UA1290益生菌固体饮料+UJA1290石榴饮");//这里把想要替换的字符串传进来
+
+        String newString = m.replaceAll(aa).trim();
+        return newString;
+    }
+
 
 }

@@ -155,7 +155,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                 if (clearingUser != null) {
                     Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                     if (rule.getUnderRelationNum() >= flow.getLevel().intValue()) {
-                        BigDecimal commFee = orderScore.multiply(rule.getUnderScale()).setScale(2, BigDecimal.ROUND_UP);
+                        BigDecimal commFee = orderScore.multiply(rule.getUnderScale()).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(commFee, BigDecimal.ZERO)) {
                             ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(flow.getPId(), clearingUser.getAccountNo(),
                                     clearingUser.getLevel(), clearingUser.getLevelName(),
@@ -179,7 +179,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                 if (clearingUser != null) {
                     Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
                     if (rule.getUnderInvitationNum() >= flow.getLevel().intValue()) {
-                        BigDecimal commFee = orderScore.multiply(rule.getUnderScale()).setScale(2, BigDecimal.ROUND_UP);
+                        BigDecimal commFee = orderScore.multiply(rule.getUnderScale()).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(commFee, BigDecimal.ZERO)) {
                             ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(flow.getPId(), clearingUser.getAccountNo(),
                                     clearingUser.getLevel(), clearingUser.getLevelName(),
@@ -221,7 +221,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     }
 
                     if (CollectionUtils.isNotEmpty(usableList)) {
-                        BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_UP);
+                        BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                             for (ClearingUser clearingUser : usableList) {
                                 ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
@@ -261,7 +261,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                         }
                     }
                     if (CollectionUtils.isNotEmpty(usableList)) {
-                        BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_UP);
+                        BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                             for (ClearingUser clearingUser : usableList) {
                                 ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),

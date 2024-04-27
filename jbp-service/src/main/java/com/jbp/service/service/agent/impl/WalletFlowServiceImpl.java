@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -14,6 +15,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.dao.agent.WalletFlowDao;
@@ -22,6 +24,7 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -34,15 +37,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow> implements WalletFlowService {
     @Resource
-    WalletConfigService walletConfigService;
+    private WalletConfigService walletConfigService;
     @Resource
     UserService userService;
     @Resource
     SystemConfigService systemConfigService;
+    @Resource
+    private WalletFlowDao dao;
 
     @Override
     public WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
@@ -157,4 +163,36 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
         } while (true);
         return result;
     }
+//
+//    @Override
+//    public void init() {
+//        int i = 0;
+//        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_").last(" limit 10"));
+//
+//        Map<Integer, User> uidMapList = userService.getUidMapList(list.stream().map(WalletFlow::getUid).collect(Collectors.toList()));
+//
+//        Map<String, List<WalletFlow>> flowMap = FunctionUtil.valueMap(list, WalletFlow::getExternalNo);
+//
+//        List<WalletFlow> updateList = Lists.newArrayList();
+//        for (WalletFlow walletFlow : list) {
+//
+//            List<WalletFlow> walletFlows = flowMap.get(walletFlow.getExternalNo());
+//            Integer uid = walletFlow.getUid();
+//            for (WalletFlow flow : walletFlows) {
+//                if (flow.getUid().intValue() != walletFlow.getUid().intValue()) {
+//                    uid = flow.getUid();
+//                }
+//            }
+//            User receiveUser = uidMapList.get(uid);
+//            walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
+//
+//            updateList.add(walletFlow);
+//            i++;
+//            log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
+//        }
+//        dao.updateBatch(updateList);
+//
+//        System.out.println(111);
+//
+//    }
 }

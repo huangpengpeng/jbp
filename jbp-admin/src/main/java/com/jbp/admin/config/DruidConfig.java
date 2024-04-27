@@ -52,7 +52,7 @@ public class DruidConfig {
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource druidDataSource() throws SQLException {
     	DruidDataSource dataSource=new DruidDataSource();
-    	dataSource.setFilters("wall,config,slf4j");
+    	dataSource.setFilters("config,slf4j");
         return dataSource;
     }
 }
