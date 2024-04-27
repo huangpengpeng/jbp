@@ -127,6 +127,6 @@ public interface OrderDetailService extends IService<OrderDetail> {
      */
     Integer getBuySuccessCount(Integer uid, Integer proId, Date startTime, Date endTime);
 
-     List<OrderDetail> getNextOrderGoods(Integer pid, String goodsId,Long capaId);
+     Integer getNextOrderGoods(Integer pid, String goodsId,Long capaId,String amt);
 
 }

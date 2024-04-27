@@ -57,6 +57,6 @@ public interface OrderDetailDao extends BaseMapper<OrderDetail> {
                                @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
 
-    public List<OrderDetail> getNextOrderGoods(@Param(value = "pid") Integer pid, @Param(value = "goodsId")  String goodsId, @Param(value = "capaId")  Long capaId);
+    public Integer getNextOrderGoods(@Param(value = "pid") Integer pid, @Param(value = "goodsId")  String goodsId, @Param(value = "capaId")  Long capaId, @Param(value = "amt")  String amt);
 
 }
