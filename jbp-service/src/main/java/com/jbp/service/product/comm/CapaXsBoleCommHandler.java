@@ -92,7 +92,7 @@ public class CapaXsBoleCommHandler extends AbstractProductCommHandler {
             return;
         }
         // 下单用户的所有上级
-        List<UserUpperDto> allUpper = invitationService.getAllUpper(order.getUid());
+        List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
         if (CollectionUtils.isEmpty(allUpper)) {
             return;
         }
