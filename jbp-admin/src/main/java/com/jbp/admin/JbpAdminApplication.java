@@ -8,6 +8,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.service.product.comm.GroupThreeRetOneHandler;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.InvitationScoreService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,12 +39,17 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//
-       TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
+//      推三返一
+      // TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
       //  groupThreeRetOneHandler.aa_3968();
-       groupThreeRetOneHandler.aa_15866();
-        groupThreeRetOneHandler.aa_3174_4();
-        groupThreeRetOneHandler.aa_12692_8();
+//       groupThreeRetOneHandler.aa_15866();
+//        groupThreeRetOneHandler.aa_3174_4();
+    //    groupThreeRetOneHandler.aa_12692_8();
+
+        //团队业绩
+//        InvitationScoreService groupThreeRetOneHandler = run.getBean(InvitationScoreService.class);
+//        groupThreeRetOneHandler.init();
+
 
 //        OrderService orderService = run.getBean(OrderService.class);
 //
