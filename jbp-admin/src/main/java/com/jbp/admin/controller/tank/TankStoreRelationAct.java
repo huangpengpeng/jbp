@@ -160,7 +160,7 @@ public class TankStoreRelationAct {
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
                     "\tWHERE u.`parentId`=" +userInvitation.getPId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(274,275,286,312,324,327,329,351,352,353,354,359,370,425)\n" +
                     "\t\t\t)"
@@ -203,7 +203,7 @@ int i=0;
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
                     "\tWHERE u.`parentId`=" +userInvitation.getPId() + "  AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28,36))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(439,453)\n" +
@@ -250,7 +250,7 @@ int i=0;
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
                     "\tWHERE u.`parentId`={parentId} AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(440,445)\n" +
                     "\t\t\t)\n" +
