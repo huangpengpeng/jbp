@@ -101,7 +101,9 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
             }
         }
         // 保存 list空 mybatis自带剔除
-        saveBatch(list);
+        if (CollectionUtils.isNotEmpty(list)) {
+            dao.insertBatch(list);
+        }
     }
 
     @Override
