@@ -52,6 +52,12 @@ public class JbpAdminApplication {
 //        OrderPaySuccessTask bean1 = run.getBean(OrderPaySuccessTask.class);
 //
 //        bean1.orderPayAfter();
+
+
+//        OrderService orderService = run.getBean(OrderService.class);
+//        GroupThreeRetOneHandler groupThreeRetOneHandler = run.getBean(GroupThreeRetOneHandler.class);
+//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT515171420171759762432"),null);
+
     }
 
 
