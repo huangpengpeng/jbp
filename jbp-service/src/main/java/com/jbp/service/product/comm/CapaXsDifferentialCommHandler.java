@@ -106,7 +106,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
             return;
         }
         // 查询所有上级
-        List<UserUpperDto> allUpper = invitationService.getAllUpper(order.getUid());
+        List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
         if (CollectionUtils.isEmpty(allUpper)) {
             return;
         }
