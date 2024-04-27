@@ -45,7 +45,7 @@ public class JbpAdminApplication {
 //       groupThreeRetOneHandler.aa_15866();
 //        groupThreeRetOneHandler.aa_3174_4();
     //    groupThreeRetOneHandler.aa_12692_8();
-      //  groupThreeRetOneHandler.aa_12692_8();
+      //  groupThreeRetOneHandler.aa_11880();
 
         //团队业绩
 //        InvitationScoreService groupThreeRetOneHandler = run.getBean(InvitationScoreService.class);
