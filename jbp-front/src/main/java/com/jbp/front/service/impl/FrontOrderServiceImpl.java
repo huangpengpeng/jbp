@@ -1462,6 +1462,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         //查询历史订单
         String ifOpenOrder =environment.getProperty("historyOrder.ifOpenOrder");
         if( Boolean.parseBoolean(ifOpenOrder)  && request.getPage() >= pageInfo.getPages() ){
+            String ifAgent =environment.getProperty("historyOrder.ifAgent");
+            if(Boolean.parseBoolean(ifAgent)){
+                request.setAgent(false);
+            }
             responseList.addAll(getHistoryOrder(request.getStatus(),userId,request.getAgent()));
         }
 
