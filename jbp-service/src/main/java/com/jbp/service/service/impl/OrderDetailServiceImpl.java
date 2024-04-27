@@ -234,8 +234,8 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
     }
 
     @Override
-    public List<OrderDetail> getNextOrderGoods(Integer pid, String goodsId,Long capaId) {
-        return dao.getNextOrderGoods(pid,goodsId,capaId);
+    public Integer getNextOrderGoods(Integer pid, String goodsId,Long capaId,String amt) {
+        return dao.getNextOrderGoods(pid,goodsId,capaId,amt);
 
     }
 }

@@ -59,13 +59,13 @@
         and o.pay_time <![CDATA[  >=  ]]> #{startTime, jdbcType=DATE}
         and o.pay_time <![CDATA[  <=  ]]> #{endTime, jdbcType=DATE}
     </select>
-    <select id="getNextOrderGoods" resultType="com.jbp.common.model.order.OrderDetail">
-            select od.* from eb_order_detail od
+    <select id="getNextOrderGoods" resultType="java.lang.Integer">
+            select (count(1) +ifnull((select number from three_back_one_init where uid =#{pid} and amt = #{amt}),0) ) as c  from eb_order_detail od
         left join eb_order o on o.order_no = od.order_no
         left join eb_user_invitation u on u.uid = o.uid
         left join eb_user_capa c on c.uid = u.pid
         where od.product_id in (${goodsId}) and o.paid = 1 and o.refund_status = 0  and o.is_del = 0 and `level` = 1
         and u.pid = #{pid}  and c.capa_id >=  #{capaId}
-        group by od.order_no
+
     </select>
 </mapper>

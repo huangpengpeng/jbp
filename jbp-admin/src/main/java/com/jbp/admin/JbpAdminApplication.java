@@ -40,8 +40,8 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 //      推三返一
-      // TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
-      //  groupThreeRetOneHandler.aa_3968();
+//       TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
+//        groupThreeRetOneHandler.aa_3968();
 //       groupThreeRetOneHandler.aa_15866();
 //        groupThreeRetOneHandler.aa_3174_4();
     //    groupThreeRetOneHandler.aa_12692_8();
@@ -51,9 +51,10 @@ public class JbpAdminApplication {
 //        groupThreeRetOneHandler.init();
 
 
+//        GroupThreeRetOneHandler groupThreeRetOneHandler=  run.getBean(GroupThreeRetOneHandler.class);
 //        OrderService orderService = run.getBean(OrderService.class);
 //
-//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT434171379135267789373"),null);
+//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("SH280171421182807092676"),null);
 
 //        OrderPaySuccessTask bean1 = run.getBean(OrderPaySuccessTask.class);
 //

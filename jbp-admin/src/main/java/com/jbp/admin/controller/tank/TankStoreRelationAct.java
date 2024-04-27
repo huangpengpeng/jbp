@@ -128,6 +128,7 @@ public class TankStoreRelationAct {
 
             if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0){
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+                threeBackOneInit.setUid(user.getId());
                 threeBackOneInit.setAmt(new BigDecimal(3968));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
                 list.add(threeBackOneInit);
@@ -174,6 +175,7 @@ public class TankStoreRelationAct {
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
             if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+                threeBackOneInit.setUid(user.getId());
                 threeBackOneInit.setAmt(new BigDecimal(15866));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
                 list.add(threeBackOneInit);
@@ -219,6 +221,7 @@ int i=0;
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
             if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+                threeBackOneInit.setUid(user.getId());
                 threeBackOneInit.setAmt(new BigDecimal(3174.4));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
                 list.add(threeBackOneInit);
@@ -265,6 +268,7 @@ int i=0;
             Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
             if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+                threeBackOneInit.setUid(user.getId());
                 threeBackOneInit.setAmt(new BigDecimal(12692.8));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
                 list.add(threeBackOneInit);

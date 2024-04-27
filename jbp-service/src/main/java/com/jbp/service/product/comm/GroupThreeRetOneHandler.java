@@ -124,10 +124,10 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
             Map<String, Object> map = productCommService.getMap(new QueryWrapper<ProductComm>().select(" group_concat(product_id) as product_id ").last(" where  type = " + getType() + " and `status` =1 and  JSON_EXTRACT(rule, '$.amt') = " + rule.getAmt() + ""));
 
             // 计算历史单数
-            List<OrderDetail> orderList = orderDetailService.getNextOrderGoods(pid, map.get("product_id").toString(), userCapa.getCapaId());
+            Integer orderSize = orderDetailService.getNextOrderGoods(pid, map.get("product_id").toString(), userCapa.getCapaId(),rule.getAmt().toString());
 
 
-            int remainder = orderList.size() % rule.getGroupComm().size();
+            int remainder = orderSize % rule.getGroupComm().size();
 
             if(remainder == 0){
                 remainder = 3;
@@ -156,7 +156,6 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
     }
 
     public static void main(String[] args) {
-        int remainder =12 % 3;
 
     }
 
