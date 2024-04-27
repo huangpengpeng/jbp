@@ -48,12 +48,15 @@
         eo.orderCount,
         eu.create_time as createTime,
         ei.uid,
-        eu.avatar
+        eu.avatar,
+        xc.icon_url as xsCapaUrl
         FROM
         eb_user_invitation ei
         LEFT JOIN eb_user eu ON eu.id = ei.uId
         LEFT JOIN eb_user_capa ec ON ec.uid = eu.id
+        LEFT JOIN eb_user_capa_xs xec ON xec.uid = eu.id
         LEFT JOIN eb_capa c ON c.id = ec.capa_id
+        LEFT JOIN eb_capa_xs xc ON xc.id = xec.capa_id
         left join (select count(1)  as orderCount,uid from eb_order  where status in (1,2,3,4,5,6) GROUP BY uid ) eo on eo.uid = ei.uId
 
         where ei.pId = #{uId}

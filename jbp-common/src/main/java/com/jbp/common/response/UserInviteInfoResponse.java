@@ -53,4 +53,7 @@ public class UserInviteInfoResponse implements Serializable {
     @ApiModelProperty(value = "头像")
     private String avatar;
 
+    @ApiModelProperty(value = "等级名称")
+    private String xsCapaUrl;
+
 }
