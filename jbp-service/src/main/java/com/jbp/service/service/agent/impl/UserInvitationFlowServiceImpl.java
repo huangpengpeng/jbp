@@ -24,6 +24,7 @@ import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.service.agent.UserInvitationService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -35,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlowDao, UserInvitationFlow> implements UserInvitationFlowService {
@@ -94,11 +96,13 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         }
         // 获取所有的上级添加关系
         List<UserInvitationFlow> list = Lists.newArrayList();
+        int i=0;
         for (UserUpperDto upper : upperList) {
             if (upper.getPId() != null && upper.getPId() > 0) {
                 UserInvitationFlow flow = new UserInvitationFlow(uId, upper.getPId(), upper.getLevel());
                 list.add(flow);
             }
+            log.info("增在处理用户:{} 的邀请层级关系:{}, 总关系:{}", uId, i++, list.size());
         }
         // 保存 list空 mybatis自带剔除
         if (CollectionUtils.isNotEmpty(list)) {
