@@ -284,7 +284,7 @@ int i=0;
             StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`= =" +user.getId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\tWHERE u.`parentId` =" +user.getId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
                     "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(281,306,369,392)\n" +
