@@ -113,7 +113,7 @@ public class TankStoreRelationAct {
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN "+name+".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (156,191,196,239,241,2005,285,287,2017,2024,2026,2055,2067,2102)"
             );
 
@@ -159,7 +159,7 @@ public class TankStoreRelationAct {
                     "\t\t\t)"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+"ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN "+name+".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (274,275,286,2004,2018,2021,2025,2045,2046,2047,2048,2060,2101)"
             );
 
@@ -203,7 +203,7 @@ int i=0;
             );
 
             StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (439,453)"
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (2110,2123)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
@@ -246,7 +246,7 @@ int i=0;
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN "+name+".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (2111,2115)"
             );
 
@@ -291,7 +291,7 @@ int i=0;
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN "+name+".USER AS ug ON ug.id=ogi.userId\n" +
                     "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (281,2002,2056)"
             );
 
