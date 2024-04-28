@@ -122,10 +122,6 @@ public class UserInvitationController {
 
         Integer pid =  userInvitationService.getPid(user.getId());
 
-     //   Integer ppid =  userInvitationService.getPid(pUser.getId());
-
-        userInvitationService.hasChild(pUser.getId(),pid);
-
         if (userInvitationService.hasChild(pUser.getId(), pid)) {
             throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
         }
