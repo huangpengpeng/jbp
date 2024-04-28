@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
@@ -13,14 +14,14 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.agent.LztWithdrawalService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -437,19 +438,57 @@ public class LztServiceImpl implements LztService {
      */
     @Override
     public AcctSerialResult queryAcctSerial(String oidPartner, String priKey, String userId, String userType,
-                                            String dateStart, String endStart, String flagDc, String pageNo) {
+                                            String dateStart, String endStart, String flagDc, Integer pageNo, Integer limit) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
-        AcctSerialParams params = new AcctSerialParams(timestamp, oidPartner, userId, userType, "USEROWN_AVAILABLE",
-                dateStart, endStart, flagDc, pageNo, "10", "DESC");
-        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
-        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
-        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        if (StringUtils.isEmpty(s)) {
-            return new AcctSerialResult();
+
+
+        List<AcctBalList> acctbal_list = Lists.newLinkedList();
+        Integer i = 1;
+        do {
+            AcctSerialParams params = new AcctSerialParams(timestamp, oidPartner, userId, userType, "USEROWN_AVAILABLE",
+                    dateStart, endStart, flagDc, i.toString(), "10", "DESC");
+            i++;
+            String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserial";
+            LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+            String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+            if (StringUtils.isNotEmpty(s)) {
+                AcctSerialResult result = JSON.parseObject(s, AcctSerialResult.class);
+                if (result != null && CollectionUtils.isNotEmpty(result.getAcctbal_list())) {
+                    acctbal_list.addAll(result.getAcctbal_list());
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }while (true);
+
+        AcctSerialResult acctSerialResult = new AcctSerialResult();
+        if(CollectionUtils.isEmpty(acctbal_list)){
+            acctSerialResult.setAcctbal_list(acctbal_list);
+            acctSerialResult.setTotal_page(1);
+            acctSerialResult.setPage_no(pageNo);
+            acctSerialResult.setTotal_num(0);
+        }else {
+            List<List<AcctBalList>> partition = Lists.partition(acctbal_list, limit);
+            if (pageNo.intValue() > partition.size()) {
+                acctSerialResult.setAcctbal_list(Lists.newLinkedList());
+                acctSerialResult.setTotal_page(partition.size());
+                acctSerialResult.setPage_no(pageNo);
+                acctSerialResult.setTotal_num(acctbal_list.size());
+            } else {
+                List<AcctBalList> acctBalLists = partition.get(pageNo - 1);
+                acctSerialResult.setAcctbal_list(acctBalLists);
+                acctSerialResult.setTotal_page(partition.size());
+                acctSerialResult.setPage_no(pageNo);
+                acctSerialResult.setTotal_num(acctbal_list.size());
+            }
         }
-        return JSON.parseObject(s, AcctSerialResult.class);
+        return acctSerialResult;
     }
+
+
 
     @Override
     public ValidationSmsResult validationSms(String oidPartner, String priKey, String payer_id, String txn_seqno,
@@ -706,7 +745,6 @@ public class LztServiceImpl implements LztService {
         return result;
     }
 
-
     @Override
     public ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
                                                            String txn_seqno, String verify_code_new) {
@@ -726,6 +764,27 @@ public class LztServiceImpl implements LztService {
             throw new CrmebException("申请手机号验证失败" + user_id);
         }
         ChangeRegPhoneVerifyResult result = JSON.parseObject(s, ChangeRegPhoneVerifyResult.class);
+        return result;
+    }
+
+    @Override
+    public AcctSerialDetailResult acctSerialDetail(String oidPartner, String priKey, String user_id, String user_type, String jno_acct) {
+        AcctSerialDetailParams params = new AcctSerialDetailParams();
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setUser_id(user_id);
+        params.setUser_type(user_type);
+        params.setJno_acct(jno_acct);
+
+        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-acctserialdetail";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("获取资金流水详情" + user_id);
+        }
+        AcctSerialDetailResult result = JSON.parseObject(s, AcctSerialDetailResult.class);
         return result;
     }
 }

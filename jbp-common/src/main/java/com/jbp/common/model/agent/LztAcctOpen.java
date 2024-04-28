@@ -73,6 +73,9 @@ public class LztAcctOpen extends BaseModel {
     @TableField(value = "queryRet", typeHandler = UserInfoResultHandler.class)
     private UserInfoResult queryRet;
 
+    @ApiModelProperty(value = "通知信息")
+    private String notifyInfo;
+
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;

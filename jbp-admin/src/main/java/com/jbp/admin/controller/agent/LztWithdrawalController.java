@@ -10,6 +10,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
@@ -49,6 +50,13 @@ public class LztWithdrawalController {
         }
         String ip = CrmebUtil.getClientIp(request);
         LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, "提现", pwd, randomKey, ip);
+        if(StringUtils.isNotEmpty(acct.getPhone())){
+            String phone = acct.getPhone();
+            result.setRegMsg("短信已发送至: " + phone.substring(0, 3) + "****" + phone.substring(7, phone.length()) + " 请注意查收");
+        }else{
+            result.setRegMsg("短信已发送请注意查收");
+        }
+
         return CommonResult.success(result);
     }
 

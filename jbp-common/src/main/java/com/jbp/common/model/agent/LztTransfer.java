@@ -126,4 +126,8 @@ public class LztTransfer extends BaseModel {
     @TableField(exist = false)
     private String merName;
 
+    @ApiModelProperty(value = "返回消息")
+    @TableField(exist = false)
+    private String regMsg;
+
 }

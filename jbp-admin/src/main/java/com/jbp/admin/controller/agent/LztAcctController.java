@@ -9,6 +9,8 @@ import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.agent.LztTransfer;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -20,6 +22,8 @@ import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.agent.LztTransferService;
+import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
@@ -48,6 +52,10 @@ public class LztAcctController {
     private LztService lztService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private LztTransferService lztTransferService;
+    @Resource
+    private LztWithdrawalService lztWithdrawalService;
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:info')")
     @GetMapping("/info")
@@ -164,11 +172,14 @@ public class LztAcctController {
         return CommonResult.success(lztAcctService.list(query));
     }
 
-    @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
+//    @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
     @SneakyThrows
     @ApiOperation(value = "账户资金明细 flagDc-> DEBIT：出账 CREDIT：入账 时间格式 yyyyMMddHHmmss")
     @GetMapping(value = "/serialPage")
-    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, String flagDc, Integer pageNo) {
+    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, String flagDc, Integer pageNo, Integer limit) {
+        if(limit == null){
+            limit = 10;
+        }
         if (StringUtils.isEmpty(userId)) {
             throw new CrmebException("请选择账号查询");
         }
@@ -189,7 +200,7 @@ public class LztAcctController {
         MerchantPayInfo payInfo = merchant.getPayInfo();
         CommonPage<AcctBalList> page = new CommonPage();
         AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), userId,
-                LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), dateStart, endStart, flagDc, pageNo.toString());
+                LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), dateStart, endStart, flagDc, pageNo, limit);
         List<AcctBalList> acctbalList = result.getAcctbal_list();
         if (CollectionUtils.isNotEmpty(acctbalList)) {
             for (AcctBalList acctBalList : acctbalList) {
@@ -200,6 +211,29 @@ public class LztAcctController {
                 acctBalList.setTxn_type(LianLianPayConfig.SerialTxnType.getName(acctBalList.getTxn_type()));
                 acctBalList.setFlag_dc("CREDIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
                 acctBalList.setTxn_time(DateTimeUtils.format(DateTimeUtils.parseDate(acctBalList.getTxn_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
+                if(StringUtils.isNotEmpty(acctBalList.getJno_acct())){
+                    AcctSerialDetailResult acctSerialDetailResult = lztService.acctSerialDetail(payInfo.getOidPartner(), payInfo.getPriKey(), acctBalList.getUserId(),
+                            LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), acctBalList.getJno_acct());
+                    acctBalList.setDetail(acctSerialDetailResult);
+
+                    if(StringUtils.equals("内部代发", acctBalList.getTxn_type())){
+                        acctBalList.setTxn_type("转账");
+                    }
+                    if(StringUtils.equals("外部代发", acctBalList.getTxn_type())){
+                        acctBalList.setTxn_type("代付");
+                        LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
+                        if(lztTransfer != null){
+                            acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
+                        }
+                    }
+                    if(StringUtils.equals("账户提现", acctBalList.getTxn_type())){
+                        LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(acctBalList.getJno_cli());
+                        if(lztWithdrawal != null){
+                            acctBalList.setFeeAmount(lztWithdrawal.getFeeAmount());
+                        }
+                    }
+                }
             }
         }
         page.setPage(result.getPage_no());
@@ -220,9 +254,11 @@ public class LztAcctController {
         if (lztAcct == null || lztAcct.getMerId() != merId) {
             throw new CrmebException("账户不存在");
         }
+        BigDecimal fee = lztAcctService.getFee(userId, new BigDecimal(amt));
+        BigDecimal totalAmt = new BigDecimal(amt).add(fee);
         Merchant merchant = merchantService.getById(merId);
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, amt, token, code);
+        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, totalAmt.toString(), token, code);
         return CommonResult.success();
     }
 
@@ -293,6 +329,8 @@ public class LztAcctController {
         if (result != null && "0000".equals(result.getRet_code())) {
             result.setRegMsg("已发送至: " + newPhone + " 请注意查收");
         }
+        lztAcct.setChangePhone(newPhone);
+        lztAcctService.updateById(lztAcct);
         return CommonResult.success(result);
     }
 
@@ -312,9 +350,26 @@ public class LztAcctController {
         ChangeRegPhoneVerifyResult result = lztService.changeRegPhoneVerify(payInfo.getOidPartner(),
                 payInfo.getPriKey(), userId, token, txn_seqno, code);
         if ("0000".equals(result.getRet_code())) {
+            lztAcct.setPhone(lztAcct.getChangePhone());
+            lztAcctService.updateById(lztAcct);
             return CommonResult.success();
         }
         return CommonResult.failed(result.getRet_msg());
+    }
+
+
+    @ApiOperation(value = "获取手续分")
+    @GetMapping(value = "/feeGet")
+    public CommonResult<BigDecimal> apply(BigDecimal amount, String userId) {
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amount).setScale(2, BigDecimal.ROUND_UP);
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amount.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
+        return CommonResult.success(feeAmount);
     }
 
 }

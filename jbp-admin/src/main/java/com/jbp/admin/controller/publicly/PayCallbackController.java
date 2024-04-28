@@ -150,6 +150,10 @@ public class PayCallbackController {
             log.info("[接收来自连连下发的异步通知] 签名源串为：" + stringBuilder.toString());
             if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通子商户.getPrefix())) {
                 LztAcctOpen lztAcctOpen = lztAcctOpenService.getByTxnSeqno(txnSeqno);
+                if(lztAcctOpen != null && stringBuilder != null && stringBuilder.length() > 0){
+                    lztAcctOpen.setNotifyInfo(stringBuilder.toString());
+                    lztAcctOpenService.updateById(lztAcctOpen);
+                }
                 if (lztAcctOpen != null) {
                     lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
                 }

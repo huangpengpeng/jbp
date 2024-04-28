@@ -3,6 +3,8 @@ package com.jbp.common.lianlian.result;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+
 @Data
 @EqualsAndHashCode
 public class AcctBalList {
@@ -87,6 +89,10 @@ public class AcctBalList {
     private String username;
 
     private String userType;
+
+    private AcctSerialDetailResult detail;
+
+    private BigDecimal feeAmount;
 
 
 }

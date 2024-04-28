@@ -77,22 +77,16 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
 
         String linked_acctno = "";
         if(LianLianPayConfig.UserType.个人用户.name().equals(lztAcct.getUserType())){
-
             QueryLinkedAcctResult queryLinkedAcctResult = lztService.queryLinkedAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
             if(queryLinkedAcctResult == null || CollectionUtils.isEmpty(queryLinkedAcctResult.getLinked_acctlist())){
                 throw new RuntimeException("个人用户提现请先绑定银行卡");
             }
             linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
         }
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
-        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
-        feeScale = feeScale.subtract(BigDecimal.valueOf(0.0008));
-        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
-            feeAmount =
-                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
-        }
+        BigDecimal feeAmount = lztAcctService.getFee(lztAcct.getUserId(), amt);
+        amt = amt.add(feeAmount);
         WithdrawalResult orderResult = lztService.withdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), userId, drawNo,
-                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
+                amt , feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt, feeAmount, postscript, orderResult);
         save(withdrawal);
         return withdrawal;

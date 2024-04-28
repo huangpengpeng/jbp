@@ -84,7 +84,8 @@ public interface LztService {
     /**
      * 资金流水
      */
-    AcctSerialResult queryAcctSerial(String oidPartner, String priKey, String userId, String userType, String dateStart, String endStart, String flagDc, String pageNo);
+    AcctSerialResult queryAcctSerial(String oidPartner, String priKey, String userId, String userType, String dateStart,
+                                     String endStart, String flagDc, Integer pageNo, Integer limit);
 
     /**
      * 短验二次确认
@@ -151,6 +152,13 @@ public interface LztService {
     ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
                                                   String txn_seqno, String verify_code_new);
 
+
+
+
+    /**
+     * 资金流水详情
+     */
+    AcctSerialDetailResult acctSerialDetail(String oidPartner, String priKey, String user_id, String user_type, String jno_acct);
 }
 
 

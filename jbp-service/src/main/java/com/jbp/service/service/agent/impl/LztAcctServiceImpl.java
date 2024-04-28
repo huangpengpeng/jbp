@@ -17,6 +17,7 @@ import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.LianLianPayService;
@@ -119,6 +120,10 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             } else {
                 s.setMerName(merchant.getName());
             }
+            if(StringUtils.isNotEmpty(s.getPhone())){
+                String phone = s.getPhone();
+                s.setPhone(phone.substring(0, 3) + "****" + phone.substring(7, phone.length()));
+            }
             //查询用户用户信息
             LztAcct bankAcctInfo = details(s.getUserId());
             s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
@@ -190,7 +195,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             Integer pageNo = 1;
             do {
                 AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
-                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), yesterdayStart, yesterdayEnd, null, pageNo.toString());
+                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), yesterdayStart, yesterdayEnd, null, pageNo, 10);
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }
@@ -221,7 +226,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             Integer pageNo = 1;
             do {
                 AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
-                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), todayStart, todayEnd, null, pageNo.toString());
+                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), todayStart, todayEnd, null, pageNo, 10);
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }
@@ -230,7 +235,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             } while (true);
         }
 
-        for (AcctBalList acctBal : yesterdayList) {
+        for (AcctBalList acctBal : todayList) {
             // 出账
             if ("DEBIT".equals(acctBal.getFlag_dc())) {
                 todayOutAmt = todayOutAmt.add(new BigDecimal(acctBal.getAmt()));
@@ -243,5 +248,19 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         response.setTodayInAmt(todayInAmt);
         response.setTodayOutAmt(todayOutAmt);
         return response;
+    }
+
+
+    @Override
+    public BigDecimal getFee(String userId, BigDecimal amt) {
+        LztAcct lztAcct = getByUserId(userId);
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
+        return feeAmount;
     }
 }

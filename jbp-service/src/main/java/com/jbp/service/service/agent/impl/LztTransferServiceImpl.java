@@ -66,14 +66,8 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
         LztAcct lztAcct = lztAcctService.getByUserId(payerId);
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
-
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
-        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
-        feeScale = feeScale.subtract(BigDecimal.valueOf(0.0008));
-        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
-            feeAmount =
-                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
-        }
+        BigDecimal feeAmount = lztAcctService.getFee(payerId, amt);
+        amt = amt.add(feeAmount);
         LztTransferResult transferResult = lztService.transfer(payInfo.getOidPartner(), payInfo.getPriKey(), payerId, txnPurpose, txnSeqno,
                 amt.toString(), feeAmount.toString(), pwd, random_key, payeeType, bankAcctNo, bankCode, bankAcctName,
                 cnapsCode, postscript, ip, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());

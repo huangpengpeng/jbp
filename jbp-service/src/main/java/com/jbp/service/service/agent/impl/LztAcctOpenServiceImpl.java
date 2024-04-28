@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -81,10 +82,29 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
         lztAcctOpen.setRetMsg(result.getRemark());
         updateById(lztAcctOpen);
+
+        LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
-            LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
             if (lztAcct == null) {
-                lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account());
+                lztAcct = lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account());
+            }
+        }
+        // 通知手机号吗
+        if(lztAcct != null && StringUtils.isNotEmpty(lztAcctOpen.getNotifyInfo()) && StringUtils.isEmpty(lztAcct.getPhone())) {
+            try {
+                JSONObject json = JSONObject.parseObject(lztAcctOpen.getNotifyInfo());
+                if (json.containsKey("basicInfo")) {
+                    JSONObject basicInfo = json.getJSONObject("basicInfo");
+                    if (basicInfo != null && basicInfo.containsKey("reg_phone")) {
+                        String reg_phone = basicInfo.getString("reg_phone");
+                        if (StringUtils.isNotEmpty(reg_phone)) {
+                            lztAcct.setPhone(reg_phone);
+                            lztAcctService.updateById(lztAcct);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+
             }
         }
     }

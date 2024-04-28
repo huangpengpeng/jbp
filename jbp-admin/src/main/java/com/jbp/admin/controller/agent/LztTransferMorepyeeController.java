@@ -11,6 +11,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import io.swagger.annotations.Api;
@@ -53,6 +54,13 @@ public class LztTransferMorepyeeController {
         }
         String ip = CrmebUtil.getClientIp(request);
         LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, "服务费", pwd, randomKey, payeeId, ip, "服务费");
+        if(StringUtils.isNotEmpty(acct.getPhone())){
+            String phone = acct.getPhone();
+            result.setRegMsg("短信已发送至: " + phone.substring(0, 3) + "****" + phone.substring(7, phone.length()) + " 请注意查收");
+        }else{
+            result.setRegMsg("短信已发送请注意查收");
+        }
+
         return CommonResult.success(result);
     }
 
