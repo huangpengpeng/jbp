@@ -151,7 +151,7 @@ public class WalletController {
 
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
         WalletWithdraw walletWithdraw = walletWithdrawService.create(user.getId(), user.getAccount(), walletConfig.getType(),
-                walletConfig.getName(), request.getAmt().multiply(wallet_pay_integral), request.getPostscript());
+                walletConfig.getName(), request.getAmt().divide(wallet_pay_integral), request.getPostscript());
         return CommonResult.success(walletWithdraw);
     }
 
