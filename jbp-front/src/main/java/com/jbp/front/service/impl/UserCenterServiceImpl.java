@@ -36,6 +36,7 @@ import com.jbp.front.service.UserCenterService;
 import com.jbp.service.dao.UserDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,8 +144,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
 
             for(int i= 0 ;i<hashMapList.size();i++) {
                 Map<String, Object> map = hashMapList.get(i);
-
-                if (StringUtils.isNotBlank(map.get("capaId").toString())) {
+                if (StringUtils.isNotBlank( MapUtils.getString(map, "capaId", ""))) {
                     if (!tempIds.contains(Long.valueOf(map.get("capaId").toString()))) {
                         hashMapList.remove(i);
                     }
