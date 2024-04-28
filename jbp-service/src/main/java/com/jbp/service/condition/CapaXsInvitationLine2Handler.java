@@ -8,12 +8,14 @@ import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.InvitationScoreService;
+import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserInvitationService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -34,7 +36,11 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
     private UserCapaXsService userCapaXsService;
     @Resource
     private UserInvitationService userInvitationService;
+    @Resource
+    private SelfScoreService selfScoreService;
 
+    @Resource
+    private Environment environment;
 
     @Override
     public String getName() {
@@ -70,7 +76,14 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
         Rule rule = getRule(riseCondition);
         // 1.自己的累积业绩
         if (rule.getTeamAmt() != null && ArithmeticUtils.gt(rule.getTeamAmt(), BigDecimal.ZERO)) {
-            BigDecimal teamAmt = invitationScoreService.getInvitationScore(uid, true);
+            BigDecimal teamAmt = BigDecimal.ZERO;
+           String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
+            if(Boolean.parseBoolean(ifOpen)){
+                teamAmt =  selfScoreService.getUserNext(uid,true);
+            }else{
+                teamAmt = invitationScoreService.getInvitationScore(uid, true);
+            }
+
             if (ArithmeticUtils.less(teamAmt, rule.getTeamAmt())) {
                 return false;
             }
@@ -92,7 +105,14 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
                 // 小区业绩
                 if (!uidList.contains(userInvitation.getUId())) {
                     if (rule.getMinTeamAmt() != null && ArithmeticUtils.gt(rule.getMinTeamAmt(), BigDecimal.ZERO)) {
-                        BigDecimal nextTotal = invitationScoreService.getInvitationScore(userInvitation.getUId(), true);
+                        String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
+                        BigDecimal nextTotal =BigDecimal.ZERO;
+                        if(Boolean.parseBoolean(ifOpen)){
+                            nextTotal =  selfScoreService.getUserNext(uid,true);
+                        }else{
+                            nextTotal = invitationScoreService.getInvitationScore(userInvitation.getUId(), true);
+                        }
+
                         if (ArithmeticUtils.less(nextTotal, rule.getMinTeamAmt())) {
                             uidList.add(userInvitation.getUId());
                             continue;

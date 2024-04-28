@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.admin.task.order.OrderPaySuccessTask;
+import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.user.User;
 import com.jbp.service.product.comm.GroupThreeRetOneHandler;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreService;
+import com.jbp.service.service.agent.UserInvitationService;
+import org.apache.commons.collections4.ListUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @EnableAsync //开启异步调用	
@@ -40,7 +45,7 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 //      推三返一
-       TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
+//       TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
 //        groupThreeRetOneHandler.aa_3968();
 //       groupThreeRetOneHandler.aa_15866();
 //        groupThreeRetOneHandler.aa_3174_4();
@@ -65,6 +70,7 @@ public class JbpAdminApplication {
 //        OrderService orderService = run.getBean(OrderService.class);
 //        GroupThreeRetOneHandler groupThreeRetOneHandler = run.getBean(GroupThreeRetOneHandler.class);
 //        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT515171420171759762432"),null);
+
 
     }
 
