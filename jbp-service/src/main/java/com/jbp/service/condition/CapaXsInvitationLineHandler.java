@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,7 +29,10 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
     private UserCapaXsService userCapaXsService;
     @Resource
     private UserInvitationService userInvitationService;
-
+    @Resource
+    private Environment environment;
+    @Resource
+    private SelfScoreService selfScoreService;
 
     @Override
     public String getName() {
@@ -59,7 +63,15 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
         // 获取规则
         Rule rule = getRule(riseCondition);
         // 1.自己的累积业绩
-        BigDecimal teamAmt = invitationScoreService.getInvitationScore(uid, true);
+        String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
+        BigDecimal teamAmt = BigDecimal.ZERO;
+        if(Boolean.parseBoolean(ifOpen)){
+            teamAmt =selfScoreService.getUserNext(uid,true);
+        }else{
+            teamAmt = invitationScoreService.getInvitationScore(uid, true);
+        }
+
+
         if (ArithmeticUtils.less(teamAmt, rule.getTeamAmt())) {
             return false;
         }
@@ -72,7 +84,12 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
         int indeCount = 0;
         for (UserInvitation userInvitation : nextList) {
             // 团队业绩
-            BigDecimal nextTotal = invitationScoreService.getInvitationScore(userInvitation.getUId(), true);
+            BigDecimal nextTotal = BigDecimal.ZERO;
+            if(Boolean.parseBoolean(ifOpen)){
+                nextTotal = selfScoreService.getUserNext(uid,true);
+            }else{
+                nextTotal = invitationScoreService.getInvitationScore(userInvitation.getUId(), true);
+            }
             if (ArithmeticUtils.less(nextTotal, rule.getMinTeamAmt())) {
                 continue;
             }

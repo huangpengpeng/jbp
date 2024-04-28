@@ -72,21 +72,6 @@ public class JbpAdminApplication {
 //        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT515171420171759762432"),null);
 
 
-        Boolean id = false;
-        UserInvitationService userInvitationService = run.getBean(UserInvitationService.class);
-        List<UserUpperDto> allUpper = userInvitationService.getAllUpper(78638);
-        if(!allUpper.isEmpty()){
-            for(UserUpperDto userUpperDto :allUpper){
-                if(userUpperDto.getUId() == 78618 ) {
-                    id =true;
-                };
-            }
-        }
-
-        if(!id){
-            throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
-        }
-
     }
 
 

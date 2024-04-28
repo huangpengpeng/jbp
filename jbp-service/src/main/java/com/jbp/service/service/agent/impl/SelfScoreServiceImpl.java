@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
+import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScore;
 import com.jbp.common.model.agent.SelfScoreFlow;
@@ -22,6 +23,7 @@ import com.jbp.service.service.agent.SelfScoreFlowService;
 import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,9 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     private UserService userService;
     @Resource
     private SelfScoreFlowService selfScoreFlowService;
+
+    @Resource
+    private SelfScoreDao selfScoreDao;
 
     @Override
     public PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
@@ -70,6 +75,20 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     @Override
     public SelfScore getByUser(Integer uid) {
         return getOne(new QueryWrapper<SelfScore>().lambda().eq(SelfScore::getUid, uid));
+    }
+
+    @Override
+    public BigDecimal getUserNext(Integer uid, Boolean containsSelf) {
+
+        BigDecimal score = selfScoreDao.getUserNext(uid);
+        if (BooleanUtils.isNotTrue(containsSelf)) {
+            return score;
+        }
+
+        SelfScore selfScore =  getOne(new QueryWrapper<SelfScore>().lambda().eq(SelfScore::getUid, uid));
+        return selfScore.getScore().add(score);
+
+
     }
 
     @Override

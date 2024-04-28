@@ -164,3 +164,6 @@ jushuitan:
   appKey: 60fe53c33c1b4fbbb243f6990e852132
   appSecret: cad5739f959c4cbc94be68b493d9e194
   url: https://sm.fnyss.cc/api/front/jushuitan/auth/callApi
+
+teamAmtSelf:
+  ifopen: true
