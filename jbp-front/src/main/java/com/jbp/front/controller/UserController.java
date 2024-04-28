@@ -1,14 +1,15 @@
 package com.jbp.front.controller;
 
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.RelationScore;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserInvitation;
-import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.UserInvitationRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.SystemConfigService;
@@ -29,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +73,9 @@ public class UserController {
     private UserCapaService userCapaService;
     @Autowired
     private SystemConfigService systemConfigService;
+    @Autowired
+    private UserInvitationService userInvitationService;
+
 
 
     @ApiOperation(value = "登录密码修改")
@@ -386,6 +391,39 @@ public class UserController {
 
         return CommonResult.success();
     }
+
+
+
+    @ApiOperation(value = "用户挂载")
+    @RequestMapping(value = "/mount", method = RequestMethod.GET)
+    public CommonResult mount(String phone) {
+        if (com.jbp.service.util.StringUtils.isAnyEmpty(phone)) {
+            throw new CrmebException("账户信息不能为空");
+        }
+        List<User> userList = userService.getByPhone(phone);
+        if (userList.isEmpty() ) {
+            throw new CrmebException("账户不存在");
+        }
+
+        Boolean ifExt = false;
+        List<UserUpperDto> allUpper = userInvitationService.getAllUpper(userService.getUserId());
+        if(!allUpper.isEmpty()){
+            for(UserUpperDto userUpperDto :allUpper){
+                if(userUpperDto.getUId().intValue() == userList.get(0).getId().intValue() ) {
+                    ifExt = true;
+                };
+            }
+        }
+
+        if(!ifExt){
+            throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
+        }
+
+        userInvitationService.band(userService.getUserId(), userList.get(0).getId(), true, true, true);
+
+        return CommonResult.success();
+    }
+
 
 
 }

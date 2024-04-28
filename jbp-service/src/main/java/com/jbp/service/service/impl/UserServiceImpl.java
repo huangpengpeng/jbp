@@ -147,8 +147,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private ChannelIdentityService channelIdentityService;
 
 
-
-
     /**
      * 手机号注册用户
      *
@@ -1890,8 +1888,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         User currentUser = getInfo();
         List<UserInviteInfoResponse> userInviteResponseList = invitationService.getUserNextInfoList(currentUser.getId(), request.getKeywords());
 
+
         userInviteResponseList.forEach(e -> {
+            UserCapa userCapa  = userCapaService.getByUser(e.getUid());
+            Date createTime = userCapa.getGmtModify()== null ? e.getCreateTime(): userCapa.getGmtModify();
+            createTime = DateTimeUtils.addHours(createTime, 24);
             e.setOneCount(invitationService.getInviteNumber(e.getUid()));
+            e.setIfMonth(createTime.getTime() >= DateTimeUtils.getNow().getTime());
         });
 
         Page<Object> page = PageHelper.startPage(request.getPage(), request.getLimit());

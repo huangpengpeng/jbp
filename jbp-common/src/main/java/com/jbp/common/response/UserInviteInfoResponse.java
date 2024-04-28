@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 订单移动端列表数据响应对象
@@ -46,7 +47,7 @@ public class UserInviteInfoResponse implements Serializable {
     private String orderCount;
 
     @ApiModelProperty(value = "加入时间")
-    private String createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "uid")
     private Integer uid;
@@ -56,4 +57,6 @@ public class UserInviteInfoResponse implements Serializable {
     @ApiModelProperty(value = "等级名称")
     private String xsCapaUrl;
 
+    @ApiModelProperty(value = "是否挂载")
+    private Boolean ifMonth;
 }
