@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserInvitationRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.util.StringUtils;
@@ -31,6 +33,9 @@ public class UserInvitationController {
     private UserInvitationService userInvitationService;
     @Resource
     private UserService userService;
+
+    @Resource
+    private TeamUserService teamUserService;
 
     @PreAuthorize("hasAuthority('agent:user:invitation:page')")
     @GetMapping("/page")
@@ -101,6 +106,13 @@ public class UserInvitationController {
         if (pUser == null) {
             throw new CrmebException("上级账户不存在");
         }
+
+       TeamUser teamUser = teamUserService.getByUser(user.getId());
+        TeamUser teamUser2 = teamUserService.getByUser(pUser.getId());
+        if(teamUser != null && teamUser.getTid() != teamUser2.getTid()){
+            throw new CrmebException("团队信息不一致");
+        }
+
         userInvitationService.band(user.getId(), pUser.getId(), true, true, true);
 
         return CommonResult.success();
