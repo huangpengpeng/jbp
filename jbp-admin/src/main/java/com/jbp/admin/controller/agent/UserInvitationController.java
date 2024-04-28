@@ -120,11 +120,11 @@ public class UserInvitationController {
             throw new CrmebException("团队信息不一致");
         }
 
-        Integer pid =  userInvitationService.getPid(user.getId());
-
-        if (userInvitationService.hasChild(pid ,pUser.getId())) {
-            throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
-        }
+//        Integer pid =  userInvitationService.getPid();
+//
+//        if (userInvitationService.hasChild(user.getId() ,pUser.getId())) {
+//            throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
+//        }
 
         userInvitationService.band(user.getId(), pUser.getId(), true, true, true);
 
