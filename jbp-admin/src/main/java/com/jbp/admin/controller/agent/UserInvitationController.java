@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.jbp.common.annotation.LogControllerAnnotation;
@@ -7,6 +8,7 @@ import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -14,6 +16,7 @@ import com.jbp.common.request.agent.UserInvitationRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/user/invitation")
@@ -36,6 +40,9 @@ public class UserInvitationController {
 
     @Resource
     private TeamUserService teamUserService;
+    @Resource
+    private UserInvitationFlowService userInvitationFlowService;
+
 
     @PreAuthorize("hasAuthority('agent:user:invitation:page')")
     @GetMapping("/page")
@@ -112,6 +119,9 @@ public class UserInvitationController {
         if(teamUser != null && teamUser.getTid() != teamUser2.getTid()){
             throw new CrmebException("团队信息不一致");
         }
+
+        Integer pid =  userInvitationService.getPid(user.getId());
+        userInvitationService.hasChild( pUser.getId(),pid);
 
         userInvitationService.band(user.getId(), pUser.getId(), true, true, true);
 
