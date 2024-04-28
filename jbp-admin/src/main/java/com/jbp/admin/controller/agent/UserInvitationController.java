@@ -121,7 +121,10 @@ public class UserInvitationController {
         }
 
         Integer pid =  userInvitationService.getPid(user.getId());
-        userInvitationService.hasChild( pUser.getId(),pid);
+
+     //   Integer ppid =  userInvitationService.getPid(pUser.getId());
+
+        userInvitationService.hasChild(user.getId(),pid);
 
         userInvitationService.band(user.getId(), pUser.getId(), true, true, true);
 

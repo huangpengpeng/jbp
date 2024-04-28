@@ -101,14 +101,10 @@ public class TankStoreRelationAct {
         int i = 0;
         for (User user : userList) {
 
-            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
-            if(userInvitation == null){
-                continue;
-            }
             StringBuilder stringBuilder = new StringBuilder("SELECT  count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`=" +userInvitation.getPId() + " AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28))\n" +
+                    "\tWHERE u.`parentId`=" +user.getId()+ " AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28))\n" +
                     "\t\t\tAND o.`status` IN (201,301,401,402,501,285) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\n" +
                     "\t\t\tAND o.id IN (\n" +
@@ -119,7 +115,7 @@ public class TankStoreRelationAct {
             );
 
             StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (156,191,196,239,241,285,287,313,323,328,331,349,357,377,426)"
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (156,191,196,239,241,285,287,313,323,328,331,349,357,377,426)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
@@ -153,14 +149,11 @@ public class TankStoreRelationAct {
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
 
-            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
-            if(userInvitation == null){
-                continue;
-            }
+
             StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`=" +userInvitation.getPId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
                     "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(274,275,286,312,324,327,329,351,352,353,354,359,370,425)\n" +
@@ -168,7 +161,7 @@ public class TankStoreRelationAct {
             );
 
             StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (274,275,286,312,324,327,329,351,352,353,354,359,370,425)"
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (274,275,286,312,324,327,329,351,352,353,354,359,370,425)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
@@ -197,14 +190,11 @@ int i=0;
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
 
-            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
-            if(userInvitation == null){
-                continue;
-            }
+
             StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`=" +userInvitation.getPId() + "  AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28,36))\n" +
+                    "\tWHERE u.`parentId`=" +user.getId() + "  AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28,36))\n" +
                     "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\n" +
                     "\t\t\tAND o.id IN (\n" +
@@ -214,7 +204,7 @@ int i=0;
             );
 
             StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (439,453)"
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (439,453)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
@@ -245,14 +235,11 @@ int i=0;
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
 
-            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
-            if(userInvitation == null){
-                continue;
-            }
+
             StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`= =" +userInvitation.getPId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\tWHERE u.`parentId`= =" +user.getId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
                     "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(440,445)\n" +
@@ -261,7 +248,7 @@ int i=0;
             );
 
             StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (440,445)"
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (440,445)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
@@ -293,14 +280,11 @@ int i=0;
         List<ThreeBackOneInit> list = new ArrayList<>();
         for (User user : userList) {
 
-            UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
-            if(userInvitation == null){
-                continue;
-            }
+
             StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
                     "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`= =" +userInvitation.getPId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\tWHERE u.`parentId`= =" +user.getId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
                     "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(281,306,369,392)\n" +
@@ -309,7 +293,7 @@ int i=0;
             );
 
             StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +userInvitation.getPId() + " AND ogi.goodsId IN (281,306,369,392)"
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (281,306,369,392)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
