@@ -105,7 +105,7 @@ public class TankStoreRelationAct {
                     "\tLEFT JOIN "+name+".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN "+name+".USER AS u2 ON u2.id=u.parentId \n" +
                     "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501,285) AND o.`payTime` <='{cTime}'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501,285) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "and (o.commissionModel !='兑换无佣金' or o.commissionModel is null)\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM "+name+".ordergoods AS og WHERE og.goodsId IN(156,191,196,239,241,2005,285,287,2017,2024,2026,2055,2067,2102)\n" +
@@ -153,7 +153,7 @@ public class TankStoreRelationAct {
                     "\tLEFT JOIN "+name+".USER AS u ON u.`id`=o.`userId`\n" +
                     "  LEFT JOIN "+name+".USER AS u2 ON u2.id=u.parentId \n" +
                     "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='{cTime}'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
                     "\t\t\t\tSELECT og.orderId FROM "+name+".ordergoods AS og WHERE og.goodsId IN(274,275,286,2004,2018,2021,2025,2045,2046,2047,2048,2060,2101)\n" +
                     "\t\t\t)"
@@ -190,14 +190,14 @@ int i=0;
         for (User user : userList) {
 
 
-            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
-                    "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
-                    "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId`=" +user.getId() + "  AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28,36))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
-                    "\n" +
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM "+name+".orders AS o \n" +
+                    "\tLEFT JOIN "+name+".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN "+name+".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28,35))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501,285) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "and (o.commissionModel !='兑换无佣金' or o.commissionModel is null)\n" +
                     "\t\t\tAND o.id IN (\n" +
-                    "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(439,453)\n" +
+                    "\t\t\t\tSELECT og.orderId FROM "+name+".ordergoods AS og WHERE og.goodsId IN(2110,2123)\n" +
                     "\t\t\t)\n" +
                     "\t"
             );
@@ -235,19 +235,19 @@ int i=0;
         for (User user : userList) {
 
 
-            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
-                    "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
-                    "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId` =" +user.getId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM "+name+".orders AS o \n" +
+                    "\tLEFT JOIN "+name+".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN "+name+".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
-                    "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(440,445)\n" +
+                    "\t\t\t\tSELECT og.orderId FROM "+name+".ordergoods AS og WHERE og.goodsId IN(2111,2115)\n" +
                     "\t\t\t)\n" +
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (440,445)"
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (2111,2115)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
@@ -280,19 +280,19 @@ int i=0;
         for (User user : userList) {
 
 
-            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM " + name + ".orders AS o \n" +
-                    "\tLEFT JOIN " + name + ".USER AS u ON u.`id`=o.`userId`\n" +
-                    "  LEFT JOIN " + name + ".USER AS u2 ON u2.id=u.parentId \n" +
-                    "\tWHERE u.`parentId` =" +user.getId() + "  AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
-                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01' and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM "+name+".orders AS o \n" +
+                    "\tLEFT JOIN "+name+".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN "+name+".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (24) OR o.`riseCapacityId` IN(24))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
                     "\t\t\tAND o.id IN (\n" +
-                    "\t\t\t\tSELECT og.orderId FROM " + name + ".ordergoods AS og WHERE og.goodsId IN(281,306,369,392)\n" +
+                    "\t\t\t\tSELECT og.orderId FROM "+name+".ordergoods AS og WHERE og.goodsId IN(281,2002,2056)\n" +
                     "\t\t\t)\n" +
                     "\t"
             );
 
-            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM " + name + ".ordergoodinit AS ogi LEFT JOIN " + name + ".USER AS ug ON ug.id=ogi.userId\n" +
-                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (281,306,369,392)"
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (281,2002,2056)"
             );
 
             Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
