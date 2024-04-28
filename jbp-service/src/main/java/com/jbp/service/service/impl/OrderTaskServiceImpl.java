@@ -12,6 +12,8 @@ import com.alibaba.fastjson.JSON;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.kqbill.result.KqPayQueryResult;
+import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
@@ -123,7 +125,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     @Autowired
     private FundClearingService fundClearingService;
     @Autowired
-    private PlatformWalletService platformWalletService;
+    private PayCallbackService payCallbackService;
     @Autowired
     private WalletService walletService;
 
@@ -663,6 +665,10 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 continue;
             }
             try {
+
+
+
+
                 boolean result = orderAutoCancel(String.valueOf(data));
                 if (!result) {
                     redisUtil.lPush(redisKey, data);
@@ -681,53 +687,59 @@ public class OrderTaskServiceImpl implements OrderTaskService {
      */
     private Boolean orderAutoCancel(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
-        if (ObjectUtil.isNull(order)) {
+        String  platOrderNo = StringUtils.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() :order.getPlatOrderNo();
+        payCallbackService.payResultSync(order.getPayChannel(), platOrderNo);
+
+        Order lastOrder = orderService.getByOrderNo(orderNo);
+        if (ObjectUtil.isNull(lastOrder)) {
             logger.error("自动取消支付订单，订单不存在，订单号为:{}", orderNo);
             return Boolean.TRUE;
         }
-        if (order.getPaid()) {
+        if (lastOrder.getPaid()) {
             return Boolean.TRUE;
         }
-        if (order.getStatus().equals(OrderConstants.ORDER_STATUS_CANCEL)) {
+        if (lastOrder.getStatus().equals(OrderConstants.ORDER_STATUS_CANCEL)) {
             return Boolean.TRUE;
         }
-        if (!order.getCancelStatus().equals(OrderConstants.ORDER_CANCEL_STATUS_NORMAL)) {
+        if (!lastOrder.getCancelStatus().equals(OrderConstants.ORDER_CANCEL_STATUS_NORMAL)) {
             return Boolean.TRUE;
         }
         // 获取过期时间
-        DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
+        DateTime cancelTime = DateUtil.offset(lastOrder.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
         long between = DateUtil.between(cancelTime, DateUtil.date(), DateUnit.SECOND, false);
         if (between < 0) {// 未到过期时间继续循环
             return Boolean.FALSE;
         }
 
-        User user = userService.getById(order.getUid());
-        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(order.getOrderNo());
+        User user = userService.getById(lastOrder.getUid());
+        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(lastOrder.getOrderNo());
         List<Integer> couponIdList = merchantOrderList.stream().filter(e -> e.getCouponId() > 0).map(MerchantOrder::getCouponId).collect(Collectors.toList());
-        if (order.getPlatCouponId() > 0) {
-            couponIdList.add(order.getPlatCouponId());
+        if (lastOrder.getPlatCouponId() > 0) {
+            couponIdList.add(lastOrder.getPlatCouponId());
         }
+
         return transactionTemplate.execute(e -> {
-            orderService.cancel(order.getOrderNo(), false);
+
+            orderService.cancel(lastOrder.getOrderNo(), false);
             //写订单日志
-            orderStatusService.createLog(order.getOrderNo(), "cancel", "到期未支付系统自动取消");
+            orderStatusService.createLog(lastOrder.getOrderNo(), "cancel", "到期未支付系统自动取消");
             // 退优惠券
             if (CollUtil.isNotEmpty(couponIdList)) {
                 couponUserService.rollbackByIds(couponIdList);
             }
             // 退积分
-            if (order.getUseIntegral() > 0) {
-                userService.updateIntegral(order.getUid(), order.getUseIntegral(), Constants.OPERATION_TYPE_ADD);
-                UserIntegralRecord userIntegralRecord = initOrderCancelIntegralRecord(user.getId(), order.getUseIntegral(), user.getIntegral(), order.getOrderNo());
+            if (lastOrder.getUseIntegral() > 0) {
+                userService.updateIntegral(lastOrder.getUid(), lastOrder.getUseIntegral(), Constants.OPERATION_TYPE_ADD);
+                UserIntegralRecord userIntegralRecord = initOrderCancelIntegralRecord(user.getId(), lastOrder.getUseIntegral(), user.getIntegral(), lastOrder.getOrderNo());
                 userIntegralRecordService.save(userIntegralRecord);
             }
             // 回退抵扣
-            walletService.refundDeduction(order.getPayUid(), order.getOrderNo(), "订单取消");
+            walletService.refundDeduction(lastOrder.getPayUid(), lastOrder.getOrderNo(), "订单取消");
             // 回滚库存
-            Boolean rollbackStock = rollbackStock(order);
+            Boolean rollbackStock = rollbackStock(lastOrder);
             if (!rollbackStock) {
                 e.setRollbackOnly();
-                logger.error("订单回滚库存失败,订单号:{}", order.getOrderNo());
+                logger.error("订单回滚库存失败,订单号:{}", lastOrder.getOrderNo());
                 return Boolean.FALSE;
             }
             return Boolean.TRUE;

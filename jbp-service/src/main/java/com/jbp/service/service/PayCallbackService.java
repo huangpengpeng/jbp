@@ -2,6 +2,7 @@ package com.jbp.service.service;
 
 import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
+import com.jbp.common.model.order.Order;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,5 +41,10 @@ public interface PayCallbackService {
     String  lianLianPayCallback(QueryPaymentResult queryPaymentResult);
 
     String  kqPayCallback(KqPayQueryResult kqPayQueryResult);
+
+    void payResultSync(String payChannel, String orderNo);
+
+
+
 
 }
