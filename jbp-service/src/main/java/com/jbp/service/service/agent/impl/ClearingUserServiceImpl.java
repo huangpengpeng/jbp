@@ -407,7 +407,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         if (commType.equals(ProductCommEnum.拓展佣金.getType())) {
             for (ClearingUserImportDto dto : userList) {
                 User user = userService.getByAccount(dto.getAccount());
-                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(1L).levelName("默认").build();
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).accountNo(user.getAccount()).level(1L).levelName("默认").build();
                 if (dto.getWeight() == null || ArithmeticUtils.lessEquals(dto.getWeight(), BigDecimal.ZERO)) {
                     throw new CrmebException(dto.getAccount() + ProductCommEnum.拓展佣金.getName() + "权重不能为空");
                 }
@@ -424,7 +424,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             }
             for (ClearingUserImportDto dto : userList) {
                 User user = userService.getByAccount(dto.getAccount());
-                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).accountNo(user.getAccount()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
                 MonthPyCommHandler.Rule rule = ruleMap.get(dto.getLevel());
                 if (rule == null) {
                     throw new CrmebException("培育佣金结算级编号不存在");
@@ -442,7 +442,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             Map<Long, PingTaiCommHandler.Rule> ruleMap = FunctionUtil.keyValueMap(ruleList, PingTaiCommHandler.Rule::getLevel);
             for (ClearingUserImportDto dto : userList) {
                 User user = userService.getByAccount(dto.getAccount());
-                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).accountNo(user.getAccount()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
                 PingTaiCommHandler.Rule rule = ruleMap.get(dto.getLevel());
                 if (rule == null) {
                     throw new CrmebException("培育佣金结算级编号不存在");
