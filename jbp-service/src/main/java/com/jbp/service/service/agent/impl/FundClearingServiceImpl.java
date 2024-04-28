@@ -418,6 +418,30 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         return one == null ? BigDecimal.ZERO : one.getSendAmt();
     }
 
+    @Override
+    public BigDecimal getUserTotal(Integer uid) {
+        return fundClearingDao.getUserTotal(uid);
+    }
+    @Override
+    public BigDecimal getUserTotalMonth(Integer uid,String month) {
+        return fundClearingDao.getUserTotalMonth(uid,month);
+    }
+
+    @Override
+    public   List<Map<String,Object>>  getUserTotalMonthList(Integer uid,String month) {
+        return fundClearingDao.getUserTotalMonthList(uid,month);
+    }
+
+    @Override
+    public BigDecimal getUserTotalContMonth(Integer uid, String month) {
+        return fundClearingDao.getUserTotalContMonth(uid,month);
+    }
+
+    @Override
+    public BigDecimal getUserTotalDay(Integer uid,String day) {
+        return fundClearingDao.getUserTotalDay(uid,day);
+    }
+
     private static List<FundClearingItem> createItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {
         List<FundClearingItem> items = Lists.newArrayList();
         List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());

@@ -129,7 +129,7 @@ public class UserInvitationController {
         userInvitationService.band(user.getId(), pUser.getId(), true, true, true);
 
         return CommonResult.success();
-    }
+}
 
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "销售关系上下级删除上级")

@@ -97,4 +97,15 @@ public interface FundClearingService extends IService<FundClearing> {
     boolean hasCreate(String orderNo, String commName);
 
     BigDecimal getSendCommAmt(Integer uid, Date start, Date end, String ...commName);
+
+
+   BigDecimal getUserTotal(Integer uid);
+
+    BigDecimal getUserTotalMonth(Integer uid,String month);
+    List<Map<String,Object>> getUserTotalMonthList(Integer uid,String month);
+
+
+    BigDecimal getUserTotalContMonth(Integer uid,String month);
+
+    BigDecimal getUserTotalDay(Integer uid,String day);
 }
