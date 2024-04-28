@@ -18,10 +18,7 @@ import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.wechat.WechatPayInfo;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.CrmebUtil;
-import com.jbp.common.utils.RedisUtil;
-import com.jbp.common.utils.WxPayUtil;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.AttachVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.WechatPayCallbackVo;
@@ -88,6 +85,8 @@ public class PayCallbackServiceImpl implements PayCallbackService {
     private AliPayCallbackService aliPayCallbackService;
     @Autowired
     private LianLianPayService lianLianPayService;
+    @Autowired
+    private KqPayService kqPayService;
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -594,6 +593,21 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
         redisTemplate.delete("PaySuccessCall" + orderNo);
         return "Success";
+    }
+
+    @Override
+    public void payResultSync(String payChannel, String orderNo) {
+        if (payChannel.equals(PayConstants.PAY_TYPE_LIANLIAN)) {
+            QueryPaymentResult result = lianLianPayService.queryPayResult(orderNo);
+            if (result != null || "TRADE_SUCCESS".equals(result.getTxn_status())) {
+                lianLianPayCallback(result);
+            }
+        } else if (payChannel.equals(PayConstants.PAY_CHANNEL_KQ)) {
+            KqPayQueryResult result = kqPayService.queryPayResult(orderNo);
+            if (result != null && result.ifSuccess()) {
+                kqPayCallback(result);
+            }
+        }
     }
 
     /**
