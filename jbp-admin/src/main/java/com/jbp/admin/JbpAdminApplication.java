@@ -49,12 +49,12 @@ public class JbpAdminApplication {
 //        groupThreeRetOneHandler.aa_3968();
 //       groupThreeRetOneHandler.aa_15866();
      //   groupThreeRetOneHandler.aa_3174_4();
-        groupThreeRetOneHandler.aa_12692_8();
+       groupThreeRetOneHandler.aa_12692_8();
         groupThreeRetOneHandler.aa_11880();
 
         //团队业绩
-//        InvitationScoreService groupThreeRetOneHandler = run.getBean(InvitationScoreService.class);
-//        groupThreeRetOneHandler.init();
+//        InvitationScoreService groupThreeRetOneHandler2 = run.getBean(InvitationScoreService.class);
+//        groupThreeRetOneHandler2.init();
 
 
 //        GroupThreeRetOneHandler groupThreeRetOneHandler=  run.getBean(GroupThreeRetOneHandler.class);

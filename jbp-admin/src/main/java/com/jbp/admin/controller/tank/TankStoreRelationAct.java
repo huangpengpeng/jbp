@@ -301,12 +301,12 @@ int i=0;
             if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
                 ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
                 threeBackOneInit.setUid(user.getId());
-                threeBackOneInit.setAmt(new BigDecimal(12692.8));
+                threeBackOneInit.setAmt(new BigDecimal(11880));
                 threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
                 list.add(threeBackOneInit);
             }
             i++;
-            log.info("12692.8"+i);
+            log.info("11880"+i);
         }
 
         threeBackOneInitService.saveBatch(list);
