@@ -5,10 +5,7 @@ import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.result.AcctBalList;
-import com.jbp.common.lianlian.result.AcctSerialResult;
-import com.jbp.common.lianlian.result.ApplyPasswordElementResult;
-import com.jbp.common.lianlian.result.ValidationSmsResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
@@ -18,10 +15,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.utils.SecurityUtil;
-import com.jbp.common.utils.StringUtils;
+import com.jbp.common.utils.*;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
@@ -36,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -81,10 +77,11 @@ public class LztAcctController {
     @ApiOperation(value = "银行虚拟户申请")
     @GetMapping(value = "/bank/apply")
     public CommonResult<LztAcctApply> apply(Integer merId, String userId, String shopId, String shopName, String province,
-                                            String city, String area, String address) {
-        LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address);
+                                            String city, String area, String address, String openBank) {
+        LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address, openBank);
         return CommonResult.success(apply);
     }
+
     @ApiOperation(value = "来账通账户密码控件")
     @GetMapping(value = "/pwd")
     public CommonResult<ApplyPasswordElementResult> pwd(String userId, BigDecimal amt, String scan) {
@@ -97,19 +94,38 @@ public class LztAcctController {
         if (StringUtils.isEmpty(scan)) {
             throw new CrmebException("场景不能为空");
         }
-        if (amt == null || !ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-            throw new CrmebException("金额错误");
+        if(!(scan.equals("换绑卡") || scan.equals("忘记密码"))) {
+            if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
+                throw new CrmebException("请先输入金额");
+            }
         }
+
         String payCode = "";
         switch (scan) {
+
+
             case "转账":
                 scan = "pay_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
+                break;
+            case "代付":
+                scan = "pay_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通外部代发.getPrefix());
                 break;
             case "提现":
                 scan = "cashout_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix());
                 break;
+            case "忘记密码":
+                scan = "setting_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.设置密码.getPrefix());
+                break;
+            case "换绑卡":
+                scan = "bind_card_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.换绑卡.getPrefix());
+                break;
+
+
         }
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
@@ -131,7 +147,9 @@ public class LztAcctController {
     public CommonResult<List<String>> userTypeList() {
         List<String> list = Lists.newArrayList();
         for (LianLianPayConfig.UserType value : LianLianPayConfig.UserType.values()) {
-            list.add(value.name());
+            if (!value.name().equals("商户")) {
+                list.add(value.name());
+            }
         }
         return CommonResult.success(list);
     }
@@ -145,6 +163,7 @@ public class LztAcctController {
         query.lambda().eq(merId > 0, LztAcct::getMerId, merId);
         return CommonResult.success(lztAcctService.list(query));
     }
+
     @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")
     @SneakyThrows
     @ApiOperation(value = "账户资金明细 flagDc-> DEBIT：出账 CREDIT：入账 时间格式 yyyyMMddHHmmss")
@@ -207,5 +226,95 @@ public class LztAcctController {
         return CommonResult.success();
     }
 
+
+    @SneakyThrows
+    @ApiOperation(value = "忘记密码发送验证码")
+    @GetMapping(value = "/findPwdSendCode")
+    public CommonResult<FindPasswordApplyResult> findPwdSendCode(String userId, HttpServletRequest request) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        String ip = CrmebUtil.getClientIp(request);
+        String linked_acctno = "";
+        if (LianLianPayConfig.UserType.个人用户.name().equals(lztAcct.getUserType())) {
+            QueryLinkedAcctResult queryLinkedAcctResult = lztService.queryLinkedAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
+            if (queryLinkedAcctResult != null && CollectionUtils.isNotEmpty(queryLinkedAcctResult.getLinked_acctlist())) {
+                linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
+            }
+        }
+        FindPasswordApplyResult passwordApply = lztService.findPasswordApply(payInfo.getOidPartner(),
+                payInfo.getPriKey(), userId, linked_acctno, ip);
+        if (passwordApply != null && "0000".equals(passwordApply.getRet_code())) {
+            passwordApply.setRegMsg("已发送至: " + passwordApply.getReg_phone() + " 请注意查收");
+        }
+        return CommonResult.success(passwordApply);
+    }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:findPwd')")
+    @SneakyThrows
+    @ApiOperation(value = "忘记密码")
+    @GetMapping(value = "/findPwd")
+    public CommonResult<FindPasswordVerifyResult> findPwd(String userId, String token, String verifyCode, String randomKey, String password) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        FindPasswordVerifyResult passwordVerify = lztService.findPasswordVerify(payInfo.getOidPartner(), payInfo.getPriKey(), userId, token, verifyCode, randomKey, password);
+        return CommonResult.success(passwordVerify);
+    }
+
+
+    @SneakyThrows
+    @ApiOperation(value = "修改手机号发送验证码")
+    @GetMapping(value = "/changePhoneSendCode")
+    public CommonResult<ChangeRegPhoneApplyResult> changePhoneSendCode(String userId, String regPhone, String newPhone,
+                                                                       String pwd, String randomKey, HttpServletRequest request) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        String ip = CrmebUtil.getClientIp(request);
+        ChangeRegPhoneApplyResult result = lztService.changeRegPhoneApply(payInfo.getOidPartner(),
+                payInfo.getPriKey(), userId, regPhone, newPhone, pwd, randomKey, merchant.getCreateTime(), ip, merchant.getFrmsWareCategory());
+
+        if (result != null && "0000".equals(result.getRet_code())) {
+            result.setRegMsg("已发送至: " + newPhone + " 请注意查收");
+        }
+        return CommonResult.success(result);
+    }
+
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:changePhone')")
+    @ApiOperation(value = "修改手机号确认")
+    @GetMapping(value = "/changePhone")
+    public CommonResult changePhone(String userId, String token, String txn_seqno, String code) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        Integer merId = systemAdmin.getMerId();
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if (lztAcct == null || lztAcct.getMerId() != merId) {
+            throw new CrmebException("账户不存在");
+        }
+        Merchant merchant = merchantService.getById(merId);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        ChangeRegPhoneVerifyResult result = lztService.changeRegPhoneVerify(payInfo.getOidPartner(),
+                payInfo.getPriKey(), userId, token, txn_seqno, code);
+        if ("0000".equals(result.getRet_code())) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed(result.getRet_msg());
+    }
 
 }

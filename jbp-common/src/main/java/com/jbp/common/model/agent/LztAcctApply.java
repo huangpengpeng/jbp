@@ -18,8 +18,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class LztAcctApply extends BaseModel {
 
-    public LztAcctApply(Integer merId, String userId, String userType, String userNo, String username, String txnSeqno, String accpTxno,
-                        String gatewayUrl) {
+    public LztAcctApply(Integer merId, String userId, String userType, String userNo, String username,
+                        String txnSeqno, String accpTxno,
+                        String gatewayUrl, String openBank) {
         this.merId = merId;
         this.userId = userId;
         this.userType = userType;
@@ -29,6 +30,7 @@ public class LztAcctApply extends BaseModel {
         this.accpTxno = accpTxno;
         this.gatewayUrl = gatewayUrl;
         this.status = "待开户";
+        this.openBank = openBank;
     }
 
     @ApiModelProperty(value = "商户ID")
@@ -45,6 +47,9 @@ public class LztAcctApply extends BaseModel {
 
     @ApiModelProperty(value = "连连账户名称")
     private String username;
+
+    @ApiModelProperty(value = "开户银行")
+    private String openBank;
 
     @ApiModelProperty(value = "请求流水号")
     private String txnSeqno;

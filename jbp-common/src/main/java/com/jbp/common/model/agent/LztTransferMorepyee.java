@@ -32,6 +32,8 @@ public class LztTransferMorepyee extends BaseModel {
         this.merId = merId;
         this.payerId = payerId;
         this.payeeId = payeeId;
+        this.payerName = payerName;
+        this.payeeName = payeeName;
         this.txnSeqno = txnSeqno;
         this.amt = amt;
         this.postscript = postscript;
@@ -39,6 +41,7 @@ public class LztTransferMorepyee extends BaseModel {
         this.txnStatus = LianLianPayConfig.TxnStatus.交易处理中.getName();
         this.accpTxno = accpTxno;
         this.createTime= DateTimeUtils.getNow();
+        this.receiptStatus = 0;
     }
 
     @ApiModelProperty(value = "商户id")
@@ -75,6 +78,18 @@ public class LztTransferMorepyee extends BaseModel {
     @ApiModelProperty(value = "查询结果")
     @TableField(value = "queryRet", typeHandler = QueryPaymentResultHandler.class)
     private QueryPaymentResult queryRet;
+
+    @ApiModelProperty(value = "回执单状态 0  待申请  1 待下载  2 已下载 ")
+    private Integer receiptStatus;
+
+    @ApiModelProperty(value = "回执token")
+    private String receiptToken;
+
+    @ApiModelProperty(value = "电子回单流水号")
+    private String receiptAccpTxno;
+
+    @ApiModelProperty(value = "回执文件")
+    private String receiptZip;
 
     @ApiModelProperty(value = "结果")
     private String txnStatus;

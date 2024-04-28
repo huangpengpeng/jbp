@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.lianlian.result.ReceiptDownloadResult;
 import com.jbp.common.lianlian.result.ReceiptProduceResult;
 import com.jbp.common.model.agent.LztReceipt;
+import com.jbp.common.model.agent.LztTransfer;
+import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.utils.DateTimeUtils;
@@ -13,6 +16,9 @@ import com.jbp.service.dao.agent.LztReceiptDao;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztReceiptService;
+import com.jbp.service.service.agent.LztTransferMorepyeeService;
+import com.jbp.service.service.agent.LztTransferService;
+import com.jbp.service.service.agent.LztWithdrawalService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +34,15 @@ import java.util.List;
 public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt> implements LztReceiptService {
 
     @Resource
+    private LztTransferService lztTransferService;
+    @Resource
     private LztService lztService;
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private LztWithdrawalService lztWithdrawalService;
+    @Resource
+    private LztTransferMorepyeeService lztTransferMorepyeeService;
 
     @Override
     public List<LztReceipt> getList(Integer merId, String tradeTxnSeqno, String memo) {
@@ -61,17 +73,77 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
         lztReceipt.setToken(receiptProduceResult.getToken());
         lztReceipt.setTradeAccpTxno(receiptProduceResult.getTrade_accp_txno());
         save(lztReceipt);
+
+        // 提现记录
+        LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(tradeTxnSeqno);
+        if(lztWithdrawal != null){
+            lztWithdrawal.setReceiptStatus(1);
+            lztWithdrawal.setReceiptToken(lztReceipt.getToken());
+            lztWithdrawal.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
+            lztWithdrawalService.updateById(lztWithdrawal);
+        }
+        // 转账记录
+        LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(tradeTxnSeqno);
+        if(lztTransferMorepyee != null){
+            lztTransferMorepyee.setReceiptStatus(1);
+            lztTransferMorepyee.setReceiptToken(lztReceipt.getToken());
+            lztTransferMorepyee.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
+            lztTransferMorepyeeService.updateById(lztTransferMorepyee);
+        }
+        // 外部转账记录
+        LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(tradeTxnSeqno);
+        if(lztTransfer != null){
+            lztTransfer.setReceiptStatus(1);
+            lztTransfer.setReceiptToken(lztReceipt.getToken());
+            lztTransfer.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
+            lztTransferService.updateById(lztTransfer);
+        }
         return lztReceipt;
     }
 
     @Override
-    public ReceiptDownloadResult download(Long id) {
-        LztReceipt lztReceipt = getById(id);
-        Merchant merchant = merchantService.getById(lztReceipt.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        ReceiptDownloadResult receiptDownloadResult = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(), lztReceipt.getReceiptAccpTxno(), lztReceipt.getToken());
-
-        return receiptDownloadResult;
+    public ReceiptDownloadResult download(String tradeTxnSeqno) {
+        ReceiptDownloadResult result = new ReceiptDownloadResult();
+        // 提现记录
+        LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(tradeTxnSeqno);
+        if (lztWithdrawal != null && StringUtils.isEmpty(lztWithdrawal.getReceiptZip())) {
+            Merchant merchant = merchantService.getById(lztWithdrawal.getMerId());
+            MerchantPayInfo payInfo = merchant.getPayInfo();
+            result = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(),
+                    lztWithdrawal.getReceiptAccpTxno(), lztWithdrawal.getReceiptToken());
+            lztWithdrawal.setReceiptZip(result.getReceipt_sum_file());
+            lztWithdrawalService.updateById(lztWithdrawal);
+        }
+        if(lztWithdrawal != null){
+            result.setReceipt_sum_file(lztWithdrawal.getReceiptZip());
+        }
+        // 转账记录
+        LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(tradeTxnSeqno);
+        if (lztTransferMorepyee != null && StringUtils.isEmpty(lztTransferMorepyee.getReceiptZip())) {
+            Merchant merchant = merchantService.getById(lztTransferMorepyee.getMerId());
+            MerchantPayInfo payInfo = merchant.getPayInfo();
+            result = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(),
+                    lztTransferMorepyee.getReceiptAccpTxno(), lztTransferMorepyee.getReceiptToken());
+            lztTransferMorepyee.setReceiptZip(result.getReceipt_sum_file());
+            lztTransferMorepyeeService.updateById(lztTransferMorepyee);
+        }
+        if(lztTransferMorepyee != null){
+            result.setReceipt_sum_file(lztTransferMorepyee.getReceiptZip());
+        }
+        // 外部转账记录
+        LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(tradeTxnSeqno);
+        if (lztTransfer != null && StringUtils.isEmpty(lztTransfer.getReceiptZip())) {
+            Merchant merchant = merchantService.getById(lztTransfer.getMerId());
+            MerchantPayInfo payInfo = merchant.getPayInfo();
+            result = lztService.receiptDownload(payInfo.getOidPartner(), payInfo.getPriKey(),
+                    lztTransfer.getReceiptAccpTxno(), lztTransfer.getReceiptToken());
+            lztTransfer.setReceiptZip(result.getReceipt_sum_file());
+            lztTransferService.updateById(lztTransfer);
+        }
+        if(lztTransfer != null){
+            result.setReceipt_sum_file(lztTransfer.getReceiptZip());
+        }
+        return result;
     }
 
 

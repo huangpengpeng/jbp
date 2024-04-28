@@ -9,6 +9,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class TransferMorepyeePayeeInfo implements Serializable {
 
+    public TransferMorepyeePayeeInfo(String payee_type, String payee_id, String payee_accttype, String payee_amount) {
+        this.payee_type = payee_type;
+        this.payee_id = payee_id;
+        this.payee_accttype = payee_accttype;
+        this.payee_amount = payee_amount;
+    }
+
     /**
      * 收款方类型。
      * 用户：USER

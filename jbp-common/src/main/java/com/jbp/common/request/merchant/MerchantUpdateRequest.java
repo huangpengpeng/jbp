@@ -14,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 编辑商户请求对象
@@ -33,7 +34,7 @@ import java.io.Serializable;
 @ApiModel(value="MerchantUpdateRequest对象", description="编辑商户请求对象")
 public class MerchantUpdateRequest implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "商户ID")
     @NotNull(message = "商户ID不能为空")
@@ -57,8 +58,7 @@ public class MerchantUpdateRequest implements Serializable {
 
     @ApiModelProperty(value = "手续费(%)")
     @NotNull(message = "手续费不能为空")
-    @Range(min = 0, max = 100, message = "手续费率范围为0-100")
-    private Integer handlingFee;
+    private BigDecimal handlingFee;
 
     @ApiModelProperty(value = "商户关键字")
     private String keywords;
@@ -100,4 +100,15 @@ public class MerchantUpdateRequest implements Serializable {
     @ApiModelProperty(value = "资质图片")
     private String qualificationPicture;
 
+    @ApiModelProperty(value = "支付私钥")
+    private String priKey;
+
+    @ApiModelProperty(value = "支付商户号")
+    private String oidPartner;
+
+    @ApiModelProperty(value = "支付模式")
+    private Integer tradeModel;
+
+    @ApiModelProperty(value = "分控类目")
+    private String frmsWareCategory;
 }

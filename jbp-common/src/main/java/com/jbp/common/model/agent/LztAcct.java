@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -32,6 +33,7 @@ public class LztAcct extends BaseModel {
         this.username = username;
         this.bankAccount = bankAccount;
         this.ifOpenBankAcct = false;
+
     }
 
     @ApiModelProperty(value = "商户id")
@@ -55,6 +57,9 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "开通银行虚拟户")
     private Boolean ifOpenBankAcct;
 
+    @ApiModelProperty(value = "开户银行")
+    private String openBank;
+
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)
     private String  gatewayUrl;
@@ -70,6 +75,26 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)
     private String merName;
+
+    @ApiModelProperty(value = "资金余额")
+    @TableField(exist = false)
+    private BigDecimal amtBalcur;
+
+    @ApiModelProperty(value = "可用余额")
+    @TableField(exist = false)
+    private BigDecimal amtBalaval;
+
+    @ApiModelProperty(value = "银行账户余额")
+    @TableField(exist = false)
+    private BigDecimal amtBankBalaval;
+
+    @ApiModelProperty(value = "冻结金额")
+    @TableField(exist = false)
+    private BigDecimal amtBalfrz;
+
+    @ApiModelProperty(value = "银行卡号")
+    @TableField(exist = false)
+    private String bankAcctNo;
 
 
 }

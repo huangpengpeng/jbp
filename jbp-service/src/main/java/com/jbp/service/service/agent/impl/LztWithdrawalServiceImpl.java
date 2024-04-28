@@ -20,6 +20,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztWithdrawalDao;
 import com.jbp.service.service.LianLianPayService;
@@ -63,6 +64,9 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
 
     @Override
     public LztWithdrawal withdrawal(Integer merId, String userId, String drawNo, BigDecimal amt, String postscript, String password, String random_key, String ip) {
+        if(StringUtils.isEmpty(drawNo)){
+            drawNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix());
+        }
         if (getByTxnSeqno(drawNo) != null) {
             throw new CrmebException("提现单号已经被使用");
         }
@@ -80,11 +84,15 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
             }
             linked_acctno = queryLinkedAcctResult.getLinked_acctlist().get(0).getLinked_acctno();
         }
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0038) : new BigDecimal(merchant.getHandlingFee());
-        BigDecimal feeAmount = amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
+        feeScale = feeScale.subtract(BigDecimal.valueOf(0.0008));
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
         WithdrawalResult orderResult = lztService.withdrawal(payInfo.getOidPartner(), payInfo.getPriKey(), userId, drawNo,
-                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno);
-
+                amt, feeAmount, postscript, password, random_key, ip, notifyUrl, linked_acctno, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt, feeAmount, postscript, orderResult);
         save(withdrawal);
         return withdrawal;
@@ -149,7 +157,8 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
     @Override
     public PageInfo<LztWithdrawal> pageList(Integer merId, String userId, String txnSeqno, String accpTxno, String status, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztWithdrawal> lqw = new LambdaQueryWrapper<LztWithdrawal>()
-                .eq(LztWithdrawal::getMerId, merId)
+                .select(LztWithdrawal.class, info -> !info.getColumn().equals("receipt_zip"))
+                .eq(merId != null && merId > 0,  LztWithdrawal::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztWithdrawal::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(userId), LztWithdrawal::getUserId, userId)
                 .eq(StringUtils.isNotEmpty(txnSeqno), LztWithdrawal::getTxnSeqno, txnSeqno)
@@ -176,5 +185,17 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         return CommonPage.copyPageInfo(page, list);
     }
 
+    @Override
+    public LztWithdrawal detail(Long id) {
+        LztWithdrawal withdrawal = getById(id);
+        refresh(withdrawal.getTxnSeqno());
+        return getById(id);
+    }
 
+    @Override
+    public List<LztWithdrawal> getWaitDownloadList() {
+        QueryWrapper<LztWithdrawal> q = new QueryWrapper<>();
+        q.last("where receipt_token is not null and receipt_token !='' and ( receipt_zip is null or receipt_zip ='') ");
+        return list(q);
+    }
 }

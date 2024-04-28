@@ -11,6 +11,7 @@ import com.jbp.common.request.PageParamRequest;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public interface LztWithdrawalService extends IService<LztWithdrawal> {
 
@@ -26,4 +27,9 @@ public interface LztWithdrawalService extends IService<LztWithdrawal> {
     LztWithdrawal refresh(String txnSeqno);
 
     PageInfo<LztWithdrawal> pageList(Integer merId, String userId, String txnSeqno, String accpTxno, String status, Date startTime, Date endTime, PageParamRequest pageParamRequest);
+
+    LztWithdrawal detail(Long id);
+
+    List<LztWithdrawal> getWaitDownloadList();
+
 }

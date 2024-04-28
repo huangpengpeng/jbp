@@ -172,7 +172,11 @@ public class LianLianPayConfig {
         来账通开通银行虚拟户("LZT_BKH_"),
         来账通划拨资金("LZT_FT_"),
         来账通内部代发("LZT_NDF_"),
+        来账通外部代发("LZT_WDF_"),
         来账通提现("LZT_DW_"),
+        设置密码("LZT_SP_"),
+
+        换绑卡("LZT_HBK_"),
         ;
 
         @Getter

@@ -13,6 +13,8 @@ public interface LztAcctOpenService extends IService<LztAcctOpen> {
 
     void refresh(String accpTxno);
 
+    void del(Long id);
+
     LztAcctOpen getByTxnSeqno(String txnSeqno);
 
     LztAcctOpen getByAccpTxno(String accpTxno);

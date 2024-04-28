@@ -400,6 +400,12 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         if (StrUtil.isNotBlank(tempMerchant.getQualificationPicture())) {
             tempMerchant.setQualificationPicture(systemAttachmentService.clearPrefix(tempMerchant.getQualificationPicture()));
         }
+        tempMerchant.setFrmsWareCategory(request.getFrmsWareCategory());
+        tempMerchant.setTradeModel(request.getTradeModel());
+        MerchantPayInfo payInfo = new MerchantPayInfo();
+        payInfo.setOidPartner(request.getOidPartner());
+        payInfo.setPriKey(request.getPriKey());
+        tempMerchant.setPayInfo(payInfo);
         return dao.updateById(tempMerchant) > 0;
     }
 
@@ -622,6 +628,11 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantDao, Merchant> impl
         baseInfo.setMerCategory(merchantCategory.getName());
         baseInfo.setMerType(merchantType.getName());
         baseInfo.setReceiptPrintingSwitch(merchant.getReceiptPrintingSwitch());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        if(payInfo != null){
+            baseInfo.setOidPartner(payInfo.getOidPartner());
+            baseInfo.setPriKey(payInfo.getPriKey());
+        }
         return baseInfo;
     }
 

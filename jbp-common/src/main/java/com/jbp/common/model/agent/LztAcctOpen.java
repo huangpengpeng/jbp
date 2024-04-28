@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.lianlian.result.AcctInfo;
 import com.jbp.common.lianlian.result.LztQueryAcctInfo;
+import com.jbp.common.lianlian.result.UserInfoResult;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.mybatis.UserInfoResultHandler;
+import com.jbp.common.mybatis.WithdrawalResultHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -65,6 +68,10 @@ public class LztAcctOpen extends BaseModel {
 
     @ApiModelProperty(value = "开户返回消息")
     private String retMsg;
+
+    @ApiModelProperty(value = "开户返回消息")
+    @TableField(value = "queryRet", typeHandler = UserInfoResultHandler.class)
+    private UserInfoResult queryRet;
 
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)

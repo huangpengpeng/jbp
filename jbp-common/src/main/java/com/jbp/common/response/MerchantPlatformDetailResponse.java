@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 平台端商户详情响应对象
@@ -53,7 +54,7 @@ public class MerchantPlatformDetailResponse implements Serializable {
     private String phone;
 
     @ApiModelProperty(value = "手续费(%)")
-    private Integer handlingFee;
+    private BigDecimal handlingFee;
 
     @ApiModelProperty(value = "商户关键字")
     private String keywords;
@@ -99,4 +100,10 @@ public class MerchantPlatformDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "连连私钥")
     private String priKey;
+
+    @ApiModelProperty(value = "交易模型")
+    private Integer tradeModel ;
+
+    @ApiModelProperty(value = "分控类目")
+    private String frmsWareCategory;
 }

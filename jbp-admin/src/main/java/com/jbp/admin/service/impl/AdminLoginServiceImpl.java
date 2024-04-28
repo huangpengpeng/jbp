@@ -164,6 +164,11 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
         SystemAdmin systemAdmin = loginUser.getUser();
 
+        Merchant merchant = null;
+        if (systemAdmin.getMerId() != null && systemAdmin.getMerId() > 0) {
+            merchant = merchantService.getById(systemAdmin.getMerId());
+        }
+
         String token = tokenComponent.createToken(loginUser);
         SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
         systemAdminResponse.setToken(token);

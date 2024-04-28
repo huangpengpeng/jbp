@@ -40,7 +40,7 @@ public class LztWithdrawalController {
     @ApiOperation(value = "来账通提现")
     @GetMapping(value = "/create")
     public CommonResult<LztWithdrawal> apply(HttpServletRequest request, String payeeId, String payCode,
-                                             String pwd, BigDecimal amt, String randomKey, String postscript) {
+                                             String pwd, BigDecimal amt, String randomKey) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(payeeId);
@@ -48,7 +48,7 @@ public class LztWithdrawalController {
             throw new CrmebException("付款用户不存在");
         }
         String ip = CrmebUtil.getClientIp(request);
-        LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, postscript, pwd, randomKey, ip);
+        LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, "提现", pwd, randomKey, ip);
         return CommonResult.success(result);
     }
 
@@ -77,6 +77,13 @@ public class LztWithdrawalController {
         Integer merId = systemAdmin.getMerId();
         PageInfo<LztWithdrawal> page = lztWithdrawalService.pageList(merId, payeeId, txnSeqno, accpTxno, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
+    }
+
+
+    @ApiOperation(value = "来账通提现详情")
+    @GetMapping(value = "/detail")
+    public CommonResult<LztWithdrawal> detail(Long id) {
+        return CommonResult.success(lztWithdrawalService.detail(id));
     }
 
 

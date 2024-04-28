@@ -31,4 +31,12 @@ public class LztAcctApplyController {
         Integer merId = systemAdmin.getMerId();
         return CommonResult.success(CommonPage.restPage(lztAcctApplyService.pageList(merId,request.getUserId(),request.getUsername(),request.getStatus(),pageParamRequest)));
     }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:apply:del')")
+    @ApiOperation(value = "删除")
+    @GetMapping(value = "/del")
+    public CommonResult del(Long id) {
+        lztAcctApplyService.del(id);
+        return CommonResult.success();
+    }
 }

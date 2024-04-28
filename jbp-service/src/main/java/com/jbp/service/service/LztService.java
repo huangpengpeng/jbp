@@ -1,8 +1,10 @@
 package com.jbp.service.service;
 
+import com.jbp.common.lianlian.params.FindPasswordVerifyParams;
 import com.jbp.common.lianlian.result.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public interface LztService {
 
@@ -27,7 +29,7 @@ public interface LztService {
      * 银行账户申请
      */
     LztOpenacctApplyResult createBankUser(String oidPartner, String priKey, String userId, String txnSeqno, String shopId,
-                                          String shopName, String province, String city, String area, String address, String notifyUrl);
+                                          String shopName, String province, String city, String area, String address, String notifyUrl, String openBank);
 
 
     /**
@@ -48,7 +50,9 @@ public interface LztService {
     /**
      * 来账通内部代发申请
      */
-    TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo, Double amt, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url);
+    TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
+                                            Double amt, String txnPurpose, String pwd, String randomKey,
+                                            String payeeId, String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory);
 
     /**
      * 来账通内部代发结果查询
@@ -58,8 +62,8 @@ public interface LztService {
     /**
      * 来账通提现
      */
-    WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo, BigDecimal amt,  BigDecimal fee, String postscript,
-                                String password, String random_key, String ip, String notifyUrl, String linked_acctno);
+    WithdrawalResult withdrawal(String oidPartner, String priKey, String payeeNo, String drawNo, BigDecimal amt, BigDecimal fee, String postscript,
+                                String password, String random_key, String ip, String notifyUrl, String linked_acctno, String phone, Date registerTime, String frmsWareCategory);
 
     /**
      * 来账通提现
@@ -107,5 +111,46 @@ public interface LztService {
     ReceiptDownloadResult receiptDownload(String oidPartner, String priKey, String receipt_accp_txno, String token);
 
 
+    /**
+     * 找回密码申请
+     */
+    FindPasswordApplyResult findPasswordApply(String oidPartner, String priKey, String user_id, String linked_acctno, String ip);
+
+    /**
+     * 找回密码验证
+     */
+    FindPasswordVerifyResult findPasswordVerify(String oidPartner, String priKey, String user_id, String token, String verify_code, String random_key, String password);
+
+
+    /**
+     * 大额行号查询
+     * https://accpapi.lianlianpay.com/v1/acctmgr/query-cnapscode
+     */
+    QueryCnapsCodeResult queryCnapsCode(String oidPartner, String priKey, String bank_code, String brabank_name, String city_code);
+
+
+    /**
+     * 代付
+     */
+    LztTransferResult transfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
+                               String amt, String feeAmt, String pwd, String random_key, String payee_type,
+                               String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
+                               String ip, String phone, Date registerTime, String frmsWareCategory);
+
+    /**
+     * 修改手机号
+     *
+     */
+    ChangeRegPhoneApplyResult changeRegPhoneApply(String oidPartner, String priKey, String user_id, String reg_phone,
+                                                  String reg_phone_new, String password, String random_key, Date registerTime, String ip, String frmsWareCategory);
+
+    /**
+     * 绑定手机号校验
+     *
+     */
+    ChangeRegPhoneVerifyResult changeRegPhoneVerify(String oidPartner, String priKey, String user_id, String token,
+                                                  String txn_seqno, String verify_code_new);
 
 }
+
+

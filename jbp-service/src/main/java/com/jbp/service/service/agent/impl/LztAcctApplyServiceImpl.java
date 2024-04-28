@@ -48,7 +48,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
 
     @Override
     public LztAcctApply apply(Integer merId, String userId, String shopId, String shopName, String province,
-                              String city, String area, String address) {
+                              String city, String area, String address, String openBank) {
 
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
         if (lztAcct == null) {
@@ -62,14 +62,15 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix());
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
         LztOpenacctApplyResult result = lztService.createBankUser(payInfo.getOidPartner(), payInfo.getPriKey(),
-                userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl);
+                userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl, openBank);
         UserInfoResult userInfoResult = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
         LztAcctApply lztAcctApply = new LztAcctApply(merId, userId, lztAcct.getUserType(), userInfoResult.getOid_userno(), userInfoResult.getUser_name(),
                 txnSeqno, result.getAccp_txno(),
-                result.getGateway_url());
+                result.getGateway_url(), openBank);
         save(lztAcctApply);
 
         lztAcct.setIfOpenBankAcct(true);
+        lztAcct.setOpenBank(openBank);
         lztAcctService.updateById(lztAcct);
         return lztAcctApply;
     }
@@ -80,12 +81,15 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-        List<LztQueryAcctInfo> list = result.getList();
-        if (CollectionUtils.isNotEmpty(list)) {
-            LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
-            lztAcctApply.setStatus(acctState.getCode());
+        if(result != null){
+            List<LztQueryAcctInfo> list = result.getList();
+            if (CollectionUtils.isNotEmpty(list)) {
+                list =  list.stream().filter(s-> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
+                LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
+                lztAcctApply.setStatus(acctState.getCode());
+            }
+            lztAcctApply.setRetMsg(result.getRet_msg());
         }
-        lztAcctApply.setRetMsg(result.getRet_msg());
         if(StringUtils.isNotEmpty(notifyInfo)){
             lztAcctApply.setNotifyInfo(notifyInfo);
         }
@@ -129,13 +133,35 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             if (StringUtils.isNotEmpty(s.getNotifyInfo())) {
                 try {
                     JSONObject jsonObject = new JSONObject(s.getNotifyInfo());
-                    s.setGateway_url2(jsonObject.get("gateway_url").toString());
+                    if(jsonObject.has("gateway_url")){
+                        s.setGateway_url2(jsonObject.getString("gateway_url"));
+                    }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
             }
-
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+
+    @Override
+    public void del(Long id) {
+        // 查询开户是否成功
+        LztAcctApply lztAcctApply = getById(id);
+        Merchant merchant = merchantService.getById(lztAcctApply.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        LztQueryAcctInfoResult result = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctApply.getUserId());
+        if (result != null && CollectionUtils.isNotEmpty(result.getList())) {
+            for (LztQueryAcctInfo acctInfo : result.getList()) {
+                if (!"FAIL".equals(acctInfo.getAcct_stat()) && !"CANCEL".equals(acctInfo.getAcct_stat()) && !"PENDING".equals(acctInfo.getAcct_stat())) {
+                    throw new RuntimeException("银行户已开户成功不能删除");
+                }
+            }
+        }
+        LztAcct lztAcct = lztAcctService.getByUserId(lztAcctApply.getUserId());
+        lztAcct.setIfOpenBankAcct(false);
+        lztAcctService.updateById(lztAcct);
+        removeById(id);
     }
 }

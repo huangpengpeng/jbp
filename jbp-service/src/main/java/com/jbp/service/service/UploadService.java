@@ -64,4 +64,5 @@ public interface UploadService {
      * @return FileResultVo
      */
     FileResultVo base64Upload(String base64, String model, Integer pid);
+
 }

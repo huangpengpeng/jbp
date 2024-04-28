@@ -114,7 +114,7 @@ public class MerchantController {
         return CommonResult.failed("修改复制商品数量失败");
     }
 
-    @PreAuthorize("hasAuthority('platform:merchant:detail')")
+//    @PreAuthorize("hasAuthority('platform:merchant:detail')")
     @ApiOperation(value="商户详情")
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public CommonResult<MerchantPlatformDetailResponse> getDetail(@PathVariable("id") Integer id) {

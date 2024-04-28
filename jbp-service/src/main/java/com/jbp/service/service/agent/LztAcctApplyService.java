@@ -11,7 +11,7 @@ import java.util.Date;
 public interface LztAcctApplyService extends IService<LztAcctApply> {
 
     LztAcctApply apply(Integer merId, String userId, String shopId, String shopName,
-                       String province, String city, String area, String address);
+                       String province, String city, String area, String address, String openBank);
 
     LztAcctApply refresh(String userId, String notifyInfo);
 
@@ -20,4 +20,6 @@ public interface LztAcctApplyService extends IService<LztAcctApply> {
     LztAcctApply getByTxnSeqno(String txnSeqno);
 
     PageInfo<LztAcctApply> pageList(Integer merId, String userId, String username, String status, PageParamRequest pageParamRequest);
+
+    void del(Long id);
 }

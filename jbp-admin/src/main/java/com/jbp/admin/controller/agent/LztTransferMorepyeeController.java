@@ -5,6 +5,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
@@ -39,7 +40,7 @@ public class LztTransferMorepyeeController {
     @ApiOperation(value = "来账通内部代发")
     @GetMapping(value = "/create")
     public CommonResult<LztTransferMorepyee> apply(HttpServletRequest request, String payerId, String payeeId, String payCode,
-                                                   String pwd, BigDecimal amt, String randomKey, String txnPurpose, String postscript) {
+                                                   String pwd, BigDecimal amt, String randomKey) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(payerId);
@@ -51,9 +52,11 @@ public class LztTransferMorepyeeController {
             throw new CrmebException("收款款用户不存在");
         }
         String ip = CrmebUtil.getClientIp(request);
-        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, txnPurpose, pwd, randomKey, payeeId, ip, postscript);
+        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, "服务费", pwd, randomKey, payeeId, ip, "服务费");
         return CommonResult.success(result);
     }
+
+
     @ApiOperation(value = "来账通内部代发刷新")
     @GetMapping(value = "/refresh")
     public CommonResult refresh(String accpTxno) {
@@ -74,6 +77,16 @@ public class LztTransferMorepyeeController {
                 accpTxno, status, startTime, endTime, pageParamRequest);
         return CommonResult.success(page);
     }
+
+    @ApiOperation(value = "来账通转账详情")
+    @GetMapping(value = "/detail")
+    public CommonResult<LztTransferMorepyee> detail(Long id) {
+        return CommonResult.success(lztTransferMorepyeeService.detail(id));
+    }
+
+
+
+
 
 
 }

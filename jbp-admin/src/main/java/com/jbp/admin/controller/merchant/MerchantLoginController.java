@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.service.service.SystemAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -48,6 +52,8 @@ public class MerchantLoginController {
 
     @Autowired
     private AdminLoginService loginService;
+    @Autowired
+    private SystemAdminService systemAdminService;
 
     @ApiOperation(value="登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -89,6 +95,12 @@ public class MerchantLoginController {
     @ApiOperation(value = "发送短信登录验证码")
     @RequestMapping(value = "/sendCode", method = RequestMethod.POST)
     public CommonResult<String> sendCode(@RequestBody @Validated MerchantSendCodeRequest request) {
+        LambdaQueryWrapper<SystemAdmin> lqw = Wrappers.lambdaQuery();
+        lqw.eq(SystemAdmin::getPhone, request.getPhone());
+        SystemAdmin systemAdmin = systemAdminService.getOne(lqw);
+        if (systemAdmin == null) {
+            return CommonResult.success("手机号不存在");
+        }
         if (loginService.sendLoginCode(request.getPhone())) {
             return CommonResult.success("发送成功");
         }

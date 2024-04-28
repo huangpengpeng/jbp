@@ -9,11 +9,9 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.AcctInfoResult;
-import com.jbp.common.lianlian.result.LianLianPayInfoResult;
 import com.jbp.common.lianlian.result.OpenacctApplyResult;
 import com.jbp.common.lianlian.result.UserInfoResult;
 import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
@@ -21,7 +19,6 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctOpenDao;
-import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctOpenService;
@@ -47,8 +44,6 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     private MerchantService merchantService;
     @Resource
     private LztAcctService lztAcctService;
-    @Resource
-    private LianLianPayService lianLianPayService;
 
     @Override
     public LztAcctOpen apply(Integer merId, String userId, String userType, String returnUrl, String businessScope) {
@@ -76,14 +71,15 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     @Override
     public void refresh(String accpTxno) {
         LztAcctOpen lztAcctOpen = getByAccpTxno(accpTxno);
-        if (lztAcctOpen == null || lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+        if (lztAcctOpen == null) {
             return;
         }
         Merchant merchant = merchantService.getById(lztAcctOpen.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         UserInfoResult result = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctOpen.getUserId());
+        lztAcctOpen.setQueryRet(result);
         lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
-        lztAcctOpen.setRetMsg(result.getRet_msg());
+        lztAcctOpen.setRetMsg(result.getRemark());
         updateById(lztAcctOpen);
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
             LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
@@ -91,6 +87,26 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
                 lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account());
             }
         }
+    }
+
+    @Override
+    public void del(Long id) {
+        LztAcctOpen lztAcctOpen = getById(id);
+        if (lztAcctOpen == null || lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+            throw new RuntimeException("当前记录已经开户完成不允许删除, 请联系管理员处理");
+        }
+        Merchant merchant = merchantService.getById(lztAcctOpen.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        UserInfoResult result = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctOpen.getUserId());
+        if(result != null && "0000".equals(result.getRet_code())){
+            lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
+            lztAcctOpen.setRetMsg(result.getRet_msg());
+            updateById(lztAcctOpen);
+        }
+        if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
+            throw new RuntimeException("当前记录已经开户完成不允许删除, 请联系管理员处理");
+        }
+        removeById(id);
     }
 
     @Override
@@ -107,6 +123,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     public Boolean has(String userId) {
         return CollectionUtils.isNotEmpty(list(new QueryWrapper<LztAcctOpen>().lambda().eq(LztAcctOpen::getUserId, userId)));
     }
+
 
 	@Override
 	public PageInfo<LztAcctOpen> pageList(Integer merId, String userId, String status,

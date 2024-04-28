@@ -31,7 +31,7 @@ public class LztQueryAcctInfo {
      */
     private String acct_stat;
     /**
-     * 账户银行余额
+     * 账户银行余额bank_acct_balance
      */
     private String bank_acct_balance;
     /**

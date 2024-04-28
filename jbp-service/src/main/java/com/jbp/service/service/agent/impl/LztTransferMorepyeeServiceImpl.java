@@ -12,11 +12,13 @@ import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.lianlian.result.TransferMorepyeeResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.agent.LztTransferMorepyeeDao;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
@@ -52,6 +54,10 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     @Override
     public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
                                                 String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String postscript) {
+        if(StringUtils.isEmpty(orderNo)){
+            orderNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
+        }
+
         if (getByTxnSeqno(orderNo) != null) {
             throw new CrmebException("单号已经被使用");
         }
@@ -68,7 +74,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
 
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
         TransferMorepyeeResult result = lztService.transferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(),
-                payerId, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
+                payerId, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
         LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno());
         save(transferMorepyee);
         return transferMorepyee;
@@ -135,7 +141,8 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     public PageInfo<LztTransferMorepyee> pageList(Integer merId, String payerId, String payeeId, String txnSeqno, String accpTxno,
                                                   String status, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztTransferMorepyee> lqw = new LambdaQueryWrapper<LztTransferMorepyee>()
-                .eq(LztTransferMorepyee::getMerId, merId)
+                .select(LztTransferMorepyee.class, info -> !info.getColumn().equals("receipt_zip"))
+                .eq(merId!= null && merId > 0,  LztTransferMorepyee::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztTransferMorepyee::getTxnStatus, status)
                 .eq(StringUtils.isNotEmpty(payerId), LztTransferMorepyee::getPayerId, payeeId)
                 .eq(StringUtils.isNotEmpty(payeeId), LztTransferMorepyee::getPayeeId, payeeId)
@@ -163,5 +170,17 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         return CommonPage.copyPageInfo(page, list);
     }
 
+    @Override
+    public LztTransferMorepyee detail(Long id) {
+        LztTransferMorepyee lztTransferMorepyee = getById(id);
+        refresh(lztTransferMorepyee.getTxnSeqno()) ;
+        return getById(id);
+    }
 
+    @Override
+    public List<LztTransferMorepyee> getWaitDownloadList() {
+        QueryWrapper<LztTransferMorepyee> q = new QueryWrapper<>();
+        q.last("where receipt_token is not null and receipt_token !='' and ( receipt_zip is null or receipt_zip ='') ");
+        return list(q);
+    }
 }

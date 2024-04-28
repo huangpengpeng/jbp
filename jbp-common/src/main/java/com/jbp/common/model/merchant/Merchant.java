@@ -57,7 +57,7 @@ public class Merchant implements Serializable {
     private String phone;
 
     @ApiModelProperty(value = "手续费(%)")
-    private Integer handlingFee;
+    private BigDecimal handlingFee;
 
     @ApiModelProperty(value = "商户关键字")
     private String keywords;
@@ -167,4 +167,10 @@ public class Merchant implements Serializable {
     @ApiModelProperty(value = "商户支付信息")
     @TableField(value = "payInfo", typeHandler = MerchantPayInfoHandler.class)
     private MerchantPayInfo payInfo;
+
+    @ApiModelProperty(value = "交易模型  0 转账（密码+验证码）+提现（密码+验证码）  1 转账（无密码+无验证码） 提现（验证码） 2 转账（无密码+无验证码）提现（无密码+无验证码）")
+    private Integer tradeModel;
+
+    @ApiModelProperty(value = "风控类目")
+    private String frmsWareCategory;
 }

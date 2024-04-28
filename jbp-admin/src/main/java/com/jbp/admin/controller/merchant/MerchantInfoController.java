@@ -42,7 +42,7 @@ public class MerchantInfoController {
     @Autowired
     private MerchantService merchantService;
 
-    @PreAuthorize("hasAuthority('merchant:base:info')")
+//    @PreAuthorize("hasAuthority('merchant:base:info')")
     @ApiOperation(value = "商户端商户基础信息")
     @RequestMapping(value = "/base/info", method = RequestMethod.GET)
     public CommonResult<MerchantBaseInfoResponse> getBaseInfo() {

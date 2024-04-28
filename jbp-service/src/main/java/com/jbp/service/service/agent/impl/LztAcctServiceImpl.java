@@ -74,12 +74,15 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 userId, LianLianPayConfig.UserType.getCode(lztAcct.getUserType()));
         if (lztAcct.getIfOpenBankAcct()) {
             LztQueryAcctInfoResult bankAcctInfoResult = lztService.queryBankAcct(payInfo.getOidPartner(), payInfo.getPriKey(), userId);
-            List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
-            if (CollectionUtils.isNotEmpty(list)) {
-                for (LztQueryAcctInfo lztQueryAcctInfo : list) {
-                    lztQueryAcctInfo.setAcct_stat(LianLianPayConfig.AcctState.valueOf(lztQueryAcctInfo.getAcct_stat()).getCode());
+            if(bankAcctInfoResult != null){
+                List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
+                if (CollectionUtils.isNotEmpty(list)) {
+                    list =  list.stream().filter(s-> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
+                    for (LztQueryAcctInfo lztQueryAcctInfo : list) {
+                        lztQueryAcctInfo.setAcct_stat(LianLianPayConfig.AcctState.valueOf(lztQueryAcctInfo.getAcct_stat()).getCode());
+                    }
+                    lztAcct.setBankAcctInfoList(list);
                 }
-                lztAcct.setBankAcctInfoList(bankAcctInfoResult.getList());
             }
         }
         List<AcctInfo> acctinfoList = acctInfoResult.getAcctinfo_list();
@@ -117,9 +120,28 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 s.setMerName(merchant.getName());
             }
             //查询用户用户信息
-            LztAcct bankAcctInfo=details(s.getUserId());
+            LztAcct bankAcctInfo = details(s.getUserId());
             s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
             s.setBankAcctInfoList(bankAcctInfo.getBankAcctInfoList());
+            BigDecimal amtBalcur = BigDecimal.ZERO, amtBalaval = BigDecimal.ZERO, amtBankBalaval = BigDecimal.ZERO, amtBalfrz = BigDecimal.ZERO;
+            if (CollectionUtils.isNotEmpty(bankAcctInfo.getAcctInfoList())) {
+                for (AcctInfo acctInfo : bankAcctInfo.getAcctInfoList()) {
+                    amtBalcur = amtBalcur.add(StringUtils.isNotEmpty(acctInfo.getAmt_balcur()) ? new BigDecimal(acctInfo.getAmt_balcur()) : BigDecimal.ZERO);
+                    amtBalaval = amtBalaval.add(StringUtils.isNotEmpty(acctInfo.getAmt_balaval()) ? new BigDecimal(acctInfo.getAmt_balaval()) : BigDecimal.ZERO);
+                    amtBalfrz = amtBalfrz.add(StringUtils.isNotEmpty(acctInfo.getAmt_balfrz()) ? new BigDecimal(acctInfo.getAmt_balfrz()) : BigDecimal.ZERO);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(bankAcctInfo.getBankAcctInfoList())) {
+                for (LztQueryAcctInfo acctInfo : bankAcctInfo.getBankAcctInfoList()) {
+                    amtBankBalaval = amtBankBalaval.add(StringUtils.isNotEmpty(acctInfo.getBank_acct_balance()) ? new BigDecimal(acctInfo.getBank_acct_balance()) : BigDecimal.ZERO);
+                    s.setBankAcctNo(acctInfo.getBank_acct_no());
+                }
+            }
+            amtBalcur = amtBalcur.add(amtBankBalaval);
+            s.setAmtBalcur(amtBalcur);
+            s.setAmtBalaval(amtBalaval);
+            s.setAmtBankBalaval(amtBankBalaval);
+            s.setAmtBalfrz(amtBalfrz);
         });
 
         return CommonPage.copyPageInfo(page, list);
@@ -151,7 +173,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             List<AcctInfo> acctInfoList = details.getAcctInfoList();
             if (CollectionUtils.isNotEmpty(acctInfoList)) {
                 for (AcctInfo acctInfo : acctInfoList) {
-                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getAmt_balaval()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getAmt_balaval());
+                    BigDecimal balance = StringUtils.isEmpty(acctInfo.getAmt_balcur()) ? BigDecimal.ZERO : new BigDecimal(acctInfo.getAmt_balcur());
                     totalAmt = totalAmt.add(balance);
                 }
             }
