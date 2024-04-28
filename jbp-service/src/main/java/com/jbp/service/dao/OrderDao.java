@@ -33,5 +33,7 @@ public interface OrderDao extends BaseMapper<Order> {
      */
     List<Order> findFrontList(Map<String, Object> searchMap);
 
+    Integer getGoodsPirce(@Param(value = "goodsIds") String goodsIds,@Param(value = "uid") Integer uid);
+
 
 }

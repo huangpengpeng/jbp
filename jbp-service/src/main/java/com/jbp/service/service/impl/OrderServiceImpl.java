@@ -1215,6 +1215,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         return CollectionUtils.isEmpty(platList) ? Lists.newArrayList() : platList;
     }
 
+    @Override
+    public Integer getGoodsPirce(String goodsIds) {
+
+
+
+        return dao.getGoodsPirce(goodsIds,userService.getUserId());
+    }
+
     /**
      * 根据订单编号获取订单
      *
