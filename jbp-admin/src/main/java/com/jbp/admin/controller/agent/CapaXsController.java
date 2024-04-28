@@ -74,9 +74,8 @@ public class CapaXsController {
             return CommonResult.failed("等级名称不能重复");
         }
         if (ObjectUtil.isNotEmpty(capaRequest.getPCapaId())) {
-            if (capa.getId() > capa.getPCapaId()) {
+            if (capa.getId() > capaRequest.getPCapaId()) {
                 throw new CrmebException("请设置下个星级比本星级较大");
-
             }
         }
 
