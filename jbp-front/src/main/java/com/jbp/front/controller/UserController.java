@@ -396,7 +396,7 @@ public class UserController {
 
     @ApiOperation(value = "用户挂载")
     @RequestMapping(value = "/mount", method = RequestMethod.GET)
-    public CommonResult mount(String phone) {
+    public CommonResult mount(String phone ,String mphone) {
         if (com.jbp.service.util.StringUtils.isAnyEmpty(phone)) {
             throw new CrmebException("账户信息不能为空");
         }
@@ -405,11 +405,19 @@ public class UserController {
             throw new CrmebException("账户不存在");
         }
 
+        List<User> muserList = userService.getByPhone(mphone);
+        if (userList.isEmpty() ) {
+            throw new CrmebException("账户不存在");
+        }
+
+
+
         Boolean ifExt = false;
-        List<UserUpperDto> allUpper = userInvitationService.getAllUpper(userService.getUserId());
+        Integer pid =  userInvitationService.getPid(userList.get(0).getId());
+        List<UserUpperDto> allUpper = userInvitationService.getAllUpper(muserList.get(0).getId());
         if(!allUpper.isEmpty()){
             for(UserUpperDto userUpperDto :allUpper){
-                if(userUpperDto.getUId().intValue() == userList.get(0).getId().intValue() ) {
+                if(userUpperDto.getUId().intValue() == pid ) {
                     ifExt = true;
                 };
             }
