@@ -336,4 +336,7 @@ public interface OrderService extends IService<Order> {
     Order getLastOne(Integer uid, String platform);
 
     List<Order> getSuccessList(Date startTime, Date endTime);
+
+    Integer getGoodsPirce(String goodsIds);
+
 }

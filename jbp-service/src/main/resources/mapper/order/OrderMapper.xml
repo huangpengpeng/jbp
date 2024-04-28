@@ -41,6 +41,15 @@
         </if>
         order by id desc
     </select>
+    <select id="getGoodsPirce" resultType="java.lang.Integer">
+
+    select ifnull(sum(o.pay_price),0) from eb_order o
+
+    where o.paid = 1 and o.plat_order_no in (select order_no from eb_order_detail where product_id in (${goodsIds}) )
+     and   DATE_FORMAT( o.`pay_Time`,'%Y-%m') = DATE_FORMAT( now(),'%Y-%m') and o.uid = #{uid}
+
+
+    </select>
 
 
 </mapper>
