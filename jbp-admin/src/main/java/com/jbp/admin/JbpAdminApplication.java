@@ -41,14 +41,14 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         Environment bean = run.getBean(Environment.class);
-        System.out.println("spring.datasource.url="+ bean.getProperty("spring.datasource.url"));
+        System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
 //      推三返一
 //       TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
 //        groupThreeRetOneHandler.aa_3968();
 //       groupThreeRetOneHandler.aa_15866();
-     //   groupThreeRetOneHandler.aa_3174_4();
+        //   groupThreeRetOneHandler.aa_3174_4();
 //       groupThreeRetOneHandler.aa_12692_8();
 //        groupThreeRetOneHandler.aa_11880();
 
@@ -71,8 +71,6 @@ public class JbpAdminApplication {
 //        GroupThreeRetOneHandler groupThreeRetOneHandler = run.getBean(GroupThreeRetOneHandler.class);
 //        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT515171420171759762432"),null);
 
-
     }
-
 
 }

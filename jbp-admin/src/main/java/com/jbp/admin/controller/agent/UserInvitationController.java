@@ -123,14 +123,14 @@ public class UserInvitationController {
             throw new CrmebException("团队信息不一致");
         }
 
-//        Integer pid =  userInvitationService.getPid();
+       Integer pid =  userInvitationService.getPid(user.getId());
 
 
         Boolean ifExt = false;
-        List<UserUpperDto> allUpper = userInvitationService.getAllUpper(user.getId());
+        List<UserUpperDto> allUpper = userInvitationService.getAllUpper(pUser.getId());
         if(!allUpper.isEmpty()){
             for(UserUpperDto userUpperDto :allUpper){
-                if(userUpperDto.getUId().intValue() == pUser.getId().intValue() ) {
+                if(userUpperDto.getUId().intValue() == pid ) {
                     ifExt = true;
                 };
             }
