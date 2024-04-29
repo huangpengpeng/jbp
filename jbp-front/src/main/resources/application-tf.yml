@@ -25,6 +25,7 @@ crmeb:
     - api/front/pagediy/info
     - /**/getPlatformUserInfo
     - /jushuitan/**
+    - /**/visa/userVisaCallback
 # 配置端口
 server:
   port: 8182
