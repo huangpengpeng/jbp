@@ -229,9 +229,11 @@ public class WalletController {
         if (ObjectUtil.isNull(receiveUser)) {
             throw new CrmebException("账号/手机号不存在");
         }
-        walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt(), request.getType(), request.getPostscript());
+
+        BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
+        walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
         return CommonResult.success();
-    }
+}
 
 
     @ApiOperation(value = "钱包配置余额明细")
