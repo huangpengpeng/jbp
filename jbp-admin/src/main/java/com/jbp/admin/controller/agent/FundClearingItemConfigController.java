@@ -1,6 +1,7 @@
 package com.jbp.admin.controller.agent;
 
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.FundClearingItemConfig;
 import com.jbp.common.model.agent.ProductCommConfig;
@@ -12,6 +13,7 @@ import com.jbp.common.request.agent.FundClearingItemConfigRequest;
 import com.jbp.common.request.agent.FundClearingItemConfigUpdateRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.FundClearingItemConfigService;
@@ -20,6 +22,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,11 +41,13 @@ import java.util.stream.Collectors;
 @Api(tags = "佣金发放配置")
 public class FundClearingItemConfigController {
 
+
+    @Autowired
+    private Environment environment;
     @Resource
     private WalletConfigService walletConfigService;
     @Resource
     private FundClearingItemConfigService fundClearingItemConfigService;
-
     @Resource
     private ProductCommConfigService productCommConfigService;
 
@@ -68,7 +74,7 @@ public class FundClearingItemConfigController {
     @ApiOperation("佣金名称")
     @PostMapping("/comm/list")
     public CommonResult commList() {
-        List<String> list = Lists.newArrayList();
+        Set<String> list = Sets.newHashSet();
 
         List<ProductCommConfig> list1 =   productCommConfigService.getOpenList();
 
@@ -78,6 +84,14 @@ public class FundClearingItemConfigController {
         list.add("销售佣金");
         list.add("培育佣金");
         list.add("其他佣金");
+
+        String commNameStr = environment.getProperty("fundClearing.name");
+        if(StringUtils.isNotEmpty(commNameStr)){
+            String[] split = commNameStr.split(",");
+            for (String s : split) {
+                list.add(s);
+            }
+        }
         return CommonResult.success(list);
     }
 
