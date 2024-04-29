@@ -142,7 +142,7 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
      */
     @Override
     public Boolean sendCommonCode(String phone) {
-        ValidateFormUtil.isPhone(phone, "手机号码错误");
+       // ValidateFormUtil.isPhone(phone, "手机号码错误");
         beforeSendMessage();
         DateTime dateTime = DateUtil.date();
         String clientIp = RequestUtil.getClientIp();
