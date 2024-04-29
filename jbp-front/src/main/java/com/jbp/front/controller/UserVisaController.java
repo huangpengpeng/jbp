@@ -358,7 +358,7 @@ public class UserVisaController {
     public String userVisaCallback(String bizContent) {
 
         if (bizContent == null) {
-          return "SUCCESS";
+          return "success";
         }
 
         log.info("法大大回调 {}", bizContent);
@@ -387,7 +387,7 @@ public class UserVisaController {
         }
         ;
 
-        return "SUCCESS";
+        return "success";
     }
 
 //
