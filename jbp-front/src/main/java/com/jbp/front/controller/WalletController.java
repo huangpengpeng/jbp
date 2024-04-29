@@ -7,10 +7,7 @@ import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Wallet;
-import com.jbp.common.model.agent.WalletConfig;
-import com.jbp.common.model.agent.WalletFlow;
-import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
@@ -139,6 +136,14 @@ public class WalletController {
     public CommonResult<WalletWithdraw> withdraw(@RequestBody @Validated WalletWithdrawRequest request) {
         User user = userService.getInfo();
         userService.validPayPwd(user.getId(), request.getPwd());
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        channelName = StringUtils.isEmpty(channelName) ? "平台" : channelName;
+        ChannelCard channelCard = channelCardService.getByUser(user.getId(), channelName);
+        if(channelCard == null){
+            throw new CrmebException("未绑定银行卡，无法提现");
+        }
+
+
         WalletConfig walletConfig = walletConfigService.getByType(request.getWalletType());
         if (!walletConfig.getCanWithdraw()) {
             throw new CrmebException("类型积分不可提现");
