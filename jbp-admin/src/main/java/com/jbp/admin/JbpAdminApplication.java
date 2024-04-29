@@ -1,11 +1,13 @@
 package com.jbp.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.beust.jcommander.internal.Sets;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.user.User;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.product.comm.GroupThreeRetOneHandler;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
@@ -26,6 +28,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -43,6 +46,7 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
 
 //      推三返一
 //       TankStoreRelationAct groupThreeRetOneHandler = run.getBean(TankStoreRelationAct.class);
