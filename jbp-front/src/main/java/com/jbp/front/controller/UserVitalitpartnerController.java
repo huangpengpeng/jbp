@@ -79,7 +79,7 @@ public class UserVitalitpartnerController {
         StringBuilder stringBuilder =new StringBuilder();
 
         String name =environment.getProperty("historyOrder.name");
-        if(!name.equals("yk")){
+        if(!name.equals("jymall")){
              stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c FROM " + name + ".orders AS o\n" +
                     "        WHERE  o.`payTime` IS NOT NULL\n" +
                     "        and o.`status` IN ( 201,301,401,402,501 )\n" +
