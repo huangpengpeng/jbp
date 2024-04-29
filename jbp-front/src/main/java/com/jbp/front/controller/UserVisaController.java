@@ -96,9 +96,10 @@ public class UserVisaController {
 
         UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid, userService.getUserId()).eq(UserVisa::getContract, contract));
         if (userVisa == null) {
-            return CommonResult.success(true);
+            return CommonResult.success(false);
         }
-        return CommonResult.success(userVisa.getVisa());
+        return CommonResult.success(false);
+      //  return CommonResult.success(userVisa.getVisa());
     }
 
 
