@@ -355,10 +355,10 @@ public class UserVisaController {
     @ApiOperation(value = "法大大回调", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult<String> userVisaCallback(String bizContent) {
+    public String userVisaCallback(String bizContent) {
 
         if (bizContent == null) {
-         //   return CommonResult.success() ;
+          return "SUCCESS";
         }
 
         log.info("法大大回调 {}", bizContent);
@@ -387,7 +387,7 @@ public class UserVisaController {
         }
         ;
 
-        return CommonResult.success("SUCCESS");
+        return "SUCCESS";
     }
 
 //
