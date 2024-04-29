@@ -86,7 +86,7 @@ public class UserVitalitpartnerController {
                 "        AND o.id IN (\n" +
                 "                SELECT g.orderId FROM "+name+".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) )\n" +
                 "\t\t)\n" +
-                "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = DATE_FORMAT( '${month}','%Y-%m')\n" +
+                "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')\n" +
                 "        and o.userId  = '"+ userService.getUserId()+"'"
         );
 
