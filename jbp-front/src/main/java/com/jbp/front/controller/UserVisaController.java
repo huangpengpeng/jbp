@@ -98,8 +98,7 @@ public class UserVisaController {
         if (userVisa == null) {
             return CommonResult.success(false);
         }
-        return CommonResult.success(false);
-      //  return CommonResult.success(userVisa.getVisa());
+        return CommonResult.success(!userVisa.getVisa());
     }
 
 
