@@ -96,9 +96,9 @@ public class UserVisaController {
 
         UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid, userService.getUserId()).eq(UserVisa::getContract, contract));
         if (userVisa == null) {
-            return CommonResult.success(true);
+            return CommonResult.success(false);
         }
-        return CommonResult.success(userVisa.getVisa());
+        return CommonResult.success(!userVisa.getVisa());
     }
 
 
@@ -355,10 +355,10 @@ public class UserVisaController {
     @ApiOperation(value = "法大大回调", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult<String> userVisaCallback(String bizContent) {
+    public String userVisaCallback(String bizContent) {
 
         if (bizContent == null) {
-         //   return CommonResult.success() ;
+          return "success";
         }
 
         log.info("法大大回调 {}", bizContent);
@@ -387,7 +387,7 @@ public class UserVisaController {
         }
         ;
 
-        return CommonResult.success("SUCCESS");
+        return "success";
     }
 
 //
