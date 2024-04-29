@@ -40,7 +40,7 @@ public class OnePassRegisterRequest implements Serializable {
 
     @ApiModelProperty(value = "手机号", required = true)
     @NotNull(message = "手机号不能为空")
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
+//    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
     private String phone;
 
     @ApiModelProperty(value = "密码", required = true)

@@ -4,8 +4,8 @@
 
     <select id="getRelationList" resultType="com.jbp.common.response.TankStoreRelationListResponse">
 
-        	select u.nickName , t.store_userId ,t.created_time ,t.id from eb_tank_store_relation t
-		left join eb_user u on u.id = t.store_userId
+        	select u.nickName , t.store_user_id ,t.created_time ,t.id from eb_tank_store_relation t
+		left join eb_user u on u.id = t.store_user_id
 		where t.tank_userId =  #{userId}
 
     </select>

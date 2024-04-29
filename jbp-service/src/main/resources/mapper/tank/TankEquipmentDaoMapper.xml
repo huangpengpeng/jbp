@@ -8,7 +8,7 @@
 
       	select t.equipment_sn,t.imei,ts.`name`,t.activate_status,t.online_status,t.use_status,ifnull(t.prohibit_status,0) as prohibitStatus , t.`status` from eb_tank_equipment t
 		left join eb_tank_store ts on ts.id = t.store_id
-		where ts.userId =  #{userId}
+		where ts.user_id =  #{userId}
         <if test="type != null and type !=''">
          <if test="type == 使用中">
             and status = 0 and activate_status = 1 and online_status = 1 and use_status = 1
@@ -34,19 +34,19 @@
     </select>
     <select id="equipmentNumber" resultType="java.lang.Integer">
         	select  count(1) from  eb_tank_equipment t
-		where t.store_userId =   #{userId}
+		where t.store_user_id =   #{userId}
     </select>
     <select id="equipmentUseNumber" resultType="java.lang.Integer">
         	select  count(1) from  eb_tank_equipment t
-		where t.store_userId =   #{userId}	and status = 0 and activate_status = 1 and online_status = 1 and use_status = 1
+		where t.store_user_id =   #{userId}	and status = 0 and activate_status = 1 and online_status = 1 and use_status = 1
     </select>
     <select id="equipmentOnlineUnusedNumber" resultType="java.lang.Integer">
         		select  count(1) from  eb_tank_equipment t
-		where t.store_userId =   #{userId}  and status = 0 and activate_status = 0 and online_status = 1 and use_status = 1
+		where t.store_user_id =   #{userId}  and status = 0 and activate_status = 0 and online_status = 1 and use_status = 1
     </select>
     <select id="equipmentOfflinedNumber" resultType="java.lang.Integer">
         	select  count(1) from  eb_tank_equipment t
-		where t.store_userId =  #{userId}  and online_status = 0
+		where t.store_user_id =  #{userId}  and online_status = 0
     </select>
     <select id="getAdminPageList" resultType="com.jbp.common.response.EquipmentAdminListResponse">
 

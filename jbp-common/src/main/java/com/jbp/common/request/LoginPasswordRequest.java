@@ -35,7 +35,7 @@ public class LoginPasswordRequest implements Serializable {
 
     @ApiModelProperty(value = "手机号", required = true, example = "18888888")
     @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
+//    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
     private String phone;
 
     @ApiModelProperty(value = "账号", required = true)

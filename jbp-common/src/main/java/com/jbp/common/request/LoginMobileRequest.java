@@ -38,7 +38,7 @@ public class LoginMobileRequest implements Serializable {
 
     @ApiModelProperty(value = "手机号", required = true)
     @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
+//    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "手机号码格式错误")
     private String phone;
 
     @ApiModelProperty(value = "验证码", required = true)

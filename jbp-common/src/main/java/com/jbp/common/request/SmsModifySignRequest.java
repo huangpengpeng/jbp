@@ -39,7 +39,7 @@ public class SmsModifySignRequest implements Serializable {
 
     @ApiModelProperty(value = "账号绑定的手机号", required = true)
     @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
+//    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
     private String phone;
 
     @ApiModelProperty(value = "短信验证码", required = true)
