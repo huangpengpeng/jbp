@@ -358,7 +358,8 @@ public class UserVisaController {
     public CommonResult<String> userVisaCallback(String bizContent) {
 
         if (bizContent == null) {
-            return CommonResult.success("SUCCESS");
+         //   return CommonResult.success() ;
+            return new CommonResult<>(200,"success");
         }
 
         log.info("法大大回调 {}", bizContent);
