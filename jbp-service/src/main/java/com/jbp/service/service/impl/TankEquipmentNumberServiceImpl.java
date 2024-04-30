@@ -82,6 +82,7 @@ public class TankEquipmentNumberServiceImpl extends ServiceImpl<TankEquipmentNum
 
         TankEquipmentNumberInfo tankEquipmentNumberInfo = new TankEquipmentNumberInfo();
         tankEquipmentNumberInfo.setStoreUserId(storeUserId);
+        tankEquipmentNumberInfo.setActivateId(storeUserId);
         tankEquipmentNumberInfo.setType("充值");
         tankEquipmentNumberInfo.setNumber(number);
         tankEquipmentNumberInfo.setCreatedTime(new Date());

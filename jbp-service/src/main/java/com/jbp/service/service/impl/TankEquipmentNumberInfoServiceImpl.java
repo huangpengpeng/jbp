@@ -44,7 +44,9 @@ public class TankEquipmentNumberInfoServiceImpl  extends ServiceImpl<TankEquipme
         List<EquipmentNumberInfoResponse> pageResponses = tankEquipmentNumberInfos.stream().map(e -> {
             EquipmentNumberInfoResponse pageResponse = new EquipmentNumberInfoResponse();
             BeanUtils.copyProperties(e, pageResponse);
-            pageResponse.setUsername(userService.getById(e.getActivateId()).getNickname());
+            if(e.getActivateId() != null) {
+                pageResponse.setUsername(userService.getById(e.getActivateId()).getNickname());
+            }
             return pageResponse;
         }).collect(Collectors.toList());
 
