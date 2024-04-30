@@ -49,8 +49,8 @@ public class JbpAdminApplication {
 
 
 //      推三返一
-        OrderPaySuccessTask orderPaySuccessTask = run.getBean(OrderPaySuccessTask.class);
-        orderPaySuccessTask.orderPayAfter();
+//        OrderPaySuccessTask orderPaySuccessTask = run.getBean(OrderPaySuccessTask.class);
+//        orderPaySuccessTask.orderPayAfter();
 //       groupThreeRetOneHandler.aa_15866();
 //           groupThreeRetOneHandler.aa_3174_4();
 //       groupThreeRetOneHandler.aa_12692_8();
