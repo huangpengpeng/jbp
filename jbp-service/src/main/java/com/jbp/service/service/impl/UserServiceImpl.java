@@ -828,7 +828,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
         if (validateCode == null && !ifBooleand) {
             throw new CrmebException("请先获取验证码");
-        }else{
+        }
+        if (validateCode == null) {
             validateCode= "";
         }
 
