@@ -25,6 +25,7 @@ import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.core.env.Environment;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundClearing> implements FundClearingService {
@@ -333,17 +335,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
-        Long id = 0L;
-        List<FundClearingVo> result = Lists.newArrayList();
-        do {
-            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName, commName, ifRefund);
-            if (CollectionUtils.isEmpty(fundClearingVos)) {
-                break;
-            }
-            result.addAll(fundClearingVos);
-            id = fundClearingVos.get(fundClearingVos.size()-1).getId();
-        } while (true);
-        return result;
+        List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, 0L, channelName, commName, ifRefund);
+        return fundClearingVos;
     }
 
     @Override
@@ -460,15 +453,21 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             return;
         }
         Map<String, List<FundClearingItemConfig>> configListMap = fundClearingItemConfigService.getMap();
+        int i = 0;
         for (FundClearing fundClearing : list) {
-            if(fundClearing.getUid() != null){
+            i++;
+            if (fundClearing.getUid() != null) {
                 fundClearing.setItems(getItemList(fundClearing, configListMap));
+                Boolean ifSuccess = updateById(fundClearing);
+                if (BooleanUtils.isNotTrue(ifSuccess)) {
+                    throw new CrmebException("当前操作人数过多");
+                }
             }
+
+            log.info("当前执行条数:{}, 总条数:{}", i, list.size());
         }
-        Boolean ifSuccess = updateBatchById(list);
-        if (BooleanUtils.isNotTrue(ifSuccess)) {
-            throw new CrmebException("当前操作人数过多");
-        }
+
+
     }
 
     private static List<FundClearingItem> createItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {

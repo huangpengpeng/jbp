@@ -41,7 +41,7 @@ public class UserCapaUpdateInvitationEventListener implements ApplicationListene
         UserCapaUpdateEvent.EventDto eventDto = userCapaUpdateEvent.getEventDto();
         UserCapa userCapa = eventDto.getUserCapa();
         UserInvitation userInvitation = userInvitationService.getByUser(userCapa.getUid());
-        if (!userInvitation.getIfForce()) {
+        if (userInvitation != null && !userInvitation.getIfForce()) {
             userInvitation.setIfForce(true);
             userInvitationService.updateById(userInvitation);
         }
