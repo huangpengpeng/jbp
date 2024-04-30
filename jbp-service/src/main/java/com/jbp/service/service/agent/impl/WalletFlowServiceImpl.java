@@ -167,7 +167,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     @Override
     public void init() {
         int i = 0;
-        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_"));
+        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_").ge(WalletFlow::getGmtCreated, "2024-04-25 00:00:00"));
 
         Map<Integer, User> uidMapList = userService.getUidMapList(list.stream().map(WalletFlow::getUid).collect(Collectors.toList()));
 
