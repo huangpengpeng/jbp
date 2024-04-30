@@ -176,6 +176,15 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
         });
     }
 
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        rule.setOneCapaId(1L);
+        rule.setOneRatio(BigDecimal.ONE);
+        rule.setTwoCapaId(1L);
+        rule.setTwoRatio(BigDecimal.ONE);
+        System.out.println(JSONObject.toJSONString(rule));
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

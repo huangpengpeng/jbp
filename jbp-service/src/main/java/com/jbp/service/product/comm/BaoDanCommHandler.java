@@ -221,6 +221,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
         System.out.println(JSONObject.toJSONString(rule));
     }
 
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
