@@ -3633,7 +3633,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 status2 = 1;
             }else if (map.get("status").toString().equals("301")){
                 status2 = 4;
-            }else if (map.get("status").toString().equals("401")){
+            }else if (map.get("status").toString().equals("401") || map.get("status").toString().equals("402") ){
                 status2 =6;
             }
             OrderFrontDataResponse orderFrontDataResponse = new OrderFrontDataResponse();
