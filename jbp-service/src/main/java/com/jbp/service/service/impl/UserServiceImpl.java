@@ -816,15 +816,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      */
     public void checkValidateCode(String phone, String code) {
         Object validateCode = redisUtil.get(getValidateCodeRedisKey(phone));
-        if (validateCode == null) {
-            throw new CrmebException("请先获取验证码");
-        }
-
-        List<User> user =  userService.getByPhone(phone);
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
         Boolean ifBooleand = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
+
+        List<User> user =  userService.getByPhone(phone);
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         channelName = com.jbp.service.util.StringUtils.isEmpty(channelName) ? "平台" : channelName;
+
+        if (validateCode == null && !ifBooleand) {
+            throw new CrmebException("请先获取验证码");
+        }else{
+            validateCode= "";
+        }
 
         if(ifBooleand){
             if(user.isEmpty() && !validateCode.toString().equals(code)) {

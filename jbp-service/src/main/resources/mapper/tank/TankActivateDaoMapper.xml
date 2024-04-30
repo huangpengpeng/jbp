@@ -34,7 +34,7 @@
     <select id="getactivateList" resultType="com.jbp.common.response.ActivateInfoResponse">
 
 			select t.operation_sn,u.nickName,tq.imei,ts.name,t.created_time,t.end_time ,t.`status` ,tq.name as tqname,tq.equipment_sn from eb_tank_activate t
-		left join user u on u.id = t.activate_user_id
+		left join eb_user u on u.id = t.activate_user_id
 		left join eb_tank_equipment tq on tq.id = t.equipment_id
 		left join eb_tank_store ts on ts.id = tq.store_id
 		where ts.user_id =  #{userId}
