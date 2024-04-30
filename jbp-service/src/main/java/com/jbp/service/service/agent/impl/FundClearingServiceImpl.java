@@ -335,17 +335,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
-        Long id = 0L;
-        List<FundClearingVo> result = Lists.newArrayList();
-        do {
-            List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, id, channelName, commName, ifRefund);
-            if (CollectionUtils.isEmpty(fundClearingVos)) {
-                break;
-            }
-            result.addAll(fundClearingVos);
-            id = fundClearingVos.get(fundClearingVos.size()-1).getId();
-        } while (true);
-        return result;
+        List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, 0L, channelName, commName, ifRefund);
+        return fundClearingVos;
     }
 
     @Override
