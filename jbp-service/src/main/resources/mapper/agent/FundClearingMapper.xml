@@ -149,7 +149,7 @@
     </resultMap>
     <select id="exportFundClearing" resultMap="FundClearingVo">
     <include refid="exportFundClearing"/>
-        <where>
+        <where> 1=1 
             <if test="uniqueNo!=null and uniqueNo !=''">
                 and c.unique_no=#{uniqueNo}
             </if>
