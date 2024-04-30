@@ -57,7 +57,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://wkp2.cqrfkonij3bk.ap-southeast-1.rds.amazonaws.com:3306/sm?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    url: jdbc:mysql://wkp2.cqrfkonij3bk.ap-southeast-1.rds.amazonaws.com:3306/sm?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true
     username: root
     password: smbs8888#
   redis:

@@ -163,36 +163,36 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
         } while (true);
         return result;
     }
-//
-//    @Override
-//    public void init() {
-//        int i = 0;
-//        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_").last(" limit 10"));
-//
-//        Map<Integer, User> uidMapList = userService.getUidMapList(list.stream().map(WalletFlow::getUid).collect(Collectors.toList()));
-//
-//        Map<String, List<WalletFlow>> flowMap = FunctionUtil.valueMap(list, WalletFlow::getExternalNo);
-//
-//        List<WalletFlow> updateList = Lists.newArrayList();
-//        for (WalletFlow walletFlow : list) {
-//
-//            List<WalletFlow> walletFlows = flowMap.get(walletFlow.getExternalNo());
-//            Integer uid = walletFlow.getUid();
-//            for (WalletFlow flow : walletFlows) {
-//                if (flow.getUid().intValue() != walletFlow.getUid().intValue()) {
-//                    uid = flow.getUid();
-//                }
-//            }
-//            User receiveUser = uidMapList.get(uid);
-//            walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
-//
-//            updateList.add(walletFlow);
-//            i++;
-//            log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
-//        }
-//        dao.updateBatch(updateList);
-//
-//        System.out.println(111);
-//
-//    }
+
+    @Override
+    public void init() {
+        int i = 0;
+        List<WalletFlow> list = list(new QueryWrapper<WalletFlow>().lambda().likeRight(WalletFlow::getExternalNo, "ZZ_"));
+
+        Map<Integer, User> uidMapList = userService.getUidMapList(list.stream().map(WalletFlow::getUid).collect(Collectors.toList()));
+
+        Map<String, List<WalletFlow>> flowMap = FunctionUtil.valueMap(list, WalletFlow::getExternalNo);
+
+        List<WalletFlow> updateList = Lists.newArrayList();
+        for (WalletFlow walletFlow : list) {
+
+            List<WalletFlow> walletFlows = flowMap.get(walletFlow.getExternalNo());
+            Integer uid = walletFlow.getUid();
+            for (WalletFlow flow : walletFlows) {
+                if (flow.getUid().intValue() != walletFlow.getUid().intValue()) {
+                    uid = flow.getUid();
+                }
+            }
+            User receiveUser = uidMapList.get(uid);
+            walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
+
+            updateList.add(walletFlow);
+            i++;
+            log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
+        }
+        dao.updateBatch(updateList);
+
+        System.out.println(111);
+
+    }
 }
