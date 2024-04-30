@@ -365,7 +365,7 @@ public class UserVisaController {
         JSONObject jsonObject = JSONObject.parseObject(bizContent);
 
         if (jsonObject.getString("signTaskStatus") != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
-            UserVisaResponse userVisa = userVisaService.getVisaTask(jsonObject.getString("signTaskId"));
+                UserVisaResponse userVisa = userVisaService.getVisaTask(jsonObject.getString("signTaskId"));
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {

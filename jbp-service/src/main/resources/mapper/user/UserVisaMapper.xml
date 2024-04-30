@@ -6,9 +6,9 @@
 
 
 			select * from (
-		select *,"sm" as platform from sm.eb_user_visa
+		select *,"sm" as platfrom from sm.eb_user_visa
 		union
-		select *,"yk" as platform from yk.eb_user_visa
+		select *,"yk" as platfrom from yk.eb_user_visa
 		) as a
 		where a.task_id = #{signTaskId}
     </select>

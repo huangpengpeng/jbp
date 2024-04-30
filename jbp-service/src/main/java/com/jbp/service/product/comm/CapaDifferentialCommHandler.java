@@ -118,6 +118,9 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 UserCapa userCapa = uidCapaMap.get(upperDto.getPId());
+                if(userCapa == null){
+                    continue;
+                }
                 if (NumberUtils.compare(userCapa.getCapaId(), capaId) > 0) {
                     userList.add(userCapa);
                     capaId = userCapa.getCapaId();

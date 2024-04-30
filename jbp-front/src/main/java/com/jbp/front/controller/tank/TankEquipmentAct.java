@@ -75,10 +75,10 @@ public class TankEquipmentAct {
         }
 
         Boolean ifRole = false;
-        if (!userId.equals(tankEquipment.getStoreUserId())) {
+        if (!userId.equals(tankEquipment.getStoreUserId().intValue())) {
             List<TankStoreClerkRelation> list = tankStoreClerkRelationService.getStoreId(tankEquipment.getStoreId());
             for (TankStoreClerkRelation tankStoreClerkRelation : list) {
-                if (tankStoreClerkRelation.getClerkUserId().equals(userId)) {
+                if (tankStoreClerkRelation.getClerkUserId().intValue() == userId) {
                     ifRole = true;
                 }
             }

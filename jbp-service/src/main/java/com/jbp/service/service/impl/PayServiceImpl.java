@@ -36,6 +36,7 @@ import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.ProductCoupon;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.system.SystemNotification;
+import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.model.user.*;
 import com.jbp.common.model.wechat.WechatPayInfo;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
@@ -168,6 +169,11 @@ public class PayServiceImpl implements PayService {
     private UserCapaXsService userCapaXsService;
     @Autowired
     private ProductMaterialsService productMaterialsService;
+    @Autowired
+    private TankOrdersService tankOrdersService;
+    @Autowired
+    private TankEquipmentNumberService tankEquipmentNumberService;
+
 
     /**
      * 获取支付配置
@@ -437,6 +443,76 @@ public class PayServiceImpl implements PayService {
         logger.info("订单支付 END response:{}", JSON.toJSONString(response));
         return response;
     }
+
+
+
+    /**
+     * 共享仓充值支付
+     *
+     * @param orderPayRequest 订单支付参数
+     * @return OrderPayResultResponse
+     */
+    @Override
+    public OrderPayResultResponse gxcPayment(OrderPayRequest orderPayRequest) {
+        logger.info("订单支付 START orderPayRequest:{}", JSON.toJSONString(orderPayRequest));
+        TankOrders order = tankOrdersService.getOrderSn(orderPayRequest.getOrderNo());
+        if (order.getPayPrice().compareTo(BigDecimal.ZERO) < 0) {
+            throw new CrmebException("支付金额不能低于等于0元");
+        }
+
+        logger.info("订单支付 当前操作的订单信息:{}", JSON.toJSONString(order));
+        if (order.getStatus() == "已支付") {
+            throw new CrmebException("订单已支付");
+        }
+
+        User user = userService.getInfo();
+
+        if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+            userService.validPayPwd(user.getId(), orderPayRequest.getPwd());
+        }
+
+
+        if (order.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
+
+            // 钱包支付
+            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET)) {
+                Wallet wallet = walletService.getCanPayByUser(user.getId());
+                if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
+                    throw new CrmebException("用户余额不足");
+                }
+            }
+        }
+
+        OrderPayResultResponse response = new OrderPayResultResponse();
+        response.setOrderNo(order.getOrderSn());
+        response.setPayType(orderPayRequest.getPayType());
+        response.setPayChannel(orderPayRequest.getPayChannel());
+
+        // 钱包支付
+        if (orderPayRequest.getPayChannel().equals(PayConstants.PAY_CHANNEL_WALLET)) {
+            Boolean walletPay = gxcWalletPay(order);
+            response.setStatus(walletPay);
+
+            if(walletPay){
+
+                order.setStatus("已支付");
+                order.setPayTime(new Date());
+                tankOrdersService.updateById(order);
+                tankEquipmentNumberService.increase(order.getStoreUserId(), order.getNumber(), order.getOrderSn(), null);
+
+            }
+
+            logger.info("钱包支付 response : {}", JSON.toJSONString(response));
+            return response;
+        }
+
+
+        response.setStatus(false);
+        logger.info("订单支付 END response:{}", JSON.toJSONString(response));
+        return response;
+    }
+
+
 
     /**
      * 查询支付结果
@@ -896,7 +972,7 @@ public class PayServiceImpl implements PayService {
         return true;
     }
 
-    @Override
+     @Override
     public Boolean walletPay(Order order) {
         // 用户余额扣除
         Boolean execute = transactionTemplate.execute(e -> {
@@ -933,6 +1009,40 @@ public class PayServiceImpl implements PayService {
         asyncService.orderPaySuccessSplit(order.getOrderNo());
         return true;
     }
+
+    private Boolean gxcWalletPay(TankOrders order) {
+        // 用户余额扣除
+        Boolean execute = transactionTemplate.execute(e -> {
+            Boolean update = Boolean.TRUE;
+            // 订单修改
+            order.setStatus("已支付");
+            order.setPayTime(DateUtil.date());
+            boolean b = tankOrdersService.updateById(order);
+            if(!b){
+                throw new RuntimeException("当前操作人数过多");
+            }
+            Wallet wallet = walletService.getCanPayByUser(order.getUserId().intValue());
+            if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), order.getPayPrice())) {
+                logger.error("钱包支付，扣除用户余额失败，orderNo = {}", order.getOrderSn());
+            }
+            // 这里只扣除金额，账单记录在task中处理
+            if (order.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
+                String postscript = String.format("单号:%s,金额:%s", order.getOrderSn(), order.getPayPrice());
+                update = walletService.transferToPlatform(order.getUserId().intValue(), wallet.getType(), order.getPayPrice(),
+                        WalletFlow.OperateEnum.付款.toString(), order.getOrderSn(), postscript);
+                if (!update) {
+                    logger.error("钱包支付，扣除用户余额失败，orderNo = {}", order.getOrderSn());
+                    e.setRollbackOnly();
+                    return update;
+                }
+            }
+            return update;
+        });
+        if (!execute) throw new CrmebException("钱包支付订单失败");
+
+        return true;
+    }
+
 
     @Override
     public Boolean confirmPay(Order order) {

@@ -6,6 +6,8 @@ import com.beust.jcommander.internal.Maps;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.model.tank.TankOrders;
+import com.jbp.common.request.OrderPayRequest;
+import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.TankStoreListResponse;
 import com.jbp.common.response.TankStoreRelationListResponse;
 import com.jbp.common.result.CommonResult;
@@ -23,10 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
@@ -54,6 +54,11 @@ public class TankOrdersAct {
     private SystemConfigService systemConfigService;
     @Resource
     private UserService userService;
+
+    @Autowired
+    private PayService payService;
+
+
     private static final Logger logger = LoggerFactory.getLogger(TankOrdersAct.class);
 
     @Autowired
@@ -90,6 +95,14 @@ public class TankOrdersAct {
         return CommonResult.success(tankOrders);
     }
 
+    @ApiOperation(value = "支付")
+    @RequestMapping(value = "/payment", method = RequestMethod.POST)
+    public CommonResult<OrderPayResultResponse> payment(@RequestBody @Validated OrderPayRequest orderPayRequest) {
+        return CommonResult.success(payService.gxcPayment(orderPayRequest));
+    }
+
+
+
     @ApiOperation(value = "充值次数选择", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/getNumberList", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -118,12 +131,11 @@ public class TankOrdersAct {
 
     @ApiOperation(value = "充值次数成功回调", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/callapi", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult<String> callapi(@RequestParam Map<String, Object> params, @ApiIgnore HttpServletResponse response,
-                                        ModelMap model) throws Exception {
+    public CommonResult<String> callapi(String orderNo) throws Exception {
         try {
-            JSONObject queryJSON = JSONObject.parseObject(JSONObject.toJSONString(params));
-
-            String orderNo = queryJSON.getString("orderNo");
+//            JSONObject queryJSON = JSONObject.parseObject(JSONObject.toJSONString(params));
+//
+//            String orderNo = queryJSON.getString("orderNo");
             if (StringUtils.isBlank(orderNo)) {
                 return CommonResult.success("SUCCESS");
             }

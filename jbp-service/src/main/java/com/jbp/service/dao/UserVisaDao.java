@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface UserVisaDao extends BaseMapper<UserVisa> {
 
-    @Update("update #{platform,jdbcType=VARCHAR}.eb_user_visa set visa=true where id = #{id,jdbcType=VARCHAR} ")
+    @Update("update ${platform}.eb_user_visa set visa=true where id = ${id} ")
      void updateVisa(Integer id, String platform);
 
 

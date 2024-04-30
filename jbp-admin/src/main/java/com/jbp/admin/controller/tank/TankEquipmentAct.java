@@ -53,9 +53,9 @@ public class TankEquipmentAct {
     @ApiOperation(value = "增加设备", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/save", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult delete(HttpServletRequest request, Long orderbondactivateId, String imei, String name, String equipmentSn, Long storeId) {
+    public CommonResult delete(HttpServletRequest request, Long orderbondactivateId, String imei, String name, String equipmentSn, Long storename) {
 
-        TankStore tankStore = tankStoreService.getById(storeId);
+        TankStore tankStore = tankStoreService.getById(storename);
         if (tankStore == null) {
             throw new RuntimeException("门店id不存在");
         }

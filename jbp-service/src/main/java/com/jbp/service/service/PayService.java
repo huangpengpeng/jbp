@@ -33,6 +33,13 @@ public interface PayService {
     OrderPayResultResponse payment(OrderPayRequest orderPayRequest);
 
     /**
+     * 充值共享舱订单支付
+     * @param orderPayRequest 订单支付参数
+     * @return OrderPayResultResponse
+     */
+    OrderPayResultResponse gxcPayment(OrderPayRequest orderPayRequest);
+
+    /**
      * 查询订单微信支付结果
      * @param orderNo 订单编号
      */
