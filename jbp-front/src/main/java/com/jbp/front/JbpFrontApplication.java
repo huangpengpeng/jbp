@@ -49,7 +49,7 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
+//
 //        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
 //        fundClearingService.init();
 
