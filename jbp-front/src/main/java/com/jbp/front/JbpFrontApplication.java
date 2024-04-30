@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.result.CommonResult;
 import com.jbp.front.controller.tank.TankAct;
+import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.WalletFlowService;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
@@ -48,6 +49,9 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+//        fundClearingService.init();
 
 
 //        Map<String, String> params = new TreeMap<String, String>();

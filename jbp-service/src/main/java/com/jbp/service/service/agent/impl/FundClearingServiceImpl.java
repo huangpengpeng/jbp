@@ -27,6 +27,7 @@ import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private WalletFlowService walletFlowService;
     @Resource
     private WalletService walletService;
+    @Resource
+    private Environment environment;
 
     @Override
     public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime,
@@ -354,12 +357,17 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public Map<String, Object> totalGet(Integer uid) {
 
+        String openWaitStatus = environment.getProperty("platform.openWaitStatus");
 
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
         Map<String, Object> map = new HashMap<>();
         LambdaQueryWrapper<FundClearing> issue = new LambdaQueryWrapper<FundClearing>()
-                .eq(FundClearing::getUid, uid)
-                .in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
+                .eq(FundClearing::getUid, uid);
+        if(StringUtils.isNotEmpty(openWaitStatus)){
+            issue.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已创建);
+        }else{
+            issue.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
+        }
         BigDecimal count = list(issue).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
         map.put("issue", count.multiply(wallet_pay_integral));
         LambdaQueryWrapper<FundClearing> completed = new LambdaQueryWrapper<FundClearing>()
@@ -442,6 +450,27 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         return fundClearingDao.getUserTotalDay(uid,day);
     }
 
+    @Override
+    public void init() {
+        QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(FundClearing::getStatus, FundClearing.Constants.已创建.toString());
+        List<FundClearing> list = list(queryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        Map<String, List<FundClearingItemConfig>> configListMap = fundClearingItemConfigService.getMap();
+        for (FundClearing fundClearing : list) {
+            if(fundClearing.getUid() != null){
+                fundClearing.setItems(getItemList(fundClearing, configListMap));
+            }
+        }
+        Boolean ifSuccess = updateBatchById(list);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
+    }
+
     private static List<FundClearingItem> createItemList(FundClearing fundClearing, Map<String, List<FundClearingItemConfig>> configListMap) {
         List<FundClearingItem> items = Lists.newArrayList();
         List<FundClearingItemConfig> configList = configListMap.get(fundClearing.getCommName());
@@ -476,16 +505,24 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
     public void setFundClearingWrapperByStatus(LambdaQueryWrapper<FundClearing> lqw, Integer uid, Integer headerStatus) {
         lqw.eq(FundClearing::getUid, uid);
+        String openWaitStatus = environment.getProperty("platform.openWaitStatus");
+
         switch (headerStatus) {
             case 0:
-                lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已出款);
+                if(StringUtils.isNotEmpty(openWaitStatus)){
+                    lqw.in(FundClearing::getStatus, FundClearing.Constants.已创建, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已出款);
+                }else{
+                    lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已出款);
+                }
                 break;
             case 1:
-                //仓库中（未上架）
-                lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
+                if(StringUtils.isNotEmpty(openWaitStatus)){
+                    lqw.in(FundClearing::getStatus, FundClearing.Constants.已创建, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
+                }else{
+                    lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
+                }
                 break;
             case 2:
-                //仓库中（未上架）
                 lqw.eq(FundClearing::getStatus, FundClearing.Constants.已出款);
                 break;
             default:

@@ -108,4 +108,7 @@ public interface FundClearingService extends IService<FundClearing> {
     BigDecimal getUserTotalContMonth(Integer uid,String month);
 
     BigDecimal getUserTotalDay(Integer uid,String day);
+
+
+    void init();
 }
