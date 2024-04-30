@@ -30,10 +30,10 @@ public class JbpAdminApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
 
-        LztFundTransferService lztFundTransferService = run.getBean(LztFundTransferService.class);
-
-        LztFundTransfer lztFundTransfer = lztFundTransferService.fundTransfer(14, "d0002", "80094800000009870000000010", BigDecimal.valueOf(3000000), "付款");
-        System.out.println(lztFundTransfer);
+//        LztFundTransferService lztFundTransferService = run.getBean(LztFundTransferService.class);
+//
+//        LztFundTransfer lztFundTransfer = lztFundTransferService.fundTransfer(14, "d0002", "80094800000009870000000010", BigDecimal.valueOf(3000000), "付款");
+//        System.out.println(lztFundTransfer);
     }
 
 }
