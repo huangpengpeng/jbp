@@ -815,6 +815,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @param code  验证码
      */
     public void checkValidateCode(String phone, String code) {
+        if(StringUtils.isBlank(code)){
+            throw new CrmebException("请输入验证码");
+        }
         Object validateCode = redisUtil.get(getValidateCodeRedisKey(phone));
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
         Boolean ifBooleand = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
