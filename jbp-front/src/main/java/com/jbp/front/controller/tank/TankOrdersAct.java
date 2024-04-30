@@ -118,12 +118,11 @@ public class TankOrdersAct {
 
     @ApiOperation(value = "充值次数成功回调", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/callapi", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult<String> callapi(@RequestParam Map<String, Object> params, @ApiIgnore HttpServletResponse response,
-                                        ModelMap model) throws Exception {
+    public CommonResult<String> callapi(String orderNo) throws Exception {
         try {
-            JSONObject queryJSON = JSONObject.parseObject(JSONObject.toJSONString(params));
-
-            String orderNo = queryJSON.getString("orderNo");
+//            JSONObject queryJSON = JSONObject.parseObject(JSONObject.toJSONString(params));
+//
+//            String orderNo = queryJSON.getString("orderNo");
             if (StringUtils.isBlank(orderNo)) {
                 return CommonResult.success("SUCCESS");
             }
