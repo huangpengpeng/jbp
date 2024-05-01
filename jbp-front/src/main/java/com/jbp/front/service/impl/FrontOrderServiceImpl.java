@@ -2242,6 +2242,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             merchantOrderVo.setFreightFee(storePostage);
             freightFee = freightFee.add(storePostage);
+
+            if(!tempIdSet.isEmpty()){
+                ShippingTemplates shippingTemplates =  shippingTemplatesService.getById(tempIdSet.iterator().next());
+                orderInfoVo.setFreightName(shippingTemplates!= null ? shippingTemplates.getName() : "");
+            }
         }
 
         orderInfoVo.setFreightFee(freightFee);

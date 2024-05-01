@@ -103,4 +103,7 @@ public class PreOrderInfoVo {
 
     @ApiModelProperty(value = "订单扩展信息")
     private OrderExt orderExt;
+
+    @ApiModelProperty(value = "运费模板")
+    private String freightName;
 }
