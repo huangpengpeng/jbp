@@ -88,6 +88,6 @@ public class PreOrderResponse implements Serializable {
     private Integer payGateway;
 
     @ApiModelProperty(value = "运费模板")
-    private String freightNmae;
+    private String freightName;
 
 }
