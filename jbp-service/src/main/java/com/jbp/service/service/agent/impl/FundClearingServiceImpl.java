@@ -159,7 +159,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(FundClearing::getExternalNo, externalNo)
-                .eq(FundClearing::getStatus, FundClearing.Constants.已创建.toString());
+                .in(FundClearing::getStatus, FundClearing.Constants.已创建.toString(),  FundClearing.Constants.已拦截.toString());
         List<FundClearing> list = list(queryWrapper);
         if (CollectionUtils.isEmpty(list)) {
             return;
@@ -182,7 +182,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(ids)) {
             throw new CrmebException("请选择佣金发放记录");
         }
-        List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().in(FundClearing::getId, ids).eq(FundClearing::getStatus, FundClearing.Constants.已创建.toString()));
+        List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().in(FundClearing::getId, ids)
+                .in(FundClearing::getStatus, FundClearing.Constants.已创建.toString(),  FundClearing.Constants.已拦截.toString()));
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
