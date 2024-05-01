@@ -135,6 +135,13 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
         return dao.selectList(lqw);
     }
 
+    @Override
+    public List<OrderDetail> getBarCodeByOrderNo(List<String> orderNoList) {
+        LambdaQueryWrapper<OrderDetail> lqw = Wrappers.lambdaQuery();
+        lqw.in(OrderDetail::getOrderNo, orderNoList);
+        return dao.selectList(lqw);
+    }
+
     /**
      * 获取待评价数量
      * @return 待评价数量

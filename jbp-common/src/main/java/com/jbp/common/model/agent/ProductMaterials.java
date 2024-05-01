@@ -52,6 +52,11 @@ public class ProductMaterials extends BaseModel {
     @TableField(exist = false)
     private String merName;
 
+    @ApiModelProperty("供应商")
+    private String supplyName;
+
+
+
 
 
 }

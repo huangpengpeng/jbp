@@ -234,6 +234,13 @@ public interface OrderService extends IService<Order> {
     List<OrderInvoiceResponse> getInvoiceList(String orderNo);
 
     /**
+     * 获取订单物料列表
+     * @param orderNo 订单号
+     * @return 物料列表
+     */
+    List<OrderMaterialsResponse> getMaterialsList(String orderNo);
+
+    /**
      * 获取可以自动完成的订单
      * @param autoCompleteDay 自动完成订单天数
      * @return 可以自动完成的订单列表
@@ -336,4 +343,6 @@ public interface OrderService extends IService<Order> {
     Order getLastOne(Integer uid, String platform);
 
     List<Order> getSuccessList(Date startTime, Date endTime);
+
+    PageInfo<PlatformOrderConsignResponse> getPlatformOrderConsignPage(OrderSearchRequest request, PageParamRequest pageParamRequest);
 }
