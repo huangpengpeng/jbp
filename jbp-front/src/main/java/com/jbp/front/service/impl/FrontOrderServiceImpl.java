@@ -2853,7 +2853,6 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             ComputedMerchantOrderResponse merOrderResponse = new ComputedMerchantOrderResponse();
             merOrderResponse.setMerId(vo.getMerId());
             merOrderResponse.setFreightFee(vo.getFreightFee());
-            merOrderResponse.setFreightName(vo.getFreightName());
             if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL) && orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_VIDEO)) {
                 merOrderResponse.setUserCouponId(0);
                 merOrderResponse.setCouponFee(BigDecimal.ZERO);

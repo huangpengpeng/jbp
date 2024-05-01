@@ -48,7 +48,4 @@ public class ComputedMerchantOrderResponse implements Serializable {
 
     @ApiModelProperty(value = "订单商户优惠券列表")
     private List<CouponUser> merCouponUserList;
-
-    @ApiModelProperty(value = "运费名称")
-    private String freightName;
 }
