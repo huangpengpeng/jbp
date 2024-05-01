@@ -42,4 +42,20 @@ public class SelfScoreController {
         }
         return CommonResult.success(CommonPage.restPage(selfScoreService.pageList(uid ,pageParamRequest)));
     }
+
+
+    @PreAuthorize("hasAuthority('agent:self:score:teampage')")
+    @GetMapping("/teamPage")
+    @ApiOperation("个人业绩团队汇总列表")
+    public CommonResult<CommonPage<SelfScore>> getTeamList(SelfScoreRequest request, PageParamRequest pageParamRequest) {
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(CommonPage.restPage(selfScoreService.pageTeamList(uid ,pageParamRequest)));
+    }
 }

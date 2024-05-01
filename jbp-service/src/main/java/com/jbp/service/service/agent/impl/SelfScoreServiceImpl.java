@@ -65,6 +65,23 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
+    @Override
+    public PageInfo<SelfScore> pageTeamList(Integer uid, PageParamRequest pageParamRequest) {
+        Page<SelfScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<SelfScore> list =selfScoreDao.getTeamUserScore(uid);
+        if(CollectionUtils.isEmpty(list)){
+            return CommonPage.copyPageInfo(page, list);
+        }
+        List<Integer> uIdList = list.stream().map(SelfScore::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        list.forEach(e -> {
+            User user = uidMapList.get(e.getUid());
+            e.setAccount(user != null ? user.getAccount() : "");
+        });
+        return CommonPage.copyPageInfo(page, list);
+    }
+
     @Override
     public SelfScore add(Integer uid) {
         SelfScore selfScore = new SelfScore(uid);
