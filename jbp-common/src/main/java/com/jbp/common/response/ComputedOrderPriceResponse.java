@@ -79,5 +79,5 @@ public class ComputedOrderPriceResponse implements Serializable {
 
 
     @ApiModelProperty(value = "运费模板")
-    private BigDecimal freightName;
+    private String freightName;
 }
