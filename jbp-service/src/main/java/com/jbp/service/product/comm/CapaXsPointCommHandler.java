@@ -116,7 +116,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
                 UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
 
                 //判断星级是否满足佣金规则
-                if (userCapaXs == null || userCapaXs.getCapaId() < rule.getCapaXsId()) {
+                if (userCapaXs == null || userCapaXs.getCapaId().intValue() < rule.getCapaXsId().intValue()) {
                     pid = invitationService.getPid(pid);
                     continue;
                 }
@@ -144,7 +144,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
-        private Integer capaXsId;
+        private Long capaXsId;
         private List<Comm> xsComm;
     }
 

@@ -2,6 +2,7 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
@@ -132,7 +133,7 @@ public class CapaXsPointComm2Handler extends AbstractProductCommHandler {
                 UserCapaXs userCapaXs = userCapaXsService.getByUser(pid);
 
                 //判断星级是否满足佣金规则
-                if (userCapaXs == null || userCapaXs.getCapaId() < rule.getCapaXsId()) {
+                if (userCapaXs == null || userCapaXs.getCapaId().intValue() < rule.getCapaXsId().intValue()) {
                     pid = invitationService.getPid(pid);
                     continue;
                 }
@@ -162,12 +163,34 @@ public class CapaXsPointComm2Handler extends AbstractProductCommHandler {
 
     }
 
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        rule.setCapaXsId(1L);
+        List<Comm> xsComm = Lists.newArrayList();
+        Comm comm = new Comm();
+        comm.setNum(1);
+        comm.setType("金额");
+        comm.setValue(BigDecimal.valueOf(5));
+        xsComm.add(comm);
+
+        Comm comm2 = new Comm();
+        comm2.setNum(2);
+        comm2.setType("比例");
+        comm2.setValue(BigDecimal.valueOf(0.05));
+        xsComm.add(comm2);
+
+        rule.setXsComm(xsComm);
+
+        System.out.println(JSONObject.toJSONString(rule));
+
+    }
+
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Rule {
-        private Integer capaXsId;
+        private Long capaXsId;
         private List<Comm> xsComm;
     }
 
