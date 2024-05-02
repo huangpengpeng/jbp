@@ -10,13 +10,16 @@ import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -24,12 +27,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * 星级见点佣金
+ * 星级见点佣金2
  */
 @Component
-public class CapaXsPointCommHandler extends AbstractProductCommHandler {
+public class CapaXsPointComm2Handler extends AbstractProductCommHandler {
 
     @Resource
     private OrderDetailService orderDetailService;
@@ -48,7 +53,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
 
     @Override
     public Integer getType() {
-        return ProductCommEnum.星级见点佣金.getType();
+        return ProductCommEnum.星级见点佣金2.getType();
     }
 
     @Override
@@ -60,12 +65,22 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
     public Boolean saveOrUpdate(ProductComm productComm) {
         // 检查是否存在存在直接更新
         if (productComm.hasError()) {
-            throw new CrmebException(ProductCommEnum.星级见点佣金.getName() + "参数不完整");
+            throw new CrmebException(ProductCommEnum.星级见点佣金2.getName() + "参数不完整0");
         }
         // 获取规则【解析错误，或者 必要字段不存在 直接在获取的时候抛异常】
         Rule rule = getRule(productComm);
-        if (rule.getCapaXsId() == null || rule.getXsComm() == null) {
-            throw new CrmebException(ProductCommEnum.星级见点佣金.getName() + "参数不完整");
+        if (rule.getCapaXsId() == null || CollectionUtils.isEmpty(rule.getXsComm())) {
+            throw new CrmebException(ProductCommEnum.星级见点佣金2.getName() + "参数不完整1");
+        }
+        List<Comm> xsComm = rule.getXsComm();
+        for (Comm comm : xsComm) {
+            if (StringUtils.isEmpty(comm.getType()) && comm.getValue() == null || ArithmeticUtils.less(comm.getValue(), BigDecimal.ZERO)) {
+                throw new CrmebException(ProductCommEnum.星级见点佣金2.getName() + "参数不完整2");
+            }
+        }
+        Set<Integer> collect = xsComm.stream().map(Comm::getNum).collect(Collectors.toSet());
+        if (collect.size() != xsComm.size()) {
+            throw new CrmebException(ProductCommEnum.星级见点佣金2.getName() + " 等级序号相同");
         }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
@@ -79,7 +94,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
     @Override
     public Rule getRule(ProductComm productComm) {
         try {
-            CapaXsPointCommHandler.Rule rules = JSONObject.parseObject(productComm.getRule(), CapaXsPointCommHandler.Rule.class);
+            Rule rules = JSONObject.parseObject(productComm.getRule(), Rule.class);
             return rules;
         } catch (Exception e) {
             throw new CrmebException(getType() + ":佣金格式解析失败:" + productComm.getRule());
@@ -109,6 +124,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
             int i = 0;
             Integer pid = invitationService.getPid(order.getUid());
 
+             List<Comm> xsCommList = rule.getXsComm();
             do {
                 if (pid == null) {
                     break;
@@ -120,21 +136,28 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
                     pid = invitationService.getPid(pid);
                     continue;
                 }
+                Comm comm = xsCommList.get(i);
 
-                CapaXsPointCommHandler.Comm comm = rule.getXsComm().get(i);
-                BigDecimal amount = totalPv.multiply(comm.getRatio()).multiply(new BigDecimal(orderDetail.getPayNum()));
-                List<FundClearingProduct> fundClearingProducts = new ArrayList<>();
-                FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
-                        orderDetail.getPayNum(), comm.getRatio(), amount);
-                fundClearingProducts.add(clearingProduct);
-                User orderUser = userService.getById(order.getUid());
-                fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.星级见点佣金.getName(), amount,
-                        fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级见点佣金.getName(), "");
-                pid = invitationService.getPid(pid);
-                i++;
+                BigDecimal amount = BigDecimal.ZERO;
+                if(comm.getType().equals("比例")){
+                    amount = totalPv.multiply(comm.getValue()).multiply(new BigDecimal(orderDetail.getPayNum()));
+                }else{
+                    amount = comm.getValue();
+                }
+
+                amount.setScale(2, BigDecimal.ROUND_DOWN);
+                if(ArithmeticUtils.gt(amount, BigDecimal.ZERO)) {
+                    List<FundClearingProduct> fundClearingProducts = new ArrayList<>();
+                    FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
+                            orderDetail.getPayNum(), comm.getValue(), amount);
+                    fundClearingProducts.add(clearingProduct);
+                    User orderUser = userService.getById(order.getUid());
+                    fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.星级见点佣金2.getName(), amount,
+                            fundClearingProducts, orderUser.getAccount() + "下单获得" + comm.getType() + ProductCommEnum.星级见点佣金2.getName(), "");
+                    pid = invitationService.getPid(pid);
+                    i++;
+                }
             } while (i < rule.getXsComm().size());
-
-
         }
 
     }
@@ -161,8 +184,13 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
         private int num;
 
         /**
-         * 比例
+         * 比例 类型  金额  比例
          */
-        private BigDecimal ratio;
+        private String type;
+
+        /**
+         * 数值【小数位 不要限制】
+         */
+        private BigDecimal value;
     }
 }
