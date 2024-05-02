@@ -13,6 +13,8 @@ import java.util.List;
 public interface SelfScoreService extends IService<SelfScore> {
   PageInfo<SelfScore> pageList(Integer uid, PageParamRequest pageParamRequest);
 
+  PageInfo<SelfScore> pageTeamList(Integer uid, PageParamRequest pageParamRequest);
+
   SelfScore add(Integer uid);
   SelfScore getByUser(Integer uid);
 

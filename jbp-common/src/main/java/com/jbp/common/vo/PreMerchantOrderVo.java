@@ -93,4 +93,7 @@ public class PreMerchantOrderVo implements Serializable {
 
     @ApiModelProperty(value = "是否自营：0-自营，1-非自营")
     private Boolean isSelf;
+
+    @ApiModelProperty(value = "运费名称")
+    private String freightName;
 }

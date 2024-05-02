@@ -2242,8 +2242,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             merchantOrderVo.setFreightFee(storePostage);
             freightFee = freightFee.add(storePostage);
+            if(!tempIdSet.isEmpty()){
+                ShippingTemplates shippingTemplates =  shippingTemplatesService.getById(tempIdSet.iterator().next());
+                orderInfoVo.setFreightName(shippingTemplates!= null ? shippingTemplates.getName() : "");
+            }
         }
-
         orderInfoVo.setFreightFee(freightFee);
     }
 
@@ -2533,6 +2536,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         });
         getFreightFee(orderInfoVo, userAddress);
         priceResponse.setFreightFee(orderInfoVo.getFreightFee());
+        priceResponse.setFreightName(orderInfoVo.getFreightName());
         // 优惠券计算
         orderInfoVo.setPlatUserCouponId(request.getPlatUserCouponId());
         getCouponFee(orderInfoVo, orderMerchantRequestList, user.getId());
@@ -2652,6 +2656,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         getFreightFee(orderInfoVo, userAddress);
         priceResponse.setFreightFee(orderInfoVo.getFreightFee());
+        priceResponse.setFreightName(orderInfoVo.getFreightName());
         priceResponse.setCouponFee(BigDecimal.ZERO);
         priceResponse.setWalletDeductionFee(BigDecimal.ZERO);
 

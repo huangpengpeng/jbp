@@ -86,4 +86,8 @@ public class PreOrderResponse implements Serializable {
 
     @ApiModelProperty(value = "支付网关 -1 统一支付 0 在线支付 1 积分支付")
     private Integer payGateway;
+
+    @ApiModelProperty(value = "运费模板")
+    private String freightName;
+
 }
