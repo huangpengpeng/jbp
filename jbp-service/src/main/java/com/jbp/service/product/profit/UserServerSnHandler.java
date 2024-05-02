@@ -6,12 +6,14 @@ import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.ProductProfitConfig;
+import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.order.RefundOrder;
 import com.jbp.service.service.OrderExtService;
+import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
@@ -44,6 +46,8 @@ public class UserServerSnHandler implements ProductProfitHandler {
     private ProductProfitConfigService configService;
     @Autowired
     private Environment environment;
+    @Resource
+    private TeamService teamService;
 
     @Override
     public Integer getType() {
@@ -91,9 +95,16 @@ public class UserServerSnHandler implements ProductProfitHandler {
         for (int i = 0; i < rule.getNum(); i++) {
 
             TeamUser teamUser = teamUserService.getByUser(order.getUid());
+            Integer teamId = 0;
+            if(teamUser != null){
+             Team team =  teamService.getById( teamUser.getTid());
+             if(team!= null){
+                 teamId = team.getLeaderId();
+             }
+            }
 
             String channel = environment.getProperty("spring.profiles.active");
-            String serverSns = order.getOrderNo() + "_" + channel + "_" + (teamUser == null ? "0" : teamUser.getTid()) + "_" + i;
+            String serverSns = order.getOrderNo() + "_" + channel + "_" + teamId + "_" + i;
             serverSn = serverSn + "," + serverSns;
         }
 
