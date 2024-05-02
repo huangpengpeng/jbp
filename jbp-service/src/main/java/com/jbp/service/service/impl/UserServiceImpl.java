@@ -145,7 +145,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private PlatformWalletService platformWalletService;
     @Resource
     private ChannelIdentityService channelIdentityService;
-
+    @Resource
+    private UserCapaXsSnapshotService userCapaXsSnapshotService;
 
     /**
      * 手机号注册用户
@@ -1897,8 +1898,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 
         userInviteResponseList.forEach(e -> {
-            UserCapa userCapa  = userCapaService.getByUser(e.getUid());
-            Date createTime = userCapa.getGmtModify()== null ? e.getCreateTime(): userCapa.getGmtModify();
+            List<UserCapaXsSnapshot> userCapaXsSnapshotList =  userCapaXsSnapshotService.list(new QueryWrapper<UserCapaXsSnapshot>().lambda().eq(UserCapaXsSnapshot::getUid,e.getUid()));
+            Date xsCreateTime = null;
+              if(!userCapaXsSnapshotList.isEmpty()){
+                  if(userCapaXsSnapshotList.size() == 1){
+                      xsCreateTime = userCapaXsSnapshotList.get(0).getGmtCreated();
+                  }
+              }
+
+            Date createTime =xsCreateTime == null ? e.getCreateTime(): xsCreateTime;
             createTime = DateTimeUtils.addHours(createTime, 24);
             e.setOneCount(invitationService.getInviteNumber(e.getUid()));
             e.setIfMonth(createTime.getTime() >= DateTimeUtils.getNow().getTime());
