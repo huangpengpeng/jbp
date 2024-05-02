@@ -87,7 +87,4 @@ public class UserInvitation extends BaseModel {
     @TableField(exist = false)
     private String mCapaXsName;
 
-    public Integer getRealPid() {
-        return getMId() != null ? getMId() : getPId();
-    }
 }

@@ -101,7 +101,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     @Override
     public Integer getPid(Integer uId) {
         UserInvitation userInvitation = getByUser(uId);
-        return userInvitation == null ? null : userInvitation.getRealPid();
+        return userInvitation == null ? null : userInvitation.getPId();
     }
 
     @Override
