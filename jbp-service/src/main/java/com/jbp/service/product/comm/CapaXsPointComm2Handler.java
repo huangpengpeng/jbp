@@ -141,7 +141,7 @@ public class CapaXsPointComm2Handler extends AbstractProductCommHandler {
 
                 BigDecimal amount = BigDecimal.ZERO;
                 if(comm.getType().equals("比例")){
-                    amount = totalPv.multiply(comm.getValue()).multiply(new BigDecimal(orderDetail.getPayNum()));
+                    amount = totalPv.multiply(comm.getValue());
                 }else{
                     amount = comm.getValue().multiply(new BigDecimal(orderDetail.getPayNum()));
                 }
