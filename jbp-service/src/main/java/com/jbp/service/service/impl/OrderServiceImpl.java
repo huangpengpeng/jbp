@@ -20,6 +20,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
@@ -33,9 +34,12 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
+import com.jbp.common.vo.ProductMaterialsVo;
 import com.jbp.service.dao.OrderDao;
+import com.jbp.service.dao.OrderInvoiceDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +111,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private OrderExtService orderExtService;
     @Resource
     private CapaService capaService;
+    @Autowired
+    private ProductMaterialsService productMaterialsService;
+    @Autowired
+    private OrderInvoiceDao orderInvoiceDao;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -315,27 +323,27 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @param dateLimit 时间参数
      */
     @Override
-    public OrderCountItemResponse getMerchantOrderStatusNum(String dateLimit) {
+    public OrderCountItemResponse getMerchantOrderStatusNum(String dateLimit, String supplyName) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         OrderCountItemResponse response = new OrderCountItemResponse();
         // 全部订单
-        response.setAll(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_ALL, systemAdmin.getMerId()));
+        response.setAll(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_ALL, systemAdmin.getMerId(), supplyName));
         // 未支付订单
-        response.setUnPaid(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_UNPAID, systemAdmin.getMerId()));
+        response.setUnPaid(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_UNPAID, systemAdmin.getMerId(), supplyName));
         // 未发货订单
-        response.setNotShipped(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_NOT_SHIPPED, systemAdmin.getMerId()));
+        response.setNotShipped(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_NOT_SHIPPED, systemAdmin.getMerId(), supplyName));
         // 待收货订单
-        response.setSpike(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_SPIKE, systemAdmin.getMerId()));
+        response.setSpike(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_SPIKE, systemAdmin.getMerId(), supplyName));
         // 已收货订单
-        response.setReceiving(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_RECEIVING, systemAdmin.getMerId()));
+        response.setReceiving(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_RECEIVING, systemAdmin.getMerId(), supplyName));
         // 交易完成订单
-        response.setComplete(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_COMPLETE, systemAdmin.getMerId()));
+        response.setComplete(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_COMPLETE, systemAdmin.getMerId(), supplyName));
         // 已退款订单
-        response.setRefunded(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_REFUNDED, systemAdmin.getMerId()));
+        response.setRefunded(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_REFUNDED, systemAdmin.getMerId(), supplyName));
         // 已删除订单
-        response.setDeleted(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_DELETED, systemAdmin.getMerId()));
+        response.setDeleted(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_DELETED, systemAdmin.getMerId(), supplyName));
         // 待核销订单
-        response.setVerification(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_AWAIT_VERIFICATION, systemAdmin.getMerId()));
+        response.setVerification(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_AWAIT_VERIFICATION, systemAdmin.getMerId(), supplyName));
         return response;
     }
 
@@ -570,6 +578,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
+
+        if(StringUtils.isNotEmpty(request.getSupplyName())){
+            List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
+            if(!CollectionUtils.isEmpty(orderNoList)){
+                lqw.eq(Order::getOrderNo, orderNoList);
+            }
+        }
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
         }
@@ -673,24 +688,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @param dateLimit 时间参数
      */
     @Override
-    public OrderCountItemResponse getPlatformOrderStatusNum(String dateLimit) {
+    public OrderCountItemResponse getPlatformOrderStatusNum(String dateLimit, String supplyName) {
         OrderCountItemResponse response = new OrderCountItemResponse();
         // 全部订单
-        response.setAll(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_ALL, 0));
+        response.setAll(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_ALL, 0, supplyName));
         // 未支付订单
-        response.setUnPaid(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_UNPAID, 0));
+        response.setUnPaid(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_UNPAID, 0,  supplyName));
         // 未发货订单
-        response.setNotShipped(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_NOT_SHIPPED, 0));
+        response.setNotShipped(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_NOT_SHIPPED, 0,  supplyName));
         // 待收货订单
-        response.setSpike(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_SPIKE, 0));
+        response.setSpike(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_SPIKE, 0,  supplyName));
         // 交易完成订单
-        response.setComplete(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_COMPLETE, 0));
+        response.setComplete(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_COMPLETE, 0,  supplyName));
         // 已退款订单
-        response.setRefunded(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_REFUNDED, 0));
+        response.setRefunded(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_REFUNDED, 0,  supplyName));
         // 已删除订单
-        response.setDeleted(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_DELETED, 0));
+        response.setDeleted(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_DELETED, 0,  supplyName));
         // 待核销订单
-        response.setVerification(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_AWAIT_VERIFICATION, 0));
+        response.setVerification(getCount(dateLimit, OrderConstants.MERCHANT_ORDER_STATUS_AWAIT_VERIFICATION, 0,  supplyName));
         return response;
     }
 
@@ -701,13 +716,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @return PlatformOrderAdminDetailResponse
      */
     @Override
-    public PlatformOrderAdminDetailResponse platformInfo(String orderNo) {
+    public PlatformOrderAdminDetailResponse platformInfo(String orderNo, String supplyName) {
         Order order = getByOrderNo(orderNo);
         PlatformOrderAdminDetailResponse response = new PlatformOrderAdminDetailResponse();
         MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderNo);
         BeanUtils.copyProperties(merchantOrder, response);
         BeanUtils.copyProperties(order, response);
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orderNo);
+        if(StringUtils.isNotEmpty(supplyName)){
+            List<String> barCodeList = productMaterialsService.getBarCodeList4Supply(supplyName);
+            if(!CollectionUtils.isEmpty(barCodeList)){
+                orderDetailList = orderDetailList.stream().filter(o->barCodeList.contains(o.getBarCode())).collect(Collectors.toList());
+            }
+        }
+
         List<OrderInfoFrontDataResponse> orderInfoList = orderDetailList.stream().map(e -> {
             OrderInfoFrontDataResponse dataResponse = new OrderInfoFrontDataResponse();
             BeanUtils.copyProperties(e, dataResponse);
@@ -1083,8 +1105,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @return Integer
      */
     @Override
-    public Integer getNotShippingNum(Integer merId) {
-        return getCount("", OrderConstants.MERCHANT_ORDER_STATUS_NOT_SHIPPED, merId);
+    public Integer getNotShippingNum(Integer merId, String  supplyName) {
+        return getCount("", OrderConstants.MERCHANT_ORDER_STATUS_NOT_SHIPPED, merId,  supplyName);
     }
 
     /**
@@ -1093,8 +1115,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @return Integer
      */
     @Override
-    public Integer getAwaitVerificationNum(Integer merId) {
-        return getCount("", OrderConstants.MERCHANT_ORDER_STATUS_AWAIT_VERIFICATION, merId);
+    public Integer getAwaitVerificationNum(Integer merId, String  supplyName) {
+        return getCount("", OrderConstants.MERCHANT_ORDER_STATUS_AWAIT_VERIFICATION, merId,  supplyName);
     }
 
     /**
@@ -1216,10 +1238,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     @Override
-    public Integer getGoodsPirce(String goodsIds) {
-
-
-
+    public Integer getGoodsPrice(String goodsIds) {
         return dao.getGoodsPirce(goodsIds,userService.getUserId());
     }
 
@@ -1488,9 +1507,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @param status    String 状态
      * @return Integer
      */
-    private Integer getCount(String dateLimit, String status, Integer merId) {
+    private Integer getCount(String dateLimit, String status, Integer merId, String supplyName) {
         //总数只计算时间
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+        if (StringUtils.isNotEmpty(supplyName)) {
+            List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(supplyName);
+            if (!CollectionUtils.isEmpty(orderNoList)) {
+                lqw.in(Order::getOrderNo, orderNoList);
+            }
+        }
         if (merId > 0) {
             lqw.eq(Order::getMerId, merId);
             lqw.eq(Order::getIsMerchantDel, false);

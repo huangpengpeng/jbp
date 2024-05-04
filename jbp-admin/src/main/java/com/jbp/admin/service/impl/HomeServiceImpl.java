@@ -86,8 +86,8 @@ public class HomeServiceImpl implements HomeService {
     public HomeOperatingMerDataResponse operatingMerchantData() {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         HomeOperatingMerDataResponse response = new HomeOperatingMerDataResponse();
-        response.setNotShippingOrderNum(orderService.getNotShippingNum(systemAdmin.getMerId()));
-        response.setAwaitVerificationOrderNum(orderService.getAwaitVerificationNum(systemAdmin.getMerId()));
+        response.setNotShippingOrderNum(orderService.getNotShippingNum(systemAdmin.getMerId(), systemAdmin.getSupplyName()));
+        response.setAwaitVerificationOrderNum(orderService.getAwaitVerificationNum(systemAdmin.getMerId(), systemAdmin.getSupplyName()));
         response.setRefundingOrderNum(refundOrderService.getAwaitAuditNum(systemAdmin.getMerId()));
         response.setOnSaleProductNum(productService.getOnSaleNum(systemAdmin.getMerId()));
         response.setAwaitAuditProductNum(productService.getAwaitAuditNum(systemAdmin.getMerId()));
@@ -125,8 +125,8 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public HomeOperatingDataResponse operatingPlatformData() {
         HomeOperatingDataResponse response = new HomeOperatingDataResponse();
-        response.setNotShippingOrderNum(orderService.getNotShippingNum(0));
-        response.setAwaitVerificationOrderNum(orderService.getAwaitVerificationNum(0));
+        response.setNotShippingOrderNum(orderService.getNotShippingNum(0, ""));
+        response.setAwaitVerificationOrderNum(orderService.getAwaitVerificationNum(0, ""));
         response.setRefundingOrderNum(refundOrderService.getAwaitAuditNum(0));
         response.setOnSaleProductNum(productService.getOnSaleNum(0));
         response.setAwaitAuditProductNum(productService.getAwaitAuditNum(0));

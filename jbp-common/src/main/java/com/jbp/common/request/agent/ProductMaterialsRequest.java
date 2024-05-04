@@ -20,4 +20,6 @@ public class ProductMaterialsRequest implements Serializable {
     private String merName;
     @ApiModelProperty(value = "商品条码")
     private String barCode;
+    @ApiModelProperty(value = "供应商名称")
+    private String supplyName;
 }

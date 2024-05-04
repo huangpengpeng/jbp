@@ -21,13 +21,14 @@ import java.math.BigDecimal;
 public class ProductMaterials extends BaseModel {
 
     public ProductMaterials(Integer merId, String barCode, String materialsName,
-                            Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode) {
+                            Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode, String supplyName) {
         this.merId = merId;
         this.barCode = barCode;
         this.materialsName = materialsName;
         this.materialsQuantity = materialsQuantity;
         this.materialsPrice = materialsPrice;
         this.materialsCode = materialsCode;
+        this.supplyName = supplyName;
     }
 
     @ApiModelProperty(value = "商户")
@@ -52,6 +53,7 @@ public class ProductMaterials extends BaseModel {
     @TableField(exist = false)
     private String merName;
 
-
+    @ApiModelProperty("供应商")
+    private String supplyName;
 
 }

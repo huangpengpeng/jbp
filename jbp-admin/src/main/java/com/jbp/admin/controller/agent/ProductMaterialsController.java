@@ -47,7 +47,7 @@ public class ProductMaterialsController {
             }
             merchantId = merchant.getId();
         }
-        return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(),request.getBarCode(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(), request.getBarCode(), request.getSupplyName(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:product:materials:add')")
@@ -62,7 +62,7 @@ public class ProductMaterialsController {
         } else {
             merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
         }
-        productMaterialsService.add(merchant.getId(), request.getBarCode(), request.getMaterialsName(), request.getMaterialsQuantity(), request.getMaterialsPrice(), request.getMaterialsCode());
+        productMaterialsService.add(merchant.getId(), request.getBarCode(), request.getMaterialsName(), request.getMaterialsQuantity(), request.getMaterialsPrice(), request.getMaterialsCode(), request.getSupplyName());
         return CommonResult.success();
     }
 
