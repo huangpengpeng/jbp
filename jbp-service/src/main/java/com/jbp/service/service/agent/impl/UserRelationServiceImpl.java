@@ -136,27 +136,37 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         UserRelation userRelation = new UserRelation();
         // 往下查询大区
         do {
+//            User user = userService.getById(userId);
             List<UserRelation> nextRelation = getByPid(userId);
             if (nextRelation.isEmpty()) {
                 userRelation.setPId(userId);
                 userRelation.setNode(0);
+//                log.info("安置信息滑落0区:"+ user.getAccount());
                 return userRelation;
             }
             // 安置有一个下级
             if (nextRelation.size() == 1) {
                 userId = nextRelation.get(0).getUId();
+//                User user0 = userService.getById(userId);
+//                log.info(user.getAccount()+"只有一个安置下级:"+ user0.getAccount()+"点位:"+nextRelation.get(0).getNode());
             }
             // 安置有2个小计 比较业绩大小
             if (nextRelation.size() == 2) {
                 Map<Integer, UserRelation> map = FunctionUtil.keyValueMap(nextRelation, UserRelation::getNode);
                 // 左
-                RelationScore left = relationScoreService.getByUser(map.get(0).getUId(), map.get(0).getNode());
+                RelationScore left = relationScoreService.getByUser(userId, map.get(0).getNode());
                 BigDecimal leftScore = left == null ? BigDecimal.ZERO : left.getUsableScore().add(left.getUsedScore());
                 // 右
-                RelationScore right = relationScoreService.getByUser(map.get(1).getUId(), map.get(1).getNode());
+                RelationScore right = relationScoreService.getByUser(userId, map.get(1).getNode());
                 BigDecimal rightScore = right == null ? BigDecimal.ZERO : right.getUsableScore().add(right.getUsedScore());
                 // 返回大区 继续往下走
                 userId = ArithmeticUtils.gte(leftScore, rightScore) ? map.get(0).getUId() : map.get(1).getUId();
+
+//                User user0 = userService.getById(nextRelation.get(0).getUId());
+//                User user1 = userService.getById(nextRelation.get(1).getUId());
+//                User user3 = userService.getById(userId);
+//                log.info(user.getAccount()+"只有两个安置下级:"+ user0.getAccount()+"点位:"+nextRelation.get(0).getNode() + "---"+user1.getAccount()+"点位:"+ nextRelation.get(1).getNode()+"---大区:"+ user3.getAccount());
+//
             }
         } while (true);
     }
