@@ -45,11 +45,13 @@ import java.util.Map;
 @RequestMapping("api/publicly/jushuitan")
 @Api(tags = "聚水潭控制器")
 public class AuthorizeAct {
-	
-	
-	@ApiOperation(value = "erp 授权", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/auth/go", produces = MediaType.APPLICATION_JSON_VALUE)
-	public String go(HttpServletRequest request, ModelMap model) {
+
+
+
+	@ApiOperation(value = "授权订单", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@RequestMapping(value = { "/sync2" }, produces = MediaType.APPLICATION_JSON_VALUE)
+	public CommonResult<String>  sync2() {
 		Map<String, Object> params = Maps.newHashMap();
 		params.put("app_key",  environment.getProperty("jushuitan.appKey"));
 	    params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
@@ -63,7 +65,9 @@ public class AuthorizeAct {
 		String url = Constants.AUTH_URL.replace("[app_key]", (String)params.get("app_key"))
 				.replace("[timestamp]", (String)params.get("timestamp")).replace("[charset]", (String)params.get("charset"))
 				.replace("[sign]", sign).replace("[state]", state);
-		return "redirect:"+url;
+	//	return "redirect:"+url;
+		return CommonResult.success(url);
+
 	}
 
 

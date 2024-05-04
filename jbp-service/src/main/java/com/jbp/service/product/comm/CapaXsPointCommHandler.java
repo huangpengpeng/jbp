@@ -122,7 +122,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
                 }
 
                 CapaXsPointCommHandler.Comm comm = rule.getXsComm().get(i);
-                BigDecimal amount = totalPv.multiply(comm.getRatio()).multiply(new BigDecimal(orderDetail.getPayNum()));
+                BigDecimal amount = totalPv.multiply(comm.getRatio());
                 List<FundClearingProduct> fundClearingProducts = new ArrayList<>();
                 FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                         orderDetail.getPayNum(), comm.getRatio(), amount);

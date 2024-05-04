@@ -40,7 +40,7 @@ public class TankEquipmentNumberInfoServiceImpl  extends ServiceImpl<TankEquipme
         Page<EquipmentNumberInfoResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
 
         List<TankEquipmentNumberInfo> tankEquipmentNumberInfos = list(new LambdaQueryWrapper<TankEquipmentNumberInfo>()
-                .eq(StringUtils.isNotEmpty(type), TankEquipmentNumberInfo::getType, type));
+                .eq(StringUtils.isNotEmpty(type), TankEquipmentNumberInfo::getType, type).eq(TankEquipmentNumberInfo::getStoreUserId,userService.getUserId()));
         List<EquipmentNumberInfoResponse> pageResponses = tankEquipmentNumberInfos.stream().map(e -> {
             EquipmentNumberInfoResponse pageResponse = new EquipmentNumberInfoResponse();
             BeanUtils.copyProperties(e, pageResponse);

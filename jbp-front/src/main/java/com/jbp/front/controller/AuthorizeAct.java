@@ -1,6 +1,7 @@
 package com.jbp.front.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.beust.jcommander.internal.Maps;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.model.express.Express;
@@ -27,6 +28,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -44,9 +46,9 @@ import java.util.Map;
 public class AuthorizeAct {
 
 
-	@ApiOperation(value = "erp 聚水潭 消息推送")
-	@RequestMapping(value = "/jushuitan/callApi1")
-	public void erpcallApi1(String jsonObject,HttpServletResponse response) {
+	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/jushuitan/callApi1", produces = MediaType.APPLICATION_JSON_VALUE)
+	public void erpcallApi1(@RequestBody String jsonObject, HttpServletResponse response) {
 
 		response.setContentType("text/html;charset=UTF-8");
 		response.setHeader("Pragma", "No-cache");
@@ -70,7 +72,7 @@ public class AuthorizeAct {
 			String orderSn = jsonObject1.getString("so_id");
 			String shipName = jsonObject1.getString("logistics_company");
 			String shipSn = jsonObject1.getString("l_id");
-			Order orders = orderService.getByOrderNo(orderSn);
+			Order orders = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getPlatOrderNo,orderSn));
 			if (!orders.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING)) {
 				throw new RuntimeException(orders.getOrderNo() + "状态错误");
 			}

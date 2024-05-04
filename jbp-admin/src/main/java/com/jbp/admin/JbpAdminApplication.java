@@ -8,6 +8,7 @@ import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.product.comm.CapaXsPointComm2Handler;
 import com.jbp.service.product.comm.GroupThreeRetOneHandler;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
@@ -72,8 +73,8 @@ public class JbpAdminApplication {
 
 
 //        OrderService orderService = run.getBean(OrderService.class);
-//        GroupThreeRetOneHandler groupThreeRetOneHandler = run.getBean(GroupThreeRetOneHandler.class);
-//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT515171420171759762432"),null);
+//        CapaXsPointComm2Handler groupThreeRetOneHandler = run.getBean(CapaXsPointComm2Handler.class);
+//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT131171472294645188581"),null);
 
     }
 

@@ -281,7 +281,11 @@ public class PageDiyServiceImpl extends ServiceImpl<PageDiyDao, PageDiy> impleme
 
         }
 
-        response.setValue(jsonValue);
+        if(currentUser != 0 ){
+            response.setValue(jsonValue);
+        }else{
+            response.setValue(new JSONObject());
+        }
         return response;
     }
 
