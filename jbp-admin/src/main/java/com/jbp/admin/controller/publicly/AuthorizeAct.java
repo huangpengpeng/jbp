@@ -2,7 +2,9 @@ package com.jbp.admin.controller.publicly;
 
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Maps;
+import com.jbp.common.annotation.CustomResponseAnnotation;
 import com.jbp.common.constants.OrderConstants;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
@@ -27,10 +29,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,12 +43,13 @@ import java.util.Map;
 @Controller
 @RequestMapping("api/publicly/jushuitan")
 @Api(tags = "聚水潭控制器")
+@CustomResponseAnnotation
+@EncryptIgnore
 public class AuthorizeAct {
-	
-	
-	@ApiOperation(value = "erp 授权", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/auth/go", produces = MediaType.APPLICATION_JSON_VALUE)
-	public CommonResult<String> go(HttpServletRequest request, ModelMap model) {
+
+	@ApiOperation(value = "erp授权")
+	@RequestMapping(value = "/auth/go", method = RequestMethod.GET)
+	public CommonResult<String> go() {
 		Map<String, Object> params = Maps.newHashMap();
 		params.put("app_key",  environment.getProperty("jushuitan.appKey"));
 	    params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
