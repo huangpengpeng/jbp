@@ -22,8 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static io.netty.util.internal.StringUtil.byteToHexString;
-
 /**
  * 工行api
  */

@@ -78,6 +78,8 @@ public class PlatformOrderController {
                 request.setUidList(collect);
             }
         }
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        request.setSupplyName(systemAdmin.getSupplyName());
         return CommonResult.success(CommonPage.restPage(orderService.getPlatformAdminPage(request, pageParamRequest)));
     }
 

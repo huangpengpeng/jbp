@@ -578,7 +578,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
-
         if(StringUtils.isNotEmpty(request.getSupplyName())){
             List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
             if(!CollectionUtils.isEmpty(orderNoList)){
@@ -1161,6 +1160,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
+        }
+        if(StringUtils.isNotEmpty(request.getSupplyName())){
+            List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
+            if (!CollectionUtils.isEmpty(orderNoList)) {
+                lqw.in(Order::getOrderNo, orderNoList);
+            }
         }
         if (StrUtil.isNotBlank(request.getOrderNo())) {
             lqw.and((wrapper) -> {
