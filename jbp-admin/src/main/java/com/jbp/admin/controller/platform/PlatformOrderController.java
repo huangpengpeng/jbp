@@ -7,10 +7,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.OrderCountItemResponse;
-import com.jbp.common.response.OrderInvoiceResponse;
-import com.jbp.common.response.PlatformOrderAdminDetailResponse;
-import com.jbp.common.response.PlatformOrderPageResponse;
+import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.service.service.OrderService;
@@ -115,6 +112,41 @@ public class PlatformOrderController {
     public CommonResult<LogisticsResultVo> confirmPay(@PathVariable(value = "orderNo") String orderNo) {
         payService.confirmPay(orderService.getByOrderNo(orderNo));
         return CommonResult.success();
+    }
+
+    @PreAuthorize("hasAuthority('platform:order:page:list')")
+    @ApiOperation(value = "供应商发货列表")
+    @RequestMapping(value = "/ConsignList", method = RequestMethod.GET)
+    public CommonResult<CommonPage<PlatformOrderConsignResponse>> consignList(@Validated OrderSearchRequest request, @Validated PageParamRequest pageParamRequest) {
+        if (StrUtil.isNotEmpty(request.getUaccount())) {
+            request.setUid(-1);
+            User user = userService.getByAccount(request.getUaccount());
+            if (user != null) {
+                request.setUid(user.getId());
+            }
+        }
+        if (StrUtil.isNotEmpty(request.getPayAccount())) {
+            request.setPayUid(-1);
+            User user = userService.getByAccount(request.getPayAccount());
+            if (user != null) {
+                request.setPayUid(user.getId());
+            }
+        }
+        if (StrUtil.isNotEmpty(request.getPayPhone())) {
+            List<User> userList = userService.getByPhone(request.getPayPhone());
+            if (!CollectionUtils.isEmpty(userList)) {
+                List<Integer> collect = userList.stream().map(User::getId).collect(Collectors.toList());
+                request.setUidList(collect);
+            }
+        }
+        return CommonResult.success(CommonPage.restPage(orderService.getPlatformOrderConsignPage(request, pageParamRequest)));
+    }
+
+    @ApiOperation(value = "获取订单发货物料列表")
+    @RequestMapping(value = "/{orderNo}/invoice/materialsList", method = RequestMethod.GET)
+    public CommonResult<List<OrderMaterialsResponse>> getMaterialsList(@PathVariable(value = "orderNo") String orderNo) {
+        orderNo = orderService.getOrderNo(orderNo);
+        return CommonResult.success(orderService.getMaterialsList(orderNo));
     }
 
 }

@@ -19,6 +19,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
@@ -32,9 +33,12 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.MyRecord;
+import com.jbp.common.vo.ProductMaterialsVo;
 import com.jbp.service.dao.OrderDao;
+import com.jbp.service.dao.OrderInvoiceDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +110,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private OrderExtService orderExtService;
     @Resource
     private CapaService capaService;
+    @Autowired
+    private ProductMaterialsService productMaterialsService;
+    @Autowired
+    private OrderInvoiceDao orderInvoiceDao;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -920,6 +928,48 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     /**
+     * 获取订单物料发货列表
+     * @param orderNo 订单号
+     * @return
+     */
+    @Override
+    public List<OrderMaterialsResponse> getMaterialsList(String orderNo) {
+        LambdaQueryWrapper<OrderInvoice> lqw = Wrappers.lambdaQuery();
+        lqw.eq(OrderInvoice::getOrderNo, orderNo);
+        List<OrderInvoice> invoiceList = orderInvoiceDao.selectList(lqw);
+        if (CollUtil.isEmpty(invoiceList)) {
+            return new ArrayList<>();
+        }
+        List<ProductMaterialsVo> productMaterialsVoList = CollUtil.newArrayList();
+        OrderMaterialsResponse response = new OrderMaterialsResponse();
+        List<OrderMaterialsResponse> list = invoiceList.stream().map(invoice -> {
+            BeanUtils.copyProperties(invoice, response);
+            return response;
+        }).collect(Collectors.toList());
+
+        List<OrderDetail> oderDetailList = orderDetailService.list(new QueryWrapper<OrderDetail>().eq("order_no", orderNo));
+        List<String> barCodeList = oderDetailList.stream().map(OrderDetail::getBarCode).collect(Collectors.toList());
+        List<ProductMaterials> productMaterials = productMaterialsService.list(new LambdaQueryWrapper<ProductMaterials>().in(ProductMaterials::getBarCode, barCodeList));
+
+        BigDecimal materialsTotalCostPrice = BigDecimal.ZERO;
+
+        for (ProductMaterials materials : productMaterials) {
+            ProductMaterialsVo vo = new ProductMaterialsVo();
+            materialsTotalCostPrice = materialsTotalCostPrice.add(materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity())));
+            vo.setMaterialsPrice(materials.getMaterialsPrice());
+            vo.setMaterialsQuantity(materials.getMaterialsQuantity());
+            vo.setMaterialsName(materials.getMaterialsName());
+            vo.setMaterialsCode(materials.getMaterialsCode());
+            vo.setTotalCostPrice(materialsTotalCostPrice);
+
+            productMaterialsVoList.add(vo);
+        }
+        response.setMaterialsList(productMaterialsVoList);
+        list.add(response);
+        return list;
+    }
+
+    /**
      * 获取可以自动完成的订单
      *
      * @param autoCompleteDay 自动完成订单天数
@@ -1208,6 +1258,96 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 .ge(Order::getPayTime, startTime)
                 .lt(Order::getPayTime, endTime);
         return list(lqw);
+    }
+
+    /**
+     * 获取供应商平台订单发货列表
+     * @param request
+     * @param pageParamRequest
+     * @return PageInfo
+     */
+    @Override
+    public PageInfo<PlatformOrderConsignResponse> getPlatformOrderConsignPage(OrderSearchRequest request, PageParamRequest pageParamRequest) {
+        SystemAdmin currentUser = SecurityUtil.getLoginUserVo().getUser();
+        LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
+        lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
+                Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
+        //获取登陆管理员绑定供应商的物料
+        List<ProductMaterials> productMaterialsList = productMaterialsService.list(new QueryWrapper<ProductMaterials>().eq("supply_name", currentUser.getSupplyName()));
+        //获取供应商绑定的物料的订单详情
+        for(ProductMaterials productMaterials : productMaterialsList){
+            List<OrderDetail> orderDetailList = orderDetailService.list(new QueryWrapper<OrderDetail>().eq("bar_code", productMaterials.getBarCode()));
+            //获取订单详情对应的订单
+            for (OrderDetail orderDetail : orderDetailList){
+                lqw.eq(Order::getOrderNo, orderDetail.getOrderNo());
+            }
+        }
+        //根据查询条件获取对应订单
+        if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
+            lqw.eq(Order::getMerId, request.getMerId());
+        }
+        if (StrUtil.isNotBlank(request.getPayTime())) {
+            getPayTimeWhere(lqw,request.getPayTime());
+        }
+        if (StrUtil.isNotBlank(request.getOrderNo())) {
+            lqw.and((wrapper) -> {
+                wrapper.eq(Order::getOrderNo, request.getOrderNo())
+                        .or().eq(Order::getPlatOrderNo, request.getOrderNo());
+            });
+        }
+        if (ObjectUtil.isNotNull(request.getType())) {
+            lqw.eq(Order::getType, request.getType());
+        }
+        if (ObjectUtil.isNotEmpty(request.getUid())) {
+            lqw.eq(Order::getUid, request.getUid());
+        }
+        if (ObjectUtil.isNotEmpty(request.getPayUid())) {
+            lqw.eq(Order::getPayUid, request.getPayUid());
+        }
+        if (!CollectionUtils.isEmpty(request.getUidList())) {
+            lqw.in(Order::getUid, request.getUidList());
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            getRequestTimeWhere(lqw, request.getDateLimit());
+        }
+        getMerchantStatusWhere(lqw, request.getStatus());
+        lqw.orderByDesc(Order::getId);
+        List<Order> orderList = dao.selectList(lqw);
+        Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        if (CollUtil.isEmpty(orderList)) {
+            return CommonPage.copyPageInfo(startPage, CollUtil.newArrayList());
+        }
+
+        List<Integer> uidList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
+        List<Integer> payUidList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(uidList);
+        Map<Integer, User> payUserMap = userService.getUidMapList(payUidList);
+
+        List<PlatformOrderConsignResponse> pageResponses = orderList.stream().map(e -> {
+            PlatformOrderConsignResponse pageResponse = new PlatformOrderConsignResponse();
+            BeanUtils.copyProperties(e, pageResponse);
+            if(StringUtils.isNotEmpty(pageResponse.getPlatOrderNo())){
+                pageResponse.setOrderNo(pageResponse.getPlatOrderNo());
+            }
+            User user = userMap.get(e.getUid());
+            if (user != null) {
+                pageResponse.setUid(user.getId());
+                pageResponse.setUAccount(user.getAccount());
+                pageResponse.setNickName(user.getNickname());
+                pageResponse.setIsLogoff(user.getIsLogoff());
+                pageResponse.setUPhone(user.getPhone());
+            }
+            User payUser = payUserMap.get(e.getPayUid());
+            if (payUser != null) {
+                pageResponse.setPayUid(payUser.getId());
+                pageResponse.setPayAccount(payUser.getAccount());
+                pageResponse.setPayNickName(payUser.getNickname());
+                pageResponse.setPayPhone(user != null ? user.getPhone() : "");
+            }
+
+            return pageResponse;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(startPage, pageResponses);
     }
 
     /**

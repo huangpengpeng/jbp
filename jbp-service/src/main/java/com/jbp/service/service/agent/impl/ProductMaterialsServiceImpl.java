@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -61,6 +62,13 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
                 .eq(ProductMaterials::getMerId, merId)
                 .eq(ProductMaterials::getBarCode, barCode);
         return list(lqw);
+    }
+
+    @Override
+    public List<ProductMaterials> getMaterialsListByBarCodeList(List<String> materialsBarCodeList) {
+            LambdaQueryWrapper<ProductMaterials> lqw = Wrappers.lambdaQuery();
+            lqw.in(ProductMaterials::getSupplyName, materialsBarCodeList);
+            return baseMapper.selectList(lqw);
     }
 
     public Boolean addrule(Integer merId, String barCode, String materialsCode) {
