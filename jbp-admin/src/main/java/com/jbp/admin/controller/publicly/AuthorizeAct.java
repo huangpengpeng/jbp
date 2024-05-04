@@ -48,7 +48,7 @@ import java.util.Map;
 public class AuthorizeAct {
 
 	@ApiOperation(value = "erp授权")
-	@RequestMapping(value = "/go", method = RequestMethod.GET)
+	@RequestMapping(value = { "/go" }, produces = MediaType.APPLICATION_JSON_VALUE)
 	public CommonResult<String> go() {
 		Map<String, Object> params = Maps.newHashMap();
 		params.put("app_key",  environment.getProperty("jushuitan.appKey"));
