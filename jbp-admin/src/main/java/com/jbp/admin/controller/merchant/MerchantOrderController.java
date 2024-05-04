@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -17,6 +18,7 @@ import com.jbp.common.response.OrderCountItemResponse;
 import com.jbp.common.response.OrderInvoiceResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.common.vo.OrderShippingExcelVo;
@@ -76,7 +78,8 @@ public class MerchantOrderController {
     @ApiOperation(value = "获取订单各状态数量")
     @RequestMapping(value = "/status/num", method = RequestMethod.GET)
     public CommonResult<OrderCountItemResponse> getOrderStatusNum(@RequestParam(value = "dateLimit", defaultValue = "") String dateLimit) {
-        return CommonResult.success(orderService.getMerchantOrderStatusNum(dateLimit));
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(orderService.getMerchantOrderStatusNum(dateLimit, systemAdmin.getSupplyName()));
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.DELETE, description = "商户删除订单")
