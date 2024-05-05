@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ClearingBonus;
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.ClearingBonusListResponse;
 
 import java.util.List;
 
@@ -16,4 +17,11 @@ public interface ClearingBonusService extends IService<ClearingBonus> {
     List<ClearingBonus> get4Clearing(Long clearingId);
 
     PageInfo<ClearingBonus> pageList(Integer uid, String account, String uniqueNo, Long clearingId, PageParamRequest pageParamRequest);
+
+    PageInfo<ClearingBonusListResponse> getcleringList(Integer uid,PageParamRequest pageParamRequest);
+
+
+
+    ClearingBonusListResponse getcleringInfoList(Integer uid);
+
 }

@@ -9,6 +9,7 @@ import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.ClearingBonusListResponse;
 import com.jbp.service.dao.agent.ClearingBonusDao;
 import com.jbp.service.service.agent.ClearingBonusService;
 import com.jbp.service.util.StringUtils;
@@ -51,6 +52,18 @@ public class ClearingBonusServiceImpl extends UnifiedServiceImpl<ClearingBonusDa
         lqw.eq(StringUtils.isNotEmpty(account), ClearingBonus::getAccountNo, account);
         lqw.orderByDesc(ClearingBonus::getId);
         return CommonPage.copyPageInfo(page, list(lqw));
+    }
+
+    @Override
+    public PageInfo<ClearingBonusListResponse> getcleringList(Integer uid, PageParamRequest pageParamRequest) {
+        Page<ClearingBonus> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+
+         return CommonPage.copyPageInfo(page, dao.getcleringList(uid));
+    }
+
+    @Override
+    public ClearingBonusListResponse getcleringInfoList(Integer uid) {
+        return dao.getcleringInfoList(uid);
     }
 }
 

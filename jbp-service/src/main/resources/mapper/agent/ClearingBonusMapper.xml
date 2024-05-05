@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.ClearingBonusDao">
+
+
+    <select id="getcleringList" resultType="com.jbp.common.response.ClearingBonusListResponse">
+
+
+select sum(e.commAmt) as commAmt,DATE_FORMAT( endTime, '%Y-%m-%d') as time from eb_clearing_bonus   e
+left  join eb_clearing_final f on f.id = e.clearingId
+where e.uid =#{uid}
+GROUP BY DATE_FORMAT( endTime, '%Y-%m-%d')
+
+    </select>
+    <select id="getcleringInfoList" resultType="com.jbp.common.response.ClearingBonusListResponse">
+
+                select sum(e.commAmt) as commAmt,DATE_FORMAT( endTime, '%Y-%m-%d') as time,levelName from eb_clearing_bonus   e
+        left  join eb_clearing_final f on f.id = e.clearingId
+        where e.uid = #{uid}
+        GROUP BY DATE_FORMAT( endTime, '%Y-%m-%d'),e.levelName
+    </select>
+</mapper>
