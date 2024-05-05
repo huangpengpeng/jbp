@@ -23,6 +23,7 @@ public enum CommAliasNameEnum {
     分组推三返一("销售提成"),
     星级级差佣金("经销扣率"),
     级差伯乐佣金("培训基金"),
+    星级级差佣金无伯乐("经销扣率"),
     ;
     @Getter
     private final String aliasName;
