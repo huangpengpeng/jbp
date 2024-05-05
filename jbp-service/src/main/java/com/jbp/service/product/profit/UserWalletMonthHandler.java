@@ -2,26 +2,29 @@ package com.jbp.service.product.profit;
 
 
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.ProductProfitConfig;
-import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderProductProfit;
 import com.jbp.common.model.order.RefundOrder;
+import com.jbp.common.model.user.User;
 import com.jbp.common.response.RefundOrderInfoResponse;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderProductProfitService;
 import com.jbp.service.service.RefundOrderService;
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.OrdersRefundMsgService;
-import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
+import com.jbp.service.service.agent.WalletGivePlanService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,12 +43,12 @@ import java.util.stream.Collectors;
  * 赠送降级积分
  */
 @Component
-public class UserWalletHandler implements ProductProfitHandler {
+public class UserWalletMonthHandler implements ProductProfitHandler {
 
     @Resource
-    private ProductProfitService productProfitService;
+    private UserService userService;
     @Resource
-    private PlatformWalletService platformWalletService;
+    private ProductProfitService productProfitService;
     @Resource
     private OrderProductProfitService orderProductProfitService;
     @Resource
@@ -53,10 +57,14 @@ public class UserWalletHandler implements ProductProfitHandler {
     private RefundOrderService refundOrderService;
     @Resource
     private OrdersRefundMsgService refundMsgService;
+    @Resource
+    private WalletGivePlanService walletGivePlanService;
+    @Resource
+    private WalletConfigService walletConfigService;
 
     @Override
     public Integer getType() {
-        return ProductProfitEnum.积分.getType();
+        return ProductProfitEnum.积分按月赠送.getType();
     }
 
     @Override
@@ -72,27 +80,29 @@ public class UserWalletHandler implements ProductProfitHandler {
         try {
             List<Rule> rules = JSONArray.parseArray(ruleStr, Rule.class);
             if (CollectionUtils.isEmpty(rules)) {
-                throw new RuntimeException(ProductProfitEnum.积分.getName() + ":商品权益格式错误0");
+                throw new RuntimeException(ProductProfitEnum.积分按月赠送.getName() + ":商品权益格式错误0");
             }
             for (Rule rule : rules) {
                 if (StringUtil.isEmpty(rule.getWalletName()) || StringUtil.isEmpty(rule.getType())
                         || rule.getWalletType() == null || rule.getValue() == null) {
-                    throw new RuntimeException(ProductProfitEnum.积分.getName() + ":商品权益格式错误00");
+                    throw new RuntimeException(ProductProfitEnum.积分按月赠送.getName() + ":商品权益格式错误00");
                 }
                 if (ArithmeticUtils.lessEquals(rule.getValue(), BigDecimal.ZERO)) {
-                    throw new RuntimeException(ProductProfitEnum.积分.getName() + ":奖励数值必须大于0");
+                    throw new RuntimeException(ProductProfitEnum.积分按月赠送.getName() + ":奖励数值必须大于0");
+                }
+                if (rule.getMonthNum() == null) {
+                    throw new RuntimeException(ProductProfitEnum.积分按月赠送.getName() + ":连续赠送月份不能为空");
                 }
             }
             return rules;
         } catch (Exception e) {
-            throw new RuntimeException(ProductProfitEnum.积分.getName() + ":商品权益格式错误1");
+            throw new RuntimeException(ProductProfitEnum.积分按月赠送.getName() + ":商品权益格式错误1");
         }
     }
 
     @Override
     public void orderSuccess(Order order, List<OrderDetail> orderDetailList, List<ProductProfit> productProfitList) {
         Map<Integer, OrderDetail> orderDetailMap = FunctionUtil.keyValueMap(orderDetailList, OrderDetail::getProductId);
-
         ProductProfitConfig profitConfig = configService.getByType(getType());
         if (profitConfig == null || !BooleanUtil.isTrue(profitConfig.getIfOpen())) {
             return;
@@ -103,6 +113,8 @@ public class UserWalletHandler implements ProductProfitHandler {
             return;
         }
 
+        User user = userService.getById(order.getUid());
+
         for (ProductProfit productProfit : productProfitList) {
             List<Rule> ruleList = getRule(productProfit.getRule());
             // 商品
@@ -110,7 +122,8 @@ public class UserWalletHandler implements ProductProfitHandler {
             // 商品支付金额
             BigDecimal payPrice = orderDetail.getPayPrice().multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
             // 奖励金额
-            StringBuilder profitPostscript  = new StringBuilder();
+            Date now = DateTimeUtils.getNow();
+            StringBuilder profitPostscript = new StringBuilder();
             BigDecimal amt = BigDecimal.ZERO;
             for (Rule rule : ruleList) {
                 if ("金额".equals(rule.getType())) {
@@ -119,18 +132,20 @@ public class UserWalletHandler implements ProductProfitHandler {
                 if ("比例".equals(rule.getType())) {
                     amt = payPrice.multiply(rule.getValue()).setScale(2, BigDecimal.ROUND_DOWN);
                 }
-                String postscript = StrUtil.format("订单支付奖励，单号:{}, 金额:{}元", order.getOrderNo(), amt);
+                String postscript = "赠送"+rule.getWalletName() + "积分:" + amt + "连续赠送:" + rule.getMonthNum() + "月";
                 if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                    platformWalletService.transferToUser(order.getUid(), rule.walletType, amt,
-                            WalletFlow.OperateEnum.奖励.toString(), order.getOrderNo(), postscript);
-                    profitPostscript.append(rule.getWalletName() + ":" + amt).append("元").append("/");
+                    profitPostscript.append(postscript).append("/");
+                }
+                WalletConfig walletConfig = walletConfigService.getByType(rule.getWalletType());
+                for (int i = 0; i < rule.getMonthNum(); i++) {
+                    String planTime = DateTimeUtils.format(DateTimeUtils.getMonthStart(DateTimeUtils.addMonths(now, i)), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN);
+                    walletGivePlanService.add(user, walletConfig, amt, order.getOrderNo(), postscript, planTime);
                 }
             }
             // 订单权益记录
             orderProductProfitService.save(order.getId(), order.getOrderNo(), productProfit.getProductId(), getType(),
-                    ProductProfitEnum.积分.getName(), JSONArray.toJSONString(ruleList), profitPostscript.toString());
+                    ProductProfitEnum.积分按月赠送.getName(), JSONArray.toJSONString(ruleList), profitPostscript.toString());
         }
-
     }
 
     @Override
@@ -147,9 +162,10 @@ public class UserWalletHandler implements ProductProfitHandler {
             return;
         }
         for (OrderProductProfit productProfit : productProfits) {
-            String context = "购买订单增加【"+ProductProfitEnum.积分.getName()+"】, 商品名称【" + refundDetail.getProductName() + "】收益名称【" + productProfit.getProfitName() + "】 收益说明【" + productProfit.getPostscript() + "】";
+            String context = "购买订单增加【"+ProductProfitEnum.积分按月赠送.getName()+"】, 商品名称【" + refundDetail.getProductName() + "】收益名称【" + productProfit.getProfitName() + "】 收益说明【" + productProfit.getPostscript() + "】";
             refundMsgService.create(orderNo, refundOrder.getRefundOrderNo(), context);
         }
+        walletGivePlanService.cancel(orderNo);
     }
 
     /**
@@ -180,6 +196,10 @@ public class UserWalletHandler implements ProductProfitHandler {
          */
         private BigDecimal value ;
 
+        /**
+         * 连续赠送几个月
+         */
+        private Integer monthNum ;
 
     }
 }
