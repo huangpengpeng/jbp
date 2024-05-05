@@ -424,6 +424,13 @@ public class UserController {
 
 
 
+    @ApiOperation(value = "获取用户的销售上级")
+    @RequestMapping(value = "/getUserInvitePanent", method = RequestMethod.GET)
+    public CommonResult getUserInvitePanent( ) {
+        Integer uid=  userService.getUserId();
+        return CommonResult.success(invitationService.getPid(uid));
+    }
+
 
     @ApiOperation(value = "获取用户的服务上级")
     @RequestMapping(value = "/getUserServicePanent", method = RequestMethod.GET)
