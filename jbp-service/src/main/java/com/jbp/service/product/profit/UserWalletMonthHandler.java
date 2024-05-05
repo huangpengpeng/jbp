@@ -5,6 +5,7 @@ import cn.hutool.core.util.BooleanUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alipay.service.schema.util.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.ProductProfit;
 import com.jbp.common.model.agent.ProductProfitConfig;
 import com.jbp.common.model.agent.WalletConfig;
@@ -166,6 +167,21 @@ public class UserWalletMonthHandler implements ProductProfitHandler {
             refundMsgService.create(orderNo, refundOrder.getRefundOrderNo(), context);
         }
         walletGivePlanService.cancel(orderNo);
+    }
+
+    public static void main(String[] args) {
+
+        List<Rule> list = Lists.newArrayList();
+        for (int i = 0; i < 2; i++) {
+            Rule rule = new Rule();
+            rule.setWalletType(1);
+            rule.setWalletName("福券积分");
+            rule.setType("比例/金额");
+            rule.setValue(BigDecimal.valueOf(1));
+            rule.setMonthNum(1);
+            list.add(rule);
+        }
+        System.out.println(JSONArray.toJSONString(list));
     }
 
     /**
