@@ -1,7 +1,9 @@
 package com.jbp.admin.controller.platform;
 
+import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderShipmentExcelInfoVo;
 import com.jbp.service.service.ExportService;
@@ -41,12 +43,16 @@ public class PlatformExportController {
     @ApiOperation(value = "导出订单发货Excel")
     @RequestMapping(value = "/order/shipment/excel", method = RequestMethod.GET)
     public CommonResult<OrderShipmentExcelInfoVo> exportOrderShipment(@Validated OrderSearchRequest request) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        request.setSupplyName(systemAdmin.getSupplyName());
         return CommonResult.success(exportService.exportOrderShipment(request));
     }
     @PreAuthorize("hasAuthority('platform:export:order:excel')")
     @ApiOperation(value = "导出订单Excel")
     @RequestMapping(value = "/order/excel", method = RequestMethod.GET)
     public CommonResult<OrderExcelInfoVo> exportOrder(@Validated OrderSearchRequest request) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        request.setSupplyName(systemAdmin.getSupplyName());
         return CommonResult.success(exportService.exportOrder(request));
     }
 

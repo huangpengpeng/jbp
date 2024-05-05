@@ -3,15 +3,14 @@ package com.jbp.admin.controller.platform;
 import cn.hutool.core.util.StrUtil;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.response.OrderCountItemResponse;
-import com.jbp.common.response.OrderInvoiceResponse;
-import com.jbp.common.response.PlatformOrderAdminDetailResponse;
-import com.jbp.common.response.PlatformOrderPageResponse;
+import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.PayService;
@@ -79,6 +78,8 @@ public class PlatformOrderController {
                 request.setUidList(collect);
             }
         }
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        request.setSupplyName(systemAdmin.getSupplyName());
         return CommonResult.success(CommonPage.restPage(orderService.getPlatformAdminPage(request, pageParamRequest)));
     }
 
@@ -86,14 +87,16 @@ public class PlatformOrderController {
     @ApiOperation(value = "平台端获取订单各状态数量")
     @RequestMapping(value = "/status/num", method = RequestMethod.GET)
     public CommonResult<OrderCountItemResponse> getOrderStatusNum(@RequestParam(value = "dateLimit", defaultValue = "") String dateLimit) {
-        return CommonResult.success(orderService.getPlatformOrderStatusNum(dateLimit));
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(orderService.getPlatformOrderStatusNum(dateLimit, systemAdmin.getSupplyName()));
     }
 
     @ApiOperation(value = "平台端订单详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<PlatformOrderAdminDetailResponse> info(@RequestParam(value = "orderNo") String orderNo) {
         orderNo = orderService.getOrderNo(orderNo);
-        return CommonResult.success(orderService.platformInfo(orderNo));
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(orderService.platformInfo(orderNo, systemAdmin.getSupplyName()));
     }
 
     @ApiOperation(value = "获取订单发货单列表")

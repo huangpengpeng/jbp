@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
@@ -21,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao, ProductMaterials> implements ProductMaterialsService {
@@ -28,11 +30,12 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
     private MerchantService merchantService;
 
     @Override
-    public PageInfo<ProductMaterials> pageList(Integer merId, String materialsName,String barCode, PageParamRequest pageParamRequest) {
+    public PageInfo<ProductMaterials> pageList(Integer merId, String materialsName, String barCode, String supplyName, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>()
                 .eq(!ObjectUtil.isNull(merId), ProductMaterials::getMerId, merId)
                 .like(StringUtils.isNotEmpty(materialsName), ProductMaterials::getMaterialsName, materialsName)
-                .like(StringUtils.isNotEmpty(barCode),ProductMaterials::getBarCode,barCode)
+                .like(StringUtils.isNotEmpty(barCode), ProductMaterials::getBarCode, barCode)
+                .eq(StringUtils.isNotEmpty(supplyName), ProductMaterials::getSupplyName, supplyName)
                 .orderByDesc(ProductMaterials::getId);
         Page<ProductMaterials> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ProductMaterials> list = list(lqw);
@@ -43,14 +46,19 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
             Merchant merchant = merchantService.getById(e.getMerId());
             e.setMerName(merchant != null ? merchant.getName() : "");
         });
-
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
-    public Boolean add(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode) {
-        addrule(merId, barCode, materialsCode);
-        ProductMaterials productMaterials = new ProductMaterials(merId, barCode, materialsName, materialsQuantity, materialsPrice, materialsCode);
+    public Boolean add(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode, String supplyName) {
+        LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(ProductMaterials::getMerId, merId);
+        lqw.eq(ProductMaterials::getBarCode, barCode);
+        lqw.eq(ProductMaterials::getMaterialsCode, materialsCode);
+        if (list(lqw).size() > 0) {
+            throw new CrmebException("已存在");
+        }
+        ProductMaterials productMaterials = new ProductMaterials(merId, barCode, materialsName, materialsQuantity, materialsPrice, materialsCode, supplyName);
         save(productMaterials);
         return true;
     }
@@ -63,14 +71,14 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
         return list(lqw);
     }
 
-    public Boolean addrule(Integer merId, String barCode, String materialsCode) {
-        LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>();
-        lqw.eq(ProductMaterials::getMerId, merId);
-        lqw.eq(ProductMaterials::getBarCode, barCode);
-        lqw.eq(ProductMaterials::getMaterialsCode, materialsCode);
-        if (list(lqw).size() > 0) {
-            throw new CrmebException("已存在");
+    @Override
+    public List<String> getBarCodeList4Supply(String supplyName) {
+        LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<ProductMaterials>()
+                .eq(ProductMaterials::getSupplyName, supplyName);
+        List<ProductMaterials> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return Lists.newArrayList();
         }
-        return true;
+        return list.stream().map(ProductMaterials::getBarCode).collect(Collectors.toSet()).stream().collect(Collectors.toList());
     }
 }

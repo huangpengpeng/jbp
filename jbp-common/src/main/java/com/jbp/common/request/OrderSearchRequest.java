@@ -1,5 +1,6 @@
 package com.jbp.common.request;
 
+import com.jbp.common.annotation.StringContains;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,8 +9,6 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.List;
-
-import com.jbp.common.annotation.StringContains;
 
 /**
  * 订单列表请求对象
@@ -71,5 +70,7 @@ public class OrderSearchRequest implements Serializable {
     @ApiModelProperty(value = "用户id列表")
     private List<Integer> uidList;
 
+    @ApiModelProperty(value = "供应商名称")
+    private String supplyName ;
 
 }

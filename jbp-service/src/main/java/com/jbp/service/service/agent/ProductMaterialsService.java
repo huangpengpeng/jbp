@@ -11,9 +11,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductMaterialsService extends IService<ProductMaterials> {
-    PageInfo<ProductMaterials> pageList(Integer merId, String materialsName,String barCode, PageParamRequest pageParamRequest);
+    PageInfo<ProductMaterials> pageList(Integer merId, String materialsName,String barCode, String supplyName,  PageParamRequest pageParamRequest);
 
-    Boolean add(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode);
+    Boolean add(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode, String supplyName);
 
     List<ProductMaterials> getByBarCode(Integer merId, String barCode);
+
+    List<String> getBarCodeList4Supply(String supplyName);
 }

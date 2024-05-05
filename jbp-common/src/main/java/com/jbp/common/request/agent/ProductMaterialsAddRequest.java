@@ -33,4 +33,7 @@ public class ProductMaterialsAddRequest implements Serializable {
     @NotBlank(message = "物料编码不能为空")
     @ApiModelProperty(value = "物料编码")
     private String materialsCode;
+
+    @ApiModelProperty(value = "供应商名称")
+    private String supplyName;
 }

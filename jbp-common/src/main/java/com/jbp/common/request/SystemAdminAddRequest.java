@@ -62,4 +62,7 @@ public class SystemAdminAddRequest implements Serializable {
     @ApiModelProperty(value = "手机号")
 //    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请填写正确的手机号")
     private String phone;
+
+    @ApiModelProperty(value = "供应商名称")
+    private String supplyName;
 }

@@ -85,7 +85,7 @@ public interface OrderService extends IService<Order> {
      * 获取商户端订单各状态数量
      * @param dateLimit 时间参数
      */
-    OrderCountItemResponse getMerchantOrderStatusNum(String dateLimit);
+    OrderCountItemResponse getMerchantOrderStatusNum(String dateLimit, String supplyName);
 
     /**
      * 订单详情（PC）
@@ -147,14 +147,14 @@ public interface OrderService extends IService<Order> {
      * 获取平台端订单各状态数量
      * @param dateLimit 时间参数
      */
-    OrderCountItemResponse getPlatformOrderStatusNum(String dateLimit);
+    OrderCountItemResponse getPlatformOrderStatusNum(String dateLimit, String supplyName);
 
     /**
      * 订单详情（平台）
      * @param orderNo 订单编号
      * @return PlatformOrderAdminDetailResponse
      */
-    PlatformOrderAdminDetailResponse platformInfo(String orderNo);
+    PlatformOrderAdminDetailResponse platformInfo(String orderNo, String supplyName);
 
     /**
      * 获取订单快递信息(商户端)
@@ -295,13 +295,13 @@ public interface OrderService extends IService<Order> {
      * 获取待发货订单数量
      * @return Integer
      */
-    Integer getNotShippingNum(Integer merId);
+    Integer getNotShippingNum(Integer merId, String  supplyName);
 
     /**
      * 获取待核销订单数量
      * @return Integer
      */
-    Integer getAwaitVerificationNum(Integer merId);
+    Integer getAwaitVerificationNum(Integer merId, String  supplyName);
 
     /**
      * 获取用户购买的商品数量
@@ -337,6 +337,6 @@ public interface OrderService extends IService<Order> {
 
     List<Order> getSuccessList(Date startTime, Date endTime);
 
-    Integer getGoodsPirce(String goodsIds);
+    Integer getGoodsPrice(String goodsIds);
 
 }

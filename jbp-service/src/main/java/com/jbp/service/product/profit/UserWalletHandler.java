@@ -179,5 +179,7 @@ public class UserWalletHandler implements ProductProfitHandler {
          * 数字
          */
         private BigDecimal value ;
+
+
     }
 }

@@ -129,4 +129,6 @@ public interface OrderDetailService extends IService<OrderDetail> {
 
      Integer getNextOrderGoods(Integer pid, String goodsId,Long capaId,String amt);
 
+     List<String> getOrderNoList4SupplyName(String supplyName);
+
 }

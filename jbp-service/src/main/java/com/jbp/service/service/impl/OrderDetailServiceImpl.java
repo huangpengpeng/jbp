@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.page.CommonPage;
@@ -20,6 +21,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.dao.OrderDetailDao;
 import com.jbp.service.service.OrderDetailService;
 
+import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +49,8 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
 
     @Resource
     private OrderDetailDao dao;
+    @Resource
+    private ProductMaterialsService productMaterialsService;
 
     /**
      * 根据主订单号获取
@@ -236,7 +240,20 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
     @Override
     public Integer getNextOrderGoods(Integer pid, String goodsId,Long capaId,String amt) {
         return dao.getNextOrderGoods(pid,goodsId,capaId,amt);
+    }
 
+    @Override
+    public List<String> getOrderNoList4SupplyName(String supplyName) {
+        List<String> barCodeList = productMaterialsService.getBarCodeList4Supply(supplyName);
+        if (CollectionUtils.isEmpty(barCodeList)) {
+            return Lists.newArrayList();
+        }
+
+        List<OrderDetail> list = list(new LambdaQueryWrapper<OrderDetail>().in(OrderDetail::getBarCode, barCodeList));
+        if (CollectionUtils.isEmpty(list)) {
+            return Lists.newArrayList();
+        }
+        return list.stream().map(OrderDetail::getOrderNo).collect(Collectors.toSet()).stream().collect(Collectors.toList());
     }
 }
 

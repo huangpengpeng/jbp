@@ -144,6 +144,13 @@ public class ClearingVipUserHandler implements ProductProfitHandler {
         }
     }
 
+    public static void main(String[] args) {
+        Rule rule = new Rule();
+        rule.setLevel(1L);
+        rule.setLevelName("vip");
+        System.out.println(JSONObject.toJSONString(rule));
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

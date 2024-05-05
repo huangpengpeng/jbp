@@ -2,26 +2,19 @@ package com.jbp.front.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.user.UserVisaOrder;
 import com.jbp.common.model.user.UserVitalitpartner;
-import com.jbp.common.response.UserVisaOrderListResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 
@@ -105,7 +98,7 @@ public class UserVitalitpartnerController {
 
         Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
 
-        BigDecimal salse = new BigDecimal(orderService.getGoodsPirce(repetitionId));
+        BigDecimal salse = new BigDecimal(orderService.getGoodsPrice(repetitionId));
 
         if((new BigDecimal(maps.get("c").toString()).add(salse)).compareTo(new BigDecimal(199)) == 1){
             return CommonResult.success("https://batchatx.oss-cn-shenzhen.aliyuncs.com/f04bbf30c1a647ddbcbda733dab9bf9b");

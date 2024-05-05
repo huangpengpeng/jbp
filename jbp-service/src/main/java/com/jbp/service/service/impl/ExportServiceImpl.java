@@ -136,7 +136,8 @@ public class ExportServiceImpl implements ExportService {
                         if (CollectionUtils.isEmpty(productMaterials)) {
                             productMaterials = Lists.newArrayList();
                             ProductMaterials materials = new ProductMaterials(merchantOrder.getMerId(),
-                                    orderDetail.getBarCode(), orderDetail.getProductName(), 1, payPrice.divide(BigDecimal.valueOf(orderDetail.getPayNum()), 4, BigDecimal.ROUND_DOWN), orderDetail.getBarCode());
+                                    orderDetail.getBarCode(), orderDetail.getProductName(), 1,
+                                    payPrice.divide(BigDecimal.valueOf(orderDetail.getPayNum()), 4, BigDecimal.ROUND_DOWN), orderDetail.getBarCode(), request.getSupplyName());
                             productMaterials.add(materials);
                         }
                         materialsMap.put(orderDetail.getBarCode(), productMaterials);
