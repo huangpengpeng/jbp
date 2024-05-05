@@ -45,7 +45,7 @@ spring:
     static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${crmeb.filePath}
     add-mappings: true
   application:
-    name: crmeb-front #这个很重要，这在以后的服务与服务之间相互调用一般都是根据这个name
+    name: ph-front #这个很重要，这在以后的服务与服务之间相互调用一般都是根据这个name
   jackson:
     locale: zh_CN
     time-zone: GMT+8

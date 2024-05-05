@@ -214,12 +214,45 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
+    public User registerNoBandPater(String username, String phone, String remark) {
+        User user = new User();
+        user.setAccount(getAccount().toUpperCase());
+        user.setPwd(CommonUtil.createPwd(phone));
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
+            throw new CrmebException("手机号重复");
+        }
+        user.setPhone(phone);
+        user.setRegisterType(UserConstants.REGISTER_TYPE_H5);
+        user.setNickname(com.jbp.common.utils.StringUtils.filterEmoji(username));
+        user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
+        Date nowDate = CrmebDateUtil.nowDateTime();
+        user.setCreateTime(nowDate);
+        user.setLastLoginTime(nowDate);
+        user.setPwd(CrmebUtil.encryptPassword("123456"));
+        if (!ObjectUtil.isNull(phone)) {
+            user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
+        }
+        user.setLevel(1);
+        // 设置活跃时间
+        setActiveTime(user);
+        // 推广人
+        user.setSpreadUid(0);
+        Boolean execute = transactionTemplate.execute(e -> {
+            save(user);
+            // 增加代理等级
+            userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), remark, remark);
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            throw new CrmebException("创建用户失败!");
+        }
+        return user;
+    }
 
+    @Override
+    public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
         User user = new User();
         user.setAccount(account.toUpperCase());
-        user.setPwd(CrmebUtil.encryptPassword(pwd));
-        user.setAccount(account);
         user.setPwd(CrmebUtil.encryptPassword(pwd));
         if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
             throw new CrmebException("手机号重复");
@@ -260,10 +293,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 }
                 invitationService.band(user.getId(), pid, false, true, false);
             }
-            if (userCapaTemplateRequest != null && userCapaTemplateRequest.getCapaId()!=0) {
+            if (userCapaTemplateRequest != null && userCapaTemplateRequest.getCapaId() != 0) {
                 userCapaService.saveOrUpdateCapa(user.getId(), userCapaTemplateRequest.getCapaId(),
                         userCapaTemplateRequest.getRemark(), userCapaTemplateRequest.getDescription());
-            }else {
+            } else {
                 userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
             }
             return Boolean.TRUE;

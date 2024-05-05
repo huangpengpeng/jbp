@@ -1,20 +1,6 @@
 package com.jbp.admin;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.beust.jcommander.internal.Sets;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.tank.TankStoreRelationAct;
-import com.jbp.admin.task.order.OrderPaySuccessTask;
-import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.user.User;
-import com.jbp.common.utils.StringUtils;
-import com.jbp.service.product.comm.CapaXsPointComm2Handler;
-import com.jbp.service.product.comm.GroupThreeRetOneHandler;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.InvitationScoreService;
-import com.jbp.service.service.agent.UserInvitationService;
-import org.apache.commons.collections4.ListUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,11 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.awt.*;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @EnableAsync //开启异步调用	
@@ -47,35 +28,6 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-
-//      推三返一
-//        OrderPaySuccessTask orderPaySuccessTask = run.getBean(OrderPaySuccessTask.class);
-//        orderPaySuccessTask.orderPayAfter();
-//       groupThreeRetOneHandler.aa_15866();
-//           groupThreeRetOneHandler.aa_3174_4();
-//       groupThreeRetOneHandler.aa_12692_8();
-//        groupThreeRetOneHandler.aa_11880();
-
-        //团队业绩
-//        InvitationScoreService groupThreeRetOneHandler2 = run.getBean(InvitationScoreService.class);
-//        groupThreeRetOneHandler2.init();
-
-
-//        GroupThreeRetOneHandler groupThreeRetOneHandler=  run.getBean(GroupThreeRetOneHandler.class);
-//        OrderService orderService = run.getBean(OrderService.class);
-//
-//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("SH280171421182807092676"),null);
-
-//        OrderPaySuccessTask bean1 = run.getBean(OrderPaySuccessTask.class);
-//
-//        bean1.orderPayAfter();
-
-
-//        OrderService orderService = run.getBean(OrderService.class);
-//        CapaXsPointComm2Handler groupThreeRetOneHandler = run.getBean(CapaXsPointComm2Handler.class);
-//        groupThreeRetOneHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT131171472294645188581"),null);
-
     }
 
 }
