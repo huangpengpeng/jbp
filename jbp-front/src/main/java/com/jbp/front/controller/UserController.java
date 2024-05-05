@@ -442,7 +442,19 @@ public class UserController {
 
     }
 
+    @ApiOperation(value = "新增用户服务关系")
+    @RequestMapping(value = "/addUserService", method = RequestMethod.GET)
+    public  CommonResult  addUserService( String raccount ,String account,Integer node) {
+        //销售人
+        Integer uid=  userService.getUserId();
+        //服务人
+        User ruser =  userService.getByAccount(raccount);
+        //注册用户
+        User user =  userService.getByAccount(account);
+        relationService.band(user.getId(), ruser.getId(), uid, node);
+        return CommonResult.success();
 
+    }
 }
 
 
