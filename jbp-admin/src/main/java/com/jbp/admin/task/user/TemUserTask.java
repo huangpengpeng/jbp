@@ -3,7 +3,6 @@ package com.jbp.admin.task.user;
 import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.service.service.TmpUserService;
-import com.jbp.service.service.agent.WalletGivePlanService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
