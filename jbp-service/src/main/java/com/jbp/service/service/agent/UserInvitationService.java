@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
@@ -51,4 +52,11 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     //获取邀请关系数量
     Integer getInviteNumber(Integer pId);
+
+
+    /**
+     * 获取直推销售下级没有服务上级的用户
+     * @return
+     */
+    PageInfo<UserInviteResponse> getUserNotService(PageParamRequest pageParamRequest);
 }
