@@ -174,4 +174,5 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "是否开店")
     private Boolean openShop;
+
 }

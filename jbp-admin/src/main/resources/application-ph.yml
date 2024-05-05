@@ -36,13 +36,13 @@ server:
     min-spare-threads: 30   # 初始化启动线程数量
 spring:
   profiles:
-    active: fny1
+    active: ph
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小
       max-request-size: 50MB #设置单次请求文件的总大小
   application:
-    name: jbp-admin #这个很重要，这在以后的服务与服务之间相互调用一般都是根据这个name
+    name: ph-admin #这个很重要，这在以后的服务与服务之间相互调用一般都是根据这个name
   jackson:
     locale: zh_CN
     time-zone: GMT+8
