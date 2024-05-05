@@ -22,6 +22,6 @@ public interface ClearingBonusService extends IService<ClearingBonus> {
 
 
 
-    ClearingBonusListResponse getcleringInfoList(Integer uid);
+    ClearingBonusListResponse getcleringInfoList(Integer uid,String day);
 
 }

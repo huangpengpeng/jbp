@@ -62,8 +62,8 @@ public class ClearingBonusServiceImpl extends UnifiedServiceImpl<ClearingBonusDa
     }
 
     @Override
-    public ClearingBonusListResponse getcleringInfoList(Integer uid) {
-        return dao.getcleringInfoList(uid);
+    public ClearingBonusListResponse getcleringInfoList(Integer uid,String day) {
+        return dao.getcleringInfoList(uid,day);
     }
 }
 

@@ -73,8 +73,8 @@ public class ClearingVipUserController {
 
     @ApiOperation(value = "收入每日明细")
     @RequestMapping(value = "/getTotalInfoDay", method = RequestMethod.GET)
-    public CommonResult<ClearingBonusListResponse> getTotalInfoDay() {
-        ClearingBonusListResponse listResponses = clearingBonusService.getcleringInfoList(userService.getUserId());
+    public CommonResult<ClearingBonusListResponse> getTotalInfoDay(String day) {
+        ClearingBonusListResponse listResponses = clearingBonusService.getcleringInfoList(userService.getUserId(),day);
         return CommonResult.success(listResponses);
     }
 

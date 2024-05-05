@@ -16,7 +16,7 @@ GROUP BY DATE_FORMAT( endTime, '%Y-%m-%d')
 
                 select sum(e.commAmt) as commAmt,DATE_FORMAT( endTime, '%Y-%m-%d') as time,levelName from eb_clearing_bonus   e
         left  join eb_clearing_final f on f.id = e.clearingId
-        where e.uid = #{uid}
+        where e.uid = #{uid} and DATE_FORMAT( endTime, '%Y-%m-%d') = #{day}
         GROUP BY DATE_FORMAT( endTime, '%Y-%m-%d'),e.levelName
     </select>
 </mapper>
