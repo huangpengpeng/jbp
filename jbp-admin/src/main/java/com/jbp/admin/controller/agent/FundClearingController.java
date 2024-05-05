@@ -214,15 +214,17 @@ public class FundClearingController {
         }
 
 
-        Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
+       List< Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
            // 新系统复销奖统计
         //        String repetitionId =  systemConfigService.getValueByKey("goods_repetition_id");
      //   BigDecimal salse = new BigDecimal(orderService.getGoodsPirce(repetitionId));
 
         List<String> list =new ArrayList<>();
-        //判断历史复销奖
-        if((new BigDecimal(maps.get("c").toString())).compareTo(new BigDecimal(199)) == 1){
-            list.add(maps.get("userId").toString());
+        for (Map<String, Object> map :maps) {
+            //判断历史复销奖
+            if ( map.get("c") != null && (new BigDecimal(map.get("c").toString())).compareTo(new BigDecimal(199)) == 1) {
+                list.add(map.get("userId") == null ?"" :map.get("userId").toString());
+            }
         }
 
         return CommonResult.success(list);
