@@ -532,7 +532,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
              map.put("orderSn" , order.getPlatOrderNo());
              map.put("userId" , order.getUid());
              map.put("payPrice" , order.getPayPrice());
-
+             maps.add(map);
          }
 
 
