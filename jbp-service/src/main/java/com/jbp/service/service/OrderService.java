@@ -11,6 +11,7 @@ import com.jbp.common.vo.LogisticsResultVo;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
 *  OrderService 接口
@@ -339,6 +340,6 @@ public interface OrderService extends IService<Order> {
 
     BigDecimal getGoodsPrice(String goodsIds,Integer uid,String month);
 
-   List<Order> getFgGoodsOrder(String goodsIds, String month);
+    List<Map<String,Object>>  getFgGoodsOrder(String goodsIds, String month);
 
 }

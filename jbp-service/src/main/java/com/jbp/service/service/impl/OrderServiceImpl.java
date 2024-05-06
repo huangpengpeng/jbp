@@ -1248,7 +1248,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     @Override
-    public List<Order> getFgGoodsOrder(String goodsIds, String month) {
+    public List<Map<String,Object>> getFgGoodsOrder(String goodsIds, String month) {
         return dao.getFgGoodsOrder(goodsIds,month);
     }
 

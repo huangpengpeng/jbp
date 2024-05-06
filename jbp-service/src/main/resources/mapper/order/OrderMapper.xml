@@ -51,12 +51,12 @@
    and o.is_del = 0
     </select>
 
-    <select id="getFgGoodsOrder" resultType="com.jbp.common.model.order.Order">
+    <select id="getFgGoodsOrder" resultType="java.util.Map">
 
-    select  o.* from eb_order o
-
-    where o.paid = 1 and o.plat_order_no in (select order_no from eb_order_detail where product_id in (${goodsIds}) )
-     and   DATE_FORMAT( o.`pay_Time`,'%Y-%m') = #{month}   and o.refund_status = 0   and o.is_del = 0
+        select o.uid, e.product_id,e.bar_code,e.pay_price,o.plat_order_no from eb_order_detail e
+        left join eb_order o on o.plat_order_no =  e.order_no
+        where product_id in (${goodsIds})
+           and   DATE_FORMAT( o.`pay_Time`,'%Y-%m') =   #{month}   and o.refund_status = 0   and o.is_del = 0
 
 
     </select>

@@ -4,6 +4,7 @@ package com.jbp.front.controller;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -426,7 +427,7 @@ public class UserController {
 
     @ApiOperation(value = "获取用户的销售上级")
     @RequestMapping(value = "/getUserInvitePanent", method = RequestMethod.GET)
-    public CommonResult getUserInvitePanent( ) {
+    public CommonResult getUserInvitePanent() {
         Integer uid=  userService.getUserId();
         return CommonResult.success(invitationService.getPid(uid));
     }
@@ -434,7 +435,7 @@ public class UserController {
 
     @ApiOperation(value = "获取用户的服务上级")
     @RequestMapping(value = "/getUserServicePanent", method = RequestMethod.GET)
-    public CommonResult getUserServicePanent( ) {
+    public CommonResult getUserServicePanent() {
         Integer uid=  userService.getUserId();
         return CommonResult.success(relationService.getPid(uid));
     }
@@ -462,6 +463,32 @@ public class UserController {
         return CommonResult.success();
 
     }
+
+
+
+    @ApiOperation(value = "新增用户绑定关系")
+    @RequestMapping(value = "/addInvitation", method = RequestMethod.GET)
+    public CommonResult addInvitation(String  account ) {
+
+        if(account == null){
+            throw new RuntimeException("请输入邀请人账号");
+        }
+        Integer uid=  userService.getUserId();
+        User user = userService.getByAccount(account);
+        if(user == null){
+            throw new RuntimeException("邀请人账号不存在");
+        }
+        UserInvitation userInvitation =  invitationService.getByUser(uid);
+        if(userInvitation == null){
+            UserCapa userCapa =  userCapaService.getByUser(uid);
+            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
+            invitationService.band(uid, user.getId(), false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
+        }
+
+        return CommonResult.success();
+    }
+
 }
 
 
