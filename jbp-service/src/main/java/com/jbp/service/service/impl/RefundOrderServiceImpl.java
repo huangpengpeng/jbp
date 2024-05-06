@@ -1075,17 +1075,17 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     @Override
     public Boolean audit(OrderRefundAuditRequest request) {
         validatedAuditRequest(request);
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+//        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(request.getRefundOrderNo());
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY)) {
             throw new CrmebException("售后单状态异常");
         }
-        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
-        if(!ifPlatformAdd){
-            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-                throw new CrmebException("无法操作非自己商户的订单");
-            }
-        }
+//        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
+//        if(!ifPlatformAdd){
+//            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
+//                throw new CrmebException("无法操作非自己商户的订单");
+//            }
+//        }
         Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
         if (ObjectUtil.isNull(order)) {
             throw new CrmebException("退款单关联的订单不存在");
@@ -1434,11 +1434,14 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             List<InvitationScoreFlow> list = invitationScoreFlowService.list(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getPlatOrderNo()));
             invitationScoreFlowService.remove(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getPlatOrderNo()));
             if(!list.isEmpty()){
-                for(InvitationScoreFlow invitationScoreFlow : list){
-                    InvitationScore invitationScore  =   invitationScoreService.getByUser(invitationScoreFlow.getUid());
-                    BigDecimal score = invitationScore.getScore().subtract(invitationScoreFlow.getScore());
-                    invitationScore.setScore(score);
-                    invitationScoreService.updateById(invitationScore);
+                for(InvitationScoreFlow invitationScoreFlow : list) {
+                    InvitationScore invitationScore = invitationScoreService.getByUser(invitationScoreFlow.getUid());
+                    if (invitationScore != null && ArithmeticUtils.gte(invitationScore.getScore(), invitationScoreFlow.getScore())) {
+                        BigDecimal score = invitationScore.getScore().subtract(invitationScoreFlow.getScore());
+                        invitationScore.setScore(score);
+                        invitationScoreService.updateById(invitationScore);
+                    }
+
                 }
             }
 
@@ -1448,10 +1451,13 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
             if(!selfList.isEmpty()){
                 for(SelfScoreFlow selfScoreFlow : selfList){
+
                     SelfScore selfScore = selfScoreService.getByUser(selfScoreFlow.getUid());
-                    BigDecimal score = selfScore.getScore().subtract(selfScoreFlow.getScore());
-                    selfScore.setScore(score);
-                    selfScoreService.updateById(selfScore);
+                    if(selfScore != null && ArithmeticUtils.gte(selfScore.getScore(), selfScoreFlow.getScore())){
+                        BigDecimal score = selfScore.getScore().subtract(selfScoreFlow.getScore());
+                        selfScore.setScore(score);
+                        selfScoreService.updateById(selfScore);
+                    }
                 }
             }
 

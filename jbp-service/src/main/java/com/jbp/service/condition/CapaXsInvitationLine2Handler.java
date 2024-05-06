@@ -101,6 +101,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
         // 3.每条独立线满足星级人数
         List<Integer> uidList = Lists.newArrayList(); // 满足或者不满足的人加入
         for (CapaXsInfo capaXsInfo : capaXsList) {
+            capaXsInfo.setIfOk(false);
             for (UserInvitation userInvitation : nextList) {
                 // 小区业绩
                 if (!uidList.contains(userInvitation.getUId())) {
@@ -131,7 +132,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
             }
         }
         for (CapaXsInfo capaXsInfo : capaXsList) {
-            if (capaXsInfo == null || !capaXsInfo.ifOk) {
+            if (capaXsInfo == null || !capaXsInfo.getIfOk()) {
                 return false;
             }
         }

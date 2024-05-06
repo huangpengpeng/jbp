@@ -60,6 +60,9 @@ public class MerchantProductController {
     @ApiOperation(value = "新增商品")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public CommonResult<String> save(@RequestBody @Validated ProductAddRequest request) {
+        if(request.getUnAddCard() == null){
+            request.setUnAddCard(false);
+        }
         if (productService.save(request)) {
             return CommonResult.success();
         }
@@ -92,8 +95,11 @@ public class MerchantProductController {
     @PreAuthorize("hasAuthority('merchant:product:update')")
     @ApiOperation(value = "商品修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public CommonResult<String> update(@RequestBody @Validated ProductAddRequest ProductRequest) {
-        if (productService.update(ProductRequest)) {
+    public CommonResult<String> update(@RequestBody @Validated ProductAddRequest request) {
+        if(request.getUnAddCard() == null){
+            request.setUnAddCard(false);
+        }
+        if (productService.update(request)) {
             return CommonResult.success();
         }
         return CommonResult.failed();
