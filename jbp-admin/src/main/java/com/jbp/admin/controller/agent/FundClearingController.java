@@ -184,13 +184,12 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:resellsave')")
     @PostMapping("/resellSave")
     @ApiOperation("增加复销奖佣金")
-    public CommonResult resellSave(String month) {
+    public CommonResult resellSave(@RequestBody FundClearingMonthRequest request) {
 
-        if (StringUtils.isBlank(month)) {
+        if (StringUtils.isBlank(request.getMonth())) {
             throw new RuntimeException("请选择月份");
         }
-
-        fundClearingService.addFgComm(month);
+        fundClearingService.addFgComm(request.getMonth());
 
         return CommonResult.success();
     }
