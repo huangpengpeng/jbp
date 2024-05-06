@@ -6,6 +6,7 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,8 @@ public interface OrderDao extends BaseMapper<Order> {
      */
     List<Order> findFrontList(Map<String, Object> searchMap);
 
-    Integer getGoodsPirce(@Param(value = "goodsIds") String goodsIds,@Param(value = "uid") Integer uid);
+    BigDecimal getGoodsPirce(@Param(value = "goodsIds") String goodsIds, @Param(value = "uid") Integer uid, @Param(value = "month") String month);
 
 
+    List<Order> getFgGoodsOrder(@Param(value = "goodsIds") String goodsIds, @Param(value = "month") String month);
 }

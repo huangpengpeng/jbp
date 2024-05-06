@@ -337,6 +337,8 @@ public interface OrderService extends IService<Order> {
 
     List<Order> getSuccessList(Date startTime, Date endTime);
 
-    Integer getGoodsPrice(String goodsIds);
+    BigDecimal getGoodsPrice(String goodsIds,Integer uid,String month);
+
+   List<Order> getFgGoodsOrder(String goodsIds, String month);
 
 }

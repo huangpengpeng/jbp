@@ -184,7 +184,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:resellsave')")
     @PostMapping("/resellSave")
     @ApiOperation("增加复销奖佣金")
-    public CommonResult resellSave(@RequestBody String month) {
+    public CommonResult resellSave(String month) {
 
         if (StringUtils.isBlank(month)) {
             throw new RuntimeException("请选择月份");
