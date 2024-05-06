@@ -67,7 +67,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund()));
+                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList()));
     }
 
     @GetMapping("/status/list")

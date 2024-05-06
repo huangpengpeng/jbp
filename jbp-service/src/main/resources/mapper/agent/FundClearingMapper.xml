@@ -156,6 +156,12 @@
     <select id="exportFundClearing" resultMap="FundClearingVo">
     <include refid="exportFundClearing"/>
         <where> 1=1
+            <if test="orderList!=null and orderList.size > 0 ">
+                and c.external_no in
+                <foreach collection="orderList" item ="orderNo" index="i" open="(" close=")" separator=",">
+                    #{orderNo}
+                </foreach>
+            </if>
             <if test="uniqueNo!=null and uniqueNo !=''">
                 and c.unique_no=#{uniqueNo}
             </if>

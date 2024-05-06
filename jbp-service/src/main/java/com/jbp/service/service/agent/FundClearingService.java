@@ -84,7 +84,7 @@ public interface FundClearingService extends IService<FundClearing> {
      */
     List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo,
                                             Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime,
-                                            String status,Integer uid,String teamName,String description,String commName, Boolean ifRefund);
+                                            String status,Integer uid,String teamName,String description,String commName, Boolean ifRefund, List<String> orderList);
 
     void updateRemark(Long id, String remark);
 
