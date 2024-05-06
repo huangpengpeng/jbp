@@ -19,7 +19,7 @@ public interface FundClearingService extends IService<FundClearing> {
     PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime,
                                     Date endClearingTime, Date startCreateTime, Date endCreateTime,
                                     String status,Integer uid,String teamName,String description,
-                                    String commName, Boolean ifRefund, PageParamRequest pageParamRequest);
+                                    String commName, Boolean ifRefund, List<String> orderList,  PageParamRequest pageParamRequest);
 
     FundClearing create(Integer uid, String externalNo, String commName, BigDecimal commAmt, List<FundClearingProduct> productList,
                      String description, String remark);

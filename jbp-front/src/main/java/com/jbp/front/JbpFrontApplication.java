@@ -43,9 +43,9 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-        KqPayService kqPayService = run.getBean(KqPayService.class);
-
-        kqPayService.refund("PT401171445779181231936", "RE808171448702346536702", BigDecimal.valueOf(2400), new Date());
+//
+//        KqPayService kqPayService = run.getBean(KqPayService.class);
+//
+//        kqPayService.refund("PT401171445779181231936", "RE808171448702346536702", BigDecimal.valueOf(2400), new Date());
     }
 }

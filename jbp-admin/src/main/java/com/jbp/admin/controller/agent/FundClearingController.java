@@ -1,9 +1,7 @@
 package com.jbp.admin.controller.agent;
 
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearing;
-import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -11,26 +9,18 @@ import com.jbp.common.request.agent.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
-import com.jbp.service.product.comm.ProductCommEnum;
-import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.agent.UserCapaXsService;
-import com.jbp.service.service.agent.UserInvitationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -41,17 +31,6 @@ public class FundClearingController {
     private FundClearingService fundClearingService;
     @Resource
     private UserService userService;
-    @Resource
-    private UserInvitationService userInvitationService;
-    @Resource
-    private Environment environment;
-    @Resource
-    private SystemConfigService systemConfigService;
-    @Resource
-    private UserCapaXsService userCapaXsService;
-
-
-
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:page')")
     @GetMapping("/page")
@@ -66,7 +45,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(fundClearingService.pageList(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), pageParamRequest)));
+                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
@@ -76,7 +55,7 @@ public class FundClearingController {
         if (StringUtils.isEmpty(request.getUniqueNo()) && StringUtils.isEmpty(request.getExternalNo()) &&
                 request.getStartClearingTime() == null && request.getEndClearingTime() == null && request.getStartCreateTime() == null && request.getEndCreateTime() == null
                 && StringUtils.isEmpty(request.getStatus()) && StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getTeamName())
-                && StringUtils.isEmpty(request.getDescription())&& ObjectUtils.isEmpty(request.getIfRefund())&&StringUtils.isEmpty(request.getCommName())) {
+                && StringUtils.isEmpty(request.getDescription()) && ObjectUtils.isEmpty(request.getIfRefund()) && StringUtils.isEmpty(request.getCommName())) {
             throw new CrmebException("请填写一个过滤信息");
         }
         Integer uid = null;
@@ -162,8 +141,6 @@ public class FundClearingController {
     }
 
 
-
-
     @PreAuthorize("hasAuthority('agent:fund:clearing:save')")
     @PostMapping("/save")
     @ApiOperation("增加自定义佣金")
@@ -176,9 +153,6 @@ public class FundClearingController {
                 null, request.getDescription(), request.getRemark());
         return CommonResult.success();
     }
-
-
-
 
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:resellsave')")
@@ -194,7 +168,6 @@ public class FundClearingController {
 
         return CommonResult.success();
     }
-
 
 
 }
