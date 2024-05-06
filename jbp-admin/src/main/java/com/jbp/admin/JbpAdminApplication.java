@@ -1,6 +1,10 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.service.event.EventPublisherContext;
+import com.jbp.service.event.UserCapaUpdateEvent;
+import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,6 +32,12 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+        EventPublisherContext eventPublisherContext = run.getBean(EventPublisherContext.class);
+        UserCapaService userCapaService = run.getBean(UserCapaService.class);
+        UserCapa userCapa = userCapaService.getByUser(1071452);
+        UserCapaUpdateEvent event = new UserCapaUpdateEvent(new UserCapaUpdateEvent.EventDto(3L, 3L, userCapa));
+        eventPublisherContext.publishEvent(event);
 
     }
 

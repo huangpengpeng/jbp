@@ -1,11 +1,9 @@
 package com.jbp.service.event.listener;
 
-import com.beust.jcommander.internal.Lists;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
-import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.event.UserCapaUpdateEvent;
 import com.jbp.service.service.UserService;
@@ -72,18 +70,6 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
             List<UserInvitation> nextList = userInvitationService.getNextList(userCapa.getUid());
             // 从一阶里面找2个比我等级低一级的客户，成为我的培育下级
             nextList = nextList.stream().sorted(Comparator.comparing(UserInvitation::getUId)).collect(Collectors.toList());
-            int i = 0;
-            for (UserInvitation invitation : nextList) {
-                UserCapa nextCapa = userCapaService.getByUser(invitation.getUId());
-                if (nextCapa != null && usableCapaIdList.contains(nextCapa.getCapaId())) {
-                    invitation.setMId(invitation.getPId());
-                    userInvitationService.updateById(invitation);
-                    i++;
-                }
-                if (i >= 2) {
-                    break;
-                }
-            }
             // 4.断开自己的上级 和 一阶的上级
             userInvitationService.del(userCapa.getUid());
             for (UserInvitation invitation : nextList) {
@@ -93,10 +79,16 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
             userInvitationService.band(userCapa.getUid(), zdUser.getId(), false, true, true);
             invitationJumpService.add(userCapa.getUid(), zdUser.getId(), orgPid);
             // 6.一阶绑定原有上级
-            for (UserInvitation invitation : nextList) {
+            for (int i = 0; i < nextList.size(); i++) {
+                UserInvitation invitation = nextList.get(i);
                 userInvitationService.band(invitation.getUId(), orgPid, false, true, true);
                 // 增加关系跳转
                 invitationJumpService.add(invitation.getUId(), orgPid, userInvitation.getPId());
+                if(i < 2){
+                    invitation = userInvitationService.getByUser(invitation.getUId());
+                    invitation.setMId(userCapa.getUid());
+                    userInvitationService.updateById(invitation);
+                }
             }
         }
     }
