@@ -37,5 +37,5 @@ public interface OrderDao extends BaseMapper<Order> {
     BigDecimal getGoodsPirce(@Param(value = "goodsIds") String goodsIds, @Param(value = "uid") Integer uid, @Param(value = "month") String month);
 
 
-    List<Order> getFgGoodsOrder(@Param(value = "goodsIds") String goodsIds, @Param(value = "month") String month);
+    List<Map<String,Object>> getFgGoodsOrder(@Param(value = "goodsIds") String goodsIds, @Param(value = "month") String month);
 }
