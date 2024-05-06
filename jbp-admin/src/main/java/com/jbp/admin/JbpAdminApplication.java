@@ -33,11 +33,6 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        EventPublisherContext eventPublisherContext = run.getBean(EventPublisherContext.class);
-        UserCapaService userCapaService = run.getBean(UserCapaService.class);
-        UserCapa userCapa = userCapaService.getByUser(1071452);
-        UserCapaUpdateEvent event = new UserCapaUpdateEvent(new UserCapaUpdateEvent.EventDto(3L, 3L, userCapa));
-        eventPublisherContext.publishEvent(event);
 
     }
 
