@@ -31,7 +31,7 @@ public class LimitTemp extends BaseModel {
                      List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner,
                      List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation,
                      List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
-                     int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime,
+                     int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum,
                      String description) {
         this.name = name;
         this.type = type;
@@ -50,6 +50,7 @@ public class LimitTemp extends BaseModel {
         this.buyLimitNum=buyLimitNum;
         this.buyLimitStartTime=buyLimitStartTime;
         this.buyLimitEndTime=buyLimitEndTime;
+        this.oneTimeNum = oneTimeNum;
     }
 
     public void init(){
@@ -120,6 +121,9 @@ public class LimitTemp extends BaseModel {
 
     @ApiModelProperty(value = "限购结束时间")
     private Date buyLimitEndTime;
+
+    @ApiModelProperty(value = "单次购买最大数量")
+    private Integer oneTimeNum;
 
     @ApiModelProperty(value = "说明")
     @TableField(value = "description")

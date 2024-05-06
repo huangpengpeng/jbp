@@ -73,6 +73,9 @@ public class LimitTempEditRequest implements Serializable {
     @ApiModelProperty(value = "限购结束时间")
     private Date buyLimitEndTime;
 
+    @ApiModelProperty(value = "单次购买限购数")
+    private Integer oneTimeNum;
+
     @ApiModelProperty(value = "说明")
     private String  description;
 }
