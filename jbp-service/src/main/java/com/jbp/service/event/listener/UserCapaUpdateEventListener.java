@@ -95,7 +95,7 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
             invitationJumpService.add(invitation.getUId(), orgPid, userInvitation.getPId());
             // 9.增加培育
             UserCapa nextUserCapa = userCapaService.getByUser(invitation.getUId());
-            if(nextUserCapa != null && usableCapaIdList.contains(nextUserCapa.getCapaId()) && !invitationJumpService.ifJump(invitation.getUId())){
+            if (nextUserCapa != null && usableCapaIdList.contains(nextUserCapa.getCapaId()) && !invitationJumpService.ifJump(invitation.getUId())) {
                 if (i < 2) {
                     invitation = userInvitationService.getByUser(invitation.getUId());
                     invitation.setMId(userCapa.getUid());
