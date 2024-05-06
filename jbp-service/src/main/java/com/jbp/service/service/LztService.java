@@ -53,7 +53,6 @@ public interface LztService {
     TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
                                             Double amt, String txnPurpose, String pwd, String randomKey,
                                             String payeeId, String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory);
-
     /**
      * 来账通内部代发结果查询
      */
