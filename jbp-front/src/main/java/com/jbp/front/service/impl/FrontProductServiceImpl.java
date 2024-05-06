@@ -133,6 +133,9 @@ public class FrontProductServiceImpl implements FrontProductService {
         // 查询普通商品
         ProductDetailResponse productDetailResponse = new ProductDetailResponse();
         Product product = productService.getH5Detail(id);
+        if(product.getUnAddCard() == null){
+            product.setUnAddCard(false);
+        }
         productDetailResponse.setProductInfo(product);
         if (StrUtil.isNotBlank(product.getGuaranteeIds())) {
             productDetailResponse.setGuaranteeList(productGuaranteeService.findByIdList(CrmebUtil.stringToArray(product.getGuaranteeIds())));

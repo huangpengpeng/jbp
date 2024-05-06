@@ -107,6 +107,10 @@ public class ProductInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "显示限制模版ID")
     private Long showLimitTempId;
+
+    @ApiModelProperty(value = "不允许加入购物车")
+    private Boolean unAddCard;
+
     @ApiModelProperty(value = "付款方式  0 在线支付  1 积分支付")
     private Integer payType;
 

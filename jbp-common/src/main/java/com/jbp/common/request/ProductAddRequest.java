@@ -133,4 +133,7 @@ public class ProductAddRequest implements Serializable {
     @ApiModelProperty(value = "显示限制模版ID")
     private Long showLimitTempId;
 
+    @ApiModelProperty(value = "不允许加入购物车")
+    private Boolean unAddCard;
+
 }
