@@ -1243,8 +1243,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     @Override
-    public Integer getGoodsPrice(String goodsIds) {
-        return dao.getGoodsPirce(goodsIds,userService.getUserId());
+    public BigDecimal getGoodsPrice(String goodsIds,Integer uid,String month) {
+        return dao.getGoodsPirce(goodsIds,uid,month);
+    }
+
+    @Override
+    public List<Order> getFgGoodsOrder(String goodsIds, String month) {
+        return dao.getFgGoodsOrder(goodsIds,month);
     }
 
     /**

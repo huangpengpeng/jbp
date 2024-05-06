@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.model.user.UserVitalitpartner;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -68,7 +70,7 @@ public class UserVitalitpartnerController {
             return CommonResult.success("");
         }
 
-        String repetitionId =  systemConfigService.getValueByKey("goods_repetition_id");
+        String goods_repetition_id_qua =  systemConfigService.getValueByKey("goods_repetition_id_qua");
         StringBuilder stringBuilder =new StringBuilder();
 
         String name =environment.getProperty("historyOrder.name");
@@ -98,7 +100,7 @@ public class UserVitalitpartnerController {
 
         Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
 
-        BigDecimal salse = new BigDecimal(orderService.getGoodsPrice(repetitionId));
+        BigDecimal salse = orderService.getGoodsPrice(goods_repetition_id_qua,userService.getUserId(), DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
 
         if((new BigDecimal(maps.get("c").toString()).add(salse)).compareTo(new BigDecimal(199)) == 1){
             return CommonResult.success("https://batchatx.oss-cn-shenzhen.aliyuncs.com/f04bbf30c1a647ddbcbda733dab9bf9b");

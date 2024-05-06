@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
+import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -22,6 +23,8 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.product.comm.CommAliasNameEnum;
+import com.jbp.service.product.comm.ProductCommEnum;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
@@ -69,6 +72,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private Environment environment;
     @Resource
     private UserInvitationService userInvitationService;
+    @Resource
+    private OrderService orderService;
 
 
     @Override
@@ -482,31 +487,34 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             return;
         }
         // 新系统复销奖统计
-        //   String repetitionId =  systemConfigService.getValueByKey("goods_repetition_id");
-        //   BigDecimal salse = new BigDecimal(orderService.getGoodsPirce(repetitionId));
+        //复销奖奖励商品
+           String repetitionId =  systemConfigService.getValueByKey("goods_repetition_id");
+
+        //复销奖资格
+        String goodsRepetitionIdQua =  systemConfigService.getValueByKey("goods_repetition_id_qua");
 
 
         StringBuilder stringBuilder = new StringBuilder();
 
         String name = environment.getProperty("historyOrder.name");
         if (name.equals("jymall")) {
-            stringBuilder = new StringBuilder("\tSELECT o.* FROM orders AS o\n" +
+            stringBuilder = new StringBuilder("\tSELECT o.* FROM " + name + ".orders AS o\n" +
                     "\t\tWHERE  o.`payTime` IS NOT NULL\n" +
                     "\t\tand o.`status` IN ( 201,301,401,402,501 )\n" +
                     "\t\tAND o.sellerId IS NULL\n" +
                     "\t\tAND o.platform in('商城', '订货')\n" +
                     "\t\tAND o.id IN (\n" +
-                    "\t\tSELECT g.orderId FROM ordergoods AS g WHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) )\n" +
+                    "\t\tSELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) )\n" +
                     "\t\t)\n" +
                     "\t\tand   DATE_FORMAT( o.`payTime`,'%Y-%m')  = '" + month + "' ");
         } else {
-            stringBuilder = new StringBuilder("\tSELECT o.* FROM orders AS o\n" +
+            stringBuilder = new StringBuilder("\tSELECT o.* FROM " + name + ".orders AS o\n" +
                     "\t\tWHERE  o.`payTime` IS NOT NULL\n" +
                     "\t\tand o.`status` IN ( 201,301,401,402,501 )\n" +
                     "\t\tAND o.sellerId IS NULL\n" +
                     "\t\tAND o.platform in('商城', '订货')\n" +
                     "\t\tAND o.id IN (\n" +
-                    "\t\tSELECT g.orderId FROM ordergoods AS g WHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) )\n" +
+                    "\t\tSELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) )\n" +
                     "\t\t)\n" +
                     "\t\tand   DATE_FORMAT( o.`payTime`,'%Y-%m')  = '" + month + "' ");
         }
@@ -515,6 +523,19 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         List<Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
 
         List<String> list = new ArrayList<>();
+
+        //查询新系统复销奖订单
+
+         List<Order>  orderList =   orderService.getFgGoodsOrder(repetitionId,month);
+         for(Order order : orderList){
+            Map<String,Object> map =new HashMap<>();
+             map.put("orderSn" , order.getPlatOrderNo());
+             map.put("userId" , order.getUid());
+             map.put("payPrice" , order.getPayPrice());
+             maps.add(map);
+         }
+
+
         for (Map<String, Object> map : maps) {
 //            //判断历史复销奖
             User createUser = userService.getById(Integer.valueOf(map.get("userId").toString()));
@@ -559,7 +580,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                             "        AND o.id IN (\n" +
                             "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) )\n" +
                             "\t\t)\n" +
-                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')\n" +
+                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') ='2024-04'\n" +
                             "        and o.userId  = '" + user.getId() + "'");
                 } else {
                     stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c FROM " + name + ".orders AS o\n" +
@@ -569,7 +590,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                             "        AND o.id IN (\n" +
                             "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) )\n" +
                             "\t\t)\n" +
-                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')\n" +
+                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') ='2024-04'\n" +
                             "        and o.userId  = '" + user.getId() + "'"
                     );
                 }
@@ -577,10 +598,14 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
                 Map<String, Object> map2 = SqlRunner.db().selectOne(stringBuilder.toString());
 
+                BigDecimal salse = orderService.getGoodsPrice(goodsRepetitionIdQua,user.getId(), month+"-01 00:00:00");
 
-                if (ifAddclearing && (new BigDecimal(map2.get("c").toString())).compareTo(new BigDecimal(199)) == 1) {
-                    //  BigDecimal amt = price.multiply(new BigDecimal("0.01")).setScale(2, BigDecimal.ROUND_DOWN);
-                    System.out.println(user.getId());
+                if (ifAddclearing && ((new BigDecimal(map2.get("c").toString())).add(salse)).compareTo(new BigDecimal(199)) == 1) {
+                  BigDecimal amt = new BigDecimal( map.get("payPrice").toString()).multiply(new BigDecimal("0.01")).setScale(2, BigDecimal.ROUND_DOWN);
+
+                    create(user.getId(), map.get("orderSn").toString(), "重复消费积分", amt,
+                            null, month+"重复消费积分", "");
+
                     J++;
                 }
 
@@ -592,7 +617,6 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 user = userService.getById(userInvitation.getPId());
 
             } while (J <= 18);
-
         }
 
 
