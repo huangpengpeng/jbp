@@ -108,7 +108,7 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
             UserCapa nextUserCapa = userCapaService.getByUser(invitation.getUId());
             // 没有培育上级 等级满足下一级别 没有跳过关系
             if (invitation.getMId() == null && nextUserCapa != null && usableCapaIdList.contains(nextUserCapa.getCapaId()) && !invitationJumpService.ifJump(invitation.getUId())) {
-                if (i < 2) {
+                if (j < 2) {
                     invitation = userInvitationService.getByUser(invitation.getUId());
                     invitation.setMId(userCapa.getUid());
                     userInvitationService.updateById(invitation);
