@@ -8,17 +8,23 @@ import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaRequest;
 import com.jbp.common.request.agent.RiseConditionRequest;
+import com.jbp.common.request.agent.UserInvitationJumpRequest;
+import com.jbp.common.response.UserInvitationJumpListResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.UserInvitationJumpService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +43,10 @@ public class CapaController {
     private CapaService capaService;
     @Resource
     private SystemAttachmentService systemAttachmentService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserInvitationJumpService userInvitationJumpService;
 
     @PreAuthorize("hasAuthority('capa:list')")
     @ApiOperation(value = "用户等级列表")
@@ -131,5 +141,42 @@ public class CapaController {
         capaService.saveRiseCondition(request);
         return CommonResult.success();
     }
+
+    @PreAuthorize("hasAuthority('agent:user:invitation:jump:page')")
+    @GetMapping("/invitation/jump/page")
+    @ApiOperation("销售上下层级跳转关系列表")
+    public CommonResult<CommonPage<UserInvitationJumpListResponse>> pageList(UserInvitationJumpRequest request, PageParamRequest pageParamRequest) {
+        //当前用户id
+        Integer uid = null;
+        if (request.getUId() != null) {
+            User user = userService.getById(request.getUId());
+            if (user == null) {
+                throw new CrmebException("当前id信息错误");
+            }
+            uid = user.getId();
+        }
+//        当前上级id
+        Integer pid = null;
+        if (request.getPId() != null) {
+            User user = userService.getById(request.getPId());
+            if (user == null) {
+                throw new CrmebException("当前上级id信息错误");
+            }
+            pid = user.getId();
+        }
+        //原上级id
+        Integer orgPid = null;
+        if (request.getOrgPid() != null) {
+            User user = userService.getById(request.getOrgPid());
+            if (user == null) {
+                throw new CrmebException("原上级id信息错误");
+            }
+            orgPid = user.getId();
+        }
+
+        return CommonResult.success(CommonPage.restPage(userInvitationJumpService.pageList(uid, pid, orgPid, pageParamRequest)));
+    }
+
+
 
 }
