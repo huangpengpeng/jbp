@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -35,10 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -69,6 +67,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private WalletService walletService;
     @Resource
     private Environment environment;
+    @Resource
+    private UserInvitationService userInvitationService;
+
 
     @Override
     public PageInfo<FundClearing> pageList(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime,
@@ -159,7 +160,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         QueryWrapper<FundClearing> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(FundClearing::getExternalNo, externalNo)
-                .in(FundClearing::getStatus, FundClearing.Constants.已创建.toString(),  FundClearing.Constants.已拦截.toString());
+                .in(FundClearing::getStatus, FundClearing.Constants.已创建.toString(), FundClearing.Constants.已拦截.toString());
         List<FundClearing> list = list(queryWrapper);
         if (CollectionUtils.isEmpty(list)) {
             return;
@@ -183,7 +184,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             throw new CrmebException("请选择佣金发放记录");
         }
         List<FundClearing> list = list(new QueryWrapper<FundClearing>().lambda().in(FundClearing::getId, ids)
-                .in(FundClearing::getStatus, FundClearing.Constants.已创建.toString(),  FundClearing.Constants.已拦截.toString()));
+                .in(FundClearing::getStatus, FundClearing.Constants.已创建.toString(), FundClearing.Constants.已拦截.toString()));
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
@@ -316,8 +317,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             return;
         }
         for (FundClearing fundClearing : list) {
-            if(fundClearing.getIfRefund() != null && fundClearing.getIfRefund()){
-                throw new RuntimeException(fundClearing.getUniqueNo()+"已经退回请勿重复操作");
+            if (fundClearing.getIfRefund() != null && fundClearing.getIfRefund()) {
+                throw new RuntimeException(fundClearing.getUniqueNo() + "已经退回请勿重复操作");
             }
             List<WalletFlow> walletFlows = walletFlowService.getByUser(fundClearing.getUid(), fundClearing.getUniqueNo(), WalletFlow.OperateEnum.奖励.toString(), WalletFlow.ActionEnum.收入.name());
             if (CollectionUtils.isNotEmpty(walletFlows)) {
@@ -357,9 +358,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         Map<String, Object> map = new HashMap<>();
         LambdaQueryWrapper<FundClearing> issue = new LambdaQueryWrapper<FundClearing>()
                 .eq(FundClearing::getUid, uid);
-        if(StringUtils.isNotEmpty(openWaitStatus)){
+        if (StringUtils.isNotEmpty(openWaitStatus)) {
             issue.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已创建);
-        }else{
+        } else {
             issue.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
         }
         BigDecimal count = list(issue).stream().map(FundClearing::getSendAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -405,7 +406,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public BigDecimal getSendCommAmt(Integer uid, Date start, Date end, String ...commName) {
+    public BigDecimal getSendCommAmt(Integer uid, Date start, Date end, String... commName) {
         QueryWrapper<FundClearing> lw = new QueryWrapper<>();
         lw.select("SUM(comm_amt) AS send_amt ");
         lw.lambda()
@@ -424,24 +425,25 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     public BigDecimal getUserTotal(Integer uid) {
         return fundClearingDao.getUserTotal(uid);
     }
+
     @Override
-    public BigDecimal getUserTotalMonth(Integer uid,String month) {
-        return fundClearingDao.getUserTotalMonth(uid,month);
+    public BigDecimal getUserTotalMonth(Integer uid, String month) {
+        return fundClearingDao.getUserTotalMonth(uid, month);
     }
 
     @Override
-    public   List<Map<String,Object>>  getUserTotalMonthList(Integer uid,String month) {
-        return fundClearingDao.getUserTotalMonthList(uid,month);
+    public List<Map<String, Object>> getUserTotalMonthList(Integer uid, String month) {
+        return fundClearingDao.getUserTotalMonthList(uid, month);
     }
 
     @Override
     public BigDecimal getUserTotalContMonth(Integer uid, String month) {
-        return fundClearingDao.getUserTotalContMonth(uid,month);
+        return fundClearingDao.getUserTotalContMonth(uid, month);
     }
 
     @Override
-    public BigDecimal getUserTotalDay(Integer uid,String day) {
-        return fundClearingDao.getUserTotalDay(uid,day);
+    public BigDecimal getUserTotalDay(Integer uid, String day) {
+        return fundClearingDao.getUserTotalDay(uid, day);
     }
 
     @Override
@@ -466,6 +468,131 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             }
 
             log.info("当前执行条数:{}, 总条数:{}", i, list.size());
+        }
+
+
+    }
+
+    @Override
+    public void addFgComm(String month) {
+
+        String repetition = systemConfigService.getValueByKey("goods_repetition");
+
+        if (repetition.equals("0")) {
+            return;
+        }
+        // 新系统复销奖统计
+        //   String repetitionId =  systemConfigService.getValueByKey("goods_repetition_id");
+        //   BigDecimal salse = new BigDecimal(orderService.getGoodsPirce(repetitionId));
+
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String name = environment.getProperty("historyOrder.name");
+        if (name.equals("jymall")) {
+            stringBuilder = new StringBuilder("\tSELECT o.* FROM orders AS o\n" +
+                    "\t\tWHERE  o.`payTime` IS NOT NULL\n" +
+                    "\t\tand o.`status` IN ( 201,301,401,402,501 )\n" +
+                    "\t\tAND o.sellerId IS NULL\n" +
+                    "\t\tAND o.platform in('商城', '订货')\n" +
+                    "\t\tAND o.id IN (\n" +
+                    "\t\tSELECT g.orderId FROM ordergoods AS g WHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) )\n" +
+                    "\t\t)\n" +
+                    "\t\tand   DATE_FORMAT( o.`payTime`,'%Y-%m')  = '" + month + "' ");
+        } else {
+            stringBuilder = new StringBuilder("\tSELECT o.* FROM orders AS o\n" +
+                    "\t\tWHERE  o.`payTime` IS NOT NULL\n" +
+                    "\t\tand o.`status` IN ( 201,301,401,402,501 )\n" +
+                    "\t\tAND o.sellerId IS NULL\n" +
+                    "\t\tAND o.platform in('商城', '订货')\n" +
+                    "\t\tAND o.id IN (\n" +
+                    "\t\tSELECT g.orderId FROM ordergoods AS g WHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) )\n" +
+                    "\t\t)\n" +
+                    "\t\tand   DATE_FORMAT( o.`payTime`,'%Y-%m')  = '" + month + "' ");
+        }
+
+
+        List<Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
+
+        List<String> list = new ArrayList<>();
+        for (Map<String, Object> map : maps) {
+//            //判断历史复销奖
+            User createUser = userService.getById(Integer.valueOf(map.get("userId").toString()));
+            if (createUser == null) {
+                continue;
+            }
+            UserInvitation userInvitation = userInvitationService.getByUser(createUser.getId());
+            if (userInvitation == null) {
+                continue;
+            }
+
+            User user = userService.getById(userInvitation.getPId());
+            Integer J = 1;
+            // 增加复销奖
+            do {
+                if (user == null) {
+                    break;
+                }
+
+                Boolean ifAddclearing = false;
+
+                UserCapaXs xsUserCapa = userCapaXsService.getByUser(user.getId());
+                if (xsUserCapa != null && xsUserCapa.getCapaId() >= 3) {
+                    //大于1星直接增加佣金
+                    ifAddclearing = true;
+                } else {
+                    UserInvitation userInvitation2 = userInvitationService.getByUser(user.getId());
+
+                    if (userInvitation2 == null) {
+                        break;
+                    }
+                    user = userService.getById(userInvitation2.getPId());
+                    continue;
+                }
+
+
+                if (name.equals("jymall")) {
+                    stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c FROM " + name + ".orders AS o\n" +
+                            "        WHERE  o.`payTime` IS NOT NULL\n" +
+                            "        and o.`status` IN ( 201,301,401,402,501 )\n" +
+                            "        AND o.platform in('商城', '订货')\n" +
+                            "        AND o.id IN (\n" +
+                            "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) )\n" +
+                            "\t\t)\n" +
+                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')\n" +
+                            "        and o.userId  = '" + user.getId() + "'");
+                } else {
+                    stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c FROM " + name + ".orders AS o\n" +
+                            "        WHERE  o.`payTime` IS NOT NULL\n" +
+                            "        and o.`status` IN ( 201,301,401,402,501 )\n" +
+                            "        AND o.platform in('商城', '订货')\n" +
+                            "        AND o.id IN (\n" +
+                            "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) )\n" +
+                            "\t\t)\n" +
+                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = DATE_FORMAT(now(),'%Y-%m')\n" +
+                            "        and o.userId  = '" + user.getId() + "'"
+                    );
+                }
+
+
+                Map<String, Object> map2 = SqlRunner.db().selectOne(stringBuilder.toString());
+
+
+                if (ifAddclearing && (new BigDecimal(map2.get("c").toString())).compareTo(new BigDecimal(199)) == 1) {
+                    //  BigDecimal amt = price.multiply(new BigDecimal("0.01")).setScale(2, BigDecimal.ROUND_DOWN);
+                    System.out.println(user.getId());
+                    J++;
+                }
+
+                userInvitation = userInvitationService.getByUser(user.getId());
+                if (userInvitation == null) {
+                    break;
+                }
+
+                user = userService.getById(userInvitation.getPId());
+
+            } while (J <= 18);
+
         }
 
 
@@ -509,16 +636,16 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
         switch (headerStatus) {
             case 0:
-                if(StringUtils.isNotEmpty(openWaitStatus)){
+                if (StringUtils.isNotEmpty(openWaitStatus)) {
                     lqw.in(FundClearing::getStatus, FundClearing.Constants.已创建, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已出款);
-                }else{
+                } else {
                     lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款, FundClearing.Constants.已出款);
                 }
                 break;
             case 1:
-                if(StringUtils.isNotEmpty(openWaitStatus)){
+                if (StringUtils.isNotEmpty(openWaitStatus)) {
                     lqw.in(FundClearing::getStatus, FundClearing.Constants.已创建, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
-                }else{
+                } else {
                     lqw.in(FundClearing::getStatus, FundClearing.Constants.待审核, FundClearing.Constants.待出款);
                 }
                 break;

@@ -65,6 +65,15 @@
             and eu.account = #{account}
         </if>
     </select>
+    <select id="getUserNotService" resultType="com.jbp.common.response.UserInviteResponse">
+
+        select u.nickname,u.account,u.phone from eb_user_invitation e
+
+        left join eb_user u on u.id= e.uid
+        where  e.pid= #{uId}  and e.uid not in (select uid from eb_user_relation)
+
+
+    </select>
 
 
 </mapper>

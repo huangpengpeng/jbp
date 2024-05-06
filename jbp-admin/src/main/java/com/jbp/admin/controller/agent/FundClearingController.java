@@ -3,6 +3,7 @@ package com.jbp.admin.controller.agent;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearing;
+import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -14,6 +15,8 @@ import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.service.agent.UserInvitationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +41,15 @@ public class FundClearingController {
     private FundClearingService fundClearingService;
     @Resource
     private UserService userService;
-
+    @Resource
+    private UserInvitationService userInvitationService;
     @Resource
     private Environment environment;
     @Resource
     private SystemConfigService systemConfigService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
+
 
 
 
@@ -176,58 +183,16 @@ public class FundClearingController {
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:resellsave')")
     @PostMapping("/resellSave")
-    @ApiOperation("增加自定义佣金")
+    @ApiOperation("增加复销奖佣金")
     public CommonResult resellSave(@RequestBody String month) {
 
-
-        String repetition =  systemConfigService.getValueByKey("goods_repetition");
-
-        if(repetition.equals("0")){
-            return CommonResult.success("");
+        if (StringUtils.isBlank(month)) {
+            throw new RuntimeException("请选择月份");
         }
 
+        fundClearingService.addFgComm(month);
 
-        StringBuilder stringBuilder =new StringBuilder();
-
-        String name =environment.getProperty("historyOrder.name");
-        if(name.equals("jymall")){
-            stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c ,o.userId FROM " + name + ".orders AS o\n" +
-                    "        WHERE  o.`payTime` IS NOT NULL\n" +
-                    "        and o.`status` IN ( 201,301,401,402,501 )\n" +
-                    "        AND o.platform in('商城', '订货')\n" +
-                    "        AND o.id IN (\n" +
-                    "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) )\n" +
-                    "\t\t)\n" +
-                    "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = '"+month+"'   \n" +
-                    "   GROUP BY o.userId    "         );
-        }else {
-            stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c  ,o.userId FROM " + name + ".orders AS o\n" +
-                    "        WHERE  o.`payTime` IS NOT NULL\n" +
-                    "        and o.`status` IN ( 201,301,401,402,501 )\n" +
-                    "        AND o.platform in('商城', '订货')\n" +
-                    "        AND o.id IN (\n" +
-                    "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) )\n" +
-                    "\t\t)\n" +
-                    "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') = '"+month+"'\n" +
-                    "   GROUP BY o.userId    "
-            );
-        }
-
-
-       List< Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
-           // 新系统复销奖统计
-        //        String repetitionId =  systemConfigService.getValueByKey("goods_repetition_id");
-     //   BigDecimal salse = new BigDecimal(orderService.getGoodsPirce(repetitionId));
-
-        List<String> list =new ArrayList<>();
-        for (Map<String, Object> map :maps) {
-            //判断历史复销奖
-            if ( map.get("c") != null && (new BigDecimal(map.get("c").toString())).compareTo(new BigDecimal(199)) == 1) {
-                list.add(map.get("userId") == null ?"" :map.get("userId").toString());
-            }
-        }
-
-        return CommonResult.success(list);
+        return CommonResult.success();
     }
 
 

@@ -111,4 +111,7 @@ public interface FundClearingService extends IService<FundClearing> {
 
 
     void init();
+
+    void addFgComm(String month);
+
 }

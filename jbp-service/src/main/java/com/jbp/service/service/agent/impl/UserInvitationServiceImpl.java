@@ -269,4 +269,12 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         });
         return list(wrapper).size();
     }
+
+    @Override
+    public  PageInfo<UserInviteResponse> getUserNotService(PageParamRequest pageParamRequest) {
+
+        Page<UserInviteResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<UserInviteResponse> userInviteResponseList =  dao.getUserNotService(userService.getUserId());
+        return CommonPage.copyPageInfo(page, userInviteResponseList);
+    }
 }

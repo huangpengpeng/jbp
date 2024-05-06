@@ -1,24 +1,17 @@
 package com.jbp.front.controller;
 
 
-import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
-import com.jbp.common.request.agent.UserInvitationRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.CapaService;
-import com.jbp.service.service.agent.RelationScoreService;
-import com.jbp.service.service.agent.UserInvitationService;
-import com.jbp.service.service.agent.UserRelationService;
-
 import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,13 +22,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -434,6 +424,44 @@ public class UserController {
 
 
 
+    @ApiOperation(value = "获取用户的销售上级")
+    @RequestMapping(value = "/getUserInvitePanent", method = RequestMethod.GET)
+    public CommonResult getUserInvitePanent( ) {
+        Integer uid=  userService.getUserId();
+        return CommonResult.success(invitationService.getPid(uid));
+    }
+
+
+    @ApiOperation(value = "获取用户的服务上级")
+    @RequestMapping(value = "/getUserServicePanent", method = RequestMethod.GET)
+    public CommonResult getUserServicePanent( ) {
+        Integer uid=  userService.getUserId();
+        return CommonResult.success(relationService.getPid(uid));
+    }
+
+
+
+    @ApiOperation(value = "获取用户销售下级没有服务上级的客户")
+    @RequestMapping(value = "/getUserNotService", method = RequestMethod.GET)
+    public  CommonResult<CommonPage<UserInviteResponse>>  getUserNotService( PageParamRequest pageParamRequest) {
+        Integer uid=  userService.getUserId();
+        return CommonResult.success(CommonPage.restPage(invitationService.getUserNotService(pageParamRequest)));
+
+    }
+
+    @ApiOperation(value = "新增用户服务关系")
+    @RequestMapping(value = "/addUserService", method = RequestMethod.GET)
+    public  CommonResult  addUserService( String raccount ,String account,Integer node) {
+        //销售人
+        Integer uid=  userService.getUserId();
+        //服务人
+        User ruser =  userService.getByAccount(raccount);
+        //注册用户
+        User user =  userService.getByAccount(account);
+        relationService.band(user.getId(), ruser.getId(), uid, node);
+        return CommonResult.success();
+
+    }
 }
 
 
