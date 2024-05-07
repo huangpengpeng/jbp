@@ -39,5 +39,6 @@
 
   spring:
     profiles:
-      active: zhcx
+      active: sm
+
 

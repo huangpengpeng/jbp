@@ -45,7 +45,7 @@ public class UserVitalitpartnerController {
     public CommonResult<String> getList( ) {
 
         String repetition =  systemConfigService.getValueByKey("goods_partner");
-        if(repetition.equals("0")){
+        if(repetition.equals("'0'")){
             return CommonResult.success();
         }
 
@@ -66,7 +66,7 @@ public class UserVitalitpartnerController {
 
         String repetition =  systemConfigService.getValueByKey("goods_repetition");
 
-        if(repetition.equals("0")){
+        if(repetition.equals("'0'")){
             return CommonResult.success("");
         }
 
