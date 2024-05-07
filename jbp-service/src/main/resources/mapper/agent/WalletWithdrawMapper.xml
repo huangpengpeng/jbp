@@ -20,6 +20,8 @@
     <result column="bank_card_no" property="bankCode"/>
     <result column="real_name" property="realName"/>
     <result column="nickname" property="nickName"/>
+    <result column="phone" property="phone"/>
+    <result column="id_card_no" property="idCardNo"/>
 </resultMap>
     <sql id="selectwalletWithdraw">
         select w.id,
@@ -38,7 +40,10 @@
                asentity.real_name,
                card.bank_name,
                card.bank_card_no,
-               u.nickname
+               u.nickname,
+               u.phone,
+               asentity.id_card_no
+
         from eb_wallet_withdraw as w
                  LEFT JOIN eb_channel_identity AS asentity on asentity.uid = w.uid and asentity.channel = #{channelName}
                  left join eb_channel_card as card on card.uid = w.uid and card.channel = #{channelName}
