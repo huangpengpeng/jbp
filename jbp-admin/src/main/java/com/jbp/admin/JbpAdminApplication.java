@@ -34,6 +34,7 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 
+
     }
 
 }
