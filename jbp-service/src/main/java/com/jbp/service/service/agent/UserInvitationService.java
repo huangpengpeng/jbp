@@ -24,6 +24,8 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     Integer getPid(Integer uId);
 
+    List<UserInvitation> getByMid(Integer mid);
+
     List<UserUpperDto> getAllUpper(Integer uId);
 
     List<UserUpperDto> getNoMountAllUpper(Integer uId);

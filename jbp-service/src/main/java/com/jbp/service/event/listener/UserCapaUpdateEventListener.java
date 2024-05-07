@@ -1,9 +1,10 @@
 package com.jbp.service.event.listener;
 
-import com.google.common.collect.Maps;
+import com.beust.jcommander.internal.Sets;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserInvitationJump;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.event.UserCapaUpdateEvent;
@@ -21,9 +22,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -53,7 +54,10 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         }
         // 达到最大等级切换关系
         UserCapaUpdateEvent.EventDto eventDto = userCapaUpdateEvent.getEventDto();
+        // 店主 等级
         Long maxCapaId = capaService.getMaxCapa().getId();
+        // VIP 等级
+        Capa pre = capaService.getPre(maxCapaId).get(0);
         // 1.没有达到最大等级跳出
         if (NumberUtils.compare(eventDto.getTagCapaId(), maxCapaId) < 0) {
             return;
@@ -72,38 +76,69 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         if (orgPid == null || orgPid.intValue() == zdUser.getId().intValue()) {
             return;
         }
-        // 3.断开自己的上级 和 一阶的上级
+
+        // 3.断开自己的上级
         userInvitationService.del(userCapa.getUid());
         // 4.自己绑定总店
         userInvitationService.band(userCapa.getUid(), zdUser.getId(), false, true, true);
         invitationJumpService.add(userCapa.getUid(), zdUser.getId(), orgPid);
 
-        // 5..全部一阶断开
+        // 获取自己的一阶
         List<UserInvitation> nextList = userInvitationService.getNextList(userCapa.getUid());
-        nextList = nextList.stream().sorted(Comparator.comparing(UserInvitation::getUId)).collect(Collectors.toList());
-
-        //  6.满足培育下级的级别
-        List<Capa> pre = capaService.getPre(maxCapaId);
-        List<Long> usableCapaIdList = pre.stream().map(Capa::getId).collect(Collectors.toList());
-
-        // 7.一阶绑定原有上级
-        int j = 0;
-        for (int i = 0; i < nextList.size(); i++) {
-            Integer nextUId = nextList.get(i).getUId();
-
-            UserCapa nextUserCapa = userCapaService.getByUser(nextUId);
-            // 没有培育上级 等级满足下一级别 没有跳过关系
-            if (nextList.get(i).getMId() == null && nextUserCapa != null && usableCapaIdList.contains(nextUserCapa.getCapaId()) && !invitationJumpService.ifJump(nextUId)) {
-                if (j < 2) {
-                    userInvitationService.del(nextUId);
-                    userInvitationService.band(nextUId, orgPid, false, true, true);
-                    UserInvitation invitation = userInvitationService.getByUser(nextUId);
-                    invitation.setMId(userCapa.getUid());
-                    userInvitationService.updateById(invitation);
-                    invitationJumpService.add(nextUId, orgPid, userCapa.getUid());
-                    j++;
+        // 5.获取培育下级 有且仅有2个培育下级
+        List<UserInvitation> mNextList = userInvitationService.getByMid(userCapa.getUid());
+        Integer num = 2 - mNextList.size();
+        Set<Integer> peiyuNextList = Sets.newHashSet();
+        if (num > 0) {
+            List<Integer> mUserList = mNextList.stream().map(UserInvitation::getUId).collect(Collectors.toList());
+            LinkedList<UserInvitationJump> jumpList = invitationJumpService.getFirst4OrgPid(userCapa.getUid());
+            for (UserInvitationJump jump : jumpList) {
+                UserCapa nextCapa = userCapaService.getByUser(jump.getUId());
+                if (nextCapa != null && nextCapa.getCapaId().intValue() >= pre.getId().intValue() && !mUserList.contains(nextCapa.getUid())) {
+                    peiyuNextList.add(jump.getUId());
+                }
+                if (peiyuNextList.size() == num) {
+                    break;
+                }
+            }
+            if (peiyuNextList.size() < num) {
+                for (UserInvitation invitation : nextList) {
+                    if (!invitationJumpService.ifJump(invitation.getUId()) && invitation.getMId() == null) {
+                        UserCapa nextCapa = userCapaService.getByUser(invitation.getUId());
+                        if (nextCapa != null && nextCapa.getCapaId().intValue() >= pre.getId().intValue() && !mUserList.contains(nextCapa.getUid())) {
+                            peiyuNextList.add(invitation.getUId());
+                        }
+                        if (peiyuNextList.size() == num) {
+                            break;
+                        }
+                    }
                 }
             }
         }
+
+        // 断开一阶
+        for (UserInvitation invitation : nextList) {
+            Integer nextUId = invitation.getUId();
+            Integer mId = invitation.getMId();
+            UserCapa nextUserCapa = userCapaService.getByUser(nextUId);
+            if (nextUserCapa != null && nextUserCapa.getCapaId().intValue() >= pre.getId().intValue()) {
+                userInvitationService.del(nextUId);
+                userInvitationService.band(nextUId, orgPid, false, true, true);
+                if (mId != null && mId.intValue() > 0) {
+                    invitation = userInvitationService.getByUser(nextUId);
+                    invitation.setMId(mId);
+                    userInvitationService.updateById(invitation);
+                }
+                invitationJumpService.add(nextUId, orgPid, userCapa.getUid());
+            }
+        }
+
+        // 设置自己的培育下级
+        for (Integer uid : peiyuNextList) {
+            UserInvitation invitation = userInvitationService.getByUser(uid);
+            invitation.setMId(userCapa.getUid());
+            userInvitationService.updateById(invitation);
+        }
+
     }
 }
