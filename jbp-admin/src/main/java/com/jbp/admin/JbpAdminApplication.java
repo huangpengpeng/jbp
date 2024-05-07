@@ -1,8 +1,11 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.controller.agent.FundClearingController;
 import com.jbp.common.request.OrderRefundAuditRequest;
+import com.jbp.common.request.agent.FundClearingMonthRequest;
 import com.jbp.service.service.RefundOrderService;
+import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.impl.RefundOrderServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -32,6 +35,8 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+        FundClearingService fundClearingController =run.getBean(FundClearingService.class);
+        fundClearingController.addFgComm("2024-04");
     }
 
 }
