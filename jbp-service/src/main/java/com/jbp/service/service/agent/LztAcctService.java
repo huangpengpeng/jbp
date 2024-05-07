@@ -7,7 +7,6 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public interface LztAcctService extends IService<LztAcct> {
 

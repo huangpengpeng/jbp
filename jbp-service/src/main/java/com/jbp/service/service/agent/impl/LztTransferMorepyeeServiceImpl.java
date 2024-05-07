@@ -52,7 +52,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     private MerchantService merchantService;
 
     @Override
-    public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
+    public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt, BigDecimal feeAmount,
                                                 String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String postscript) {
         if(StringUtils.isEmpty(orderNo)){
             orderNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
@@ -77,7 +77,8 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
         TransferMorepyeeResult result = lztService.transferMorepyee(payInfo.getOidPartner(), payInfo.getPriKey(),
                 payerId, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl, merchant.getPhone(), merchant.getCreateTime(), merchant.getFrmsWareCategory());
-        LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno());
+        
+        LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, feeAmount, postscript, result, result.getAccp_txno());
         save(transferMorepyee);
         return transferMorepyee;
     }

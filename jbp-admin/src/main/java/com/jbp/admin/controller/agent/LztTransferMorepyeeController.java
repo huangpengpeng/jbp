@@ -41,7 +41,7 @@ public class LztTransferMorepyeeController {
     @ApiOperation(value = "来账通内部代发")
     @GetMapping(value = "/create")
     public CommonResult<LztTransferMorepyee> apply(HttpServletRequest request, String payerId, String payeeId, String payCode,
-                                                   String pwd, BigDecimal amt, String randomKey) {
+                                                   String pwd, BigDecimal amt, String randomKey, BigDecimal feeAmount) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(payerId);
@@ -53,7 +53,7 @@ public class LztTransferMorepyeeController {
             throw new CrmebException("收款款用户不存在");
         }
         String ip = CrmebUtil.getClientIp(request);
-        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, "服务费", pwd, randomKey, payeeId, ip, "服务费");
+        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, feeAmount,"服务费", pwd, randomKey, payeeId, ip, "服务费");
         if(StringUtils.isNotEmpty(acct.getPhone())){
             String phone = acct.getPhone();
             result.setRegMsg("短信已发送至: " + phone.substring(0, 3) + "****" + phone.substring(7, phone.length()) + " 请注意查收");

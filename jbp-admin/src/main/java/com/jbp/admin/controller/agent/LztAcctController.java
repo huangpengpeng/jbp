@@ -7,10 +7,7 @@ import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
-import com.jbp.common.model.agent.LztTransfer;
-import com.jbp.common.model.agent.LztWithdrawal;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -20,10 +17,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.*;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.agent.LztAcctApplyService;
-import com.jbp.service.service.agent.LztAcctService;
-import com.jbp.service.service.agent.LztTransferService;
-import com.jbp.service.service.agent.LztWithdrawalService;
+import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
@@ -56,6 +50,8 @@ public class LztAcctController {
     private LztTransferService lztTransferService;
     @Resource
     private LztWithdrawalService lztWithdrawalService;
+    @Resource
+    private LztTransferMorepyeeService lztTransferMorepyeeService;
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:info')")
     @GetMapping("/info")
@@ -219,6 +215,10 @@ public class LztAcctController {
 
                     if(StringUtils.equals("内部代发", acctBalList.getTxn_type())){
                         acctBalList.setTxn_type("转账");
+                        LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(acctBalList.getJno_cli());
+                        if(lztTransferMorepyee != null){
+                            acctBalList.setFeeAmount(lztTransferMorepyee.getFeeAmount());
+                        }
                     }
                     if(StringUtils.equals("外部代发", acctBalList.getTxn_type())){
                         acctBalList.setTxn_type("代付");

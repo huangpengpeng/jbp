@@ -28,7 +28,7 @@ import java.util.Date;
 public class LztTransferMorepyee extends BaseModel {
 
     public LztTransferMorepyee(Integer merId, String payerId, String payerName,  String payeeId, String payeeName, String txnSeqno,
-                               BigDecimal amt, String postscript, TransferMorepyeeResult orderRet, String accpTxno) {
+                               BigDecimal amt, BigDecimal feeAmount, String postscript, TransferMorepyeeResult orderRet, String accpTxno) {
         this.merId = merId;
         this.payerId = payerId;
         this.payeeId = payeeId;
@@ -36,6 +36,7 @@ public class LztTransferMorepyee extends BaseModel {
         this.payeeName = payeeName;
         this.txnSeqno = txnSeqno;
         this.amt = amt;
+        this.feeAmount = feeAmount;
         this.postscript = postscript;
         this.orderRet = orderRet;
         this.txnStatus = LianLianPayConfig.TxnStatus.交易处理中.getName();
@@ -67,6 +68,9 @@ public class LztTransferMorepyee extends BaseModel {
 
     @ApiModelProperty(value = "金额")
     private BigDecimal amt;
+
+    @ApiModelProperty(value = "手续费")
+    private BigDecimal feeAmount;
 
     @ApiModelProperty(value = "说明")
     private String postscript;
