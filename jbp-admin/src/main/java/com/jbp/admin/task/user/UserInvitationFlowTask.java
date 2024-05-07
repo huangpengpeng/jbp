@@ -53,18 +53,18 @@ public class UserInvitationFlowTask {
             }
 
             // 查询所有没团队的
-            String sql = " select * from eb_user where id not in(select uid from eb_team_user) ";
-            List<Map<String, Object>> maps = SqlRunner.db().selectList(sql);
-            for (Map<String, Object> map : maps) {
-
-                UserInvitation userInvitation = userInvitationService.getByUser(MapUtils.getInteger(map, "id"));
-                if(userInvitation != null && userInvitation.getPId() != null){
-                     TeamUser teamUser = teamUserService.getByUser(userInvitation.getPId());
-                     if(teamUser != null){
-                         teamUserService.save(MapUtils.getInteger(map, "id"), teamUser.getTid());
-                     }
-                }
-            }
+//            String sql = " select * from eb_user where id not in(select uid from eb_team_user) ";
+//            List<Map<String, Object>> maps = SqlRunner.db().selectList(sql);
+//            for (Map<String, Object> map : maps) {
+//
+//                UserInvitation userInvitation = userInvitationService.getByUser(MapUtils.getInteger(map, "id"));
+//                if(userInvitation != null && userInvitation.getPId() != null){
+//                     TeamUser teamUser = teamUserService.getByUser(userInvitation.getPId());
+//                     if(teamUser != null){
+//                         teamUserService.save(MapUtils.getInteger(map, "id"), teamUser.getTid());
+//                     }
+//                }
+//            }
 
 
 

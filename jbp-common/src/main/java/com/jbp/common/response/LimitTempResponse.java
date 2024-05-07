@@ -81,4 +81,7 @@ public class LimitTempResponse {
     @ApiModelProperty(value = "限购结束时间")
     private Date buyLimitEndTime;
 
+    @ApiModelProperty(value = "单次购买最大数量")
+    private Integer oneTimeNum;
+
 }

@@ -166,7 +166,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
             if (twoId != null) {
                 BigDecimal twoFee = totalPv.multiply(rule.getTwoRatio());
                 FundClearing twoFund = new FundClearing();
-                twoFund.setUid(oneUserInvitation.getMId());
+                twoFund.setUid(twoId);
                 twoFund.setCommName("间推");
                 twoFund.setCommAmt(twoFee);
                 list.add(twoFund);
@@ -181,7 +181,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
         Map<Integer, List<FundClearing>> fundClearingMap = FunctionUtil.valueMap(list, FundClearing::getUid);
         fundClearingMap.forEach((uid, fundClearingList) -> {
             String description = "";
-            Map<BigDecimal, List<FundClearing>> map = FunctionUtil.valueMap(fundClearingList, FundClearing::getCommAmt);
+            Map<String, List<FundClearing>> map = FunctionUtil.valueMap(fundClearingList, FundClearing::getCommName);
             BigDecimal totalAmt = BigDecimal.ZERO;
             List<FundClearing> fundClearings1 = map.get("直推");
             if (CollectionUtils.isNotEmpty(fundClearings1)) {
@@ -203,7 +203,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 description = description + "培育获奖:" + totalAmt;
             }
             fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.报单佣金.getName(),
-                    totalAmt, null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
+                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
         });
     }
 

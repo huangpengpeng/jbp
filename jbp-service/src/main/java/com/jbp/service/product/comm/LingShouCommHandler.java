@@ -157,7 +157,7 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
         Map<Integer, List<FundClearing>> fundClearingMap = FunctionUtil.valueMap(list, FundClearing::getUid);
         fundClearingMap.forEach((uid, fundClearingList) -> {
             String description = "";
-            Map<BigDecimal, List<FundClearing>> map = FunctionUtil.valueMap(fundClearingList, FundClearing::getCommAmt);
+            Map<String, List<FundClearing>> map = FunctionUtil.valueMap(fundClearingList, FundClearing::getCommName);
             BigDecimal totalAmt = BigDecimal.ZERO;
             List<FundClearing> fundClearings1 = map.get("直推");
             if (CollectionUtils.isNotEmpty(fundClearings1)) {
@@ -172,7 +172,7 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
                 description = description + "培育获奖:" + totalAmt;
             }
             fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.零售佣金.getName(),
-                    totalAmt, null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.零售佣金.getName() + "【" + description + "】", "");
+                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.零售佣金.getName() + "【" + description + "】", "");
         });
     }
 

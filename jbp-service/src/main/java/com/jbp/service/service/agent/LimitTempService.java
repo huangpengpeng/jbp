@@ -17,7 +17,7 @@ public interface LimitTempService extends IService<LimitTemp> {
                   List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner,
                   List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation,
                   List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
-                  int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, String description);
+                  int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum, String description);
 
     List<Long> hasLimits(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList, Integer pId, Integer rId);
 
@@ -32,7 +32,7 @@ public interface LimitTempService extends IService<LimitTemp> {
                 List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner,
                 List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation, List<Long> rCapaIdList,
                 List<Long> rCapaXsIdList, Boolean hasBuyLimit,
-                int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, String description);
+                int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum, String description);
 
     LimitTempResponse details(Integer id);
 }

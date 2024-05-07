@@ -7,6 +7,10 @@ import com.jbp.common.request.agent.FundClearingMonthRequest;
 import com.jbp.service.service.RefundOrderService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.impl.RefundOrderServiceImpl;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.service.event.EventPublisherContext;
+import com.jbp.service.event.UserCapaUpdateEvent;
+import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,6 +41,7 @@ public class JbpAdminApplication {
 
         FundClearingService fundClearingController =run.getBean(FundClearingService.class);
         fundClearingController.addFgComm("2024-04");
+
     }
 
 }
