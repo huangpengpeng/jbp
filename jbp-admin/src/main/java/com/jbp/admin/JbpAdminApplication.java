@@ -39,8 +39,6 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        FundClearingService fundClearingController =run.getBean(FundClearingService.class);
-        fundClearingController.addFgComm("2024-04");
 
     }
 
