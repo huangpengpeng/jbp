@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
@@ -123,6 +124,7 @@ public class LimitTemp extends BaseModel {
     private Date buyLimitEndTime;
 
     @ApiModelProperty(value = "单次购买最大数量")
+    @TableField(value="one_time_num", updateStrategy = FieldStrategy.IGNORED)
     private Integer oneTimeNum;
 
     @ApiModelProperty(value = "说明")

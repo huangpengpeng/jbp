@@ -77,43 +77,32 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         // 4.自己绑定总店
         userInvitationService.band(userCapa.getUid(), zdUser.getId(), false, true, true);
         invitationJumpService.add(userCapa.getUid(), zdUser.getId(), orgPid);
+
         // 5..全部一阶断开
         List<UserInvitation> nextList = userInvitationService.getNextList(userCapa.getUid());
         nextList = nextList.stream().sorted(Comparator.comparing(UserInvitation::getUId)).collect(Collectors.toList());
-        // 记录历史培育上级
-        Map<Integer, Integer> mMap = Maps.newConcurrentMap();
-        for (UserInvitation invitation : nextList) {
-            if (invitation.getMId() != null) {
-                mMap.put(invitation.getUId(), invitation.getMId());
-            }
-            userInvitationService.del(invitation.getUId());
-        }
-        //  6..满足培育下级的级别
+
+        //  6.满足培育下级的级别
         List<Capa> pre = capaService.getPre(maxCapaId);
         List<Long> usableCapaIdList = pre.stream().map(Capa::getId).collect(Collectors.toList());
+
         // 7.一阶绑定原有上级
         int j = 0;
         for (int i = 0; i < nextList.size(); i++) {
-            UserInvitation invitation = nextList.get(i);
-            userInvitationService.band(invitation.getUId(), orgPid, false, true, true);
-            invitation = userInvitationService.getByUser(invitation.getUId());
-            // 绑定原来的培育
-            if (mMap.get(invitation.getUId()) != null) {
-                invitation.setMId(mMap.get(invitation.getUId()));
-                userInvitationService.updateById(invitation);
-            }
-            // 8.增加关系跳转
-            invitationJumpService.add(invitation.getUId(), orgPid, userInvitation.getPId());
-            // 9.增加培育
-            UserCapa nextUserCapa = userCapaService.getByUser(invitation.getUId());
+            Integer nextUId = nextList.get(i).getUId();
+
+            UserCapa nextUserCapa = userCapaService.getByUser(nextUId);
             // 没有培育上级 等级满足下一级别 没有跳过关系
-            if (invitation.getMId() == null && nextUserCapa != null && usableCapaIdList.contains(nextUserCapa.getCapaId()) && !invitationJumpService.ifJump(invitation.getUId())) {
+            if (nextList.get(i).getMId() == null && nextUserCapa != null && usableCapaIdList.contains(nextUserCapa.getCapaId()) && !invitationJumpService.ifJump(nextUId)) {
                 if (j < 2) {
-                    invitation = userInvitationService.getByUser(invitation.getUId());
+                    userInvitationService.del(nextUId);
+                    userInvitationService.band(nextUId, orgPid, false, true, true);
+                    UserInvitation invitation = userInvitationService.getByUser(nextUId);
                     invitation.setMId(userCapa.getUid());
                     userInvitationService.updateById(invitation);
+                    invitationJumpService.add(nextUId, orgPid, userCapa.getUid());
+                    j++;
                 }
-                j++;
             }
         }
     }
