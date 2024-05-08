@@ -40,7 +40,6 @@ public class MerchantExpressController {
     @Autowired
     private ExpressService expressService;
 
-    @PreAuthorize("hasAuthority('merchant:express:all')")
     @ApiOperation(value = "查询全部物流公司")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     @ApiImplicitParam(name = "type", value = "类型：normal-普通，elec-电子面单", required = true)
@@ -48,7 +47,6 @@ public class MerchantExpressController {
         return CommonResult.success(expressService.findAll(type));
     }
 
-    @PreAuthorize("hasAuthority('merchant:express:template')")
     @ApiOperation(value = "查询物流公司面单模板")
     @RequestMapping(value = "/template", method = RequestMethod.GET)
     @ApiImplicitParam(name = "com", value = "快递公司编号", required = true)
