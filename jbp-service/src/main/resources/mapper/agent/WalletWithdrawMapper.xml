@@ -93,6 +93,8 @@
         <result column="bank_card_no" property="bankCode"/>
         <result column="real_name" property="realName"/>
         <result column="nickname" property="nickName"/>
+        <result column="id_card_no" property="idCardNo"/>
+        <result column="phone" property="phone"/>
     </resultMap>
     <select id="excel" resultMap="excelVo">
         <include refid="selectwalletWithdraw"/>

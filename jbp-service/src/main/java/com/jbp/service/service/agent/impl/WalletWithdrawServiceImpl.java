@@ -100,6 +100,8 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         head.put("bankCode", "银行卡号");
         head.put("realName", "真实姓名");
         head.put("nickName","用户昵称");
+        head.put("idCardNo","身份证");
+        head.put("phone","手机号");
         JSONArray array = new JSONArray();
         head.forEach((k,v)->{
             JSONObject json = new JSONObject();
