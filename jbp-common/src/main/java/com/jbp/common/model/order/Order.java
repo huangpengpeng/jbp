@@ -165,6 +165,10 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "是否被拉取")
     private Boolean ifPull;
 
+    @ApiModelProperty(value = "是否用户确认收货")
+    private Boolean ifUserVerifyReceive;
+
+
     @Version
     @TableField(value = "version", fill = FieldFill.INSERT)
     private Integer version = 1;

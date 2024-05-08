@@ -12,6 +12,7 @@ import com.jbp.common.utils.IPUtil;
 import com.jbp.common.vo.DeclUserInfoResultVo;
 import com.jbp.common.vo.LogisticsResultVo;
 import com.jbp.front.service.FrontOrderService;
+import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderExtService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.UserService;
@@ -59,6 +60,9 @@ public class OrderController {
     private OrderService service;
     @Autowired
     private OrderExtService orderExtService;
+    @Autowired
+    private OrderDetailService orderDetailService;
+
 
 
     @ApiOperation(value = "预下单")
@@ -141,6 +145,13 @@ public class OrderController {
     @RequestMapping(value = "/take/delivery/{orderNo}", method = RequestMethod.POST)
     public CommonResult<String> take(@PathVariable(value = "orderNo") String orderNo) {
         if (orderService.takeDelivery(orderNo)) {
+
+           Order order = service.getByOrderNo(orderNo);
+           if(order != null){
+               order.setIfUserVerifyReceive(true);
+               service.updateById(order);
+           }
+
             return CommonResult.success("订单收货成功");
         }
         return CommonResult.failed("订单收货失败");
