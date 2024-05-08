@@ -429,7 +429,14 @@ public class UserController {
     @RequestMapping(value = "/getUserInvitePanent", method = RequestMethod.GET)
     public CommonResult getUserInvitePanent() {
         Integer uid=  userService.getUserId();
-        return CommonResult.success(invitationService.getPid(uid));
+
+       Integer pid  = invitationService.getPid(uid);
+       User user = null;
+       if(pid != null){
+           user = userService.getById(pid);
+       }
+
+        return CommonResult.success(user);
     }
 
 
