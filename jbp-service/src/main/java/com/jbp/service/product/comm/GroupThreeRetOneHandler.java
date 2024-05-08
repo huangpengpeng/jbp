@@ -113,6 +113,9 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
 
         Integer pid = invitationService.getPid(order.getUid());
         UserCapa userCapa = userCapaService.getByUser(pid);
+        if(userCapa == null){
+            return;
+        }
 
         for (OrderDetail orderDetail : orderDetailList) {
 

@@ -59,4 +59,13 @@ public class UserInviteInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "是否挂载")
     private Boolean ifMonth;
+
+    @ApiModelProperty(value = "mid")
+    private Integer mid;
+
+    @ApiModelProperty(value = "mnickname")
+    private String mnickname;
+
+    @ApiModelProperty(value = "mphone")
+    private String mphone;
 }
