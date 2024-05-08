@@ -67,4 +67,7 @@ public class LoginAdminResponse implements Serializable {
 
     @ApiModelProperty(value = "商户小票打印开关：0关闭，1=手动打印，2=自动打印，3=自动和手动")
     private Integer merReceiptPrintingSwitch;
+
+    @ApiModelProperty(value = "供应商名称")
+    private String supplyName;
 }
