@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,25 +50,32 @@ public class UserInvitationJumpServiceImpl extends ServiceImpl<UserInvitationJum
     @Override
     public PageInfo<UserInvitationJumpListResponse> pageList(Integer uid, Integer pid, Integer orgPid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserInvitationJump> lqw = new LambdaQueryWrapper<UserInvitationJump>()
-                .eq(!ObjectUtil.isNull(uid),UserInvitationJump::getUId, uid)
-                .eq(!ObjectUtil.isNull(pid),UserInvitationJump::getPId, pid)
-                .eq(!ObjectUtil.isNull(orgPid),UserInvitationJump::getOrgPid, orgPid);
+                .eq(!ObjectUtil.isNull(uid), UserInvitationJump::getUId, uid)
+                .eq(!ObjectUtil.isNull(pid), UserInvitationJump::getPId, pid)
+                .eq(!ObjectUtil.isNull(orgPid), UserInvitationJump::getOrgPid, orgPid);
         Page<UserInvitationJump> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserInvitationJump> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
         }
+        List<Integer> collect = list.stream().map(UserInvitationJump::getUId).collect(Collectors.toList());
+        List<Integer> collect2 = list.stream().map(UserInvitationJump::getOrgPid).collect(Collectors.toList());
+        List<Integer> collect3 = list.stream().map(UserInvitationJump::getPId).collect(Collectors.toList());
+        collect.addAll(collect2);
+        collect.addAll(collect3);
+        Map<Integer, User> uidMapList = userService.getUidMapList(collect);
+
         List<UserInvitationJumpListResponse> responseList = list.stream().map(e -> {
             UserInvitationJumpListResponse response = new UserInvitationJumpListResponse();
-            User byUid = userService.getById(e.getUId());
+            User user = uidMapList.get(e.getUId());
             response.setUId(e.getUId());
-            response.setUaccount(byUid.getAccount());
-            User byPid = userService.getById(e.getPId());
+            response.setUaccount(user.getAccount());
+            User puser = uidMapList.get(e.getPId());
             response.setPId(e.getPId());
-            response.setPaccount(byPid.getAccount());
-            User byOrgPid = userService.getById(e.getOrgPid());
+            response.setPaccount(puser.getAccount());
+            User orgPUser = uidMapList.get(e.getOrgPid());
             response.setOrgPid(e.getOrgPid());
-            response.setOaccount(byOrgPid.getAccount());
+            response.setOaccount(orgPUser.getAccount());
             response.setGmtCreated(e.getGmtCreated());
             return response;
         }).collect(Collectors.toList());
