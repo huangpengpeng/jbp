@@ -2,6 +2,7 @@ package com.jbp.front.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
@@ -18,6 +19,7 @@ import com.jbp.common.response.UserWalletInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.service.product.comm.CommAliasNameSmEnum;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
@@ -26,6 +28,7 @@ import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +59,8 @@ public class WalletController {
     private WalletWithdrawService walletWithdrawService;
     @Resource
     private SystemConfigService systemConfigService;
-
+    @Resource
+    private Environment environment;
 
     @PostMapping("/identity")
     @ApiOperation("认证")
@@ -126,7 +130,18 @@ public class WalletController {
         PageParamRequest pageParamRequest = new PageParamRequest();
         pageParamRequest.setLimit(request.getLimit());
         pageParamRequest.setPage(request.getPage());
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageWalletList(userService.getUserId(), request.getType(), request.getAction(), pageParamRequest)));
+
+        PageInfo<WalletFlow> pageInfo = walletFlowService.pageWalletList(userService.getUserId(), request.getType(), request.getAction(), pageParamRequest);
+
+       List<WalletFlow> walletFlow =   pageInfo.getList();
+        String name = environment.getProperty("spring.profiles.active");
+        if(name.equals("sm") || name.equals("yk")  || name.equals("tf") ){
+            walletFlow.forEach(e->{
+                e.setPostscript(CommAliasNameSmEnum.getAliasNameReplaceName(e.getPostscript()));
+            });
+        }
+
+        return CommonResult.success(CommonPage.restPage(pageInfo));
     }
 
 

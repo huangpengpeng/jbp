@@ -23,6 +23,7 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.product.comm.CommAliasNameEnum;
+import com.jbp.service.product.comm.CommAliasNameSmEnum;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.SystemConfigService;
@@ -381,6 +382,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     @Override
     public PageInfo<FundClearing> flowGet(Integer uid, Integer headerStatus, PageParamRequest pageParamRequest) {
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
+        String name = environment.getProperty("spring.profiles.active");
 
         LambdaQueryWrapper<FundClearing> lqw = new LambdaQueryWrapper<>();
         setFundClearingWrapperByStatus(lqw, uid, headerStatus);
@@ -395,7 +397,11 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
             e.setSendAmt(e.getSendAmt().multiply(wallet_pay_integral));
-            e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
+            if(name.equals("sm") || name.equals("yk")  || name.equals("tf") ){
+                e.setDescription(CommAliasNameSmEnum.getAliasNameReplaceName(e.getDescription()));
+            }else{
+                e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
+            }
             for (FundClearingItem item : e.getItems()) {
                 WalletConfig walletConfig = walletMap.get(item.getWalletType());
                 item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
