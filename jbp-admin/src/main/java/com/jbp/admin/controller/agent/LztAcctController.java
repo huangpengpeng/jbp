@@ -218,6 +218,8 @@ public class LztAcctController {
                         LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(acctBalList.getJno_cli());
                         if(lztTransferMorepyee != null){
                             acctBalList.setFeeAmount(lztTransferMorepyee.getFeeAmount());
+                        }else{
+                            acctBalList.setFeeAmount(BigDecimal.ZERO.setScale(2));
                         }
                     }
                     if(StringUtils.equals("外部代发", acctBalList.getTxn_type())){
@@ -225,6 +227,8 @@ public class LztAcctController {
                         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
                         if(lztTransfer != null){
                             acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
+                        }else{
+                            acctBalList.setFeeAmount(BigDecimal.ZERO.setScale(2));
                         }
                     }
                     if(StringUtils.equals("账户提现", acctBalList.getTxn_type())){
@@ -371,5 +375,7 @@ public class LztAcctController {
         }
         return CommonResult.success(feeAmount);
     }
+
+
 
 }
