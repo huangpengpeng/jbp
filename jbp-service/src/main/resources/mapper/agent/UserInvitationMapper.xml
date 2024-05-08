@@ -63,7 +63,7 @@
         LEFT JOIN eb_capa_xs xc ON xc.id = xec.capa_id
         left join (select count(1)  as orderCount,uid from eb_order  where status in (1,2,3,4,5,6) GROUP BY uid ) eo on eo.uid = ei.uId
         left join eb_user mu on mu.id  = ei.mid
-        where (ei.pId = #{uId} or ei.uid =  #{uId})
+        where (ei.pId = #{uId} or ei.mid =  #{uId})
 
         <if test="account!='' and account!= null ">
             and eu.account = #{account}

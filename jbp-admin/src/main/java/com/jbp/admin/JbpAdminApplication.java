@@ -2,6 +2,7 @@ package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.agent.FundClearingController;
+import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.request.OrderRefundAuditRequest;
 import com.jbp.common.request.agent.FundClearingMonthRequest;
 import com.jbp.service.service.RefundOrderService;
@@ -40,6 +41,8 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 
+//        OrderPaySuccessTask orderPaySuccessTask =  run.getBean(OrderPaySuccessTask.class);
+//        orderPaySuccessTask.orderPayAfter();
 
     }
 

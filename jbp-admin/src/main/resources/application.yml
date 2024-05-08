@@ -39,6 +39,6 @@
 
   spring:
     profiles:
-      active: sm
+      active: yk
 
 
