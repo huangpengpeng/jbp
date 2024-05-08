@@ -459,7 +459,7 @@ public class UserController {
         User ruser =  userService.getByAccount(raccount);
         //注册用户
         User user =  userService.getByAccount(account);
-        relationService.band(user.getId(), ruser.getId(), uid, node);
+        relationService.band(user.getId(), ruser.getId(), null, node);
         return CommonResult.success();
 
     }
