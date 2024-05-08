@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserInvitationJump;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationJumpService;
 import com.jbp.service.service.agent.UserInvitationService;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -61,9 +63,20 @@ public class CapaInviteOneLevelHandler implements ConditionHandler {
         for (UserInvitation userInvitation : nextList) {
             UserCapa userCapa = userCapaService.getByUser(userInvitation.getUId());
             if (userCapa != null && userCapa.getCapaId().compareTo(rule.getCapaId()) >= 0) {
-                if(!invitationJumpService.ifJump(userInvitation.getUId())){
+                if (!invitationJumpService.ifJump(userInvitation.getUId())) {
                     num++;
                 }
+            }
+            if (num >= rule.getNum()) {
+                return true;
+            }
+        }
+
+        LinkedList<UserInvitationJump> linkedList = invitationJumpService.getFirst4OrgPid(uid);
+        for (UserInvitationJump jump : linkedList) {
+            UserCapa userCapa = userCapaService.getByUser(jump.getUId());
+            if (userCapa != null && userCapa.getCapaId().compareTo(rule.getCapaId()) >= 0) {
+                num++;
             }
             if (num >= rule.getNum()) {
                 return true;
