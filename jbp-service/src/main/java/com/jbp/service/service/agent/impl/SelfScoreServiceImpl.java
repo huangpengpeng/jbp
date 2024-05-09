@@ -67,9 +67,9 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     }
 
     @Override
-    public PageInfo<SelfScore> pageTeamList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScore> pageTeamList(Integer uid,String startPayTime,String endPayTime, PageParamRequest pageParamRequest) {
         Page<SelfScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<SelfScore> list =selfScoreDao.getTeamUserScore(uid);
+        List<SelfScore> list =selfScoreDao.getTeamUserScore(uid,startPayTime,endPayTime);
         if(CollectionUtils.isEmpty(list)){
             return CommonPage.copyPageInfo(page, list);
         }

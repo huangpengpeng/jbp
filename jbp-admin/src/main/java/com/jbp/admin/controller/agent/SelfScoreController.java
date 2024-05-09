@@ -56,6 +56,6 @@ public class SelfScoreController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreService.pageTeamList(uid ,pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreService.pageTeamList(uid ,request.getStartPayTime(),request.getEndPayTime(),pageParamRequest)));
     }
 }

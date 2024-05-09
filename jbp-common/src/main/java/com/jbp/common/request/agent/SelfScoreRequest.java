@@ -16,4 +16,9 @@ public class SelfScoreRequest implements Serializable {
     @ApiModelProperty("账户")
     private String account;
 
+    @ApiModelProperty("开始时间")
+    private String startPayTime;
+    @ApiModelProperty("结束时间")
+    private String endPayTime;
+
 }
