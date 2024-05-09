@@ -101,16 +101,13 @@
                c.external_no,
                c.comm_name,
                c.comm_amt,
-               c.items,
                c.send_amt,
-               c.user_info,
                c.description,
                c.clearing_time,
                c.status,
                c.if_refund,
                c.remark,
                c.create_time,
-               c.product_list,
                u.account,
                u.nickname,
                t.name,
@@ -127,7 +124,7 @@
                  LEFT JOIN eb_channel_identity AS asentity on asentity.uid = c.uid and asentity.channel=#{channelName}
                  left join eb_channel_card as card on card.uid = c.uid  and card.channel=#{channelName}
     </sql>
-    <resultMap id="FundClearingVo" type="com.jbp.common.vo.FundClearingVo">
+    <resultMap id="FundClearingVo" type="com.jbp.common.excel.FundClearingExcel">
         <id column="id" property="id"/>
         <result column="uid" property="uid"/>
         <result column="unique_no" property="uniqueNo"/>
@@ -149,13 +146,11 @@
         <result column="bank_name" property="bankName"/>
         <result column="bank_card_no" property="bankCode"/>
         <result column="name" property="teamName"/>
-        <result column="user_info" property="userInfo" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
-        <result column="items" property="items" typeHandler="com.jbp.common.mybatis.FundClearingItemListHandler"/>
-        <result column="product_list" property="productList" typeHandler="com.jbp.common.mybatis.FundClearingProductListHandler"/>
     </resultMap>
     <select id="exportFundClearing" resultMap="FundClearingVo">
     <include refid="exportFundClearing"/>
-        <where> 1=1
+        <where>
+            1=1
             <if test="orderList!=null and orderList.size > 0 ">
                 and c.external_no in
                 <foreach collection="orderList" item ="orderNo" index="i" open="(" close=")" separator=",">
@@ -193,7 +188,6 @@
                 and DATE( c.create_time) BETWEEN #{starteCreateTime} AND #{endCreateTime}
             </if>
         </where>
-        ORDER BY c.id ASC
     </select>
     <select id="getUserTotal" resultType="java.math.BigDecimal">
         SELECT IFNULL(SUM(f.send_amt),0) FROM eb_fund_clearing AS f WHERE f.`uid`=${uid} AND f.status NOT IN ('已退款','已取消','已拦截')

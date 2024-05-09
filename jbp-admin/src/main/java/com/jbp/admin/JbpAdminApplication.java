@@ -1,17 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.agent.FundClearingController;
-import com.jbp.admin.task.order.OrderPaySuccessTask;
-import com.jbp.common.request.OrderRefundAuditRequest;
-import com.jbp.common.request.agent.FundClearingMonthRequest;
-import com.jbp.service.service.RefundOrderService;
-import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.impl.RefundOrderServiceImpl;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.service.event.EventPublisherContext;
-import com.jbp.service.event.UserCapaUpdateEvent;
-import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,9 +29,6 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-
-//        OrderPaySuccessTask orderPaySuccessTask =  run.getBean(OrderPaySuccessTask.class);
-//        orderPaySuccessTask.orderPayAfter();
 
     }
 

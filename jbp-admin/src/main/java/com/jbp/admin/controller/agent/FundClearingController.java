@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.user.User;
@@ -7,6 +8,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.service.UserService;
@@ -51,13 +53,7 @@ public class FundClearingController {
     @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
     @ApiOperation(value = "佣金发放记录导出Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
-    public CommonResult<List<FundClearingVo>> exportOrder(FundClearingRequest request) {
-        if (StringUtils.isEmpty(request.getUniqueNo()) && StringUtils.isEmpty(request.getExternalNo()) &&
-                request.getStartClearingTime() == null && request.getEndClearingTime() == null && request.getStartCreateTime() == null && request.getEndCreateTime() == null
-                && StringUtils.isEmpty(request.getStatus()) && StringUtils.isEmpty(request.getAccount()) && StringUtils.isEmpty(request.getTeamName())
-                && StringUtils.isEmpty(request.getDescription()) && ObjectUtils.isEmpty(request.getIfRefund()) && StringUtils.isEmpty(request.getCommName())) {
-            throw new CrmebException("请填写一个过滤信息");
-        }
+    public CommonResult<List<FundClearingExcel>> exportOrder(FundClearingRequest request) {
         Integer uid = null;
         if (StringUtils.isNotEmpty(request.getAccount())) {
             User user = userService.getByAccount(request.getAccount());
@@ -65,6 +61,14 @@ public class FundClearingController {
                 throw new CrmebException("账号信息错误");
             }
             uid = user.getId();
+        }
+        if (StringUtils.isAllEmpty(request.getUniqueNo(), request.getExternalNo()) && uid == null) {
+            if (request.getStartCreateTime() == null && request.getEndCreateTime() == null) {
+                throw new CrmebException("导出没指定【外部单号  流水单号 用户账户 】条件, 数据开始时间结束时间为必填，并且时间间距不能超过一个月");
+            }
+            if (DateTimeUtils.addMonths(request.getStartCreateTime(), 1).before(request.getEndCreateTime())) {
+                throw new CrmebException("导出没指定【外部单号  流水单号 用户账户 】条件, 数据开始时间结束时间为必填，并且时间间距不能超过一个月");
+            }
         }
         return CommonResult.success(fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
                 uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList()));

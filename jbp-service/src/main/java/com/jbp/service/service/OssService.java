@@ -2,6 +2,8 @@ package com.jbp.service.service;
 
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.List;
 
 import com.jbp.common.vo.CloudVo;
 
@@ -20,5 +22,9 @@ import com.jbp.common.vo.CloudVo;
 public interface OssService {
 
     void upload(CloudVo cloudVo, String webPth, String localFile, File file);
+
+    String upload(InputStream is, String fileName);
+
+    String uploadXlsx(List<?> data, Class<?> excelClass, String fileName);
 
 }
