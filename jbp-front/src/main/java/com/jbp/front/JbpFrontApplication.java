@@ -41,13 +41,15 @@ public class JbpFrontApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         System.out.println("ok");
 
-        YopService yopService = run.getBean(YopService.class);
+//        YopService yopService = run.getBean(YopService.class);
 //        AccountBalanceQueryResult accountBalanceQueryResult = yopService.accountBalanceQuery("10090108498");
 
-        String requestNo = StringUtils.N_TO_10("LZT_NDF_");
-        System.out.println(requestNo);
-        AccountTransferOrderResult accountTransferOrderResult = yopService.transferB2bOrder(requestNo, "10090108498", "10090224584", "0.02", null);
-        AccountTransferOrderQueryResult accountTransferOrderQueryResult = yopService.transferB2bOrderQuery("10090108498", requestNo);
+
+//        String requestNo = StringUtils.N_TO_10("LZT_NDF_");
+//        System.out.println(requestNo);
+//        AccountTransferOrderResult accountTransferOrderResult = yopService.transferB2bOrder(requestNo, "10090108498", "10090224584", "0.02", null);
+//        AccountTransferOrderQueryResult accountTransferOrderQueryResult = yopService.transferB2bOrderQuery("10090108498", requestNo);
+//
         System.out.println("111");
     }
 
