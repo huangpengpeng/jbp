@@ -7,6 +7,7 @@ import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.FundClearingItem;
 import com.jbp.common.model.agent.FundClearingProduct;
+import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.vo.FundClearingVo;
 
@@ -115,4 +116,6 @@ public interface FundClearingService extends IService<FundClearing> {
 
     void addFgComm(String month);
 
+
+    public void createTankOrder(TankOrders orders);
 }

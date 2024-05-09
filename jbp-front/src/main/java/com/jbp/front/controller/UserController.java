@@ -429,7 +429,14 @@ public class UserController {
     @RequestMapping(value = "/getUserInvitePanent", method = RequestMethod.GET)
     public CommonResult getUserInvitePanent() {
         Integer uid=  userService.getUserId();
-        return CommonResult.success(invitationService.getPid(uid));
+
+       Integer pid  = invitationService.getPid(uid);
+       User user = null;
+       if(pid != null){
+           user = userService.getById(pid);
+       }
+
+        return CommonResult.success(user);
     }
 
 
@@ -459,7 +466,7 @@ public class UserController {
         User ruser =  userService.getByAccount(raccount);
         //注册用户
         User user =  userService.getByAccount(account);
-        relationService.band(user.getId(), ruser.getId(), uid, node);
+        relationService.band(user.getId(), ruser.getId(), null, node);
         return CommonResult.success();
 
     }

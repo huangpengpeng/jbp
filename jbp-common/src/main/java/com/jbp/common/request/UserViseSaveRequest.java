@@ -29,4 +29,11 @@ public class UserViseSaveRequest {
     private String signTaskSubject;
     @ApiModelProperty(value = "订单号", required = true)
     private String orderNo;
+
+    private String eventTime;
+
+    private String signTaskId;
+    private String signTaskStatus;
+    private String transReferenceId;
+
 }

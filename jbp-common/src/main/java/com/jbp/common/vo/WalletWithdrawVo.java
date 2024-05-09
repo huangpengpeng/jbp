@@ -58,4 +58,9 @@ public class WalletWithdrawVo {
     private String realName;
     @ApiModelProperty("用户昵称")
     private String nickName;
+
+    @ApiModelProperty("身份证")
+    private String idCardNo;
+    @ApiModelProperty("手机号")
+    private String phone;
 }

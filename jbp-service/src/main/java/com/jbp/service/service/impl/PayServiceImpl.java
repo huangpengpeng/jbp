@@ -16,16 +16,15 @@ import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.dto.ProductInfoDto;
+import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
-import com.jbp.common.model.agent.OrdersFundSummary;
-import com.jbp.common.model.agent.ProductMaterials;
-import com.jbp.common.model.agent.Wallet;
-import com.jbp.common.model.agent.WalletFlow;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.alipay.AliPayInfo;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
@@ -48,11 +47,14 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
-import com.jbp.service.product.comm.CommCalculateResult;
-import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;
 
 import com.jbp.service.service.agent.*;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -60,6 +62,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -173,6 +176,8 @@ public class PayServiceImpl implements PayService {
     private TankOrdersService tankOrdersService;
     @Autowired
     private TankEquipmentNumberService tankEquipmentNumberService;
+    @Resource
+    private FundClearingService fundClearingService;
 
 
     /**
@@ -499,6 +504,7 @@ public class PayServiceImpl implements PayService {
                 order.setPayTime(new Date());
                 tankOrdersService.updateById(order);
                 tankEquipmentNumberService.increase(order.getStoreUserId(), order.getNumber(), order.getOrderSn(), null);
+                fundClearingService.createTankOrder(order);
 
             }
 

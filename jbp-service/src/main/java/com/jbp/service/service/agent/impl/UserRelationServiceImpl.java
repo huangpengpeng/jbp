@@ -100,7 +100,7 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
             User puser = userService.getById(pId);
             throw new RuntimeException("接受人不能是被安置人的下级, 被安置人:" + user.getAccount() + "接受人:" + puser.getAccount());
         }
-        if (operateId != null) {
+        if (operateId != null && pId.intValue() != operateId.intValue()) {
             if (!hasChild(pId, operateId)) {
                 throw new RuntimeException("接受人不是当前操作用户的下级, 接受人:" + pId + "操作人:" + operateId);
             }

@@ -69,7 +69,7 @@ public class TankStoreClerkAct {
         tankStoreClerkRelation1.setClerkUserId(user.getId().longValue());
         tankStoreClerkRelation1.setCreatedTime(new Date());
         tankStoreClerkRelation1.setStoreId(storeId);
-
+        tankStoreClerkRelationService.save(tankStoreClerkRelation1);
         return CommonResult.success();
     }
 
