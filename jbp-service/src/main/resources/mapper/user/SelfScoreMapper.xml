@@ -17,7 +17,7 @@
 			and f.pid =#{uid}
 		</if>
 
-		<if test="startPayTime !=null and endPayTime !=null">
+		<if test="startPayTime !=null and endPayTime !=null and startPayTime !='' and endPayTime !='' ">
 			and DATE(pay_time) BETWEEN #{startPayTime} AND #{endPayTime}
 		</if>
 
