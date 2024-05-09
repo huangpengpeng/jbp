@@ -3,7 +3,7 @@
 <mapper namespace="com.jbp.service.dao.TankStoreClerkRelationDao">
     <select id="getClerkList" resultType="com.jbp.common.response.TankStoreClerkManagerListResponse">
 
-        	select  u.nickName,u.phone,ts.`name`,t.clerk_user_id from eb_tank_store_clerk_relation t
+        	select  u.nickName as  username,u.phone,ts.`name`,t.clerk_user_id from eb_tank_store_clerk_relation t
 		left join eb_user u on u.id = t.clerk_user_id
 		left join eb_tank_store ts on ts.id = t.store_id
 		where t.store_user_id = #{userId}
