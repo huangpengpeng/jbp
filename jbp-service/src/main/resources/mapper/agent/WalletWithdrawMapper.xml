@@ -41,7 +41,7 @@
                card.bank_name,
                card.bank_card_no,
                u.nickname,
-               u.phone,
+               card.phone,
                asentity.id_card_no
 
         from eb_wallet_withdraw as w

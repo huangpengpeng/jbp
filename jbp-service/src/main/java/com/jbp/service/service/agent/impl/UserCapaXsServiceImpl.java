@@ -25,6 +25,7 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserCapaXsSnapshotService;
+import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -56,6 +57,8 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     private OrderService orderService;
     @Resource
     public AsyncUtils asyncUtils;
+    @Resource
+    private UserInvitationService userInvitationService;
 
     @Override
     public UserCapaXs getByUser(Integer uid) {
@@ -101,6 +104,14 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
 		UserCapaXsSnapshot snapshot = UserCapaXsSnapshot.builder().uid(uid).capaId(capaXsId).type(type).remark(remark)
 				.description(description).build();
 		snapshotService.save(snapshot);
+
+		//升星后用户关系强绑
+        UserInvitation userInvitation =  userInvitationService.getByUser(uid);
+        if(userInvitation != null && !userInvitation.getIfForce()){
+            userInvitation.setIfForce(true);
+            userInvitationService.updateById(userInvitation);
+        }
+
 		return getByUser(uid);
 	}
 
