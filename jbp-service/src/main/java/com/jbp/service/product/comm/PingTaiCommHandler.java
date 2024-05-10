@@ -173,7 +173,6 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
         // 分钱
         for (ClearingVipUser clearingVipUser : clearingVipUsers) {
             BigDecimal price = priceMap.get(clearingVipUser.getLevel());
-            BigDecimal usedAmount = clearingVipUser.getUsedAmount();
             BigDecimal usableAmt = clearingVipUser.getMaxAmount().subtract(clearingVipUser.getUsedAmount());
             BigDecimal realFee = BigDecimal.valueOf(Math.min(price.doubleValue(), usableAmt.doubleValue()));
             clearingVipUser.setUsedAmount(clearingVipUser.getUsedAmount().add(realFee));
