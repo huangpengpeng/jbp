@@ -20,10 +20,7 @@ import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.CrmebDateUtil;
-import com.jbp.common.utils.SecurityUtil;
-import com.jbp.common.utils.StringUtils;
+import com.jbp.common.utils.*;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelShipmentVo;
 import com.jbp.common.vo.OrderExcelVo;
@@ -31,6 +28,7 @@ import com.jbp.common.vo.OrderShipmentExcelInfoVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.ProductMaterialsService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -57,6 +55,7 @@ import java.util.stream.Collectors;
  * | Author: CRMEB Team <admin@crmeb.com>
  * +----------------------------------------------------------------------
  */
+@Slf4j
 @Service
 public class ExportServiceImpl implements ExportService {
 
@@ -77,6 +76,8 @@ public class ExportServiceImpl implements ExportService {
 
     @Autowired
     private CrmebConfig crmebConfig;
+    @Autowired
+    private OrderInvoiceService orderInvoiceService;
 
     @Resource
     private OrderExtService orderExtService;
@@ -91,159 +92,163 @@ public class ExportServiceImpl implements ExportService {
      *
      */
     @Override
-    public OrderShipmentExcelInfoVo exportOrderShipment(OrderSearchRequest request) {
+    public String exportOrderShipment(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
                 && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
-                && ObjectUtils.isEmpty(request.getType())&&StringUtils.isEmpty(request.getPayTime())) {
-            throw new CrmebException("请至少选择一个查询条件");
+                && ObjectUtils.isEmpty(request.getType()) && StringUtils.isEmpty(request.getPayTime())) {
+            throw new CrmebException("导出发货列表条件不能为空");
         }
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        if (systemAdmin.getMerId() > 0) {
-            request.setMerId(systemAdmin.getMerId());
+        List<Order> orderList = orderService.findExportList(request);
+        if (CollectionUtils.isEmpty(orderList)) {
+            throw new CrmebException("未查询到订单数据");
         }
+        log.info("订单导出订单数据查询完成...");
 
-        Integer id = 0;
-        List<OrderExcelShipmentVo> voList = CollUtil.newArrayList();
-        Map<String, String> walletDeductionMap = Maps.newConcurrentMap();
+        // 订单用户
+        List<Integer> userIdList = orderList.stream().filter(s -> s.getUid() != null).map(Order::getUid).distinct().collect(Collectors.toList());
+        List<Integer> payUserIdList = orderList.stream().filter(s -> s.getUid() != null).map(Order::getPayUid).distinct().collect(Collectors.toList());
+        userIdList.addAll(payUserIdList);
+        userIdList = userIdList.stream().distinct().collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(userIdList);
+        log.info("订单导出用户数据查询完成...");
+
+        // 订单详情
+        List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
+        Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+        Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
+        List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNoList);
+        Map<String, MerchantOrder> merchantOrderMap = FunctionUtil.keyValueMap(merchantOrderList, MerchantOrder::getOrderNo);
+        log.info("订单导出详情数据查询完成...");
+
+        OrderExcelShipmentExcel
+
 
         Map<String, List<ProductMaterials>> materialsMap = Maps.newConcurrentMap();
-        do {
-            List<Order> orderList = orderService.findExportList(request, id);
-            if (CollectionUtils.isEmpty(orderList)) {
-                break;
-            }
-            // 商户 用户 订单 数据准备
-            List<Integer> userIdList = orderList.stream().map(Order::getUid).distinct().collect(Collectors.toList());
-            List<Integer> payUserIdList = orderList.stream().map(Order::getPayUid).distinct().collect(Collectors.toList());
-            userIdList.addAll(payUserIdList);
-            userIdList = userIdList.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
-            List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, User> userMap = userService.getUidMapList(userIdList);
-            Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
-            Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
-            // 导出对象
-            for (Order order : orderList) {
-                // 商户详情
-                MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
-                // 订单商品
-                List<OrderDetail> orderDetailsList = orderDetailMap.get(order.getOrderNo());
-                // 循环设置
-                for (OrderDetail orderDetail : orderDetailsList) {
-                    // 获取物料信息
-                    BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
-                    List<ProductMaterials> productMaterials = materialsMap.get(orderDetail.getBarCode());
-                    if (CollectionUtils.isEmpty(productMaterials)) {
-                        productMaterials = productMaterialsService.getByBarCode(merchantOrder.getMerId(), orderDetail.getBarCode());
-                        if (CollectionUtils.isEmpty(productMaterials)) {
-                            productMaterials = Lists.newArrayList();
-                            ProductMaterials materials = new ProductMaterials(merchantOrder.getMerId(),
-                                    orderDetail.getBarCode(), orderDetail.getProductName(), 1,
-                                    payPrice.divide(BigDecimal.valueOf(orderDetail.getPayNum()), 4, BigDecimal.ROUND_DOWN), orderDetail.getBarCode(), request.getSupplyName());
-                            productMaterials.add(materials);
-                        }
-                        materialsMap.put(orderDetail.getBarCode(), productMaterials);
-                    }
 
-                    // 物料总价
-                    BigDecimal materialsTotalPrice = BigDecimal.ZERO;
-                    for (ProductMaterials materials : productMaterials) {
-                        materialsTotalPrice = materialsTotalPrice.add(materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity())));
+
+
+        // 导出对象
+        for (Order order : orderList) {
+            // 商户详情
+            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+            // 订单商品
+            List<OrderDetail> orderDetailsList = orderDetailMap.get(order.getOrderNo());
+            // 循环设置
+            for (OrderDetail orderDetail : orderDetailsList) {
+                // 获取物料信息
+                BigDecimal payPrice = (orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
+                List<ProductMaterials> productMaterials = materialsMap.get(orderDetail.getBarCode());
+                if (CollectionUtils.isEmpty(productMaterials)) {
+                    productMaterials = productMaterialsService.getByBarCode(merchantOrder.getMerId(), orderDetail.getBarCode());
+                    if (CollectionUtils.isEmpty(productMaterials)) {
+                        productMaterials = Lists.newArrayList();
+                        ProductMaterials materials = new ProductMaterials(merchantOrder.getMerId(),
+                                orderDetail.getBarCode(), orderDetail.getProductName(), 1,
+                                payPrice.divide(BigDecimal.valueOf(orderDetail.getPayNum()), 4, BigDecimal.ROUND_DOWN), orderDetail.getBarCode(), request.getSupplyName());
+                        productMaterials.add(materials);
+                    }
+                    materialsMap.put(orderDetail.getBarCode(), productMaterials);
+                }
+
+                // 物料总价
+                BigDecimal materialsTotalPrice = BigDecimal.ZERO;
+                for (ProductMaterials materials : productMaterials) {
+                    materialsTotalPrice = materialsTotalPrice.add(materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity())));
+                }
+                // 物料信息
+                for (ProductMaterials materials : productMaterials) {
+                    // 组装订单
+                    OrderExcelShipmentVo vo = new OrderExcelShipmentVo();
+                    vo.setType(order.getOrderType());
+                    vo.setOrderNo(order.getOrderNo());
+                    if (StringUtils.isNotEmpty(order.getPlatOrderNo())) {
+                        vo.setOrderNo(order.getPlatOrderNo());
+                    }
+                    vo.setPlatform(order.getPlatform());
+                    if (order.getUid() != null) {
+                        TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                        if (teamUser != null) {
+                            vo.setTeam(teamUser.getName());
+                        }
+                    } else {
+                        vo.setTeam("");
+                    }
+                    if (order.getUid() != null) {
+                        vo.setUid(order.getUid());
+                        vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+                        vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() : "");
+                    }
+                    if (order.getPayUid() != null) {
+                        vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+                    }
+                    vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
+                    vo.setPayPostage(order.getPayPostage());
+                    vo.setCouponPrice(order.getCouponPrice());
+                    vo.setWalletDeductionFee(order.getWalletDeductionFee());
+                    vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
+                    vo.setOrderPayType(order.getOrderPayType());
+                    vo.setPayMethod(order.getPayMethod());
+                    vo.setPayChannel(order.getPayChannel());
+                    vo.setStatus(order.getOrderStatus());
+                    vo.setRefundStatus(order.getOrderRefundStatus());
+                    vo.setPayTime(order.getPayTime());
+                    // 原始产品
+                    vo.setOrderDetailId(orderDetail.getId());
+                    vo.setProductName(orderDetail.getProductName());
+                    vo.setProductBarCode(orderDetail.getBarCode());
+                    vo.setProductQuantity(orderDetail.getPayNum());
+                    vo.setProductPrice(payPrice);
+                    vo.setProductPostage(orderDetail.getFreightFee());
+                    vo.setProductCouponPrice(orderDetail.getCouponPrice());
+                    vo.setProductWalletDeductionFee(orderDetail.getWalletDeductionFee());
+                    vo.setWalletDeductionList(orderDetail.getWalletDeductionList());
+                    if (CollectionUtils.isNotEmpty(vo.getWalletDeductionList())) {
+                        for (ProductDeduction deduction : vo.getWalletDeductionList()) {
+                            walletDeductionMap.put(deduction.getWalletType().toString(), deduction.getWalletName());
+                        }
+                    }
+                    //设置下单前 后等级
+                    OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+                    if (orderExt != null) {
+                        if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
+                            Capa capa = capaService.getById(orderExt.getCapaId());
+                            vo.setCapaName(capa != null ? capa.getName() : "");
+                        }
+                        //设置成功后等级
+                        if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
+                            Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
+                            vo.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
+                        }
                     }
                     // 物料信息
-                    for (ProductMaterials materials : productMaterials) {
-                        // 组装订单
-                        OrderExcelShipmentVo vo = new OrderExcelShipmentVo();
-                        vo.setType(order.getOrderType());
-                        vo.setOrderNo(order.getOrderNo());
-                        if (StringUtils.isNotEmpty(order.getPlatOrderNo())) {
-                            vo.setOrderNo(order.getPlatOrderNo());
-                        }
-                        vo.setPlatform(order.getPlatform());
-                        if (order.getUid() != null) {
-                            TeamUser teamUser = teamUserService.getByUser(order.getUid());
-                            if (teamUser != null) {
-                                vo.setTeam(teamUser.getName());
-                            }
-                        } else {
-                            vo.setTeam("");
-                        }
-                        if (order.getUid() != null) {
-                            vo.setUid(order.getUid());
-                            vo.setUserAccount(userMap.get(order.getUid()).getAccount());
-                            vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() : "");
-                        }
-                        if (order.getPayUid() != null) {
-                            vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
-                        }
-                        vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
-                        vo.setPayPostage(order.getPayPostage());
-                        vo.setCouponPrice(order.getCouponPrice());
-                        vo.setWalletDeductionFee(order.getWalletDeductionFee());
-                        vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
-                        vo.setOrderPayType(order.getOrderPayType());
-                        vo.setPayMethod(order.getPayMethod());
-                        vo.setPayChannel(order.getPayChannel());
-                        vo.setStatus(order.getOrderStatus());
-                        vo.setRefundStatus(order.getOrderRefundStatus());
-                        vo.setPayTime(order.getPayTime());
-                        // 原始产品
-                        vo.setOrderDetailId(orderDetail.getId());
-                        vo.setProductName(orderDetail.getProductName());
-                        vo.setProductBarCode(orderDetail.getBarCode());
-                        vo.setProductQuantity(orderDetail.getPayNum());
-                        vo.setProductPrice(payPrice);
-                        vo.setProductPostage(orderDetail.getFreightFee());
-                        vo.setProductCouponPrice(orderDetail.getCouponPrice());
-                        vo.setProductWalletDeductionFee(orderDetail.getWalletDeductionFee());
-                        vo.setWalletDeductionList(orderDetail.getWalletDeductionList());
-                        if (CollectionUtils.isNotEmpty(vo.getWalletDeductionList())) {
-                            for (ProductDeduction deduction : vo.getWalletDeductionList()) {
-                                walletDeductionMap.put(deduction.getWalletType().toString(), deduction.getWalletName());
-                            }
-                        }
-                        //设置下单前 后等级
-                        OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
-                        if (orderExt != null) {
-                            if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
-                                Capa capa = capaService.getById(orderExt.getCapaId());
-                                vo.setCapaName(capa != null ? capa.getName() : "");
-                            }
-                            //设置成功后等级
-                            if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
-                                Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
-                                vo.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
-                            }
-                        }
-                        // 物料信息
-                        BigDecimal price = materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity()));
-                        if (ArithmeticUtils.gt(materialsTotalPrice, BigDecimal.ZERO) && ArithmeticUtils.gt(payPrice, BigDecimal.ZERO)) {
-                            BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
-                            vo.setMaterialsPrice(materialsPrice);
-                        } else {
-                            vo.setMaterialsPrice(BigDecimal.ZERO);
-                        }
-                        vo.setMaterialsName(materials.getMaterialsName());
-                        vo.setMaterialsCode(materials.getMaterialsCode());
-                        vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getMaterialsQuantity());
-
-                        // 收货人
-                        vo.setRealName(merchantOrder.getRealName());
-                        vo.setUserPhone(merchantOrder.getUserPhone());
-                        vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
-                        vo.setUserRemark(merchantOrder.getUserRemark());
-                        vo.setMerchantRemark(merchantOrder.getMerchantRemark());
-                        vo.setUserAddress(merchantOrder.getUserAddress());
-
-                        // 下单时间
-                        vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-
-                        // 保存
-                        voList.add(vo);
+                    BigDecimal price = materials.getMaterialsPrice().multiply(BigDecimal.valueOf(materials.getMaterialsQuantity()));
+                    if (ArithmeticUtils.gt(materialsTotalPrice, BigDecimal.ZERO) && ArithmeticUtils.gt(payPrice, BigDecimal.ZERO)) {
+                        BigDecimal materialsPrice = payPrice.multiply(price.divide(materialsTotalPrice, 10, BigDecimal.ROUND_DOWN)).setScale(2, BigDecimal.ROUND_DOWN);
+                        vo.setMaterialsPrice(materialsPrice);
+                    } else {
+                        vo.setMaterialsPrice(BigDecimal.ZERO);
                     }
+                    vo.setMaterialsName(materials.getMaterialsName());
+                    vo.setMaterialsCode(materials.getMaterialsCode());
+                    vo.setMaterialsQuantity(orderDetail.getPayNum() * materials.getMaterialsQuantity());
+
+                    // 收货人
+                    vo.setRealName(merchantOrder.getRealName());
+                    vo.setUserPhone(merchantOrder.getUserPhone());
+                    vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
+                    vo.setUserRemark(merchantOrder.getUserRemark());
+                    vo.setMerchantRemark(merchantOrder.getMerchantRemark());
+                    vo.setUserAddress(merchantOrder.getUserAddress());
+
+                    // 下单时间
+                    vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+
+                    // 保存
+                    voList.add(vo);
                 }
             }
-            id = orderList.get(orderList.size() - 1).getId();
-        } while (true);
+        }
+
 
         OrderShipmentExcelInfoVo vo = new OrderShipmentExcelInfoVo();
         LinkedHashMap<String, String> head = new LinkedHashMap<String, String>();
@@ -284,9 +289,9 @@ public class ExportServiceImpl implements ExportService {
         head.put("userRemark", "用户备注");
         head.put("merchantRemark", "商户备注");
         head.put("createTime", "下单时间");
-        head.put("payTime","支付时间");
-        head.put("capaName","下单前等级名称");
-        head.put("successCapaName","下单后等级名称");
+        head.put("payTime", "支付时间");
+        head.put("capaName", "下单前等级名称");
+        head.put("successCapaName", "下单后等级名称");
 
         head.put("productPostage", "商品运费");
         head.put("productCouponPrice", "商品优惠");
@@ -324,15 +329,12 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
-        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo())
-                && StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getStatus())
-                && ObjectUtils.isEmpty(request.getType())&&StringUtils.isEmpty(request.getPayTime())) {
-            throw new CrmebException("请至少选择一个查询条件");
+        if(StringUtils.isAllEmpty(request.getOrderNo(), request.getPlatOrderNo(), request.getUaccount(), request.getPayAccount())){
+            if(StringUtils.isEmpty(request.getDateLimit())) {
+                throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
+            }
         }
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        if (systemAdmin.getMerId() > 0) {
-            request.setMerId(systemAdmin.getMerId());
-        }
+
         Integer id = 0;
         List<OrderExcelVo> voList = CollUtil.newArrayList();
         do {

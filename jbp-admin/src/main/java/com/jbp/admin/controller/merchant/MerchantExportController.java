@@ -1,7 +1,11 @@
 package com.jbp.admin.controller.merchant;
 
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.common.vo.OrderShipmentExcelInfoVo;
@@ -46,6 +50,13 @@ public class MerchantExportController {
     public CommonResult<OrderShipmentExcelInfoVo> exportOrderShipment(@Validated OrderSearchRequest request) {
         return CommonResult.success(exportService.exportOrderShipment(request));
     }
+
+    @ApiOperation(value = "导出订单发货Excel")
+    @RequestMapping(value = "/order/shipment/excel2", method = RequestMethod.GET)
+    public CommonResult<OrderShipmentExcelInfoVo> exportOrderShipment2(@Validated OrderSearchRequest request) {
+        return CommonResult.success(exportService.exportOrderShipment(request));
+    }
+
     @PreAuthorize("hasAuthority('merchant:export:order:excel')")
     @ApiOperation(value = "导出订单Excel")
     @RequestMapping(value = "/order/excel", method = RequestMethod.GET)
