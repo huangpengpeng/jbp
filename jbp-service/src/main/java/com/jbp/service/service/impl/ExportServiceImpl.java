@@ -17,7 +17,7 @@ import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.utils.*;
-import com.jbp.common.vo.*;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.ProductMaterialsService;
@@ -28,7 +28,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -75,7 +77,7 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public String exportOrderShipment(OrderSearchRequest request) {
-        vaild(request);
+        valid(request);
 
         List<Order> orderList = orderService.findExportList(request);
         if (CollectionUtils.isEmpty(orderList)) {
@@ -233,7 +235,7 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public String exportOrder(OrderSearchRequest request) {
-        vaild(request);
+        valid(request);
         List<Order> orderList = orderService.findExportList(request);
         if (CollectionUtils.isEmpty(orderList)) {
             throw new CrmebException("未查询到订单数据");
@@ -346,19 +348,19 @@ public class ExportServiceImpl implements ExportService {
             // 保存
             result.add(vo);
         }
-        String s = ossService.uploadXlsx(result, OrderShipmentExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        String s = ossService.uploadXlsx(result, OrderExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         log.info("订单列表导出下载地址:" + s);
         return s;
     }
 
-    private static void vaild(OrderSearchRequest request) {
+    private static void valid(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getUaccount()) && StringUtils.isEmpty(request.getPayAccount())) {
             if (StringUtils.isEmpty(request.getDateLimit())) {
                 throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
             }
             if (StringUtils.isNotEmpty(request.getDateLimit())) {
                 DateLimitUtilVo timeVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
-                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 31).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
+                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 60).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
                     throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
                 }
             }
