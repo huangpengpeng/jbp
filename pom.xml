@@ -164,6 +164,12 @@
 				<version>5.4.7</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>easyexcel</artifactId>
+				<version>2.2.10</version>
+			</dependency>
+
 			<!--httpclient-->
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>

@@ -14,9 +14,7 @@ import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.user.User;
 import com.jbp.common.response.RefundOrderInfoResponse;
 import com.jbp.common.utils.FunctionUtil;
-import com.jbp.service.product.comm.AbstractProductCommHandler;
 import com.jbp.service.product.comm.PingTaiCommHandler;
-import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.OrderProductProfitService;
 import com.jbp.service.service.RefundOrderService;
@@ -30,7 +28,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -59,8 +56,9 @@ public class ClearingVipUserHandler implements ProductProfitHandler {
     private RefundOrderService refundOrderService;
     @Resource
     private ClearingVipUserService clearingVipUserService;
-    @Autowired
-    private ProductCommChain productCommChain;
+    @Resource
+    private PingTaiCommHandler pingTaiCommHandler;
+
 
     @Override
     public Integer getType() {
@@ -101,7 +99,6 @@ public class ClearingVipUserHandler implements ProductProfitHandler {
         }
         Map<Integer, OrderDetail> detailMap = FunctionUtil.keyValueMap(orderDetailList, OrderDetail::getProductId);
         User user = userService.getById(order.getUid());
-        AbstractProductCommHandler pingTaiCommHandler = productCommChain.handlers.get(ProductCommEnum.平台分红.getType());
         List<PingTaiCommHandler.Rule> commRuleList = pingTaiCommHandler.getRule(null);
         Map<Long, PingTaiCommHandler.Rule> commRuleMap = FunctionUtil.keyValueMap(commRuleList, PingTaiCommHandler.Rule::getLevel);
         // 保存用户权益

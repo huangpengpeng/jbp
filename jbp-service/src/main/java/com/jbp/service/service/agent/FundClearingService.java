@@ -3,6 +3,7 @@ package com.jbp.service.service.agent;
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.FundClearingItem;
 import com.jbp.common.model.agent.FundClearingProduct;
@@ -83,9 +84,9 @@ public interface FundClearingService extends IService<FundClearing> {
      * 佣金发放导出
      * @return
      */
-    List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo,
-                                            Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime,
-                                            String status,Integer uid,String teamName,String description,String commName, Boolean ifRefund, List<String> orderList);
+    List<FundClearingExcel> exportFundClearing(String uniqueNo, String externalNo,
+                                               Date startClearingTime, Date endClearingTime, Date startCreateTime, Date endCreateTime,
+                                               String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund, List<String> orderList);
 
     void updateRemark(Long id, String remark);
 

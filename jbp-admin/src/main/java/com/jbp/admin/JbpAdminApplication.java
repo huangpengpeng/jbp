@@ -1,19 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.agent.FundClearingController;
-import com.jbp.admin.task.order.OrderPaySuccessTask;
-import com.jbp.common.model.tank.TankOrders;
-import com.jbp.common.request.OrderRefundAuditRequest;
-import com.jbp.common.request.agent.FundClearingMonthRequest;
-import com.jbp.service.service.RefundOrderService;
-import com.jbp.service.service.TankOrdersService;
-import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.impl.RefundOrderServiceImpl;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.service.event.EventPublisherContext;
-import com.jbp.service.event.UserCapaUpdateEvent;
-import com.jbp.service.service.agent.UserCapaService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,11 +28,6 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-
-//        FundClearingService fundClearingService =  run.getBean(FundClearingService.class);
-//        TankOrdersService tankOrdersService =  run.getBean(TankOrdersService.class);
-//        fundClearingService.createTankOrder(tankOrdersService.getOrderSn("GXC591171496793701114113"));
 
     }
 

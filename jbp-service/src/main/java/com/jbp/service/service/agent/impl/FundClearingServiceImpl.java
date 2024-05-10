@@ -13,9 +13,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
-import com.jbp.common.model.order.Order;
 import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -24,7 +24,6 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
-import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.product.comm.*;
 import com.jbp.service.service.OrderService;
@@ -351,9 +350,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     }
 
     @Override
-    public List<FundClearingVo> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund , List<String> orderList) {
+    public List<FundClearingExcel> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund , List<String> orderList) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
-        List<FundClearingVo> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, 0L, channelName, commName, ifRefund, orderList);
+        List<FundClearingExcel> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, 0L, channelName, commName, ifRefund, orderList);
         return fundClearingVos;
     }
 

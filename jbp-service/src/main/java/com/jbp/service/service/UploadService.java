@@ -1,10 +1,7 @@
 package com.jbp.service.service;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.jbp.common.vo.FileResultVo;
-
-import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * UploadService 接口
@@ -64,4 +61,5 @@ public interface UploadService {
      * @return FileResultVo
      */
     FileResultVo base64Upload(String base64, String model, Integer pid);
+
 }
