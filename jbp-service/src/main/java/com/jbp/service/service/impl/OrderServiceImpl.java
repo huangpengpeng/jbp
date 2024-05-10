@@ -612,6 +612,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
         getMerchantStatusWhere(lqw, request.getStatus());
+        if(ObjectUtil.isNotNull(request.getTeamId())) {
+            lqw.last("  and uid in (select uid from eb_team_user where tid = " + request.getTeamId() + ") ");
+        }
         lqw.orderByDesc(Order::getId);
         List<Order> orderList = dao.selectList(lqw);
         if (CollUtil.isEmpty(orderList)) {
