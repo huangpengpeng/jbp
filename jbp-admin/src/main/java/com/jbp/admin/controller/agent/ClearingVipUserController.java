@@ -43,7 +43,6 @@ public class ClearingVipUserController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(clearingVipUserService.pageList(uid,request.getStatus(),request.getLevel(),
-                request.getLevelName(),request.getCommType(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(clearingVipUserService.pageList(uid,request.getStatus(),request.getLevel(),request.getCommType(),pageParamRequest)));
     }
 }

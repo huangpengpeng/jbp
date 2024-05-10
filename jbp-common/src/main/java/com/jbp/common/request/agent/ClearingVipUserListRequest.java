@@ -25,9 +25,6 @@ public class ClearingVipUserListRequest implements Serializable {
     @ApiModelProperty("级别")
     private Long level;
 
-    @ApiModelProperty("级别名称")
-    private String levelName;
-
     @ApiModelProperty("状态 0有效 -1失效")
     private Integer status;
 

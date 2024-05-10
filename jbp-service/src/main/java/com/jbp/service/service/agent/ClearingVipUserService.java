@@ -14,7 +14,7 @@ public interface ClearingVipUserService extends IService<ClearingVipUser> {
 
     ClearingVipUser getByUser(Integer uid, Long level, Integer commType);
 
-    PageInfo<ClearingVipUser> pageList(Integer uid, Integer status,Long level,String levelName,Integer commType,PageParamRequest pageParamRequest);
+    PageInfo<ClearingVipUser> pageList(Integer uid, Integer status,Long level,Integer commType,PageParamRequest pageParamRequest);
 
 
 

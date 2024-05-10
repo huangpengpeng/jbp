@@ -35,12 +35,11 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
     }
 
     @Override
-    public PageInfo<ClearingVipUser> pageList(Integer uid,Integer status,Long level,String levelName,Integer commType,PageParamRequest pageParamRequest) {
+    public PageInfo<ClearingVipUser> pageList(Integer uid,Integer status,Long level,Integer commType,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<ClearingVipUser> queryWrapper = new LambdaQueryWrapper<ClearingVipUser>()
                 .eq(!ObjectUtil.isNull(uid), ClearingVipUser::getUid, uid)
                 .eq(!ObjectUtil.isNull(status), ClearingVipUser::getStatus, status)
                 .eq(!ObjectUtil.isNull(level), ClearingVipUser::getLevel, level)
-                .eq(!ObjectUtil.isEmpty(levelName), ClearingVipUser::getLevelName, levelName)
                 .eq(!ObjectUtil.isNull(commType), ClearingVipUser::getCommType, commType)
                 .orderByDesc(ClearingVipUser::getId);
         Page<ClearingVipUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
