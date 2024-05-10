@@ -358,7 +358,7 @@ public class ExportServiceImpl implements ExportService {
             }
             if (StringUtils.isNotEmpty(request.getDateLimit())) {
                 DateLimitUtilVo timeVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
-                if (DateTimeUtils.addMonths(DateTimeUtils.parseDate(timeVo.getStartTime()), 2).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
+                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 31).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
                     throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
                 }
             }
