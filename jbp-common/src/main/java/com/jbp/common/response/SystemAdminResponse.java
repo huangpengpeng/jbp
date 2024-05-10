@@ -61,4 +61,7 @@ public class SystemAdminResponse implements Serializable {
 
     @ApiModelProperty(value = "商户id")
     private Integer merId;
+
+    @ApiModelProperty("供应商名称")
+    private String supplyName;
 }

@@ -43,10 +43,7 @@ public class CapaController {
     private CapaService capaService;
     @Resource
     private SystemAttachmentService systemAttachmentService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserInvitationJumpService userInvitationJumpService;
+
 
     @PreAuthorize("hasAuthority('capa:list')")
     @ApiOperation(value = "用户等级列表")
@@ -141,42 +138,4 @@ public class CapaController {
         capaService.saveRiseCondition(request);
         return CommonResult.success();
     }
-
-    @PreAuthorize("hasAuthority('agent:user:invitation:jump:page')")
-    @GetMapping("/invitation/jump/page")
-    @ApiOperation("销售上下层级跳转关系列表")
-    public CommonResult<CommonPage<UserInvitationJumpListResponse>> pageList(UserInvitationJumpRequest request, PageParamRequest pageParamRequest) {
-        //当前用户id
-        Integer uid = null;
-        if (request.getUId() != null) {
-            User user = userService.getById(request.getUId());
-            if (user == null) {
-                throw new CrmebException("当前id信息错误");
-            }
-            uid = user.getId();
-        }
-//        当前上级id
-        Integer pid = null;
-        if (request.getPId() != null) {
-            User user = userService.getById(request.getPId());
-            if (user == null) {
-                throw new CrmebException("当前上级id信息错误");
-            }
-            pid = user.getId();
-        }
-        //原上级id
-        Integer orgPid = null;
-        if (request.getOrgPid() != null) {
-            User user = userService.getById(request.getOrgPid());
-            if (user == null) {
-                throw new CrmebException("原上级id信息错误");
-            }
-            orgPid = user.getId();
-        }
-
-        return CommonResult.success(CommonPage.restPage(userInvitationJumpService.pageList(uid, pid, orgPid, pageParamRequest)));
-    }
-
-
-
 }
