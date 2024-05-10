@@ -124,7 +124,7 @@ public class WalletConfigServiceImpl extends ServiceImpl<WalletConfigDao, Wallet
 
     @Override
     public List<UserWalletInfoResponse> getUserWalletInfo() {
-        List<WalletConfig> list = list();
+        List<WalletConfig> list = list(new QueryWrapper<WalletConfig>().lambda().eq(WalletConfig::getStatus,1));
         List<UserWalletInfoResponse> userWalletInfoResponseList = new ArrayList<>();
         User user = userService.getInfo();
         list.forEach(e -> {
