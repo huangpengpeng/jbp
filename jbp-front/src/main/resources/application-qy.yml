@@ -38,7 +38,7 @@ server:
 
 spring:
   profiles:
-    active:
+    active: qy-front
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小

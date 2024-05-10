@@ -136,7 +136,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/captcha/get", "/captcha/check").anonymous()
                 .antMatchers("/api/admin/payment/callback/**").anonymous()
                 .antMatchers("/api/public/**").anonymous()
-                .antMatchers("/api/admin/agent/fund/clearing/excel2**").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

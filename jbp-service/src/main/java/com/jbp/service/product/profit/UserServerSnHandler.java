@@ -104,6 +104,7 @@ public class UserServerSnHandler implements ProductProfitHandler {
             }
 
             String channel = environment.getProperty("spring.profiles.active");
+            channel = channel.split("-")[0];
             String serverSns = order.getOrderNo() + "_" + channel + "_" + teamId + "_" + i;
             serverSn = serverSn + "," + serverSns;
         }

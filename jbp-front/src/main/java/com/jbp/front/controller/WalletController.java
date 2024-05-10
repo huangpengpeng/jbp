@@ -135,7 +135,7 @@ public class WalletController {
 
        List<WalletFlow> walletFlow =   pageInfo.getList();
         String name = environment.getProperty("spring.profiles.active");
-        if(name.equals("sm") || name.equals("yk")  || name.equals("tf") ){
+        if(name.contains("sm") || name.contains("yk")  || name.contains("tf") ){
             walletFlow.forEach(e->{
                 e.setPostscript(CommAliasNameSmEnum.getAliasNameReplaceName(e.getPostscript()));
             });
