@@ -66,7 +66,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         if (StringUtils.isAllEmpty(request.getUniqueNo(), request.getExternalNo()) && uid == null) {
-            if (request.getStartCreateTime() == null && request.getEndCreateTime() == null) {
+            if (request.getStartCreateTime() == null || request.getEndCreateTime() == null) {
                 throw new CrmebException("导出没指定【外部单号  流水单号 用户账户 】条件, 数据开始时间结束时间为必填，并且时间间距不能超过一个月");
             }
             if (DateTimeUtils.addMonths(request.getStartCreateTime(), 1).before(request.getEndCreateTime())) {
@@ -188,7 +188,7 @@ public class FundClearingController {
             uid = user.getId();
         }
         if (StringUtils.isAllEmpty(request.getUniqueNo(), request.getExternalNo()) && uid == null) {
-            if (request.getStartCreateTime() == null && request.getEndCreateTime() == null) {
+            if (request.getStartCreateTime() == null || request.getEndCreateTime() == null) {
                 throw new CrmebException("导出没指定【外部单号  流水单号 用户账户 】条件, 数据开始时间结束时间为必填，并且时间间距不能超过一个月");
             }
             if (DateTimeUtils.addMonths(request.getStartCreateTime(), 1).before(request.getEndCreateTime())) {
