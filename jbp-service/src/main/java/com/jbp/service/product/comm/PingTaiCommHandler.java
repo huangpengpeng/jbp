@@ -100,7 +100,6 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
         List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingFinal.getId());
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
-        List<Rule> ruleList = getRule(null);
         // 结算周期内支付成功的订单
         List<Order> successList = orderService.getSuccessList(startTime, endTime);
         Map<Integer, ProductComm> map = Maps.newConcurrentMap();
@@ -174,7 +173,6 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
         // 分钱
         for (ClearingVipUser clearingVipUser : clearingVipUsers) {
             BigDecimal price = priceMap.get(clearingVipUser.getLevel());
-            BigDecimal usedAmount = clearingVipUser.getUsedAmount();
             BigDecimal usableAmt = clearingVipUser.getMaxAmount().subtract(clearingVipUser.getUsedAmount());
             BigDecimal realFee = BigDecimal.valueOf(Math.min(price.doubleValue(), usableAmt.doubleValue()));
             clearingVipUser.setUsedAmount(clearingVipUser.getUsedAmount().add(realFee));
@@ -182,7 +180,7 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
             ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingVipUser.getUid(), clearingVipUser.getAccountNo(),
                     clearingVipUser.getLevel(), clearingVipUser.getLevelName(),
                     clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                    realFee, "购买商品赠送分红等级:" + clearingVipUser.getLevelName() + "额度上限:" + clearingVipUser.getMaxAmount() + "已获金额:" + usedAmount, clearingVipUser.getRule());
+                    realFee, "购买商品赠送分红等级:" + clearingVipUser.getLevelName() + "额度上限:" + clearingVipUser.getMaxAmount() + "已获金额:" + clearingVipUser.getUsedAmount(), clearingVipUser.getRule());
             clearingBonusFlowList.add(clearingBonusFlow);
 
             // 佣金

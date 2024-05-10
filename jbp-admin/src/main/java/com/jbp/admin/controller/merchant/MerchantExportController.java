@@ -3,8 +3,6 @@ package com.jbp.admin.controller.merchant;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.OrderExcelInfoVo;
-import com.jbp.common.vo.OrderExcelVo;
-import com.jbp.common.vo.OrderShipmentExcelInfoVo;
 import com.jbp.service.service.ExportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,8 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 
 /**
@@ -43,13 +39,14 @@ public class MerchantExportController {
     @PreAuthorize("hasAuthority('merchant:export:order:shipment:excel')")
     @ApiOperation(value = "导出订单发货Excel")
     @RequestMapping(value = "/order/shipment/excel", method = RequestMethod.GET)
-    public CommonResult<OrderShipmentExcelInfoVo> exportOrderShipment(@Validated OrderSearchRequest request) {
+    public CommonResult<String> exportOrderShipment(@Validated OrderSearchRequest request) {
         return CommonResult.success(exportService.exportOrderShipment(request));
     }
+
     @PreAuthorize("hasAuthority('merchant:export:order:excel')")
     @ApiOperation(value = "导出订单Excel")
     @RequestMapping(value = "/order/excel", method = RequestMethod.GET)
-    public CommonResult<OrderExcelInfoVo> exportOrder(@Validated OrderSearchRequest request) {
+    public CommonResult<String> exportOrder(@Validated OrderSearchRequest request) {
         return CommonResult.success(exportService.exportOrder(request));
     }
 

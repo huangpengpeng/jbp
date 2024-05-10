@@ -28,7 +28,7 @@ public interface ExportService {
      * @param request 查询条件
      * @return 文件名称
      */
-    OrderShipmentExcelInfoVo exportOrderShipment(OrderSearchRequest request);
+    String exportOrderShipment(OrderSearchRequest request);
 
-    OrderExcelInfoVo exportOrder(OrderSearchRequest request);
+    String exportOrder(OrderSearchRequest request);
 }

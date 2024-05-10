@@ -581,7 +581,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if(StringUtils.isNotEmpty(request.getSupplyName())){
             List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
             if(!CollectionUtils.isEmpty(orderNoList)){
-                lqw.eq(Order::getOrderNo, orderNoList);
+                lqw.in(Order::getOrderNo, orderNoList);
             }
         }
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
@@ -1159,12 +1159,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      * @param request 请求参数
      */
     @Override
-    public List<Order> findExportList(OrderSearchRequest request,Integer id) {
+    public List<Order> findExportList(OrderSearchRequest request) {
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
         }
-        if(StringUtils.isNotEmpty(request.getSupplyName())){
+        if (StringUtils.isNotEmpty(request.getSupplyName())) {
             List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
             if (!CollectionUtils.isEmpty(orderNoList)) {
                 lqw.in(Order::getOrderNo, orderNoList);
@@ -1177,7 +1177,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             });
         }
         if (StrUtil.isNotBlank(request.getPayTime())) {
-            getPayTimeWhere(lqw,request.getPayTime());
+            getPayTimeWhere(lqw, request.getPayTime());
         }
         if (ObjectUtil.isNotNull(request.getType())) {
             lqw.eq(Order::getType, request.getType());
@@ -1186,9 +1186,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
         getMerchantStatusWhere(lqw, request.getStatus());
-        lqw.gt(Order::getId, id);
-        lqw.orderByAsc(Order::getId);
-        lqw.last("LIMIT 1000");
         return dao.selectList(lqw);
     }
 

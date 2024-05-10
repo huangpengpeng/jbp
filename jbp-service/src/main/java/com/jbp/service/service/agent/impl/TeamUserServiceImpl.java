@@ -1,17 +1,16 @@
 package com.jbp.service.service.agent.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.TeamUserDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
@@ -72,8 +71,13 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
                 .in(TeamUser::getUid, uidList);
         List<TeamUser> list = list(lqw);
         Map<Integer, TeamUser> teamUserMap = new HashMap<>();
+        if (CollectionUtils.isEmpty(list)) {
+            return teamUserMap;
+        }
+        List<Team> teamList = teamService.list();
+        Map<Integer, Team> teamMap = FunctionUtil.keyValueMap(teamList, Team::getId);
         list.forEach(e -> {
-            Team team = teamService.getById(e.getTid());
+            Team team = teamMap.get(e.getTid());
             e.setName(team != null ? team.getName() : "");
             teamUserMap.put(e.getUid(), e);
         });

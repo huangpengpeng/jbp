@@ -116,4 +116,7 @@ public class OrderExcelVo implements Serializable {
 
     @ApiModelProperty(value = "用户是否确认收货")
     private String ifUserVerifyReceive;
+
+    @ApiModelProperty(value = "确认收货时间")
+    private String receiveTime;
 }

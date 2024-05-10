@@ -325,7 +325,7 @@ public interface OrderService extends IService<Order> {
      * @param request 请求参数
      * @return
      */
-    List<Order> findExportList(OrderSearchRequest request,Integer id);
+    List<Order> findExportList(OrderSearchRequest request);
 
     /**
      * 获取待支付订单

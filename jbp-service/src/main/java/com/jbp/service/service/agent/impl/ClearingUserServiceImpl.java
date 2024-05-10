@@ -284,7 +284,9 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     clearingUserList.add(newUser);
                 });
             }
-            clearingUserDao.insertBatch(clearingUserList);
+            if(CollectionUtils.isNotEmpty(clearingUserList)){
+                clearingUserDao.insertBatch(clearingUserList);
+            }
         }
     }
 
