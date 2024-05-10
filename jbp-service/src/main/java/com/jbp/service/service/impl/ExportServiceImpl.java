@@ -251,7 +251,7 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public OrderExcelInfoVo exportOrder(OrderSearchRequest request) {
-        if(StringUtils.isEmpty(request.getOrderNo())&&StringUtils.isEmpty(request.getPlatOrderNo())&&StringUtils.isEmpty(request.getUaccount())&&StringUtils.isEmpty(request.getPayAccount())){
+        if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getUaccount()) && StringUtils.isEmpty(request.getPayAccount())) {
             if (StringUtils.isEmpty(request.getDateLimit())) {
                 throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
             }
@@ -264,91 +264,87 @@ public class ExportServiceImpl implements ExportService {
         }
 
         List<OrderExcelVo> voList = CollUtil.newArrayList();
-        do {
-            List<Order> orderList = orderService.findExportList(request);
-            if (CollectionUtils.isEmpty(orderList)) {
-                break;
+        List<Order> orderList = orderService.findExportList(request);
+
+        List<Integer> userIdList = orderList.stream().filter(s -> s.getUid() != null).map(Order::getUid).distinct().collect(Collectors.toList());
+        List<Integer> payUserIdList = orderList.stream().filter(s -> s.getPayUid() != null).map(Order::getPayUid).distinct().collect(Collectors.toList());
+        userIdList.addAll(payUserIdList);
+        Set<Integer> userSet = userIdList.stream().collect(Collectors.toSet());
+        List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(userSet.stream().collect(Collectors.toList()));
+        Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+        Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
+        for (Order order : orderList) {
+            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+            // 循环设置
+            OrderExcelVo vo = new OrderExcelVo();
+            vo.setType(getOrderType(order.getType()));
+            vo.setOrderNo(StringUtils.isNotEmpty(order.getPlatOrderNo()) ? order.getPlatOrderNo() : order.getOrderNo());
+            vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
+            vo.setPayType(getOrderPayType(order.getPayType()));
+            vo.setIfUserVerifyReceive(BooleanUtils.isTrue(order.getIfUserVerifyReceive()) ? "是" : "否");
+            vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
+            vo.setStatus(getOrderStatus(order.getStatus()));
+            vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
+            vo.setWalletDeductionFee(order.getWalletDeductionFee());
+            vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
+            vo.setPayTime(order.getPayTime());
+            // 收货人
+            vo.setRealName(merchantOrder.getRealName());
+            vo.setUserPhone(merchantOrder.getUserPhone());
+            vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
+            vo.setUserRemark(merchantOrder.getUserRemark());
+            vo.setMerchantRemark(merchantOrder.getMerchantRemark());
+            vo.setUserAddress(merchantOrder.getUserAddress());
+            vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
+            vo.setPayPostage(order.getPayPostage());
+            vo.setCouponPrice(order.getCouponPrice());
+            //设置下单 前 后等级名称
+            OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
+            if (orderExt != null) {
+                if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
+                    Capa capa = capaService.getById(orderExt.getCapaId());
+                    vo.setCapaName(capa != null ? capa.getName() : "");
+                }
+                //设置成功后等级
+                if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
+                    Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
+                    vo.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
+                }
             }
-            List<Integer> userIdList = orderList.stream().filter(s -> s.getUid() != null).map(Order::getUid).distinct().collect(Collectors.toList());
-            List<Integer> payUserIdList = orderList.stream().filter(s -> s.getPayUid() != null).map(Order::getPayUid).distinct().collect(Collectors.toList());
-            userIdList.addAll(payUserIdList);
-            Set<Integer> userSet = userIdList.stream().collect(Collectors.toSet());
-            List<String> orderNoList = orderList.stream().map(Order::getOrderNo).distinct().collect(Collectors.toList());
-            Map<Integer, User> userMap = userService.getUidMapList(userSet.stream().collect(Collectors.toList()));
-            Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
-            Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
-            for (Order order : orderList) {
-                MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
-                // 循环设置
-                OrderExcelVo vo = new OrderExcelVo();
-                vo.setType(getOrderType(order.getType()));
-                vo.setOrderNo(StringUtils.isNotEmpty(order.getPlatOrderNo()) ? order.getPlatOrderNo() : order.getOrderNo());
-                vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
-                vo.setPayType(getOrderPayType(order.getPayType()));
-                vo.setIfUserVerifyReceive(BooleanUtils.isTrue(order.getIfUserVerifyReceive()) ? "是" : "否");
-                vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
-                vo.setStatus(getOrderStatus(order.getStatus()));
-                vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
-                vo.setWalletDeductionFee(order.getWalletDeductionFee());
-                vo.setCreateTime(CrmebDateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-                vo.setProductInfo(getOrderProductInfo(orderDetailMap.get(order.getOrderNo())));
-                vo.setPayTime(order.getPayTime());
-                // 收货人
-                vo.setRealName(merchantOrder.getRealName());
-                vo.setUserPhone(merchantOrder.getUserPhone());
-                vo.setShippingType(1 == merchantOrder.getShippingType() ? "快递" : "自提");
-                vo.setUserRemark(merchantOrder.getUserRemark());
-                vo.setMerchantRemark(merchantOrder.getMerchantRemark());
-                vo.setUserAddress(merchantOrder.getUserAddress());
-                vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
-                vo.setPayPostage(order.getPayPostage());
-                vo.setCouponPrice(order.getCouponPrice());
-                //设置下单 前 后等级名称
-                OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
-                if (orderExt != null) {
-                    if (ObjectUtil.isNotEmpty(orderExt.getCapaId())) {
-                        Capa capa = capaService.getById(orderExt.getCapaId());
-                        vo.setCapaName(capa != null ? capa.getName() : "");
-                    }
-                    //设置成功后等级
-                    if (ObjectUtil.isNotEmpty(orderExt.getSuccessCapaId())) {
-                        Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
-                        vo.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
-                    }
+            //设置场景
+            vo.setPlatform(order.getPlatform());
+            if (order.getUid() != null) {
+                TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                if (teamUser != null) {
+                    vo.setTeam(teamUser.getName());
                 }
-                //设置场景
-                vo.setPlatform(order.getPlatform());
-                if (order.getUid() != null) {
-                    TeamUser teamUser = teamUserService.getByUser(order.getUid());
-                    if (teamUser != null) {
-                        vo.setTeam(teamUser.getName());
-                    }
-                } else {
-                    vo.setTeam("");
-                }
-                //设置团队
-                if (order.getUid() != null) {
-                    TeamUser teamUser = teamUserService.getByUser(order.getUid());
-                    if (teamUser != null) {
-                        vo.setTeam(teamUser.getName());
-                    }
-                } else {
-                    vo.setTeam("");
-                }
-                //设置用id
-                if (order.getUid() != null) {
-                    vo.setUid(order.getUid());
-                    vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() : "");
-                    vo.setUserAccount(userMap.get(order.getUid()).getAccount());
-                }
-                //设置付款账号
-                if (order.getPayUid() != null) {
-                    vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
-                }
-                voList.add(vo);
+            } else {
+                vo.setTeam("");
             }
-            id = orderList.get(orderList.size() - 1).getId();
-        } while (true);
+            //设置团队
+            if (order.getUid() != null) {
+                TeamUser teamUser = teamUserService.getByUser(order.getUid());
+                if (teamUser != null) {
+                    vo.setTeam(teamUser.getName());
+                }
+            } else {
+                vo.setTeam("");
+            }
+            //设置用id
+            if (order.getUid() != null) {
+                vo.setUid(order.getUid());
+                vo.setUserNickname(userMap.get(order.getUid()) != null ? userMap.get(order.getUid()).getNickname() : "");
+                vo.setUserAccount(userMap.get(order.getUid()).getAccount());
+            }
+            //设置付款账号
+            if (order.getPayUid() != null) {
+                vo.setPayUserAccount(userMap.get(order.getPayUid()).getAccount());
+            }
+            voList.add(vo);
+        }
+
 
         OrderExcelInfoVo orderExcelInfoVo = new OrderExcelInfoVo();
         //自定义标题别名
