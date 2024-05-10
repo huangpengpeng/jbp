@@ -347,7 +347,7 @@ public class ExportServiceImpl implements ExportService {
             result.add(vo);
         }
         String s = ossService.uploadXlsx(result, OrderShipmentExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        log.info("订单发货导出下载地址:" + s);
+        log.info("订单列表导出下载地址:" + s);
         return s;
     }
 
