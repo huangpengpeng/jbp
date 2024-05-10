@@ -11,6 +11,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FundClearingVo;
+import com.jbp.service.service.OssService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
 import io.swagger.annotations.Api;
@@ -33,6 +34,8 @@ public class FundClearingController {
     private FundClearingService fundClearingService;
     @Resource
     private UserService userService;
+    @Resource
+    private OssService ossService;
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:page')")
     @GetMapping("/page")
@@ -170,6 +173,32 @@ public class FundClearingController {
         fundClearingService.addFgComm(request.getMonth());
 
         return CommonResult.success();
+    }
+
+
+    @ApiOperation(value = "佣金发放记录导出Excel")
+    @RequestMapping(value = "/excel2", method = RequestMethod.GET)
+    public CommonResult<String> excel2(FundClearingRequest request) {
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        if (StringUtils.isAllEmpty(request.getUniqueNo(), request.getExternalNo()) && uid == null) {
+            if (request.getStartCreateTime() == null && request.getEndCreateTime() == null) {
+                throw new CrmebException("导出没指定【外部单号  流水单号 用户账户 】条件, 数据开始时间结束时间为必填，并且时间间距不能超过一个月");
+            }
+            if (DateTimeUtils.addMonths(request.getStartCreateTime(), 1).before(request.getEndCreateTime())) {
+                throw new CrmebException("导出没指定【外部单号  流水单号 用户账户 】条件, 数据开始时间结束时间为必填，并且时间间距不能超过一个月");
+            }
+        }
+        List<FundClearingExcel> fundClearingExcels = fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
+                uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList());
+        String s = ossService.uploadXlsx(fundClearingExcels, FundClearingExcel.class, "佣金记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return CommonResult.success(s);
     }
 
 
