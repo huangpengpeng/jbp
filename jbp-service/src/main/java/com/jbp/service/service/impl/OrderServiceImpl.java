@@ -581,7 +581,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if(StringUtils.isNotEmpty(request.getSupplyName())){
             List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
             if(!CollectionUtils.isEmpty(orderNoList)){
-                lqw.eq(Order::getOrderNo, orderNoList);
+                lqw.in(Order::getOrderNo, orderNoList);
             }
         }
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
