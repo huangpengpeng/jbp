@@ -114,7 +114,6 @@ public class MerchantOrderController {
         return CommonResult.success(orderService.adminDetail(orderNo));
     }
 
-    @PreAuthorize("hasAuthority('merchant:order:detail:list')")
     @ApiOperation(value = "订单细节详情列表（发货使用）")
     @RequestMapping(value = "/{orderNo}/detail/list", method = RequestMethod.GET)
     public CommonResult<List<OrderDetail>> getDetailList(@PathVariable(value = "orderNo") String orderNo) {
