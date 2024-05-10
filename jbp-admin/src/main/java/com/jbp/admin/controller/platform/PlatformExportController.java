@@ -42,7 +42,7 @@ public class PlatformExportController {
     @PreAuthorize("hasAuthority('platform:export:order:shipment:excel')")
     @ApiOperation(value = "导出订单发货Excel")
     @RequestMapping(value = "/order/shipment/excel", method = RequestMethod.GET)
-    public CommonResult<OrderShipmentExcelInfoVo> exportOrderShipment(@Validated OrderSearchRequest request) {
+    public CommonResult<String> exportOrderShipment(@Validated OrderSearchRequest request) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         request.setSupplyName(systemAdmin.getSupplyName());
         return CommonResult.success(exportService.exportOrderShipment(request));
