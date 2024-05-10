@@ -62,6 +62,10 @@ public class FundClearing extends VersionModel {
         return Lists.newArrayList(Constants.已创建.toString(), Constants.待审核.toString(), Constants.待出款.toString());
     }
 
+    public static List<String> contributeStatus() {
+        return Lists.newArrayList(Constants.已创建.toString(), Constants.待审核.toString(), Constants.待出款.toString(),Constants.已出款.toString());
+    }
+
     @ApiModelProperty("得奖用户")
     @TableField("uid")
     private Integer uid;

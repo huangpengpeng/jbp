@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
@@ -38,8 +39,10 @@ import com.jbp.service.service.*;
 
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -118,6 +121,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private SelfScoreService selfScoreService;
     @Autowired
     private SelfScoreFlowService selfScoreFlowService;
+    @Autowired
+    private FundClearingService fundClearingService;
+    @Autowired
+    private Environment environment;
 
     /**
      * 商户端退款订单分页列表
@@ -1080,6 +1087,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY)) {
             throw new CrmebException("售后单状态异常");
         }
+
+        String name = environment.getProperty("fundClearing.refundBack");
+        if(BooleanUtil.toBoolean(name)) {
+            List<FundClearing> fundClearingList = fundClearingService.getByExternalNo(refundOrder.getOrderNo(), FundClearing.contributeStatus());
+            if (!fundClearingList.isEmpty()) {
+                throw new CrmebException("还有佣金未追回，无法退款");
+            }
+        }
+
 //        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
 //        if(!ifPlatformAdd){
 //            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
