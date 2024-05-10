@@ -46,7 +46,7 @@ public class MerchantExportController {
     @PreAuthorize("hasAuthority('merchant:export:order:excel')")
     @ApiOperation(value = "导出订单Excel")
     @RequestMapping(value = "/order/excel", method = RequestMethod.GET)
-    public CommonResult<OrderExcelInfoVo> exportOrder(@Validated OrderSearchRequest request) {
+    public CommonResult<String> exportOrder(@Validated OrderSearchRequest request) {
         return CommonResult.success(exportService.exportOrder(request));
     }
 

@@ -30,5 +30,5 @@ public interface ExportService {
      */
     String exportOrderShipment(OrderSearchRequest request);
 
-    OrderExcelInfoVo exportOrder(OrderSearchRequest request);
+    String exportOrder(OrderSearchRequest request);
 }
