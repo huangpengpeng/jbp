@@ -32,6 +32,7 @@ import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.ProductMaterialsService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -355,6 +356,7 @@ public class ExportServiceImpl implements ExportService {
                 vo.setOrderNo(StringUtils.isNotEmpty(order.getPlatOrderNo()) ? order.getPlatOrderNo() : order.getOrderNo());
                 vo.setPaidStr(order.getPaid() ? "已支付" : "未支付");
                 vo.setPayType(getOrderPayType(order.getPayType()));
+                vo.setIfUserVerifyReceive(BooleanUtils.isTrue(order.getIfUserVerifyReceive()) ? "是" : "否");
                 vo.setPayChannel(getOrderPayChannel(order.getPayChannel()));
                 vo.setStatus(getOrderStatus(order.getStatus()));
                 vo.setRefundStatus(getOrderRefundStatus(order.getRefundStatus()));
@@ -450,6 +452,7 @@ public class ExportServiceImpl implements ExportService {
         head.put("payTime","支付时间");
         head.put("capaName","下单前等级名称");
         head.put("successCapaName","下单后等级名称");
+        head.put("ifUserVerifyReceive","用户是否确认收货");
         JSONArray array = new JSONArray();
         head.forEach((k, v) -> {
             JSONObject json = new JSONObject();
