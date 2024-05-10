@@ -56,11 +56,6 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
         if (clearingFinal == null || !clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
             throw new CrmebException("结算状态不是待结算不允许生成销售关系");
         }
-        List<ClearingUser> clearingUserList = clearingUserService.getByClearing(clearingFinal.getId());
-        Map<Integer, ClearingUser> clearingUserMap = FunctionUtil.keyValueMap(clearingUserList, ClearingUser::getUid);
-        if (CollectionUtils.isEmpty(clearingUserList)) {
-            throw new CrmebException("请先生成结算名单");
-        }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.拓展佣金.getType()) {
             log.info("拓展佣金:不需要生成结算销售关系");
             return true;
@@ -68,6 +63,11 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.平台分红.getType()) {
             log.info("平台分红:不需要生成结算销售关系");
             return true;
+        }
+        List<ClearingUser> clearingUserList = clearingUserService.getByClearing(clearingFinal.getId());
+        Map<Integer, ClearingUser> clearingUserMap = FunctionUtil.keyValueMap(clearingUserList, ClearingUser::getUid);
+        if (CollectionUtils.isEmpty(clearingUserList)) {
+            throw new CrmebException("请先生成结算名单");
         }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.培育佣金.getType()) {
             // 删除上一次的结算关系网

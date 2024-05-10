@@ -1,6 +1,9 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.request.agent.ClearingRequest;
+import com.jbp.service.product.comm.ProductCommEnum;
+import com.jbp.service.service.agent.ClearingFinalService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,6 +32,14 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+        ClearingFinalService clearingFinalService = run.getBean(ClearingFinalService.class);
+        ClearingRequest request = new ClearingRequest();
+        request.setCommType(ProductCommEnum.平台分红.getType());
+        request.setCommName(ProductCommEnum.平台分红.getName());
+        request.setStartTime("20240509");
+        request.setEndTime("20240510");
+        request.setIfImportUser(false);
+        clearingFinalService.syncOneKeyClearing(request);
 
     }
 
