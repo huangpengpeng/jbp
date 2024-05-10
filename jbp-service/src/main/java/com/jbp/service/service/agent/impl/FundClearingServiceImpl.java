@@ -353,6 +353,15 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     public List<FundClearingExcel> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund , List<String> orderList) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         List<FundClearingExcel> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, 0L, channelName, commName, ifRefund, orderList);
+        String name = environment.getProperty("spring.profiles.active");
+        if(name.contains("sm") || name.contains("yk")  || name.contains("tf") || name.contains("qy") ){
+            for (FundClearingExcel fundClearingVo : fundClearingVos) {
+                fundClearingVo.setIdCardNo("");
+                fundClearingVo.setPhone("");
+                fundClearingVo.setBankName("");
+                fundClearingVo.setBankCode("");
+            }
+        }
         return fundClearingVos;
     }
 
@@ -406,7 +415,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
             e.setSendAmt(e.getSendAmt().multiply(wallet_pay_integral));
-            if(name.equals("sm") || name.equals("yk")  || name.equals("tf") ){
+            if(name.contains("sm") || name.contains("yk")  || name.contains("tf") ){
                 e.setDescription(CommAliasNameSmEnum.getAliasNameReplaceName(e.getDescription()));
             }else{
                 e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));

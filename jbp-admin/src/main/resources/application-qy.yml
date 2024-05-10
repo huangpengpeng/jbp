@@ -36,7 +36,7 @@ server:
     min-spare-threads: 30   # 初始化启动线程数量
 spring:
   profiles:
-    active: beta
+    active: qy-admin
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小
