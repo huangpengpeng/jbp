@@ -82,7 +82,7 @@ public class ClearingVipUserController {
         return CommonResult.success(listResponses);
     }
 
-    @ApiOperation(value = "购买平台校验 platform =【直通VIP1 直通VIP2 直通VIP3】 num =  购买合计数量")
+    @ApiOperation(value = "购买平台校验 platform =【直通V1 直通V2 直通V3】 num =  购买合计数量")
     @RequestMapping(value = "/valid4Platform", method = RequestMethod.GET)
     public CommonResult<Boolean> valid(String platform, int num) {
         if (StringUtils.isEmpty(platform)) {
@@ -104,7 +104,7 @@ public class ClearingVipUserController {
         if (ArithmeticUtils.gt(usedMaxFee, maxFee)) {
             throw new CrmebException("购买份额超出限制");
         }
-        if (StringUtils.equals(platform, "直通VIP2")) {
+        if (StringUtils.equals(platform, "直通V2")) {
             // 验证是否购买V1
             PingTaiCommHandler.Rule rule1 = ruleMap.get("直通VIP1");
             ClearingVipUser clearingVipUser1 = clearingVipUserService.getByUser(uid, rule1.getRefLevel(), pingTaiCommHandler.getType());
@@ -112,7 +112,7 @@ public class ClearingVipUserController {
                 throw new CrmebException("未购买直通VIP1礼包");
             }
         }
-        if (StringUtils.equals(platform, "直通VIP3")) {
+        if (StringUtils.equals(platform, "直通V3")) {
             // 验证是否购买V2
             PingTaiCommHandler.Rule rule2 = ruleMap.get("直通VIP2");
             ClearingVipUser clearingVipUser2 = clearingVipUserService.getByUser(uid, rule2.getRefLevel(), pingTaiCommHandler.getType());
