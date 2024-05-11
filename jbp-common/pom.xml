@@ -14,6 +14,27 @@
 
 	<properties>
 	</properties>
+	
+		<!-- 配置远程仓库-->
+	<repositories>
+		<repository>
+			<id>aliyun</id>
+			<name>aliyun Repository</name>
+			<url>https://maven.aliyun.com/repository/public</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jeecg</id>
+			<name>jeecg Repository</name>
+			<url>https://maven.jeecg.org/nexus/content/repositories/jeecg</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 
 	<dependencies>
 		<dependency>
@@ -343,13 +364,13 @@
 			<groupId>org.lionsoul</groupId>
 			<artifactId>ip2region</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.yeepay.yop.sdk</groupId>
 			<artifactId>yop-java-sdk</artifactId>
 			<version>4.0.1</version>
 		</dependency>
+	
 
 	</dependencies>
-
-
 </project>

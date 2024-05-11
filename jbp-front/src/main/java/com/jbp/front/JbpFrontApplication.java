@@ -42,12 +42,14 @@ public class JbpFrontApplication {
         System.out.println("ok");
 
         YopService yopService = run.getBean(YopService.class);
-//        AccountBalanceQueryResult accountBalanceQueryResult = yopService.accountBalanceQuery("10090108498");
+        AccountBalanceQueryResult accountBalanceQueryResult = yopService.accountBalanceQuery("10090108498");
 
-        String requestNo = StringUtils.N_TO_10("LZT_NDF_");
-        System.out.println(requestNo);
-        AccountTransferOrderResult accountTransferOrderResult = yopService.transferB2bOrder(requestNo, "10090108498", "10090224584", "0.02", null);
-        AccountTransferOrderQueryResult accountTransferOrderQueryResult = yopService.transferB2bOrderQuery("10090108498", requestNo);
+//        String requestNo = StringUtils.N_TO_10("LZT_NDF_");
+//        System.out.println(requestNo);
+//        AccountTransferOrderResult accountTransferOrderResult = yopService.transferB2bOrder(requestNo, "10090269643", "10090225827", "0.02", "http://127.0.0.1:8888/soft");
+//        AccountTransferOrderQueryResult accountTransferOrderQueryResult = yopService.transferB2bOrderQuery("10090269643", requestNo);
+//     
+        
         System.out.println("111");
     }
 

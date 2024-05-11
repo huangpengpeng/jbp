@@ -177,6 +177,7 @@ public class YopServiceImpl implements YopService {
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);
+        request.withRequestConfig(null);
         //设置参数
         Map<String, Object> mapObj = JacksonTool.objectToMap(parameters);
         for (Map.Entry<String, Object> entry : mapObj.entrySet()) {
