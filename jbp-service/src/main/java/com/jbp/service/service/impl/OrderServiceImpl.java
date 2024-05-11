@@ -578,6 +578,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
+        if(StringUtils.isNotBlank(request.getTeamId())) {
+            lqw.last("  and uid in (select uid from eb_team_user where tid = " + request.getTeamId() + ") ");
+        }
+
         if(StringUtils.isNotEmpty(request.getSupplyName())){
             List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
             if(!CollectionUtils.isEmpty(orderNoList)){
@@ -612,9 +616,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
         getMerchantStatusWhere(lqw, request.getStatus());
-        if(ObjectUtil.isNotNull(request.getTeamId())) {
-            lqw.last("  and uid in (select uid from eb_team_user where tid = " + request.getTeamId() + ") ");
-        }
+
         lqw.orderByDesc(Order::getId);
         List<Order> orderList = dao.selectList(lqw);
         if (CollUtil.isEmpty(orderList)) {
