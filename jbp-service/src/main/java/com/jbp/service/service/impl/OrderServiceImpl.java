@@ -579,7 +579,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
         if(StringUtils.isNotBlank(request.getTeamId())) {
-            lqw.in( Order::getUid ,"select uid from eb_team_user where tid = " + request.getTeamId() + "");
+            lqw.apply("  uid in (select uid from eb_team_user where tid = " + request.getTeamId() + ") ");
         }
 
         if(StringUtils.isNotEmpty(request.getSupplyName())){
