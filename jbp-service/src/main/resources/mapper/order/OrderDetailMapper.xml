@@ -64,6 +64,7 @@
         left join eb_order o on o.order_no = od.order_no
         left join eb_user_invitation u on u.uid = o.uid
         left join eb_user_capa c on c.uid = u.pid
+        inner join eb_orders_success_msg f on f.orders_sn = o.plat_order_no and f.exec = 1
         where od.product_id in (${goodsId}) and o.paid = 1 and o.refund_status = 0  and o.is_del = 0 and `level` = 1
         and u.pid = #{pid}  and c.capa_id >=  #{capaId}
 
