@@ -21,6 +21,8 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.ProductMaterials;
+import com.jbp.common.model.agent.Team;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
@@ -115,6 +117,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private ProductMaterialsService productMaterialsService;
     @Autowired
     private OrderInvoiceDao orderInvoiceDao;
+    @Autowired
+    private TeamService teamService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -578,6 +582,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
+        if(StringUtils.isNotBlank(request.getTeamId())) {
+            Team team =  teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId,request.getTeamId()));
+            lqw.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
+        }
+
         if(StringUtils.isNotEmpty(request.getSupplyName())){
             List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
             if(!CollectionUtils.isEmpty(orderNoList)){
@@ -612,9 +621,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             getRequestTimeWhere(lqw, request.getDateLimit());
         }
         getMerchantStatusWhere(lqw, request.getStatus());
-        if(ObjectUtil.isNotNull(request.getTeamId())) {
-            lqw.last("  and uid in (select uid from eb_team_user where tid = " + request.getTeamId() + ") ");
-        }
+
         lqw.orderByDesc(Order::getId);
         List<Order> orderList = dao.selectList(lqw);
         if (CollUtil.isEmpty(orderList)) {

@@ -16,6 +16,7 @@ import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.response.OrderInvoiceResponse;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.service.*;
@@ -68,6 +69,8 @@ public class ExportServiceImpl implements ExportService {
     private CapaService capaService;
     @Resource
     private OssService ossService;
+    @Resource
+    private OrderInvoiceService orderInvoiceService;
 
     /**
      * 订单导出
@@ -312,6 +315,8 @@ public class ExportServiceImpl implements ExportService {
             vo.setCreateTime(order.getCreateTime());
 
             vo.setPayTime(order.getPayTime());
+            List<OrderInvoiceResponse> shopList=   orderInvoiceService.findByOrderNo(order.getOrderNo());
+            vo.setShipTime(shopList.isEmpty() ? null : shopList.get(0).getCreateTime());
             // 下单等级
             OrderExt orderExt = orderNoMapList.get(merchantOrder.getOrderNo());
             if (orderExt != null) {
