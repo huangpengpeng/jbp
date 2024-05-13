@@ -112,6 +112,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/merchant/login").permitAll()
                 .antMatchers("/jmreport/desreport_/cdn/iview/fonts/**").permitAll()
                 .antMatchers("/api/admin/agent/lzt/**").permitAll()
+                .antMatchers("/api/admin/agent/capa/**").permitAll()
+
+                 // TODO 测试
+                .antMatchers("/api/admin/agent/user/wallet/give/plan/**").permitAll()
+                .antMatchers("/api/admin/agent/product/supply/**").permitAll()
+                .antMatchers("/api/admin/platform/admin/**").permitAll()
+                .antMatchers("/api/admin/agent/invitation/Jump/**").permitAll()
+                .antMatchers("/api/admin/agent/clearingVipUser/**").permitAll()
+                .antMatchers("/api/admin/agent/fund/clearing/**").permitAll()
+
+
                 // 放行资源路径
                 .antMatchers("/" + UploadConstants.UPLOAD_FILE_KEYWORD + "/**").permitAll()
                 .antMatchers("/" + UploadConstants.DOWNLOAD_FILE_KEYWORD + "/**").permitAll()

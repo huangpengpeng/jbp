@@ -52,4 +52,5 @@ public class UserInvitationFlowController {
         }
         return CommonResult.success(CommonPage.restPage(userInvitationFlowService.pageList(uid, pid, request.getLevel(), pageParamRequest)));
     }
+
 }
