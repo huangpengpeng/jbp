@@ -92,7 +92,7 @@ public class ClearingVipUserController {
         List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
         Map<String, PingTaiCommHandler.Rule> ruleMap = FunctionUtil.keyValueMap(ruleList, PingTaiCommHandler.Rule::getLevelName);
 
-        PingTaiCommHandler.Rule rule = ruleMap.get(platform.equals("直通V1" )? "直通VIP1" : platform.equals("直通V2")? "直通VIP2" :platform.equals("直通V3")?platform.equals("直通VIP3"): "" );
+        PingTaiCommHandler.Rule rule = ruleMap.get(platform.equals("直通V1" )? "直通VIP1" : platform.equals("直通V2")? "直通VIP2" :platform.equals("直通V3")?"直通VIP3": "" );
         BigDecimal maxFee = rule.getMaxFee().multiply(BigDecimal.valueOf(rule.getMaxNum()));
 
         ClearingVipUser clearingVipUser = clearingVipUserService.getByUser(uid, rule.getRefLevel(), pingTaiCommHandler.getType());
@@ -109,7 +109,7 @@ public class ClearingVipUserController {
             // 验证是否购买V1
             PingTaiCommHandler.Rule rule1 = ruleMap.get("直通VIP1");
             ClearingVipUser clearingVipUser1 = clearingVipUserService.getByUser(uid, rule1.getRefLevel(), pingTaiCommHandler.getType());
-            if (clearingVipUser1 != null) {
+            if (clearingVipUser1 == null) {
                 throw new CrmebException("未购买直通VIP1礼包");
             }
         }
@@ -117,7 +117,7 @@ public class ClearingVipUserController {
             // 验证是否购买V2
             PingTaiCommHandler.Rule rule2 = ruleMap.get("直通VIP2");
             ClearingVipUser clearingVipUser2 = clearingVipUserService.getByUser(uid, rule2.getRefLevel(), pingTaiCommHandler.getType());
-            if (clearingVipUser2 != null) {
+            if (clearingVipUser2 == null) {
                 throw new CrmebException("未购买直通VIP2礼包");
             }
         }
