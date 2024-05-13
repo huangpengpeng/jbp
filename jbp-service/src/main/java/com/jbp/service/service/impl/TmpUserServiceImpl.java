@@ -55,7 +55,8 @@ public class TmpUserServiceImpl extends ServiceImpl<TmpUserDao, TmpUser> impleme
         if (!CollectionUtils.isEmpty(list)) {
             size = list.size();
             for (TmpUser tmpUser : list) {
-                User user = userService.registerNoBandPater(tmpUser.getNickName(), tmpUser.getMobile(), "导入");
+                User user = userService.registerNoBandPater(tmpUser.getNickName(), tmpUser.getMobile(), "导入", 3L);
+
                 tmpUser.setUid(user.getId());
                 log.info("增在执行用户导入新增 总长度:{}, 当前长度:{}", size, i++);
             }
@@ -64,24 +65,24 @@ public class TmpUserServiceImpl extends ServiceImpl<TmpUserDao, TmpUser> impleme
         }
         // 执行绑定上级
         LambdaQueryWrapper<TmpUser> lqw2 = new LambdaQueryWrapper<>();
-        lqw2.eq(TmpUser::getIfBand, false).last(" limit 1000");
-        list = list(lqw2);
-        if (!CollectionUtils.isEmpty(list)) {
-            size = list.size();
+        lqw2.isNull(TmpUser::getIfBand).isNull(TmpUser::getPid).last(" limit 1000");
+        List<TmpUser> list2 = list(lqw2);
+        if (!CollectionUtils.isEmpty(list2)) {
+            size = list2.size();
             i = 0;
-            for (TmpUser tmpUser : list) {
+            for (TmpUser tmpUser : list2) {
                 if (tmpUser.getOrgPid() != null) {
                     TmpUser pUser = getByOrgId(tmpUser.getOrgPid());
                     if (pUser != null) {
-                        pUser = getByOrgId(503803);
                         Integer pId = pUser.getUid();
                         invitationService.band(tmpUser.getUid(), pId, false, true, true);
+                        tmpUser.setPid(pId);
                     }
                 }
                 tmpUser.setIfBand(true);
                 log.info("增在执行用户导入绑定 总长度:{}, 当前长度:{}", size, i++);
             }
-            dao.updateBatch(list);
+            dao.updateBatch(list2);
         }
     }
 

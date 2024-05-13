@@ -28,10 +28,18 @@ public class TmpUser extends BaseModel {
     @ApiModelProperty(value = "原系统上级")
     private Integer orgPid;
 
+    @ApiModelProperty(value = "等级名称")
+    private String capaName;
+
+    @ApiModelProperty(value = "星级名称")
+    private String capaXsName;
+
     @ApiModelProperty(value = "用户id")
     private Integer uid;
 
+    @ApiModelProperty(value = "父级id")
+    private Integer pid;
+
     @ApiModelProperty(value = "是否绑定上级")
     private Boolean ifBand;
-
 }

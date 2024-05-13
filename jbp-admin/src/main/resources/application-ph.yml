@@ -178,8 +178,6 @@ kq:
 
 internal:
   uid: 1014545,1014667
-  shop:
-    uid: 1014545,1015435,1015048,1015157
-    pid: 1015043
+  shop: 0
 erp:
   userPrefix: A

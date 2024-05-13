@@ -360,13 +360,19 @@ public class ExportServiceImpl implements ExportService {
 
     private static void valid(OrderSearchRequest request) {
         if (StringUtils.isEmpty(request.getOrderNo()) && StringUtils.isEmpty(request.getPlatOrderNo()) && StringUtils.isEmpty(request.getUaccount()) && StringUtils.isEmpty(request.getPayAccount())) {
-            if (StringUtils.isEmpty(request.getDateLimit())) {
-                throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
+            if (StringUtils.isEmpty(request.getDateLimit()) && StringUtils.isEmpty(request.getPayTime())) {
+                throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据【创建时间】或者【付款时间】为必填二选一，且时间跨度不超出3个月");
             }
             if (StringUtils.isNotEmpty(request.getDateLimit())) {
                 DateLimitUtilVo timeVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
-                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 60).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
-                    throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据创建开始时间结束时间为必填，并且时间间距不能超过一个月");
+                if (DateTimeUtils.addMonths(DateTimeUtils.parseDate(timeVo.getStartTime()), 4).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
+                    throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据【创建时间】或者【付款时间】为必填二选一，且时间跨度不超出3个月");
+                }
+            }
+            if (StringUtils.isNotEmpty(request.getPayTime())) {
+                DateLimitUtilVo timeVo = CrmebDateUtil.getDateLimit(request.getPayTime());
+                if (DateTimeUtils.addMonths(DateTimeUtils.parseDate(timeVo.getStartTime()), 4).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
+                    throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据【创建时间】或者【付款时间】为必填二选一，且时间跨度不超出3个月");
                 }
             }
         }

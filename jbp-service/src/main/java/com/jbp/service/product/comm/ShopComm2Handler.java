@@ -2,6 +2,7 @@ package com.jbp.service.product.comm;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
@@ -18,16 +19,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -89,26 +88,26 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
         for (CommCalculateResult calculateResult : collisionFeeList) {
 
             Integer uid = calculateResult.getUid();
-
-            String internalUid = environment.getProperty("internal.shop.uid");
-            String internalPid = environment.getProperty("internal.shop.pid");
-            List<String> internalList = Lists.newArrayList();
-            if(StringUtils.isNotEmpty(internalUid)){
-                internalList = Arrays.stream(internalUid.split(",")).collect(Collectors.toList());
-            }
-            if(CollectionUtils.isNotEmpty(internalList) && internalList.contains(uid.toString()) && StringUtils.isNotEmpty(internalPid)) {
-                BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
-                fundClearingService.create(Integer.valueOf(internalPid), order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
-                        null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
-            }else {
-                Integer pid = invitationService.getPid(uid);
-                BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
-                if (pid != null && ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
-                    fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
-                            null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+            String internalUid = environment.getProperty("internal.shop");
+            if (StringUtils.isNotEmpty(internalUid) && internalUid.equals("1")) {
+                User user = userService.getById(uid);
+                Map<String, Object> map = SqlRunner.db().selectOne("select * from user_shop_band where account={0} limit 1", user.getAccount());
+                if (map != null) {
+                    String paccount = MapUtils.getString(map, "paccount");
+                    BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
+                    if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
+                        fundClearingService.create(userService.getByAccount(paccount).getId(), order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
+                                null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+                    }
+                    return;
                 }
             }
-
+            Integer pid = invitationService.getPid(uid);
+            BigDecimal amt = calculateResult.getPv().multiply(ratio).setScale(2, BigDecimal.ROUND_DOWN);
+            if (pid != null && ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
+                fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推荐店铺佣金.getName(), amt,
+                        null, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.推荐店铺佣金.getName(), "");
+            }
         }
     }
 
