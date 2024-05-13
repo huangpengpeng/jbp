@@ -923,15 +923,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         getByOrderNoAndMerId(orderNo, admin.getMerId());
         List<OrderDetail> list = orderDetailService.getShipmentByOrderNo(orderNo);
-        if(StringUtils.isNotEmpty(admin.getSupplyName())){
-            List<String> barCodeList = productMaterialsService.getBarCodeList4Supply(admin.getSupplyName());
-            for (OrderDetail orderDetail : list) {
-                if(!barCodeList.contains(orderDetail.getBarCode())){
-                    list.remove(orderDetail);
-                }
+        if (StringUtils.isEmpty(admin.getSupplyName())) {
+            return list;
+        }
+        List<OrderDetail> result = Lists.newArrayList();
+        List<String> barCodeList = productMaterialsService.getBarCodeList4Supply(admin.getSupplyName());
+        for (OrderDetail orderDetail : list) {
+            if (barCodeList.contains(orderDetail.getBarCode())) {
+                result.add(orderDetail);
             }
         }
-        return list;
+
+        return result;
     }
 
     /**
