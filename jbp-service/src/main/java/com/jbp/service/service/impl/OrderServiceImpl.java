@@ -920,7 +920,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      */
     @Override
     public List<OrderDetail> getDetailList(String orderNo) {
-        SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
+        SystemAdmin admin = systemAdminService.getById(SecurityUtil.getLoginUserVo().getUser().getId());
         getByOrderNoAndMerId(orderNo, admin.getMerId());
         List<OrderDetail> list = orderDetailService.getShipmentByOrderNo(orderNo);
         if (StringUtils.isEmpty(admin.getSupplyName())) {
