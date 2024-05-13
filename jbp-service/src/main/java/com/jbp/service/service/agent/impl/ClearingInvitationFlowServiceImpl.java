@@ -170,8 +170,7 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
 
     @Override
     public List<ClearingInvitationFlow> getByPUser(Integer pid, Long clearingId, Integer level) {
-        return list(new QueryWrapper<ClearingInvitationFlow>().lambda().eq(ClearingInvitationFlow::getPId, pid).eq(ClearingInvitationFlow::getClearingId, clearingId).eq(ClearingInvitationFlow::getLevel, level);
-                ;
+        return list(new QueryWrapper<ClearingInvitationFlow>().lambda().eq(ClearingInvitationFlow::getPId, pid).eq(ClearingInvitationFlow::getClearingId, clearingId).eq(ClearingInvitationFlow::getLevel, level));
     }
 
     @Override
