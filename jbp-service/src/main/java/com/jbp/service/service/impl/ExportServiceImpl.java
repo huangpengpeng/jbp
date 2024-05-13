@@ -365,13 +365,13 @@ public class ExportServiceImpl implements ExportService {
             }
             if (StringUtils.isNotEmpty(request.getDateLimit())) {
                 DateLimitUtilVo timeVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
-                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 3).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
+                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 4).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
                     throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据【创建时间】或者【付款时间】为必填二选一，且时间跨度不超出3个月");
                 }
             }
             if (StringUtils.isNotEmpty(request.getPayTime())) {
                 DateLimitUtilVo timeVo = CrmebDateUtil.getDateLimit(request.getPayTime());
-                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 3).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
+                if (DateTimeUtils.addDays(DateTimeUtils.parseDate(timeVo.getStartTime()), 4).before(DateTimeUtils.parseDate(timeVo.getEndTime()))) {
                     throw new CrmebException("导出没指定【单号 下单账户  付款账户 】条件, 数据【创建时间】或者【付款时间】为必填二选一，且时间跨度不超出3个月");
                 }
             }
