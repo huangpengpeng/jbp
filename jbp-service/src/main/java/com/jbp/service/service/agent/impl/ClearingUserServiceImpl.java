@@ -9,6 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.ClearingUserImportDto;
+import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
@@ -22,6 +23,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.ClearingUserDao;
+import com.jbp.service.product.comm.MonthGuanLiCommHandler;
 import com.jbp.service.product.comm.MonthPyCommHandler;
 import com.jbp.service.product.comm.PingTaiCommHandler;
 import com.jbp.service.product.comm.ProductCommEnum;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,8 @@ import java.util.stream.Collectors;
 @Service
 public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao, ClearingUser> implements ClearingUserService {
 
+    @Resource
+    private UserInvitationService invitationService;
     @Resource
     private FundClearingService fundClearingService;
     @Resource
@@ -71,13 +76,14 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private UserService userService;
     @Resource
     private ClearingFinalService clearingFinalService;
-
     @Resource
     private RedisTemplate redisTemplate;
     @Resource
     private MonthPyCommHandler monthPyCommHandler;
     @Resource
     private PingTaiCommHandler pingTaiCommHandler;
+    @Resource
+    private MonthGuanLiCommHandler monthGuanLiCommHandler;
 
 
     @Override
@@ -174,6 +180,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         createPeiYuUser(clearingId, clearingFinal, startTime, endTime, perMap);
         // 平台分红名单
         createPingTaiUser(clearingId, clearingFinal, endTime, perMap);
+        // 月度管理佣金
+        createMonthGuanLiUser(clearingId, clearingFinal, startTime, endTime, perMap);
         // 删除预设名单
         delPerUser();
         return true;
@@ -222,6 +230,100 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         return CommonPage.copyPageInfo(page, list(lqw));
     }
 
+    private void createMonthGuanLiUser(Long clearingId, ClearingFinal clearingFinal, Date startTime, Date endTime, Map<Integer, ClearingUser> perMap) {
+        if (clearingFinal.getCommName().equals(ProductCommEnum.月度管理补贴.getName())) {
+            Map<Long, MonthGuanLiCommHandler.Rule> ruleMap = monthGuanLiCommHandler.getRule(null);
+            if (ruleMap == null || ruleMap.isEmpty()) {
+                throw new CrmebException("月度管理补贴规则为空请联系管理员");
+            }
+            Long capaId = ruleMap.get(0).getCapaId();
+            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().ge(UserCapa::getCapaId, capaId));
+            if (CollectionUtils.isEmpty(userCapaList)) {
+                return;
+            }
+            // 支付成功的订单
+            Map<Integer, Double> userScoreMap = Maps.newConcurrentMap();
+            List<Order> successList = orderService.getSuccessList(startTime, endTime);
+            for (Order order : successList) {
+                BigDecimal score = BigDecimal.ZERO;
+                List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+                for (OrderDetail orderDetail : orderDetailList) {
+                    ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), monthGuanLiCommHandler.getType());
+                    if (productComm != null) {
+                        BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
+                        score = score.add(realScore);
+                    }
+                }
+                if (ArithmeticUtils.gt(score, BigDecimal.ZERO)) {
+                    Double d = MapUtils.getDouble(userScoreMap, order.getUid(), 0.0);
+                    userScoreMap.put(order.getUid(), BigDecimal.valueOf(d).add(score).doubleValue());
+                }
+            }
+            if (userScoreMap.isEmpty()) {
+                return;
+            }
+            // 满足结算等级用户
+            Map<Integer, Double> userTeamScoreMap = Maps.newConcurrentMap();
+            List<Integer> uidList = userCapaList.stream().map(UserCapa::getUid).collect(Collectors.toList());
+            userScoreMap.forEach((uid, score) -> {
+                // 先加给自己
+                if (uidList.contains(uid)) {
+                    Double d = MapUtils.getDouble(userTeamScoreMap, uid, 0.0);
+                    userTeamScoreMap.put(uid, BigDecimal.valueOf(d).add(BigDecimal.valueOf(score)).doubleValue());
+                }
+                // 在加给上级
+                List<UserUpperDto> allUpper = invitationService.getAllUpper(uid);
+                if (CollectionUtils.isNotEmpty(allUpper)) {
+                    for (UserUpperDto upperDto : allUpper) {
+                        if (upperDto.getPId() != null && uidList.contains(upperDto.getPId())) {
+                            Double d = MapUtils.getDouble(userTeamScoreMap, upperDto.getPId(), 0.0);
+                            userTeamScoreMap.put(upperDto.getPId(), BigDecimal.valueOf(d).add(BigDecimal.valueOf(score)).doubleValue());
+                        }
+                    }
+                }
+            });
+            // 更具团队业绩确定结算等级
+            List<MonthGuanLiCommHandler.Rule> ruleList = ruleMap.values().stream().sorted(Comparator.comparing(MonthGuanLiCommHandler.Rule::getMinScore).reversed()).collect(Collectors.toList());
+            List<ClearingUser> clearingUserList = Lists.newArrayList();
+            userTeamScoreMap.forEach((uid, score) -> {
+                ClearingUser perUser = perMap.get(uid);
+                if (perUser == null) {
+                    MonthGuanLiCommHandler.Rule tagRule = monthGuanLiCommHandler.getRuleByScore(ruleList, BigDecimal.valueOf(score));
+                    if (tagRule != null) {
+                        // 说明满足结算条件
+                        tagRule.setUsableScore(BigDecimal.valueOf(score));
+                        User user = userService.getById(uid);
+                        ClearingUser clearingUser = new ClearingUser(clearingId, uid, user.getAccount(),
+                                tagRule.getLevel(), tagRule.getLevelName(), JSONObject.toJSONString(tagRule));
+                        clearingUserList.add(clearingUser);
+                    }
+                }
+            });
+
+            // 处理预设名单
+            if (!perMap.isEmpty()) {
+                perMap.forEach((uid, perUser) -> {
+                    try {
+                        JSONObject rule = JSONObject.parseObject(perUser.getRule());
+                        if (rule == null) {
+                            throw new RuntimeException("预设名单不是当前佣金结算，请清空再次结算");
+                        }
+                        rule.toJavaObject(MonthGuanLiCommHandler.Rule.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                    ClearingUser newUser = new ClearingUser();
+                    BeanUtils.copyProperties(perUser, newUser, "id", "clearingId");
+                    newUser.setClearingId(clearingId);
+                    clearingUserList.add(newUser);
+                });
+            }
+
+            if (CollectionUtils.isNotEmpty(clearingUserList)) {
+                clearingUserDao.insertBatch(clearingUserList);
+            }
+        }
+    }
 
     private void createPingTaiUser(Long clearingId, ClearingFinal clearingFinal, Date endTime, Map<Integer, ClearingUser> perMap) {
         if (clearingFinal.getCommName().equals(ProductCommEnum.平台分红.getName())) {
@@ -449,6 +551,27 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 if (rule == null) {
                     throw new CrmebException("培育佣金结算级编号不存在");
                 }
+                clearingUser.setRule(JSONObject.toJSONString(rule));
+                insetBatchList.add(clearingUser);
+            }
+        }
+        if (commType.equals(ProductCommEnum.月度管理补贴.getType())) {
+            Map<Long, MonthGuanLiCommHandler.Rule> ruleMap = monthGuanLiCommHandler.getRule(null);
+            if (ruleMap == null || ruleMap.isEmpty()) {
+                throw new CrmebException("请联系管理员设置月度管理补贴规则");
+            }
+            for (ClearingUserImportDto dto : userList) {
+                User user = userService.getByAccount(dto.getAccount());
+                ClearingUser clearingUser = ClearingUser.builder().clearingId(clearingId).uid(user.getId()).accountNo(user.getAccount()).level(dto.getLevel()).levelName(dto.getLevelName()).build();
+
+                MonthGuanLiCommHandler.Rule rule = ruleMap.get(dto.getLevel());
+                if (rule == null) {
+                    throw new CrmebException("培育佣金结算级编号不存在");
+                }
+                if (dto.getWeight() == null || ArithmeticUtils.lessEquals(dto.getWeight(), BigDecimal.ZERO)) {
+                    throw new CrmebException(dto.getAccount() + ProductCommEnum.月度管理补贴.getName() + "权重不能为空");
+                }
+                rule.setUsableScore(dto.getWeight());
                 clearingUser.setRule(JSONObject.toJSONString(rule));
                 insetBatchList.add(clearingUser);
             }

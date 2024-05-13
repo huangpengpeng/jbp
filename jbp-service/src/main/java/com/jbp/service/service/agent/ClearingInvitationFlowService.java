@@ -20,5 +20,7 @@ public interface ClearingInvitationFlowService extends IService<ClearingInvitati
 
     List<ClearingInvitationFlow> getByPUser(Integer pid);
 
+    List<ClearingInvitationFlow> getByPUser(Integer pid, Long clearingId, Integer level);
+
     PageInfo<ClearingInvitationFlow> pageList(Integer uid, Integer pid, Integer level, Long clearingId,  PageParamRequest pageParamRequest);
 }

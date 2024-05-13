@@ -97,6 +97,28 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
                 dao.insertBatch(clearingInvitationFlows);
             }
         }
+        if (clearingFinal.getCommType().intValue() == ProductCommEnum.月度管理补贴.getType()) {
+            List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingFinal.getId());
+            List<Integer> uidList = clearingUsers.stream().map(ClearingUser::getUid).collect(Collectors.toList());
+            List<ClearingInvitationFlow> flowList = Lists.newArrayList();
+            for (ClearingUser clearingUser : clearingUsers) {
+                List<UserUpperDto> allUpper = invitationService.getAllUpper(clearingUser.getUid());
+                if (CollectionUtils.isNotEmpty(allUpper)) {
+                    int i = 1;
+                    for (UserUpperDto upperDto : allUpper) {
+                        if (upperDto.getPId() != null && uidList.contains(upperDto.getPId())) {
+                            ClearingInvitationFlow flow = new ClearingInvitationFlow(clearingId, upperDto.getUId(), upperDto.getPId(), i);
+                            i++;
+                            flowList.add(flow);
+                        }
+                    }
+                }
+            }
+            List<List<ClearingInvitationFlow>> partition = Lists.partition(flowList, 5000);
+            for (List<ClearingInvitationFlow> clearingInvitationFlows : partition) {
+                dao.insertBatch(clearingInvitationFlows);
+            }
+        }
         return true;
     }
 
@@ -144,6 +166,12 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     public List<ClearingInvitationFlow> getByPUser(Integer pid) {
         return list(new QueryWrapper<ClearingInvitationFlow>().lambda().eq(ClearingInvitationFlow::getPId, pid)
                 .orderByAsc(ClearingInvitationFlow::getLevel));
+    }
+
+    @Override
+    public List<ClearingInvitationFlow> getByPUser(Integer pid, Long clearingId, Integer level) {
+        return list(new QueryWrapper<ClearingInvitationFlow>().lambda().eq(ClearingInvitationFlow::getPId, pid).eq(ClearingInvitationFlow::getClearingId, clearingId).eq(ClearingInvitationFlow::getLevel, level)
+                ;
     }
 
     @Override

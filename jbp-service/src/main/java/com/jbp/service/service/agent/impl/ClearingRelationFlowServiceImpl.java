@@ -64,6 +64,10 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
             log.info("平台分红:不需要生成结算销售关系");
             return true;
         }
+        if (clearingFinal.getCommType().intValue() == ProductCommEnum.月度管理补贴.getType()) {
+            log.info("月度管理补贴:不需要生成结算销售关系");
+            return true;
+        }
         List<ClearingUser> clearingUserList = clearingUserService.getByClearing(clearingFinal.getId());
         Map<Integer, ClearingUser> clearingUserMap = FunctionUtil.keyValueMap(clearingUserList, ClearingUser::getUid);
         if (CollectionUtils.isEmpty(clearingUserList)) {

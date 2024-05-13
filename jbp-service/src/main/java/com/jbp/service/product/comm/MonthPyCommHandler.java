@@ -107,6 +107,9 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
         Map<Integer, ClearingUser> cleaingUserMap = FunctionUtil.keyValueMap(clearingUsers, ClearingUser::getUid);
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
+
+
+
         List<Order> successList = orderService.getSuccessList(startTime, endTime);
 
         // 计算积分汇总
