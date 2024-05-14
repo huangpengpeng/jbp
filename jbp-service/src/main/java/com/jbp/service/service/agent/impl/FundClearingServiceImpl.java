@@ -1,16 +1,19 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.beust.jcommander.internal.Sets;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.jayway.jsonpath.internal.Utils;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.excel.FundClearingExcel;
@@ -20,6 +23,7 @@ import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.FundClearingImportRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
@@ -31,11 +35,14 @@ import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
+import com.jbp.service.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -50,6 +57,9 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundClearing> implements FundClearingService {
+
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
 
     @Resource
     private OrdersFundSummaryService ordersFundSummaryService;
@@ -946,6 +956,81 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
         }
 
+    }
+
+    /**
+     * Excel导入佣金出款
+     * @param list
+     * @return
+     */
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Override
+    public Boolean importFundClearing(List<FundClearingImportRequest> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            throw new CrmebException("导入数据不能为空！");
+        }
+        //校验
+        int i = 1;
+        Map<String,FundClearingImportRequest> fundClearingMap = Maps.newConcurrentMap();
+        for(FundClearingImportRequest importFound : list){
+            String account = importFound.getAccount();
+            if (StringUtils.isEmpty(account)) {
+                throw new CrmebException("账号不能为空！");
+            }
+            account = StringUtils.trim(account);
+            if (userService.getByAccount(importFound.getAccount()) == null) {
+                throw new CrmebException(importFound.getAccount() + ":账号不存在");
+            }
+            fundClearingMap.put(account,importFound);
+            if (StringUtils.isEmpty(importFound.getExternalNo())) {
+                throw new CrmebException("外部订单号不能为空！"+importFound.getAccount());
+            }
+            if (StringUtils.isEmpty(importFound.getCommName())) {
+                throw new CrmebException("佣金名称不能为空！"+importFound.getAccount());
+            }
+            //获取佣金名称
+            Set<String> list0 = Sets.newHashSet();
+            List<ProductCommConfig> list1 =   productCommConfigService.getOpenList();
+            for (ProductCommConfig  value: list1) {
+                list0.add(value.getName());
+            }
+            list0.add("销售佣金");
+            list0.add("培育佣金");
+            list0.add("其他佣金");
+
+            String commNameStr = environment.getProperty("fundClearing.name");
+            if(StringUtils.isNotEmpty(commNameStr)){
+                String[] split = commNameStr.split(",");
+                for (String s : split) {
+                    list0.add(s);
+                }
+            }
+            //判断提供的佣金名称是否包含
+            if(!list0.contains(importFound.getCommName())){
+                throw new CrmebException("佣金名称不存在或状态未开启！"+importFound.getAccount());
+            }
+
+            if (ObjectUtil.isEmpty(importFound.getCommAmt())) {
+                throw new CrmebException("佣金金额不能为空！"+importFound.getAccount());
+            }
+            if (StringUtils.isEmpty(importFound.getDescription())) {
+                throw new CrmebException("佣金描述不能为空！"+importFound.getAccount());
+            }
+            if(StringUtils.isEmpty(importFound.getRemark())){
+                throw new CrmebException("佣金备注不能为空！"+importFound.getAccount());
+            }
+            logger.info("正在检查导入数据基础信息:" + i + "###总条数:" + list.size());
+            i++;
+        }
+        //保存数据
+        i = 1;
+        for (FundClearingImportRequest importFound : list){
+            User user = userService.getByAccount(importFound.getAccount());
+            create(user.getId(),importFound.getExternalNo(),importFound.getCommName(),importFound.getCommAmt(),null,importFound.getDescription(),importFound.getRemark());
+            logger.info("正在保存佣金出款信息:" + i + "###总条数:" + list.size());
+            i++;
+        }
+        return true;
     }
 
 }

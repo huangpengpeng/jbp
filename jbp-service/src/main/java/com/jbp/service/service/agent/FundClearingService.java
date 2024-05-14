@@ -6,9 +6,11 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.FundClearingItem;
+import com.jbp.common.model.agent.FundClearingItemConfig;
 import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.FundClearingImportRequest;
 import com.jbp.common.vo.FundClearingVo;
 
 import java.math.BigDecimal;
@@ -118,4 +120,6 @@ public interface FundClearingService extends IService<FundClearing> {
 
 
     public void createTankOrder(TankOrders orders);
+
+    Boolean importFundClearing(List<FundClearingImportRequest> list);
 }

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -200,6 +201,16 @@ public class FundClearingController {
         String s = ossService.uploadXlsx(fundClearingExcels, FundClearingExcel.class, "佣金记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         return CommonResult.success(s);
     }
+
+    @PreAuthorize("hasAuthority('agent:fund:clearing:import')")
+    @PostMapping("/import")
+    @ApiOperation("佣金出款导入")
+    public CommonResult importFundClearing(@RequestBody @Validated List<FundClearingImportRequest> request) {
+        fundClearingService.importFundClearing(request);
+        return CommonResult.success();
+    }
+
+
 
 
 }
