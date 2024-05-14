@@ -1,6 +1,9 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.request.agent.ClearingRequest;
+import com.jbp.service.service.agent.ClearingFinalService;
+import com.jbp.service.service.agent.impl.ClearingFinalServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,5 +41,14 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//        ClearingFinalService clearingFinalService = run.getBean(ClearingFinalService.class);
+//        ClearingRequest re = new ClearingRequest();
+//        re.setIfImportUser(false);
+//        re.setStartTime("20240514");
+//        re.setEndTime("20240515");
+//        re.setCommType(20);
+//        re.setCommName("平台分红");
+//        clearingFinalService.syncOneKeyClearing(re);
     }
 }

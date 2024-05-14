@@ -126,7 +126,7 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
         }
         if (ArithmeticUtils.lessEquals(totalScore, BigDecimal.ZERO)) {
             log.error(clearingFinal.getName() + "结算积分为0");
-            clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
+            clearingFinal.setStatus(ClearingFinal.Constants.待出款.name());
             clearingFinalService.updateById(clearingFinal);
             return;
         }
@@ -136,7 +136,7 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
         if (CollectionUtils.isEmpty(clearingVipUsers) && CollectionUtils.isEmpty(clearingUsers)) {
             log.error(clearingFinal.getName() + "没有获奖名单");
             clearingFinal.setTotalScore(totalScore);
-            clearingFinal.setStatus(ClearingFinal.Constants.已出款.name());
+            clearingFinal.setStatus(ClearingFinal.Constants.待出款.name());
             clearingFinalService.updateById(clearingFinal);
             return;
         }
