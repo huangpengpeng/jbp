@@ -207,7 +207,7 @@ public class FundClearingController {
     @ApiOperation("佣金出款导入")
     public CommonResult importFundClearing(@RequestBody @Validated List<FundClearingImportRequest> request) {
         fundClearingService.importFundClearing(request);
-        return CommonResult.success("SUCCESS");
+        return CommonResult.success();
     }
 
 
