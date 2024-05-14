@@ -30,9 +30,6 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        OrderPaySuccessTask orderPaySuccessTask = run.getBean(OrderPaySuccessTask.class);
-        orderPaySuccessTask.orderPayAfter();
-
     }
 
 }
