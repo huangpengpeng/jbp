@@ -12,6 +12,7 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
@@ -112,16 +113,18 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
             score = score.add(totalPv);
-            BigDecimal productAmt = totalPv.multiply(rule.getRatio()).setScale(2, BigDecimal.ROUND_DOWN);
+            BigDecimal productAmt = BigDecimal.ZERO;
+            if(StringUtils.isNotEmpty(rule.getType()) && StringUtils.equals(rule.getType(), "金额")){
+                productAmt = rule.getRatio().multiply(BigDecimal.valueOf(orderDetail.getPayNum())).setScale(2, BigDecimal.ROUND_DOWN);
+            }else{
+                productAmt = totalPv.multiply(rule.getRatio()).setScale(2, BigDecimal.ROUND_DOWN);
+            }
             FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                     orderDetail.getPayNum(), rule.getRatio(), productAmt);
             productList.add(clearingProduct);
-
             // 店铺佣金
             amt = amt.add(productAmt);
         }
-
-
         if (!ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
             return;
         }
@@ -159,5 +162,11 @@ public class ShopCommHandler extends AbstractProductCommHandler {
          * 比例
          */
         private BigDecimal ratio;
+
+
+        /**
+         * 比例 类型  金额  比例
+         */
+        private String type;
     }
 }
