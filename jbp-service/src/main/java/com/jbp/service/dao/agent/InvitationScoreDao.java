@@ -1,8 +1,7 @@
 package com.jbp.service.dao.agent;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jbp.common.model.BaseModel;
 import com.jbp.common.model.agent.InvitationScore;
+import com.jbp.common.mybatis.RootMapper;
 
-public interface InvitationScoreDao extends BaseMapper<InvitationScore> {
+public interface InvitationScoreDao extends RootMapper<InvitationScore> {
 }

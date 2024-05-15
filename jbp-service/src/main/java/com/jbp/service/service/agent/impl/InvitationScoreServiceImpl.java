@@ -20,6 +20,7 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.InvitationScoreDao;
+import com.jbp.service.dao.agent.InvitationScoreFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.InvitationScoreFlowService;
 import com.jbp.service.service.agent.InvitationScoreService;
@@ -50,6 +51,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     private UserInvitationService userInvitationService;
     @Resource
     private SelfScoreService selfScoreService;
+    @Resource
+    private InvitationScoreFlowDao flowDao;
 
 
     @Override
@@ -161,9 +164,6 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         // 更新团队业绩
         saveOrUpdateBatch(invitationScoreList);
         // 增加明细
-        List<List<InvitationScoreFlow>> partition = Lists.partition(list, 100);
-        for (List<InvitationScoreFlow> invitationScoreFlows : partition) {
-            invitationScoreFlowService.saveBatch(invitationScoreFlows);
-        }
+        flowDao.insertBatch(list);
     }
 }

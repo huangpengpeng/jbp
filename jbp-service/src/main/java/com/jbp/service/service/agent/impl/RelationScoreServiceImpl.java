@@ -23,6 +23,7 @@ import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.RelationScoreVo;
 import com.jbp.service.dao.agent.RelationScoreDao;
+import com.jbp.service.dao.agent.UserRelationFlowDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -50,8 +51,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     private UserRelationService userRelationService;
     @Resource
     private UserCapaService userCapaService;
-    @Resource
-    private CapaService capaService;
 
     @Override
     public RelationScore getByUser(Integer uId, Integer node) {

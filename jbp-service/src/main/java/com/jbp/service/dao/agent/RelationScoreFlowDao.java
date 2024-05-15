@@ -1,7 +1,7 @@
 package com.jbp.service.dao.agent;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.agent.RelationScoreFlow;
+import com.jbp.common.mybatis.RootMapper;
 
-public interface RelationScoreFlowDao extends BaseMapper<RelationScoreFlow> {
+public interface RelationScoreFlowDao extends RootMapper<RelationScoreFlow> {
 }

@@ -14,6 +14,8 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.service.dao.agent.RelationScoreFlowDao;
+import com.jbp.service.dao.agent.UserRelationFlowDao;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -30,6 +32,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 渠道佣金
@@ -55,6 +58,8 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     private FundClearingService fundClearingService;
     @Resource
     private RelationScoreFlowService relationScoreFlowService;
+    @Resource
+    private RelationScoreFlowDao flowDao;
 
     @Override
     public Integer getType() {
@@ -155,10 +160,8 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
                     upperDto.getNode(), order.getOrderNo(), order.getPayTime(), productInfoList, upperDto.getLevel());
             relationScoreFlowList.add(flow);
         }
-        List<List<RelationScoreFlow>> partition = Lists.partition(relationScoreFlowList, 300);
-        for (List<RelationScoreFlow> relationScoreFlows : partition) {
-            relationScoreFlowService.saveBatch(relationScoreFlows);
-        }
+        // 保存明细
+        flowDao.insertBatch(relationScoreFlowList);
 
         // 等级比例
         Rule rule = getRule(null);
