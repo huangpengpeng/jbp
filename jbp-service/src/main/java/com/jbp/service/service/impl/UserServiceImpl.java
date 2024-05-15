@@ -149,6 +149,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Resource
     private UserCapaXsSnapshotService userCapaXsSnapshotService;
 
+    public static void main(String[] args) {
+
+    }
     /**
      * 手机号注册用户
      *
@@ -174,7 +177,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
          String mobileDefaultPwd = systemConfigService.getValueByKey(SysConfigConstants.MOBILE_DEFAULT_PWD);
 
-         if(!mobileDefaultPwd.equals("'true'")){
+         if(!org.apache.commons.lang3.StringUtils.equals(Constants.CONFIG_FORM_SWITCH_OPEN,mobileDefaultPwd)){
              user.setPwd(CrmebUtil.encryptPassword("123456"));
              if(!ObjectUtil.isNull(phone)){
                  user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
