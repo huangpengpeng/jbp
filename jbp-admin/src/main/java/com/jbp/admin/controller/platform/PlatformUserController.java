@@ -2,6 +2,8 @@ package com.jbp.admin.controller.platform;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.user.User;
@@ -63,6 +65,7 @@ public class PlatformUserController {
     }
 
     @PreAuthorize("hasAuthority('platform:user:update')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "修改用户信息")
     @ApiOperation(value = "修改用户信息")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public CommonResult<String> update(@RequestBody @Validated UserUpdateRequest userRequest) {
