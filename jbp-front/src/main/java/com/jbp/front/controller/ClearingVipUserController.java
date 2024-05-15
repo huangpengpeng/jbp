@@ -84,14 +84,14 @@ public class ClearingVipUserController {
         List<ClearingBonusListResponse> clearingList = clearingBonusFlowService.getClearingList(userService.getUserId(), day);
         for (ClearingBonusListResponse bonus : clearingList) {
             if (StringUtils.isNotEmpty(bonus.getPostscript()) && bonus.getPostscript().contains("额度上限")) {
-                if (bonus.getName().equals("店1")) {
-                    bonus.setName("V1");
+                if (org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(),"店1") ) {
+                    bonus.setLevelName("V1");
                 }
-                if (bonus.getName().equals("店2")) {
-                    bonus.setName("V2");
+                if ( org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(),"店2") ) {
+                    bonus.setLevelName("V2");
                 }
-                if (bonus.getName().equals("店3")) {
-                    bonus.setName("V3");
+                if ( org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(),"店3") ) {
+                    bonus.setLevelName("V3");
                 }
             }
         }

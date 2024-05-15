@@ -24,7 +24,7 @@ public class ClearingBonusListResponse implements Serializable {
     private String time;
 
     @ApiModelProperty(value = "佣金名称")
-    private String name;
+    private String levelName;
 
     @ApiModelProperty(value = "凭证")
     private String postscript;

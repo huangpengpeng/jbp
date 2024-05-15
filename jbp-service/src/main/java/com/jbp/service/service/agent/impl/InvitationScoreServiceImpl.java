@@ -167,7 +167,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         // 更新团队业绩
         saveOrUpdateBatch(invitationScoreList);
         // 增加明细
-        flowDao.insertBatch(list);
+       invitationScoreFlowService.saveBatch(list);
     }
 
     @Override

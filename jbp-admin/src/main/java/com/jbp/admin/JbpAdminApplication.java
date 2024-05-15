@@ -33,6 +33,9 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 
+        OrderPaySuccessTask orderPaySuccessTask =run.getBean(OrderPaySuccessTask.class);
+        orderPaySuccessTask.orderPayAfter();
+
 
     }
 
