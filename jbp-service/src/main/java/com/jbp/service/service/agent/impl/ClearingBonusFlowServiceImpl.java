@@ -46,4 +46,9 @@ public class ClearingBonusFlowServiceImpl extends UnifiedServiceImpl<ClearingBon
         lqw.orderByDesc(ClearingBonusFlow::getId);
         return CommonPage.copyPageInfo(page, list(lqw));
     }
+
+    @Override
+    public List<ClearingBonusFlow> getByClearing(Long clearingId) {
+        return list(new LambdaQueryWrapper<ClearingBonusFlow>().eq(ClearingBonusFlow::getClearingId, clearingId));
+    }
 }

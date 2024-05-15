@@ -225,6 +225,16 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
     @Override
     public void del4Clearing(ClearingFinal clearingFinal) {
         clearingBonusService.del4Clearing(clearingFinal.getId());
+        List<ClearingBonusFlow> list = clearingBonusFlowService.getByClearing(clearingFinal.getId());
+        for (ClearingBonusFlow flow : list) {
+            if (flow.getPostscript().contains("额度上限")) {
+                ClearingVipUser clearingVipUser = clearingVipUserService.getByUser(flow.getUid(), flow.getLevel(), getType());
+                if (clearingVipUser != null) {
+                    clearingVipUser.setMaxAmount(clearingVipUser.getMaxAmount().subtract(flow.getCommAmt()));
+                    clearingVipUserService.updateById(clearingVipUser);
+                }
+            }
+        }
         clearingBonusFlowService.del4Clearing(clearingFinal.getId());
     }
 
