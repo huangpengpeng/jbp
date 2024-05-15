@@ -15,4 +15,6 @@ public interface ClearingBonusFlowService extends IService<ClearingBonusFlow> {
     void del4Clearing(Long clearingId);
 
     PageInfo<ClearingBonusFlow> pageList(Integer uid, String account, Long clearingId, PageParamRequest pageParamRequest);
+
+    List<ClearingBonusFlow> getByClearing(Long clearingId);
 }

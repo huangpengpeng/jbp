@@ -9,6 +9,7 @@ import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String return_url = systemConfigService.getValueByKey("lianlian_return_url");
         String return_url2 = systemConfigService.getValueByKey("lianlian_return_url2");
         String host = systemConfigService.getValueByKey("lianlian_host");
+        String frms_ware_category = systemConfigService.getValueByKey("lianlian_frms_ware_category");
 
         String lzt_oid_partner = systemConfigService.getValueByKey("lianlian_lzt_oid_partner");
         String lzt_pri_key = systemConfigService.getValueByKey("lianlian_lzt_pri_key");
@@ -52,6 +54,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         result.setReturn_url(return_url);
         result.setReturn_url2(return_url2);
         result.setHost(host);
+        result.setFrms_ware_category(frms_ware_category);
 
         // 来账通产品信息
         result.setLzt_priKey(lzt_pri_key);
@@ -82,7 +85,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
 
 
     @Override
-    public CashierPayCreateResult cashier(String account, String payCode, BigDecimal amount, String goodsName, String ip) {
+    public CashierPayCreateResult cashier(String account, String phone, String payCode, BigDecimal amount, String goodsName, String ip) {
         LianLianPayInfoResult lianLianInfo = get();
 
         CashierPayCreateParams params = new CashierPayCreateParams();
@@ -103,7 +106,11 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setFlag_chnl("H5");
         // 测试风控参数
         String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo("4009", account, "", registerTime, goodsName);
+        String frms_ware_category = "4009";
+        if(StringUtils.isNotEmpty(lianLianInfo.getFrms_ware_category())){
+            frms_ware_category = lianLianInfo.getFrms_ware_category();
+        }
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frms_ware_category, account, phone, registerTime, goodsName);
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("H5");
         riskItemInfo.setUser_auth_flag("1");

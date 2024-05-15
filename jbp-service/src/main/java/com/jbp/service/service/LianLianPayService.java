@@ -14,7 +14,7 @@ public interface LianLianPayService {
 
     QueryPaymentResult queryPayResult(String orderNo);
 
-    CashierPayCreateResult cashier(String account, String payCode, BigDecimal amount, String goodsName, String ip);
+    CashierPayCreateResult cashier(String account, String phone, String payCode, BigDecimal amount, String goodsName, String ip);
 
     MorePayeeRefundResult refund(String account, String payCode, String refundNo, BigDecimal refundAmt);
 
