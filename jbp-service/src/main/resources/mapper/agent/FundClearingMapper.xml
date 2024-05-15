@@ -214,7 +214,7 @@
     </select>
     <select id="getUserTotalMonthList" resultType="java.util.Map">
 
-          SELECT '获的收益' AS title ,f.`create_Time`,SUM(f.`send_amt`) AS total FROM eb_fund_clearing AS f WHERE
+          SELECT '获的收益' AS title ,  DATE_FORMAT(f.`create_Time`, '%Y-%m-%d') as create_Time,SUM(f.`send_amt`) AS total FROM eb_fund_clearing AS f WHERE
                DATE_FORMAT(f.`create_Time`, '%Y-%m')=#{month} AND uid=${uid} AND f.`status` NOT IN ('已退款','已取消','已拦截')
               GROUP BY DATE_FORMAT(f.`create_Time`, '%Y-%m-%d')
               ORDER BY DATE_FORMAT(f.`create_Time`, '%Y-%m-%d') DESC
