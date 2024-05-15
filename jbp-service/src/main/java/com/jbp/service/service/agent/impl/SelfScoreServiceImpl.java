@@ -15,6 +15,7 @@ import com.jbp.common.model.agent.SelfScoreFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.agent.SelfScoreDao;
@@ -123,5 +124,22 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
         updateById(selfScore);
         // 增加明细
         selfScoreFlowService.add(uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
+    }
+
+    @Override
+    public void orderRefund(String ordersSn) {
+        //退还个人业绩
+        List<SelfScoreFlow> selfList = selfScoreFlowService.list(new QueryWrapper<SelfScoreFlow>().lambda().eq(SelfScoreFlow::getOrdersSn, ordersSn));
+        selfScoreFlowService.remove(new QueryWrapper<SelfScoreFlow>().lambda().eq(SelfScoreFlow::getOrdersSn, ordersSn));
+        if (!selfList.isEmpty()) {
+            for (SelfScoreFlow selfScoreFlow : selfList) {
+                SelfScore selfScore = getByUser(selfScoreFlow.getUid());
+                if (selfScore != null && ArithmeticUtils.gte(selfScore.getScore(), selfScoreFlow.getScore())) {
+                    BigDecimal score = selfScore.getScore().subtract(selfScoreFlow.getScore());
+                    selfScore.setScore(score);
+                    updateById(selfScore);
+                }
+            }
+        }
     }
 }

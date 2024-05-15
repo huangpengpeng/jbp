@@ -99,6 +99,18 @@ public class RelationScoreController {
         return CommonResult.success();
     }
 
+    @PreAuthorize("hasAuthority('agent:relation:score:refund')")
+    @ApiOperation("业绩退款")
+    @GetMapping("/refund")
+    public CommonResult refund(String orderNo) {
+        if (StringUtils.isEmpty(orderNo)) {
+            throw new CrmebException("单号不能为空");
+        }
+        relationScoreService.orderRefund(orderNo);
+        return CommonResult.success();
+    }
+
+
     @PreAuthorize("hasAuthority('agent:relation:score:fake:excel')")
     @GetMapping("/excel")
     @ApiOperation("服务业绩汇总导出")
@@ -115,6 +127,5 @@ public class RelationScoreController {
             uid = user.getId();
         }
         return CommonResult.success(relationScoreService.excel(uid));
-
     }
 }

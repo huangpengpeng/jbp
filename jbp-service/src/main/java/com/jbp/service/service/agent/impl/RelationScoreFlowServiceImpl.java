@@ -37,10 +37,10 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     private UserService userService;
 
     @Override
-    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderuid, String ordersSn, String dateLimit, Integer node, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderUid, String ordersSn, String dateLimit, Integer node, String action, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
-                .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
+                .eq(!ObjectUtil.isNull(orderUid), RelationScoreFlow::getOrderUid, orderUid)
                 .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn)
                 .eq(ObjectUtil.isNotEmpty(node), RelationScoreFlow::getNode, node)
                 .eq(StringUtils.isNotEmpty(action), RelationScoreFlow::getAction, action);
@@ -65,14 +65,14 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     }
 
     @Override
-    public List<RelationScoreFlowVo> excel(Integer uid, Integer orderuid, String ordersSn, String dateLimit, Integer node, String action) {
+    public List<RelationScoreFlowVo> excel(Integer uid, Integer orderUid, String ordersSn, String dateLimit, Integer node, String action) {
         Long id = 0L;
         List<RelationScoreFlowVo> result = Lists.newArrayList();
         do {
             LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
                     .gt(RelationScoreFlow::getId, id)
                     .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
-                    .eq(!ObjectUtil.isNull(orderuid), RelationScoreFlow::getOrderUid, orderuid)
+                    .eq(!ObjectUtil.isNull(orderUid), RelationScoreFlow::getOrderUid, orderUid)
                     .eq(StringUtils.isNotEmpty(ordersSn), RelationScoreFlow::getOrdersSn, ordersSn)
                     .eq(ObjectUtil.isNotEmpty(node), RelationScoreFlow::getNode, node)
                     .eq(StringUtils.isNotEmpty(action), RelationScoreFlow::getAction, action);
@@ -99,6 +99,14 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
             id = fundClearingList.get(fundClearingList.size() - 1).getId();
         } while (true);
         return result;
+    }
+
+    @Override
+    public List<RelationScoreFlow> getByOrders(String ordersSn, String operate, String action) {
+        LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(RelationScoreFlow::getOrdersSn, ordersSn).eq(RelationScoreFlow::getOperate, operate).eq(RelationScoreFlow::getAction, action);
+        lqw.orderByAsc(RelationScoreFlow::getLevel);
+        return list(lqw);
     }
 
     private void getRequestTimeWhere(LambdaQueryWrapper<RelationScoreFlow> lqw, String dateLimit) {

@@ -32,4 +32,6 @@ public interface RelationScoreService extends IService<RelationScore> {
     RelationScoreResponse getUserResult();
 
     List<RelationScoreVo> excel(Integer uid);
+
+    void orderRefund(String platOrderNo);
 }

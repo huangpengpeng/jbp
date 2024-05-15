@@ -114,17 +114,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     @Autowired
     private KqPayService kqPayService;
     @Autowired
-    private InvitationScoreFlowService invitationScoreFlowService;
-    @Autowired
     private InvitationScoreService invitationScoreService;
     @Autowired
     private SelfScoreService selfScoreService;
     @Autowired
-    private SelfScoreFlowService selfScoreFlowService;
-    @Autowired
     private FundClearingService fundClearingService;
     @Autowired
     private Environment environment;
+    @Autowired
+    private RelationScoreService relationScoreService;
 
     /**
      * 商户端退款订单分页列表
@@ -1086,7 +1084,6 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     @Override
     public Boolean audit(OrderRefundAuditRequest request) {
         validatedAuditRequest(request);
-//        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(request.getRefundOrderNo());
         if (!refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_APPLY)) {
             throw new CrmebException("售后单状态异常");
@@ -1100,12 +1097,6 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             }
         }
 
-//        Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
-//        if(!ifPlatformAdd){
-//            if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
-//                throw new CrmebException("无法操作非自己商户的订单");
-//            }
-//        }
         Order order = orderService.getByOrderNo(refundOrder.getOrderNo());
         if (ObjectUtil.isNull(order)) {
             throw new CrmebException("退款单关联的订单不存在");
@@ -1392,7 +1383,6 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             }
         }
 
-
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() - refundOrderInfo.getApplyRefundNum());
         orderDetail.setRefundNum(orderDetail.getRefundNum() + refundOrderInfo.getApplyRefundNum());
 
@@ -1449,38 +1439,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             updateById(refundOrder);
             refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
             productProfitChain.orderRefund(order, refundOrder);
-
-            //退还销售积分
-            List<InvitationScoreFlow> list = invitationScoreFlowService.list(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getPlatOrderNo()));
-            invitationScoreFlowService.remove(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn,order.getPlatOrderNo()));
-            if(!list.isEmpty()){
-                for(InvitationScoreFlow invitationScoreFlow : list) {
-                    InvitationScore invitationScore = invitationScoreService.getByUser(invitationScoreFlow.getUid());
-                    if (invitationScore != null && ArithmeticUtils.gte(invitationScore.getScore(), invitationScoreFlow.getScore())) {
-                        BigDecimal score = invitationScore.getScore().subtract(invitationScoreFlow.getScore());
-                        invitationScore.setScore(score);
-                        invitationScoreService.updateById(invitationScore);
-                    }
-
-                }
-            }
-
-            //退还个人业绩
-            List<SelfScoreFlow> selfList = selfScoreFlowService.list(new QueryWrapper<SelfScoreFlow>().lambda().eq(SelfScoreFlow::getOrdersSn,order.getPlatOrderNo()));
-            selfScoreFlowService.remove(new QueryWrapper<SelfScoreFlow>().lambda().eq(SelfScoreFlow::getOrdersSn,order.getPlatOrderNo()));
-
-            if(!selfList.isEmpty()){
-                for(SelfScoreFlow selfScoreFlow : selfList){
-
-                    SelfScore selfScore = selfScoreService.getByUser(selfScoreFlow.getUid());
-                    if(selfScore != null && ArithmeticUtils.gte(selfScore.getScore(), selfScoreFlow.getScore())){
-                        BigDecimal score = selfScore.getScore().subtract(selfScoreFlow.getScore());
-                        selfScore.setScore(score);
-                        selfScoreService.updateById(selfScore);
-                    }
-                }
-            }
-
+            // 退还团队业绩
+            invitationScoreService.orderRefund(order.getPlatOrderNo());
+            // 退还个人业绩
+            selfScoreService.orderRefund(order.getPlatOrderNo());
 
             productCommChain.orderRefundIntercept(order);
 

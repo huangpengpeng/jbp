@@ -21,8 +21,9 @@ public interface SelfScoreService extends IService<SelfScore> {
   //查询团队业绩
   BigDecimal getUserNext(Integer uid,Boolean containsSelf);
 
-
   void orderSuccess(Integer uid, BigDecimal score, String ordersSn, Date payTime, List<ProductInfoDto> productInfo);
+
+  void orderRefund(String ordersSn);
 
 
 
