@@ -134,6 +134,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
             SystemAdminResponse sar = new SystemAdminResponse();
             BeanUtils.copyProperties(admin, sar);
             sar.setLastTime(admin.getUpdateTime());
+            sar.setSupplyName(admin.getSupplyName());
             List<Integer> roleIds = CrmebUtil.stringToArrayInt(admin.getRoles());
             List<String> roleNames = new ArrayList<>();
             for (Integer roleId : roleIds) {
@@ -186,6 +187,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
         systemAdmin.setPwd(pwd);
         systemAdmin.setMerId(currentUser.getMerId());
         systemAdmin.setType(systemRoleService.getRoleTypeByCurrentAdmin());
+        systemAdmin.setSupplyName(systemAdminAddRequest.getSupplyName());
         return save(systemAdmin);
     }
 

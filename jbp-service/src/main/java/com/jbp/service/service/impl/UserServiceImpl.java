@@ -214,7 +214,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public User registerNoBandPater(String username, String phone, String remark) {
+    public User registerNoBandPater(String username, String phone, String remark, Long capaId) {
         User user = new User();
         user.setAccount(getAccount().toUpperCase());
         user.setPwd(CommonUtil.createPwd(phone));
@@ -240,7 +240,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         Boolean execute = transactionTemplate.execute(e -> {
             save(user);
             // 增加代理等级
-            userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), remark, remark);
+            if(capaId == null){
+                userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), remark, remark);
+            }else{
+                userCapaService.saveOrUpdateCapa(user.getId(), capaId, remark, remark);
+            }
             return Boolean.TRUE;
         });
         if (!execute) {

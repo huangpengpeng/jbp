@@ -135,7 +135,7 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
 
             // 分给直推的培育人
             UserInvitation oneUserInvitation = invitationService.getByUser(oneId);
-            if (oneUserInvitation.getMId() != null) {
+            if (oneUserInvitation != null && oneUserInvitation.getMId() != null) {
                 UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getMId());
                 if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getTwoCapaId()) >= 0) {
                     BigDecimal threeFee = totalPv.multiply(rule.getTwoRatio());

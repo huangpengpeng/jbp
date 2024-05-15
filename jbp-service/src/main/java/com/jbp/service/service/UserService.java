@@ -37,7 +37,7 @@ public interface UserService extends IService<User> {
      */
     User registerPhone(String username, String phone, Integer spreadUid);
 
-    User registerNoBandPater(String username, String phone, String remark);
+    User registerNoBandPater(String username, String phone, String remark, Long capaId);
 
     void setActiveTime(User user);
 

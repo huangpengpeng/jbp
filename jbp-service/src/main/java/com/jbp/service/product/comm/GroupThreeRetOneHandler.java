@@ -129,6 +129,8 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
             // 计算历史单数
             Integer orderSize = orderDetailService.getNextOrderGoods(pid, map.get("product_id").toString(), userCapa.getCapaId(),rule.getAmt().toString());
 
+            //计算当前笔数
+            orderSize = orderSize + 1;
 
             int remainder = orderSize % rule.getGroupComm().size();
 
@@ -159,7 +161,7 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
     }
 
     public static void main(String[] args) {
-
+        System.out.println(1%3 );
     }
 
 

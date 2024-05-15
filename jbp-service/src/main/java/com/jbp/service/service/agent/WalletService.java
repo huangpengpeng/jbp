@@ -34,4 +34,6 @@ public interface WalletService extends IService<Wallet> {
     void init();
 
     void init2();
+
+    void init3();
 }

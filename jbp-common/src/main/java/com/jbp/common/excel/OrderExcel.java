@@ -133,5 +133,6 @@ public class OrderExcel implements Serializable {
     @ExcelProperty(value = "福券抵扣", index = 38)
     private BigDecimal fuquan;
 
-
+    @ExcelProperty(value = "发货时间", index = 39)
+    private Date shipTime;
 }

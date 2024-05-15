@@ -134,7 +134,7 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
     public List<OrderDetail> getShipmentByOrderNo(String orderNo) {
         LambdaQueryWrapper<OrderDetail> lqw = Wrappers.lambdaQuery();
         lqw.select(OrderDetail::getId, OrderDetail::getProductName, OrderDetail::getImage, OrderDetail::getSku,
-                OrderDetail::getPayNum, OrderDetail::getDeliveryNum, OrderDetail::getRefundNum, OrderDetail::getPrice, OrderDetail::getPayPrice);
+                OrderDetail::getPayNum, OrderDetail::getDeliveryNum, OrderDetail::getRefundNum, OrderDetail::getPrice, OrderDetail::getPayPrice, OrderDetail::getBarCode);
         lqw.eq(OrderDetail::getOrderNo, orderNo);
         return dao.selectList(lqw);
     }

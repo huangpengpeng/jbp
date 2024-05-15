@@ -277,5 +277,10 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
          * 最大金额
          */
         private BigDecimal maxFee;
+
+        /**
+         * 最大数量
+         */
+        private Integer maxNum;
     }
 }

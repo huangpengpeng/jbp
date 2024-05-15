@@ -13,7 +13,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.jayway.jsonpath.internal.Utils;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.excel.FundClearingExcel;
@@ -963,7 +962,6 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
      * @param list
      * @return
      */
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public Boolean importFundClearing(List<FundClearingImportRequest> list) {
         if (CollectionUtils.isEmpty(list)) {
@@ -971,62 +969,64 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         }
         //校验
         int i = 1;
-        Map<String,FundClearingImportRequest> fundClearingMap = Maps.newConcurrentMap();
-        for(FundClearingImportRequest importFound : list){
+        Map<String, User> userMap = Maps.newConcurrentMap();
+        for (FundClearingImportRequest importFound : list) {
             String account = importFound.getAccount();
+            account = StringUtils.trim(account);
             if (StringUtils.isEmpty(account)) {
                 throw new CrmebException("账号不能为空！");
             }
-            account = StringUtils.trim(account);
-            if (userService.getByAccount(importFound.getAccount()) == null) {
+            importFound.setAccount(account);
+            User user = userService.getByAccount(account);
+            if (user == null) {
                 throw new CrmebException(importFound.getAccount() + ":账号不存在");
             }
-            fundClearingMap.put(account,importFound);
+            userMap.put(account, user);
             if (StringUtils.isEmpty(importFound.getExternalNo())) {
-                throw new CrmebException("外部订单号不能为空！"+importFound.getAccount());
+                throw new CrmebException("外部订单号不能为空！" + importFound.getAccount());
             }
             if (StringUtils.isEmpty(importFound.getCommName())) {
-                throw new CrmebException("佣金名称不能为空！"+importFound.getAccount());
+                throw new CrmebException("佣金名称不能为空！" + importFound.getAccount());
             }
             //获取佣金名称
-            Set<String> list0 = Sets.newHashSet();
-            List<ProductCommConfig> list1 =   productCommConfigService.getOpenList();
-            for (ProductCommConfig  value: list1) {
-                list0.add(value.getName());
+            Set<String> set = Sets.newHashSet();
+            List<ProductCommConfig> list1 = productCommConfigService.getOpenList();
+            for (ProductCommConfig value : list1) {
+                set.add(value.getName());
             }
-            list0.add("销售佣金");
-            list0.add("培育佣金");
-            list0.add("其他佣金");
+            set.add("销售佣金");
+            set.add("培育佣金");
+            set.add("其他佣金");
 
             String commNameStr = environment.getProperty("fundClearing.name");
-            if(StringUtils.isNotEmpty(commNameStr)){
+            if (StringUtils.isNotEmpty(commNameStr)) {
                 String[] split = commNameStr.split(",");
                 for (String s : split) {
-                    list0.add(s);
+                    set.add(s);
                 }
             }
             //判断提供的佣金名称是否包含
-            if(!list0.contains(importFound.getCommName())){
-                throw new CrmebException("佣金名称不存在或状态未开启！"+importFound.getAccount());
+            if (!set.contains(importFound.getCommName())) {
+                throw new CrmebException("佣金名称不存在或状态未开启！" + importFound.getAccount());
             }
 
-            if (ObjectUtil.isEmpty(importFound.getCommAmt())) {
-                throw new CrmebException("佣金金额不能为空！"+importFound.getAccount());
+            if (ObjectUtil.isEmpty(importFound.getCommAmt()) && ArithmeticUtils.gt(importFound.getCommAmt(), BigDecimal.ZERO)) {
+                throw new CrmebException("佣金金额不能为空！" + importFound.getAccount());
             }
             if (StringUtils.isEmpty(importFound.getDescription())) {
-                throw new CrmebException("佣金描述不能为空！"+importFound.getAccount());
+                throw new CrmebException("佣金描述不能为空！" + importFound.getAccount());
             }
-            if(StringUtils.isEmpty(importFound.getRemark())){
-                throw new CrmebException("佣金备注不能为空！"+importFound.getAccount());
+            if (StringUtils.isEmpty(importFound.getRemark())) {
+                throw new CrmebException("佣金备注不能为空！" + importFound.getAccount());
             }
             logger.info("正在检查导入数据基础信息:" + i + "###总条数:" + list.size());
             i++;
         }
         //保存数据
         i = 1;
-        for (FundClearingImportRequest importFound : list){
-            User user = userService.getByAccount(importFound.getAccount());
-            create(user.getId(),importFound.getExternalNo(),importFound.getCommName(),importFound.getCommAmt(),null,importFound.getDescription(),importFound.getRemark());
+        for (FundClearingImportRequest importFound : list) {
+            User user = userMap.get(importFound.getAccount());
+            create(user.getId(), importFound.getExternalNo(), importFound.getCommName(), importFound.getCommAmt(), null, importFound.getDescription(), importFound.getRemark());
             logger.info("正在保存佣金出款信息:" + i + "###总条数:" + list.size());
             i++;
         }

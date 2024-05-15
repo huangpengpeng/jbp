@@ -202,8 +202,12 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         if (order.getRefundStatus().equals(OrderConstants.ORDER_REFUND_STATUS_ALL)) {
             throw new CrmebException("订单已全部退款");
         }
-        if (order.getStatus().equals(OrderConstants.ORDER_STATUS_COMPLETE)) {
-            throw new CrmebException("已完成订单无法申请退款");
+
+        String name = environment.getProperty("fundClearing.refundBack");
+        if(BooleanUtil.toBoolean(name)) {
+            if (order.getStatus().equals(OrderConstants.ORDER_STATUS_COMPLETE)) {
+                throw new CrmebException("已完成订单无法申请退款");
+            }
         }
 
         MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());

@@ -13,6 +13,7 @@ import com.jbp.common.model.order.OrderProductProfit;
 import com.jbp.common.model.order.RefundOrder;
 import com.jbp.common.model.user.User;
 import com.jbp.common.response.RefundOrderInfoResponse;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.product.comm.PingTaiCommHandler;
 import com.jbp.service.product.comm.ProductCommEnum;
@@ -112,11 +113,18 @@ public class ClearingVipUserHandler implements ProductProfitHandler {
 
             ClearingVipUser clearingVipUser = clearingVipUserService.getByUser(order.getUid(), orgCommRule.getLevel(), ProductCommEnum.平台分红.getType());
             if(clearingVipUser == null){
+                if(payNum.intValue() >= commRule.getMaxNum().intValue()){
+                    maxFee = commRule.getMaxFee().multiply(BigDecimal.valueOf(commRule.getMaxNum()));
+                }
                 clearingVipUserService.create(order.getUid(), user.getAccount(), orgCommRule.getLevel(), orgCommRule.getLevelName(),
                         ProductCommEnum.平台分红.getType(), ProductCommEnum.平台分红.getName(),
                         maxFee, JSONObject.toJSONString(orgCommRule), "单号:" + order.getOrderNo() + "产品:" + orderDetail.getProductName());
             }else{
                 clearingVipUser.setMaxAmount(clearingVipUser.getMaxAmount().add(maxFee));
+                BigDecimal tagMaxFee = commRule.getMaxFee().multiply(BigDecimal.valueOf(commRule.getMaxNum()));
+                if(ArithmeticUtils.gte(clearingVipUser.getMaxAmount(), tagMaxFee)){
+                    clearingVipUser.setMaxAmount(tagMaxFee);
+                }
                 clearingVipUserService.updateById(clearingVipUser);
             }
             StringBuilder profitPostscript = new StringBuilder();

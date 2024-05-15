@@ -391,12 +391,12 @@ public class UserController {
         if (com.jbp.service.util.StringUtils.isAnyEmpty(phone)) {
             throw new CrmebException("账户信息不能为空");
         }
-        List<User> userList = userService.getByPhone(phone);
+        List<User> userList = userService.getByPhone(mphone);
         if (userList.isEmpty() ) {
             throw new CrmebException("账户不存在");
         }
 
-        List<User> muserList = userService.getByPhone(mphone);
+        List<User> muserList = userService.getByPhone(phone);
         if (userList.isEmpty() ) {
             throw new CrmebException("账户不存在");
         }
@@ -418,7 +418,7 @@ public class UserController {
             throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
         }
 
-        userInvitationService.band(userService.getUserId(), userList.get(0).getId(), true, true, true);
+        userInvitationService.band(userList.get(0).getId(),muserList.get(0).getId(), true, true, true);
 
         return CommonResult.success();
     }
