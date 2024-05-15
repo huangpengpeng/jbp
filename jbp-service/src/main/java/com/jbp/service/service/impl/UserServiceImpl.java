@@ -27,6 +27,7 @@ import com.jbp.common.model.bill.UserBill;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.order.OrderRegister;
+import com.jbp.common.model.system.SystemConfig;
 import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
@@ -148,6 +149,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Resource
     private UserCapaXsSnapshotService userCapaXsSnapshotService;
 
+    public static void main(String[] args) {
+
+    }
     /**
      * 手机号注册用户
      *
@@ -170,11 +174,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         Date nowDate = CrmebDateUtil.nowDateTime();
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
-        user.setPwd(CrmebUtil.encryptPassword("123456"));
 
-        if(!ObjectUtil.isNull(phone)){
-            user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
-        }
+         String mobileDefaultPwd = systemConfigService.getValueByKey(SysConfigConstants.MOBILE_DEFAULT_PWD);
+
+         if(!org.apache.commons.lang3.StringUtils.equals(Constants.CONFIG_FORM_SWITCH_OPEN,mobileDefaultPwd)){
+             user.setPwd(CrmebUtil.encryptPassword("123456"));
+             if(!ObjectUtil.isNull(phone)){
+                 user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
+             }
+         }
+
 
         user.setLevel(1);
         // 设置活跃时间

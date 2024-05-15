@@ -254,6 +254,9 @@ public class SysConfigConstants {
      * 手机号验证码登录默认注册
      */
     public static final String CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN = "mobile_default_register_open";
+
+    public static final String MOBILE_DEFAULT_PWD = "mobile_default_pwd";
+
     public static final String MOBILE_PHONE_LENGTH_OPEN = "mobile_phone_length_open";
 
     public static final String ORDER_REFUND_OPEN = "order_refund_open";
