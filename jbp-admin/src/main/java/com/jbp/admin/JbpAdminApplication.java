@@ -34,11 +34,6 @@ public class JbpAdminApplication {
 
 
 
-
-
-        TankStoreRelationAct tankStoreRelationAct = run.getBean(TankStoreRelationAct.class);
-
-        tankStoreRelationAct.aa_lishi();
     }
 
 }
