@@ -230,7 +230,7 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
             if (flow.getPostscript().contains("额度上限")) {
                 ClearingVipUser clearingVipUser = clearingVipUserService.getByUser(flow.getUid(), flow.getLevel(), getType());
                 if (clearingVipUser != null) {
-                    clearingVipUser.setMaxAmount(clearingVipUser.getMaxAmount().subtract(flow.getCommAmt()));
+                    clearingVipUser.setUsedAmount(clearingVipUser.getUsedAmount().subtract(flow.getCommAmt()));
                     clearingVipUserService.updateById(clearingVipUser);
                 }
             }
