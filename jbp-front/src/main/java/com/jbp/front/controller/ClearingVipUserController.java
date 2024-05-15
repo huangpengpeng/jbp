@@ -14,6 +14,7 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.product.comm.PingTaiCommHandler;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.ClearingBonusFlowService;
 import com.jbp.service.service.agent.ClearingBonusService;
 import com.jbp.service.service.agent.ClearingVipUserService;
 import io.swagger.annotations.Api;
@@ -56,6 +57,8 @@ public class ClearingVipUserController {
     private UserService userService;
     @Autowired
     private PingTaiCommHandler pingTaiCommHandler;
+    @Autowired
+    private ClearingBonusFlowService clearingBonusFlowService;
 
     @ApiOperation(value = "收入汇总")
     @RequestMapping(value = "/getTotal", method = RequestMethod.GET)
@@ -71,15 +74,28 @@ public class ClearingVipUserController {
     @ApiOperation(value = "收入每日汇总")
     @RequestMapping(value = "/getTotalDay", method = RequestMethod.GET)
     public CommonPage<ClearingBonusListResponse> getTotalDay(PageParamRequest pageParamRequest) {
-        PageInfo<ClearingBonusListResponse> listResponses = clearingBonusService.getcleringList(userService.getUserId(),pageParamRequest);
+        PageInfo<ClearingBonusListResponse> listResponses = clearingBonusService.getClearingList(userService.getUserId(), pageParamRequest);
         return CommonPage.restPage(listResponses);
     }
 
     @ApiOperation(value = "收入每日明细")
     @RequestMapping(value = "/getTotalInfoDay", method = RequestMethod.GET)
-    public CommonResult<ClearingBonusListResponse> getTotalInfoDay(String day) {
-        ClearingBonusListResponse listResponses = clearingBonusService.getcleringInfoList(userService.getUserId(),day);
-        return CommonResult.success(listResponses);
+    public CommonResult<List<ClearingBonusListResponse>> getTotalInfoDay(String day) {
+        List<ClearingBonusListResponse> clearingList = clearingBonusFlowService.getClearingList(userService.getUserId(), day);
+        for (ClearingBonusListResponse bonus : clearingList) {
+            if (StringUtils.isNotEmpty(bonus.getPostscript()) && bonus.getPostscript().contains("额度上限")) {
+                if (bonus.getName().equals("店1")) {
+                    bonus.setName("V1");
+                }
+                if (bonus.getName().equals("店2")) {
+                    bonus.setName("V2");
+                }
+                if (bonus.getName().equals("店3")) {
+                    bonus.setName("V3");
+                }
+            }
+        }
+        return CommonResult.success(clearingList);
     }
 
     @ApiOperation(value = "购买平台校验 platform =【直通V1 直通V2 直通V3】 num =  购买合计数量")
