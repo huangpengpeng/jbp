@@ -13,6 +13,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -140,7 +141,12 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
                 ratio = rule.getRatio();
             }
             // 计算订单金额
-            BigDecimal amt = ratio.multiply(totalPv);
+            BigDecimal amt = BigDecimal.ZERO;
+            if(StringUtils.isNotEmpty(rule.getType()) && StringUtils.equals(rule.getType(), "金额")){
+                amt = rule.getRatio().multiply(BigDecimal.valueOf(orderDetail.getPayNum())).setScale(2, BigDecimal.ROUND_DOWN);
+            }else{
+                amt = ratio.multiply(totalPv);
+            }
             totalAmt = totalAmt.add(amt);
             FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                     orderDetail.getPayNum(), ratio, amt);
@@ -172,6 +178,11 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
          * 比例
          */
         private BigDecimal ratio;
+
+        /**
+         * 比例 类型  金额  比例
+         */
+        private String type;
     }
 
 
