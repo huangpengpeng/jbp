@@ -1,7 +1,9 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.admin.task.order.OrderPaySuccessTask;
+import com.jbp.service.service.agent.SelfScoreService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,6 +32,13 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+
+
+
+
+        TankStoreRelationAct tankStoreRelationAct = run.getBean(TankStoreRelationAct.class);
+
+        tankStoreRelationAct.aa_lishi();
     }
 
 }
