@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.user.User;
@@ -99,6 +101,7 @@ public class RelationScoreController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "服务业绩回退")
     @PreAuthorize("hasAuthority('agent:relation:score:refund')")
     @ApiOperation("业绩退款")
     @GetMapping("/refund")

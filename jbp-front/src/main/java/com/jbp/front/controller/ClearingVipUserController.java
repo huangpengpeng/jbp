@@ -92,7 +92,7 @@ public class ClearingVipUserController {
         List<PingTaiCommHandler.Rule> ruleList = pingTaiCommHandler.getRule(null);
         Map<String, PingTaiCommHandler.Rule> ruleMap = FunctionUtil.keyValueMap(ruleList, PingTaiCommHandler.Rule::getLevelName);
 
-        PingTaiCommHandler.Rule rule = ruleMap.get(platform.equals("直通V1") ? "直通VIP1" : platform.equals("直通V2") ? "直通VIP2" : platform.equals("直通V3") ? "直通VIP3" : "");
+        PingTaiCommHandler.Rule rule = ruleMap.get(platform.equals("直通V1") ? "V1" : platform.equals("直通V2") ? "V2" : platform.equals("直通V3") ? "V3" : "");
         BigDecimal maxFee = rule.getMaxFee().multiply(BigDecimal.valueOf(rule.getMaxNum()));
 
         ClearingVipUser clearingVipUser = clearingVipUserService.getByUser(uid, rule.getRefLevel(), pingTaiCommHandler.getType());
