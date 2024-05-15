@@ -2,6 +2,7 @@ package com.jbp.admin.controller.tank;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.order.ThreeBackOneInit;
 import com.jbp.common.model.tank.TankStoreRelation;
@@ -13,6 +14,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.TankStoreRelationService;
 import com.jbp.service.service.ThreeBackOneInitService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.UserInvitationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +45,7 @@ public class TankStoreRelationAct {
     @Resource
     private UserService userService;
     @Resource
-    private UserInvitationService userInvitationService;
+    private SelfScoreService selfScoreService;
     @Resource
     private ThreeBackOneInitService threeBackOneInitService;
 
@@ -311,6 +313,35 @@ int i=0;
         threeBackOneInitService.saveBatch(list);
 
     }
+
+
+
+
+
+    public void aa_lishi() {
+
+
+int i=0;
+
+
+
+            StringBuilder stringBuilder = new StringBuilder(" select  * from jymall.orderinit  "  );
+
+
+
+            List<Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
+            for(Map<String,Object> map : maps){
+                selfScoreService.orderSuccess(Integer.valueOf(map.get("userId").toString()),new BigDecimal(map.get("amount").toString()),"CS_123123"+i,new Date(),null);
+                i++;
+            }
+
+
+
+
+
+
+    }
+
 
 
 }
