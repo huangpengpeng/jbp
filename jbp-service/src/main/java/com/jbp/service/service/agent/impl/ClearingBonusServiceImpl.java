@@ -5,7 +5,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ClearingBonus;
-import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -55,15 +54,10 @@ public class ClearingBonusServiceImpl extends UnifiedServiceImpl<ClearingBonusDa
     }
 
     @Override
-    public PageInfo<ClearingBonusListResponse> getcleringList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<ClearingBonusListResponse> getClearingList(Integer uid, PageParamRequest pageParamRequest) {
         Page<ClearingBonus> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-
-         return CommonPage.copyPageInfo(page, dao.getcleringList(uid));
+        return CommonPage.copyPageInfo(page, dao.getClearingList(uid));
     }
 
-    @Override
-    public ClearingBonusListResponse getcleringInfoList(Integer uid,String day) {
-        return dao.getcleringInfoList(uid,day);
-    }
 }
 

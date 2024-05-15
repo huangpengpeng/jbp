@@ -9,6 +9,7 @@ import com.jbp.common.model.agent.ClearingBonusFlow;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.ClearingBonusListResponse;
 import com.jbp.service.dao.agent.ClearingBonusFlowDao;
 import com.jbp.service.service.agent.ClearingBonusFlowService;
 import com.jbp.service.util.StringUtils;
@@ -50,5 +51,10 @@ public class ClearingBonusFlowServiceImpl extends UnifiedServiceImpl<ClearingBon
     @Override
     public List<ClearingBonusFlow> getByClearing(Long clearingId) {
         return list(new LambdaQueryWrapper<ClearingBonusFlow>().eq(ClearingBonusFlow::getClearingId, clearingId));
+    }
+
+    @Override
+    public List<ClearingBonusListResponse> getClearingList(Integer userId, String day) {
+        return dao.getClearingInfoList(userId, day);
     }
 }

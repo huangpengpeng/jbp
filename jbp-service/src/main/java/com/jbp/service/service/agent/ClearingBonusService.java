@@ -3,7 +3,6 @@ package com.jbp.service.service.agent;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ClearingBonus;
-import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ClearingBonusListResponse;
 
@@ -18,10 +17,7 @@ public interface ClearingBonusService extends IService<ClearingBonus> {
 
     PageInfo<ClearingBonus> pageList(Integer uid, String account, String uniqueNo, Long clearingId, PageParamRequest pageParamRequest);
 
-    PageInfo<ClearingBonusListResponse> getcleringList(Integer uid,PageParamRequest pageParamRequest);
+    PageInfo<ClearingBonusListResponse> getClearingList(Integer uid, PageParamRequest pageParamRequest);
 
-
-
-    ClearingBonusListResponse getcleringInfoList(Integer uid,String day);
 
 }
