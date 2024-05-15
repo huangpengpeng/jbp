@@ -158,7 +158,7 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
 
             BigDecimal totalAmt = totalScore.multiply(rule.getRatio());
             if (size > 0 && ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
-                BigDecimal price = totalAmt.divide(BigDecimal.valueOf(size), 0, BigDecimal.ROUND_UP);
+                BigDecimal price = totalAmt.divide(BigDecimal.valueOf(size), 2, BigDecimal.ROUND_DOWN);
                 if (ArithmeticUtils.gt(price, BigDecimal.ZERO)) {
                     priceMap.put(rule.getLevel(), price);
                 }

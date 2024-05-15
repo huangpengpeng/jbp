@@ -7,7 +7,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.RelationScore;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -36,8 +39,6 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
 
     @Resource
     private UserRelationDao dao;
-    @Resource
-    private UserInvitationService userInvitationService;
     @Resource
     private UserRelationFlowService userRelationFlowService;
     @Resource
