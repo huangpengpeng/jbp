@@ -349,7 +349,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     User user = userService.getById(snapshot.getUid());
                     scoreStart = user.getCreateTime();
                 } else {
-                    scoreStart = snapshot.getGmtCreated();
+                    scoreStart = userCapa.getGmtCreated();
                 }
                 BigDecimal sendCommAmt = fundClearingService.getSendCommAmt(userCapa.getUid(), scoreStart, endTime, ProductCommEnum.报单佣金.getName(), ProductCommEnum.零售佣金.getName());
                 Long level = 0L;

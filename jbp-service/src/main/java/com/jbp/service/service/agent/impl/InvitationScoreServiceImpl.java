@@ -16,6 +16,7 @@ import com.jbp.common.model.agent.SelfScore;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
@@ -53,6 +54,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     private SelfScoreService selfScoreService;
     @Resource
     private InvitationScoreFlowDao flowDao;
+    @Resource
+    private InvitationScoreDao dao;
 
 
     @Override
@@ -140,7 +143,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             return;
         }
         List<Integer> pIdList = allUpper.stream().filter(u -> u.getPId() != null).map(UserUpperDto::getPId).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(pIdList)){
+        if (CollectionUtils.isEmpty(pIdList)) {
             return;
         }
         List<InvitationScore> invitationScores = list(new QueryWrapper<InvitationScore>().lambda().in(InvitationScore::getUid, pIdList));
@@ -165,5 +168,25 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         saveOrUpdateBatch(invitationScoreList);
         // 增加明细
         flowDao.insertBatch(list);
+    }
+
+    @Override
+    public void orderRefund(String orderSn) {
+        List<InvitationScoreFlow> list = invitationScoreFlowService.list(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn, orderSn));
+        invitationScoreFlowService.remove(new QueryWrapper<InvitationScoreFlow>().lambda().eq(InvitationScoreFlow::getOrdersSn, orderSn));
+        if (!list.isEmpty()) {
+            List<InvitationScore> updateList = Lists.newArrayList();
+            for (InvitationScoreFlow invitationScoreFlow : list) {
+                InvitationScore invitationScore = getByUser(invitationScoreFlow.getUid());
+                if (invitationScore != null && ArithmeticUtils.gte(invitationScore.getScore(), invitationScoreFlow.getScore())) {
+                    BigDecimal score = invitationScore.getScore().subtract(invitationScoreFlow.getScore());
+                    invitationScore.setScore(score);
+                    updateList.add(invitationScore);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(updateList)) {
+                dao.updateBatch(updateList);
+            }
+        }
     }
 }
