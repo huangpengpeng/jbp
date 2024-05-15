@@ -217,7 +217,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             rechargeOrder.setOutTradeNo(rechargeNo);
         }
         if (request.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)) {
-            CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), rechargeNo, rechargePrice, "补差", request.getIp());
+            CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), user.getPhone(), rechargeNo, rechargePrice, "补差", request.getIp());
             response.setStatus(true);
             response.setLianLianCashierConfig(cashier);
             response.setPayType(PayConstants.PAY_TYPE_LIANLIAN);
