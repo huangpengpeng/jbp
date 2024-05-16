@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.alipay.service.schema.util.StringUtil;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.ClearingFinal;
+import com.jbp.common.model.agent.FundClearing;
+import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.utils.FunctionUtil;
-import com.jbp.service.service.agent.ClearingUserService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.ProductCommConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +39,6 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public class ProductCommChain implements ApplicationContextAware {
 
-    @Resource
-    private ClearingUserService clearingUserService;
     @Resource
     private FundClearingService fundClearingService;
     @Resource
@@ -75,7 +75,9 @@ public class ProductCommChain implements ApplicationContextAware {
         for (AbstractProductCommHandler handler : handlers) {
             ProductCommConfig productCommConfig = commConfigMap.get(handler.getType());
             if (productCommConfig != null && productCommConfig.getIfOpen() != null && productCommConfig.getIfOpen()) {
-                handler.orderSuccessCalculateAmt(order, orderDetails, resultList);
+                if (!fundClearingService.hasCreate(order.getOrderNo(), ProductCommEnum.getCommName(handler.getType()))) {
+                    handler.orderSuccessCalculateAmt(order, orderDetails, resultList);
+                }
             }
         }
     }

@@ -44,11 +44,5 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        OrderSuccessMsgService orderSuccessMsgService = run.getBean(OrderSuccessMsgService.class);
-
-        List<OrderSuccessMsg> list = orderSuccessMsgService.list(new QueryWrapper<OrderSuccessMsg>().lambda().eq(OrderSuccessMsg::getExec, false));
-        for (OrderSuccessMsg msg : list) {
-            orderSuccessMsgService.exec(msg);
-        }
     }
 }

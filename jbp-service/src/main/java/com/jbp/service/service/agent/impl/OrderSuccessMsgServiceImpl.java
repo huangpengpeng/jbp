@@ -153,7 +153,7 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
             orderDetailList.addAll(merOrderDetailList);
         }
         boolean b = true;
-        // 1..资金概况
+        // 1.资金概况
         ordersFundSummaryService.create(platOrder.getId(), platOrder.getOrderNo(),
                 platOrder.getPayPrice().subtract(platOrder.getPayPostage()), score);
         // 2.自有业绩
