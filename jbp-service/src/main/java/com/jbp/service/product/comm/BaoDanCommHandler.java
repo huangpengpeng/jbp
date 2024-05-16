@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.FundClearing;
+import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
@@ -85,13 +88,8 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
         // 增加对碰积分业绩
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         List<FundClearing> list = Lists.newArrayList();
         // 订单总PV
         for (OrderDetail orderDetail : orderDetails) {

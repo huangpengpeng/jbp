@@ -1,18 +1,18 @@
 package com.jbp.service.product.comm;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.FundClearingProduct;
+import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -93,11 +92,8 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         // 查询所有上级
         List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
         if (CollectionUtils.isEmpty(allUpper)) {
@@ -108,7 +104,7 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
         Map<Integer, UserCapa> uidCapaMap = userCapaService.getUidMap(allUpper.stream().filter(u -> u.getPId() != null).map(UserUpperDto::getPId).collect(Collectors.toList()));
         Map<Integer, List<FundClearingProduct>> productMap = Maps.newConcurrentMap();
         Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             // 佣金配置
@@ -124,7 +120,7 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
             // 每个人拿钱 代数
             int i = 1;
             for (UserUpperDto user : allUpper) {
-                if(i > rule.getNum()){
+                if (i > rule.getNum()) {
                     break;
                 }
                 if (user.getPId() == null) {
@@ -160,7 +156,7 @@ public class CapaPointCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.见点佣金.getName(), clearingFee,
-                         fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.见点佣金.getName(), "");
+                        fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.见点佣金.getName(), "");
             }
         });
     }

@@ -105,11 +105,8 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         // 没有上级直接返回
         Integer pid = invitationService.getPid(order.getUid());
         if (pid == null) {
@@ -121,7 +118,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
         Long capaId = pUserCapa == null ? capaService.getMinCapa().getId() : pUserCapa.getCapaId();
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             // 佣金不存在或者关闭直接忽略

@@ -103,12 +103,8 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
         // 没有上级直接返回
         Integer pid = invitationService.getPid(order.getUid());
         if (pid == null) {
@@ -124,7 +120,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
         Long capaId = pUserCapa == null ? capaService.getMinCapa().getId() : pUserCapa.getCapaId();
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()); // 商品总价

@@ -101,13 +101,8 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
-        List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
 
@@ -117,7 +112,7 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
             return;
         }
 
-        for (OrderDetail orderDetail : orderDetailList) {
+        for (OrderDetail orderDetail : orderDetails) {
 
             ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
             if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {

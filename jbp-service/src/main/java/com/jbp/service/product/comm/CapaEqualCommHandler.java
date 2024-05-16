@@ -6,7 +6,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.FundClearingProduct;
+import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
@@ -99,11 +102,8 @@ public class CapaEqualCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         // 查询所有上级
         List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
         if (CollectionUtils.isEmpty(allUpper)) {
@@ -117,7 +117,7 @@ public class CapaEqualCommHandler extends AbstractProductCommHandler {
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 UserCapa userCapa = uidCapaMap.get(upperDto.getPId());
-                if(userCapa == null){
+                if (userCapa == null) {
                     continue;
                 }
                 if (NumberUtils.compare(userCapa.getCapaId(), capaId) > 0) {
@@ -165,7 +165,6 @@ public class CapaEqualCommHandler extends AbstractProductCommHandler {
         Map<Integer, List<FundClearingProduct>> productMap = Maps.newConcurrentMap();
         Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
 
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             // 佣金配置
@@ -214,7 +213,7 @@ public class CapaEqualCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.平级佣金.getName(), clearingFee,
-                         fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.平级佣金.getName(), "");
+                        fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.平级佣金.getName(), "");
             }
         });
     }

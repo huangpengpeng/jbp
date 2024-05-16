@@ -1,13 +1,13 @@
 package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
@@ -74,11 +74,7 @@ public class DepthCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
         // 对碰奖金
         List<CommCalculateResult> collisionFeeList = resultList.stream().filter(r -> r.getType().equals(ProductCommEnum.渠道佣金.getType()))
                 .sorted(Comparator.comparing(CommCalculateResult::getSort)).collect(Collectors.toList());

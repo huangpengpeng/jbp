@@ -116,13 +116,8 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if(!productCommConfig.getIfOpen()){
-            return;
-        }
-        // 增加对碰积分业绩
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         // 订单总PV
         BigDecimal score = BigDecimal.ZERO;
         List<ProductInfoDto> productInfoList = Lists.newArrayList();

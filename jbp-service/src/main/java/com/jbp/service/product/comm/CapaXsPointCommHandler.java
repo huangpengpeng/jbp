@@ -87,12 +87,7 @@ public class CapaXsPointCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();

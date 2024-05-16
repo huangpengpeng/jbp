@@ -7,6 +7,7 @@ import com.beust.jcommander.internal.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.service.agent.ClearingUserService;
 import com.jbp.service.service.agent.FundClearingService;
@@ -68,10 +69,13 @@ public class ProductCommChain implements ApplicationContextAware {
     /**
      * 订单成功计算佣金
      */
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+        List<ProductCommConfig> list = productCommConfigService.list();
+        Map<Integer, ProductCommConfig> commConfigMap = FunctionUtil.keyValueMap(list, ProductCommConfig::getType);
         for (AbstractProductCommHandler handler : handlers) {
-            if (!fundClearingService.hasCreate(order.getOrderNo(), ProductCommEnum.getCommName(handler.getType()))) {
-                handler.orderSuccessCalculateAmt(order, resultList);
+            ProductCommConfig productCommConfig = commConfigMap.get(handler.getType());
+            if (productCommConfig != null && productCommConfig.getIfOpen() != null && productCommConfig.getIfOpen()) {
+                handler.orderSuccessCalculateAmt(order, orderDetails, resultList);
             }
         }
     }

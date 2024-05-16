@@ -100,11 +100,7 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
         //查询第一笔获取直推佣金的用户
         FundClearing fundClearing = fundClearingService.getOne(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getPlatOrderNo()).eq(FundClearing::getCommName, ProductCommEnum.直推佣金.getName()).last(" order by id asc limit 1"));
@@ -147,7 +143,6 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
         Map<Integer, List<FundClearingProduct>> productMap = Maps.newConcurrentMap();
         Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
 
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             // 佣金配置

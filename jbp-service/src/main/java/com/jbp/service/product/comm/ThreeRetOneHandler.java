@@ -105,11 +105,8 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         Integer pid = invitationService.getPid(order.getUid());
         if (pid == null) {
             return;
@@ -117,7 +114,6 @@ public class ThreeRetOneHandler extends AbstractProductCommHandler {
         BigDecimal totalAmt = BigDecimal.ZERO;
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         // 历史推三返一单量
         List<FundClearing> fundClearingList = fundClearingService.getByUser(pid, ProductCommEnum.推三返一.getName(), FundClearing.interceptStatus());
         // 根据产品算钱

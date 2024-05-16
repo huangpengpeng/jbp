@@ -3,11 +3,13 @@ package com.jbp.service.product.comm;
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.service.service.agent.ProductCommConfigService;
 import com.jbp.service.service.agent.ProductCommService;
 
 import javax.annotation.Resource;
 import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractProductCommHandler implements ProductCommHandler {
 
@@ -22,7 +24,7 @@ public abstract class AbstractProductCommHandler implements ProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
     }
 

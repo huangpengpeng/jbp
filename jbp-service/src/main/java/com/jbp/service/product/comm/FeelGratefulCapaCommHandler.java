@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
@@ -75,11 +76,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
         List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_comm) as send_comm,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getPlatOrderNo()));
 
         if (fundClearingList.isEmpty()) {

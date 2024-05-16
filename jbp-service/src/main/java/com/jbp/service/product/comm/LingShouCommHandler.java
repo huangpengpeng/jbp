@@ -84,13 +84,9 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         // 增加对碰积分业绩
-        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
         List<FundClearing> list = Lists.newArrayList();
         // 订单总PV
         for (OrderDetail orderDetail : orderDetails) {

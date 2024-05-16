@@ -8,6 +8,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.StringUtils;
@@ -73,11 +74,8 @@ public class ShopComm2Handler extends AbstractProductCommHandler {
     }
 
     @Override
-    public void orderSuccessCalculateAmt(Order order, LinkedList<CommCalculateResult> resultList) {
-        ProductCommConfig productCommConfig = productCommConfigService.getByType(getType());
-        if (!productCommConfig.getIfOpen()) {
-            return;
-        }
+    public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+
         List<CommCalculateResult> collisionFeeList = resultList.stream().filter(r -> r.getType().equals(ProductCommEnum.店铺佣金.getType()))
                 .sorted(Comparator.comparing(CommCalculateResult::getSort)).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(collisionFeeList)) {
