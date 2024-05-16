@@ -39,7 +39,7 @@
 
   spring:
     profiles:
-      active: sm
+      active: jh
 
 
 

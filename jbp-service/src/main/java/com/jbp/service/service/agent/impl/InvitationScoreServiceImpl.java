@@ -149,7 +149,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         List<InvitationScore> invitationScores = list(new QueryWrapper<InvitationScore>().lambda().in(InvitationScore::getUid, pIdList));
         Map<Integer, InvitationScore> invitationScoreMap = FunctionUtil.keyValueMap(invitationScores, InvitationScore::getUid);
         LinkedList<InvitationScoreFlow> list = Lists.newLinkedList();
-        LinkedList<InvitationScore> invitationScoreList = Lists.newLinkedList();
+        LinkedList<InvitationScore> updateList = Lists.newLinkedList();
+
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 InvitationScore invitationScore = invitationScoreMap.get(upperDto.getPId());
@@ -158,16 +159,20 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 }
                 // 汇总
                 invitationScore.setScore(invitationScore.getScore().add(score));
-                invitationScoreList.add(invitationScore);
+                updateList.add(invitationScore);
                 // 明细
                 InvitationScoreFlow flow = new InvitationScoreFlow(upperDto.getPId(), uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
                 list.add(flow);
             }
         }
         // 更新团队业绩
-        saveOrUpdateBatch(invitationScoreList);
+        if(CollectionUtils.isNotEmpty(updateList)){
+            dao.updateBatch(updateList);
+        }
         // 增加明细
-       invitationScoreFlowService.saveBatch(list);
+        if(CollectionUtils.isNotEmpty(list)){
+            flowDao.insertBatch(list);
+        }
     }
 
     @Override

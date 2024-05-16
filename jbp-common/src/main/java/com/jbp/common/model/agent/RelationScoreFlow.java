@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.dto.ProductInfoDto;
@@ -11,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -38,7 +40,9 @@ public class RelationScoreFlow extends BaseModel {
         this.action = action;
         this.ordersSn = ordersSn;
         this.payTime = payTime;
-        this.productInfo = productInfo;
+        if(CollectionUtils.isNotEmpty(productInfo)){
+            this.productInfo = JSONArray.toJSONString(productInfo);
+        }
         this.remark = remark;
         this.level = level;
         this.amt = amt;
@@ -77,8 +81,8 @@ public class RelationScoreFlow extends BaseModel {
     private Date payTime;
 
     @ApiModelProperty("商品信息【新增积分=产品积分  减少是不相同的根据可用区最小值对碰】")
-    @TableField(value = "product_info", typeHandler = ProductInfoListHandler.class)
-    private List<ProductInfoDto> productInfo;
+    @TableField(value = "product_info")
+    private String productInfo;
 
     @ApiModelProperty("奖金")
     @TableField("amt")
