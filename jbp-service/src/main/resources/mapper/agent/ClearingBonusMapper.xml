@@ -8,7 +8,7 @@
               on f.id = e.clearingId
               where e.uid =#{uid}
               GROUP BY DATE_FORMAT(startTime, '%Y-%m-%d')) t
-        order by time desc;
+        order by time desc
     </select>
 
 </mapper>
