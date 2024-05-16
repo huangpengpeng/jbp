@@ -165,7 +165,7 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
     @Override
     public Boolean oneKeySend(Long clearingId) {
         ClearingFinal clearingFinal = getById(clearingId);
-        if (clearingFinal.getStatus().equals(ClearingFinal.Constants.待出款.name())) {
+        if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待出款.name())) {
             throw new CrmebException("只能操作待出款");
         }
         List<ClearingBonus> clearing = clearingBonusService.get4Clearing(clearingId);
