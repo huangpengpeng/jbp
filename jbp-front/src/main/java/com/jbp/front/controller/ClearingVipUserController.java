@@ -132,7 +132,7 @@ public class ClearingVipUserController {
                 throw new CrmebException("一次性购买2件商品");
             }
             // 验证是否购买V1
-            PingTaiCommHandler.Rule rule1 = ruleMap.get("直通VIP1");
+            PingTaiCommHandler.Rule rule1 = ruleMap.get("V1");
             ClearingVipUser clearingVipUser1 = clearingVipUserService.getByUser(uid, rule1.getRefLevel(), pingTaiCommHandler.getType());
             if (clearingVipUser1 == null) {
                 throw new CrmebException("未购买直通VIP1礼包");
@@ -143,7 +143,7 @@ public class ClearingVipUserController {
                 throw new CrmebException("一次性购买3件商品");
             }
             // 验证是否购买V2
-            PingTaiCommHandler.Rule rule2 = ruleMap.get("直通VIP2");
+            PingTaiCommHandler.Rule rule2 = ruleMap.get("V2");
             ClearingVipUser clearingVipUser2 = clearingVipUserService.getByUser(uid, rule2.getRefLevel(), pingTaiCommHandler.getType());
             if (clearingVipUser2 == null) {
                 throw new CrmebException("未购买直通VIP2礼包");
