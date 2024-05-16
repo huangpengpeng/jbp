@@ -159,15 +159,11 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 }
                 // 汇总
                 invitationScore.setScore(invitationScore.getScore().add(score));
-                updateList.add(invitationScore);
+                updateById(invitationScore);
                 // 明细
                 InvitationScoreFlow flow = new InvitationScoreFlow(upperDto.getPId(), uid, score, "增加", "下单", ordersSn, payTime, productInfo, "");
                 list.add(flow);
             }
-        }
-        // 更新团队业绩
-        if(CollectionUtils.isNotEmpty(updateList)){
-            dao.updateBatch(updateList);
         }
         // 增加明细
         if(CollectionUtils.isNotEmpty(list)){
