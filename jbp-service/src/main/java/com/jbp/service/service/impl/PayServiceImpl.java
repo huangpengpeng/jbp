@@ -871,7 +871,7 @@ public class PayServiceImpl implements PayService {
 //            userCapaXsService.riseCapaXs(platOrder.getUid());
             // 5.分销佣金
             LinkedList<CommCalculateResult> commList = new LinkedList<>();
-            productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+            productCommChain.orderSuccessCalculateAmt(platOrder, platOrderDetailList, commList);
             // 订单、佣金
 //            if (CollUtil.isNotEmpty(brokerageRecordList)) {
 //                merchantOrderService.updateBatchById(merchantOrderList);

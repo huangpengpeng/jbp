@@ -1,6 +1,5 @@
 package com.jbp.common.model.agent;
 
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.dto.ProductInfoDto;
@@ -12,7 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,9 +33,7 @@ public class InvitationScoreFlow extends BaseModel {
         this.operate = operate;
         this.ordersSn = ordersSn;
         this.payTime = payTime;
-        if(CollectionUtils.isNotEmpty(productInfo)){
-            this.productInfo = JSONArray.toJSONString(productInfo);
-        }
+        this.productInfo = productInfo;
         this.remark = remark;
     }
 
@@ -69,8 +65,8 @@ public class InvitationScoreFlow extends BaseModel {
     private Date payTime;
 
     @ApiModelProperty("商品信息")
-    @TableField(value = "product_info")
-    private String productInfo;
+    @TableField(value = "product_info", typeHandler = ProductInfoListHandler.class)
+    private List<ProductInfoDto> productInfo;
 
     @ApiModelProperty("备注")
     @TableField("remark")

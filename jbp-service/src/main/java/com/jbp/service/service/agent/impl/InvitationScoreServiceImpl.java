@@ -149,8 +149,6 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         List<InvitationScore> invitationScores = list(new QueryWrapper<InvitationScore>().lambda().in(InvitationScore::getUid, pIdList));
         Map<Integer, InvitationScore> invitationScoreMap = FunctionUtil.keyValueMap(invitationScores, InvitationScore::getUid);
         LinkedList<InvitationScoreFlow> list = Lists.newLinkedList();
-        LinkedList<InvitationScore> updateList = Lists.newLinkedList();
-
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 InvitationScore invitationScore = invitationScoreMap.get(upperDto.getPId());
@@ -167,7 +165,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         }
         // 增加明细
         if(CollectionUtils.isNotEmpty(list)){
-            flowDao.insertBatch(list);
+            invitationScoreFlowService.saveBatch(list);
         }
     }
 

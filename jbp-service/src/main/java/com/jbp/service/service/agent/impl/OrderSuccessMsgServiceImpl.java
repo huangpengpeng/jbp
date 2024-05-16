@@ -165,7 +165,7 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
 //        userCapaXsService.asyncRiseCapaXs(platOrder.getUid());
         // 5.分销佣金
         LinkedList<CommCalculateResult> commList = new LinkedList<>();
-        productCommChain.orderSuccessCalculateAmt(platOrder, commList);
+        productCommChain.orderSuccessCalculateAmt(platOrder, platOrderDetailList, commList);
         // 订单信息
         b = orderDetailService.updateBatchById(orderDetailList);
         if (!b) {

@@ -40,9 +40,7 @@ public class RelationScoreFlow extends BaseModel {
         this.action = action;
         this.ordersSn = ordersSn;
         this.payTime = payTime;
-        if(CollectionUtils.isNotEmpty(productInfo)){
-            this.productInfo = JSONArray.toJSONString(productInfo);
-        }
+        this.productInfo = productInfo;
         this.remark = remark;
         this.level = level;
         this.amt = amt;
@@ -80,9 +78,9 @@ public class RelationScoreFlow extends BaseModel {
     @TableField("pay_time")
     private Date payTime;
 
-    @ApiModelProperty("商品信息【新增积分=产品积分  减少是不相同的根据可用区最小值对碰】")
-    @TableField(value = "product_info")
-    private String productInfo;
+    @ApiModelProperty("商品信息")
+    @TableField(value = "product_info", typeHandler = ProductInfoListHandler.class)
+    private List<ProductInfoDto> productInfo;
 
     @ApiModelProperty("奖金")
     @TableField("amt")

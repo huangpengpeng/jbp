@@ -58,8 +58,6 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
     private FundClearingService fundClearingService;
     @Resource
     private RelationScoreFlowService relationScoreFlowService;
-    @Resource
-    private RelationScoreFlowDao flowDao;
 
     @Override
     public Integer getType() {
@@ -117,7 +115,6 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
-
         // 订单总PV
         BigDecimal score = BigDecimal.ZERO;
         List<ProductInfoDto> productInfoList = Lists.newArrayList();
@@ -156,7 +153,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             relationScoreFlowList.add(flow);
         }
         // 保存明细
-        flowDao.insertBatch(relationScoreFlowList);
+        relationScoreFlowService.saveBatch(relationScoreFlowList);
 
         // 等级比例
         Rule rule = getRule(null);
