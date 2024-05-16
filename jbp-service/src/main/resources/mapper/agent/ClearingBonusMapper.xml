@@ -6,7 +6,7 @@
         from eb_clearing_bonus e left join eb_clearing_final f
         on f.id = e.clearingId
         where e.uid =#{uid}
-        GROUP BY DATE_FORMAT(startTime, '%Y-%m-%d')
+        GROUP BY DATE_FORMAT(startTime, '%Y-%m-%d') DESC
     </select>
 
 </mapper>
