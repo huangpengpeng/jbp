@@ -73,6 +73,7 @@ public class ProductCommChain implements ApplicationContextAware {
         List<ProductCommConfig> list = productCommConfigService.list();
         Map<Integer, ProductCommConfig> commConfigMap = FunctionUtil.keyValueMap(list, ProductCommConfig::getType);
         for (AbstractProductCommHandler handler : handlers) {
+            log.info("佣金处理中#########################正在执行:{},单号:{}", ProductCommEnum.getCommName(handler.getType()), order.getOrderNo());
             ProductCommConfig productCommConfig = commConfigMap.get(handler.getType());
             if (productCommConfig != null && productCommConfig.getIfOpen() != null && productCommConfig.getIfOpen()) {
                 if (!fundClearingService.hasCreate(order.getOrderNo(), ProductCommEnum.getCommName(handler.getType()))) {
