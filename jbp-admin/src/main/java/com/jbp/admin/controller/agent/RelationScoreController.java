@@ -50,6 +50,7 @@ public class RelationScoreController {
 
 
     @PreAuthorize("hasAuthority('agent:relation:score:increase')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "更新可用")
     @ApiOperation("更新可用")
     @PostMapping("/increase")
     public CommonResult increase(@Validated @RequestBody RelationScoreUpdateRequest request) {
@@ -63,6 +64,7 @@ public class RelationScoreController {
     }
 
     @PreAuthorize("hasAuthority('agent:relation:score:reduce')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "更新已用")
     @ApiOperation("更新已用")
     @PostMapping("/reduce")
     public CommonResult reduce(@Validated @RequestBody RelationScoreUpdateRequest request) {
@@ -76,6 +78,7 @@ public class RelationScoreController {
     }
 
     @PreAuthorize("hasAuthority('agent:relation:score:fake:set')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "设置虚拟业绩")
     @ApiOperation("设置虚拟业绩")
     @GetMapping("/fake/edit")
     public CommonResult fakeEdit(String account, int node, int score) {
