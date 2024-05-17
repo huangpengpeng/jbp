@@ -1286,8 +1286,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             throw new CrmebException("订单不存在");
         }
         Order order = this.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo, orderNo));
-        if (!OrderConstants.ORDER_STATUS_WAIT_SHIPPING.equals(order.getStatus()) ||
-                !OrderConstants.ORDER_REFUND_STATUS_NOT_APPLY.equals(order.getRefundStatus())) {
+        if (!OrderConstants.ORDER_STATUS_WAIT_SHIPPING.equals(order.getStatus())) {
             throw new CrmebException("只能修改待发货未退款的订单");
         }
         merchantOrder.setRealName(request.getRealName());
