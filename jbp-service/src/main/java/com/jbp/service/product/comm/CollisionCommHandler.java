@@ -139,6 +139,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             // 订单总PV
             score = score.add(totalPv);
         }
+        score = BigDecimal.valueOf(score.intValue());
         // 没有积分退出
         if (!ArithmeticUtils.gt(score, BigDecimal.ZERO)) {
             return;
