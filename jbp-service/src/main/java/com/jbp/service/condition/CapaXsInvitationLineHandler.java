@@ -1,20 +1,24 @@
 package com.jbp.service.condition;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.service.service.agent.*;
+import com.jbp.service.service.agent.InvitationScoreService;
+import com.jbp.service.service.agent.SelfScoreService;
+import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.service.agent.UserInvitationService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,11 +67,11 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
         // 获取规则
         Rule rule = getRule(riseCondition);
         // 1.自己的累积业绩
-        String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
+        String ifOpen = environment.getProperty("teamAmtSelf.ifopen");
         BigDecimal teamAmt = BigDecimal.ZERO;
-        if(Boolean.parseBoolean(ifOpen)){
-            teamAmt =selfScoreService.getUserNext(uid,true);
-        }else{
+        if (Boolean.parseBoolean(ifOpen)) {
+            teamAmt = selfScoreService.getUserNext(uid, true);
+        } else {
             teamAmt = invitationScoreService.getInvitationScore(uid, true);
         }
 
@@ -76,7 +80,7 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
             return false;
         }
         // 2.一阶人数
-        List<UserInvitation> nextList = userInvitationService.getNextList(uid);
+        List<UserInvitation> nextList = userInvitationService.getNextOrMidList(uid);
         if (CollectionUtils.isEmpty(nextList) || nextList.size() < rule.getIndeCount().intValue()) {
             return false;
         }
@@ -85,15 +89,22 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
         for (UserInvitation userInvitation : nextList) {
             // 团队业绩
             BigDecimal nextTotal = BigDecimal.ZERO;
-            if(Boolean.parseBoolean(ifOpen)){
-                nextTotal = selfScoreService.getUserNext(uid,true);
-            }else{
+            if (Boolean.parseBoolean(ifOpen)) {
+                nextTotal = selfScoreService.getUserNext(uid, true);
+            } else {
                 nextTotal = invitationScoreService.getInvitationScore(userInvitation.getUId(), true);
             }
             if (ArithmeticUtils.less(nextTotal, rule.getMinTeamAmt())) {
                 continue;
             }
-            List<UserCapaXs> userCapaXsList = userCapaXsService.getRelationUnder(userInvitation.getUId(), rule.getIndeCapaXsId());
+            List<UserCapaXs> userCapaXsList = new ArrayList<>();
+
+            if (Boolean.parseBoolean(ifOpen)) {
+                userCapaXsList = userCapaXsService.getInvitationUnder(userInvitation.getUId(), rule.getIndeCapaXsId());
+            } else {
+                userCapaXsList = userCapaXsService.getRelationUnder(userInvitation.getUId(), rule.getIndeCapaXsId());
+            }
+
             UserCapaXs userCapaXs = userCapaXsService.getByUser(userInvitation.getUId());
             if (userCapaXs != null && userCapaXs.getCapaId().compareTo(rule.getIndeCapaXsId()) >= 0) {
                 userCapaXsList.add(userCapaXs);

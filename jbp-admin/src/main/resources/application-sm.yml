@@ -187,6 +187,8 @@ fundClearing:
 historyOrder:
   name: wkp42271043176625
 
+teamAmtSelf:
+  ifopen: true
 
 
 
