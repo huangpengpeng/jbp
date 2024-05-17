@@ -3,6 +3,10 @@ package com.jbp.front;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.model.agent.OrderSuccessMsg;
+import com.jbp.service.product.comm.CollisionCommHandler;
+import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.OrderSuccessMsgService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -43,6 +48,13 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+        CollisionCommHandler collisionCommHandler = run.getBean(CollisionCommHandler.class);
+        OrderService orderService = run.getBean(OrderService.class);
+        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
+        collisionCommHandler.orderSuccessCalculateAmt(orderService.getByOrderNo("PT388171536758865495653"), orderDetailService.getByOrderNo("PT388171536758865495653"), resultList);
+
 
     }
 }
