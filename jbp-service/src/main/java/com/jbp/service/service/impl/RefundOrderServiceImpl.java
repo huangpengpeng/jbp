@@ -202,7 +202,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         }
 
         String name = environment.getProperty("fundClearing.refundBack");
-        if(BooleanUtil.toBoolean(name)) {
+        if(!BooleanUtil.toBoolean(name)) {
             if (order.getStatus().equals(OrderConstants.ORDER_STATUS_COMPLETE)) {
                 throw new CrmebException("已完成订单无法申请退款");
             }
