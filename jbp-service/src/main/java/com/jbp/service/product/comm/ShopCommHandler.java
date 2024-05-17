@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
-import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
@@ -16,13 +15,14 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.agent.ProductCommConfigService;
 import com.jbp.service.service.agent.ProductCommService;
 import com.jbp.service.service.agent.UserInvitationService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -45,9 +45,9 @@ public class ShopCommHandler extends AbstractProductCommHandler {
     @Resource
     private UserInvitationService invitationService;
     @Resource
-    private ProductCommConfigService productCommConfigService;
-    @Resource
     private FundClearingService fundClearingService;
+    @Autowired
+    private Environment environment;
 
 
     @Override
@@ -127,12 +127,28 @@ public class ShopCommHandler extends AbstractProductCommHandler {
         // 下单用户信息
         User orderUser = userService.getById(order.getUid());
         Integer uid = order.getUid();
+        String active = environment.getProperty("spring.profiles.active");
+        if(StringUtils.isNotEmpty(active) && active.contains("hdf")) {
+            Boolean openShop = userService.getById(uid).getOpenShop();
+            if (openShop != null && BooleanUtils.isTrue(openShop)) {
+                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
+                        productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
+
+                int sort = resultList.size() + 1;
+                CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.店铺佣金.getName(),
+                        null, null, BigDecimal.ZERO,
+                        1, score, BigDecimal.ONE, BigDecimal.ZERO, amt, sort);
+                resultList.add(calculateResult);
+                return;
+            }
+        }
+
         do {
             Integer pid = invitationService.getPid(uid);
             if (pid == null) {
                 break;
             }
-            final Boolean openShop = userService.getById(pid).getOpenShop();
+            Boolean openShop = userService.getById(pid).getOpenShop();
             if (openShop != null && BooleanUtils.isTrue(openShop)) {
                 fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
                          productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
@@ -164,5 +180,6 @@ public class ShopCommHandler extends AbstractProductCommHandler {
          * 比例 类型  金额  比例
          */
         private String type;
+
     }
 }
