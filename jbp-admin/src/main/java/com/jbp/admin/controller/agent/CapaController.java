@@ -80,7 +80,7 @@ public class CapaController {
             return CommonResult.failed("等级名称不能重复");
         }
         if (ObjectUtil.isNotEmpty(capaRequest.getPCapaId())){
-            if (capa.getId()>capa.getPCapaId()){
+            if (capa.getId()>capaRequest.getPCapaId()){
                 throw new CrmebException("请设置下个等级比本等级较大");
             }
         }
