@@ -1812,9 +1812,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             User spreadUser = getById(user.getSpreadUid());
             response.setSpreadName(spreadUser.getNickname());
         }
-        if (StrUtil.isNotBlank(user.getPhone())) {
-            response.setPhone(CrmebUtil.maskMobile(user.getPhone()));
-        }
         SystemUserLevel systemUserLevel = systemUserLevelService.getByLevelId(user.getLevel());
         response.setGrade(ObjectUtil.isNotNull(systemUserLevel) ? systemUserLevel.getGrade() : 0);
         return response;
