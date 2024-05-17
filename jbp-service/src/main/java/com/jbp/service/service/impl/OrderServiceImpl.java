@@ -1277,13 +1277,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
     @Override
     public Boolean editAddress(PlatformOrderAddressEditRequest request) {
-        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(request.getOrderNo());
+        String orderNo = getOrderNo(request.getOrderNo());
+        if (StringUtils.isEmpty(orderNo)) {
+            throw new CrmebException("订单未付款不允许修改");
+        }
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderNo);
         if (ObjectUtil.isNull(merchantOrder)) {
             throw new CrmebException("订单不存在");
         }
-        Order order = this.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo, merchantOrder.getOrderNo()));
-        if (!OrderConstants.ORDER_STATUS_WAIT_SHIPPING.equals(order.getStatus())) {
-            throw new CrmebException("订单状态不允许修改地址");
+        Order order = this.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo, orderNo));
+        if (!OrderConstants.ORDER_STATUS_WAIT_SHIPPING.equals(order.getStatus()) ||
+                !OrderConstants.ORDER_REFUND_STATUS_NOT_APPLY.equals(order.getRefundStatus())) {
+            throw new CrmebException("只能修改待发货未退款的订单");
         }
         merchantOrder.setRealName(request.getRealName());
         merchantOrder.setUserPhone(request.getUserPhone());

@@ -41,7 +41,6 @@ public class PlatformOrderAddressEditRequest implements Serializable {
     private String district;
 
     @ApiModelProperty(value = "收货街道")
-//    @NotBlank(message = "收货街道不能为空")
     private String street;
 
     @ApiModelProperty(value = "收货详细地址")

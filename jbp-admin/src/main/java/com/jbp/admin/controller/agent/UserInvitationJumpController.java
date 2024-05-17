@@ -43,7 +43,7 @@ public class UserInvitationJumpController {
             }
             uId = user.getId();
         }
-//        当前上级id
+        // 当前上级id
         Integer pId = null;
         if (StringUtils.isNotEmpty(request.getPaccount())) {
             User user = userService.getByAccount(request.getPaccount());
@@ -52,7 +52,7 @@ public class UserInvitationJumpController {
             }
             pId = user.getId();
         }
-        //原上级id
+        // 原上级id
         Integer orgPid = null;
         if (StringUtils.isNotEmpty(request.getOaccount())) {
             User user = userService.getByAccount(request.getOaccount());
