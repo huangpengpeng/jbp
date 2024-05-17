@@ -33,7 +33,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = {"com.jbp", "com.jbp.front"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
 public class JbpFrontApplication {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
