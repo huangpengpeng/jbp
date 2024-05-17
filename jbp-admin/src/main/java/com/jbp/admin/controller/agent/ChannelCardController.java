@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelCard;
 import com.jbp.common.model.user.User;
@@ -44,6 +46,7 @@ public class ChannelCardController {
         return CommonResult.success(CommonPage.restPage(channelCardService.pageList(uid,request.getBankCardNo(),request.getType(),request.getPhone(),pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:channel:card:update')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "修改渠道银行卡")
     @PostMapping("/update")
     @ApiOperation("修改渠道银行卡")
     public CommonResult update(@RequestBody @Validated ChannelCardEditRequest request) {

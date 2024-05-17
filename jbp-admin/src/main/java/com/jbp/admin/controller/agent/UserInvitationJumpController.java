@@ -7,6 +7,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserInvitationJumpRequest;
 import com.jbp.common.response.UserInvitationJumpListResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationJumpService;
 import io.swagger.annotations.Api;
@@ -35,28 +36,28 @@ public class UserInvitationJumpController {
     public CommonResult<CommonPage<UserInvitationJumpListResponse>> pageList(UserInvitationJumpRequest request, PageParamRequest pageParamRequest) {
         //当前用户id
         Integer uId = null;
-        if (request.getUId() != null) {
-            User user = userService.getById(request.getUId());
+        if (StringUtils.isNotEmpty(request.getUaccount())) {
+            User user = userService.getByAccount(request.getUaccount());
             if (user == null) {
-                throw new CrmebException("当前id信息错误");
+                throw new CrmebException("当前账户信息错误");
             }
             uId = user.getId();
         }
-//        当前上级id
+        // 当前上级id
         Integer pId = null;
-        if (request.getPId() != null) {
-            User user = userService.getById(request.getPId());
+        if (StringUtils.isNotEmpty(request.getPaccount())) {
+            User user = userService.getByAccount(request.getPaccount());
             if (user == null) {
-                throw new CrmebException("当前上级id信息错误");
+                throw new CrmebException("当前上级账户信息错误");
             }
             pId = user.getId();
         }
-        //原上级id
+        // 原上级id
         Integer orgPid = null;
-        if (request.getOrgPid() != null) {
-            User user = userService.getById(request.getOrgPid());
+        if (StringUtils.isNotEmpty(request.getOaccount())) {
+            User user = userService.getByAccount(request.getOaccount());
             if (user == null) {
-                throw new CrmebException("原上级id信息错误");
+                throw new CrmebException("原上级账户信息错误");
             }
             orgPid = user.getId();
         }

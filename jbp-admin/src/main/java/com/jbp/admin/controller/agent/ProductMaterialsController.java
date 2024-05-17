@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.ProductMaterials;
@@ -50,6 +52,7 @@ public class ProductMaterialsController {
         return CommonResult.success(CommonPage.restPage(productMaterialsService.pageList(merchantId, request.getMaterialsName(), request.getBarCode(), request.getSupplyName(), pageParamRequest)));
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "物料新增")
     @PreAuthorize("hasAuthority('agent:product:materials:add')")
     @PostMapping("/add")
     @ApiOperation("新增")
@@ -66,6 +69,7 @@ public class ProductMaterialsController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.DELETE, description = "物料删除")
     @PreAuthorize("hasAuthority('agent:product:materials:delete')")
     @GetMapping("/delete")
     @ApiOperation("删除")

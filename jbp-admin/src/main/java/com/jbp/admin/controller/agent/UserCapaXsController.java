@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.user.User;
@@ -47,6 +49,7 @@ public class UserCapaXsController {
     }
 
     @PreAuthorize("hasAuthority('agent:user:capa:xs:add')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "添加")
     @PostMapping("/add")
     @ApiOperation("添加")
     public CommonResult add(@Validated  @RequestBody UserCapaXsAddRequest request) {

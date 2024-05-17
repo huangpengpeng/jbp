@@ -3,6 +3,8 @@ package com.jbp.admin.controller.agent;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Maps;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.agent.FundClearingItemConfig;
 import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.agent.WalletConfig;
@@ -96,7 +98,8 @@ public class FundClearingItemConfigController {
     }
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:add')")
-    @ApiOperation("头部配置")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "出款规则配置")
+    @ApiOperation("出款规则配置")
     @PostMapping("/add")
     public CommonResult add(@RequestBody @Validated List<FundClearingItemConfigRequest> request) {
         if (CollectionUtils.isEmpty(request)) {
