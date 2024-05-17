@@ -22,6 +22,8 @@ import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 /**
  * 渠道佣金
  */
+@Slf4j
 @Component
 public class CollisionCommHandler extends AbstractProductCommHandler {
 
@@ -128,7 +131,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             // 业绩金额为0忽略
             BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             // 折算系数
-            totalPv = BigDecimal.valueOf(totalPv.multiply(productComm.getScale()).intValue());
+            totalPv = totalPv.multiply(productComm.getScale());
             // 明细商品
             BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee());
             ProductInfoDto productInfo = new ProductInfoDto(productId, orderDetail.getProductName(), orderDetail.getPayNum(), payPrice, totalPv);
@@ -136,6 +139,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             // 订单总PV
             score = score.add(totalPv);
         }
+        score = BigDecimal.valueOf(score.intValue());
         // 没有积分退出
         if (!ArithmeticUtils.gt(score, BigDecimal.ZERO)) {
             return;
