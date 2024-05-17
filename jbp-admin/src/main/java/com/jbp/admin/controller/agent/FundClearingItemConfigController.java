@@ -98,8 +98,8 @@ public class FundClearingItemConfigController {
     }
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:item:config:add')")
-    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "头部配置")
-    @ApiOperation("头部配置")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "出款规则配置")
+    @ApiOperation("出款规则配置")
     @PostMapping("/add")
     public CommonResult add(@RequestBody @Validated List<FundClearingItemConfigRequest> request) {
         if (CollectionUtils.isEmpty(request)) {

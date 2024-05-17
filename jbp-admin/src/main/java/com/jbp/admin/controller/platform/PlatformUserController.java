@@ -117,6 +117,7 @@ public class PlatformUserController {
         return CommonResult.failed();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "用户注册")
     @PreAuthorize("hasAuthority('platform:user:register:phone')")
     @PostMapping("/register/phone")
     @ApiOperation("用户注册")
@@ -131,6 +132,7 @@ public class PlatformUserController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "修改用户基本信息")
     @PreAuthorize("hasAuthority('platform:user:update:user')")
     @PostMapping("/update/user")
     @ApiOperation("修改用户基本信息")

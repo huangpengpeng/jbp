@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.FundClearing;
@@ -54,6 +56,8 @@ public class FundClearingController {
                 uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList(), pageParamRequest)));
     }
 
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.EXPORT, description = "佣金发放记录导出Excel")
     @PreAuthorize("hasAuthority('agent:fund:clearing:excel')")
     @ApiOperation(value = "佣金发放记录导出Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
@@ -84,6 +88,7 @@ public class FundClearingController {
         return CommonResult.success(FundClearing.Constants.values());
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "更新待审核")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:wait:audit')")
     @PostMapping("/update/wait/audit")
     @ApiOperation("更新待审核")
@@ -92,6 +97,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "更新待出款")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:wait:send')")
     @PostMapping("/update/wait/send")
     @ApiOperation("更新待出款")
@@ -100,6 +106,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "更新已出款")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:send')")
     @PostMapping("/update/send")
     @ApiOperation("更新已出款")
@@ -108,6 +115,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "更新已取消")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:cancel')")
     @PostMapping("/update/cancel")
     @ApiOperation("更新已取消")
@@ -116,6 +124,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "更新已拦截")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:intercept')")
     @PostMapping("/update/intercept")
     @ApiOperation("更新已拦截")
@@ -124,6 +133,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "修改备注")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:remark')")
     @PostMapping("/update/remark")
     @ApiOperation("修改备注")
@@ -132,6 +142,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "修改发放金额")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:send:amt')")
     @PostMapping("/update/send/amt")
     @ApiOperation("修改发放金额")
@@ -140,6 +151,7 @@ public class FundClearingController {
         return CommonResult.success();
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "标记退回")
     @PreAuthorize("hasAuthority('agent:fund:clearing:update:if:refund')")
     @PostMapping("/update/if/refund")
     @ApiOperation("标记退回")
@@ -149,6 +161,7 @@ public class FundClearingController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "增加自定义佣金")
     @PreAuthorize("hasAuthority('agent:fund:clearing:save')")
     @PostMapping("/save")
     @ApiOperation("增加自定义佣金")
@@ -163,6 +176,7 @@ public class FundClearingController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "增加复销奖佣金")
     @PreAuthorize("hasAuthority('agent:fund:clearing:resellsave')")
     @PostMapping("/resellSave")
     @ApiOperation("增加复销奖佣金")
@@ -177,6 +191,7 @@ public class FundClearingController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.EXPORT, description = "佣金发放记录导出Excel")
     @ApiOperation(value = "佣金发放记录导出Excel")
     @RequestMapping(value = "/excel2", method = RequestMethod.GET)
     public CommonResult<String> excel2(FundClearingRequest request) {
@@ -202,6 +217,7 @@ public class FundClearingController {
         return CommonResult.success(s);
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "佣金出款导入")
     @PreAuthorize("hasAuthority('agent:fund:clearing:import')")
     @PostMapping("/import")
     @ApiOperation("佣金出款导入")
