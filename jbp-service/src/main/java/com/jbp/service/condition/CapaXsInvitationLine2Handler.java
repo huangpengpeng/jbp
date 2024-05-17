@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,7 +92,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
         // 2.一阶人数
         List<CapaXsInfo> capaXsList = rule.getCapaXsList();
         int indeCount = capaXsList.size();
-        List<UserInvitation> nextList = userInvitationService.getNextList(uid);
+        List<UserInvitation> nextList = userInvitationService.getNextOrMidList(uid);
         if (CollectionUtils.isEmpty(nextList) || nextList.size() < indeCount) {
             return false;
         }
@@ -119,7 +120,14 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
                             continue;
                         }
                     }
-                    List<UserCapaXs> userCapaXsList = userCapaXsService.getRelationUnder(userInvitation.getUId(), capaXsInfo.getCapaXsId());
+                    String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
+                    List<UserCapaXs> userCapaXsList =new ArrayList<>();
+
+                    if(Boolean.parseBoolean(ifOpen)) {
+                        userCapaXsList =  userCapaXsService.getInvitationUnder(userInvitation.getUId(), capaXsInfo.getCapaXsId());
+                    }else{
+                        userCapaXsList =   userCapaXsService.getRelationUnder(userInvitation.getUId(), capaXsInfo.getCapaXsId());
+                    }
                     UserCapaXs userCapaXs = userCapaXsService.getByUser(userInvitation.getUId());
                     if (userCapaXs != null && userCapaXs.getCapaId().compareTo(capaXsInfo.getCapaXsId()) >= 0) {
                         userCapaXsList.add(userCapaXs);
@@ -127,6 +135,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
                     if (userCapaXsList.size() >= capaXsInfo.getNum().intValue()) {
                         capaXsInfo.setIfOk(true);
                         uidList.add(userInvitation.getUId());
+                        break;
                     }
                 }
             }

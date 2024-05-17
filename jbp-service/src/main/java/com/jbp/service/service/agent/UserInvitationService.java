@@ -18,6 +18,9 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     List<UserInvitation> getNextList(Integer uid);
 
+    List<UserInvitation> getNextOrMidList(Integer uid);
+
+
     List<UserInvitation> getNextList(List<Integer> uid);
 
     LinkedList<List<UserInvitation>> getLevelList(Integer uid, int level);

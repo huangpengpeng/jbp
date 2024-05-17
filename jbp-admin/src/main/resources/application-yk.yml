@@ -187,3 +187,6 @@ fundClearing:
 
 historyOrder:
   name: jymall
+
+teamAmtSelf:
+  ifopen: true
