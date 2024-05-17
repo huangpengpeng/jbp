@@ -8,6 +8,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.PlatformOrderAddressEditRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
@@ -118,6 +119,15 @@ public class PlatformOrderController {
     public CommonResult<LogisticsResultVo> confirmPay(@PathVariable(value = "orderNo") String orderNo) {
         payService.confirmPay(orderService.getByOrderNo(orderNo));
         return CommonResult.success();
+    }
+
+    @PreAuthorize("hasAuthority('platform:order:address:edit')")
+    @ApiOperation(value = "修改订单收货地址")
+    @RequestMapping(value = "/address/edit", method = RequestMethod.POST)
+    public CommonResult editAddress(@RequestBody @Validated PlatformOrderAddressEditRequest request){
+        orderService.editAddress(request);
+        return CommonResult.success();
+
     }
 
 }

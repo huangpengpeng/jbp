@@ -1270,6 +1270,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     /**
+     * 订单收货地址修改
+     * @param request
+     * @return
+     */
+
+    @Override
+    public Boolean editAddress(PlatformOrderAddressEditRequest request) {
+        MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(request.getOrderNo());
+        if (ObjectUtil.isNull(merchantOrder)) {
+            throw new CrmebException("订单不存在");
+        }
+        Order order = this.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo, merchantOrder.getOrderNo()));
+        if (!OrderConstants.ORDER_STATUS_WAIT_SHIPPING.equals(order.getStatus())) {
+            throw new CrmebException("订单状态不允许修改地址");
+        }
+        merchantOrder.setRealName(request.getRealName());
+        merchantOrder.setUserPhone(request.getUserPhone());
+        merchantOrder.setProvince(request.getProvince());
+        merchantOrder.setCity(request.getCity());
+        merchantOrder.setDistrict(request.getDistrict());
+        merchantOrder.setStreet(request.getStreet());
+        merchantOrder.setAddress(request.getAddress());
+
+        String userAddressStr = request.getProvince() + request.getCity() + request.getDistrict() + request.getStreet() + request.getAddress();
+        merchantOrder.setUserAddress(userAddressStr);
+        return merchantOrderService.updateById(merchantOrder);
+    }
+
+    /**
      * 根据订单编号获取订单
      *
      * @param orderNo 订单编号

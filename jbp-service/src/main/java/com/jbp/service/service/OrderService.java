@@ -342,4 +342,6 @@ public interface OrderService extends IService<Order> {
 
     List<Map<String,Object>>  getFgGoodsOrder(String goodsIds, String month);
 
+    Boolean editAddress(PlatformOrderAddressEditRequest request);
+
 }
