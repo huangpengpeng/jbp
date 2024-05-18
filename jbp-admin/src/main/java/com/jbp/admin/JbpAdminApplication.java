@@ -7,9 +7,7 @@ import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.order.Order;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.CapaXsInvitationLineHandler;
-import com.jbp.service.product.comm.FeelGratefulCapaCommHandler;
-import com.jbp.service.product.comm.OfflineSubsidyCommHandler;
-import com.jbp.service.product.comm.RiseCapaDifferentialCommHandler;
+import com.jbp.service.product.comm.*;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.CapaXsService;
@@ -42,18 +40,18 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
+//
 //
 //        FeelGratefulCapaCommHandler orderPaySuccessTask =run.getBean(FeelGratefulCapaCommHandler.class);
 //
 //        OrderService order =run.getBean(OrderService.class);
 //
 //
-//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT656171602506018926726"),null,null);
+//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT233171603655023082111"),null,null);
 //
 //
-//
-//        RiseCapaDifferentialCommHandler orderPaySuccessTask =run.getBean(RiseCapaDifferentialCommHandler.class);
+
+//        CapaDifferentialCommHandler orderPaySuccessTask =run.getBean(CapaDifferentialCommHandler.class);
 //
 //        OrderService order =run.getBean(OrderService.class);
 //
@@ -61,7 +59,7 @@ public class JbpAdminApplication {
 //        OrderDetailService orderDetails =run.getBean(OrderDetailService.class);
 //
 //
-//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT718171602496886734358"),orderDetails.getByOrderNo("PT718171602496886734358"),null);
+//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT124171603525723849518"),orderDetails.getByOrderNo("PT124171603525723849518"),null);
 
     }
 

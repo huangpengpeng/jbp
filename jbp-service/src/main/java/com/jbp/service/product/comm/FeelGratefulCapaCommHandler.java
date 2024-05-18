@@ -104,7 +104,6 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                     if (pidCapaXs == null) {
                         continue;
                     }
-                    pid = invitationService.getPid(pid);
                     //上级等级为小于设计等级，紧缩
                     if (pidCapaXs.getCapaId() < rule.getCapaXsId()) {
                         continue;
@@ -117,7 +116,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                     if (pCapa.getPCapaId() == capa.getId() || pCapa.getId() == capa.getId()) {
                         userList.add(pid);
                     }
-
+                    pid = invitationService.getPid(pid);
 
                 } while (userList.size() < 3);
 
@@ -138,7 +137,6 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                     if (pidCapa == null) {
                         continue;
                     }
-                    pid = invitationService.getPid(pid);
                     //上级等级为小于设计等级，紧缩
                     if (pidCapa.getCapaId() < rule.getCapaId()) {
                         continue;
@@ -152,6 +150,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                         userList.add(pid);
                     }
 
+                    pid = invitationService.getPid(pid);
 
                 } while (userList.size() < 3);
             }
@@ -166,7 +165,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                                     null, user.getNickname() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
 
                             //减去用户发放的佣金金额
-                            List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()));
+                            List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()).eq(FundClearing::getUid,user.getId()));
                             for(FundClearing fundClearing1 :fundClearingList2){
                                 fundClearing1.setSendAmt(fundClearing1.getSendAmt().subtract( fundClearing1.getSendAmt().multiply(levelRatio.getRatio().get(i))));
                                 fundClearing1.setCommAmt(fundClearing1.getCommAmt().subtract(fundClearing1.getCommAmt().multiply(levelRatio.getRatio().get(i))));
