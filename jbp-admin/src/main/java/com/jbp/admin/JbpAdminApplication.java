@@ -47,9 +47,9 @@ public class JbpAdminApplication {
 //        OrderService order =run.getBean(OrderService.class);
 //
 //
-//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT233171603655023082111"),null,null);
-//
-//
+//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT152171603871578262420"),null,null);
+
+
 
 //        CapaDifferentialCommHandler orderPaySuccessTask =run.getBean(CapaDifferentialCommHandler.class);
 //

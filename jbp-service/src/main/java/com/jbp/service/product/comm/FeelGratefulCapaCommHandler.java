@@ -155,6 +155,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                 } while (userList.size() < 3);
             }
 
+            BigDecimal amtRatio = BigDecimal.ZERO;
             //分佣
             if(!userList.isEmpty()) {
                 for (FeelGratefulCapaCommHandler.LevelRatio levelRatio : levelRatios) {
@@ -164,13 +165,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                             fundClearingService.create(userList.get(i), order.getOrderNo(), ProductCommEnum.感恩奖.getName(), fundClearing.getSendAmt().multiply(levelRatio.getRatio().get(i)),
                                     null, user.getNickname() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
 
-                            //减去用户发放的佣金金额
-                            List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()).eq(FundClearing::getUid,user.getId()));
-                            for(FundClearing fundClearing1 :fundClearingList2){
-                                fundClearing1.setSendAmt(fundClearing1.getSendAmt().subtract( fundClearing1.getSendAmt().multiply(levelRatio.getRatio().get(i))));
-                                fundClearing1.setCommAmt(fundClearing1.getCommAmt().subtract(fundClearing1.getCommAmt().multiply(levelRatio.getRatio().get(i))));
-                                fundClearingService.updateById(fundClearing1);
-                            }
+                            amtRatio= amtRatio.add(levelRatio.getRatio().get(i));
 
                         }
                         break;
@@ -180,9 +175,13 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
 
 
             }
-
-
-
+            List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()).eq(FundClearing::getUid,user.getId()));
+            //减去用户发放的佣金金额
+            for(FundClearing fundClearing1 :fundClearingList2){
+                fundClearing1.setSendAmt(fundClearing1.getSendAmt().subtract( fundClearing1.getSendAmt().multiply(amtRatio)));
+                fundClearing1.setCommAmt(fundClearing1.getCommAmt().subtract(fundClearing1.getCommAmt().multiply(amtRatio)));
+                fundClearingService.updateById(fundClearing1);
+            }
 
 
         }
