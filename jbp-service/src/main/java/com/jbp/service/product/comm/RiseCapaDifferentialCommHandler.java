@@ -120,6 +120,8 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
         // 更高头衔的用户【拿钱用户】
         LinkedList<UserCapa> userList = Lists.newLinkedList();
         Long capaId = userCapaService.getByUser(uid).getCapaId();
+        Long userCapaId  =capaId;
+
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
                 UserCapa userCapa = uidCapaMap.get(upperDto.getPId());
@@ -157,15 +159,12 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
             List<Rule> rules = getRule(productComm);
             Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
             // 已发比例
-            BigDecimal usedRatio = BigDecimal.ZERO;
+            BigDecimal usedRatio =ruleMap.get(userCapaId).getRatio();
             // 每个人拿钱
+
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
-                BigDecimal ratio = BigDecimal.ZERO;
-                if (rule != null) {
-                    ratio = rule.getRatio();
-                }
-
+                BigDecimal ratio =  rule.getRatio();
 
                 // 佣金
                 if (ArithmeticUtils.gt(ratio, usedRatio)) {

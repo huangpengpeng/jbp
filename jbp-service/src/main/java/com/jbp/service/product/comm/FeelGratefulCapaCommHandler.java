@@ -77,7 +77,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
-        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_amt) as send_amt,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getOrderNo()));
+        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_amt) as send_amt,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).last(" group by comm_name ,uid ,comm_name"));
 
         if (fundClearingList.isEmpty()) {
             return;
@@ -95,7 +95,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                 Integer pid = invitationService.getPid(fundClearing.getUid());
 
                 do {
-                    if (pid == 0) {
+                    if (pid == null || pid == 0) {
                         break;
                     }
                     UserCapaXs pidCapaXs = userCapaXsService.getByUser(pid);
@@ -129,7 +129,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                 Capa capa = capaService.getById(userCapa.getCapaId());
                 Integer pid = invitationService.getPid(fundClearing.getUid());
                 do {
-                    if (pid == 0) {
+                    if (pid == null ||  pid == 0) {
                         break;
                     }
                     UserCapa pidCapa = userCapaService.getByUser(pid);
@@ -157,16 +157,18 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
             }
 
             //分佣
-            for(FeelGratefulCapaCommHandler.LevelRatio levelRatio :levelRatios){
+            if(!userList.isEmpty()) {
+                for (FeelGratefulCapaCommHandler.LevelRatio levelRatio : levelRatios) {
 
-                if(levelRatio.number == userList.size()){
-                    for(int i=0;i<levelRatio.getRatio().size();i++){
-                        fundClearingService.create(userList.get(i), order.getOrderNo(), ProductCommEnum.感恩奖.getName(), fundClearing.getCommAmt().multiply(levelRatio.getRatio().get(i)),
-                                null, user.getAccount() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
+                    if (levelRatio.number == userList.size()) {
+                        for (int i = 0; i < levelRatio.getRatio().size(); i++) {
+                            fundClearingService.create(userList.get(i), order.getOrderNo(), ProductCommEnum.感恩奖.getName(), fundClearing.getSendAmt().multiply(levelRatio.getRatio().get(i)),
+                                    null, user.getAccount() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
+                        }
+                        break;
                     }
-                    break;
-                }
 
+                }
             }
         }
 
