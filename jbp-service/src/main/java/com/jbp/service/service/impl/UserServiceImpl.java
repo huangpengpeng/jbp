@@ -1906,6 +1906,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province, String city, String district, String address, String payPwd, Boolean openShop) {
+        if(StringUtils.isNotBlank(phone) && phone.contains("***")){
+            throw new CrmebException("手机号格式错误");
+        }
         User user = getById(id);
         LambdaUpdateWrapper<User> lqw = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, id)
