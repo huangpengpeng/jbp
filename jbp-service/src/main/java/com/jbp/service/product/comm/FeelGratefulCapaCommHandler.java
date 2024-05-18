@@ -77,7 +77,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
-        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_amt) as send_amt,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).last(" group by comm_name ,uid ,comm_name"));
+        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_amt) as send_amt,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).last(" group by  uid ,comm_name"));
 
         if (fundClearingList.isEmpty()) {
             return;
@@ -163,13 +163,29 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                     if (levelRatio.number == userList.size()) {
                         for (int i = 0; i < levelRatio.getRatio().size(); i++) {
                             fundClearingService.create(userList.get(i), order.getOrderNo(), ProductCommEnum.感恩奖.getName(), fundClearing.getSendAmt().multiply(levelRatio.getRatio().get(i)),
-                                    null, user.getAccount() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
+                                    null, user.getNickname() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
+
+                            //减去用户发放的佣金金额
+                            List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()));
+                            for(FundClearing fundClearing1 :fundClearingList2){
+                                fundClearing1.setSendAmt(fundClearing1.getSendAmt().subtract( fundClearing1.getSendAmt().multiply(levelRatio.getRatio().get(i))));
+                                fundClearing1.setCommAmt(fundClearing1.getCommAmt().subtract(fundClearing1.getCommAmt().multiply(levelRatio.getRatio().get(i))));
+                                fundClearingService.updateById(fundClearing1);
+                            }
+
                         }
                         break;
                     }
 
                 }
+
+
             }
+
+
+
+
+
         }
 
 
