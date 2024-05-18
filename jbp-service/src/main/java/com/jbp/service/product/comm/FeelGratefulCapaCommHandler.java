@@ -77,7 +77,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
-        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_comm) as send_comm,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getPlatOrderNo()));
+        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().select(" sum(send_comm) as send_comm,uid,external_no,comm_name ").lambda().eq(FundClearing::getExternalNo, order.getOrderNo()));
 
         if (fundClearingList.isEmpty()) {
             return;

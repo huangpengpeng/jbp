@@ -103,7 +103,7 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
         //查询第一笔获取直推佣金的用户
-        FundClearing fundClearing = fundClearingService.getOne(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getPlatOrderNo()).eq(FundClearing::getCommName, ProductCommEnum.直推佣金.getName()).last(" order by id asc limit 1"));
+        FundClearing fundClearing = fundClearingService.getOne(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName, ProductCommEnum.直推佣金.getName()).last(" order by id asc limit 1"));
         if (fundClearing == null) {
             return;
         }

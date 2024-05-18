@@ -1,6 +1,7 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.task.order.OrderPaySuccessTask;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
@@ -35,6 +36,11 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+
+        OrderPaySuccessTask orderPaySuccessTask =run.getBean(OrderPaySuccessTask.class);
+
+        orderPaySuccessTask.orderPayAfter();
     }
 
 }

@@ -108,7 +108,7 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             // 佣金规则
             OfflineSubsidyCommHandler.Rule rule = getRule(productComm);
 
-            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getPlatOrderNo());
+            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
 
             //市公司补助
             UserOfflineSubsidy userOfflineSubsidy = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), null, UserRegion.Constants.已开通.toString());
