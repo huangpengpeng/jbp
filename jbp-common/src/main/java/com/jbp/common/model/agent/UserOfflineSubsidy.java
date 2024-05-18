@@ -46,6 +46,10 @@ public class UserOfflineSubsidy extends BaseModel {
     @TableField(exist = false)
     private String account;
 
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
+
     public static enum Constants {
         申请中, 已开通, 已取消
     }
