@@ -151,15 +151,16 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
             // 佣金规则
             List<Rule> rules = getRule(productComm);
             Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
-            // 已发比例
+            // 已发比例【或者金额】
             BigDecimal usedRatio = BigDecimal.ZERO;
             // 每个人拿钱
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
-                BigDecimal ratio = BigDecimal.ZERO;
+                BigDecimal ratio = BigDecimal.ZERO; // 当前头衔获得比例或者金额
                 if (rule != null) {
                     ratio = rule.getRatio();
                 }
+
                 // 佣金
                 if (ArithmeticUtils.gt(ratio, usedRatio)) {
                     BigDecimal usableRatio = ratio.subtract(usedRatio);
@@ -176,6 +177,8 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
                     productList.add(clearingProduct);
                     productMap.put(userCapa.getUid(), productList);
                 }
+
+
             }
         }
 

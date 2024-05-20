@@ -4,10 +4,10 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
@@ -70,7 +70,13 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             }
         }
         // 保存 list空 mybatis自带剔除
-        saveBatch(list);
+        if (CollectionUtils.isNotEmpty(list)) {
+            List<List<UserRelationFlow>> partition = Lists.partition(list, 1000);
+            for (List<UserRelationFlow> userRelationFlows : partition) {
+                saveBatch(userRelationFlows);
+            }
+        }
+
     }
 
     @Override
