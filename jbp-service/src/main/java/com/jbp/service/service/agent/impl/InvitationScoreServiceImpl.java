@@ -16,7 +16,6 @@ import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
-import com.jbp.common.model.user.UserTag;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ScoreDownloadRequest;
@@ -25,13 +24,8 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.InvitationScoreDao;
-import com.jbp.service.dao.agent.InvitationScoreFlowDao;
-import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.TeamUserService;
-import com.jbp.service.service.UserService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
-import io.swagger.models.auth.In;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -45,13 +39,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, InvitationScore> implements InvitationScoreService {
 
 
+    @Resource
+    private OssService ossService;
     @Resource
     private TeamUserService teamUserService;
     @Resource
@@ -104,13 +99,13 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
 
     @Override
-    public PageInfo<InvitationScore> pageList(Integer uid,  PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid)
                 .orderByDesc(InvitationScore::getId);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(InvitationScore::getUid).collect(Collectors.toList());
@@ -121,6 +116,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
     @Override
     public InvitationScore add(Integer uid) {
         InvitationScore invitationScore = new InvitationScore(uid);
@@ -180,7 +176,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             }
         }
         // 增加明细
-        if(CollectionUtils.isNotEmpty(list)){
+        if (CollectionUtils.isNotEmpty(list)) {
             invitationScoreFlowService.saveBatch(list);
         }
     }
@@ -217,7 +213,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         }
         // 查询订单指定时间成功的订单
         List<Order> successList = orderService.getSuccessList(request.getStartTime(), request.getEndTime());
-        if(CollectionUtils.isEmpty(successList)){
+        if (CollectionUtils.isEmpty(successList)) {
             throw new RuntimeException("没查到支付成功的订单");
         }
         // 查询账户
@@ -279,24 +275,20 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
         List<ScoreDownLoadExcel> list = Lists.newArrayList();
 
-
         Map<Integer, User> userMap = Maps.newConcurrentMap();
         Map<Integer, TeamUser> userTeamMap = Maps.newConcurrentMap();
         for (Order order : successList) {
 
             List<Integer> pidList = pidListMap.get(order.getUid());
-            if(CollectionUtils.isEmpty(pidList)){
+            if (CollectionUtils.isEmpty(pidList)) {
                 continue;
             }
-
             List<OrderDetail> orderDetailList = orderDetailMap.get(order.getOrderNo());
             for (OrderDetail orderDetail : orderDetailList) {
                 BigDecimal score = orderDetailService.getRealScore(orderDetail);
-
-
                 for (Integer pid : pidList) {
-                    ScoreDownLoadExcel excel = new   ScoreDownLoadExcel();
-                     User puser = userMap.get(pid);
+                    ScoreDownLoadExcel excel = new ScoreDownLoadExcel();
+                    User puser = userMap.get(pid);
                     if (puser == null) {
                         puser = userService.getById(pid);
                         userMap.put(pid, puser);
@@ -305,27 +297,27 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     excel.setAccount(puser.getAccount());
                     excel.setNickName(puser.getNickname());
                     TeamUser pUserTeam = userTeamMap.get(pid);
-                    if(pUserTeam == null){
+                    if (pUserTeam == null) {
                         pUserTeam = teamUserService.getByUser(pid);
                         userTeamMap.put(pid, pUserTeam);
                     }
-                    if(pUserTeam != null){
+                    if (pUserTeam != null) {
                         excel.setTeamName(pUserTeam.getName());
                     }
                     UserCapa pUserCapa = capaMap.get(pid);
-                    if(pUserCapa == null){
+                    if (pUserCapa == null) {
                         pUserCapa = userCapaService.getByUser(pid);
                         capaMap.put(pid, pUserCapa);
                     }
-                    if(pUserCapa != null){
+                    if (pUserCapa != null) {
                         excel.setCapaName(pUserCapa.getCapaName());
                     }
                     UserCapaXs pUserCapaXs = capaXsMap.get(pid);
-                    if(pUserCapaXs == null){
+                    if (pUserCapaXs == null) {
                         pUserCapaXs = userCapaXsService.getByUser(pid);
                         capaXsMap.put(pid, pUserCapaXs);
                     }
-                    if(pUserCapaXs != null){
+                    if (pUserCapaXs != null) {
                         excel.setCapaXsName(pUserCapaXs.getCapaName());
                     }
 
@@ -348,23 +340,9 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     excel.setEndTime(request.getEndTime());
                     list.add(excel);
                 }
-
-
-
-
-
-
-
             }
-
-
-
-
-
-
         }
-
-
-        return null;
+        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return s;
     }
 }

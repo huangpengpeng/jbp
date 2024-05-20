@@ -46,13 +46,11 @@ public class InvitationScoreController {
     }
 
 
-
-    @LogControllerAnnotation(intoDB = true, methodType = MethodType.EXPORT, description = "业绩分组下载")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.EXPORT, description = "团队业绩下载")
     @PreAuthorize("hasAuthority('agent:invitation:score:download')")
     @PostMapping("/download")
     @ApiOperation("业绩下载")
     public CommonResult<String> download(@Validated @RequestBody ScoreDownloadRequest request) {
-
-        return CommonResult.success();
+        return CommonResult.success(invitationScoreService.download(request));
     }
 }
