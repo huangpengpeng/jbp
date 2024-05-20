@@ -53,7 +53,7 @@ public class ClearingFinalController {
     public CommonResult baseInfo() {
         // 返回佣金类型
         JSONArray commArray = new JSONArray();
-        List<ProductCommEnum> commEnumList = ProductCommEnum.getByNames(ProductCommEnum.拓展佣金.getName(), ProductCommEnum.培育佣金.getName());
+        List<ProductCommEnum> commEnumList = ProductCommEnum.getByNames(ProductCommEnum.拓展佣金.getName(), ProductCommEnum.培育佣金.getName(), ProductCommEnum.平台分红.getName() , ProductCommEnum.月度管理补贴.getName());
         for (ProductCommEnum commEnum : commEnumList) {
             JSONObject json = new JSONObject();
             json.put("name", commEnum.getName());
@@ -130,7 +130,7 @@ public class ClearingFinalController {
     @ApiOperation("结算佣金下拉选")
     @GetMapping("/commList")
     public CommonResult<List<Map<Integer, String>>> commList() {
-        List<ProductCommEnum> list = Lists.newArrayList(ProductCommEnum.拓展佣金, ProductCommEnum.培育佣金, ProductCommEnum.平台分红);
+        List<ProductCommEnum> list = Lists.newArrayList(ProductCommEnum.拓展佣金, ProductCommEnum.培育佣金, ProductCommEnum.平台分红 , ProductCommEnum.月度管理补贴);
         List<Map<Integer, String>> result = Lists.newArrayList();
         for (ProductCommEnum commEnum : list) {
             Map<Integer, String> map = Maps.newConcurrentMap();
