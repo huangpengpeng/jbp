@@ -1,17 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.task.order.OrderPaySuccessTask;
-import com.jbp.admin.task.user.UserCapaXsQueueTask;
-import com.jbp.common.model.agent.CapaXs;
-import com.jbp.common.model.agent.RiseCondition;
-import com.jbp.common.model.order.Order;
-import com.jbp.service.condition.CapaXsInvitationLine2Handler;
-import com.jbp.service.condition.CapaXsInvitationLineHandler;
-import com.jbp.service.product.comm.*;
-import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.agent.CapaXsService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,8 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.List;
 
 
 @EnableAsync //开启异步调用	
@@ -41,28 +28,9 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-//
-//
-//        FeelGratefulCapaCommHandler orderPaySuccessTask =run.getBean(FeelGratefulCapaCommHandler.class);
-//
-//        OrderService order =run.getBean(OrderService.class);
-//
-//
-//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT152171603871578262420"),null,null);
 
 
 
-//        CapaDifferentialCommHandler orderPaySuccessTask =run.getBean(CapaDifferentialCommHandler.class);
-//
-//        OrderService order =run.getBean(OrderService.class);
-//
-//
-//        OrderDetailService orderDetails =run.getBean(OrderDetailService.class);
-//
-//
-//        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT124171603525723849518"),orderDetails.getByOrderNo("PT124171603525723849518"),null);
-//        UserCapaXsQueueTask orderPaySuccessTask =run.getBean(UserCapaXsQueueTask.class);
-//        orderPaySuccessTask.UserCapaXsQueueTask();
 
     }
 

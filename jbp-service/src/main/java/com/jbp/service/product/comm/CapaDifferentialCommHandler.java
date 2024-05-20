@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
@@ -15,6 +16,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -32,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -78,10 +81,17 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
         if (CollectionUtils.isEmpty(rules)) {
             throw new CrmebException(ProductCommEnum.级差佣金.getName() + "参数不完整");
         }
+        Set<String> set = Sets.newHashSet();
         for (Rule rule : rules) {
             if (rule.getCapaId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
                 throw new CrmebException(ProductCommEnum.级差佣金.getName() + "参数不完整");
             }
+            if (StringUtils.isNotEmpty(rule.getType())) {
+                set.add(rule.getType());
+            }
+        }
+        if(!rules.isEmpty() && rules.size() > 1) {
+            throw new CrmebException(ProductCommEnum.级差佣金.getName() + "类型不能同时存在金额和比例");
         }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
@@ -151,19 +161,34 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
             // 佣金规则
             List<Rule> rules = getRule(productComm);
             Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
-            // 已发比例
+            String type = rules.get(0).getType();
+            if(StringUtils.isNotEmpty(type) && "金额".equals(type)){
+                type= "金额";
+            }else{
+                type= "比例";
+            }
+
+            // 已发比例【或者金额】
             BigDecimal usedRatio = BigDecimal.ZERO;
             // 每个人拿钱
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
-                BigDecimal ratio = BigDecimal.ZERO;
+                BigDecimal ratio = BigDecimal.ZERO; // 当前头衔获得比例或者金额
                 if (rule != null) {
                     ratio = rule.getRatio();
                 }
+                if("金额".equals(type)){
+                    ratio = ratio.multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
+                }
                 // 佣金
                 if (ArithmeticUtils.gt(ratio, usedRatio)) {
-                    BigDecimal usableRatio = ratio.subtract(usedRatio);
-                    double amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
+                    double amt = 0.0;
+                    BigDecimal usableRatio = ratio.subtract(usedRatio); // 可发比例 、金额
+                    if("金额".equals(type)){
+                        amt = usableRatio.doubleValue();
+                    }else{
+                        amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
+                    }
                     usedRatio = ratio;
                     userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
                     FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
@@ -209,6 +234,11 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
          * 比例
          */
         private BigDecimal ratio;
+
+        /**
+         * 比例 金额
+         */
+        private String type;
     }
 
 }

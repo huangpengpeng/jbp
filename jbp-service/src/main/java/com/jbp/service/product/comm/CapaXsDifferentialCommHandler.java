@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.CapaXs;
@@ -15,6 +16,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -29,10 +31,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -79,10 +78,17 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
         if (CollectionUtils.isEmpty(rules)) {
             throw new CrmebException(ProductCommEnum.星级级差佣金.getName() + "参数不完整");
         }
+        Set<String> set = Sets.newHashSet();
         for (Rule rule : rules) {
             if (rule.getCapaXsId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
                 throw new CrmebException(ProductCommEnum.星级级差佣金.getName() + "参数不完整");
             }
+            if (StringUtils.isNotEmpty(rule.getType())) {
+                set.add(rule.getType());
+            }
+        }
+        if(!rules.isEmpty() && rules.size() > 1) {
+            throw new CrmebException(ProductCommEnum.星级级差佣金.getName() + "类型不能同时存在金额和比例");
         }
         // 删除数据库的信息
         productCommService.remove(new LambdaQueryWrapper<ProductComm>()
@@ -104,7 +110,6 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
-
         // 查询所有上级
         List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
         if (CollectionUtils.isEmpty(allUpper)) {
@@ -140,6 +145,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
         // 分钱用户金额
         LinkedHashMap<Integer, Double> userAmtMap = Maps.newLinkedHashMap();
 
+
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
             // 佣金配置
@@ -152,6 +158,13 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
             totalPv = totalPv.multiply(productComm.getScale());
             // 佣金规则
             List<Rule> rules = getRule(productComm);
+            String type = rules.get(0).getType();
+            if(StringUtils.isNotEmpty(type) && "金额".equals(type)){
+                type= "金额";
+            }else{
+                type= "比例";
+            }
+
             Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaXsId);
             // 已发比例
             BigDecimal usedRatio = BigDecimal.ZERO;
@@ -162,12 +175,19 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
                 if (rule != null) {
                     ratio = rule.getRatio();
                 }
+                if("金额".equals(type)){
+                    ratio = ratio.multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
+                }
                 // 佣金
                 if (ArithmeticUtils.gt(ratio, usedRatio)) {
-                    BigDecimal usableRatio = ratio.subtract(usedRatio);
-                    double amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
+                    double amt = 0.0;
+                    BigDecimal usableRatio = ratio.subtract(usedRatio); // 可发比例 、金额
+                    if("金额".equals(type)){
+                        amt = usableRatio.doubleValue();
+                    }else{
+                        amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
+                    }
                     usedRatio = ratio;
-
                     userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
                     FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                             orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
@@ -219,6 +239,8 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
          * 比例
          */
         private BigDecimal ratio;
+
+        private String type;
     }
 
 }

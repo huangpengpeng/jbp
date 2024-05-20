@@ -12,6 +12,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -34,18 +35,20 @@ public class UserInvitationFlowTask {
     private UserInvitationService userInvitationService;
     @Autowired
     private UserInvitationFlowService userInvitationFlowService;
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     public void refreshFlowAndTeam() {
         // cron : 0 0 1 * * ?
-        logger.info("---UserInvitationFlowTask refreshFlowAndTeam------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
-        if (StringUtils.isNotEmpty(stringRedisTemplate.opsForValue().get("refreshFlowAndTeam"))){
-            logger.info("---UserInvitationFlowTask refreshFlowAndTeam-----未执行完成忽略本次", DateUtil.date());
-            return;
+        logger.info("---UserInvitationFlowTask refresh------produce Data with fixed rate task: Execution Time - {}", DateUtil.date());
+        // 1.加锁成功
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("UserInvitationFlowTask.refresh", 1);
+        if(!task){
+            //没有争抢(设置)到锁
+            logger.info("上一次任务未执行完成退出");
+            return;//方法结束
         }
-        stringRedisTemplate.opsForValue().set("refreshFlowAndTeam","1");
         try {
             List<UserInvitation> noFlowList = userInvitationService.getNoFlowList();
             for (UserInvitation userInvitation : noFlowList) {
@@ -72,7 +75,7 @@ public class UserInvitationFlowTask {
             e.printStackTrace();
             logger.error("UserInvitationFlowTask.refreshFlowAndTeam" + " | msg : " + e.getMessage());
         }finally {
-            stringRedisTemplate.delete("refreshFlowAndTeam");
+            redisTemplate.delete("UserInvitationFlowTask.refresh");
         }
     }
 }

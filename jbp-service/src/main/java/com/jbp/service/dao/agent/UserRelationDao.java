@@ -18,6 +18,6 @@ public interface UserRelationDao extends BaseMapper<UserRelation> {
             "        ORDER BY level ")
     List<UserUpperDto> getAllUpper(Integer uId);
 
-    @Select("select u.* from eb_user_relation u left join eb_user_relation_flow f on f.uId = u.uId where f.id is null")
+    @Select("select u.* from eb_user_relation u left join eb_user_relation_flow f on f.uId = u.uId where f.id is null  limit 100")
     List<UserRelation> getNoFlowList();
 }

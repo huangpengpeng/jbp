@@ -107,7 +107,7 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
                     int i = 1;
                     for (UserUpperDto upperDto : allUpper) {
                         if (upperDto.getPId() != null && uidList.contains(upperDto.getPId())) {
-                            ClearingInvitationFlow flow = new ClearingInvitationFlow(clearingId, upperDto.getUId(), upperDto.getPId(), i);
+                            ClearingInvitationFlow flow = new ClearingInvitationFlow(clearingId, clearingUser.getUid(), upperDto.getPId(), i);
                             i++;
                             flowList.add(flow);
                         }
