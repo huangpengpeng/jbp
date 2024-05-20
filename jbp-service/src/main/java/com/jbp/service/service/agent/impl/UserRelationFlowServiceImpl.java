@@ -21,6 +21,7 @@ import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserRelationFlowService;
 import com.jbp.service.service.agent.UserRelationService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao, UserRelationFlow> implements UserRelationFlowService {
@@ -63,15 +65,17 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         }
         // 获取所有的上级添加关系
         List<UserRelationFlow> list = Lists.newArrayList();
+        int i = 1;
         for (UserUpperDto upper : upperList) {
             if (upper.getPId() != null && upper.getPId() > 0) {
                 UserRelationFlow flow = new UserRelationFlow(uId, upper.getPId(), upper.getLevel(), upper.getNode());
                 list.add(flow);
             }
+            log.info("增在处理用户:{} 的服务层级关系:{}, 总关系:{}", uId, i++, upperList.size());
         }
         // 保存 list空 mybatis自带剔除
         if (CollectionUtils.isNotEmpty(list)) {
-            List<List<UserRelationFlow>> partition = Lists.partition(list, 1000);
+            List<List<UserRelationFlow>> partition = Lists.partition(list, 500);
             for (List<UserRelationFlow> userRelationFlows : partition) {
                 saveBatch(userRelationFlows);
             }
