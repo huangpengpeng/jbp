@@ -120,7 +120,7 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
         // 更高头衔的用户【拿钱用户】
         LinkedList<UserCapa> userList = Lists.newLinkedList();
         Long capaId = userCapaService.getByUser(uid).getCapaId();
-        Long userCapaId  =capaId;
+        Long userCapaId = capaId;
 
         for (UserUpperDto upperDto : allUpper) {
             if (upperDto.getPId() != null) {
@@ -159,12 +159,12 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
             List<Rule> rules = getRule(productComm);
             Map<Long, Rule> ruleMap = FunctionUtil.keyValueMap(rules, Rule::getCapaId);
             // 已发比例
-            BigDecimal usedRatio =ruleMap.get(userCapaId).getRatio();
+            BigDecimal usedRatio = ruleMap.get(userCapaId).getRatio();
             // 每个人拿钱
 
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
-                BigDecimal ratio =  rule.getRatio();
+                BigDecimal ratio = rule.getRatio();
 
                 // 佣金
                 if (ArithmeticUtils.gt(ratio, usedRatio)) {
@@ -176,9 +176,18 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
                         amt = usableRatio.doubleValue();
                     }
                     usedRatio = ratio;
-                    userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
+
+
+                    BigDecimal total = BigDecimal.ZERO;
+                    if (rule.getMode().equals("金额")) {
+                        total = new BigDecimal(amt).multiply(new BigDecimal(orderDetail.getPayNum()));
+                    } else {
+                        total = new BigDecimal(amt);
+                    }
+                    userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + total.doubleValue());
+
                     FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
-                            orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
+                            orderDetail.getPayNum(), ratio, total);
 
                     List<FundClearingProduct> productList = productMap.get(userCapa.getUid());
                     if (CollectionUtils.isEmpty(productList)) {
