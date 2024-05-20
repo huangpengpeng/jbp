@@ -507,6 +507,10 @@ public class UserController {
 
         Integer uid = userService.getUserId();
         UserCapaXs userCapa = userCapaXsService.getByUser(uid);
+
+        if(userCapa == null){
+            return  CommonResult.success();
+        }
         CapaXs pCapa = capaXsService.getNext(userCapa.getCapaId());
         userRiseIndexResponse.setCapaName(pCapa.getName());
         userRiseIndexResponse.setActualPerformance(selfScoreService.getUserNext(uid, true));
