@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -30,22 +31,14 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
 
 
     @Resource
-    private TeamService teamService;
+    private OrdersFundSummaryDao ordersFundSummaryDao;
 
     @Override
     public PageInfo<OrdersFundSummary> pageList(String ordersSn,String teamId,  PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<OrdersFundSummary> lqw = new LambdaQueryWrapper<OrdersFundSummary>()
-                .like(!ObjectUtil.isNull(ordersSn), OrdersFundSummary::getOrdersSn, ordersSn);
-        if (StringUtils.isNotEmpty(teamId)) {
-            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
-            lqw.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
-        }
 
-
-
-        lqw.orderByDesc(OrdersFundSummary::getId);
+        List<OrdersFundSummary> list = ordersFundSummaryDao.getList(teamId,ordersSn);
         Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        return CommonPage.copyPageInfo(page, list(lqw));
+        return CommonPage.copyPageInfo(page, list);
     }
 
     @Override

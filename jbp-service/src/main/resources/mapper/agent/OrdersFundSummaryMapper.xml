@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.OrdersFundSummaryDao">
+
+    <select id="getList" resultType="com.jbp.common.model.agent.OrdersFundSummary">
+
+        select f.* from eb_orders_fund_summary f
+        left join eb_order o on o.plat_order_no  = f.orders_sn
+				left join eb_team_user  u on u.uid = o.uid
+				left join eb_team t on t.id = u.tid
+				where  1=1
+        <if test="teamId!='' and teamId!= null ">
+          and   t.leader_id =#{teamId}
+            </if>
+        <if test="ordersSn !='' and ordersSn!= null ">
+            and   f.orders_sn =#{ordersSn}
+        </if>
+
+        order by f.id desc
+
+    </select>
+
+
+</mapper>
