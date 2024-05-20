@@ -31,7 +31,7 @@ import java.util.Date;
 public class IcbcSvc {
 
     // 1、网关公钥
-    protected static final String APIGW_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtyXVDOYoh1yj0VbnHlsELMRgnloYDm5u57ffvUR1mvQanEhdKvzmgBxbg0T4n53OrOFxieio8zEwGuUbaRyCI8iRAXseZgJzIwVpe79RtUttK+waUS8tGjQ7kC/Y0S4/C/dh0bj1+z5QQpsUrzjakZ5trjGB0ARb2ILQ5L7PmhE5Tkihp4E16nFrjOT4iFhJA3WMi0EUzOb2Co2KtC7dOrIEbfvE1LgJ7yWp98U7Zbe6dN/hfd0/dxdVrt6EQsquWN68xXfR8UlPAMjYrGkSb0GXL3AgpHH8oR9FTpApe/1L8aiU7ucH9OJtBydbkVorzV8/cXxJntzttVwDkygGzQIDAQAB";
+    protected static final String APIGW_PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMpjaWjngB4E3ATh+G1DVAmQnIpiPEFAEDqRfNGAVvvH35yDetqewKi0l7OEceTMN1C6NPym3zStvSoQayjYV+eIcZERkx31KhtFu9clZKgRTyPjdKMIth/wBtPKjL/5+PYalLdomM4ONthrPgnkN4x4R0+D4+EBpXo8gNiAFsNwIDAQAB";
     // 2、密钥对认证方式，公钥在API平台登记，此处为私钥
     protected static final String MY_PRIVATE_KEY = "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC3JdUM5iiHXKPRVuceWwQsxGCeWhgObm7nt9+9RHWa9BqcSF0q/OaAHFuDRPifnc6s4XGJ6KjzMTAa5RtpHIIjyJEBex5mAnMjBWl7v1G1S20r7BpRLy0aNDuQL9jRLj8L92HRuPX7PlBCmxSvONqRnm2uMYHQBFvYgtDkvs+aETlOSKGngTXqcWuM5PiIWEkDdYyLQRTM5vYKjYq0Lt06sgRt+8TUuAnvJan3xTtlt7p03+F93T93F1Wu3oRCyq5Y3rzFd9HxSU8AyNisaRJvQZcvcCCkcfyhH0VOkCl7/UvxqJTu5wf04m0HJ1uRWivNXz9xfEme3O21XAOTKAbNAgMBAAECggEADqB03WzcO8NISgW4u5HlSXX9iWgEl9J2BQeIVONMyS1JmsWkuzQrbHvXSyqM+KJvyRrQKIVuSM3a26sEf2aJdjYkbovYp6j2bQuXmwxyiBoYA/P9PhKYdYlKYH+Rv1MEMf51z3wIGSKm4krkYgIWYp7Wf5zwkx5l/2qjKEGc7t7ilFF8xRyQ8tSsKXqCLWKA34LUgWJH5Cx0OOjK6VglX+9yl4yjUTJ5/4nOcs7o0ryr/9GjEusShvGx+uLMj+t4ED+FA3uRNWX0cZTMWyuyOmPEUB7VJ6wn8ZqWHk9xIPCGX08LhS1SXRC0d2Qr6I29lhwy1mDxaLhgHaEKM56e+QKBgQDqjyQs4jA59NfhGC/wYxp0NBL8rjw2Z3F3rOYTB90akrJkHbWX0eNwh5DV3QrlI6IcNkcJjISbHctrt6SdQiJMOwXwksIP0tT1pdESQjavFW11eG761jBwzS9yFiydko5FU8JZUHajhXmwLLjkw2SiPmP42oFdolDIiN32PTqgYwKBgQDH46Bw7SmPHPFWHR+sr+tz3iuu3MjweJ17wXsQqPETvyRhqKUeWIhWZVdMl0le4j5ftllQPJBteEuTRF6c0YGMfMEpLX881pimEgegEfV5dFawild2Sda+UNRZx4Ya6KsGO8/8nFf1lYHmnlZvI5ILq0M58UfR+3tgdCOsQ5grDwKBgQCtMlT772i84tYlF78OOZ9m/qymd+FuKqPWQo0AsGXLIVcoJefY2tqeVPvVbwqEd/NT8aAypNel0jJKr6eVlyfMMikIotU46ezmFjJy0QGf9qqEexE3lsDeCiRmkYkQMQ9skZSIbqmrxPs940gDY2QDiR44ut+bTCdqa+W51SxdEQKBgQC/PUNp5y1Es88dsV11jRW6VEv8z1Ub5HnfRhwks016s/vtxzi6kL9X0Ts1luRmeBRu4/oNLvSLF3VO3zGZ3UORkmYHrHS4UyPWdxd+iNAPNEQgQSsui7R9fr27a44dPo8ptp3ls/rfhfuzFbfiOujmayM1U2eAOZcvj831aPIz9wKBgQCzHm/5enhYau6joSoBxG4irLcdB0J7Jwgy2jSkozF6iko5GxB1rpfbv+DMr856FLtGPnVzHyStaey8/a4cwDI3X77rg8aAuNgFfKRRXlNYiflrUxayyTLaOqU/cz6YdWEaDNEPorcwQ9RXsj3VUJCm+ZMnSXytU7TyeFuT+I97HA==";
     // 3、appid
@@ -41,10 +41,10 @@ public class IcbcSvc {
     protected static final String HOST = "https://gw.open.icbc.com.cn";
 
     // 商户编号
-    protected static final String MER_ID = "141090000951446";
+    protected static final String MER_ID = "141073750009";
 
     // 收单产品协议编号
-    protected static final String MER_PRTCL_NO = "IdYR5bFW3IYLwWopGXuiDA==";
+    protected static final String MER_PRTCL_NO = "141090000951446";
 
     // 微信appid
     private static final String WECHAT_APP_ID="";
@@ -56,7 +56,7 @@ public class IcbcSvc {
 
     public static void main(String[] args) {
         String orderId = "202405170000";
-        payOrder( orderId, "13", "测试", "36.24.41.101", BigDecimal.valueOf(1));
+        payOrder( orderId, "10", "测试", "36.24.41.101", BigDecimal.valueOf(1));
     }
     /**
      * 随机生成秘钥
@@ -129,8 +129,8 @@ public class IcbcSvc {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String time = df.format(now);
         bizContent.setOrig_date_time(time);
-//        String decive_info = "141090000951446";
-//        bizContent.setDecive_info(decive_info);
+        String decive_info = "141090000951446";
+        bizContent.setDecive_info(decive_info);
         bizContent.setBody(goodsName);
         bizContent.setFee_type("001"); // 人民币
         bizContent.setSpbill_create_ip(userIp);
