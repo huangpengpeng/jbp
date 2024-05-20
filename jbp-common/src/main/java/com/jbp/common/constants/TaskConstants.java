@@ -33,4 +33,8 @@ public class TaskConstants {
     public static final String TASK_SECKILL_PRODUCT_CALLBACK_KEY = "seckill_product_callback_list";
 
     public static final String TASK_ORDER_SUCCESS_USER_RISE_KEY = "order_success_user_rise_key";
+    /**
+     * 升星用户记录
+     */
+    public static final String TASK_CAPA_XS_USER_MASSAGE = "task_capa_xs_user_massage";
 }

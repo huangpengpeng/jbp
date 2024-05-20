@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.constants.TaskConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.RelationScore;
 import com.jbp.common.model.agent.UserCapa;
@@ -16,12 +17,14 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.dao.agent.UserRelationDao;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +52,8 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     private UserCapaService userCapaService;
     @Resource
     private UserCapaXsService userCapaXsService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public UserRelation getByUid(Integer uId) {
@@ -126,6 +131,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         saveOrUpdate(userRelation);
         // 删除关系留影
         userRelationFlowService.clear(uId);
+
+        redisUtil.lPush( TaskConstants.TASK_CAPA_XS_USER_MASSAGE, uId);
+
         return userRelation;
     }
 

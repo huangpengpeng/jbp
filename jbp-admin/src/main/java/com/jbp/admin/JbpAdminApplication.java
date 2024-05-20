@@ -2,6 +2,7 @@ package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.task.order.OrderPaySuccessTask;
+import com.jbp.admin.task.user.UserCapaXsQueueTask;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.order.Order;
@@ -60,6 +61,8 @@ public class JbpAdminApplication {
 //
 //
 //        orderPaySuccessTask.orderSuccessCalculateAmt(order.getByOrderNo("PT124171603525723849518"),orderDetails.getByOrderNo("PT124171603525723849518"),null);
+//        UserCapaXsQueueTask orderPaySuccessTask =run.getBean(UserCapaXsQueueTask.class);
+//        orderPaySuccessTask.UserCapaXsQueueTask();
 
     }
 

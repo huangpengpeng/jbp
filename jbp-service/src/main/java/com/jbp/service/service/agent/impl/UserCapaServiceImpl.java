@@ -10,6 +10,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.jbp.common.constants.TaskConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
@@ -18,6 +19,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.AsyncUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.condition.ConditionEnum;
@@ -66,6 +68,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private UserCapaDao dao;
     @Resource
     private EventPublisherContext eventPublisherContext;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -107,6 +111,10 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         // 发送等级变更消息
         UserCapaUpdateEvent event = new UserCapaUpdateEvent(new UserCapaUpdateEvent.EventDto(orgCapaId, tagCapaId, userCapa));
         eventPublisherContext.publishEvent(event);
+
+
+        redisUtil.lPush( TaskConstants.TASK_CAPA_XS_USER_MASSAGE, uid);
+
         return getByUser(uid);
     }
 
