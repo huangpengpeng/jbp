@@ -1,16 +1,17 @@
 package com.jbp.front.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserInvitation;
-import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.condition.CapaXsInvitationLineHandler;
+import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -67,7 +68,13 @@ public class UserController {
     @Autowired
     private UserInvitationService userInvitationService;
 
+    @Autowired
+    private SelfScoreService selfScoreService;
 
+    @Autowired
+    private UserCapaXsService userCapaXsService;
+    @Autowired
+    private CapaXsService capaXsService;
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -285,15 +292,15 @@ public class UserController {
     @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
     public CommonResult<UserInviteResponse> getAccountUser(String account) {
 
-        List<User> phoneList  = userService.getByPhone(account);
-        if(phoneList.size()>1){
+        List<User> phoneList = userService.getByPhone(account);
+        if (phoneList.size() > 1) {
             throw new CrmebException("手机号重复，请输入账号");
         }
 
         User user;
-        if(!phoneList.isEmpty()){
+        if (!phoneList.isEmpty()) {
             user = phoneList.get(0);
-        }else{
+        } else {
             user = userService.getByAccount(account);
         }
 
@@ -306,16 +313,15 @@ public class UserController {
     }
 
 
-
     @ApiOperation(value = "获取平台登录账号")
     @RequestMapping(value = "/getPlatformUserInfo", method = RequestMethod.GET)
     public CommonResult<List<UserPlatformInfoResponse>> getPlatformUserInfo(String mobile, Long parentId, String appId, Boolean ifregister) {
 
         List<UserPlatformInfoResponse> userList = new ArrayList<>();
         String dbName = environment.getProperty("platform.dbName");
-        if(StringUtils.isBlank(dbName)){
+        if (StringUtils.isBlank(dbName)) {
             UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(mobile);
-            if(userPlatformInfoResponse == null){
+            if (userPlatformInfoResponse == null) {
                 return CommonResult.success();
             }
             userList.add(userPlatformInfoResponse);
@@ -324,7 +330,7 @@ public class UserController {
         String[] platforms = dbName.split(",");
         for (String platform : platforms) {
 
-            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platform,mobile);
+            UserPlatformInfoResponse userPlatformInfoResponse = userService.getUserPlatfromInfo(platform, mobile);
             if (userPlatformInfoResponse != null) {
                 userList.add(userPlatformInfoResponse);
             }
@@ -365,16 +371,16 @@ public class UserController {
 
     @ApiOperation(value = "用户修改绑定关系")
     @RequestMapping(value = "/updateInvitation", method = RequestMethod.GET)
-    public CommonResult updateInvitation(Integer spreadPid ) {
+    public CommonResult updateInvitation(Integer spreadPid) {
 
-        Integer uid=  userService.getUserId();
-        if(uid == 0) {
+        Integer uid = userService.getUserId();
+        if (uid == 0) {
             return CommonResult.success();
         }
 
-        UserCapa userCapa =  userCapaService.getByUser(uid);
-        if(spreadPid != null && spreadPid>0){
-            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+        UserCapa userCapa = userCapaService.getByUser(uid);
+        if (spreadPid != null && spreadPid > 0) {
+            String ifOpen = systemConfigService.getValueByKey("ifOpen");
             String capaId = systemConfigService.getValueByKey("capaId");
             //邀请配置 配置关闭时默认强绑定
             invitationService.band(uid, spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
@@ -384,57 +390,55 @@ public class UserController {
     }
 
 
-
     @ApiOperation(value = "用户挂载")
     @RequestMapping(value = "/mount", method = RequestMethod.GET)
-    public CommonResult mount(String phone ,String mphone) {
+    public CommonResult mount(String phone, String mphone) {
         if (com.jbp.service.util.StringUtils.isAnyEmpty(phone)) {
             throw new CrmebException("账户信息不能为空");
         }
         List<User> userList = userService.getByPhone(mphone);
-        if (userList.isEmpty() ) {
+        if (userList.isEmpty()) {
             throw new CrmebException("账户不存在");
         }
 
         List<User> muserList = userService.getByPhone(phone);
-        if (userList.isEmpty() ) {
+        if (userList.isEmpty()) {
             throw new CrmebException("账户不存在");
         }
 
 
-
         Boolean ifExt = false;
-        Integer pid =  userInvitationService.getPid(userList.get(0).getId());
+        Integer pid = userInvitationService.getPid(userList.get(0).getId());
         List<UserUpperDto> allUpper = userInvitationService.getAllUpper(muserList.get(0).getId());
-        if(!allUpper.isEmpty()){
-            for(UserUpperDto userUpperDto :allUpper){
-                if(userUpperDto.getUId().intValue() == pid ) {
+        if (!allUpper.isEmpty()) {
+            for (UserUpperDto userUpperDto : allUpper) {
+                if (userUpperDto.getUId().intValue() == pid) {
                     ifExt = true;
-                };
+                }
+                ;
             }
         }
 
-        if(!ifExt){
+        if (!ifExt) {
             throw new RuntimeException("关系链条的上级不能绑定给自己绑定账户");
         }
 
-        userInvitationService.band(userList.get(0).getId(),muserList.get(0).getId(), true, true, true);
+        userInvitationService.band(userList.get(0).getId(), muserList.get(0).getId(), true, true, true);
 
         return CommonResult.success();
     }
 
 
-
     @ApiOperation(value = "获取用户的销售上级")
     @RequestMapping(value = "/getUserInvitePanent", method = RequestMethod.GET)
     public CommonResult getUserInvitePanent() {
-        Integer uid=  userService.getUserId();
+        Integer uid = userService.getUserId();
 
-       Integer pid  = invitationService.getPid(uid);
-       User user = null;
-       if(pid != null){
-           user = userService.getById(pid);
-       }
+        Integer pid = invitationService.getPid(uid);
+        User user = null;
+        if (pid != null) {
+            user = userService.getById(pid);
+        }
 
         return CommonResult.success(user);
     }
@@ -443,58 +447,108 @@ public class UserController {
     @ApiOperation(value = "获取用户的服务上级")
     @RequestMapping(value = "/getUserServicePanent", method = RequestMethod.GET)
     public CommonResult getUserServicePanent() {
-        Integer uid=  userService.getUserId();
+        Integer uid = userService.getUserId();
         return CommonResult.success(relationService.getPid(uid));
     }
 
 
-
     @ApiOperation(value = "获取用户销售下级没有服务上级的客户")
     @RequestMapping(value = "/getUserNotService", method = RequestMethod.GET)
-    public  CommonResult<CommonPage<UserInviteResponse>>  getUserNotService( PageParamRequest pageParamRequest) {
-        Integer uid=  userService.getUserId();
+    public CommonResult<CommonPage<UserInviteResponse>> getUserNotService(PageParamRequest pageParamRequest) {
+        Integer uid = userService.getUserId();
         return CommonResult.success(CommonPage.restPage(invitationService.getUserNotService(pageParamRequest)));
 
     }
 
     @ApiOperation(value = "新增用户服务关系")
     @RequestMapping(value = "/addUserService", method = RequestMethod.GET)
-    public  CommonResult  addUserService( String raccount ,String account,Integer node) {
+    public CommonResult addUserService(String raccount, String account, Integer node) {
         //销售人
-        Integer uid=  userService.getUserId();
+        Integer uid = userService.getUserId();
         //服务人
-        User ruser =  userService.getByAccount(raccount);
+        User ruser = userService.getByAccount(raccount);
         //注册用户
-        User user =  userService.getByAccount(account);
+        User user = userService.getByAccount(account);
         relationService.band(user.getId(), ruser.getId(), null, node);
         return CommonResult.success();
 
     }
 
 
-
     @ApiOperation(value = "新增用户绑定关系")
     @RequestMapping(value = "/addInvitation", method = RequestMethod.GET)
-    public CommonResult addInvitation(String  account ) {
+    public CommonResult addInvitation(String account) {
 
-        if(account == null){
+        if (account == null) {
             throw new RuntimeException("请输入邀请人账号");
         }
-        Integer uid=  userService.getUserId();
+        Integer uid = userService.getUserId();
         User user = userService.getByAccount(account);
-        if(user == null){
+        if (user == null) {
             throw new RuntimeException("邀请人账号不存在");
         }
-        UserInvitation userInvitation =  invitationService.getByUser(uid);
-        if(userInvitation == null){
-            UserCapa userCapa =  userCapaService.getByUser(uid);
-            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+        UserInvitation userInvitation = invitationService.getByUser(uid);
+        if (userInvitation == null) {
+            UserCapa userCapa = userCapaService.getByUser(uid);
+            String ifOpen = systemConfigService.getValueByKey("ifOpen");
             String capaId = systemConfigService.getValueByKey("capaId");
             invitationService.band(uid, user.getId(), false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
         }
 
         return CommonResult.success();
     }
+
+
+    @ApiOperation("获取用户独立线会员业绩")
+    @RequestMapping(value = "/getUserLineResult", method = RequestMethod.GET)
+    public CommonResult<UserRiseIndexResponse> getTeamList() {
+
+        UserRiseIndexResponse userRiseIndexResponse = new UserRiseIndexResponse();
+
+        Integer uid = userService.getUserId();
+        UserCapaXs userCapa = userCapaXsService.getByUser(uid);
+        CapaXs pCapa = capaXsService.getNext(userCapa.getCapaId());
+        userRiseIndexResponse.setCapaName(pCapa.getName());
+        userRiseIndexResponse.setActualPerformance(selfScoreService.getUserNext(uid, true));
+
+        // 获取规则
+        List<RiseCondition> conditionList = capaXsService.getById(pCapa.getId()).getConditionList();
+
+        RiseCondition riseCondition = new RiseCondition();
+        for (RiseCondition condition : conditionList) {
+            if (condition.getName().equals(ConditionEnum.邀请独立线升星.getName())) {
+                riseCondition = condition;
+            }
+        }
+
+        if(StringUtils.isBlank(riseCondition.getValue()) ){
+            return  CommonResult.success();
+        }
+
+        CapaXsInvitationLineHandler.Rule rule = JSONObject.parseObject(riseCondition.getValue()).toJavaObject(CapaXsInvitationLineHandler.Rule.class);
+
+        // 2.一阶人数
+        List<UserInvitation> nextList = userInvitationService.getNextOrMidList(uid);
+        // 3.每条独立线满足星级人数
+        int indeCount = 0;
+        for (UserInvitation userInvitation : nextList) {
+            List<UserCapaXs> userCapaXsList = userCapaXsService.getInvitationUnder(userInvitation.getUId(), rule.getIndeCapaXsId());
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(userInvitation.getUId());
+            if (userCapaXs != null && userCapaXs.getCapaId().compareTo(rule.getIndeCapaXsId()) >= 0) {
+                userCapaXsList.add(userCapaXs);
+            }
+            if (userCapaXsList.size() >= rule.getIndeCapaXsNum().intValue()) {
+                indeCount++;
+            }
+        }
+        userRiseIndexResponse.setPerformanceIndex(rule.getTeamAmt());
+
+        userRiseIndexResponse.setActualUser(indeCount);
+        userRiseIndexResponse.setUserIndex(rule.getIndeCount().intValue());
+
+        return CommonResult.success(userRiseIndexResponse);
+    }
+
 
 }
 
