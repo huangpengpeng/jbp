@@ -30,4 +30,7 @@ public class WalletRequest implements Serializable {
     @ApiModelProperty("资金方向   收入 支出")
     private String action;
 
+    @ApiModelProperty("团队id")
+    private String teamId;
+
 }

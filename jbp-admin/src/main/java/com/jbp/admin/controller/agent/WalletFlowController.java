@@ -43,7 +43,7 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(), request.getTeamId(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")

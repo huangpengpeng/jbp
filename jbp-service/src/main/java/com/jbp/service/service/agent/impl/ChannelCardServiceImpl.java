@@ -11,6 +11,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ChannelCard;
+import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -18,6 +19,7 @@ import com.jbp.common.response.AliBankcardResponse;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.RestTemplateUtil;
 import com.jbp.service.dao.agent.ChannelCardDao;
+import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.util.StringUtils;
@@ -42,15 +44,23 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
     private RestTemplateUtil restTemplateUtil;
     @Resource
     private UserService userService;
+    @Resource
+    private TeamService teamService;
 
     @Override
-    public PageInfo<ChannelCard> pageList(Integer uid, String bankCardNo, String type, String phone, PageParamRequest pageParamRequest) {
+    public PageInfo<ChannelCard> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<ChannelCard> lqw = new LambdaQueryWrapper<ChannelCard>()
                 .eq(!ObjectUtil.isNull(uid), ChannelCard::getUid, uid)
                 .like(StringUtils.isNotEmpty(bankCardNo), ChannelCard::getBankCardNo, bankCardNo)
                 .like(StringUtils.isNotEmpty(type), ChannelCard::getType, type)
-                .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone)
-                .orderByDesc(ChannelCard::getId);
+                .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone);
+
+        if (StringUtils.isNotEmpty(teamId)) {
+            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
+            lqw.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
+        }
+
+        lqw.orderByDesc(ChannelCard::getId);
         Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<ChannelCard> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
