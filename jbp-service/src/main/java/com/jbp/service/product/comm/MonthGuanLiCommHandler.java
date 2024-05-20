@@ -88,7 +88,7 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
             Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
             totalScore = totalScore.add(rule.getUsableScore());
             BigDecimal fee = rule.getUsableScore().multiply(rule.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
-            totalFee.add(fee);
+            totalFee = totalFee.add(fee);
             if (ArithmeticUtils.gt(fee, BigDecimal.ZERO)) {
                 ClearingBonus clearingBonus = new ClearingBonus(clearingUser.getUid(), clearingUser.getAccountNo(), clearingUser.getLevel(), clearingUser.getLevelName(),
                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(), StringUtils.N_TO_10("MGL_"), fee);

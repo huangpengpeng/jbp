@@ -54,18 +54,18 @@ public class ClearingRelationFlowServiceImpl extends UnifiedServiceImpl<Clearing
     public Boolean create(Long clearingId) {
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
         if (clearingFinal == null || !clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
-            throw new CrmebException("结算状态不是待结算不允许生成销售关系");
+            throw new CrmebException("结算状态不是待结算不允许生成服务关系");
         }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.拓展佣金.getType()) {
-            log.info("拓展佣金:不需要生成结算销售关系");
+            log.info("拓展佣金:不需要生成结算服务关系");
             return true;
         }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.平台分红.getType()) {
-            log.info("平台分红:不需要生成结算销售关系");
+            log.info("平台分红:不需要生成结算服务关系");
             return true;
         }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.月度管理补贴.getType()) {
-            log.info("月度管理补贴:不需要生成结算销售关系");
+            log.info("月度管理补贴:不需要生成结算服务关系");
             return true;
         }
         List<ClearingUser> clearingUserList = clearingUserService.getByClearing(clearingFinal.getId());
