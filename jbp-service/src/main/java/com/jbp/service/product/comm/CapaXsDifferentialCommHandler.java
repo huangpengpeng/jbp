@@ -87,7 +87,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
                 set.add(rule.getType());
             }
         }
-        if(!rules.isEmpty() && rules.size() > 1) {
+        if(!set.isEmpty() && set.size() > 1) {
             throw new CrmebException(ProductCommEnum.星级级差佣金.getName() + "类型不能同时存在金额和比例");
         }
         // 删除数据库的信息
