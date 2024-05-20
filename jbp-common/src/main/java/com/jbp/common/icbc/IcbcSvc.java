@@ -44,7 +44,7 @@ public class IcbcSvc {
     protected static final String MER_ID = "141073750009";
 
     // 收单产品协议编号
-    protected static final String MER_PRTCL_NO = "141090000951446";
+    protected static final String MER_PRTCL_NO = "141073750009";
 
     // 微信appid
     private static final String WECHAT_APP_ID="";
@@ -129,13 +129,13 @@ public class IcbcSvc {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String time = df.format(now);
         bizContent.setOrig_date_time(time);
-        String decive_info = "141090000951446";
+        String decive_info = "100000020803";
         bizContent.setDecive_info(decive_info);
         bizContent.setBody(goodsName);
         bizContent.setFee_type("001"); // 人民币
         bizContent.setSpbill_create_ip(userIp);
         bizContent.setTotal_fee(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
-        bizContent.setMer_url("www.baidu.com");
+        bizContent.setMer_url("https://adm.zhonghe88188.com");
         if ("9".equals(payMode)) {
             bizContent.setShop_appid(WECHAT_APP_ID);
         }
