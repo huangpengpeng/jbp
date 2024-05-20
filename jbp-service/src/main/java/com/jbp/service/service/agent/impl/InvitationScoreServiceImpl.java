@@ -8,25 +8,24 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.InvitationScore;
-import com.jbp.common.model.agent.InvitationScoreFlow;
-import com.jbp.common.model.agent.SelfScore;
+import com.jbp.common.excel.ScoreDownLoadExcel;
+import com.jbp.common.model.agent.*;
+import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ScoreDownloadRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.InvitationScoreDao;
-import com.jbp.service.dao.agent.InvitationScoreFlowDao;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.InvitationScoreFlowService;
-import com.jbp.service.service.agent.InvitationScoreService;
-import com.jbp.service.service.agent.SelfScoreService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.*;
+import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -44,6 +43,20 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, InvitationScore> implements InvitationScoreService {
+
+
+    @Resource
+    private OssService ossService;
+    @Resource
+    private TeamUserService teamUserService;
+    @Resource
+    private UserCapaXsService userCapaXsService;
+    @Resource
+    private UserCapaService userCapaService;
+    @Resource
+    private OrderDetailService orderDetailService;
+    @Resource
+    private OrderService orderService;
     @Resource
     private UserService userService;
     @Resource
@@ -52,8 +65,6 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     private UserInvitationService userInvitationService;
     @Resource
     private SelfScoreService selfScoreService;
-    @Resource
-    private InvitationScoreFlowDao flowDao;
     @Resource
     private InvitationScoreDao dao;
 
@@ -88,13 +99,13 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
 
     @Override
-    public PageInfo<InvitationScore> pageList(Integer uid,  PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid)
                 .orderByDesc(InvitationScore::getId);
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
         List<Integer> uIdList = list.stream().map(InvitationScore::getUid).collect(Collectors.toList());
@@ -105,6 +116,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         });
         return CommonPage.copyPageInfo(page, list);
     }
+
     @Override
     public InvitationScore add(Integer uid) {
         InvitationScore invitationScore = new InvitationScore(uid);
@@ -164,7 +176,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             }
         }
         // 增加明细
-        if(CollectionUtils.isNotEmpty(list)){
+        if (CollectionUtils.isNotEmpty(list)) {
             invitationScoreFlowService.saveBatch(list);
         }
     }
@@ -187,5 +199,150 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 dao.updateBatch(updateList);
             }
         }
+    }
+
+    @Override
+    public String download(ScoreDownloadRequest request) {
+        if (CollectionUtils.isEmpty(request.getAccountList())) {
+            if (request.getStartTime() == null || request.getEndTime() == null) {
+                throw new RuntimeException("未指定固定账户,业绩开始时间-结束时间不能为空");
+            }
+            if (DateTimeUtils.addMonths(request.getStartTime(), 3).before(request.getEndTime())) {
+                throw new RuntimeException("未指定固定账户,时间跨度不能超过3个月");
+            }
+        }
+        // 查询订单指定时间成功的订单
+        List<Order> successList = orderService.getSuccessList(request.getStartTime(), request.getEndTime());
+        if (CollectionUtils.isEmpty(successList)) {
+            throw new RuntimeException("没查到支付成功的订单");
+        }
+        // 查询账户
+        List<Integer> uidList = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(request.getAccountList())) {
+            List<User> userList = userService.list(new LambdaQueryWrapper<User>().in(User::getAccount, request.getAccountList()));
+            if (CollectionUtils.isNotEmpty(userList)) {
+                uidList = userList.stream().map(User::getId).collect(Collectors.toList());
+            }
+        }
+
+        // 查询所有的用户上级
+        Map<Integer, List<Integer>> pidListMap = Maps.newConcurrentMap();
+        Map<Integer, UserCapa> capaMap = Maps.newConcurrentMap();
+        Map<Integer, UserCapaXs> capaXsMap = Maps.newConcurrentMap();
+        for (Order order : successList) {
+            List<Integer> pidList = pidListMap.get(order.getUid());
+            if (CollectionUtils.isNotEmpty(pidList)) {
+                continue;
+            }
+            List<UserUpperDto> allUpper = userInvitationService.getAllUpper(order.getUid());
+            if (CollectionUtils.isEmpty(allUpper) || allUpper.get(0).getPId() == null) {
+                continue;
+            }
+            pidList = Lists.newArrayList();
+            for (UserUpperDto upperDto : allUpper) {
+                if (CollectionUtils.isNotEmpty(uidList)) {
+                    if (!uidList.contains(upperDto.getPId())) {
+                        continue;
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(request.getCapaIdList())) {
+                    UserCapa userCapa = capaMap.get(upperDto.getPId());
+                    if (userCapa == null) {
+                        userCapa = userCapaService.getByUser(upperDto.getPId());
+                        capaMap.put(upperDto.getPId(), userCapa);
+                    }
+
+                    if (userCapa == null || !request.getCapaIdList().contains(userCapa.getCapaId())) {
+                        continue;
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(request.getCapaIdXsList())) {
+                    UserCapaXs userCapaXs = capaXsMap.get(upperDto.getPId());
+                    if (userCapaXs == null) {
+                        userCapaXs = userCapaXsService.getByUser(upperDto.getPId());
+                        capaXsMap.put(upperDto.getPId(), userCapaXs);
+                    }
+                    if (userCapaXs == null || !request.getCapaIdXsList().contains(userCapaXs.getCapaId())) {
+                        continue;
+                    }
+                }
+                pidList.add(upperDto.getPId());
+            }
+            pidListMap.put(order.getUid(), pidList);
+        }
+
+        List<String> orderNoList = successList.stream().map(Order::getOrderNo).collect(Collectors.toList());
+        Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
+        List<ScoreDownLoadExcel> list = Lists.newArrayList();
+
+        Map<Integer, User> userMap = Maps.newConcurrentMap();
+        Map<Integer, TeamUser> userTeamMap = Maps.newConcurrentMap();
+        for (Order order : successList) {
+
+            List<Integer> pidList = pidListMap.get(order.getUid());
+            if (CollectionUtils.isEmpty(pidList)) {
+                continue;
+            }
+            List<OrderDetail> orderDetailList = orderDetailMap.get(order.getOrderNo());
+            for (OrderDetail orderDetail : orderDetailList) {
+                BigDecimal score = orderDetailService.getRealScore(orderDetail);
+                for (Integer pid : pidList) {
+                    ScoreDownLoadExcel excel = new ScoreDownLoadExcel();
+                    User puser = userMap.get(pid);
+                    if (puser == null) {
+                        puser = userService.getById(pid);
+                        userMap.put(pid, puser);
+                    }
+                    excel.setUid(pid);
+                    excel.setAccount(puser.getAccount());
+                    excel.setNickName(puser.getNickname());
+                    TeamUser pUserTeam = userTeamMap.get(pid);
+                    if (pUserTeam == null) {
+                        pUserTeam = teamUserService.getByUser(pid);
+                        userTeamMap.put(pid, pUserTeam);
+                    }
+                    if (pUserTeam != null) {
+                        excel.setTeamName(pUserTeam.getName());
+                    }
+                    UserCapa pUserCapa = capaMap.get(pid);
+                    if (pUserCapa == null) {
+                        pUserCapa = userCapaService.getByUser(pid);
+                        capaMap.put(pid, pUserCapa);
+                    }
+                    if (pUserCapa != null) {
+                        excel.setCapaName(pUserCapa.getCapaName());
+                    }
+                    UserCapaXs pUserCapaXs = capaXsMap.get(pid);
+                    if (pUserCapaXs == null) {
+                        pUserCapaXs = userCapaXsService.getByUser(pid);
+                        capaXsMap.put(pid, pUserCapaXs);
+                    }
+                    if (pUserCapaXs != null) {
+                        excel.setCapaXsName(pUserCapaXs.getCapaName());
+                    }
+
+                    excel.setScore(score);
+                    excel.setOrderSn(order.getOrderNo());
+                    excel.setProductName(orderDetail.getProductName());
+                    excel.setBarCode(orderDetail.getBarCode());
+                    excel.setPayNum(orderDetail.getPayNum());
+                    excel.setPayPrice(orderDetail.getPayPrice().subtract(orderDetail.getFreightFee()));
+                    excel.setOrderUid(order.getUid());
+
+                    User user = userMap.get(order.getUid());
+                    if (user == null) {
+                        user = userService.getById(order.getUid());
+                        userMap.put(order.getUid(), puser);
+                    }
+                    excel.setOrderAccount(user.getAccount());
+                    excel.setPayTime(order.getPayTime());
+                    excel.setStartTime(request.getStartTime());
+                    excel.setEndTime(request.getEndTime());
+                    list.add(excel);
+                }
+            }
+        }
+        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return s;
     }
 }
