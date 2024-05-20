@@ -63,4 +63,6 @@ public class WalletWithdrawVo {
     private String idCardNo;
     @ApiModelProperty("手机号")
     private String phone;
+    @ApiModelProperty("团队")
+    private String teamName;
 }

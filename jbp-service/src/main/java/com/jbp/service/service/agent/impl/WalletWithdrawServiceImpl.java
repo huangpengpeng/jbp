@@ -58,22 +58,22 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private WalletWithdrawDao walletWithdrawDao;
 
     @Override
-    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, String teamId,PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletWithdraw> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName);
+        List<WalletWithdraw> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName,teamId);
         return CommonPage.copyPageInfo(page, walletWithdrawsList);
     }
 
     @Override
-    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName) {
+    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName, String teamId) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName,nickName);
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName,nickName,teamId);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
@@ -102,6 +102,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         head.put("nickName","用户昵称");
         head.put("idCardNo","身份证");
         head.put("phone","手机号");
+        head.put("teamName","团队");
         JSONArray array = new JSONArray();
         head.forEach((k,v)->{
             JSONObject json = new JSONObject();

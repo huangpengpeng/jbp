@@ -25,4 +25,7 @@ public class ChannelCardRequest implements Serializable {
 
     @ApiModelProperty("银行卡预留手机号")
     private String phone;
+
+    @ApiModelProperty("团队id")
+    private String teamId;
 }

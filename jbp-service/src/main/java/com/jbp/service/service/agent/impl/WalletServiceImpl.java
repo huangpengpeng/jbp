@@ -3,12 +3,14 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
@@ -19,6 +21,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.WalletDao;
+import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.PlatformWalletService;
@@ -50,6 +53,10 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     private WalletConfigService walletConfigService;
     @Resource
     private UserService userService;
+    @Resource
+    private TeamService teamService;
+
+
 
     @Override
     public Wallet add(Integer uId, Integer type) {
@@ -172,10 +179,19 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
 
     @Override
-    public PageInfo<Wallet> pageList(Integer uid, Integer type, PageParamRequest pageParamRequest) {
+    public PageInfo<Wallet> pageList(Integer uid, Integer type,String teamId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<Wallet> walletLambdaQueryWrapper = new LambdaQueryWrapper<Wallet>()
                 .eq(!ObjectUtil.isNull(uid), Wallet::getUId, uid)
                 .eq(!ObjectUtil.isNull(type), Wallet::getType, type);
+
+
+        if (com.jbp.service.util.StringUtils.isNotEmpty(teamId)) {
+            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
+            walletLambdaQueryWrapper.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
+        }
+
+
+
         Page<Wallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<Wallet> list = list(walletLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {

@@ -30,4 +30,7 @@ public class WalletWithdrawPageRequest {
 
     @ApiModelProperty(value = "用户昵称")
     private String nickName;
+
+    @ApiModelProperty(value = "团队查询")
+    private String teamId;
 }

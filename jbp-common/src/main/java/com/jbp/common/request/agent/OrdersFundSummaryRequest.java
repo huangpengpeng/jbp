@@ -16,4 +16,9 @@ public class OrdersFundSummaryRequest implements Serializable {
 
     @ApiModelProperty("单号")
     private String ordersSn;
+
+
+
+    @ApiModelProperty("团队id")
+    private String teamId;
 }

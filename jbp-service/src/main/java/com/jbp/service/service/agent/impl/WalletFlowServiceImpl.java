@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -20,6 +21,7 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.dao.agent.WalletFlowDao;
 import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.WalletFlowService;
@@ -49,6 +51,8 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     SystemConfigService systemConfigService;
     @Resource
     private WalletFlowDao dao;
+    @Resource
+    private TeamService teamService;
 
     @Override
     public WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
@@ -70,12 +74,19 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, String externalNo,String action, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, String externalNo,String action,String teamId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<WalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<WalletFlow>()
                 .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
                 .eq(StringUtils.isNotEmpty(externalNo), WalletFlow::getExternalNo, externalNo)
                 .eq(StringUtils.isNotEmpty(action),WalletFlow::getAction,action);
+
+
+        if (StringUtils.isNotEmpty(teamId)) {
+            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
+            walletLambdaQueryWrapper.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
+        }
+
         getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
         walletLambdaQueryWrapper.orderByDesc(WalletFlow::getId);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());

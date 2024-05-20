@@ -42,12 +42,15 @@
                card.bank_card_no,
                u.nickname,
                card.phone,
-               asentity.id_card_no
+               asentity.id_card_no,
+               t.name as teamName
 
         from eb_wallet_withdraw as w
                  LEFT JOIN eb_channel_identity AS asentity on asentity.uid = w.uid and asentity.channel = #{channelName}
                  left join eb_channel_card as card on card.uid = w.uid and card.channel = #{channelName}
                  LEFT JOIN eb_user as u on u.id = w.uid
+                 LEFT JOIN eb_team_user as tu on tu.uid = w.uid
+                LEFT JOIN eb_team as t on t.id = tu.tid
 
     </sql>
 <!-- List<WalletWithdraw> pageList(String account, String walletName, String status, String endTime, String startTime, String realName, String channelName);-->
@@ -72,6 +75,10 @@
                 <if test="nickName!=null and nickName!=''">
                     and u.nickname=#{nickName}
                 </if>
+                <if test="teamId!=null and teamId!=''">
+                    and  t.leader_id = #{teamId}
+                </if>
+
             </where> ORDER BY w.id DESC
     </select>
 <!-- List<WalletWithdrawVo> excel(@Param("id") Integer id,@Param("account") String account,@Param("walletName") String walletName,@Param("status") String status,
@@ -117,6 +124,9 @@
             </if>
             <if test="nickName!=null and nickName!=''">
                 and u.nickname=#{nickName}
+            </if>
+            <if test="teamId!=null and teamId!=''">
+                and  t.leader_id= #{teamId}
             </if>
         </where>
         ORDER BY w.id ASC

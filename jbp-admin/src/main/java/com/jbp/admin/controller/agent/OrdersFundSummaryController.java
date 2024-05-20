@@ -25,6 +25,6 @@ public class OrdersFundSummaryController {
     @GetMapping("/page")
     @ApiOperation("订单资金汇总列表")
     public CommonResult<CommonPage<OrdersFundSummary>> getList(OrdersFundSummaryRequest request, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(ordersFundSummaryService.pageList(request.getOrdersSn(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(ordersFundSummaryService.pageList(request.getOrdersSn(),request.getTeamId(),pageParamRequest)));
     }
 }

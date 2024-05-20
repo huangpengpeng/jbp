@@ -18,5 +18,5 @@ public interface OrdersFundSummaryService extends IService<OrdersFundSummary> {
 
     OrdersFundSummary reduceCommAmt(String ordersSn, BigDecimal commAmt);
 
-    PageInfo<OrdersFundSummary> pageList(String ordersSn, PageParamRequest pageParamRequest);
+    PageInfo<OrdersFundSummary> pageList(String ordersSn,String teamId,  PageParamRequest pageParamRequest);
 }

@@ -6,11 +6,11 @@
 	<select id="getUserNext" resultType="java.math.BigDecimal">
 
 
-		select  sum(score) from eb_self_Score
+		select  ifnull(sum(score),0) from eb_self_Score
 		where uid in (select uid from eb_user_invitation_flow where pid = ${uid})
 	</select>
     <select id="getTeamUserScore" resultType="com.jbp.common.model.agent.SelfScore">
-		select  sum(score)as score ,f.pid as uid  from eb_self_score_flow  e
+		select   ifnull(sum(score),0)  as score ,f.pid as uid  from eb_self_score_flow  e
 		left join eb_user_invitation_flow f on f.uid = e.uid
 		where 1=1
 		<if test="uid !=null">
