@@ -16,6 +16,8 @@ public interface ClearingVipUserService extends IService<ClearingVipUser> {
 
     PageInfo<ClearingVipUser> pageList(Integer uid, Integer status,Long level,Integer commType,PageParamRequest pageParamRequest);
 
+    String getActive(Integer uid);
+
 
 
 

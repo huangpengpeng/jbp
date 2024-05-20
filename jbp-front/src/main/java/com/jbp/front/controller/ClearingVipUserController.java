@@ -84,13 +84,13 @@ public class ClearingVipUserController {
         List<ClearingBonusListResponse> clearingList = clearingBonusFlowService.getClearingList(userService.getUserId(), day);
         for (ClearingBonusListResponse bonus : clearingList) {
             if (StringUtils.isNotEmpty(bonus.getPostscript()) && bonus.getPostscript().contains("额度上限")) {
-                if (org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(),"店1") ) {
+                if (org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(), "店1")) {
                     bonus.setLevelName("V1");
                 }
-                if ( org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(),"店2") ) {
+                if (org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(), "店2")) {
                     bonus.setLevelName("V2");
                 }
-                if ( org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(),"店3") ) {
+                if (org.apache.commons.lang3.StringUtils.equals(bonus.getLevelName(), "店3")) {
                     bonus.setLevelName("V3");
                 }
             }
@@ -151,7 +151,12 @@ public class ClearingVipUserController {
         }
         return CommonResult.success(true);
     }
+
+    @ApiOperation(value = "月度活跃展示")
+    @RequestMapping(value = "/active", method = RequestMethod.GET)
+    public CommonResult<String> active() {
+        return CommonResult.success(clearingVipUserService.getActive(userService.getUserId()));
+    }
+
 }
-
-
 
