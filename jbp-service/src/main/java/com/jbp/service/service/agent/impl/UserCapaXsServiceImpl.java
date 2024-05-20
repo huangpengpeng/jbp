@@ -9,6 +9,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.jbp.common.constants.TaskConstants;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.user.User;
@@ -16,6 +17,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.AsyncUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.condition.ConditionEnum;
@@ -28,6 +30,8 @@ import com.jbp.service.service.agent.UserCapaXsSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -59,6 +63,9 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     public AsyncUtils asyncUtils;
     @Resource
     private UserInvitationService userInvitationService;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public UserCapaXs getByUser(Integer uid) {
@@ -112,6 +119,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             userInvitationService.updateById(userInvitation);
         }
 
+        redisUtil.lPush( TaskConstants.TASK_CAPA_XS_USER_MASSAGE, uid);
 		return getByUser(uid);
 	}
 
