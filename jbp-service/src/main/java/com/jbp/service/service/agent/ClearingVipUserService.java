@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ClearingVipUser;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserMonthActiveResponse;
 
 import java.math.BigDecimal;
 
@@ -16,7 +17,7 @@ public interface ClearingVipUserService extends IService<ClearingVipUser> {
 
     PageInfo<ClearingVipUser> pageList(Integer uid, Integer status,Long level,Integer commType,PageParamRequest pageParamRequest);
 
-    String getActive(Integer uid);
+    UserMonthActiveResponse getActive(Integer uid);
 
 
 
