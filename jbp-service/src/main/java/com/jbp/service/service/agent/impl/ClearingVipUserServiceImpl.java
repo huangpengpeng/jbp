@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.ClearingVipUser;
 import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.ProductCommConfig;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -15,12 +16,15 @@ import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.ClearingVipUserDao;
 import com.jbp.service.product.comm.MonthPyCommHandler;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.ClearingVipUserService;
+import com.jbp.service.service.agent.ProductCommConfigService;
 import com.jbp.service.service.agent.ProductCommService;
 import com.jbp.service.service.agent.UserCapaService;
 import org.apache.commons.lang3.BooleanUtils;
@@ -34,6 +38,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +58,8 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
     private MonthPyCommHandler monthPyCommHandler;
     @Autowired
     private UserCapaService userCapaService;
+    @Autowired
+    private ProductCommConfigService productCommConfigService;
 
     @Override
     public ClearingVipUser create(Integer uid, String accountNo, Long level, String levelName,
@@ -83,40 +90,42 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
 
     @Override
     public String getActive(Integer uid) {
+        ProductCommConfig config = productCommConfigService.getByType(ProductCommEnum.培育佣金.getType());
+        if(config == null || !config.getIfOpen() || StringUtils.isEmpty(config.getRatioJson())){
+            // false  0  0  msg = 未开启活跃设置
+
+            return "";
+        }
+
+
+
+
         //获取当前月份的第一天和最后一天
-        LocalDate today = LocalDate.now();
-        Date startTime = Date.from(today.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date endTime = Date.from(today.with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date now = DateTimeUtils.getNow();
+        Date startTime = DateTimeUtils.getMonthStart(now);
+        Date endTime = DateTimeUtils.getMonthEnd(now);
         // 查询购买成功的订单里面包含培育商品计算出当前用户购买金额汇总
-        List<Order> list = orderService.getSuccessList(startTime, endTime);
-        List<Order> successList = list.stream().filter(o -> uid.equals(o.getUid())).collect(Collectors.toList());
+        List<Order> successList = orderService.getSuccessList(uid, startTime, endTime);
         // 个人支付金额汇总
         BigDecimal fee = BigDecimal.ZERO;
-        Map<Integer, ProductComm> map = Maps.newConcurrentMap();
         for (Order order : successList) {
             List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
             for (OrderDetail orderDetail : orderDetailList) {
-                ProductComm productComm = map.get(orderDetail.getProductId());
-                if (productComm == null) {
-                    productComm = productCommService.getByProduct(orderDetail.getProductId(), ProductCommEnum.培育佣金.getType());
-                    if (productComm != null) {
-                        map.put(orderDetail.getProductId(), productComm);
-                    }
-                }
+                ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), ProductCommEnum.培育佣金.getType());
                 // 佣金不存在或者关闭直接忽略
                 if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
                     continue;
                 }
-                BigDecimal payPrice = orderDetail.getPayPrice().subtract(orderDetail.getFreightFee());
-                fee = payPrice.add(fee);
+                BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
+                realScore = realScore.multiply(productComm.getScale());
+                fee = realScore.add(fee);
             }
         }
 
         Map<Long, MonthPyCommHandler.Rule> ruleMap = monthPyCommHandler.getRule(null);
-        List<MonthPyCommHandler.Rule> ruleList = ruleMap.values().stream().collect(Collectors.toList());
+        List<MonthPyCommHandler.Rule> ruleList = ruleMap.values().stream().sorted(Comparator.comparing(MonthPyCommHandler.Rule::getLevel)).collect(Collectors.toList());
         UserCapa userCapa = userCapaService.getByUser(uid);
         Long level = 0L;
-
         if (userCapa != null) {
             for (MonthPyCommHandler.Rule rule : ruleList) {
                 if (NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) >= 0 && ArithmeticUtils.gte(fee, rule.getPayPrice())) {
@@ -126,13 +135,27 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
                 }
             }
         }
-        BigDecimal hundred = new BigDecimal(100);
+
+        MonthPyCommHandler.Rule rule = ruleList.get(0);
+        BigDecimal hundred = rule.getPayPrice();
+        // 是否活跃 false  true
+        // subPrice   相差金额
+        // payPrice  复购金额
+        // msg
         BigDecimal balance = hundred.subtract(fee);
         if (level == 0L) {
+
+
+            if(userCapa == null || NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) < 0){
+                // false subPrice  payPrice  msg = 等级未达到要求
+            }
             return "本月不活跃：复购金额差" + balance + "元可活跃";
         } else if (level == 1L || level == 2L) {
+            // msg = "本月活跃：已复购满100元";
+
             return "本月活跃：已复购满100元";
         } else {
+            // msg = "本月活跃：已复购满300元";
             return "本月活跃：已复购满300元";
         }
 

@@ -1260,6 +1260,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     }
 
     @Override
+    public List<Order> getSuccessList(Integer uid, Date startTime, Date endTime) {
+        LambdaQueryWrapper<Order> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Order::getUid, uid).eq(Order::getPaid, true).ge(Order::getPayTime, startTime).lt(Order::getPayTime, endTime);
+        List<Order> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return list;
+        }
+        // 退款商户订单过滤出来
+        List<String> refundList = list.stream().filter(o -> Integer.valueOf(1).equals(o.getLevel()) && !Integer.valueOf(0).equals(o.getRefundStatus())).map(Order::getPlatOrderNo).collect(Collectors.toList());
+        //  支付成功的平台订单 商户订单没有退款
+        List<Order> platList = list.stream().filter(o -> Integer.valueOf(0).equals(o.getLevel()) && !refundList.contains(o.getOrderNo())).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(platList) ? Lists.newArrayList() : platList;
+    }
+
+    @Override
     public BigDecimal getGoodsPrice(String goodsIds,Integer uid,String month) {
         return dao.getGoodsPirce(goodsIds,uid,month);
     }
