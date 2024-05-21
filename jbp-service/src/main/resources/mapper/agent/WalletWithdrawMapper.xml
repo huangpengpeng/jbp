@@ -22,6 +22,7 @@
     <result column="nickname" property="nickName"/>
     <result column="phone" property="phone"/>
     <result column="id_card_no" property="idCardNo"/>
+    <result column="team_name" property="teamName"/>
 </resultMap>
     <sql id="selectwalletWithdraw">
         select w.id,
@@ -43,7 +44,7 @@
                u.nickname,
                card.phone,
                asentity.id_card_no,
-               t.name as teamName
+               t.name as team_name
 
         from eb_wallet_withdraw as w
                  LEFT JOIN eb_channel_identity AS asentity on asentity.uid = w.uid and asentity.channel = #{channelName}
@@ -102,6 +103,7 @@
         <result column="nickname" property="nickName"/>
         <result column="id_card_no" property="idCardNo"/>
         <result column="phone" property="phone"/>
+        <result column="team_name" property="teamName"/>
     </resultMap>
     <select id="excel" resultMap="excelVo">
         <include refid="selectwalletWithdraw"/>

@@ -8,6 +8,7 @@ import com.jbp.common.request.agent.WalletWithdrawPageRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
+import com.jbp.common.vo.WalletWithdrawVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletWithdrawService;
 import com.jbp.service.util.StringUtils;
@@ -31,7 +32,7 @@ public class WalletWithdrawController {
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:page')")
     @GetMapping("/page")
     @ApiOperation("钱包提现列表")
-    public CommonResult<CommonPage<WalletWithdraw>> getList(WalletWithdrawPageRequest request, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<WalletWithdrawVo>> getList(WalletWithdrawPageRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(), request.getRealName(),request.getNickName(), request.getTeamId(),pageParamRequest)));
     }
 

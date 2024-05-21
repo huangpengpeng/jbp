@@ -3,6 +3,26 @@
 <mapper namespace="com.jbp.service.dao.agent.WalletDao">
 
 
+    <select id="getList" resultType="com.jbp.common.response.WalletExtResponse">
 
 
+         select f.*,t.name from eb_wallet f
+        left join eb_team_user  u on u.uid = f.uid
+        left join eb_team t on t.id = u.tid
+        where  1=1
+        <if test="teamId!='' and teamId!= null ">
+            and   t.leader_id =#{teamId}
+        </if>
+        <if test="uId !='' and uId!= null ">
+            and   f.uId =#{uId}
+        </if>
+
+        <if test="type !='' and type!= null ">
+            and   f.type =#{type}
+        </if>
+
+
+
+
+    </select>
 </mapper>

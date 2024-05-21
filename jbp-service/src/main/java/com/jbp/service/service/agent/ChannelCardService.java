@@ -6,12 +6,13 @@ import com.jbp.common.model.agent.ChannelCard;
 import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.common.response.ChannelCardExtResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ChannelCardService extends IService<ChannelCard> {
-    PageInfo<ChannelCard> pageList(Integer uid, String bankCardNo, String type, String phone,String teamId, PageParamRequest pageParamRequest);
+    PageInfo<ChannelCardExtResponse> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, PageParamRequest pageParamRequest);
 
 
     AliBankcardResponse getAliBankCard(String kaHao);

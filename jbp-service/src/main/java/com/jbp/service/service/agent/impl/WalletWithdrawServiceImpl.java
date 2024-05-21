@@ -58,11 +58,11 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private WalletWithdrawDao walletWithdrawDao;
 
     @Override
-    public PageInfo<WalletWithdraw> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, String teamId,PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, String teamId,PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
-        Page<WalletWithdraw> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletWithdraw> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName,teamId);
+        Page<WalletWithdrawVo> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<WalletWithdrawVo> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName,teamId);
         return CommonPage.copyPageInfo(page, walletWithdrawsList);
     }
 

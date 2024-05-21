@@ -15,6 +15,7 @@ import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.WalletFlowExtResponse;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
@@ -27,6 +28,7 @@ import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -74,23 +76,12 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public PageInfo<WalletFlow> pageList(Integer uid, Integer type, String dateLimit, String externalNo,String action,String teamId, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<WalletFlow> walletLambdaQueryWrapper = new LambdaQueryWrapper<WalletFlow>()
-                .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
-                .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
-                .eq(StringUtils.isNotEmpty(externalNo), WalletFlow::getExternalNo, externalNo)
-                .eq(StringUtils.isNotEmpty(action),WalletFlow::getAction,action);
+    public PageInfo<WalletFlowExtResponse> pageList(Integer uid, Integer type, String dateLimit, String externalNo, String action, String teamId, PageParamRequest pageParamRequest) {
 
 
-        if (StringUtils.isNotEmpty(teamId)) {
-            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
-            walletLambdaQueryWrapper.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
-        }
-
-        getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
-        walletLambdaQueryWrapper.orderByDesc(WalletFlow::getId);
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletFlow> list = list(walletLambdaQueryWrapper);
+        List<WalletFlowExtResponse> list = dao.getList(uid,type,dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(),externalNo,action,teamId);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }

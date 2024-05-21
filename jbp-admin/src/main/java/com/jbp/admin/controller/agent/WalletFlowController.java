@@ -6,6 +6,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletRequest;
+import com.jbp.common.response.WalletFlowExtResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.service.UserService;
@@ -34,7 +35,7 @@ public class WalletFlowController {
     @PreAuthorize("hasAuthority('agent:user:wallet:flow')")
     @GetMapping("/page")
     @ApiOperation("用户积分详情")
-    public CommonResult<CommonPage<WalletFlow>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<WalletFlowExtResponse>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
         if (StringUtils.isNotEmpty(request.getAccount())) {
             User user = userService.getByAccount(request.getAccount());

@@ -8,7 +8,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 
 public interface WalletWithdrawDao extends BaseMapper<WalletWithdraw> {
-    List<WalletWithdraw> pageList(@Param("account") String account, @Param("walletName") String walletName, @Param("status") String status,
+    List<WalletWithdrawVo> pageList(@Param("account") String account, @Param("walletName") String walletName, @Param("status") String status,
                                   @Param("endTime") String endTime, @Param("startTime") String startTime, @Param("realName") String realName,
                                   @Param("channelName") String channelName,@Param("nickName")String nickName,@Param("teamId")String teamId);
 

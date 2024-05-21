@@ -16,6 +16,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.AliBankcardResponse;
+import com.jbp.common.response.ChannelCardExtResponse;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.RestTemplateUtil;
 import com.jbp.service.dao.agent.ChannelCardDao;
@@ -46,23 +47,14 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
     private UserService userService;
     @Resource
     private TeamService teamService;
-
+    @Resource
+    private ChannelCardDao dao;
     @Override
-    public PageInfo<ChannelCard> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<ChannelCard> lqw = new LambdaQueryWrapper<ChannelCard>()
-                .eq(!ObjectUtil.isNull(uid), ChannelCard::getUid, uid)
-                .like(StringUtils.isNotEmpty(bankCardNo), ChannelCard::getBankCardNo, bankCardNo)
-                .like(StringUtils.isNotEmpty(type), ChannelCard::getType, type)
-                .like(StringUtils.isNotEmpty(phone), ChannelCard::getPhone, phone);
+    public PageInfo<ChannelCardExtResponse> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, PageParamRequest pageParamRequest) {
 
-        if (StringUtils.isNotEmpty(teamId)) {
-            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
-            lqw.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
-        }
 
-        lqw.orderByDesc(ChannelCard::getId);
-        Page<ChannelCard> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<ChannelCard> list = list(lqw);
+        Page<ChannelCardExtResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ChannelCardExtResponse> list = dao.getList(uid,bankCardNo,type,phone,teamId);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }

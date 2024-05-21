@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.agent.OrdersFundSummaryDao">
 
-    <select id="getList" resultType="com.jbp.common.model.agent.OrdersFundSummary">
+    <select id="getList" resultType="com.jbp.common.response.OrdersFundSummaryExtResponse">
 
-        select f.* from eb_orders_fund_summary f
+        select f.*,t.name from eb_orders_fund_summary f
         left join eb_order o on o.plat_order_no  = f.orders_sn
 				left join eb_team_user  u on u.uid = o.uid
 				left join eb_team t on t.id = u.tid

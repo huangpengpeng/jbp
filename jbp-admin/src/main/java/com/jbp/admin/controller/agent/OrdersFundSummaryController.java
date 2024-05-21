@@ -4,6 +4,7 @@ import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.OrdersFundSummaryRequest;
+import com.jbp.common.response.OrdersFundSummaryExtResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
 import io.swagger.annotations.Api;
@@ -24,7 +25,7 @@ public class OrdersFundSummaryController {
     @PreAuthorize("hasAuthority('agent:orders:fund:summary:page')")
     @GetMapping("/page")
     @ApiOperation("订单资金汇总列表")
-    public CommonResult<CommonPage<OrdersFundSummary>> getList(OrdersFundSummaryRequest request, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<OrdersFundSummaryExtResponse>> getList(OrdersFundSummaryRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(ordersFundSummaryService.pageList(request.getOrdersSn(),request.getTeamId(),pageParamRequest)));
     }
 }

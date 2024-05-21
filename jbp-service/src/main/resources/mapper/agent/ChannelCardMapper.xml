@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.ChannelCardDao">
+
+
+    <select id="getList" resultType="com.jbp.common.response.ChannelCardExtResponse">
+
+              select f.*,t.name from eb_channel_card f
+				left join eb_team_user  u on u.uid = f.uid
+				left join eb_team t on t.id = u.tid
+				where  1=1
+
+        <if test="teamId!='' and teamId!= null ">
+            and   t.leader_id =#{teamId}
+        </if>
+        <if test="uId !='' and uId!= null ">
+            and   f.uId =#{uId}
+        </if>
+
+        <if test="type !='' and type!= null ">
+            and   f.type =#{type}
+        </if>
+
+        <if test="bankCardNo !='' and bankCardNo!= null ">
+            and   f.bank_Card_No =#{bankCardNo}
+        </if>
+
+        <if test="phone !='' and phone!= null ">
+            and   f.phone =#{phone}
+        </if>
+
+        order by f.id desc
+
+    </select>
+</mapper>

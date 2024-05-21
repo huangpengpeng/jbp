@@ -12,6 +12,7 @@ import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.OrdersFundSummaryExtResponse;
 import com.jbp.service.dao.agent.OrdersFundSummaryDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
@@ -34,9 +35,9 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
     private OrdersFundSummaryDao ordersFundSummaryDao;
 
     @Override
-    public PageInfo<OrdersFundSummary> pageList(String ordersSn,String teamId,  PageParamRequest pageParamRequest) {
+    public PageInfo<OrdersFundSummaryExtResponse> pageList(String ordersSn,String teamId,  PageParamRequest pageParamRequest) {
 
-        List<OrdersFundSummary> list = ordersFundSummaryDao.getList(teamId,ordersSn);
+        List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(teamId,ordersSn);
         Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list);
     }

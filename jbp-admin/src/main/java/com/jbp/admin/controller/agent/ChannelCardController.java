@@ -9,6 +9,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ChannelCardEditRequest;
 import com.jbp.common.request.agent.ChannelCardRequest;
+import com.jbp.common.response.ChannelCardExtResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ChannelCardService;
@@ -34,7 +35,7 @@ public class ChannelCardController {
     @PreAuthorize("hasAuthority('agent:channel:card:page')")
     @GetMapping("/page")
     @ApiOperation("渠道银行卡列表")
-    public CommonResult<CommonPage<ChannelCard>> getList(ChannelCardRequest request, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<ChannelCardExtResponse>> getList(ChannelCardRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
         if (StringUtils.isNotEmpty(request.getAccount())) {
             User user = userService.getByAccount(request.getAccount());

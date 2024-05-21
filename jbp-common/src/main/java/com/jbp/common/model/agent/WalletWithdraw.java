@@ -111,4 +111,7 @@ public class WalletWithdraw extends VersionModel {
     @ApiModelProperty("身份证")
     @TableField(exist = false)
     private String idCardNo;
+    @ApiModelProperty("团队")
+    @TableField(exist = false)
+    private String teamName;
 }

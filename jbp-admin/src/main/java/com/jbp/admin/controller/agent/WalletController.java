@@ -11,6 +11,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.request.agent.WalletformEditRequest;
+import com.jbp.common.response.WalletExtResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.WalletService;
@@ -35,7 +36,7 @@ public class WalletController {
     @PreAuthorize("hasAuthority('agent:user:wallet:page')")
     @ApiOperation("用户积分列表")
     @GetMapping("/page")
-    public CommonResult<CommonPage<Wallet>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<WalletExtResponse>> getList(WalletRequest request, PageParamRequest pageParamRequest) {
         Integer uid = null;
         if (StringUtils.isNotEmpty(request.getAccount())) {
             User user = userService.getByAccount(request.getAccount());

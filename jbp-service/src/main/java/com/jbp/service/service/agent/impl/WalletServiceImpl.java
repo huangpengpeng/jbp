@@ -18,6 +18,7 @@ import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.WalletExtResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.WalletDao;
@@ -55,7 +56,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     private UserService userService;
     @Resource
     private TeamService teamService;
-
+    @Resource
+    private WalletDao walletDao;
 
 
     @Override
@@ -179,25 +181,14 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
 
     @Override
-    public PageInfo<Wallet> pageList(Integer uid, Integer type,String teamId, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<Wallet> walletLambdaQueryWrapper = new LambdaQueryWrapper<Wallet>()
-                .eq(!ObjectUtil.isNull(uid), Wallet::getUId, uid)
-                .eq(!ObjectUtil.isNull(type), Wallet::getType, type);
-
-
-        if (com.jbp.service.util.StringUtils.isNotEmpty(teamId)) {
-            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId, teamId));
-            walletLambdaQueryWrapper.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
-        }
-
-
+    public PageInfo<WalletExtResponse> pageList(Integer uid, Integer type, String teamId, PageParamRequest pageParamRequest) {
 
         Page<Wallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<Wallet> list = list(walletLambdaQueryWrapper);
+        List<WalletExtResponse> list =   walletDao.getList(uid,type,teamId);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
-        List<Integer> uIdList = list.stream().map(Wallet::getUId).collect(Collectors.toList());
+        List<Integer> uIdList = list.stream().map(WalletExtResponse::getUId).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         list.forEach(e -> {
             WalletConfig walletConfig = walletConfigService.getByType(e.getType());

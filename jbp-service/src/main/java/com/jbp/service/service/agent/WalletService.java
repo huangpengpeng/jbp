@@ -5,12 +5,13 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.WalletExtResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface WalletService extends IService<Wallet> {
-    PageInfo<Wallet> pageList(Integer uid,Integer type,String teamId, PageParamRequest pageParamRequest);
+    PageInfo<WalletExtResponse> pageList(Integer uid, Integer type, String teamId, PageParamRequest pageParamRequest);
     Wallet add(Integer uid, Integer type);
 
     Wallet getByUser(Integer uid, Integer type);
