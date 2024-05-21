@@ -1,10 +1,6 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.request.agent.ClearingRequest;
-import com.jbp.service.service.agent.CapaXsService;
-import com.jbp.service.service.agent.ClearingFinalService;
-import com.jbp.service.service.agent.UserCapaXsService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -42,17 +38,6 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-//        run.getBean(UserCapaXsService.class).riseCapaXs(74643);
-
-//        ClearingFinalService clearingFinalService = run.getBean(ClearingFinalService.class);
-//        ClearingRequest request = new ClearingRequest();
-//        request.setCommType(25);
-//        request.setCommName("月度管理补贴");
-//        request.setIfImportUser(false);
-//        request.setStartTime("20240501");
-//        request.setEndTime("20240531");
-//        clearingFinalService.syncOneKeyClearing(request);
 
     }
 }
