@@ -57,7 +57,7 @@ public class CapaInviteOneLevelHandler implements ConditionHandler {
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
         // 当前用户是否满足改升级条件  满足返回 true  不满足返回false
-        List<UserInvitation> nextList = userInvitationService.getNextList(uid);
+        List<UserInvitation> nextList = userInvitationService.getNextList2(uid);
         int num = 0;
         Rule rule = getRule(riseCondition);
         for (UserInvitation userInvitation : nextList) {

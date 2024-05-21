@@ -53,7 +53,7 @@ public class CapaXsInviteOneLevelHandler implements ConditionHandler {
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
         Rule rule = getRule(riseCondition);
-        List<UserInvitation> nextList = userInvitationService.getNextList(uid);
+        List<UserInvitation> nextList = userInvitationService.getNextList2(uid);
         if(CollectionUtils.isEmpty(nextList) || nextList.size() < rule.getNum().intValue()){
             return false;
         }
