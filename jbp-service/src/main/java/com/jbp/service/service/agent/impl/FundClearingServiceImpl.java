@@ -424,7 +424,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
             e.setSendAmt(e.getSendAmt().multiply(wallet_pay_integral));
-            if(name.contains("sm") || name.contains("yk")  || name.contains("tf") ){
+            if(name.contains("sm") || name.contains("yk")  || name.contains("tf")  || name.contains("hdf")){
                 e.setDescription(CommAliasNameSmEnum.getAliasNameReplaceName(e.getDescription()));
             }else{
                 e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));

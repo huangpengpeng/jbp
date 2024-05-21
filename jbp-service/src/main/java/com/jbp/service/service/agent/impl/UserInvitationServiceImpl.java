@@ -83,7 +83,7 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
 
         LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
         wrapper.eq(UserInvitation::getPId, uid);
-        wrapper.eq(UserInvitation::getMId, null);
+        wrapper.isNull(UserInvitation::getMId);
         List<UserInvitation> list = list(wrapper);
         LambdaQueryWrapper<UserInvitation> wrapper2 = new LambdaQueryWrapper();
         wrapper2.eq(UserInvitation::getMId, uid);

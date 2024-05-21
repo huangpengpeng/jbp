@@ -1,6 +1,7 @@
 package com.jbp.admin.task.user;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.user.User;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsService;
