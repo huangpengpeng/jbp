@@ -44,12 +44,12 @@ public class JbpAdminApplication {
 //        ConditionChain capaXsInvitationLine2Handler = run.getBean(ConditionChain.class);
 //
 //        CapaXsService capaXsService = run.getBean(CapaXsService.class);
-//        CapaXs capaXs =capaXsService.getById(3);
+//        CapaXs capaXs =capaXsService.getById(6);
 //        // 升级条件
 //        List<RiseCondition> conditionList = capaXs.getConditionList();
 //        for(RiseCondition riseCondition :conditionList){
 //
-//              capaXsInvitationLine2Handler.isOk(1006458,riseCondition);
+//              capaXsInvitationLine2Handler.isOk(1002644,riseCondition);
 //
 //
 //        }

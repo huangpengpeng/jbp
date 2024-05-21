@@ -45,7 +45,7 @@ public class UserCapaXsTask {
         }
         redisTemplate.expire("UserCapaXsTask.refreshUserCapaXs", 500, TimeUnit.MINUTES);
         try {
-            List<User> list = userService.list(new QueryWrapper<User>().lambda().gt(User::getId,1000000));
+            List<User> list = userService.list();
             for (User user : list) {
                 userCapaXsService.riseCapaXs(user.getId());
             }
