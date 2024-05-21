@@ -2,6 +2,9 @@ package com.jbp.front.controller;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.dto.EncryptionDTO;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
@@ -10,12 +13,16 @@ import com.jbp.common.response.FrontIndividualCenterConfigResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.SignType;
+import com.jbp.common.utils.SignatureUtil;
 import com.jbp.front.service.LoginService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jodd.http.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户登陆 前端控制器
@@ -153,6 +161,39 @@ public class LoginController {
         loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha(),request.getPhone());
         return CommonResult.success();
     }
+
+
+    @ApiOperation(value = "跨境授权")
+    @RequestMapping(value = "/cbec_user_account", method = RequestMethod.GET)
+    public CommonResult<EncryptionDTO> cbec() {
+        User user = userService.getInfo();
+        EncryptionDTO dto = EncryptionDTO.builder().bizId(user.getAccount()).channelName("SYCP").mobile(user.getPhone())
+                .noceStr(SignatureUtil.generateNonceStr()).timestamp(System.currentTimeMillis()).build();
+        Map<String, String> stringStringMap = SignatureUtil.convertObjectToMap(dto);
+        try {
+            stringStringMap.put(SignatureUtil.FIELD_SIGN,
+                    SignatureUtil.generateSignature(stringStringMap, "LpfVpVnnyZS1XBEhshztDwt3gG9tOr8t", SignType.MD5));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String body = JSON.toJSONString(stringStringMap);
+        HttpRequest request = HttpRequest.post("https://buyer.api.xiangyuanb2b.com/buyer/passport/member/mobileEncryption" );
+        request.contentType("application/json");
+        request.charset("utf-8");
+        String response = request.body(body).send().bodyText();
+        if (StringUtils.isBlank(response)) {
+            throw new RuntimeException("请求接口https://buyer.api.xiangyuanb2b.com/buyer/passport/member/mobileEncryption返回信息未空");
+        }
+        JSONObject jsonObject = JSON.parseObject(response);
+        if (!jsonObject.containsKey("success") || BooleanUtils.isNotTrue(jsonObject.getBoolean("success"))) {
+            throw new RuntimeException("请求接口https://buyer.api.xiangyuanb2b.com/buyer/passport/member/mobileEncryption返回失败");
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
+        dto.setAccessToken(result.getString("accessToken"));
+        dto.setRefreshToken(result.getString("refreshToken"));
+        return CommonResult.success(dto);
+    }
+
 }
 
 
