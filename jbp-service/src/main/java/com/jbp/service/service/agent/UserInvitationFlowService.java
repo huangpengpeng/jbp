@@ -13,6 +13,8 @@ public interface UserInvitationFlowService extends IService<UserInvitationFlow> 
 
     List<UserInvitationFlow> getXsUnderList(Integer pId, Long minXsCapaId);
 
+    List<UserInvitationFlow> getUnderList(Integer pId);
+
     /**
      * 用户关系如果变更需要将更当前用户有关的的记录全部删除重新生成
      */

@@ -12,4 +12,5 @@ public interface UserInvitationFlowDao extends RootMapper<UserInvitationFlow> {
     List<UserInvitationFlow> getUnderCapaList(@Param("pId") Integer pId, @Param("minCapaId") Long minCapaId);
 
     List<UserInvitationFlow> getUnderXsCapaList(@Param("pId") Integer pId, @Param("minXsCapaId") Long minXsCapaId);
+
 }

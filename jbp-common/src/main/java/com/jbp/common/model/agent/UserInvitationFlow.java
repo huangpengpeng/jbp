@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -61,9 +62,17 @@ public class UserInvitationFlow extends BaseModel {
     @TableField(exist = false)
     private String pNickName;
 
+    @ApiModelProperty("星级ID")
+    @TableField(exist = false)
+    private Long capaId;
+
     @ApiModelProperty("等级ID")
     @TableField(exist = false)
     private String uCapaName;
+
+    @ApiModelProperty("星级ID")
+    @TableField(exist = false)
+    private Long capaXsId;
 
     @ApiModelProperty("星级ID")
     @TableField(exist = false)
@@ -76,4 +85,8 @@ public class UserInvitationFlow extends BaseModel {
     @ApiModelProperty("上级星级")
     @TableField(exist = false)
     private String pCapaXsName;
+
+    @ApiModelProperty("团队业绩")
+    @TableField(exist = false)
+    private BigDecimal teamAmt;
 }

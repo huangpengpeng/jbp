@@ -7,7 +7,7 @@
         <result column="pId" property="pId"/>
         <result column="level" property="level"/>
         <result column="capaId" property="capaId"/>
-        <result column="xs_capa_id" property="xsCapaId"/>
+        <result column="xs_capa_id" property="capaXsId"/>
         <result column="gmt_created" property="gmtCreated"/>
         <result column="gmt_modify" property="gmtModify"/>
     </resultMap>

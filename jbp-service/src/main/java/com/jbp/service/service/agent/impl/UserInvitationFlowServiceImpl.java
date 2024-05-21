@@ -66,6 +66,13 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         return dao.getUnderXsCapaList(pId, minXsCapaId);
     }
 
+    @Override
+    public List<UserInvitationFlow> getUnderList(Integer pId) {
+        LambdaQueryWrapper<UserInvitationFlow> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(UserInvitationFlow::getPId, pId);
+        return list(lqw);
+    }
+
     /**
      * 用户关系如果变更需要将更当前用户有关的的记录全部删除重新生成
      */

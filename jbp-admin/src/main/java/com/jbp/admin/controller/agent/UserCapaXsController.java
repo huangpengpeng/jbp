@@ -5,7 +5,10 @@ import com.beust.jcommander.internal.Lists;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -15,13 +18,13 @@ import com.jbp.common.request.agent.UserCapaXsAddRequest;
 import com.jbp.common.response.UserUpgradeListResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.UserCapaXsService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.ModelMap;
@@ -31,10 +34,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/admin/agent/user/capa/xs")
@@ -42,11 +43,17 @@ import java.util.Map;
 public class UserCapaXsController {
     @Resource
     private UserCapaXsService userCapaXsService;
-
     @Resource
     private UserService userService;
     @Resource
     private UserInvitationService invitationService;
+    @Resource
+    private UserInvitationFlowService invitationFlowService;
+    @Resource
+    private CapaXsService capaXsService;
+    @Resource
+    private SelfScoreService selfScoreService;
+
 
     @PreAuthorize("hasAuthority('agent:user:capa:xs:page')")
     @GetMapping("/page")
@@ -87,76 +94,53 @@ public class UserCapaXsController {
     @ApiOperation(value = "升星查看")
     @ResponseBody
     @GetMapping(value = "/user/upgradeList")
-    public Object upgradeList(Integer uid) {
+    public CommonResult<List<UserInvitationFlow>> upgradeList(Integer uid) {
         // 返回对象
-        List<UserUpgradeListResponse> result = Lists.newArrayList();
-        if(uid == null){
+        if (uid == null) {
             uid = -1;
         }
+        List<UserInvitationFlow> result = Lists.newArrayList();
+        List<CapaXs> capaXsList = capaXsService.list();
+        capaXsList = capaXsList.stream().sorted(Comparator.comparing(CapaXs::getId).reversed()).collect(Collectors.toList());
+        List<UserInvitation> nextList = invitationService.getNextList2(uid);
         // 查询直属下级最高等级用户【星级最高，业绩最好】
-        for (User user : usersSub) {
-            List<XsUserCapaResp> selfUserXsCapa = unifiedJDBCMng.query(new String[]{"userId"}, new String[]{user.getId().toString()}, "查询用户星级信息", XsUserCapaResp.class);
-            // 查询出一阶下面所有下级
-            List<XsUserCapaResp> allUserXsCapa = unifiedJDBCMng.query(new String[]{"userId"}, new String[]{user.getId().toString()}, "查询下级所有星级用户", XsUserCapaResp.class);
-            allUserXsCapa.addAll(selfUserXsCapa);
-            if(CollectionUtils.isEmpty(allUserXsCapa)){
+        for (UserInvitation invitation : nextList) {
+            UserCapaXs userCapaXs = userCapaXsService.getByUser(invitation.getUId());
+            // 下级星级最高的用户列表
+            List<UserInvitationFlow> xsUnderList = Lists.newArrayList();
+            for (CapaXs capaXs : capaXsList) {
+                xsUnderList = invitationFlowService.getXsUnderList(invitation.getUId(), capaXs.getId());
+                if (userCapaXs != null && NumberUtils.compare(userCapaXs.getCapaId(), capaXs.getId()) >= 0) {
+                    UserInvitationFlow flow = new UserInvitationFlow();
+                    flow.setUId(invitation.getUId());
+                    flow.setCapaXsId(userCapaXs.getCapaId());
+                    flow.setUCapaXsName(userCapaXs.getCapaName());
+                    xsUnderList.add(flow);
+                }
+                if (CollectionUtils.isNotEmpty(xsUnderList)) {
+                    break;
+                }
+            }
+            if (CollectionUtils.isEmpty(xsUnderList)) {
                 continue;
             }
-            Map<Long, XsUserCapaResp> userCapaRespMap = FunctionUtil.keyValueMap(allUserXsCapa, XsUserCapaResp::getId);
-
-            Map<Integer, List<XsUserCapaResp>> queryXsUserCapaRespMap = FunctionUtil.valueMap(allUserXsCapa, XsUserCapaResp::getRankNum);
-            //根据key进行升序排序
-            Map<Integer, List<XsUserCapaResp>> xsUserCapaRespMap = new LinkedHashMap<>();
-            queryXsUserCapaRespMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEachOrdered(x -> xsUserCapaRespMap.put(x.getKey(), x.getValue()));
-            // 获取最大key
-            List<Integer> mapkey = new ArrayList<>(xsUserCapaRespMap.keySet());
-            Integer maxKey = mapkey.get(mapkey.size() - 1);
-            // 独立先最高级别用户
-            List<XsUserCapaResp> topRankNumUsers = xsUserCapaRespMap.get(maxKey);
-
-            // 筛选最高星级并且团队业绩最大的用户
-            Long topUserId = null;
-            BigDecimal topTeamAmt = BigDecimal.ZERO;
-            BigDecimal selfAmt = BigDecimal.ZERO;
-
-            for (XsUserCapaResp xsUserCapaResp : topRankNumUsers) {
-                // 线上业绩
-                Number teamNum = unifiedJDBCMng.getNum(new String[]{"userId"}, new Object[]{xsUserCapaResp.getId()}, "用户团队业绩");
-                // 历史业绩
-                Number teamNum2 = 0d;
-                if (com.common.util.StringUtils.isBlank((String) (params.get("startTime")))) {
-                    teamNum2 = unifiedJDBCMng.getNum(new String[]{"userId"}, new Object[]{xsUserCapaResp.getId()}, "用户团队业绩2");
-                }
-                BigDecimal totalTeamNum = BigDecimal.valueOf(teamNum.doubleValue()).add(BigDecimal.valueOf(teamNum2.intValue()));
-                if (ArithmeticUtils.gte(totalTeamNum, topTeamAmt)) {
-                    topTeamAmt = totalTeamNum;
-                    topUserId = xsUserCapaResp.getId();
-                }
+            // 最大业绩的人找出来
+            for (UserInvitationFlow flow : xsUnderList) {
+                BigDecimal teamAmt = selfScoreService.getUserNext(flow.getUId(), true);
+                flow.setTeamAmt(teamAmt);
             }
-
-            BigDecimal differenceAmt = BigDecimal.ZERO;
-            if (topUserId != null) {
-                XsUserCapaResp xsUserCapaResp = userCapaRespMap.get(topUserId);
-                BigDecimal teamAmt = xsUserCapaResp.getTeamAmt();
-                if(teamAmt == null){
-                    log.info("########### id:{}", topUserId);
-                }
-                // 用户没有被转挂，并且转挂后任然属于自己的下级
-                if(xsUserCapaResp.getMountUserId() == null || userCapaRespMap.get(xsUserCapaResp.getId()) != null || NumberUtils.compare(userId, xsUserCapaResp.getId()) == 0){
-                    differenceAmt = teamAmt.subtract(topTeamAmt);
-                    differenceAmt = ArithmeticUtils.less(differenceAmt, BigDecimal.ZERO) ? BigDecimal.ZERO : differenceAmt;
-
-                    Number selfNum = unifiedJDBCMng.getNum(new String[]{"userId"}, new Object[]{topUserId}, "个人业绩");
-                    selfAmt = BigDecimal.valueOf(selfNum.doubleValue());
-                    UserUpgradeListRep rep = new UserUpgradeListRep(topUserId, xsUserCapaResp.getUsername(), xsUserCapaResp.getNumberCode(), xsUserCapaResp.getRankName(), topTeamAmt, differenceAmt, selfAmt);
-                    result.add(rep);
-                }
-            }
+            UserInvitationFlow flow = xsUnderList.stream().sorted(Comparator.comparing(UserInvitationFlow::getTeamAmt).reversed()).findFirst().get();
+            result.add(flow);
         }
-        List<UserUpgradeListRep> newResult = Lists.newArrayList();
-        result.stream().filter(FunctionUtil.distinctByKey(p -> p.getId()))  //filter保留true的值
-                .forEach(newResult::add);
-        return new ResponseUtil<>(ResponseUtil.SUCCESS, ResponseUtil.MESSAGE, newResult.size(), newResult);
+        for (UserInvitationFlow flow : result) {
+            User user = userService.getById(flow.getUId());
+            String nickname = user.getNickname();
+            String account = user.getAccount();
+            flow.setUNickName(nickname);
+            flow.setUAccount(account);
+        }
+        return CommonResult.success(result);
     }
+
 
 }
