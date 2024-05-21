@@ -1,6 +1,7 @@
 package com.jbp.admin.task.user;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.user.User;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -44,7 +45,7 @@ public class UserCapaXsTask {
         }
         redisTemplate.expire("UserCapaXsTask.refreshUserCapaXs", 500, TimeUnit.MINUTES);
         try {
-            List<User> list = userService.list();
+            List<User> list = userService.list(new QueryWrapper<User>().lambda().gt(User::getId,1000000));
             for (User user : list) {
                 userCapaXsService.riseCapaXs(user.getId());
             }
