@@ -94,7 +94,7 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         ProductCommConfig config = productCommConfigService.getByType(ProductCommEnum.培育佣金.getType());
         UserMonthActiveResponse response = new UserMonthActiveResponse();
         if (config == null || !config.getIfOpen() || StringUtils.isEmpty(config.getRatioJson())) {
-            return response.setMsg("未开启活跃设置").setIsActive(false).setSubPrice(new BigDecimal("100.00"));
+            return response.setMsg("未开启活跃设置");
         }
         //获取当前月份的第一天和最后一天
         Date now = DateTimeUtils.getNow();
@@ -136,7 +136,7 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         BigDecimal subPrice = hundred.subtract(fee);
 
         if (userCapa == null || NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) < 0) {
-            return response.setIsActive(false).setSubPrice(new BigDecimal("100.00")).setPayPrice(fee).setMsg("等级未达到要求");
+            return response.setPayPrice(fee).setMsg("等级未达到要求");
         }
         if (level == 0L) {
             return response.setMsg("" + subPrice).setIsActive(false).setSubPrice(subPrice).setPayPrice(fee);
