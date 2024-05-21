@@ -92,7 +92,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
         // 2.一阶人数
         List<CapaXsInfo> capaXsList = rule.getCapaXsList();
         int indeCount = capaXsList.size();
-        List<UserInvitation> nextList = userInvitationService.getNextOrMidList(uid);
+        List<UserInvitation> nextList = userInvitationService.getNextList2(uid);
         if (CollectionUtils.isEmpty(nextList) || nextList.size() < indeCount) {
             return false;
         }

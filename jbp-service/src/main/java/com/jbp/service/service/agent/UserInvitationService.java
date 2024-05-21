@@ -18,6 +18,14 @@ public interface UserInvitationService extends IService<UserInvitation> {
 
     List<UserInvitation> getNextList(Integer uid);
 
+    /**
+     * 挂载出去的用户不算独立线
+     * @param uid
+     * @return
+     */
+    List<UserInvitation> getNextList2(Integer uid);
+
+
     List<UserInvitation> getNextOrMidList(Integer uid);
 
 

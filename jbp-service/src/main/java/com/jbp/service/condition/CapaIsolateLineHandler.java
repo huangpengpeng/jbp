@@ -54,7 +54,7 @@ public class CapaIsolateLineHandler implements ConditionHandler {
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
         Rule rule = getRule(riseCondition);
-        List<UserInvitation> nextList = userInvitationService.getNextList(uid);
+        List<UserInvitation> nextList = userInvitationService.getNextList2(uid);
         if (CollectionUtils.isEmpty(nextList) || nextList.size() < rule.getIndeCount().intValue()) {
             return false;
         }

@@ -79,6 +79,21 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     }
 
     @Override
+    public List<UserInvitation> getNextList2(Integer uid) {
+
+        LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
+        wrapper.eq(UserInvitation::getPId, uid);
+        wrapper.eq(UserInvitation::getMId, null);
+        List<UserInvitation> list = list(wrapper);
+        LambdaQueryWrapper<UserInvitation> wrapper2 = new LambdaQueryWrapper();
+        wrapper2.eq(UserInvitation::getMId, uid);
+        List<UserInvitation> list2 = list(wrapper2);
+        list.addAll(list2);
+        return  list;
+    }
+
+
+    @Override
     public List<UserInvitation> getNextOrMidList(Integer uid) {
         LambdaQueryWrapper<UserInvitation> wrapper = new LambdaQueryWrapper();
         wrapper.last( "  where (pid = "+uid+" or mid ="+uid+" )");
