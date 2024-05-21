@@ -8,6 +8,7 @@ import com.jbp.common.model.agent.ClearingVipUser;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ClearingBonusListResponse;
+import com.jbp.common.response.UserMonthActiveResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
@@ -154,7 +155,7 @@ public class ClearingVipUserController {
 
     @ApiOperation(value = "月度活跃展示")
     @RequestMapping(value = "/active", method = RequestMethod.GET)
-    public CommonResult<String> active() {
+    public CommonResult<UserMonthActiveResponse> active() {
         return CommonResult.success(clearingVipUserService.getActive(userService.getUserId()));
     }
 

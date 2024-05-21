@@ -15,6 +15,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.response.UserMonthActiveResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
@@ -89,17 +90,12 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
     }
 
     @Override
-    public String getActive(Integer uid) {
+    public UserMonthActiveResponse getActive(Integer uid) {
         ProductCommConfig config = productCommConfigService.getByType(ProductCommEnum.培育佣金.getType());
-        if(config == null || !config.getIfOpen() || StringUtils.isEmpty(config.getRatioJson())){
-            // false  0  0  msg = 未开启活跃设置
-
-            return "";
+        UserMonthActiveResponse response = new UserMonthActiveResponse();
+        if (config == null || !config.getIfOpen() || StringUtils.isEmpty(config.getRatioJson())) {
+            return response.setMsg("未开启活跃设置").setIsActive(false);
         }
-
-
-
-
         //获取当前月份的第一天和最后一天
         Date now = DateTimeUtils.getNow();
         Date startTime = DateTimeUtils.getMonthStart(now);
@@ -135,38 +131,21 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
                 }
             }
         }
-
         MonthPyCommHandler.Rule rule = ruleList.get(0);
         BigDecimal hundred = rule.getPayPrice();
-        // 是否活跃 false  true
-        // subPrice   相差金额
-        // payPrice  复购金额
-        // msg
-        BigDecimal balance = hundred.subtract(fee);
+        BigDecimal subPrice = hundred.subtract(fee);
+
+        if (userCapa == null || NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) < 0) {
+            return response.setIsActive(false).setSubPrice(subPrice).setPayPrice(fee).setMsg("等级未达到要求");
+        }
         if (level == 0L) {
-
-
-            if(userCapa == null || NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) < 0){
-                // false subPrice  payPrice  msg = 等级未达到要求
-            }
-            return "本月不活跃：复购金额差" + balance + "元可活跃";
+            return response.setMsg("复购金额差" + subPrice + "元可活跃").setIsActive(false).setSubPrice(subPrice).setPayPrice(fee);
         } else if (level == 1L || level == 2L) {
             // msg = "本月活跃：已复购满100元";
-
-            return "本月活跃：已复购满100元";
+            return response.setMsg("已复购满100元").setPayPrice(fee).setSubPrice(subPrice).setIsActive(true);
         } else {
             // msg = "本月活跃：已复购满300元";
-            return "本月活跃：已复购满300元";
+            return response.setMsg("已复购满300元").setPayPrice(fee).setSubPrice(subPrice).setIsActive(true);
         }
-
     }
-
-
-
-
-
-
-
-
-
 }
