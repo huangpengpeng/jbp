@@ -139,7 +139,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
             }
             // 计算订单金额
             BigDecimal amt = BigDecimal.ZERO;
-            if(StringUtils.isNotEmpty(rule.getType()) && StringUtils.equals(rule.getType(), "金额")){
+            if(rule != null && StringUtils.isNotEmpty(rule.getType()) && StringUtils.equals(rule.getType(), "金额")){
                 amt = rule.getRatio().multiply(BigDecimal.valueOf(orderDetail.getPayNum())).setScale(2, BigDecimal.ROUND_DOWN);
             }else{
                 amt = ratio.multiply(totalPv);
@@ -171,7 +171,7 @@ public class DirectInvitationHandler extends AbstractProductCommHandler {
          */
         private Long capaId;
 
-        /**
+        /**ou
          * 比例
          */
         private BigDecimal ratio;
