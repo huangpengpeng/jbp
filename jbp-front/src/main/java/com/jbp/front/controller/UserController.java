@@ -512,6 +512,11 @@ public class UserController {
             return  CommonResult.success();
         }
         CapaXs pCapa = capaXsService.getNext(userCapa.getCapaId());
+
+        if(pCapa == null){
+            pCapa = capaXsService.getById(userCapa.getCapaId());
+        }
+
         userRiseIndexResponse.setCapaName(pCapa.getName());
         userRiseIndexResponse.setActualPerformance(selfScoreService.getUserNext(uid, true));
 
