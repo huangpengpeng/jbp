@@ -11,6 +11,6 @@ import java.util.List;
 public interface ChannelCardDao extends BaseMapper<ChannelCard> {
 
 
-    List<ChannelCardExtResponse> getList(@Param("uId")Integer uId, @Param("bankCardNo")String bankCardNo, @Param("type")String type, @Param("phone")String phone, @Param("teamId")String teamId);
+    List<ChannelCardExtResponse> getList(@Param("uId")Integer uId, @Param("bankCardNo")String bankCardNo, @Param("type")String type, @Param("phone")String phone, @Param("teamId")String teamId, @Param("nickname")String nickname);
 
 }

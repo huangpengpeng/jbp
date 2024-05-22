@@ -181,10 +181,10 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
 
     @Override
-    public PageInfo<WalletExtResponse> pageList(Integer uid, Integer type, String teamId, PageParamRequest pageParamRequest) {
+    public PageInfo<WalletExtResponse> pageList(Integer uid, Integer type, String teamId, String nickname, PageParamRequest pageParamRequest) {
 
         Page<Wallet> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletExtResponse> list =   walletDao.getList(uid,type,teamId);
+        List<WalletExtResponse> list =   walletDao.getList(uid,type,teamId,nickname);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
@@ -195,6 +195,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
             e.setTypeName(walletConfig != null ? walletConfig.getName() : "");
             User user = uidMapList.get(e.getUId());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

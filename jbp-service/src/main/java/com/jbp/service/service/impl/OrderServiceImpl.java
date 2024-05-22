@@ -594,6 +594,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
         }
+        if (StrUtil.isNotBlank(request.getNickname())){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + request.getNickname() + "%')");
+        }
         if (StrUtil.isNotBlank(request.getPayTime())) {
             getPayTimeWhere(lqw,request.getPayTime());
         }

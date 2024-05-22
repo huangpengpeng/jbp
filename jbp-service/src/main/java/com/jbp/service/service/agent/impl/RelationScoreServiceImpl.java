@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -66,9 +67,12 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
     }
 
     @Override
-    public PageInfo<RelationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScore> pageList(Integer uid, String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScore> lqw = new LambdaQueryWrapper<RelationScore>()
                 .eq(!ObjectUtil.isNull(uid), RelationScore::getUid, uid);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         lqw.last("order by uid, id desc ");
         Page<RelationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScore> list = list(lqw);
@@ -80,6 +84,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

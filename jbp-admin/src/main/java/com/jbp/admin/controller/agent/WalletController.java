@@ -45,7 +45,7 @@ public class WalletController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletService.pageList(uid, request.getType(),request.getTeamId(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletService.pageList(uid, request.getType(),request.getTeamId(), request.getNickname(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:increase')")

@@ -9,6 +9,6 @@ import com.jbp.common.request.PageParamRequest;
 import java.util.List;
 
 public interface SelfScoreGroupService extends IService<SelfScoreGroup> {
-    PageInfo<SelfScoreGroup> pageList(Integer uid,String groupName, String action, PageParamRequest pageParamRequest);
+    PageInfo<SelfScoreGroup> pageList(Integer uid,String groupName, String action, String nickname,PageParamRequest pageParamRequest);
 
 }

@@ -76,12 +76,10 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public PageInfo<WalletFlowExtResponse> pageList(Integer uid, Integer type, String dateLimit, String externalNo, String action, String teamId, PageParamRequest pageParamRequest) {
-
-
+    public PageInfo<WalletFlowExtResponse> pageList(Integer uid, Integer type, String dateLimit, String externalNo, String action, String teamId, String nickname,PageParamRequest pageParamRequest) {
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletFlowExtResponse> list = dao.getList(uid,type,dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(),externalNo,action,teamId);
+        List<WalletFlowExtResponse> list = dao.getList(uid,type,dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(),externalNo,action,teamId,nickname);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
@@ -92,6 +90,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             e.setTypeName(walletConfig != null ? walletConfig.getName() : "");
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

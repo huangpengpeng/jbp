@@ -109,4 +109,8 @@ public class RelationScoreFlow extends BaseModel {
     @ApiModelProperty("下单用户账户")
     @TableField(exist = false)
     private String orderAccount;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
 }

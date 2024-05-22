@@ -12,7 +12,8 @@
 </resultMap>
 <!-- List<TeamUser> pageList(@Param("tid") Integer tid,@Param("account") String account,@Param("teamLeader") Integer teamLeader);-->
 <select id="pageList" resultMap="TeamUserType">
-    SELECT a.id,a.uid,a.tid,a.gmt_modify,a.gmt_created,eb_user.account,eb_team.leader_id,eb_team.`name`,eb_user.account FROM  eb_team_user as a
+    SELECT a.id,a.uid,a.tid,a.gmt_modify,a.gmt_created,eb_user.account,eb_team.leader_id,eb_team.`name`,eb_user.account,eb_user.nickname
+    FROM  eb_team_user as a
         LEFT  JOIN eb_user on a.uid = eb_user.id
         LEFT  JOIN eb_team on a.tid=eb_team.id
     <where>
@@ -30,7 +31,11 @@
              and uid=leader_id
          </if>
      </if>
+        <if test="nickname !='' and nickname!= null ">
+            and   eb_user.nickname =#{nickname}
+        </if>
     </where>
+    order by a.id desc
 
 </select>
 </mapper>

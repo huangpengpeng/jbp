@@ -59,9 +59,9 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
     }
 
     @Override
-    public PageInfo<TeamUser> pageList(Integer tid, String account, Integer teamLeader, PageParamRequest pageParamRequest) {
+    public PageInfo<TeamUser> pageList(Integer tid, String account, Integer teamLeader, String nickname,PageParamRequest pageParamRequest) {
         Page<TeamUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<TeamUser> teamUserList = teamUserDao.pageList(tid, account, teamLeader);
+        List<TeamUser> teamUserList = teamUserDao.pageList(tid, account, teamLeader, nickname);
         return CommonPage.copyPageInfo(page, teamUserList);
     }
 

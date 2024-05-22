@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface TeamUserDao extends BaseMapper<TeamUser> {
- List<TeamUser> pageList(@Param("tid") Integer tid,@Param("account") String account,@Param("teamLeader") Integer teamLeader);
+ List<TeamUser> pageList(@Param("tid") Integer tid, @Param("account") String account, @Param("teamLeader") Integer teamLeader, @Param("nickname") String nickname);
 
 }

@@ -35,4 +35,8 @@ public class SelfScore extends BaseModel {
     @ApiModelProperty("账户")
     @TableField(exist = false)
     private String account;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
 }

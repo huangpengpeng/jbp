@@ -24,10 +24,12 @@ public class InvitationScoreFlowRequest implements Serializable {
     @ApiModelProperty("方向")
     private String action;
 
-
     @ApiModelProperty("单号")
     private String ordersSn;
 
     @ApiModelProperty(value = "付款时间区间")
     private String dateLimit;
+
+    @ApiModelProperty("用户昵称")
+    private String nickname;
 }

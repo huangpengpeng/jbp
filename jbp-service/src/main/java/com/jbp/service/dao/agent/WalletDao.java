@@ -10,5 +10,5 @@ import java.util.List;
 public interface WalletDao extends BaseMapper<Wallet> {
 
 
-    List<WalletExtResponse> getList(@Param("uId") Integer uid, @Param("type") Integer type, @Param("teamId")String teamId);
+    List<WalletExtResponse> getList(@Param("uId") Integer uid, @Param("type") Integer type, @Param("teamId")String teamId, @Param("nickname")String nickname);
 }

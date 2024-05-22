@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -31,11 +32,14 @@ public class RelationScoreGroupServiceImpl extends ServiceImpl<RelationScoreGrou
     private UserService userService;
 
     @Override
-    public PageInfo<RelationScoreGroup> pageList(Integer uid, String groupName, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreGroup> pageList(Integer uid, String groupName, String nickname, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreGroup> lqw = new LambdaQueryWrapper<RelationScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreGroup::getUid, uid)
                 .like(!ObjectUtil.isNull(groupName) && !groupName.equals(""), RelationScoreGroup::getGroupName, groupName)
                 .orderByDesc(RelationScoreGroup::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<RelationScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -46,6 +50,7 @@ public class RelationScoreGroupServiceImpl extends ServiceImpl<RelationScoreGrou
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

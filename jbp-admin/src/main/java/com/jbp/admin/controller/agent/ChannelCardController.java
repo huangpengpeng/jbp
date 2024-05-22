@@ -44,7 +44,7 @@ public class ChannelCardController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(channelCardService.pageList(uid,request.getBankCardNo(),request.getType(),request.getPhone(),request.getTeamId(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(channelCardService.pageList(uid,request.getBankCardNo(),request.getType(),request.getPhone(),request.getTeamId(),request.getNickname(),pageParamRequest)));
     }
     @PreAuthorize("hasAuthority('agent:channel:card:update')")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "修改渠道银行卡")

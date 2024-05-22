@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -39,7 +40,7 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
     private UserService userService;
 
     @Override
-    public PageInfo<InvitationScoreFlow> pageList(Integer uid, Integer orderuid, String action, String ordersSn, String dateLimit, PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScoreFlow> pageList(Integer uid, Integer orderuid, String action, String ordersSn, String dateLimit, String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScoreFlow> lqw = new LambdaQueryWrapper<InvitationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderuid), InvitationScoreFlow::getOrderUid, orderuid)
@@ -47,6 +48,9 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
                 .eq(StringUtils.isNotEmpty(ordersSn), InvitationScoreFlow::getOrdersSn, ordersSn);
         getRequestTimeWhere(lqw, dateLimit);
         lqw.orderByDesc(InvitationScoreFlow::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<InvitationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -61,6 +65,7 @@ public class InvitationScoreFlowServiceImpl extends ServiceImpl<InvitationScoreF
             User user2 = uidMapList.get(e.getOrderUid());
             e.setAccount(user != null ? user.getAccount() : "");
             e.setOrderAccount(user2 != null ? user2.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -8,6 +8,7 @@
          select f.*,t.name from eb_wallet_flow f
         left join eb_team_user  u on u.uid = f.uid
         left join eb_team t on t.id = u.tid
+        left join eb_user us on us.id = f.uid
         where  1=1
         <if test="teamId!='' and teamId!= null ">
             and   t.leader_id =#{teamId}
@@ -25,6 +26,10 @@
 
         <if test="action !='' and action!= null ">
             and   f.action =#{action}
+        </if>
+
+        <if test="nickname !='' and nickname!= null ">
+            and   us.nickname =#{nickname}
         </if>
 
 

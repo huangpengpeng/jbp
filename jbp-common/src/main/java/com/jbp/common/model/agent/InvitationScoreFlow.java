@@ -79,4 +79,8 @@ public class InvitationScoreFlow extends BaseModel {
     @ApiModelProperty("下单用户账户")
     @TableField(exist = false)
     private String orderAccount;
+
+    @ApiModelProperty("下单用户昵称")
+    @TableField(exist = false)
+    private String nickname;
 }

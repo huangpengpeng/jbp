@@ -40,6 +40,6 @@ public class SelfScoreGroupController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreGroupService.pageList(uid, request.getGroupName(), request.getAction(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreGroupService.pageList(uid, request.getGroupName(), request.getAction(), request.getNickname(),pageParamRequest)));
     }
 }
