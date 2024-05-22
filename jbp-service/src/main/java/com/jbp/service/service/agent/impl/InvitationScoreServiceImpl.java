@@ -110,9 +110,13 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         }
         List<Integer> uIdList = list.stream().map(InvitationScore::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        List<SelfScore> selfScoreList = selfScoreService.list(new QueryWrapper<SelfScore>().lambda().in(SelfScore::getUid, uIdList));
+        Map<Integer, SelfScore> selfScoreMap = FunctionUtil.keyValueMap(selfScoreList, SelfScore::getUid);
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            SelfScore selfScore = selfScoreMap.get(e.getUid());
+            e.setSelfScore(selfScore != null ? selfScore.getScore() : BigDecimal.ZERO);
         });
         return CommonPage.copyPageInfo(page, list);
     }

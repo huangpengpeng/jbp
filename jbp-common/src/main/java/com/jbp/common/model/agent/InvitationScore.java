@@ -38,4 +38,8 @@ public class InvitationScore extends BaseModel {
     @ApiModelProperty("账户")
     @TableField(exist = false)
     private String account;
+
+    @ApiModelProperty("个人积分")
+    @TableField(exist = false)
+    private BigDecimal selfScore;
 }

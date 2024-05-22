@@ -2,37 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.agent.WalletFlowDao">
 
-
     <select id="getList" resultType="com.jbp.common.response.WalletFlowExtResponse">
-
-         select f.*,t.name from eb_wallet_flow f
-        left join eb_team_user  u on u.uid = f.uid
+        select f.*,t.name from eb_wallet_flow f
+        left join eb_team_user u on u.uid = f.uid
         left join eb_team t on t.id = u.tid
-        where  1=1
+        where 1=1
         <if test="teamId!='' and teamId!= null ">
-            and   t.leader_id =#{teamId}
+            and t.leader_id =#{teamId}
         </if>
         <if test="uId !='' and uId!= null ">
-        and   f.uId =#{uId}
-    </if>
+            and f.uId =#{uId}
+        </if>
         <if test="type !='' and type!= null ">
-            and   f.type =#{type}
+            and f.wallet_type =#{type}
         </if>
-
         <if test="externalNo !='' and externalNo!= null ">
-            and   f.external_No =#{externalNo}
+            and f.external_No =#{externalNo}
         </if>
-
         <if test="action !='' and action!= null ">
-            and   f.action =#{action}
+            and f.action =#{action}
         </if>
-
-
         <if test="startTime !='' and startTime!= null and endTime !='' and endTime!= null ">
             and f.gmt_Created between #{startTime} and #{endTime}
         </if>
-
         order by f.id desc
-
     </select>
 </mapper>
