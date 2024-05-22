@@ -4,8 +4,10 @@ package com.jbp.front.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.dto.EncryptionDTO;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.user.CbecUser;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
 import com.jbp.common.response.AccountCapaResponse;
@@ -16,6 +18,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SignType;
 import com.jbp.common.utils.SignatureUtil;
 import com.jbp.front.service.LoginService;
+import com.jbp.service.service.CbecUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
@@ -54,6 +57,8 @@ public class LoginController {
     private LoginService loginService;
     @Resource
     private UserService userService;
+    @Resource
+    private CbecUserService cbecUserService;
 
     @ApiOperation(value = "获取登录配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)
@@ -66,6 +71,7 @@ public class LoginController {
     public CommonResult<FrontIndividualCenterConfigResponse> getIndividualCenterConfig() {
         return CommonResult.success(loginService.getIndividualCenterConfig());
     }
+
     @ApiOperation(value = "手机号获取账号")
     @RequestMapping(value = "/account/List", method = RequestMethod.POST)
     public CommonResult<List<AccountCapaResponse>> accountList(@RequestBody @Validated LoginMobileRequest loginRequest) {
@@ -74,7 +80,7 @@ public class LoginController {
     }
 
     @ApiOperation(value = "校验账号")
-    @GetMapping( "/check/account")
+    @GetMapping("/check/account")
     public CommonResult<String> checkAccount(String account) {
         User user = userService.getByAccount(account);
         if (ObjectUtil.isEmpty(user)) {
@@ -85,6 +91,7 @@ public class LoginController {
         }
         return CommonResult.success();
     }
+
     @ApiOperation(value = "手机号验证码登录")
     @RequestMapping(value = "/mobile/captcha", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest) {
@@ -158,7 +165,7 @@ public class LoginController {
     @ApiOperation(value = "忘记密码")
     @PostMapping(value = "/forgot/password")
     public CommonResult forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
-        loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha(),request.getPhone());
+        loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha(), request.getPhone());
         return CommonResult.success();
     }
 
@@ -167,7 +174,14 @@ public class LoginController {
     @RequestMapping(value = "/cbec_user_account", method = RequestMethod.GET)
     public CommonResult<EncryptionDTO> cbec() {
         User user = userService.getInfo();
-        EncryptionDTO dto = EncryptionDTO.builder().bizId(user.getAccount()).channelName("SYCP").mobile(user.getPhone())
+
+        String account = user.getAccount();
+        CbecUser cbecUser = cbecUserService.getOne(new QueryWrapper<CbecUser>().lambda().eq(CbecUser::getUid, user.getId()));
+        if (cbecUser != null) {
+            account = cbecUser.getAccountNo();
+        }
+
+        EncryptionDTO dto = EncryptionDTO.builder().bizId(account).channelName("SYCP").mobile(user.getPhone())
                 .noceStr(SignatureUtil.generateNonceStr()).timestamp(System.currentTimeMillis()).build();
         Map<String, String> stringStringMap = SignatureUtil.convertObjectToMap(dto);
         try {
@@ -177,7 +191,7 @@ public class LoginController {
             e.printStackTrace();
         }
         String body = JSON.toJSONString(stringStringMap);
-        HttpRequest request = HttpRequest.post("https://buyer.api.xiangyuanb2b.com/buyer/passport/member/mobileEncryption" );
+        HttpRequest request = HttpRequest.post("https://buyer.api.xiangyuanb2b.com/buyer/passport/member/mobileEncryption");
         request.contentType("application/json");
         request.charset("utf-8");
         String response = request.body(body).send().bodyText();
