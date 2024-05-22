@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -99,10 +100,13 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
 
     @Override
-    public PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScore> pageList(Integer uid, String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScore> lqw = new LambdaQueryWrapper<InvitationScore>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScore::getUid, uid)
                 .orderByDesc(InvitationScore::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<InvitationScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScore> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -115,6 +119,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
             SelfScore selfScore = selfScoreMap.get(e.getUid());
             e.setSelfScore(selfScore != null ? selfScore.getScore() : BigDecimal.ZERO);
         });

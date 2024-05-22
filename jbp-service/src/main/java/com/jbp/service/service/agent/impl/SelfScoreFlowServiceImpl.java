@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -39,13 +40,16 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
     private UserService userService;
 
     @Override
-    public PageInfo<SelfScoreFlow> pageList(Integer uid, String action, String ordersSn, String dateLimit, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScoreFlow> pageList(Integer uid, String action, String ordersSn, String dateLimit, String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScoreFlow> lqw = new LambdaQueryWrapper<SelfScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), SelfScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreFlow::getAction, action)
                 .eq(StringUtils.isNotEmpty(ordersSn), SelfScoreFlow::getOrdersSn, ordersSn);
         getRequestTimeWhere(lqw, dateLimit);
         lqw.orderByDesc(SelfScoreFlow::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<SelfScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScoreFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -56,6 +60,7 @@ public class SelfScoreFlowServiceImpl extends ServiceImpl<SelfScoreFlowDao, Self
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user !=null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

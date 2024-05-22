@@ -61,4 +61,8 @@ public class RelationScoreGroup extends BaseModel {
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
     private String account;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
 }

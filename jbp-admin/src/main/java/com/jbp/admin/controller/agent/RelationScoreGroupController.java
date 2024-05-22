@@ -40,6 +40,6 @@ public class RelationScoreGroupController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreGroupService.pageList(uid, request.getGroupName(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreGroupService.pageList(uid, request.getGroupName(), request.getNickname(),pageParamRequest)));
     }
 }

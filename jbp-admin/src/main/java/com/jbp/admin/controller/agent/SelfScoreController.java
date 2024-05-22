@@ -40,7 +40,7 @@ public class SelfScoreController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreService.pageList(uid ,pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreService.pageList(uid ,request.getNickname(),pageParamRequest)));
     }
 
 

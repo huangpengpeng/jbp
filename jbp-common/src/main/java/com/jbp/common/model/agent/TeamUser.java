@@ -35,6 +35,9 @@ public class TeamUser implements Serializable {
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
     private String account;
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
     @TableField(value = "gmt_created", fill = FieldFill.INSERT)
     private Date gmtCreated;
     @JsonIgnore

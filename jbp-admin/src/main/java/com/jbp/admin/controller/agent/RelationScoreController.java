@@ -45,7 +45,7 @@ public class RelationScoreController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreService.pageList(uid, request.getNickname(),pageParamRequest)));
     }
 
 

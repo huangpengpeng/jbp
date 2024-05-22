@@ -16,4 +16,7 @@ public class InvitationScoreRequest implements Serializable {
     @ApiModelProperty("账户")
     private String account;
 
+    @ApiModelProperty("用户昵称")
+    private String nickname;
+
 }

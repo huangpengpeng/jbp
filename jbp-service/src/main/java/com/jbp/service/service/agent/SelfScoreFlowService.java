@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface SelfScoreFlowService extends IService<SelfScoreFlow> {
-    PageInfo<SelfScoreFlow> pageList(Integer uid, String action,String ordersSn,String dateLimit, PageParamRequest pageParamRequest);
+    PageInfo<SelfScoreFlow> pageList(Integer uid, String action,String ordersSn,String dateLimit,String nickname, PageParamRequest pageParamRequest);
 
     SelfScoreFlow add(Integer uid, BigDecimal score, String action, String operate,
                       String ordersSn, Date payTime, List<ProductInfoDto> productInfo, String remark);

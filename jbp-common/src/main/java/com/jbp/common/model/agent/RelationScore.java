@@ -60,6 +60,10 @@ public class RelationScore extends VersionModel {
     @TableField(exist = false)
     private String account;
 
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
+
 
 
 }

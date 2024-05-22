@@ -20,4 +20,8 @@ public class RelationScoreGroupRequest implements Serializable {
 
     @ApiModelProperty("分组名称")
     private String groupName;
+
+    @ApiModelProperty("用户昵称")
+    private String nickname;
+
 }

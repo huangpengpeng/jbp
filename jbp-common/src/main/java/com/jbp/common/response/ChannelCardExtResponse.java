@@ -16,4 +16,7 @@ public class ChannelCardExtResponse extends ChannelCard {
     @ApiModelProperty(value = "团队")
     private String name;
 
+    @ApiModelProperty("用户昵称")
+    private String nickname;
+
 }

@@ -50,11 +50,11 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
     @Resource
     private ChannelCardDao dao;
     @Override
-    public PageInfo<ChannelCardExtResponse> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, PageParamRequest pageParamRequest) {
+    public PageInfo<ChannelCardExtResponse> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, String nickname,PageParamRequest pageParamRequest) {
 
 
         Page<ChannelCardExtResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<ChannelCardExtResponse> list = dao.getList(uid,bankCardNo,type,phone,teamId);
+        List<ChannelCardExtResponse> list = dao.getList(uid,bankCardNo,type,phone,teamId,nickname);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
@@ -63,6 +63,7 @@ public class ChannelCardServiceImpl extends ServiceImpl<ChannelCardDao, ChannelC
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

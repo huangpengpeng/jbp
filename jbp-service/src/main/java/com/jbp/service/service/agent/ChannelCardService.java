@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ChannelCardService extends IService<ChannelCard> {
-    PageInfo<ChannelCardExtResponse> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, PageParamRequest pageParamRequest);
+    PageInfo<ChannelCardExtResponse> pageList(Integer uid, String bankCardNo, String type, String phone, String teamId, String nickname,PageParamRequest pageParamRequest);
 
 
     AliBankcardResponse getAliBankCard(String kaHao);

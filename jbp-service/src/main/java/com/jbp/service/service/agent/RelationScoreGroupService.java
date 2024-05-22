@@ -6,5 +6,5 @@ import com.jbp.common.model.agent.RelationScoreGroup;
 import com.jbp.common.request.PageParamRequest;
 
 public interface RelationScoreGroupService extends IService<RelationScoreGroup> {
-    PageInfo<RelationScoreGroup> pageList(Integer uid, String groupName, PageParamRequest pageParamRequest);
+    PageInfo<RelationScoreGroup> pageList(Integer uid, String groupName, String nickname,PageParamRequest pageParamRequest);
 }

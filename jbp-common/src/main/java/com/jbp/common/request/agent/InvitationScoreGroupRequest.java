@@ -22,4 +22,7 @@ public class InvitationScoreGroupRequest implements Serializable {
 
     @ApiModelProperty("变动方向")
     private String action;
+
+    @ApiModelProperty("用户昵称")
+    private String nickname;
 }

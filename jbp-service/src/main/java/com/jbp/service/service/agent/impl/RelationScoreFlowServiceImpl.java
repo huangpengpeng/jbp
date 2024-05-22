@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -37,7 +38,7 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
     private UserService userService;
 
     @Override
-    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderUid, String ordersSn, String dateLimit, Integer node, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<RelationScoreFlow> pageList(Integer uid, Integer orderUid, String ordersSn, String dateLimit, Integer node, String action, String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<RelationScoreFlow> lqw = new LambdaQueryWrapper<RelationScoreFlow>()
                 .eq(!ObjectUtil.isNull(uid), RelationScoreFlow::getUid, uid)
                 .eq(!ObjectUtil.isNull(orderUid), RelationScoreFlow::getOrderUid, orderUid)
@@ -46,6 +47,9 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
                 .eq(StringUtils.isNotEmpty(action), RelationScoreFlow::getAction, action);
         getRequestTimeWhere(lqw, dateLimit);
         lqw.orderByDesc(RelationScoreFlow::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<RelationScoreFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<RelationScoreFlow> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
@@ -58,6 +62,7 @@ public class RelationScoreFlowServiceImpl extends ServiceImpl<RelationScoreFlowD
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
             User orderUser = orderIdMapList.get(e.getOrderUid());
             e.setOrderAccount(orderUser != null ? orderUser.getAccount() : "");
         });

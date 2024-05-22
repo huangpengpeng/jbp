@@ -50,7 +50,7 @@ public class InvitationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(invitationScoreFlowService.pageList(uid, orderuid, request.getAction(), request.getOrdersSn(), request.getDateLimit(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(invitationScoreFlowService.pageList(uid, orderuid, request.getAction(), request.getOrdersSn(), request.getDateLimit(), request.getNickname(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:invitation:score:flow:excel')")
