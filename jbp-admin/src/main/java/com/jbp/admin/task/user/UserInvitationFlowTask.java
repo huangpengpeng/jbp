@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 刷新用户销售层级关系和等级
@@ -49,6 +50,7 @@ public class UserInvitationFlowTask {
             logger.info("上一次任务未执行完成退出");
             return;//方法结束
         }
+        redisTemplate.expire("UserInvitationFlowTask.refresh",3, TimeUnit.MINUTES);
         try {
             List<UserInvitation> noFlowList = userInvitationService.getNoFlowList();
             for (UserInvitation userInvitation : noFlowList) {
@@ -69,8 +71,7 @@ public class UserInvitationFlowTask {
 //                }
 //            }
 
-
-
+            redisTemplate.delete("UserInvitationFlowTask.refresh");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("UserInvitationFlowTask.refreshFlowAndTeam" + " | msg : " + e.getMessage());
