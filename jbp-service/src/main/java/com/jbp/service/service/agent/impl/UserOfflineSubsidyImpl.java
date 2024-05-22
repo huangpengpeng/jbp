@@ -10,12 +10,15 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.agent.UserRegion;
+import com.jbp.common.model.city.CityRegion;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserOfflineSubsidyAddRequest;
 import com.jbp.common.request.agent.UserOfflineSubsidyEditRequest;
+import com.jbp.common.utils.AddressUtil;
 import com.jbp.service.dao.agent.UserOfflineSubsidyDao;
+import com.jbp.service.service.CityRegionService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import com.jbp.service.util.StringUtils;
@@ -35,6 +38,8 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private CityRegionService cityRegionService;
 
     @Override
     public PageInfo<UserOfflineSubsidy> pageList(Integer uid, String province, String city, String area, PageParamRequest pageParamRequest) {
@@ -62,47 +67,65 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     @Override
     public Boolean add(UserOfflineSubsidyAddRequest request) {
 
-        if (StringUtils.isAnyBlank(request.getAccount(), request.getProvince(), request.getCity())){
+        if (StringUtils.isBlank(request.getAccount()) || request.getProvinceId() == null || request.getCityId() == null) {
             throw new CrmebException("请填写完整信息");
         }
         User user = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNull(user)) {
             throw new CrmebException("账户不存在");
         }
-        List<UserOfflineSubsidy> list = this.list(new QueryWrapper<UserOfflineSubsidy>().eq("uid", user.getId()).eq("status", "已开通"));
-        if (!CollectionUtils.isEmpty(list)) {
-            throw new CrmebException("该用户已有开通区域");
+        CityRegion province = cityRegionService.getByRegionId(request.getProvinceId());
+        CityRegion city = cityRegionService.getByRegionId(request.getCityId());
+        CityRegion area = new CityRegion();
+        if (request.getAreaId() != null) {
+            area = cityRegionService.getByRegionId(request.getAreaId());
         }
-        UserOfflineSubsidy userOfflineSubsidy = getByArea(request.getProvince(), request.getCity(),
-                !StringUtils.isEmpty(request.getArea()) ? request.getArea() : "",
-                UserOfflineSubsidy.Constants.已开通.toString());
-        if (!ObjectUtil.isNull(userOfflineSubsidy)) {
-            throw new CrmebException("该区域已经被其他用户开通");
-        }
-        userOfflineSubsidy = UserOfflineSubsidy.builder().uid(user.getId()).province(request.getProvince()).
-                city(request.getCity()).status(UserRegion.Constants.已开通.toString()).build();
-        userOfflineSubsidy.setArea(StringUtils.isNotEmpty(request.getArea()) ? request.getArea() : "");
-        this.save(userOfflineSubsidy);
-        return true;
+            List<UserOfflineSubsidy> list = this.list(new QueryWrapper<UserOfflineSubsidy>().eq("uid", user.getId()).eq("status", "已开通"));
+            if (!CollectionUtils.isEmpty(list)) {
+                throw new CrmebException("该用户已有开通区域");
+            }
+            UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
+                    request.getAreaId() != null ? area.getRegionName() : "",
+                    UserOfflineSubsidy.Constants.已开通.toString());
+            if (!ObjectUtil.isNull(userOfflineSubsidy)) {
+                throw new CrmebException("该区域已经被其他用户开通");
+            }
+            userOfflineSubsidy = UserOfflineSubsidy.builder().uid(user.getId()).provinceId(request.getProvinceId()).
+                    province(province.getRegionName()).city(city.getRegionName()).
+                    cityId(request.getCityId()).status(UserRegion.Constants.已开通.toString()).build();
+            userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
+            userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
+
+            this.save(userOfflineSubsidy);
+            return true;
     }
 
     @Override
     public Boolean edit(UserOfflineSubsidyEditRequest request) {
-        if (StringUtils.isAnyBlank(request.getProvince(), request.getCity(),request.getStatus())){
+        if (StringUtils.isBlank(request.getStatus()) || request.getProvinceId() == null || request.getCityId() == null){
             throw new CrmebException("请填写完整信息");
         }
+        CityRegion province = cityRegionService.getByRegionId(request.getProvinceId());
+        CityRegion city = cityRegionService.getByRegionId(request.getCityId());
+        CityRegion area = new CityRegion();
+        if (request.getAreaId() != null) {
+            area = cityRegionService.getByRegionId(request.getAreaId());
+        }
         if (request.getStatus().equals(UserOfflineSubsidy.Constants.已开通.toString())){
-            UserOfflineSubsidy userOfflineSubsidy = getByArea(request.getProvince(), request.getCity(),
-                    !StringUtils.isEmpty(request.getArea()) ? request.getArea() : "",
+            UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
+                    request.getAreaId() != null ? area.getRegionName() : "",
                     UserOfflineSubsidy.Constants.已开通.toString());
             if (!ObjectUtil.isNull(userOfflineSubsidy)) {
                 throw new CrmebException("该区域已经被其他用户开通");
             }
         }
         UserOfflineSubsidy userOfflineSubsidy = this.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getId, request.getId()));
-        userOfflineSubsidy.setProvince(request.getProvince());
-        userOfflineSubsidy.setCity(request.getCity());
-        userOfflineSubsidy.setArea(StringUtils.isNotEmpty(request.getArea()) ? request.getArea() : "");
+        userOfflineSubsidy.setProvinceId(request.getProvinceId());
+        userOfflineSubsidy.setProvince(province.getRegionName());
+        userOfflineSubsidy.setCityId(request.getCityId());
+        userOfflineSubsidy.setCity(city.getRegionName());
+        userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
+        userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
         userOfflineSubsidy.setStatus(request.getStatus());
         return updateById(userOfflineSubsidy);
     }
