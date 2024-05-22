@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 用户线下补助
  */
@@ -49,6 +51,17 @@ public class UserOfflineSubsidy extends BaseModel {
     @ApiModelProperty("用户昵称")
     @TableField(exist = false)
     private String nickname;
+
+    @ApiModelProperty(value = "省份ID")
+    @NotNull(message = "省份ID不能为空")
+    private Integer provinceId;
+
+    @ApiModelProperty(value = "城市id")
+    @NotNull(message = "城市id不能为空")
+    private Integer cityId;
+
+    @ApiModelProperty(value = "区/县id")
+    private Integer areaId;
 
     public static enum Constants {
         申请中, 已开通, 已取消
