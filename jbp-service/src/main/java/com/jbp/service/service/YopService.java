@@ -1,19 +1,27 @@
 package com.jbp.service.service;
 
+import com.jbp.common.yop.params.BankAccountOpenParams;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.result.*;
 
+import java.io.InputStream;
+
 public interface YopService {
+
+    String upload(String url);
+
+    /**
+     * 银行开户
+     *
+     */
+    BankAccountOpenResult bankAccountOpen(BankAccountOpenParams params);
 
 
     /**
      * 充值下单
      *
      */
-
     OnlineBankOrderResult onlineBankOrder(OnlineBankOrderParams params);
-
-
 
     /**
      * 开户进度查询

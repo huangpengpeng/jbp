@@ -7,13 +7,19 @@ import com.jbp.common.yop.dto.ExtParams4BankPay;
 import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
+import com.yeepay.yop.sdk.exception.YopClientException;
 import com.yeepay.yop.sdk.service.common.YopClient;
 import com.yeepay.yop.sdk.service.common.request.YopRequest;
 import com.yeepay.yop.sdk.service.common.response.YopResponse;
+import com.yeepay.yop.sdk.service.common.response.YosUploadResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 
 @Slf4j
@@ -23,6 +29,30 @@ public class YopServiceImpl implements YopService {
     @Resource
     private YopClient yopClient;
 
+    @Override
+    public String upload(String url) {
+        InputStream inputStream = null;
+        try {
+            if (StringUtils.isNotBlank(url)) {
+                inputStream = new URL(url).openStream();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.isNotBlank(url)) {
+            return upload(inputStream).getMerQualUrl();
+        } else {
+            MerFileUploadResponse merFileUploadResponse = new MerFileUploadResponse();
+            merFileUploadResponse.setMerQualUrl("");
+            return "";
+        }
+    }
+
+    @Override
+    public BankAccountOpenResult bankAccountOpen(BankAccountOpenParams params) {
+        params.setParentMerchantNo("10089066338");
+        return send2("/rest/v1.0/account/account-manage/bank-account/open", "POST", params, BankAccountOpenResult.class);
+    }
 
     @Override
     public OnlineBankOrderResult onlineBankOrder(OnlineBankOrderParams params) {
@@ -195,6 +225,44 @@ public class YopServiceImpl implements YopService {
             return (T) resp;
         } catch (Exception e) {
             log.error("易宝请求异常:" + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+
+    public <T> T send2(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
+        //生成易宝请求
+        YopRequest request = new YopRequest(url, method);
+        request.setContent(JacksonTool.toJsonString(parameters));
+        log.info("易宝请求参数" + JacksonTool.toJsonString(parameters));
+        try {
+            YopResponse response = yopClient.request(request);
+            String responseText = JacksonTool.toJsonString(response);
+            log.info("易宝返回参数" + responseText);
+            //结果转换成对应的response
+            BaseYopResponse resp = (BaseYopResponse) JacksonTool.toObject(response.getStringResult(), responseClass);
+            return (T) resp;
+        } catch (Exception e) {
+            log.error("易宝请求异常:" + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public MerFileUploadResponse upload(InputStream inputStream){
+        YopRequest request = new YopRequest("/yos/v1.0/sys/merchant/qual/upload", "POST");
+        request.addMultiPartFile("merQual", inputStream);
+        YosUploadResponse uploadResponse = makeUploadRequest(request);
+        return JacksonTool.toObject(uploadResponse.getStringResult(), MerFileUploadResponse.class);
+    }
+
+    private YosUploadResponse makeUploadRequest(YopRequest request){
+        log.info("易宝资质上传参数" + JacksonTool.toJsonString(request.getParameters().asMap()));
+        try {
+            YosUploadResponse response = yopClient.upload(request);
+            log.info("易宝资质上传返回参数" + response.getStringResult());
+            return response;
+        }catch (YopClientException e){
+            log.error("易宝请求异常:" +e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
     }
