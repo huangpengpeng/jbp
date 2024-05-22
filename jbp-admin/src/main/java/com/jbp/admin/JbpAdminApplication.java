@@ -1,7 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-<<<<<<< HEAD
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.Oldcapaxs;
 import com.jbp.common.model.agent.RiseCondition;
