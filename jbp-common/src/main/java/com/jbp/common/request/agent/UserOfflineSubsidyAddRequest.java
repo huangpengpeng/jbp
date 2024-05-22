@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
@@ -23,15 +24,27 @@ public class UserOfflineSubsidyAddRequest implements Serializable {
     @NotBlank(message = "用户账号不能为空")
     private String account;
 
-    @ApiModelProperty("省份")
-    @NotBlank(message = "省份不能为空")
-    private String province;
+//    @ApiModelProperty("省份")
+//    @NotBlank(message = "省份不能为空")
+//    private String province;
 
-    @ApiModelProperty("城市")
-    @NotBlank(message = "城市不能为空")
-    private String city;
+    @ApiModelProperty(value = "省份ID")
+    @NotNull(message = "省份ID不能为空")
+    private Integer provinceId;
 
-    @ApiModelProperty("区域")
-    private String area;
+//    @ApiModelProperty("城市")
+//    @NotBlank(message = "城市不能为空")
+//    private String city;
+
+    @ApiModelProperty(value = "城市id")
+    @NotNull(message = "城市id不能为空")
+    private Integer cityId;
+
+//    @ApiModelProperty("区域")
+//    private String area;
+
+    @ApiModelProperty(value = "区/县id")
+    @NotNull(message = "区/县id不能为空")
+    private Integer areaId;
 
 }
