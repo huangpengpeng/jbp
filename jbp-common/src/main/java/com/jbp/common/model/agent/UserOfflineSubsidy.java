@@ -61,7 +61,6 @@ public class UserOfflineSubsidy extends BaseModel {
     private Integer cityId;
 
     @ApiModelProperty(value = "区/县id")
-    @NotNull(message = "区/县id不能为空")
     private Integer areaId;
 
     public static enum Constants {
