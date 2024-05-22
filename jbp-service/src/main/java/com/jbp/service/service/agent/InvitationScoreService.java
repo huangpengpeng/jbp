@@ -15,7 +15,7 @@ public interface InvitationScoreService extends IService<InvitationScore> {
 
     void init();
 
-    PageInfo<InvitationScore> pageList(Integer uid, PageParamRequest pageParamRequest);
+    PageInfo<InvitationScore> pageList(Integer uid,String nickname ,PageParamRequest pageParamRequest);
 
     InvitationScore add(Integer uid);
 

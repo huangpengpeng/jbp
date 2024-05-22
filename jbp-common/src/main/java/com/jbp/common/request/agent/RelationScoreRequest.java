@@ -16,4 +16,7 @@ import java.io.Serializable;
 public class RelationScoreRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
+    @ApiModelProperty("用户昵称")
+    private String nickname;
+
 }

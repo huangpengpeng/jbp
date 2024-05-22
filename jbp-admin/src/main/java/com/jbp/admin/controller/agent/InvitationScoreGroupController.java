@@ -40,6 +40,6 @@ public class InvitationScoreGroupController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(invitationScoreGroupService.pageList(uid, request.getGroupName(), request.getAction(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(invitationScoreGroupService.pageList(uid, request.getGroupName(), request.getAction(), request.getNickname(),pageParamRequest)));
     }
 }

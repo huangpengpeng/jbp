@@ -9,6 +9,7 @@
          select f.*,t.name from eb_wallet f
         left join eb_team_user  u on u.uid = f.uid
         left join eb_team t on t.id = u.tid
+        left join eb_user eu on eu.id = f.uid
         where  1=1
         <if test="teamId!='' and teamId!= null ">
             and   t.leader_id =#{teamId}
@@ -19,6 +20,9 @@
 
         <if test="type !='' and type!= null ">
             and   f.type =#{type}
+        </if>
+        <if test="nickname !='' and nickname!= null ">
+            and   eu.nickname =#{nickname}
         </if>
 
 

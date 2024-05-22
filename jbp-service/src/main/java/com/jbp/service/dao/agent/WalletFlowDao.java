@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface WalletFlowDao extends RootMapper<WalletFlow> {
 
-    List<WalletFlowExtResponse>  getList(@Param("uId")Integer uid, @Param("type") Integer type, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("externalNo") String externalNo, @Param("action") String action,  @Param("teamId") String teamId);
+    List<WalletFlowExtResponse>  getList(@Param("uId")Integer uid, @Param("type") Integer type, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("externalNo") String externalNo, @Param("action") String action,  @Param("teamId") String teamId, @Param("nickname") String nickname);
 
 }

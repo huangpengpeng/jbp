@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -31,12 +32,15 @@ public class SelfScoreGroupServiceImpl extends ServiceImpl<SelfScoreGroupDao, Se
     private UserService userService;
 
     @Override
-    public PageInfo<SelfScoreGroup> pageList(Integer uid,String groupName, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<SelfScoreGroup> pageList(Integer uid,String groupName, String action,String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<SelfScoreGroup> lqw = new LambdaQueryWrapper<SelfScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), SelfScoreGroup::getUid, uid)
                 .like(!ObjectUtil.isNull(groupName)&&!groupName.equals(""),SelfScoreGroup::getGroupName,groupName)
                 .eq(!ObjectUtil.isNull(action) && !action.equals(""), SelfScoreGroup::getAction, action)
                 .orderByDesc(SelfScoreGroup::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<SelfScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<SelfScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -47,6 +51,7 @@ public class SelfScoreGroupServiceImpl extends ServiceImpl<SelfScoreGroupDao, Se
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ?user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

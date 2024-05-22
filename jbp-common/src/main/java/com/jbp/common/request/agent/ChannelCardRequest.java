@@ -28,4 +28,7 @@ public class ChannelCardRequest implements Serializable {
 
     @ApiModelProperty("团队id")
     private String teamId;
+
+    @ApiModelProperty("用户昵称")
+    private String nickname;
 }

@@ -43,7 +43,7 @@ public class SelfScoreFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(), request.getOrdersSn(), request.getDateLimit(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(selfScoreFlowService.pageList(uid, request.getAction(), request.getOrdersSn(), request.getDateLimit(), request.getNickname(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:self:score:flow:excel')")

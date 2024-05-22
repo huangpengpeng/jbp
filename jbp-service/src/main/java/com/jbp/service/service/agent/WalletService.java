@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface WalletService extends IService<Wallet> {
-    PageInfo<WalletExtResponse> pageList(Integer uid, Integer type, String teamId, PageParamRequest pageParamRequest);
+    PageInfo<WalletExtResponse> pageList(Integer uid, Integer type, String teamId, String nickname,PageParamRequest pageParamRequest);
     Wallet add(Integer uid, Integer type);
 
     Wallet getByUser(Integer uid, Integer type);

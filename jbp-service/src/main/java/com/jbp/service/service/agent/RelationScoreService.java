@@ -16,7 +16,7 @@ import java.util.List;
 public interface RelationScoreService extends IService<RelationScore> {
     RelationScore getByUser(Integer uId, Integer node);
 
-    PageInfo<RelationScore> pageList(Integer uid, PageParamRequest pageParamRequest);
+    PageInfo<RelationScore> pageList(Integer uid, String nickname,PageParamRequest pageParamRequest);
 
     RelationScoreFlow orderSuccessIncrease(Integer uid, Integer orderUid, BigDecimal score, int node, String ordersSn,
                                            Date payTime, List<ProductInfoDto> productInfo, Integer level);

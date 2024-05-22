@@ -21,4 +21,6 @@ public class TeamUserRequest implements Serializable {
     private String account;
     @ApiModelProperty("是否为团队头")
     private Integer teamLeader;
+    @ApiModelProperty("用户昵称")
+    private String nickname;
 }

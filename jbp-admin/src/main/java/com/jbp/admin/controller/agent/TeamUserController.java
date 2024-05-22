@@ -26,6 +26,6 @@ public class TeamUserController {
     @GetMapping("/page")
     @ApiOperation("列表分页查询")
     public CommonResult<CommonPage<TeamUser>> getList(TeamUserRequest request, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(teamUserService.pageList(request.getTid(), request.getAccount(), request.getTeamLeader(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(teamUserService.pageList(request.getTid(), request.getAccount(), request.getTeamLeader(), request.getNickname(),pageParamRequest)));
     }
 }

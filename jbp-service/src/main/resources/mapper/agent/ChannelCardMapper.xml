@@ -8,6 +8,7 @@
               select f.*,t.name from eb_channel_card f
 				left join eb_team_user  u on u.uid = f.uid
 				left join eb_team t on t.id = u.tid
+                left join eb_user us on us.id = f.uid
 				where  1=1
 
         <if test="teamId!='' and teamId!= null ">
@@ -27,6 +28,10 @@
 
         <if test="phone !='' and phone!= null ">
             and   f.phone =#{phone}
+        </if>
+
+        <if test="nickname !='' and nickname!= null ">
+            and   us.nickname =#{nickname}
         </if>
 
         order by f.id desc

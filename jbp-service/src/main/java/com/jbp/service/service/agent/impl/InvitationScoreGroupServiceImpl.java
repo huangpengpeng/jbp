@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -32,12 +33,15 @@ public class InvitationScoreGroupServiceImpl extends ServiceImpl<InvitationScore
     private UserService userService;
 
     @Override
-    public PageInfo<InvitationScoreGroup> pageList(Integer uid, String groupName, String action, PageParamRequest pageParamRequest) {
+    public PageInfo<InvitationScoreGroup> pageList(Integer uid, String groupName, String action, String nickname,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<InvitationScoreGroup> lqw = new LambdaQueryWrapper<InvitationScoreGroup>()
                 .eq(!ObjectUtil.isNull(uid), InvitationScoreGroup::getUid, uid)
                 .like(StringUtils.isNotEmpty(groupName), InvitationScoreGroup::getGroupName, groupName)
                 .eq(StringUtils.isNotEmpty(action), InvitationScoreGroup::getAction, action)
                 .orderByDesc(InvitationScoreGroup::getId);
+        if (StrUtil.isNotBlank(nickname)){
+            lqw.apply("1=1 and uid in (select id from eb_user where nickname like '%" + nickname + "%')");
+        }
         Page<InvitationScoreGroup> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<InvitationScoreGroup> list = list(lqw);
         if(CollectionUtils.isEmpty(list)){
@@ -48,6 +52,7 @@ public class InvitationScoreGroupServiceImpl extends ServiceImpl<InvitationScore
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

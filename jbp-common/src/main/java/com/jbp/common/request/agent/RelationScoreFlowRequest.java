@@ -32,4 +32,7 @@ public class RelationScoreFlowRequest implements Serializable {
 
     @ApiModelProperty(value = "付款时间区间")
     private String dateLimit;
+
+    @ApiModelProperty("用户昵称")
+    private String nickname;
 }

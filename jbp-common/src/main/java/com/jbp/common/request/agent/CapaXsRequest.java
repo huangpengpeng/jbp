@@ -28,15 +28,12 @@ public class CapaXsRequest {
     private Integer rankNum;
 
     @ApiModelProperty("等级图标地址")
-    @NotEmpty(message = "等级图标地址不能为空")
     private String iconUrl;
 
     @ApiModelProperty("升级提醒图片")
-    @NotEmpty(message = "升级提醒图片不能为空")
     private String riseImgUrl;
 
     @ApiModelProperty("邀请图片")
-    @NotEmpty(message = "邀请图片不能为空")
     private String shareImgUrl;
 
     @ApiModelProperty("计算表达式")

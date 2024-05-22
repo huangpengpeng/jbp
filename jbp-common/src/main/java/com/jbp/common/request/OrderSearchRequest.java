@@ -73,7 +73,9 @@ public class OrderSearchRequest implements Serializable {
     @ApiModelProperty(value = "供应商名称")
     private String supplyName ;
 
-
     @ApiModelProperty(value = "团队id")
     private String teamId ;
+
+    @ApiModelProperty(value = "用户昵称")
+    private String nickname;
 }

@@ -49,7 +49,7 @@ public class RelationScoreFlowController {
             }
             orderuid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid, orderuid, request.getOrdersSn(), request.getDateLimit(),request.getNode(),request.getAction(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(relationScoreFlowService.pageList(uid, orderuid, request.getOrdersSn(), request.getDateLimit(),request.getNode(),request.getAction(), request.getNickname(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:relation:score:flow:excel')")

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.ClearingVipUser;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.agent.ProductCommConfig;
@@ -36,9 +35,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +90,7 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         ProductCommConfig config = productCommConfigService.getByType(ProductCommEnum.培育佣金.getType());
         UserMonthActiveResponse response = new UserMonthActiveResponse();
         if (config == null || !config.getIfOpen() || StringUtils.isEmpty(config.getRatioJson())) {
-            return response.setMsg("未开启活跃设置");
+            return response.setMsg("未开启活跃设置").setIsActive(null);
         }
         //获取当前月份的第一天和最后一天
         Date now = DateTimeUtils.getNow();
@@ -136,7 +132,7 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         BigDecimal subPrice = hundred.subtract(fee);
 
         if (userCapa == null || NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) < 0) {
-            return response.setPayPrice(fee).setMsg("等级未达到要求");
+            return response.setIsActive(null).setSubPrice(subPrice).setPayPrice(fee).setMsg("等级未达到要求");
         }
         if (level == 0L) {
             return response.setMsg(subPrice.toString()).setIsActive(false).setSubPrice(subPrice).setPayPrice(fee);
