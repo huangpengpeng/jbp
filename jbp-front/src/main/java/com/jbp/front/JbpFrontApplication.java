@@ -13,6 +13,7 @@ import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
+import com.yeepay.yop.sdk.security.DigitalEnvelopeUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -51,31 +52,58 @@ public class JbpFrontApplication {
         System.out.println("ok");
 
         YopService yopService = run.getBean(YopService.class);
-//        AccountBalanceQueryResult accountBalanceQueryResult = yopService.accountBalanceQuery("10090108498");
 
-        //10090316790
-        //10090316825
-        //10090319762
-        //10090320189
+//          String withdrawNo = StringUtils.N_TO_10("LZT_WD_");
+//         WithdrawCardQueryResult card = yopService.withdrawCardQuery("10090316825");
+//        System.out.println(JSONObject.toJSONString(card));
 
-        String requestNo = StringUtils.N_TO_10("LZT_NDF_");
-        System.out.println(requestNo);
-//        AccountTransferOrderResult accountTransferOrderResult = yopService.transferB2bOrder(requestNo, "10090316790", "10090316825", "0.02", null);
-//        AccountTransferOrderQueryResult accountTransferOrderQueryResult = yopService.transferB2bOrderQuery("10090108498", requestNo);
+//         WithdrawOrderResult withdrawOrderResult = yopService.withdrawOrder("10090316790", withdrawNo,
+//                card.getBankCardAccountList().get(0).getBindCardId(), "0.2", "https://applet.dys.ink/yop/ew");
+//
+//         System.out.println(JSONObject.toJSONString(withdrawOrderResult));
 
-         BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090328093", "BO_139168410173851");
-         System.out.println(JSONObject.toJSONString(bankAccountQueryResult));
+
+
 
         System.out.println("111");
+
+
     }
 
+    private static void register(YopService yopService) {
+        String registerMicroRequestNo = StringUtils.N_TO_10("LZT_RS_");
+        RegisterMicroResult registerMicroResult = yopService.registerMicro(registerMicroRequestNo, "冯开英", "429005199305060899", "http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E6%AD%A3.jpg",
+                "http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E5%8F%8D.jpg",
+                "15871898210", "420000", "429000", "429005",
+                "竹根滩镇黑流渡村一组", "6228480329262404075", "ABC", "http://fky.natapp1.cc/yop/registerMicro");
+
+        System.out.println(JSONObject.toJSONString(registerMicroResult));
+
+
+        RegisterQueryResult result = yopService.registerQuery("LZT_RS_157329444997738");
+        System.out.println(JSONObject.toJSONString(result));
+    }
+
+
+    private static void queryOpenBank(YopService yopService) {
+        BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090328093", "BO_65808892927832");
+        System.out.println(JSONObject.toJSONString(bankAccountQueryResult));
+    }
+
+
+    /**
+     * 10090316790
+     * 10090316825
+     * 10090319762
+     * 10090320189
+     */
     private static void openBank(YopService yopService) {
-        // {"authType":"NO_AUTH","orderNo":"12eb0802e8b740e3b402762e275c8a1b","requestNo":"BO_139168410173851","returnCode":"AM00000","status":"PROCESS"}
+        // {"authType":"NO_AUTH","orderNo":"6dfaa3a38bf84ba7aca8228158ba10ab","requestNo":"BO_65808892927832","returnCode":"AM00000","status":"PROCESS"}
         BankAccountOpenParams params = new BankAccountOpenParams();
         String requestNo2 = StringUtils.N_TO_10("BO_");
         System.out.println(requestNo2);
         params.setRequestNo(requestNo2);
-        params.setMerchantNo("10090328093");
+        params.setMerchantNo("10090333092");
         params.setMerchantName("海口龙华郦冷琴百货店（个体工商户）");
         params.setOpenBankCode("SUNINGBANK_MULTICHANNEL");
         params.setOpenAccountType("INDIVIDUAL_BUSINESS_TYPE");
@@ -85,7 +113,7 @@ public class JbpFrontApplication {
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
 
-        dto.setSocialCreditCodeImageUrl("http://batchatx-dys.oss-cn-shenzhen.aliyuncs.com/a94d53847c8a4001a433a2d60402df4e");
+        dto.setSocialCreditCodeImageUrl("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7.png");
         dto.setSocialCreditCodeImageUrl(yopService.upload(dto.getSocialCreditCodeImageUrl()));
 
         dto.setLegalCardImageFont("http://batchatx-dys.oss-cn-shenzhen.aliyuncs.com/c9081f5aa23742229d83b0d1fc25cf9c");

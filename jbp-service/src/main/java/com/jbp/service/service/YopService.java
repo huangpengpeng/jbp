@@ -1,12 +1,36 @@
 package com.jbp.service.service;
 
 import com.jbp.common.yop.params.BankAccountOpenParams;
+import com.jbp.common.yop.params.MerchantInfoModifyParams;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.result.*;
 
-import java.io.InputStream;
-
 public interface YopService {
+
+
+
+    /**
+     * 小微入网
+     * /rest/v2.0/mer/register/saas/micro
+     */
+    RegisterMicroResult registerMicro(String requestNo, String signName,  String id_card, String frontUrl,
+                                      String backUrl, String mobile,  String province, String city, String district,
+                                      String address, String bankCardNo, String bankCode, String notifyUrl);
+
+
+    /**
+     * 入网进度查询
+     * /rest/v2.0/mer/register/query
+     */
+    RegisterQueryResult registerQuery(String requestNo);
+
+
+    /**
+     * 商户信息变更
+     * /rest/v1.0/mer/merchant/info/modify
+     */
+    MerchantInfoModifyResult  merchantInfoModify(MerchantInfoModifyParams params);
+
 
     String upload(String url);
 
@@ -37,6 +61,11 @@ public interface YopService {
      * 查询资金账户余额
      */
     AccountBalanceQueryResult accountBalanceQuery(String merchantNo);
+
+    /**
+     * 提现卡绑定
+     * /rest/v1.0/account/withdraw/card/bind
+     */
 
     /**
      * 提现卡bin查询

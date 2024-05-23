@@ -1,8 +1,10 @@
 package com.jbp.service.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.yop.BaseYopRequest;
 import com.jbp.common.yop.BaseYopResponse;
+import com.jbp.common.yop.constants.YopProducts;
 import com.jbp.common.yop.dto.ExtParams4BankPay;
 import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
@@ -28,6 +30,63 @@ public class YopServiceImpl implements YopService {
 
     @Resource
     private YopClient yopClient;
+
+    @Override
+    public RegisterMicroResult registerMicro(String requestNo, String signName, String id_card, String frontUrl,
+                                             String backUrl, String mobile, String province, String city, String district,
+                                             String address, String bankCardNo, String bankCode, String notifyUrl) {
+        RegisterMicroParams params = new RegisterMicroParams();
+        params.setParentMerchantNo("10089625822");
+        params.setBusinessRole("SHARE_MERCHANT");
+        params.setRequestNo(requestNo);
+
+        // 签约信息
+        JSONObject merchantSubjectInfo = new JSONObject();
+        merchantSubjectInfo.put("signName", signName);
+        merchantSubjectInfo.put("shortName", signName);
+        params.setMerchantSubjectInfo(merchantSubjectInfo.toJSONString());
+
+        // 实名信息
+        JSONObject merchantCorporationInfo = new JSONObject();
+        merchantCorporationInfo.put("legalLicenceType", "ID_CARD");
+        merchantCorporationInfo.put("legalLicenceNo", id_card);
+        frontUrl = upload(frontUrl);
+        merchantCorporationInfo.put("legalLicenceFrontUrl", frontUrl);
+        backUrl = upload(backUrl);
+        merchantCorporationInfo.put("legalLicenceBackUrl", backUrl);
+        merchantCorporationInfo.put("mobile", mobile);
+        params.setMerchantCorporationInfo(merchantCorporationInfo.toJSONString());
+
+        // 地址信息
+        JSONObject businessAddressInfo = new JSONObject();
+        businessAddressInfo.put("province", province);
+        businessAddressInfo.put("city", city);
+        businessAddressInfo.put("district", district);
+        businessAddressInfo.put("address", address);
+        params.setBusinessAddressInfo(businessAddressInfo.toJSONString());
+
+        // 账户信息
+        JSONObject accountInfo = new JSONObject();
+        accountInfo.put("settlementDirection", "BANKCARD");
+        accountInfo.put("bankAccountType", "DEBIT_CARD");
+        accountInfo.put("bankCardNo", bankCardNo);
+        accountInfo.put("bankCode", bankCode);
+        params.setAccountInfo(accountInfo.toJSONString());
+        // 通知开户产品
+        params.setNotifyUrl(notifyUrl);
+        params.setProductInfo(YopProducts.getMicroMerchant());
+        return send("/rest/v2.0/mer/register/saas/micro", "POST", params, RegisterMicroResult.class);
+    }
+
+    @Override
+    public RegisterQueryResult registerQuery(String requestNo) {
+        return send("/rest/v2.0/mer/register/query", "GET", new RegisterQueryParams(requestNo), RegisterQueryResult.class);
+    }
+
+    @Override
+    public MerchantInfoModifyResult merchantInfoModify(MerchantInfoModifyParams params) {
+        return send("/rest/v1.0/mer/merchant/info/modify", "POST", params, MerchantInfoModifyResult.class);
+    }
 
     @Override
     public String upload(String url) {
@@ -248,21 +307,21 @@ public class YopServiceImpl implements YopService {
         }
     }
 
-    public MerFileUploadResponse upload(InputStream inputStream){
+    public MerFileUploadResponse upload(InputStream inputStream) {
         YopRequest request = new YopRequest("/yos/v1.0/sys/merchant/qual/upload", "POST");
         request.addMultiPartFile("merQual", inputStream);
         YosUploadResponse uploadResponse = makeUploadRequest(request);
         return JacksonTool.toObject(uploadResponse.getStringResult(), MerFileUploadResponse.class);
     }
 
-    private YosUploadResponse makeUploadRequest(YopRequest request){
+    private YosUploadResponse makeUploadRequest(YopRequest request) {
         log.info("易宝资质上传参数" + JacksonTool.toJsonString(request.getParameters().asMap()));
         try {
             YosUploadResponse response = yopClient.upload(request);
             log.info("易宝资质上传返回参数" + response.getStringResult());
             return response;
-        }catch (YopClientException e){
-            log.error("易宝请求异常:" +e.getMessage(), e);
+        } catch (YopClientException e) {
+            log.error("易宝请求异常:" + e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
     }
