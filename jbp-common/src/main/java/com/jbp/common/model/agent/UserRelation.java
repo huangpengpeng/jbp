@@ -68,4 +68,8 @@ public class UserRelation extends BaseModel {
     @ApiModelProperty("上级星级")
     @TableField(exist = false)
     private String pCapaXsName;
+
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
 }

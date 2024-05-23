@@ -87,4 +87,8 @@ public class UserInvitation extends BaseModel {
     @TableField(exist = false)
     private String mCapaXsName;
 
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
 }

@@ -36,6 +36,9 @@ public class UserInvitationJumpListResponse implements Serializable {
     @ApiModelProperty("创建时间")
     private Date gmtCreated;
 
+    @ApiModelProperty("团队名称")
+    private String teamName;
+
 
 
 

@@ -78,5 +78,9 @@ public class UserRelationFlow extends BaseModel {
     @TableField(exist = false)
     private String pCapaXsName;
 
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
 }
 
