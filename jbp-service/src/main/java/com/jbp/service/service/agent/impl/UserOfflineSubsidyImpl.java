@@ -42,13 +42,19 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     private CityRegionService cityRegionService;
 
     @Override
-    public PageInfo<UserOfflineSubsidy> pageList(Integer uid, String province, String city, String area, PageParamRequest pageParamRequest) {
+    public PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserOfflineSubsidy> lqw = new LambdaQueryWrapper<UserOfflineSubsidy>()
-                .eq(!ObjectUtil.isNull(uid), UserOfflineSubsidy::getUid, uid)
-                .eq(!ObjectUtil.isNull(province) && !province.equals(""), UserOfflineSubsidy::getProvince, province)
-                .eq(!ObjectUtil.isNull(city) && !city.equals(""), UserOfflineSubsidy::getCity, city)
-                .eq(!ObjectUtil.isNull(area) && !area.equals(""), UserOfflineSubsidy::getArea, area)
-                .orderByDesc(UserOfflineSubsidy::getUid);
+                .eq(!ObjectUtil.isNull(uid), UserOfflineSubsidy::getUid, uid);
+        if (provinceId!=null){
+            lqw.eq(UserOfflineSubsidy::getProvince, cityRegionService.getByRegionId(provinceId).getRegionName());
+        }
+        if (cityId!=null){
+            lqw.eq(UserOfflineSubsidy::getCity, cityRegionService.getByRegionId(cityId).getRegionName());
+        }
+        if (areaId!=null){
+            lqw.eq(UserOfflineSubsidy::getArea, cityRegionService.getByRegionId(areaId).getRegionName());
+        }
+        lqw.orderByDesc(UserOfflineSubsidy::getUid);
         Page<UserRegion> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserOfflineSubsidy> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
