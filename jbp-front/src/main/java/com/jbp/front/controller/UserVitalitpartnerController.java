@@ -95,11 +95,11 @@ public class UserVitalitpartnerController {
          }
 
         UserOfflineSubsidy userOfflineSubsidy =  userOfflineSubsidyService.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getStatus,"已开通").eq(UserOfflineSubsidy::getArea,"").eq(UserOfflineSubsidy::getUid,user.getId()));
-         if(userOfflineSubsidy == null){
+         if(userOfflineSubsidy != null){
              list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/e9ff7c1ca4694b14905088f4a36f634b");
          }
         UserOfflineSubsidy userOfflineSubsidy2 =  userOfflineSubsidyService.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getStatus,"已开通").ne(UserOfflineSubsidy::getArea,"").eq(UserOfflineSubsidy::getUid,user.getId()));
-        if(userOfflineSubsidy2 == null){
+        if(userOfflineSubsidy2 != null){
             list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/85b9f50620c84249972809e0cd7b4e48");
         }
 

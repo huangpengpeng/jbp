@@ -94,6 +94,8 @@ public class OrderFrontDataResponse implements Serializable {
     @ApiModelProperty(value = "服务码")
     private String serverSn;
 
+    @ApiModelProperty(value = "平台订单号")
+    private String platOrderNo;
 
 
 }
