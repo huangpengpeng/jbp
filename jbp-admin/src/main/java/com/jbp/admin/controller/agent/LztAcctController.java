@@ -63,10 +63,6 @@ public class LztAcctController {
     private DegreePayService degreePayService;
     @Resource
     private SmsService smsService;
-    @Resource
-    private SystemConfigService systemConfigService;
-    @Resource
-    private RedisUtil redisUtil;
 
     @GetMapping("/add")
     @ApiOperation("新增账户")

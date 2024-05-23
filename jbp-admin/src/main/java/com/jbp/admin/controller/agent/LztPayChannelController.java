@@ -35,28 +35,32 @@ public class LztPayChannelController {
     @PostMapping("/saveOrUpdate")
     @ApiOperation("新增")
     public CommonResult<LztPayChannel> add(@RequestBody LztPayChannel request) {
-        if(StringUtils.isEmpty(request.getName())){
+        if (StringUtils.isEmpty(request.getName())) {
             throw new RuntimeException("名称必填");
         }
-        if(StringUtils.isEmpty(request.getType())){
+        if (StringUtils.isEmpty(request.getType())) {
             throw new RuntimeException("类型必填");
         }
-        if(request.getMerId() == null){
+        if (request.getMerId() == null) {
             throw new RuntimeException("商户必填");
         }
-        if(request.getPartnerId() == null){
+        if (request.getPartnerId() == null) {
             throw new RuntimeException("平台编号必填");
         }
-        if(request.getTradeModel() == null){
+        if (request.getTradeModel() == null) {
             throw new RuntimeException("模式必填");
         }
-        if(request.getHandlingFee() == null){
+        if (request.getHandlingFee() == null) {
             throw new RuntimeException("手续费必填");
         }
-        if(StringUtils.equals(request.getType(), "连连")){
-            if(StringUtils.isEmpty(request.getPriKey())){
+        if (StringUtils.equals(request.getType(), "连连")) {
+            if (StringUtils.isEmpty(request.getPriKey())) {
                 throw new RuntimeException("私钥不能为空");
             }
+        }
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(request.getMerId(), request.getType());
+        if (lztPayChannel != null && request.getId() != null && lztPayChannel.getId().intValue() != request.getId().intValue()) {
+            throw new RuntimeException("当前商户支付渠道已经存在不允许重复添加");
         }
         lztPayChannelService.saveOrUpdate(request);
         return CommonResult.success();

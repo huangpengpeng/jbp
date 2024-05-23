@@ -66,7 +66,10 @@ public class  YopProducts {
 //        易宝钱包提现_实时到账("WALLET_WITHDRAW_REALTIME", "SINGLE_FIXED", "1", "0"),
 //        易宝钱包支付_余额支付("WALLET_PAY_BALANCEPAY", "SINGLE_FIXED", "0", "0"),
 
+//        企业账户转账_公对公("ENTERPRISE_TRANSFER_B2B", "SINGLE_FIXED", "1", "1"),
         D1_自助结算("D1_MANUAL", "SINGLE_FIXED", "0", "0"),
+        企业账户提现标准版_实时到账("ENTERPRISE_WITHDRAW_STANDARD_REALTIME", "SINGLE_FIXED", "1", "1"),
+
         ;
 
         @Getter

@@ -10,6 +10,7 @@ import com.jbp.common.yop.dto.BenefitDTO;
 import com.jbp.common.yop.dto.SnMultiChannelOpenAccountDTO;
 import com.jbp.common.yop.params.BankAccountOpenParams;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
+import com.jbp.common.yop.params.RegisterMicroH5Params;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
@@ -53,21 +54,47 @@ public class JbpFrontApplication {
 
         YopService yopService = run.getBean(YopService.class);
 
-//          String withdrawNo = StringUtils.N_TO_10("LZT_WD_");
-//         WithdrawCardQueryResult card = yopService.withdrawCardQuery("10090316825");
-//        System.out.println(JSONObject.toJSONString(card));
-
-//         WithdrawOrderResult withdrawOrderResult = yopService.withdrawOrder("10090316790", withdrawNo,
-//                card.getBankCardAccountList().get(0).getBindCardId(), "0.2", "https://applet.dys.ink/yop/ew");
-//
-//         System.out.println(JSONObject.toJSONString(withdrawOrderResult));
-
+        String registerMicroH5No = StringUtils.N_TO_10("YOP_OPEN_");
+        RegisterMicroH5Params params = new RegisterMicroH5Params();
+        params.setParentMerchantNo("10089625822");
+        params.setMobile("15871898210");
+        params.setRequestNo(registerMicroH5No);
+        params.setNotifyUrl("http://fky.natapp1.cc/yop/"+registerMicroH5No);
+        params.setReturnUrl("http://fky.natapp1.cc/yop/re");
 
 
+         RegisterMicroH5Result registerMicroH5Result = yopService.registerMicroH5(params);
+
+//        withdraw(yopService);
+
+//        transfer(yopService);
+
+//        register(yopService);
+
+//        queryOpenBank(yopService);
+
+
+//         RegisterQueryResult result = yopService.registerQuery("LZT_RS_103702359635243");
 
         System.out.println("111");
 
 
+    }
+
+    private static void withdraw(YopService yopService) {
+        String withdrawNo = StringUtils.N_TO_10("LZT_DW_");
+        WithdrawCardQueryResult card = yopService.withdrawCardQuery("10090334402");
+        WithdrawOrderResult withdrawResult = yopService.withdrawOrder("10090334402", withdrawNo, card.getBankCardAccountList().get(0).getBindCardId(), "1", "http://fky.natapp1.cc/yop/dw");
+
+        System.out.println(JSONObject.toJSONString(withdrawResult));
+    }
+
+    private static void transfer(YopService yopService) {
+        String transferNo = StringUtils.N_TO_10("LZT_NDF_");
+        // 10090316790  5元最早账户
+        // 10089625822
+        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10090316790", "10090334402", "1", null);
+        System.out.println(JSONObject.toJSONString(transferResult));
     }
 
     private static void register(YopService yopService) {
@@ -80,13 +107,13 @@ public class JbpFrontApplication {
         System.out.println(JSONObject.toJSONString(registerMicroResult));
 
 
-        RegisterQueryResult result = yopService.registerQuery("LZT_RS_157329444997738");
-        System.out.println(JSONObject.toJSONString(result));
+//        RegisterQueryResult result = yopService.registerQuery("LZT_RS_157329444997738");
+//        System.out.println(JSONObject.toJSONString(result));
     }
 
 
     private static void queryOpenBank(YopService yopService) {
-        BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090328093", "BO_65808892927832");
+        BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090333092", "BO_147774594513976");
         System.out.println(JSONObject.toJSONString(bankAccountQueryResult));
     }
 
@@ -104,11 +131,12 @@ public class JbpFrontApplication {
         System.out.println(requestNo2);
         params.setRequestNo(requestNo2);
         params.setMerchantNo("10090333092");
-        params.setMerchantName("海口龙华郦冷琴百货店（个体工商户）");
+
+        params.setMerchantName("海口龙华帅梦春百货店（个体工商户）");
         params.setOpenBankCode("SUNINGBANK_MULTICHANNEL");
         params.setOpenAccountType("INDIVIDUAL_BUSINESS_TYPE");
         params.setCertificateType("BUSINESS_LICENCE");
-        params.setCertificateNo("92460000MADG8WF957");
+        params.setCertificateNo("92460000MADG8W081L");
         params.setNotifyUrl("https://applet.dys.ink/yop/ew");
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
@@ -116,30 +144,31 @@ public class JbpFrontApplication {
         dto.setSocialCreditCodeImageUrl("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7.png");
         dto.setSocialCreditCodeImageUrl(yopService.upload(dto.getSocialCreditCodeImageUrl()));
 
-        dto.setLegalCardImageFont("http://batchatx-dys.oss-cn-shenzhen.aliyuncs.com/c9081f5aa23742229d83b0d1fc25cf9c");
+        dto.setLegalCardImageFont("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%81.jpeg");
         dto.setLegalCardImageFont(yopService.upload(dto.getLegalCardImageFont()));
 
-        dto.setLegalCardImageBack("http://batchatx-dys.oss-cn-shenzhen.aliyuncs.com/6631ec634cff45f8905774f2e978c118");
+        dto.setLegalCardImageBack("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%811.jpeg");
         dto.setLegalCardImageBack(yopService.upload(dto.getLegalCardImageBack()));
 
-        dto.setLegalMobileNo("13543341989");
+        dto.setLegalMobileNo("13691813976");
         dto.setOperatorName("徐静");
         dto.setMobileNo("13823668660");
 
         List<BenefitDTO> benefitList = Lists.newArrayList();
         BenefitDTO benefit = new BenefitDTO();
-        benefit.setBenefitName("甘富权");
+        benefit.setBenefitName("甘富红");
         benefit.setBenefitIdType("ID_CARD");
-        benefit.setBenefitIdNo("440982198604243196");
-        benefit.setBenefitStartDate("20130104");
-        benefit.setBenefitExpireDate("20330104");
-        benefit.setBenefitImageFont("http://batchatx-dys.oss-cn-shenzhen.aliyuncs.com/c9081f5aa23742229d83b0d1fc25cf9c");
+        benefit.setBenefitIdNo("440924197404133189");
+
+        benefit.setBenefitStartDate("20180208");
+        benefit.setBenefitExpireDate("20380208");
+        benefit.setBenefitImageFont("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%81.jpeg");
         benefit.setBenefitImageFont(yopService.upload(benefit.getBenefitImageFont()));
 
-        benefit.setBenefitImageBack("http://batchatx-dys.oss-cn-shenzhen.aliyuncs.com/6631ec634cff45f8905774f2e978c118");
+        benefit.setBenefitImageBack("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%811.jpeg");
         benefit.setBenefitImageBack(yopService.upload(benefit.getBenefitImageBack()));
 
-        benefit.setBenefitAddress("广东省化州市合江镇新车村195号之一");
+        benefit.setBenefitAddress("广东省深圳市龙岗区平湖街道办凤凰社区居委会建设路六巷3号401房");
         benefitList.add(benefit);
 
         dto.setBenefitDTOList(benefitList);

@@ -36,32 +36,26 @@ public class LztAcctOpenController {
 
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
-    @ApiOperation(value = "开户申请")
+    @ApiOperation(value = "连连开户")
     @GetMapping(value = "/apply")
-    public CommonResult<LztAcctOpen> apply(Long payChannelId, String partnerUserId,  Integer merId, String userId, String userType, String returnUrl, String businessScope) {
-        if (ObjectUtil.isEmpty(merId)) {
-            SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-             merId = systemAdmin.getMerId();
-        }
-        if (payChannelId == null && partnerUserId == null) {
-            throw new RuntimeException("请选择支付渠道");
-        }
-        if(partnerUserId != null){
-            LztAcct lztAcct = lztAcctService.getByUserId(partnerUserId);
-            payChannelId = lztAcct.getPayChannelId();
-        }
-        if(payChannelId != null){
-            LztPayChannel lztPayChannel = lztPayChannelService.getById(payChannelId);
-            if (lztPayChannel == null) {
-                throw new RuntimeException("支付渠道不存在");
-            }
-            if (lztPayChannel.getMerId().intValue() != merId.intValue()) {
-                throw new RuntimeException("只能选择当前商户的支付渠道");
-            }
-        }
-        LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(merId, userId, userType, returnUrl, businessScope, payChannelId);
+    public CommonResult<LztAcctOpen> apply(String userId, String userType, String returnUrl, String businessScope) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(systemAdmin.getMerId(), "连连");
+        LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(systemAdmin.getMerId(), userId, userType, returnUrl, businessScope, lztPayChannel);
         return CommonResult.success(lztAcctOpen);
     }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
+    @ApiOperation(value = "易宝开户")
+    @GetMapping(value = "/yop/apply")
+    public CommonResult<LztAcctOpen> yopApply(String userId, String userType, String returnUrl, String businessScope) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(systemAdmin.getMerId(), "易宝");
+        LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(systemAdmin.getMerId(), userId, userType, returnUrl, businessScope, lztPayChannel);
+        return CommonResult.success(lztAcctOpen);
+    }
+
+
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:page')")
     @ApiOperation(value = "开户记录列表")

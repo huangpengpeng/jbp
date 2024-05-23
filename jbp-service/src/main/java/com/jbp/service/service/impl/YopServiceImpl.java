@@ -32,12 +32,17 @@ public class YopServiceImpl implements YopService {
     private YopClient yopClient;
 
     @Override
+    public RegisterMicroH5Result registerMicroH5(RegisterMicroH5Params params) {
+        return send("/rest/v2.0/mer/register/saas/index", "POST", params, RegisterMicroH5Result.class);
+    }
+
+    @Override
     public RegisterMicroResult registerMicro(String requestNo, String signName, String id_card, String frontUrl,
                                              String backUrl, String mobile, String province, String city, String district,
                                              String address, String bankCardNo, String bankCode, String notifyUrl) {
         RegisterMicroParams params = new RegisterMicroParams();
         params.setParentMerchantNo("10089625822");
-        params.setBusinessRole("SHARE_MERCHANT");
+        params.setBusinessRole("SETTLED_MERCHANT");
         params.setRequestNo(requestNo);
 
         // 签约信息
@@ -155,7 +160,7 @@ public class YopServiceImpl implements YopService {
     @Override
     public WithdrawOrderResult withdrawOrder(String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl) {
         WithdrawOrderParams params = new WithdrawOrderParams();
-        params.setParentMerchantNo("10089066338");
+        params.setParentMerchantNo("10089625822");
         params.setMerchantNo(merchantNo);
         params.setRequestNo(requestNo);
         params.setBankCardId(bankCardId);

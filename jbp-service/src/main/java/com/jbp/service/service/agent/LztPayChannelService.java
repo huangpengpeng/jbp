@@ -11,5 +11,7 @@ public interface LztPayChannelService extends IService<LztPayChannel> {
 
    List<LztPayChannel> getByMer(Integer merId);
 
+    LztPayChannel getByMer(Integer merId, String type);
+
 
 }

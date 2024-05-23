@@ -24,4 +24,9 @@ public class LztPayChannelServiceImpl extends ServiceImpl<LztPayChannelDao, LztP
     public List<LztPayChannel> getByMer(Integer merId) {
         return list(new LambdaQueryWrapper<LztPayChannel>().eq(LztPayChannel::getMerId, merId));
     }
+
+    @Override
+    public LztPayChannel getByMer(Integer merId, String type) {
+        return getOne(new LambdaQueryWrapper<LztPayChannel>().eq(LztPayChannel::getMerId, merId).eq(LztPayChannel::getType, type).last(" limit 1"));
+    }
 }

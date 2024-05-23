@@ -3,10 +3,17 @@ package com.jbp.service.service;
 import com.jbp.common.yop.params.BankAccountOpenParams;
 import com.jbp.common.yop.params.MerchantInfoModifyParams;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
+import com.jbp.common.yop.params.RegisterMicroH5Params;
 import com.jbp.common.yop.result.*;
 
 public interface YopService {
 
+
+    /**
+     * H5注册个人入网
+     *
+     */
+    RegisterMicroH5Result registerMicroH5(RegisterMicroH5Params params);
 
 
     /**
