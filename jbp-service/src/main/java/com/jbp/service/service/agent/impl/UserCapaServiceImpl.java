@@ -2,6 +2,7 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -147,10 +148,13 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     }
 
     @Override
-    public PageInfo<UserCapa> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest) {
+    public PageInfo<UserCapa> pageList(Integer uid, Long capaId, String phone,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserCapa> userCapaLambdaQueryWrapper = new LambdaQueryWrapper<UserCapa>();
         userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(uid), UserCapa::getUid, uid);
         userCapaLambdaQueryWrapper.eq(!ObjectUtil.isNull(capaId), UserCapa::getCapaId, capaId);
+        if (StrUtil.isNotBlank(phone)){
+            userCapaLambdaQueryWrapper.apply("1=1 and uid in (select id from eb_user where phone = '" + phone + "')");
+        }
         Page<UserCapa> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserCapa> list = list(userCapaLambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list)) {
@@ -159,7 +163,9 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         Map<Integer, User> userMap = userService.getUidMapList(list.stream().map(UserCapa::getUid).collect(Collectors.toList()));
         Map<Long, Capa> capaMap = capaService.getCapaMap();
         list.forEach(e -> {
+            User user = userMap.get(e.getUid());
             e.setAccount(userMap.get(e.getUid()).getAccount());
+            e.setPhone(user!= null ? user.getPhone() : "");
             Capa capa = capaMap.get(e.getCapaId());
             e.setCapaName(capa.getName());
             e.setCapaUrl(capa.getIconUrl());
