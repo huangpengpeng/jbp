@@ -11,6 +11,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.product.comm.FeelGratefulCapaCommHandler;
 import com.jbp.service.product.comm.OfflineSubsidyCommHandler;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
@@ -52,10 +53,10 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 //
-//        OfflineSubsidyCommHandler productCommChain = run.getBean(OfflineSubsidyCommHandler.class);
+//        FeelGratefulCapaCommHandler productCommChain = run.getBean(FeelGratefulCapaCommHandler.class);
 //       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //       OrderService orderService = run.getBean(OrderService.class);
-//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT339171645099026128902"));
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT600171646333294428146"));
 //
 //       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 //         LinkedList<CommCalculateResult> commList = new LinkedList<>();
