@@ -11,6 +11,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.product.comm.OfflineSubsidyCommHandler;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaXsService;
@@ -50,13 +51,16 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-//        ProductCommChain productCommChain = run.getBean(ProductCommChain.class);
-//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
-//        OrderService orderService = run.getBean(OrderService.class);
-//      Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT376171626188683980796 "));
-//        List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
-//        LinkedList<CommCalculateResult> commList = new LinkedList<>();
+//
+//        OfflineSubsidyCommHandler productCommChain = run.getBean(OfflineSubsidyCommHandler.class);
+//       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+//       OrderService orderService = run.getBean(OrderService.class);
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT339171645099026128902"));
+//
+//       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+//         LinkedList<CommCalculateResult> commList = new LinkedList<>();
+//
+//        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class);
 //         List<Oldcapaxs> list =  oldcapaxsService.list();

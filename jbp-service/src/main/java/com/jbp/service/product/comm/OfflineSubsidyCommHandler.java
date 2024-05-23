@@ -111,12 +111,12 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
 
             //市公司补助
-            UserOfflineSubsidy userOfflineSubsidy = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), null, UserRegion.Constants.已开通.toString());
+            UserOfflineSubsidy userOfflineSubsidy = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), "", UserRegion.Constants.已开通.toString());
             BigDecimal totalCityAmt = BigDecimal.ZERO;
             if (rule.getMode().equals("比例")) {
                 totalCityAmt = totalPv.multiply(rule.getCityComm());
             } else {
-                totalCityAmt = rule.getCityComm();
+                totalCityAmt = rule.getCityComm().multiply(new BigDecimal(orderDetail.getPayNum()));
             }
             if (userOfflineSubsidy != null && totalCityAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalCityAmt,
@@ -130,7 +130,7 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             if (rule.getMode().equals("比例")) {
                 totalAreaAmt = totalPv.multiply(rule.getAreaComm());
             } else {
-                totalAreaAmt = rule.getAreaComm();
+                totalAreaAmt = rule.getAreaComm().multiply(new BigDecimal(orderDetail.getPayNum()));
             }
             if (userOfflineSubsidy2 != null && totalAreaAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy2.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalAreaAmt,
