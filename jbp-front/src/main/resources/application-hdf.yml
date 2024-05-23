@@ -147,6 +147,7 @@ kq:
 historyOrder:
   ifOpenOrder: true
   name: hdfmall
+  ifAgent: true
 
 internal:
   uid:
