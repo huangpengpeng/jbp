@@ -173,14 +173,14 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
 
                 }
 
+                List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()).eq(FundClearing::getUid,user.getId()));
+                //减去用户发放的佣金金额
+                for(FundClearing fundClearing1 :fundClearingList2){
+                    fundClearing1.setSendAmt(fundClearing1.getSendAmt().subtract( fundClearing1.getSendAmt().multiply(amtRatio)));
+                    fundClearing1.setCommAmt(fundClearing1.getCommAmt().subtract(fundClearing1.getCommAmt().multiply(amtRatio)));
+                    fundClearingService.updateById(fundClearing1);
+                }
 
-            }
-            List<FundClearing> fundClearingList2 = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, order.getOrderNo()).eq(FundClearing::getCommName,fundClearing.getCommName()).ne(FundClearing::getCommName,ProductCommEnum.感恩奖.getName()).eq(FundClearing::getUid,user.getId()));
-            //减去用户发放的佣金金额
-            for(FundClearing fundClearing1 :fundClearingList2){
-                fundClearing1.setSendAmt(fundClearing1.getSendAmt().subtract( fundClearing1.getSendAmt().multiply(amtRatio)));
-                fundClearing1.setCommAmt(fundClearing1.getCommAmt().subtract(fundClearing1.getCommAmt().multiply(amtRatio)));
-                fundClearingService.updateById(fundClearing1);
             }
 
 

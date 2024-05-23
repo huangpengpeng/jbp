@@ -1,21 +1,26 @@
 package com.jbp.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.Oldcapaxs;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.ConditionChain;
-import com.jbp.service.service.OldcapaxsService;
-import com.jbp.service.service.UserService;
+import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.product.comm.FeelGratefulCapaCommHandler;
+import com.jbp.service.product.comm.OfflineSubsidyCommHandler;
+import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
 
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.city.CityRegion;
 import com.jbp.common.utils.StringUtils;
-import com.jbp.service.service.CityRegionService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -29,6 +34,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -46,20 +52,17 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-//        ConditionChain capaXsInvitationLine2Handler = run.getBean(ConditionChain.class);
 //
-//        CapaXsService capaXsService = run.getBean(CapaXsService.class);
-//        CapaXs capaXs =capaXsService.getById(6);
-//        // 升级条件
-//        List<RiseCondition> conditionList = capaXs.getConditionList();
-//        for(RiseCondition riseCondition :conditionList){
+//        FeelGratefulCapaCommHandler productCommChain = run.getBean(FeelGratefulCapaCommHandler.class);
+//       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+//       OrderService orderService = run.getBean(OrderService.class);
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT600171646333294428146"));
 //
-//              capaXsInvitationLine2Handler.isOk(1002644,riseCondition);
+//       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+//         LinkedList<CommCalculateResult> commList = new LinkedList<>();
 //
-//
-//        }
-
+//        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
+//        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class);
 //         List<Oldcapaxs> list =  oldcapaxsService.list();
 //        CapaXsService capaXsService = run.getBean(CapaXsService.class);
