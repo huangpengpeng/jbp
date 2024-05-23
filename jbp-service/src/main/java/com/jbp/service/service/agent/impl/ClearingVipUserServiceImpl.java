@@ -2,14 +2,12 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
-import com.jbp.common.model.agent.ClearingVipUser;
-import com.jbp.common.model.agent.ProductComm;
-import com.jbp.common.model.agent.ProductCommConfig;
-import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
@@ -24,6 +22,8 @@ import com.jbp.service.product.comm.MonthPyCommHandler;
 import com.jbp.service.product.comm.ProductCommEnum;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.TeamService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.agent.ClearingVipUserService;
 import com.jbp.service.service.agent.ProductCommConfigService;
 import com.jbp.service.service.agent.ProductCommService;
@@ -61,6 +61,10 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
     private UserCapaService userCapaService;
     @Autowired
     private ProductCommConfigService productCommConfigService;
+    @Autowired
+    private TeamUserService teamUserService;
+    @Autowired
+    private TeamService teamService;
 
     @Override
     public ClearingVipUser create(Integer uid, String accountNo, Long level, String levelName,
@@ -94,7 +98,7 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         ProductCommConfig config = productCommConfigService.getByType(ProductCommEnum.培育佣金.getType());
         UserMonthActiveResponse response = new UserMonthActiveResponse();
         if (config == null || !config.getIfOpen() || StringUtils.isEmpty(config.getRatioJson())) {
-            return response.setMsg("未开启活跃设置");
+            return response.setMsg("未开启活跃设置").setIsActive(false);
         }
         //获取当前月份的第一天和最后一天
         Date now = DateTimeUtils.getNow();
@@ -136,14 +140,27 @@ public class ClearingVipUserServiceImpl extends UnifiedServiceImpl<ClearingVipUs
         BigDecimal subPrice = hundred.subtract(fee);
 
         if (userCapa == null || NumberUtils.compare(userCapa.getCapaId(), rule.getCapaId()) < 0) {
-            return response.setPayPrice(fee).setMsg("等级未达到要求");
+            return response.setIsActive(false).setSubPrice(subPrice).setPayPrice(fee).setMsg("等级未达到要求");
         }
+        //汇成团队成员活跃展示
+        TeamUser teamUser = teamUserService.getOne(new QueryWrapper<TeamUser>().lambda().eq(TeamUser::getUid, uid));
+        if (teamUser != null) {
+            Team team = teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getId, teamUser.getTid()));
+            if (team != null && team.getName().equals("汇成")) {
+                if (level < 3L){
+                    return response.setIsActive(false).setSubPrice(subPrice).setPayPrice(fee).setMsg("请及时复购");
+                }else {
+                    return response.setIsActive(true).setSubPrice(subPrice).setPayPrice(fee).setMsg(ruleList.get(2).getPayPrice().toString());
+                }
+            }
+        }
+        //其他成员活跃展示
         if (level == 0L) {
-            return response.setMsg("" + subPrice).setIsActive(false).setSubPrice(subPrice).setPayPrice(fee);
+            return response.setMsg("请及时复购").setIsActive(false).setSubPrice(subPrice).setPayPrice(fee);
         } else if (level == 1L || level == 2L) {
-            return response.setMsg("" + ruleList.get(0).getPayPrice()).setPayPrice(fee).setSubPrice(subPrice).setIsActive(true);
+            return response.setMsg(ruleList.get(0).getPayPrice().toString()).setPayPrice(fee).setSubPrice(subPrice).setIsActive(true);
         } else {
-            return response.setMsg("" + ruleList.get(2).getPayPrice()).setPayPrice(fee).setSubPrice(subPrice).setIsActive(true);
+            return response.setMsg(ruleList.get(2).getPayPrice().toString()).setPayPrice(fee).setSubPrice(subPrice).setIsActive(true);
         }
     }
 }
