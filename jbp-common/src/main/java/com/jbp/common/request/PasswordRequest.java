@@ -36,7 +36,7 @@ public class PasswordRequest implements Serializable {
     private String password;
 
     @ApiModelProperty(value = "验证码", required = true)
-    @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
+   // @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
     @JsonProperty(value = "captcha")
     private String validateCode;
 
