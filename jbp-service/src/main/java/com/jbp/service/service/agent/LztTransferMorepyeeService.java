@@ -14,7 +14,7 @@ import java.util.List;
 public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee> {
 
     LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo,
-                                         BigDecimal amt, String txnPurpose, String pwd,
+                                         BigDecimal amt, BigDecimal feeAmount,  String txnPurpose, String pwd,
                                          String randomKey, String payeeId, String ip, String postscript);
 
     LztTransferMorepyee callBack(QueryPaymentResult paymentResult);

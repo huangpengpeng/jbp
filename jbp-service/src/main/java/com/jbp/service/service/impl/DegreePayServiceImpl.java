@@ -126,7 +126,7 @@ public class DegreePayServiceImpl implements DegreePayService {
     }
 
     @Override
-    public AcctSerialResult queryAcctSerial(LztAcct lztAcct, String startTime, String entTime, Integer pageNo) {
+    public AcctSerialResult queryAcctSerial(LztAcct lztAcct, String startTime, String entTime, Integer pageNo, Integer limit) {
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         Date start = DateTimeUtils.parseDate(startTime);
         Date end = DateTimeUtils.parseDate(entTime);

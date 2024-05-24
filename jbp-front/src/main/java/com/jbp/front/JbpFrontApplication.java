@@ -1,20 +1,15 @@
 package com.jbp.front;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.dto.BenefitDTO;
 import com.jbp.common.yop.dto.SnMultiChannelOpenAccountDTO;
 import com.jbp.common.yop.params.BankAccountOpenParams;
-import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.params.RegisterMicroH5Params;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
-import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
-import com.yeepay.yop.sdk.security.DigitalEnvelopeUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -176,6 +171,7 @@ public class JbpFrontApplication {
 
         BankAccountOpenResult result = yopService.bankAccountOpen(params);
         System.out.println(JSONObject.toJSONString(result));
+
     }
 
 

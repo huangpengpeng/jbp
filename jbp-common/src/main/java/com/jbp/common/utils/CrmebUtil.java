@@ -5,10 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.exception.CrmebException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
@@ -46,8 +44,10 @@ public class CrmebUtil {
      */
     public static void main(String[] args) throws Exception {
 //        System.out.println(encryptPassword("123456", "15871898211"));
-        System.out.println("美质"+decryptPassowrd("8FOo2uLVucE=", "19011203013"));
-
+        System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
+        System.out.println(decryptPassowrd("qNRS8Ah2YmU=", "19979384655"));
+        System.out.println(decryptPassowrd("qYt3rFZLANUI2QE1JaCktQ==", "18929560630"));
+        System.out.println(decryptPassowrd("qT2WGnqYLTT63zbreFYPkg==", "13686668640"));
     }
 
     public static String encryptPassword(String pwd, String key) {
@@ -144,6 +144,8 @@ public class CrmebUtil {
         if (map == null) return null;
         return JSONObject.parseObject(JSONObject.toJSONString(map), clz);
     }
+
+
 
 
     /**

@@ -6,7 +6,7 @@ import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 public interface LztAcctService extends IService<LztAcct> {
 
@@ -20,4 +20,6 @@ public interface LztAcctService extends IService<LztAcct> {
 
 
     LztInfoResponse lztInfo(Integer merId);
+
+    BigDecimal getFee(String userId, BigDecimal amt);
 }

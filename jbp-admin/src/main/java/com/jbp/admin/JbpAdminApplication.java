@@ -1,10 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.service.service.agent.LztAcctOpenService;
-import com.jbp.service.service.agent.LztAcctService;
-import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
-import com.jbp.service.service.agent.impl.LztAcctServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -57,7 +57,7 @@ public class PlatformLoginController {
         return CommonResult.success(systemAdminResponse);
     }
 
-    @PreAuthorize("hasAuthority('platform:logout')")
+//    @PreAuthorize("hasAuthority('platform:logout')")
     @ApiOperation(value="登出")
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public CommonResult<Object> systemAdminLogout() {
@@ -65,7 +65,7 @@ public class PlatformLoginController {
         return CommonResult.success("logout success");
     }
 
-    @PreAuthorize("hasAuthority('platform:login:user:info')")
+//    @PreAuthorize("hasAuthority('platform:login:user:info')")
     @ApiOperation(value="获取登录用户详情")
     @RequestMapping(value = "/getAdminInfoByToken", method = RequestMethod.GET)
     public CommonResult<LoginAdminResponse> getAdminInfo() {

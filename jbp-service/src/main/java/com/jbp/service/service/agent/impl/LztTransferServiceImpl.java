@@ -12,13 +12,10 @@ import com.jbp.common.lianlian.result.LztTransferResult;
 import com.jbp.common.lianlian.result.QueryWithdrawalResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransfer;
-import com.jbp.common.model.agent.LztTransferMorepyee;
-import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztTransferDao;
 import com.jbp.service.service.DegreePayService;
@@ -35,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -67,13 +63,10 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
             throw new CrmebException("转账单号已经被使用");
         }
         LztAcct lztAcct = lztAcctService.getByUserId(payerId);
-        BigDecimal feeScale = lztAcct.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : lztAcct.getHandlingFee();
-        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
-        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
-            feeAmount = amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
-        }
+        BigDecimal feeAmount = lztAcctService.getFee(payerId, amt);
+        amt = amt.add(feeAmount);
         LztTransferResult transferResult = degreePayService.transfer(lztAcct, txnPurpose, txnSeqno,
-                amt.toString(), feeAmount.toString(), pwd, random_key, payeeType, bankAcctNo, bankCode, bankAcctName,
+         amt.toString(), feeAmount.toString(), pwd, random_key, payeeType, bankAcctNo, bankCode, bankAcctName,
                 cnapsCode, postscript, ip);
         LztTransfer lztTransfer = new LztTransfer(lztAcct.getMerId(), payerId, lztAcct.getUsername(), txnSeqno, transferResult.getAccp_txno(), amt, feeAmount, payeeType, bankAcctNo,
                 bankCode, bankAcctName, cnapsCode, postscript, lztAcct.getPayChannelType());

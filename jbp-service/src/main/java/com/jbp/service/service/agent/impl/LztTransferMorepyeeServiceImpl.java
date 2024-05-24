@@ -12,13 +12,10 @@ import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.lianlian.result.TransferMorepyeeResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransferMorepyee;
-import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.model.merchant.Merchant;
-import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.vo.MyRecord;
 import com.jbp.service.dao.agent.LztTransferMorepyeeDao;
 import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LztService;
@@ -28,14 +25,12 @@ import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import com.jbp.service.util.StringUtils;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +50,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
     private DegreePayService degreePayService;
 
     @Override
-    public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt,
+    public LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo, BigDecimal amt, BigDecimal feeAmount,
                                                 String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String postscript) {
         if (StringUtils.isEmpty(orderNo)) {
             orderNo = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix());
@@ -73,11 +68,9 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         }
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
         TransferMorepyeeResult result = degreePayService.transferMorepyee(payerAcct, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
-        LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno(), payerAcct.getPayChannelType());
-        transferMorepyee.setFeeAmount(BigDecimal.ZERO);
-        if(payerAcct.getPayChannelType().equals("易宝")){
-            transferMorepyee.setFeeAmount(BigDecimal.ONE);
-        }
+        BigDecimal fee = lztAcctService.getFee(payerId, amt);
+        amt = amt.add(fee);
+        LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, fee,postscript, result, result.getAccp_txno(), payerAcct.getPayChannelType());
         save(transferMorepyee);
         return transferMorepyee;
     }

@@ -5,8 +5,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.jbp.common.model.admin.SystemAdmin;
+import com.jbp.common.model.admin.SystemAdminRef;
+import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.LoginUserVo;
+import com.jbp.service.service.SystemAdminRefService;
 import com.jbp.service.service.SystemAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,6 +60,7 @@ public class MerchantLoginController {
     @Autowired
     private SystemAdminService systemAdminService;
 
+
     @ApiOperation(value="登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public CommonResult<SystemLoginResponse> login(@RequestBody @Validated SystemAdminLoginRequest systemAdminLoginRequest, HttpServletRequest request) {
@@ -62,7 +68,6 @@ public class MerchantLoginController {
         SystemLoginResponse systemAdminResponse = loginService.merchantLogin(systemAdminLoginRequest, ip);
         return CommonResult.success(systemAdminResponse);
     }
-    
 
     @PreAuthorize("hasAuthority('merchant:logout')")
     @ApiOperation(value="登出")
