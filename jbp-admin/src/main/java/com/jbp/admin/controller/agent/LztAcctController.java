@@ -108,7 +108,6 @@ public class LztAcctController {
         return CommonResult.success(apply);
     }
 
-    @PreAuthorize("hasAuthority('agent:lzt:acct:bank:yop:apply')")
     @ApiOperation(value = "易宝开通银行户")
     @GetMapping(value = "/yop/bank/apply")
     public CommonResult<LztAcctApply> yopBankApply(String userId, String merchantName, String openBankCode,
@@ -229,7 +228,7 @@ public class LztAcctController {
         }
         MerchantPayInfo payInfo = merchant.getPayInfo();
         CommonPage<AcctBalList> page = new CommonPage();
-        AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, dateStart, endStart, pageNo);
+        AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, dateStart, endStart, pageNo, limit);
         List<AcctBalList> acctbalList = result.getAcctbal_list();
         if (CollectionUtils.isNotEmpty(acctbalList)) {
             for (AcctBalList acctBalList : acctbalList) {

@@ -64,6 +64,7 @@ public class DegreePayServiceImpl implements DegreePayService {
                 if ("REVIEW_BACK".equals(registerQueryResult.getApplicationStatus())) {
                     result.setUser_status("ACTIVATE_PENDING");
                 }
+                result.setUser_name(lztAcctOpen.getUsername());
                 result.setRemark(registerQueryResult.getAuditOpinion());
             }
         }
@@ -93,10 +94,12 @@ public class DegreePayServiceImpl implements DegreePayService {
                         acctInfo.setAcct_state(account.getAccountStatus().equals("AVAILABLE") ? "NORMAL" : "CANCEL");
                         acctInfo.setAmt_balcur(account.getBalance());
                         acctInfo.setAmt_balaval(account.getBalance());
-                        acctInfoResult.setAcctinfo_list(acctinfoList);
+                        acctinfoList.add(acctInfo);
                     }
                 }
+                acctInfoResult.setAcctinfo_list(acctinfoList);
             }
+
         }
         return acctInfoResult;
     }
@@ -111,14 +114,25 @@ public class DegreePayServiceImpl implements DegreePayService {
             result = lztService.queryBankAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcctApply.getUserId());
         }
         if (lztAcctApply.getPayChannelType().equals("易宝")) {
-            BankAccountQueryResult bankAccountQuery = yopService.bankAccountQuery(lztAcctApply.getUserId(), lztAcctApply.getTxnSeqno());
-            if (bankAccountQuery != null && "SUCCESS".equals(bankAccountQuery.getStatus())) {
+            if (StringUtils.isNotEmpty(lztAcct.getBankAccount())) {
                 BankAccountBalanceQueryResult yopResult = yopService.bankAccountBalanceQuery(lztAcctApply.getUserId(), lztAcctApply.getOpenBank(),
-                        bankAccountQuery.getBankAccountNo());
-                lztAcct.setBankAccount(bankAccountQuery.getBankAccountNo());
+                        lztAcct.getBankAccount());
                 if (yopResult != null && yopResult.validate()) {
                     List<LztQueryAcctInfo> list = getAcctInfoList(lztAcct, yopResult);
                     result.setList(list);
+                }
+            } else {
+                if (StringUtils.isNotEmpty(lztAcctApply.getTxnSeqno())) {
+                    BankAccountQueryResult bankAccountQuery = yopService.bankAccountQuery(lztAcctApply.getUserId(), lztAcctApply.getTxnSeqno());
+                    if (bankAccountQuery != null && "SUCCESS".equals(bankAccountQuery.getStatus())) {
+                        BankAccountBalanceQueryResult yopResult = yopService.bankAccountBalanceQuery(lztAcctApply.getUserId(), lztAcctApply.getOpenBank(),
+                                bankAccountQuery.getBankAccountNo());
+                        lztAcct.setBankAccount(bankAccountQuery.getBankAccountNo());
+                        if (yopResult != null && yopResult.validate()) {
+                            List<LztQueryAcctInfo> list = getAcctInfoList(lztAcct, yopResult);
+                            result.setList(list);
+                        }
+                    }
                 }
             }
         }
@@ -133,11 +147,11 @@ public class DegreePayServiceImpl implements DegreePayService {
         AcctSerialResult result = new AcctSerialResult();
         if (lztAcct.getPayChannelType().equals("连连")) {
             result = lztService.queryAcctSerial(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(),
-                    LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), startTime, entTime, null, pageNo.toString());
+                    LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), startTime, entTime, null, pageNo, limit);
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
             FundBillFlowQueryResult yopResult = yopService.fundBillFlowQuery(DateTimeUtils.format(start, DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN),
-                    DateTimeUtils.format(end, DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN), lztAcct.getUserId(), pageNo, 10);
+                    DateTimeUtils.format(end, DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN), lztAcct.getUserId(), pageNo, limit);
 
             if (yopResult != null && yopResult.validate()) {
                 result.setUser_id(lztAcct.getUserId());
@@ -180,6 +194,8 @@ public class DegreePayServiceImpl implements DegreePayService {
                 }
                 result.setAcctbal_list(list);
             }
+
+
         }
         return result;
     }

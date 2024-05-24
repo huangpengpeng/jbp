@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -55,4 +56,8 @@ public class LztPayChannel extends BaseModel {
 
     @ApiModelProperty(value = "手续费(%)")
     private BigDecimal handlingFee;
+
+    @ApiModelProperty(value = "商户名称")
+    @TableField(exist = false)
+    private String merName;
 }

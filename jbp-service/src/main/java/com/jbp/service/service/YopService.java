@@ -5,6 +5,9 @@ import com.jbp.common.yop.params.MerchantInfoModifyParams;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.params.RegisterMicroH5Params;
 import com.jbp.common.yop.result.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface YopService {
 
@@ -40,6 +43,8 @@ public interface YopService {
 
 
     String upload(String url);
+
+    String upload(MultipartFile file);
 
     /**
      * 银行开户

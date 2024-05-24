@@ -17,6 +17,7 @@ import com.yeepay.yop.sdk.service.common.response.YosUploadResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -55,9 +56,7 @@ public class YopServiceImpl implements YopService {
         JSONObject merchantCorporationInfo = new JSONObject();
         merchantCorporationInfo.put("legalLicenceType", "ID_CARD");
         merchantCorporationInfo.put("legalLicenceNo", id_card);
-        frontUrl = upload(frontUrl);
         merchantCorporationInfo.put("legalLicenceFrontUrl", frontUrl);
-        backUrl = upload(backUrl);
         merchantCorporationInfo.put("legalLicenceBackUrl", backUrl);
         merchantCorporationInfo.put("mobile", mobile);
         params.setMerchantCorporationInfo(merchantCorporationInfo.toJSONString());
@@ -113,6 +112,16 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
+    public String upload(MultipartFile file)  {
+        try {
+            return upload(file.getInputStream()).getMerQualUrl();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public BankAccountOpenResult bankAccountOpen(BankAccountOpenParams params) {
         params.setParentMerchantNo("10089066338");
         return send2("/rest/v1.0/account/account-manage/bank-account/open", "POST", params, BankAccountOpenResult.class);
@@ -154,7 +163,7 @@ public class YopServiceImpl implements YopService {
     public AllAccountBalanceQueryResult allAccountBalanceQuery(String merchantNo) {
         AccountBalanceQueryParams params = new AccountBalanceQueryParams();
         params.setMerchantNo(merchantNo);
-        return send("/rest/v1.0/account/accountinfos/query", "GET", params, AllAccountBalanceQueryResult.class);
+        return send3("/rest/v1.0/account/accountinfos/query", "GET", params, AllAccountBalanceQueryResult.class);
     }
 
     @Override
@@ -275,6 +284,30 @@ public class YopServiceImpl implements YopService {
         return send("/rest/v1.0/account/receipt/get", "GET", params, AccountReceiptResult.class);
     }
 
+    public <T> T send3(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
+        //生成易宝请求
+        YopRequest request = new YopRequest(url, method);
+        //设置参数
+        Map<String, Object> mapObj = JacksonTool.objectToMap(parameters);
+        for (Map.Entry<String, Object> entry : mapObj.entrySet()) {
+            if (entry.getValue() != null) {
+                request.addParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        String requestText = JacksonTool.toJsonString(request.getParameters().asMap());
+        log.info("易宝请求参数" + requestText);
+        try {
+            YopResponse response = yopClient.request(request);
+            String responseText = JacksonTool.toJsonString(response);
+            log.info("易宝返回参数" + responseText);
+            //结果转换成对应的response
+            BaseYopResponse resp = (BaseYopResponse) JacksonTool.toObject(response.getResult(), responseClass);
+            return (T) resp;
+        } catch (Exception e) {
+            log.error("易宝请求异常:" + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);

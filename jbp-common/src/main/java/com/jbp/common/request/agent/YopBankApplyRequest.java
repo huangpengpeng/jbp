@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.Serializable;
 
 @Data

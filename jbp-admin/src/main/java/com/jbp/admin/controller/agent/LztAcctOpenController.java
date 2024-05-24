@@ -10,14 +10,19 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.YopBankApplyRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.service.LztService;
+import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -27,10 +32,18 @@ import javax.annotation.Resource;
 public class LztAcctOpenController {
 
     @Resource
+    private YopService yopService;
+    @Resource
     private LztAcctOpenService lztAcctOpenService;
     @Resource
     private LztPayChannelService lztPayChannelService;
 
+
+    @ApiOperation(value = "图片上传")
+    @RequestMapping(value = "/yop/image", method = RequestMethod.POST)
+    public CommonResult<String> image(MultipartFile multipart) {
+        return CommonResult.success(yopService.upload(multipart));
+    }
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
     @ApiOperation(value = "连连个人开户")

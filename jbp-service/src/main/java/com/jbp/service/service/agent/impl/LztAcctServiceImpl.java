@@ -81,6 +81,12 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         }
         AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcct);
         if (lztAcct.getIfOpenBankAcct()) {
+            if(lztAcctApply == null){
+                lztAcctApply = new LztAcctApply();
+                lztAcctApply.setUserId(userId);
+                lztAcctApply.setPayChannelType(lztAcct.getPayChannelType());
+                lztAcctApply.setPayChannelId(lztAcct.getPayChannelId());
+            }
             LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcctApply);
             if (bankAcctInfoResult != null) {
                 List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
@@ -198,12 +204,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
             do {
-<<<<<<< HEAD
-                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, yesterdayStart, yesterdayEnd, pageNo);
-=======
-                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
-                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), yesterdayStart, yesterdayEnd, null, pageNo, 10);
->>>>>>> main-pay
+                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, yesterdayStart, yesterdayEnd, pageNo, 10);
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }
@@ -233,12 +234,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
             do {
-<<<<<<< HEAD
-                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, todayStart, todayEnd, pageNo);
-=======
-                AcctSerialResult result = lztService.queryAcctSerial(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcct.getUserId(),
-                        LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), todayStart, todayEnd, null, pageNo, 10);
->>>>>>> main-pay
+                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, todayStart, todayEnd, pageNo, 10);
+
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }

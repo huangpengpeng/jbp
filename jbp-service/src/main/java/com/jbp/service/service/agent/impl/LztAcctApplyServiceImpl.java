@@ -118,13 +118,13 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         params.setCertificateType("BUSINESS_LICENCE");
         params.setCertificateNo(certificateNo);
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
-        String notifyUrl = lianLianInfo.getHost() + "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
+        String notifyUrl = lianLianInfo.getHost() + "/api/publicly/payment/callback/yop/" + txnSeqno;
         params.setNotifyUrl(notifyUrl);
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
-        dto.setSocialCreditCodeImageUrl(yopService.upload(socialCreditCodeImageUrl));
-        dto.setLegalCardImageFont(yopService.upload(legalCardImageFont));
-        dto.setLegalCardImageBack(yopService.upload(legalCardImageBack));
+        dto.setSocialCreditCodeImageUrl(socialCreditCodeImageUrl);
+        dto.setLegalCardImageFont(legalCardImageFont);
+        dto.setLegalCardImageBack(legalCardImageBack);
 
         dto.setLegalMobileNo(legalMobile);
         dto.setOperatorName(operatorName);
@@ -160,7 +160,6 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     @Override
     public LztAcctApply refresh(String userId, String notifyInfo) {
         LztAcctApply lztAcctApply = getByUserId(userId);
-
         LztQueryAcctInfoResult result = degreePayService.queryBankAcct(lztAcctApply);
         if (result != null) {
             List<LztQueryAcctInfo> list = result.getList();
@@ -168,8 +167,6 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                 list = list.stream().filter(s -> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
                 LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
                 lztAcctApply.setStatus(acctState.getCode());
-
-
                 if(lztAcctApply.getPayChannelType().equals("易宝")){
                     LztAcct lztAcct = lztAcctService.getByUserId(userId);
                     lztAcct.setBankAccount(list.get(0).getBank_acct_no());
@@ -182,10 +179,6 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             lztAcctApply.setNotifyInfo(notifyInfo);
         }
         updateById(lztAcctApply);
-
-
-
-
         return lztAcctApply;
     }
 

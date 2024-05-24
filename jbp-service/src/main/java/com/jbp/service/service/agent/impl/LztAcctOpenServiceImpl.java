@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -81,7 +82,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
 
     @Override
     public LztAcctOpen yopApply(String signName, String id_card, String frontUrl, String backUrl, String mobile, String province,
-                                String city, String district,String address, String bankCardNo, String bankCode,  LztPayChannel lztPayChannel) {
+                                String city, String district, String address, String bankCardNo, String bankCode, LztPayChannel lztPayChannel) {
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.易宝开通子商户.getPrefix());
         LianLianPayInfoResult payInfo = lianLianPayService.get();
         String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + txnSeqno;
@@ -92,6 +93,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         }
         LztAcctOpen lztAcctOpen = new LztAcctOpen(lztPayChannel.getMerId(), registerMicro.getMerchantNo(), txnSeqno, registerMicro.getApplicationNo(),
                 "个人用户", "H5", DateTimeUtils.getNow(), "", lztPayChannel.getId(), lztPayChannel.getName(), lztPayChannel.getType());
+        lztAcctOpen.setUsername(signName);
         save(lztAcctOpen);
         return lztAcctOpen;
     }
@@ -107,6 +109,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         lztAcctOpen.setQueryRet(result);
         lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
         lztAcctOpen.setRetMsg(result.getRemark());
+        lztAcctOpen.setUsername(result.getUser_name());
         updateById(lztAcctOpen);
         LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
@@ -196,7 +199,12 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
             }
             // 检查第三方开户状态
             if (!s.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
-                AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcctService.getByUserId(s.getUserId()));
+                LztAcct lztAcct = new LztAcct();
+                lztAcct.setUserId(s.getUserId());
+                lztAcct.setPayChannelId(s.getPayChannelId());
+                lztAcct.setPayChannelType(s.getPayChannelType());
+                lztAcct.setUserType(s.getUserType());
+                AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcct);
                 if (CollectionUtils.isNotEmpty(acctInfoResult.getAcctinfo_list())) {
                     String extStatus = acctInfoResult.getAcctinfo_list().get(0).getAcct_state();
                     if (extStatus.equals(LianLianPayConfig.UserStatus.正常.getCode())) {
