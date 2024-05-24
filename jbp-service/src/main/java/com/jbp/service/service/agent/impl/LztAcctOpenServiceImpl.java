@@ -10,6 +10,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.AcctInfoResult;
+import com.jbp.common.lianlian.result.LianLianPayInfoResult;
 import com.jbp.common.lianlian.result.OpenacctApplyResult;
 import com.jbp.common.lianlian.result.UserInfoResult;
 import com.jbp.common.model.agent.LztAcct;
@@ -22,10 +23,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.yop.result.RegisterMicroResult;
 import com.jbp.service.dao.agent.LztAcctOpenDao;
-import com.jbp.service.service.DegreePayService;
-import com.jbp.service.service.LztService;
-import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.YopService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
@@ -56,13 +54,15 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     private DegreePayService degreePayService;
     @Resource
     private YopService yopService;
+    @Resource
+    private LianLianPayService lianLianPayService;
 
     @Override
-    public LztAcctOpen apply(Integer merId, String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel) {
+    public LztAcctOpen apply(String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel) {
         if (has(userId)) {
             throw new CrmebException("当前账户已存在，建议使用企业全拼加序号");
         }
-        Merchant merchant = merchantService.getById(merId);
+        Merchant merchant = merchantService.getById(lztPayChannel.getMerId());
         MerchantPayInfo payInfo = merchant.getPayInfo();
         if (payInfo == null || StringUtils.isEmpty(payInfo.getOidPartner()) || StringUtils.isEmpty(payInfo.getPriKey())) {
             throw new CrmebException("当前商户号配置缺少，请联系管理员");
@@ -73,7 +73,7 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
         OpenacctApplyResult result = lztService.createUser(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno,
                 userId, code, notifyUrl, returnUrl, "H5", businessScope);
-        LztAcctOpen lztAcctOpen = new LztAcctOpen(merId, userId, txnSeqno, result.getAccp_txno(),
+        LztAcctOpen lztAcctOpen = new LztAcctOpen(lztPayChannel.getMerId(), userId, txnSeqno, result.getAccp_txno(),
                 userType, flagChnl, DateTimeUtils.getNow(), result.getGateway_url(), lztPayChannel.getId(), lztPayChannel.getName(), lztPayChannel.getType());
         save(lztAcctOpen);
         return lztAcctOpen;
@@ -81,10 +81,10 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
 
     @Override
     public LztAcctOpen yopApply(String signName, String id_card, String frontUrl, String backUrl, String mobile, String province,
-                                String city, String district,
-                                String address, String bankCardNo, String bankCode,  LztPayChannel lztPayChannel) {
+                                String city, String district,String address, String bankCardNo, String bankCode,  LztPayChannel lztPayChannel) {
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.易宝开通子商户.getPrefix());
-        String notifyUrl = "" + txnSeqno;
+        LianLianPayInfoResult payInfo = lianLianPayService.get();
+        String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + txnSeqno;
         RegisterMicroResult registerMicro = yopService.registerMicro(txnSeqno, signName, id_card, frontUrl, backUrl, mobile, province, city, district, address, bankCardNo, bankCode, notifyUrl);
         boolean validate = registerMicro.validate();
         if (!validate) {
@@ -102,21 +102,20 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         if (lztAcctOpen == null) {
             return;
         }
-        Merchant merchant = merchantService.getById(lztAcctOpen.getMerId());
-        MerchantPayInfo payInfo = merchant.getPayInfo();
-        UserInfoResult result = lztService.queryUserInfo(payInfo.getOidPartner(), payInfo.getPriKey(), lztAcctOpen.getUserId());
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcctOpen.getPayChannelId());
+        UserInfoResult result = degreePayService.queryUserInfo(lztPayChannel, lztAcctOpen);
         lztAcctOpen.setQueryRet(result);
         lztAcctOpen.setStatus(LianLianPayConfig.UserStatus.getName(result.getUser_status()));
         lztAcctOpen.setRetMsg(result.getRemark());
         updateById(lztAcctOpen);
-
         LztAcct lztAcct = lztAcctService.getByUserId(lztAcctOpen.getUserId());
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
             if (lztAcct == null) {
                 lztAcct = lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account(), lztAcctOpen.getPayChannelId());
             }
         }
-        // 通知手机号吗
+
+        // 通知手机号码 连连需要
         if (lztAcct != null && StringUtils.isNotEmpty(lztAcctOpen.getNotifyInfo()) && StringUtils.isEmpty(lztAcct.getPhone())) {
             try {
                 JSONObject json = JSONObject.parseObject(lztAcctOpen.getNotifyInfo());

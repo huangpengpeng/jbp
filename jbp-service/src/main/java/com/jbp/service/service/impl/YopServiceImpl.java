@@ -151,6 +151,13 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
+    public AllAccountBalanceQueryResult allAccountBalanceQuery(String merchantNo) {
+        AccountBalanceQueryParams params = new AccountBalanceQueryParams();
+        params.setMerchantNo(merchantNo);
+        return send("/rest/v1.0/account/accountinfos/query", "GET", params, AllAccountBalanceQueryResult.class);
+    }
+
+    @Override
     public WithdrawCardQueryResult withdrawCardQuery(String merchantNo) {
         WithdrawCardQueryParams params = new WithdrawCardQueryParams();
         params.setMerchantNo(merchantNo);
@@ -158,9 +165,9 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
-    public WithdrawOrderResult withdrawOrder(String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl) {
+    public WithdrawOrderResult withdrawOrder(String parentMerchantNo, String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl) {
         WithdrawOrderParams params = new WithdrawOrderParams();
-        params.setParentMerchantNo("10089625822");
+        params.setParentMerchantNo(parentMerchantNo);
         params.setMerchantNo(merchantNo);
         params.setRequestNo(requestNo);
         params.setBankCardId(bankCardId);

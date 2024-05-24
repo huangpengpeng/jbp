@@ -56,7 +56,6 @@ public class LztWithdrawalController {
         }else{
             result.setRegMsg("短信已发送请注意查收");
         }
-
         return CommonResult.success(result);
     }
 

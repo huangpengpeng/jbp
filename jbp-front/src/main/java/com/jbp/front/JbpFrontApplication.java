@@ -63,7 +63,7 @@ public class JbpFrontApplication {
         params.setReturnUrl("http://fky.natapp1.cc/yop/re");
 
 
-         RegisterMicroH5Result registerMicroH5Result = yopService.registerMicroH5(params);
+//         RegisterMicroH5Result registerMicroH5Result = yopService.registerMicroH5(params);
 
 //        withdraw(yopService);
 
@@ -73,8 +73,12 @@ public class JbpFrontApplication {
 
 //        queryOpenBank(yopService);
 
+        openBank(yopService);
+
 
 //         RegisterQueryResult result = yopService.registerQuery("LZT_RS_103702359635243");
+
+//        yopService.registerQuery("ZZRWQY20240523140812868542");
 
         System.out.println("111");
 
@@ -84,7 +88,7 @@ public class JbpFrontApplication {
     private static void withdraw(YopService yopService) {
         String withdrawNo = StringUtils.N_TO_10("LZT_DW_");
         WithdrawCardQueryResult card = yopService.withdrawCardQuery("10090334402");
-        WithdrawOrderResult withdrawResult = yopService.withdrawOrder("10090334402", withdrawNo, card.getBankCardAccountList().get(0).getBindCardId(), "1", "http://fky.natapp1.cc/yop/dw");
+        WithdrawOrderResult withdrawResult = yopService.withdrawOrder("10089625822", "10090334402", withdrawNo, card.getBankCardAccountList().get(0).getBindCardId(), "1", "http://fky.natapp1.cc/yop/dw");
 
         System.out.println(JSONObject.toJSONString(withdrawResult));
     }
@@ -130,45 +134,41 @@ public class JbpFrontApplication {
         String requestNo2 = StringUtils.N_TO_10("BO_");
         System.out.println(requestNo2);
         params.setRequestNo(requestNo2);
-        params.setMerchantNo("10090333092");
+        params.setMerchantNo("10090333215");
 
-        params.setMerchantName("海口龙华帅梦春百货店（个体工商户）");
+        params.setMerchantName("深圳市千浪文化传媒有限公司");
         params.setOpenBankCode("SUNINGBANK_MULTICHANNEL");
         params.setOpenAccountType("INDIVIDUAL_BUSINESS_TYPE");
         params.setCertificateType("BUSINESS_LICENCE");
-        params.setCertificateNo("92460000MADG8W081L");
+        params.setCertificateNo("91440300MA5H6C9T1J");
         params.setNotifyUrl("https://applet.dys.ink/yop/ew");
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
 
-        dto.setSocialCreditCodeImageUrl("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7.png");
+        dto.setSocialCreditCodeImageUrl("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7.jpg");
         dto.setSocialCreditCodeImageUrl(yopService.upload(dto.getSocialCreditCodeImageUrl()));
-
-        dto.setLegalCardImageFont("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%81.jpeg");
+        dto.setLegalCardImageFont("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E6%B3%95%E4%BA%BA%E8%BA%AB%E4%BB%BD%E8%AF%81%E6%AD%A3%E9%9D%A2.jpg");
         dto.setLegalCardImageFont(yopService.upload(dto.getLegalCardImageFont()));
-
-        dto.setLegalCardImageBack("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%811.jpeg");
+        dto.setLegalCardImageBack("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E6%B3%95%E4%BA%BA%E8%BA%AB%E4%BB%BD%E8%AF%81%E5%8F%8D%E9%9D%A2.jpg");
         dto.setLegalCardImageBack(yopService.upload(dto.getLegalCardImageBack()));
+        dto.setLegalMobileNo("15678516978");
 
-        dto.setLegalMobileNo("13691813976");
         dto.setOperatorName("徐静");
         dto.setMobileNo("13823668660");
 
         List<BenefitDTO> benefitList = Lists.newArrayList();
         BenefitDTO benefit = new BenefitDTO();
-        benefit.setBenefitName("甘富红");
+        benefit.setBenefitName("龙海浪");
         benefit.setBenefitIdType("ID_CARD");
-        benefit.setBenefitIdNo("440924197404133189");
+        benefit.setBenefitIdNo("45032219970904051X");
 
-        benefit.setBenefitStartDate("20180208");
-        benefit.setBenefitExpireDate("20380208");
-        benefit.setBenefitImageFont("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%81.jpeg");
-        benefit.setBenefitImageFont(yopService.upload(benefit.getBenefitImageFont()));
+        benefit.setBenefitStartDate("20140207");
+        benefit.setBenefitExpireDate("20240207");
 
-        benefit.setBenefitImageBack("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%BA%AB%E4%BB%BD%E8%AF%811.jpeg");
-        benefit.setBenefitImageBack(yopService.upload(benefit.getBenefitImageBack()));
+        benefit.setBenefitImageFont(dto.getLegalCardImageFont());
+        benefit.setBenefitImageBack(dto.getLegalCardImageBack());
 
-        benefit.setBenefitAddress("广东省深圳市龙岗区平湖街道办凤凰社区居委会建设路六巷3号401房");
+        benefit.setBenefitAddress("广西临桂县六塘镇罗塘村委会上村28号");
         benefitList.add(benefit);
 
         dto.setBenefitDTOList(benefitList);

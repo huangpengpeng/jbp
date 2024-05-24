@@ -178,6 +178,7 @@ public class LianLianPayConfig {
         换绑卡("LZT_HBK_"),
 
         易宝开通子商户("YOP_ZSH_"),
+        易宝开通银行虚拟户("YOP_BKH_"),
         ;
 
         @Getter

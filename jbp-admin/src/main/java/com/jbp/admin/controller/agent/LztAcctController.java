@@ -111,6 +111,22 @@ public class LztAcctController {
         return CommonResult.success(apply);
     }
 
+    @PreAuthorize("hasAuthority('agent:lzt:acct:bank:yop:apply')")
+    @ApiOperation(value = "易宝开通银行户")
+    @GetMapping(value = "/yop/bank/apply")
+    public CommonResult<LztAcctApply> yopBankApply(String userId, String merchantName, String openBankCode,
+                                                   String openAccountType, String certificateNo, String socialCreditCodeImageUrl,
+                                                   String legalCardImageFont, String legalCardImageBack, String legalMobile,
+                                                   String operatorName, String operatorMobile, String benefitName, String benefitIdNo,
+                                                   String benefitStartDate, String benefitStartEnd, String benefitAddress) {
+        LztAcctApply apply = lztAcctApplyService.yopApply(userId, merchantName, openBankCode,
+                openAccountType, certificateNo, socialCreditCodeImageUrl,
+                legalCardImageFont, legalCardImageBack, legalMobile,
+                operatorName, operatorMobile, benefitName, benefitIdNo,
+                benefitStartDate, benefitStartEnd, benefitAddress);
+        return CommonResult.success(apply);
+    }
+
     @ApiOperation(value = "来账通账户密码控件")
     @GetMapping(value = "/pwd")
     public CommonResult<ApplyPasswordElementResult> pwd(String userId, BigDecimal amt, String scan) {

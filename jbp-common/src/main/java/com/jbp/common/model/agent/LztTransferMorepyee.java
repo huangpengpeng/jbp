@@ -70,6 +70,9 @@ public class LztTransferMorepyee extends BaseModel {
     @ApiModelProperty(value = "金额")
     private BigDecimal amt;
 
+    @ApiModelProperty(value = "手续费")
+    private BigDecimal feeAmount;
+
     @ApiModelProperty(value = "说明")
     private String postscript;
 

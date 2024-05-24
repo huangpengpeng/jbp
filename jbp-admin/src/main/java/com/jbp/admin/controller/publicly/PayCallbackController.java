@@ -152,7 +152,6 @@ public class PayCallbackController {
                 LztAcctOpen lztAcctOpen = lztAcctOpenService.getByTxnSeqno(txnSeqno);
                 if(lztAcctOpen != null && stringBuilder != null && stringBuilder.length() > 0){
                     lztAcctOpen.setNotifyInfo(stringBuilder.toString());
-                    lztAcctOpenService.updateById(lztAcctOpen);
                 }
                 if (lztAcctOpen != null) {
                     lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
@@ -201,7 +200,38 @@ public class PayCallbackController {
             }
         }
 
+        return "SUCCESS";
+    }
 
+
+    @ApiOperation(value = "来账通回调")
+    @RequestMapping(value = "/yop/{txnSeqno}")
+    public String yop(@PathVariable("txnSeqno") String txnSeqno) {
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.易宝开通子商户.getPrefix())) {
+            LztAcctOpen lztAcctOpen = lztAcctOpenService.getByTxnSeqno(txnSeqno);
+            if (lztAcctOpen != null) {
+                lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
+            }
+        }
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.易宝开通银行虚拟户.getPrefix())) {
+            LztAcctApply lztAcctApply = lztAcctApplyService.getByTxnSeqno(txnSeqno);
+            if (lztAcctApply != null) {
+                lztAcctApplyService.refresh(lztAcctApply.getUserId(), "");
+            }
+        }
+
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通内部代发.getPrefix())) {
+            LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(txnSeqno);
+            if (lztTransferMorepyee != null) {
+                lztTransferMorepyeeService.refresh(txnSeqno);
+            }
+        }
+        if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通提现.getPrefix())) {
+            LztWithdrawal lztWithdrawal = lztWithdrawalService.getByTxnSeqno(txnSeqno);
+            if (lztWithdrawal != null) {
+                lztWithdrawalService.refresh(txnSeqno);
+            }
+        }
 
         return "SUCCESS";
     }

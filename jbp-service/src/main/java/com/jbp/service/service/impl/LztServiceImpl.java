@@ -28,8 +28,6 @@ public class LztServiceImpl implements LztService {
 
     @Resource
     private LianLianPayService lianLianPayService;
-    @Resource
-    private LztWithdrawalService lztWithdrawalService;
 
     @Override
     public OpenacctApplyResult createUser(String oidPartner, String priKey, String txnSeqno, String userId,

@@ -69,6 +69,15 @@ public interface YopService {
      */
     AccountBalanceQueryResult accountBalanceQuery(String merchantNo);
 
+
+    /**
+     *
+     * 查询全部余额
+     * /rest/v1.0/account/accountinfos/query
+     */
+    AllAccountBalanceQueryResult allAccountBalanceQuery(String merchantNo);
+
+
     /**
      * 提现卡绑定
      * /rest/v1.0/account/withdraw/card/bind
@@ -82,7 +91,7 @@ public interface YopService {
     /**
      * 提现下单
      */
-    WithdrawOrderResult withdrawOrder(String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl);
+    WithdrawOrderResult withdrawOrder(String parentMerchantNo, String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl);
 
     /**
      * 提现查询

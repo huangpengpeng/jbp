@@ -13,6 +13,12 @@ public interface LztAcctApplyService extends IService<LztAcctApply> {
     LztAcctApply apply(Integer merId, String userId, String shopId, String shopName,
                        String province, String city, String area, String address, String openBank);
 
+    LztAcctApply yopApply(String userId, String merchantName, String openBankCode,
+                          String openAccountType, String certificateNo, String socialCreditCodeImageUrl,
+                          String legalCardImageFont, String legalCardImageBack, String legalMobile,
+                          String operatorName, String operatorMobile, String benefitName, String benefitIdNo,
+                          String benefitStartDate, String benefitStartEnd, String benefitAddress);
+
     LztAcctApply refresh(String userId, String notifyInfo);
 
     LztAcctApply getByUserId(String userId);

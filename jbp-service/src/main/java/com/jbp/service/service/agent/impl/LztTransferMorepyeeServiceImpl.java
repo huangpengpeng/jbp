@@ -74,6 +74,10 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
         TransferMorepyeeResult result = degreePayService.transferMorepyee(payerAcct, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
         LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, postscript, result, result.getAccp_txno(), payerAcct.getPayChannelType());
+        transferMorepyee.setFeeAmount(BigDecimal.ZERO);
+        if(payerAcct.getPayChannelType().equals("易宝")){
+            transferMorepyee.setFeeAmount(BigDecimal.ONE);
+        }
         save(transferMorepyee);
         return transferMorepyee;
     }
@@ -117,11 +121,11 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         }
         LztAcct lztAcct = lztAcctService.getByUserId(lztTransferMorepyee.getPayerId());
         QueryPaymentResult result = degreePayService.queryTransferMorepyee(lztAcct, txnSeqno);
-        LztTransferMorepyee lztTransferMorepyee1 = callBack(result);
-        if (lztTransferMorepyee1 == null) {
+        LztTransferMorepyee update = callBack(result);
+        if (update == null) {
             return lztTransferMorepyee;
         }
-        return lztTransferMorepyee1;
+        return update;
     }
 
     @Override
@@ -129,10 +133,6 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         return getOne(new QueryWrapper<LztTransferMorepyee>().lambda().eq(LztTransferMorepyee::getTxnSeqno, txnSeqno));
     }
 
-    @Override
-    public LztTransferMorepyee getByAccpTxno(String accpTxno) {
-        return getOne(new QueryWrapper<LztTransferMorepyee>().lambda().eq(LztTransferMorepyee::getAccpTxno, accpTxno));
-    }
 
     @Override
     public PageInfo<LztTransferMorepyee> pageList(Integer merId, String payerId, String payeeId, String txnSeqno, String accpTxno,

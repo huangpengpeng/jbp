@@ -23,8 +23,6 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
 
     LztTransferMorepyee getByTxnSeqno(String txnSeqno);
 
-    LztTransferMorepyee getByAccpTxno(String accpTxno);
-
     PageInfo<LztTransferMorepyee> pageList(Integer merId, String payerId, String payeeId, String txnSeqno,
                                        String accpTxno, String status, Date startTime, Date endTime,
                                            PageParamRequest pageParamRequest);

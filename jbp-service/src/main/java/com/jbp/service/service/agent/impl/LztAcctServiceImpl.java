@@ -78,7 +78,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         }
         AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcct);
         if (lztAcct.getIfOpenBankAcct()) {
-            LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcct);
+            LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcctApply);
             if (bankAcctInfoResult != null) {
                 List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
                 if (CollectionUtils.isNotEmpty(list)) {

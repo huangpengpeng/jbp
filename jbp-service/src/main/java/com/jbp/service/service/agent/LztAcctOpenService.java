@@ -9,7 +9,7 @@ import com.jbp.common.request.PageParamRequest;
 
 public interface LztAcctOpenService extends IService<LztAcctOpen> {
 
-    LztAcctOpen apply(Integer merId, String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel);
+    LztAcctOpen apply( String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel);
 
     LztAcctOpen yopApply(String signName, String id_card, String frontUrl, String backUrl, String mobile, String province, String city, String district,
                          String address, String bankCardNo, String bankCode, LztPayChannel lztPayChannel);

@@ -52,6 +52,9 @@ public class LztTransferMorepyeeController {
         if (acct2 == null) {
             throw new CrmebException("收款款用户不存在");
         }
+        if(!acct.getPayChannelType().equals(acct2.getPayChannelType())){
+            throw new CrmebException("不同支付渠道账户不允许转账");
+        }
         String ip = CrmebUtil.getClientIp(request);
         LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(merId, payerId, payCode, amt, "服务费", pwd, randomKey, payeeId, ip, "服务费");
         if(StringUtils.isNotEmpty(acct.getPhone())){

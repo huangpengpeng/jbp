@@ -85,6 +85,9 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
             feeAmount =
                     amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         }
+        if(lztAcct.getPayChannelType().equals("易宝")){
+            feeAmount = BigDecimal.ONE;
+        }
         WithdrawalResult orderResult = degreePayService.withdrawal(lztAcct, drawNo, amt, feeAmount, postscript, password, random_key, ip, notifyUrl);
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt,
                 feeAmount, postscript, orderResult, lztAcct.getPayChannelType());
