@@ -9,6 +9,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.ProductInfoDto;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.InvitationScore;
 import com.jbp.common.model.agent.InvitationScoreFlow;
 import com.jbp.common.model.agent.SelfScore;
@@ -149,5 +150,37 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
                 }
             }
         }
+    }
+
+    @Override
+    public void updateScore(Integer uid, BigDecimal score, String ordersSn, Date payTime, String remark, Boolean ifAdd) {
+        SelfScore selfScore = getByUser(uid);
+        //减少
+        if (BooleanUtils.isFalse(ifAdd)) {
+            if (selfScore == null || ArithmeticUtils.less(selfScore.getScore(), score)) {
+                throw new CrmebException("个人积分不足");
+            }
+            selfScore.setScore(selfScore.getScore().subtract(score));
+            updateById(selfScore);
+            Boolean ifSuccess = updateById(selfScore);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
+            SelfScoreFlow flow = new SelfScoreFlow(uid,score, "减少", "人工", ordersSn, payTime, null,remark);
+            selfScoreFlowService.save(flow);
+            return;
+        }
+        //增加
+        if (BooleanUtils.isTrue(ifAdd) && selfScore == null) {
+            selfScore = new SelfScore(uid);
+            save(selfScore);
+        }
+        selfScore.setScore(selfScore.getScore().add(score));
+        Boolean ifSuccess = updateById(selfScore);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
+        SelfScoreFlow flow = new SelfScoreFlow(uid,score, "增加", "人工", ordersSn, payTime, null,remark);
+        selfScoreFlowService.save(flow);
     }
 }
