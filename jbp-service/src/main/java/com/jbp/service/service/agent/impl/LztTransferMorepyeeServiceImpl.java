@@ -67,9 +67,11 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
             throw new CrmebException("收款账户不存在");
         }
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
-        TransferMorepyeeResult result = degreePayService.transferMorepyee(payerAcct, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
         BigDecimal fee = lztAcctService.getFee(payerId, amt);
-        amt = amt.add(fee);
+        if(payerAcct.getPayChannelType().equals("连连")){
+            amt = amt.add(fee);
+        }
+        TransferMorepyeeResult result = degreePayService.transferMorepyee(payerAcct, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
         LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, fee,postscript, result, result.getAccp_txno(), payerAcct.getPayChannelType());
         save(transferMorepyee);
         return transferMorepyee;

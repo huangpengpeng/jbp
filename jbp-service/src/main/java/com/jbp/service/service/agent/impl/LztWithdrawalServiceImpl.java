@@ -80,12 +80,13 @@ public class LztWithdrawalServiceImpl extends ServiceImpl<LztWithdrawalDao, LztW
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + drawNo;
 
-        BigDecimal feeAmount = lztAcctService.getFee(lztAcct.getUserId(), amt);
-        amt = amt.add(feeAmount);
-
-        WithdrawalResult orderResult = degreePayService.withdrawal(lztAcct, drawNo, amt, feeAmount, postscript, password, random_key, ip, notifyUrl);
+        BigDecimal fee = lztAcctService.getFee(userId, amt);
+        if(lztAcct.getPayChannelType().equals("连连")){
+            amt = amt.add(fee);
+        }
+        WithdrawalResult orderResult = degreePayService.withdrawal(lztAcct, drawNo, amt, fee, postscript, password, random_key, ip, notifyUrl);
         LztWithdrawal withdrawal = new LztWithdrawal(merId, userId, lztAcct.getUsername(), drawNo, orderResult.getAccp_txno(), amt,
-                feeAmount, postscript, orderResult, lztAcct.getPayChannelType());
+                fee, postscript, orderResult, lztAcct.getPayChannelType());
         save(withdrawal);
         return withdrawal;
     }
