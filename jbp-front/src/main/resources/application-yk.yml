@@ -27,6 +27,7 @@ crmeb:
     - /jushuitan/**
     - /**/visa/userVisaCallback
     - /**/tankOrder/callapi
+    - /**/cbec_order/sync
 # 配置端口
 server:
   port: 8182

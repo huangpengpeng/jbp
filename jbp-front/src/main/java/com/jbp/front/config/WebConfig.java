@@ -127,7 +127,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 
 //				excludePathPatterns("/api/front/user/relation/slip/get/**").
-
+				excludePathPatterns("/api/front/login/cbec_order/sync").
 				excludePathPatterns("/api/front/pagediy/**").
 				excludePathPatterns("/api/front/user/getPlatformUserInfo").
 				excludePathPatterns("/api/front/jushuitan/**")
