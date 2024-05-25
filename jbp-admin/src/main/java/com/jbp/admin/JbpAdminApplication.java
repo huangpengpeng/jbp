@@ -1,6 +1,7 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.service.service.agent.impl.LztAcctServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,8 +27,8 @@ public class JbpAdminApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
 
-//        LztAcctServiceImpl bean = run.getBean(LztAcctServiceImpl.class);
-//        bean.init();
+        LztAcctServiceImpl bean = run.getBean(LztAcctServiceImpl.class);
+        bean.init();
 
     }
 

@@ -66,6 +66,7 @@ public interface DegreePayService {
      */
     QueryWithdrawalResult queryWithdrawal(LztAcct lztAcct, String txnSeqno);
 
-    ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno,  String token, String tradeType);
+    ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno,
+                                          String token, String tradeType, String txnTime);
 
 }

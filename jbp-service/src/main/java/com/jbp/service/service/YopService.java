@@ -142,13 +142,13 @@ public interface YopService {
     /**
      * 资金流水
      */
-    FundBillFlowQueryResult fundBillFlowQuery(String startDate, String endDate, String merchantNo, Integer page, Integer size);
+    FundBillFlowQueryResult fundBillFlowQuery(String parentMerchantNo, String startDate, String endDate, String merchantNo, Integer page, Integer size);
 
 
     /**
      * 回执下载
      */
-    AccountReceiptResult accountReceiptGet(String merchantNo, String requestNo, String tradeType);
+    AccountReceiptResult accountReceiptGet(String merchantNo, String orderNo, String requestNo, String tradeType, String orderData);
 
 
 

@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -139,19 +141,28 @@ public class DegreePayServiceImpl implements DegreePayService {
         return result;
     }
 
+
+    private String getYopTime(String dateString){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return date.format(formatter2);
+    }
     @Override
     public AcctSerialResult queryAcctSerial(LztAcct lztAcct, String startTime, String entTime, Integer pageNo, Integer limit) {
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
-        Date start = DateTimeUtils.parseDate(startTime);
-        Date end = DateTimeUtils.parseDate(entTime);
+
         AcctSerialResult result = new AcctSerialResult();
         if (lztAcct.getPayChannelType().equals("连连")) {
             result = lztService.queryAcctSerial(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(),
                     LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), startTime, entTime, null, pageNo, limit);
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
-            FundBillFlowQueryResult yopResult = yopService.fundBillFlowQuery(DateTimeUtils.format(start, DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN),
-                    DateTimeUtils.format(end, DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN), lztAcct.getUserId(), pageNo, limit);
+            String  parentMerchantNo = "10089066338";
+            if(lztAcct.getUserType().equals("个人用户")){
+                parentMerchantNo = "10089625822" ;
+            }
+            FundBillFlowQueryResult yopResult = yopService.fundBillFlowQuery(parentMerchantNo, getYopTime(startTime), getYopTime(entTime) , lztAcct.getUserId(), pageNo, limit);
 
             if (yopResult != null && yopResult.validate()) {
                 result.setUser_id(lztAcct.getUserId());
@@ -188,8 +199,14 @@ public class DegreePayServiceImpl implements DegreePayService {
                         acctBal.setAmt_bal(bill.getBalance());
                         acctBal.setAccp_txnno(bill.getOrderId());
                         acctBal.setMemo(bill.getTradeDesc());
-                        acctBal.setTxn_type(YopEnums.TrxCodeEnum.getByValue(bill.getTrxCode()).name());
+                        if(bill.getTrxCode().equals("提现")){
+                            acctBal.setTxn_type("ACCT_CASH_OUT");
+                        }
+                        if(bill.getTrxCode().equals("转账")){
+                            acctBal.setTxn_type("INNER_FUND_EXCHANGE");
+                        }
                         acctBal.setDetail(detail);
+                        list.add(acctBal);
                     }
                 }
                 result.setAcctbal_list(list);
@@ -493,7 +510,7 @@ public class DegreePayServiceImpl implements DegreePayService {
     }
 
     @Override
-    public ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno, String token, String tradeType) {
+    public ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno, String token, String tradeType, String txnTime) {
         ReceiptDownloadResult result = new ReceiptDownloadResult();
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         if (lztAcct.getPayChannelType().equals("连连")) {
@@ -501,7 +518,7 @@ public class DegreePayServiceImpl implements DegreePayService {
                     receipt_accp_txno, token);
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
-            AccountReceiptResult yopResult = yopService.accountReceiptGet(lztAcct.getUserId(), txnSeqno, tradeType);
+            AccountReceiptResult yopResult = yopService.accountReceiptGet(lztAcct.getUserId(), null, txnSeqno, tradeType, txnTime);
             result.setReceipt_sum_file(yopResult.getData());
 
         }

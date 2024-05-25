@@ -262,10 +262,10 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
-    public FundBillFlowQueryResult fundBillFlowQuery(String startDate, String endDate, String merchantNo,
+    public FundBillFlowQueryResult fundBillFlowQuery(String parentMerchantNo, String startDate, String endDate, String merchantNo,
                                                      Integer page, Integer size) {
         FundBillFlowQueryParams params = new FundBillFlowQueryParams();
-        params.setParentMerchantNo("10089066338");
+        params.setParentMerchantNo(parentMerchantNo);
         params.setMerchantNo(merchantNo);
         params.setStartDate(startDate);
         params.setEndDate(endDate);
@@ -275,12 +275,14 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
-    public AccountReceiptResult accountReceiptGet(String merchantNo, String requestNo, String tradeType) {
+    public AccountReceiptResult accountReceiptGet(String merchantNo, String orderNo, String requestNo,  String tradeType, String orderData) {
         AccountReceiptParams params = new AccountReceiptParams();
         params.setParentMerchantNo("10089066338");
         params.setMerchantNo(merchantNo);
-        params.setRequestNo(requestNo);
+        params.setOrderNo(orderNo);
         params.setTradeType(tradeType);
+        params.setRequestNo(requestNo);
+        params.setOrderDate(orderData);
         return send("/rest/v1.0/account/receipt/get", "GET", params, AccountReceiptResult.class);
     }
 

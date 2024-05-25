@@ -68,9 +68,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
         }
         String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt/" + orderNo;
         BigDecimal fee = lztAcctService.getFee(payerId, amt);
-        if(payerAcct.getPayChannelType().equals("连连")){
-            amt = amt.add(fee);
-        }
+        amt = amt.add(fee);
         TransferMorepyeeResult result = degreePayService.transferMorepyee(payerAcct, orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notifyUrl);
         LztTransferMorepyee transferMorepyee = new LztTransferMorepyee(merId, payerId, payerAcct.getUsername(), payeeId, payeeAcct.getUsername(), orderNo, amt, fee,postscript, result, result.getAccp_txno(), payerAcct.getPayChannelType());
         save(transferMorepyee);

@@ -22,7 +22,11 @@ public class AccountReceiptParams extends BaseYopRequest {
      */
     private String tradeType;
 
+    private String orderNo;
+
     private String requestNo;
+
+    private String orderDate;
 
     private String merchantNo;
 
