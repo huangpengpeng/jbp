@@ -3,10 +3,15 @@ package com.jbp.front.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
+import com.jbp.common.dto.CbecOrderSyncDTO;
 import com.jbp.common.dto.EncryptionDTO;
+import com.jbp.common.encryptapi.AESUtils;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.order.CbecOrder;
 import com.jbp.common.model.user.CbecUser;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.*;
@@ -15,9 +20,12 @@ import com.jbp.common.response.FrontIndividualCenterConfigResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignType;
 import com.jbp.common.utils.SignatureUtil;
 import com.jbp.front.service.LoginService;
+import com.jbp.service.service.CbecOrderService;
 import com.jbp.service.service.CbecUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.util.StringUtils;
@@ -32,7 +40,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -59,6 +71,8 @@ public class LoginController {
     private UserService userService;
     @Resource
     private CbecUserService cbecUserService;
+    @Resource
+    private CbecOrderService cbecOrderService;
 
     @ApiOperation(value = "获取登录配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)
@@ -207,6 +221,68 @@ public class LoginController {
         dto.setRefreshToken(result.getString("refreshToken"));
         return CommonResult.success(dto);
     }
+
+
+
+
+    @ApiOperation(value = "跨境订单同步")
+    @RequestMapping(value = "/cbec_order/sync", method = RequestMethod.POST)
+    public CommonResult<String> ioslogin(@RequestBody String syncStr) throws Exception {
+
+
+        // 设置回传信息发送异步消息
+        JSONObject jsonObject = JSON.parseObject(syncStr);
+        String decrypt = AESUtils.decrypt(jsonObject.getString("data"), "IihtFZ3nFq8vVHe4");
+        CbecOrderSyncReq orderSyncReq =
+                jsonObject.toJavaObject(JSONObject.parseObject(decrypt), CbecOrderSyncReq.class);
+        Map<String, String> stringStringMap = SignatureUtil.convertObjectToMap(orderSyncReq);
+        stringStringMap.put("sign", jsonObject.getString("sign"));
+        boolean signatureValid = SignatureUtil.isSignatureValid(stringStringMap,"LpfVpVnnyZS1XBEhshztDwt3gG9tOr8t", SignType.MD5);
+        if (BooleanUtils.isNotTrue(signatureValid)) {
+            throw new RuntimeException("验签失败");
+        }
+
+
+        JSONArray orderItems = jsonObject.getJSONArray("orderItems");
+        String orderStatus = CbecOrder.parseCode(jsonObject.getString("orderStatus"));
+        if(StringUtils.isBlank(orderStatus)){
+            return CommonResult.success();
+        }
+        List<CbecOrderSyncDTO.GoodsDetail> goodsDetails = Lists.newArrayListWithCapacity(orderItems.size());
+        for (int i = 0, size = orderItems.size(); i < size; i++) {
+            JSONObject item = orderItems.getJSONObject(i);
+
+            CbecOrderSyncDTO.GoodsDetail goodsDetail =
+                    CbecOrderSyncDTO.GoodsDetail.builder().goodsName(item.getString("goodsName"))
+                            .price(item.getBigDecimal("unitPrice")).quantity(item.getInteger("num")).build();
+            goodsDetails.add(goodsDetail);
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+        Date paymentTime =
+                StringUtils.isNoneBlank(jsonObject.getString("paymentTime")) ? sdf.parse(jsonObject.getString("paymentTime")) : null;
+        Date createTime =
+                StringUtils.isNoneBlank(jsonObject.getString("createTime")) ? sdf.parse(jsonObject.getString("createTime")) : null;
+
+        Date logisticsTime = StringUtils.isNoneBlank(jsonObject.getString("logisticsTime"))
+                ? sdf.parse(jsonObject.getString("logisticsTime")) : DateTimeUtils.getNow();
+        BigDecimal score =
+                jsonObject.containsKey("payPoints") && ArithmeticUtils.gt(jsonObject.getBigDecimal("payPoints"), BigDecimal.ZERO) ?
+                        jsonObject.getBigDecimal("payPoints") : BigDecimal.ZERO;
+
+        CbecOrderSyncDTO orderSyncDTO =
+                CbecOrderSyncDTO.builder().bizId(jsonObject.getString("bizId")).mobile(jsonObject.getString("mobile"))
+                        .orderSn(jsonObject.getString("orderSn")).status(orderStatus).totalFee(jsonObject.getBigDecimal("flowPrice"))
+                        .goodsFee(jsonObject.getBigDecimal("goodsPrice")).postFee(jsonObject.getBigDecimal("freightPrice")).score(score)
+                        .createTime(createTime).paymentTime(paymentTime).shipmentTime(logisticsTime).goodsDetails(goodsDetails)
+                        .build();
+        cbecOrderService.orderSync(orderSyncDTO);
+
+
+
+        return CommonResult.success();
+    }
+
+
 
 }
 

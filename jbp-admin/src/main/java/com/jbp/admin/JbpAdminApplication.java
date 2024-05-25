@@ -2,6 +2,7 @@ package com.jbp.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.Oldcapaxs;
 import com.jbp.common.model.agent.RiseCondition;
@@ -76,11 +77,11 @@ public class JbpAdminApplication {
 //
 //             System.out.println(i++);
 //         }
-
-
-
-
-
+//
+//        TankStoreRelationAct productCommChain = run.getBean(TankStoreRelationAct.class);
+//
+//        productCommChain.aa_8360();
+//
 
 
 

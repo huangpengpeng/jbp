@@ -24,6 +24,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -51,6 +53,8 @@ public class CapaXsDifferentialNoBoleCommHandler extends AbstractProductCommHand
     private FundClearingService fundClearingService;
     @Resource
     private ProductCommService productCommService;
+    @Autowired
+    private Environment environment;
 
     @Override
     public Integer getType() {
@@ -108,6 +112,14 @@ public class CapaXsDifferentialNoBoleCommHandler extends AbstractProductCommHand
 
         // 查询所有上级
         List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
+        String active = environment.getProperty("spring.profiles.active");
+        //第三套从下单用户开始算
+        if(StringUtils.isNotEmpty(active) && active.contains("hdf")) {
+            UserUpperDto userUpperDto =new UserUpperDto();
+            userUpperDto.setPId(order.getUid());
+            allUpper.add(0,userUpperDto);
+        }
+
         if (CollectionUtils.isEmpty(allUpper)) {
             return;
         }

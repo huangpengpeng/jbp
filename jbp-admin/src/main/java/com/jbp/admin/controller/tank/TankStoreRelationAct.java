@@ -344,4 +344,50 @@ int i=0;
 
 
 
+
+
+    public void aa_8360() {
+
+        String name = "jymall";
+
+        int i = 0;
+        List<User> userList = userService.list(new QueryWrapper<>());
+        List<ThreeBackOneInit> list = new ArrayList<>();
+        for (User user : userList) {
+
+
+            StringBuilder stringBuilder = new StringBuilder("SELECT count(1) + IFNULL(u2.ext,0) as c FROM "+name+".orders AS o \n" +
+                    "\tLEFT JOIN "+name+".USER AS u ON u.`id`=o.`userId`\n" +
+                    "  LEFT JOIN "+name+".USER AS u2 ON u2.id=u.parentId \n" +
+                    "\tWHERE u.`parentId`=" +user.getId() + " AND (o.`orderCapacityId`IN (23,24,28) OR o.`riseCapacityId` IN(23,24,28))\n" +
+                    "\t\t\tAND o.`status` IN (201,301,401,402,501) AND o.`payTime` <='2024-05-01'  and ( o.shareCapaId >22 || o.shareCapaId is null )\n" +
+                    "\t\t\tAND o.id IN (\n" +
+                    "\t\t\t\tSELECT og.orderId FROM "+name+".ordergoods AS og WHERE og.goodsId IN(2009)\n" +
+                    "\t\t\t)\n" +
+                    "\t"
+            );
+
+            StringBuilder stringBuilder2 = new StringBuilder("\t\tSELECT IFNULL(SUM(ogi.count),0) AS c1 FROM "+name+".ordergoodinit AS ogi LEFT JOIN "+name+".USER AS ug ON ug.id=ogi.userId\n" +
+                    "\t\tWHERE ug.parentId=" +user.getId() + " AND ogi.goodsId IN (2009)"
+            );
+
+            Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
+            Map<String, Object> maps2 = SqlRunner.db().selectOne(stringBuilder2.toString());
+            if((Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue()) >0) {
+                ThreeBackOneInit threeBackOneInit = new ThreeBackOneInit();
+                threeBackOneInit.setUid(user.getId());
+                threeBackOneInit.setAmt(new BigDecimal(8360));
+                threeBackOneInit.setNumber(Double.valueOf(String.valueOf(maps.get("c"))).intValue() + Double.valueOf(String.valueOf(maps2.get("c1"))).intValue());
+                list.add(threeBackOneInit);
+            }
+            i++;
+            log.info("8360"+i);
+        }
+
+        threeBackOneInitService.saveBatch(list);
+
+    }
+
+
+
 }

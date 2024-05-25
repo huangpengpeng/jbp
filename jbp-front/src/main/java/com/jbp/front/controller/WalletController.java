@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
@@ -43,6 +44,9 @@ import java.util.Map;
     @RequestMapping("api/front/wallet")
 @Api(tags = "用户积分")
 public class WalletController {
+
+    @Resource
+    private UserInvitationService userInvitationService;
     @Resource
     private ChannelCardService channelCardService;
     @Resource
@@ -248,6 +252,13 @@ public class WalletController {
 
         if (ObjectUtil.isNull(receiveUser)) {
             throw new CrmebException("账号/手机号不存在");
+        }
+
+        String verifyTransferAcme = systemConfigService.getValueByKey(SysConfigConstants.VERIFY_TRANSFER_ACME);
+        Boolean ifAcme = Constants.CONFIG_FORM_SWITCH_OPEN.equals(verifyTransferAcme);
+        //验证转账顶点账号
+        if(ifAcme){
+            userService.checkAccountTeamCode(user.getId(),receiveUser.getId());
         }
 
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));

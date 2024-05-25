@@ -134,7 +134,7 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             }
             if (userOfflineSubsidy2 != null && totalAreaAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy2.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalAreaAmt,
-                        null, user.getNickname() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
+                        null, user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
             }
 
 
