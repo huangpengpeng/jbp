@@ -68,7 +68,7 @@ public class JbpFrontApplication {
 
 //        register(yopService);
 
-//        queryOpenBank(yopService);
+        queryOpenBank(yopService);
 
 //        openBank(yopService);
 
