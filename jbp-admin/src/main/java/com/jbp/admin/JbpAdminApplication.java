@@ -26,10 +26,6 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
-
-        LztAcctServiceImpl bean = run.getBean(LztAcctServiceImpl.class);
-        bean.init();
-
     }
 
 }
