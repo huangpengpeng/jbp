@@ -19,6 +19,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.constants.*;
+import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.*;
@@ -904,6 +905,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
           throw new CrmebException("验证码错误");
         }
         redisUtil.delete(getValidateCodeRedisKey(phone));
+    }
+
+    @Override
+    public void checkAccountTeamCode(Integer uid, Integer receiveUserId) {
+
+        //验证是否同一个顶点账号，不是同一个不允许转账
+        List<UserUpperDto> list =  invitationService.getAllUpper(uid);
+        List<UserUpperDto>  receiveList =  invitationService.getAllUpper(receiveUserId);
+        if(list.isEmpty() || receiveList.isEmpty() ){
+            throw new CrmebException("无法转让积分");
+        }
+        if(list.get(list.size() - 1).getPId().intValue() != receiveList.get(receiveList.size() - 1).getPId().intValue() ){
+            throw new CrmebException("无法转让积分");
+        }
+
     }
 
     /**

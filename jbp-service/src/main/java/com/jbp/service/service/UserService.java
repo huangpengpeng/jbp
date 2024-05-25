@@ -415,4 +415,8 @@ public interface UserService extends IService<User> {
 
    void checkValidateCode(String phone,String captcha);
 
+
+    void checkAccountTeamCode(Integer uid,Integer receiveUserId);
+
+
 }

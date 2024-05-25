@@ -269,6 +269,11 @@ public class SysConfigConstants {
      *  验证码是否使用身份证后6位
      */
     public static final String IPHON_CODE_CARD = "iphon_code_card";
+    /**
+     *  验证转账用户顶点账号
+     */
+    public static final String VERIFY_TRANSFER_ACME = "verify_transfer_acme";
+
 
     /**
      * 用户默认头像
