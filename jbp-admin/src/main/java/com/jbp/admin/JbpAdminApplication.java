@@ -57,14 +57,14 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 //
-//        FeelGratefulCapaCommHandler productCommChain = run.getBean(FeelGratefulCapaCommHandler.class);
+//        ProductCommChain productCommChain = run.getBean(ProductCommChain.class);
 //       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //       OrderService orderService = run.getBean(OrderService.class);
-//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT600171646333294428146"));
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT359171681076144196357"));
 //
 //       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 //         LinkedList<CommCalculateResult> commList = new LinkedList<>();
-//
+////
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class);

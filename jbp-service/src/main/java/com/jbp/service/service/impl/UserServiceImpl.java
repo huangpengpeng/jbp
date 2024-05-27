@@ -914,10 +914,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         List<UserUpperDto> list =  invitationService.getAllUpper(uid);
         List<UserUpperDto>  receiveList =  invitationService.getAllUpper(receiveUserId);
         if(list.isEmpty() || receiveList.isEmpty() ){
-            throw new CrmebException("无法转让积分");
+            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
         if(list.get(list.size() - 1).getPId().intValue() != receiveList.get(receiveList.size() - 1).getPId().intValue() ){
-            throw new CrmebException("无法转让积分");
+            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
 
     }
