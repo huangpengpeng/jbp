@@ -181,3 +181,6 @@ internal:
   shop: 0
 erp:
   userPrefix: PH
+
+fundClearing:
+  refundBack: true
