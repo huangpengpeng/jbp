@@ -1,7 +1,12 @@
 package com.jbp.admin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.service.service.agent.impl.LztAcctServiceImpl;
+import com.jbp.common.constants.LianLianPayConfig;
+import com.jbp.common.yop.result.AccountRechargeResult;
+import com.jbp.common.yop.result.AllAccountBalanceQueryResult;
+import com.jbp.service.service.YopService;
+import com.jbp.service.util.StringUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +31,12 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
+
+        YopService yopService = run.getBean(YopService.class);
+//        String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通划拨资金.getPrefix());
+//        AccountRechargeResult result = yopService.accountRecharge("10090333395", txnSeqno, "100", "SUNINGBANK", "9517701000203906777");
+//        System.out.println(JSONObject.toJSONString(result));
+
     }
 
 }

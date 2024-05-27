@@ -394,10 +394,10 @@ public class LztAcctController {
     }
 
     @ApiOperation(value = "发送验证码")
-    @GetMapping(value = "/yop/changePhoneSend")
-    public CommonResult<String> changePhone(String userId) {
-        LztAcct lztAcct = lztAcctService.getByUserId(userId);
-        String phone = lztAcct.getPhone();
+    @GetMapping(value = "/yop/sendCode")
+    public CommonResult<String> changePhone() {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        String phone = systemAdmin.getPhone();
         if (StringUtils.isEmpty(phone)) {
             return CommonResult.failed("当前账户未绑定手机号请联系管理员");
         }
@@ -408,17 +408,6 @@ public class LztAcctController {
         return CommonResult.failed("短信发送失败请联系管理员");
     }
 
-
-    @PreAuthorize("hasAuthority('agent:lzt:acct:changePhone')")
-    @ApiOperation(value = "易宝手机号修改")
-    @GetMapping(value = "/yop/changePhone")
-    public CommonResult changePhone(String userId, String code, String phone) {
-        LztAcct lztAcct = lztAcctService.getByUserId(userId);
-        smsService.checkValidateCode(lztAcct.getPhone(), code);
-        lztAcct.setPhone(phone);
-        lztAcctService.updateById(lztAcct);
-        return CommonResult.success();
-    }
 
     @ApiOperation(value = "获取易宝银行编码")
     @GetMapping(value = "/yop/bankList")

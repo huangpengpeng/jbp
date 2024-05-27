@@ -65,6 +65,6 @@ public class AccountRechargeQueryResult extends BaseYopResponse {
 
     @Override
     public boolean validate() {
-        return false;
+        return  "UA00000".equals(returnCode);
     }
 }

@@ -86,6 +86,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 lztAcctApply.setUserId(userId);
                 lztAcctApply.setPayChannelType(lztAcct.getPayChannelType());
                 lztAcctApply.setPayChannelId(lztAcct.getPayChannelId());
+                lztAcctApply.setOpenBank(lztAcct.getOpenBank());
             }
             LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcctApply);
             if (bankAcctInfoResult != null) {
@@ -141,12 +142,16 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             LztAcct bankAcctInfo = details(s.getUserId());
             s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
             s.setBankAcctInfoList(bankAcctInfo.getBankAcctInfoList());
-            BigDecimal amtBalcur = BigDecimal.ZERO, amtBalaval = BigDecimal.ZERO, amtBankBalaval = BigDecimal.ZERO, amtBalfrz = BigDecimal.ZERO;
+            BigDecimal amtBalcur = BigDecimal.ZERO, amtBalaval = BigDecimal.ZERO, amtBankBalaval = BigDecimal.ZERO, amtBalfrz = BigDecimal.ZERO, amtUnClearing = BigDecimal.ZERO;
             if (CollectionUtils.isNotEmpty(bankAcctInfo.getAcctInfoList())) {
                 for (AcctInfo acctInfo : bankAcctInfo.getAcctInfoList()) {
                     amtBalcur = amtBalcur.add(StringUtils.isNotEmpty(acctInfo.getAmt_balcur()) ? new BigDecimal(acctInfo.getAmt_balcur()) : BigDecimal.ZERO);
                     amtBalaval = amtBalaval.add(StringUtils.isNotEmpty(acctInfo.getAmt_balaval()) ? new BigDecimal(acctInfo.getAmt_balaval()) : BigDecimal.ZERO);
                     amtBalfrz = amtBalfrz.add(StringUtils.isNotEmpty(acctInfo.getAmt_balfrz()) ? new BigDecimal(acctInfo.getAmt_balfrz()) : BigDecimal.ZERO);
+                    if("用户自有待结算账户".equals(acctInfo.getAcct_type())){
+                        amtUnClearing = amtUnClearing.add(StringUtils.isNotEmpty(acctInfo.getAmt_balcur()) ? new BigDecimal(acctInfo.getAmt_balcur()) : BigDecimal.ZERO);
+                        amtBalaval = amtBalaval.subtract(amtUnClearing);
+                    }
                 }
             }
             if (CollectionUtils.isNotEmpty(bankAcctInfo.getBankAcctInfoList())) {
@@ -160,6 +165,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             s.setAmtBalaval(amtBalaval);
             s.setAmtBankBalaval(amtBankBalaval);
             s.setAmtBalfrz(amtBalfrz);
+            s.setAmtUnClearing(amtUnClearing);
         });
 
         return CommonPage.copyPageInfo(page, list);

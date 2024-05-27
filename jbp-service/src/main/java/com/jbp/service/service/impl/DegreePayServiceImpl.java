@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.LianLianPayConfig;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.params.QueryPaymentOrderInfo;
 import com.jbp.common.lianlian.params.QueryPaymentPayeeInfo;
 import com.jbp.common.lianlian.params.QueryPaymentPayerInfo;
@@ -117,7 +118,14 @@ public class DegreePayServiceImpl implements DegreePayService {
         }
         if (lztAcctApply.getPayChannelType().equals("易宝")) {
             if (StringUtils.isNotEmpty(lztAcct.getBankAccount())) {
-                BankAccountBalanceQueryResult yopResult = yopService.bankAccountBalanceQuery(lztAcctApply.getUserId(), lztAcctApply.getOpenBank(),
+                String   bankCode = lztAcctApply.getOpenBank();
+                if("HXBXB_GATHER".equals(bankCode)){
+                    bankCode = "HXBXB";
+                }
+                if("SUNINGBANK_MULTICHANNEL".equals(bankCode)){
+                    bankCode = "SUNINGBANK";
+                }
+                BankAccountBalanceQueryResult yopResult = yopService.bankAccountBalanceQuery(lztAcctApply.getUserId(), bankCode,
                         lztAcct.getBankAccount());
                 if (yopResult != null && yopResult.validate()) {
                     List<LztQueryAcctInfo> list = getAcctInfoList(lztAcct, yopResult);
@@ -145,6 +153,9 @@ public class DegreePayServiceImpl implements DegreePayService {
     private String getYopTime(String dateString){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDate date = LocalDate.parse(dateString, formatter);
+        if(date.isAfter(LocalDate.now())){
+            date = LocalDate.now();
+        }
         DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(formatter2);
     }
@@ -168,7 +179,7 @@ public class DegreePayServiceImpl implements DegreePayService {
                 result.setUser_id(lztAcct.getUserId());
                 result.setPage_no(pageNo);
                 result.setTotal_num(Integer.valueOf(yopResult.getTotalCount()));
-                result.setTotal_page(result.getTotal_num() / 10);
+                result.setTotal_page(result.getTotal_num() / limit);
                 List<AcctBalList> list = Lists.newArrayList();
                 if (CollectionUtils.isNotEmpty(yopResult.getData())) {
                     for (FundBillFlowDto bill : yopResult.getData()) {
@@ -205,6 +216,9 @@ public class DegreePayServiceImpl implements DegreePayService {
                         if(bill.getTrxCode().equals("转账")){
                             acctBal.setTxn_type("INNER_FUND_EXCHANGE");
                         }
+                        if(bill.getTrxCode().equals("充值")){
+                            acctBal.setTxn_type("USER_TOPUP");
+                        }
                         acctBal.setDetail(detail);
                         list.add(acctBal);
                     }
@@ -226,12 +240,24 @@ public class DegreePayServiceImpl implements DegreePayService {
                     txnSeqno, lztAcct.getUserId(), bankAccountNo, amt, notifyUrl);
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
-            AccountRechargeResult yopResult = yopService.accountRecharge(lztAcct.getUserId(), txnSeqno, amt, lztAcct.getOpenBank(), lztAcct.getBankAccount());
-            if (yopResult != null && yopResult.validate()) {
+            String   bankCode = lztAcct.getOpenBank();
+            if("HXBXB_GATHER".equals(bankCode)){
+                bankCode = "HXBXB";
+            }
+            if("SUNINGBANK_MULTICHANNEL".equals(bankCode)){
+                bankCode = "SUNINGBANK";
+            }
+            AccountRechargeResult yopResult = yopService.accountRecharge(lztAcct.getUserId(), txnSeqno, amt, bankCode, lztAcct.getBankAccount());
+            if(yopResult == null){
+                throw new CrmebException(lztAcct.getUserId()+"划拨请求异常请联系管理员");
+            }
+            if (yopResult.validate()) {
                 result.setRet_code("0000");
                 result.setRet_msg("交易成功");
                 result.setTxn_seqno(txnSeqno);
                 result.setAccp_txno(yopResult.getOrderNo());
+            }else{
+                throw new CrmebException(yopResult.getReturnMsg());
             }
         }
         return result;
@@ -251,7 +277,7 @@ public class DegreePayServiceImpl implements DegreePayService {
                 result.setAccp_txno(yopResult.getOrderNo());
                 result.setAmt(yopResult.getOrderAmount());
                 if ("INIT".equals(yopResult.getStatus())) {
-                    result.setTxn_status("CREATE");
+                    result.setTxn_status("PROCESS");
                 }
                 if ("ACCOUNTING_EXCEPTION".equals(yopResult.getStatus()) || "FAIL".equals(yopResult.getStatus()) || "CANCELED".equals(yopResult.getStatus())) {
                     result.setTxn_status("FAIL");
@@ -356,12 +382,17 @@ public class DegreePayServiceImpl implements DegreePayService {
             LianLianPayInfoResult payInfo = lianLianPayService.get();
             String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + orderNo;
             AccountTransferOrderResult yopResult = yopService.transferB2bOrder(orderNo, lztAcct.getUserId(), payeeId, amt.toString(), notifyUrl);
-            if (yopResult != null && yopResult.validate()) {
+            if(yopResult == null){
+                throw new CrmebException(lztAcct.getUserId()+"转账请求异常请联系管理员");
+            }
+            if (yopResult.validate()) {
                 result.setAccounting_date(DateTimeUtils.format(new Date(), DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN2));
                 result.setTxn_seqno(yopResult.getRequestNo());
                 result.setAccp_txno(yopResult.getOrderNo());
                 result.setTotal_amount(Double.valueOf(yopResult.getOrderAmount()));
                 result.setRet_code("0000");
+            }else{
+                throw new CrmebException(yopResult.getReturnMsg());
             }
         }
         return result;
@@ -436,8 +467,15 @@ public class DegreePayServiceImpl implements DegreePayService {
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
             WithdrawCardQueryResult card = yopService.withdrawCardQuery(lztAcct.getUserId());
-            if (card == null || !card.validate()) {
-                throw new RuntimeException("请绑定银行卡信息");
+            if(card == null){
+                throw new RuntimeException(lztAcct.getUserId()+"未获取到提现银行卡信息");
+            }
+            if (!card.validate()) {
+                if ("个人用户".equals(lztAcct.getUserType())) {
+                    throw new RuntimeException(lztAcct.getUserId()+"|"+lztAcct.getUsername()+"提现卡状态同步中，请15分钟后重试");
+                }else{
+                    throw new RuntimeException(card.getReturnMsg());
+                }
             }
             LianLianPayInfoResult payInfo = lianLianPayService.get();
             notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + drawNo;
@@ -447,12 +485,17 @@ public class DegreePayServiceImpl implements DegreePayService {
                 parentMerchantNo = "10089625822";
             }
             WithdrawOrderResult yopResult = yopService.withdrawOrder(parentMerchantNo, lztAcct.getUserId(), drawNo, card.getBankCardAccountList().get(0).getBindCardId(), amt.toString(), notifyUrl);
-            if (yopResult != null && yopResult.validate()) {
+            if(yopResult == null){
+                throw new CrmebException(lztAcct.getUserId()+"提现异常请联系管理员");
+            }
+            if (yopResult.validate()) {
                 result.setRet_code("0000");
                 result.setUser_id(lztAcct.getUserId());
                 result.setTxn_seqno(drawNo);
                 result.setAccp_txno(yopResult.getOrderNo());
                 result.setTotal_amount(amt.doubleValue());
+            }else{
+                throw new CrmebException(yopResult.getReturnMsg());
             }
         }
         return result;
@@ -533,8 +576,8 @@ public class DegreePayServiceImpl implements DegreePayService {
         lztQueryAcctInfo.setBank_acct_name(lztAcct.getUsername());
         lztQueryAcctInfo.setBank_acct_no(lztAcct.getBankAccount());
         lztQueryAcctInfo.setBank_acct_name(lztAcct.getOpenBank());
-        lztQueryAcctInfo.setBank_acct_balance(result.getUseableAmt());
-        lztQueryAcctInfo.setBank_acct_frz_balance(result.getFrozenAmt());
+        lztQueryAcctInfo.setBank_acct_balance(result.getAccountAmt() == null ? "0" : result.getAccountAmt());
+        lztQueryAcctInfo.setBank_acct_frz_balance(result.getFrozenAmt() == null ? "0" : result.getFrozenAmt());
         list.add(lztQueryAcctInfo);
         return list;
     }

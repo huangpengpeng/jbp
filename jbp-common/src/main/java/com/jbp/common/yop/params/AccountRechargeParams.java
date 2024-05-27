@@ -17,6 +17,8 @@ public class AccountRechargeParams extends BaseYopRequest {
 
     private String payType = "BANK_PAY";
 
+    private String feeType;
+
     private String amount;
 
     private ExtParams4BankPay requestExtParams4BankPay;

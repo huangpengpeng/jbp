@@ -11,6 +11,7 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.SmsService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
@@ -33,6 +34,8 @@ public class LztWithdrawalController {
 
 
     @Resource
+    private SmsService smsService;
+    @Resource
     private LztAcctService lztAcctService;
     @Resource
     private LztWithdrawalService lztWithdrawalService;
@@ -41,12 +44,15 @@ public class LztWithdrawalController {
     @ApiOperation(value = "来账通提现")
     @GetMapping(value = "/create")
     public CommonResult<LztWithdrawal> apply(HttpServletRequest request, String payeeId, String payCode,
-                                             String pwd, BigDecimal amt, String randomKey) {
+                                             String pwd, BigDecimal amt, String randomKey, String  phoneCode) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztAcct acct = lztAcctService.getByUserId(payeeId);
         if (acct == null || acct.getMerId() != merId) {
             throw new CrmebException("付款用户不存在");
+        }
+        if("易宝".equals(acct.getPayChannelType())){
+            smsService.checkValidateCode(systemAdmin.getPhone(), phoneCode);
         }
         String ip = CrmebUtil.getClientIp(request);
         LztWithdrawal result = lztWithdrawalService.withdrawal(merId, payeeId, payCode, amt, "提现", pwd, randomKey, ip);

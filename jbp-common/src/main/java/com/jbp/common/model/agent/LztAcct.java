@@ -102,6 +102,10 @@ public class LztAcct extends BaseModel {
     @TableField(exist = false)
     private BigDecimal amtBalaval;
 
+    @ApiModelProperty(value = "待结算余额")
+    @TableField(exist = false)
+    private BigDecimal amtUnClearing;
+
     @ApiModelProperty(value = "银行账户余额")
     @TableField(exist = false)
     private BigDecimal amtBankBalaval;

@@ -12,6 +12,7 @@ import com.jbp.common.yop.params.MerchantInfoModifyParams;
 import com.jbp.common.yop.params.RegisterMicroH5Params;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
+import com.jbp.service.service.agent.LztAcctService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,7 +50,13 @@ public class JbpFrontApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         System.out.println("ok");
 
+
+
+
+
         YopService yopService = run.getBean(YopService.class);
+
+        yopService.withdrawCardQuery("10090339599");
 
 //        String registerMicroH5No = StringUtils.N_TO_10("YOP_OPEN_");
 //        RegisterMicroH5Params params = new RegisterMicroH5Params();
@@ -68,7 +75,7 @@ public class JbpFrontApplication {
 
 //        register(yopService);
 
-        queryOpenBank(yopService);
+//        queryOpenBank(yopService);
 
 //        openBank(yopService);
 

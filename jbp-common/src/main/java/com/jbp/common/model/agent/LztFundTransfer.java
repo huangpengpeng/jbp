@@ -33,7 +33,7 @@ public class LztFundTransfer extends BaseModel {
         this.bankAccountNo = bankAccountNo;
         this.postscript = postscript;
         this.accpTxno = accpTxno;
-        this.status = LianLianPayConfig.FundTransferStatus.创建.name();
+        this.status = LianLianPayConfig.FundTransferStatus.处理中.name();
         this.payChannelType = payChannelType;
     }
 
@@ -51,6 +51,9 @@ public class LztFundTransfer extends BaseModel {
 
     @ApiModelProperty(value = "金额")
     private BigDecimal amt;
+
+    @ApiModelProperty(value = "手续费")
+    private BigDecimal feeAmount;
 
     @ApiModelProperty(value = "划拨时间")
     private Date txnTime;

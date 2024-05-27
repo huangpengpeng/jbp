@@ -48,6 +48,10 @@ public class CrmebUtil {
         System.out.println(decryptPassowrd("qNRS8Ah2YmU=", "19979384655"));
         System.out.println(decryptPassowrd("qYt3rFZLANUI2QE1JaCktQ==", "18929560630"));
         System.out.println(decryptPassowrd("qT2WGnqYLTT63zbreFYPkg==", "13686668640"));
+        System.out.println(decryptPassowrd("jR0ADu2fShA=", "18598005835"));
+        System.out.println(decryptPassowrd("0g98reb4gO4=", "15618417068"));
+
+
     }
 
     public static String encryptPassword(String pwd, String key) {

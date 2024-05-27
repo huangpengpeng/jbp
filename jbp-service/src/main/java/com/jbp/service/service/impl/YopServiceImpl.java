@@ -199,10 +199,11 @@ public class YopServiceImpl implements YopService {
         params.setParentMerchantNo("10089066338");
         params.setMerchantNo(merchantNo);
         params.setRequestNo(requestNo);
+        params.setFeeType("INTER");
         params.setAmount(amount);
         ExtParams4BankPay ext = new ExtParams4BankPay(bankCode, bankAccountNo);
         params.setRequestExtParams4BankPay(ext);
-        return send("/rest/v1.0/account/recharge", "POST", params, AccountRechargeResult.class);
+        return send2("/rest/v1.0/account/recharge", "POST", params, AccountRechargeResult.class);
     }
 
     @Override

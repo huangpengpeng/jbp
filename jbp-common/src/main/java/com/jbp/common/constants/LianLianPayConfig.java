@@ -255,7 +255,7 @@ public class LianLianPayConfig {
 
     public enum FundTransferStatus {
 
-        创建("CREATE"), // 自定义的
+
         处理中("PROCESS"),
         成功("SUCCESS"),
         失败("FAIL"),

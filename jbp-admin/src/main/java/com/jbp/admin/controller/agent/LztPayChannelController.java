@@ -1,10 +1,12 @@
 package com.jbp.admin.controller.agent;
 
 import com.beust.jcommander.internal.Lists;
+import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.LztPayChannelService;
 import io.swagger.annotations.Api;
@@ -32,6 +34,13 @@ public class LztPayChannelController {
     @ApiOperation("支付渠道列表")
     public CommonResult<List<LztPayChannel>> list(Integer merId) {
         return CommonResult.success(lztPayChannelService.getByMer(merId));
+    }
+
+    @GetMapping("/list2")
+    @ApiOperation("支付渠道列表")
+    public CommonResult<List<LztPayChannel>> list2() {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        return CommonResult.success(lztPayChannelService.getByMer(systemAdmin.getMerId()));
     }
 
     @GetMapping("/typeList")
