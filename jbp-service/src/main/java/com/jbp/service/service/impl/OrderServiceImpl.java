@@ -26,6 +26,7 @@ import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
+import com.jbp.common.model.product.Product;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserToken;
@@ -117,6 +118,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private ProductMaterialsService productMaterialsService;
     @Autowired
     private TeamService teamService;
+    @Autowired
+    private ProductService productService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -583,6 +586,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if(StringUtils.isNotBlank(request.getTeamId())) {
             Team team =  teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId,request.getTeamId()));
             lqw.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
+        }
+
+        if (StringUtils.isNotEmpty(request.getProductName())) {
+            lqw.apply(" order_no in ( select order_no from eb_order_detail where product_id in " +
+                    "(select id from eb_product where name like '%"+request.getProductName()+"%') ) ");
+        }
+
+        if (StringUtils.isNotEmpty(request.getBarCode())){
+            lqw.apply("order_no in ( select order_no from eb_order_detail where product_id in " +
+                    "(select product_id from eb_product_attr_value where bar_code='"+request.getBarCode()+"'))");
         }
 
         if(StringUtils.isNotEmpty(request.getSupplyName())){
