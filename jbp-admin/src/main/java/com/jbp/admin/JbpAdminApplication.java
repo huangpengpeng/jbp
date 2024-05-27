@@ -6,8 +6,10 @@ import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.Oldcapaxs;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderInvoice;
 import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.ConditionChain;
@@ -37,6 +39,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 
 @EnableAsync //开启异步调用
@@ -82,7 +85,16 @@ public class JbpAdminApplication {
 //
 //        productCommChain.aa_8360();
 //
-
+//        OrderInvoiceService orderInvoiceService = run.getBean(OrderInvoiceService.class);
+//        OrderService orderService = run.getBean(OrderService.class);
+//        MerchantOrderService merchantOrderService = run.getBean(MerchantOrderService.class);
+//        MerchantOrder merchantOrder =   merchantOrderService.getOneByOrderNo("PT698171616749741166621");
+//        OrderInvoice orderInvoice = orderInvoiceService.getById(3580);
+//        LogisticService logisticService = run.getBean(LogisticService.class);
+//        logisticService.info(orderInvoice.getTrackingNumber(), null, Optional.ofNullable(orderInvoice.getExpressCode()).orElse(""), merchantOrder.getUserPhone());
+//
+//
+//        orderService.getLogisticsInfoByMerchant(3564);
 
 
 //
