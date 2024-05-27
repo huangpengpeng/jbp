@@ -11,8 +11,10 @@ import com.beust.jcommander.internal.Sets;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.excel.FundClearingExcel;
@@ -340,10 +342,51 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
+
+        StringBuilder msg = new StringBuilder();
+        Set<Integer> uidSet = new HashSet<>();
+        Table<Integer, Integer, BigDecimal> tab = HashBasedTable.create();
         for (FundClearing fundClearing : list) {
             if (fundClearing.getIfRefund() != null && fundClearing.getIfRefund()) {
-                throw new RuntimeException(fundClearing.getUniqueNo() + "已经退回请勿重复操作");
+                msg.append(fundClearing.getUniqueNo()).append(",");
             }
+            uidSet.add(fundClearing.getUid());
+            List<WalletFlow> walletFlows = walletFlowService.getByUser(fundClearing.getUid(), fundClearing.getUniqueNo(), WalletFlow.OperateEnum.奖励.toString(), WalletFlow.ActionEnum.收入.name());
+            if (CollectionUtils.isNotEmpty(walletFlows)) {
+                for (WalletFlow walletFlow : walletFlows) {
+                    BigDecimal amt = tab.get(walletFlow.getUid(), walletFlow.getWalletType());
+                    amt = amt == null ? BigDecimal.ZERO : amt;// 需要回退金额
+                    amt = walletFlow.getAmt().add(amt);
+                    tab.put(walletFlow.getUid(), walletFlow.getWalletType(), amt);
+                }
+            }
+        }
+
+        if(StringUtils.isNotEmpty(msg.toString())){
+            throw new RuntimeException(msg.toString() + "已经退回请勿重复操作");
+        }
+
+        Map<Integer, User> userMap = userService.getUidMapList(uidSet.stream().collect(Collectors.toList()));
+        Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
+        // 遍历
+        Set<Table.Cell<Integer, Integer, BigDecimal>> cells = tab.cellSet();
+        for (Table.Cell<Integer, Integer, BigDecimal> cell : cells) {
+            Integer uid = cell.getRowKey();
+            Integer walletType = cell.getColumnKey();
+            BigDecimal amt = cell.getValue();
+            Wallet wallet = walletService.getByUser(uid, walletType);
+            BigDecimal balance = wallet == null ? BigDecimal.ZERO : wallet.getBalance();
+            if (ArithmeticUtils.less(balance, amt)) {
+                WalletConfig walletConfig = walletMap.get(walletType);
+                BigDecimal subtract = amt.subtract(balance);
+                msg.append("[").append(userMap.get(uid).getAccount()).append("|").append(walletConfig.getName()).append("积分不足差额:").append(subtract).append("]");
+            }
+        }
+        if(StringUtils.isNotEmpty(msg.toString())){
+            throw new RuntimeException(msg.toString());
+        }
+
+        for (FundClearing fundClearing : list) {
             List<WalletFlow> walletFlows = walletFlowService.getByUser(fundClearing.getUid(), fundClearing.getUniqueNo(), WalletFlow.OperateEnum.奖励.toString(), WalletFlow.ActionEnum.收入.name());
             if (CollectionUtils.isNotEmpty(walletFlows)) {
                 for (WalletFlow walletFlow : walletFlows) {
@@ -355,7 +398,6 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             fundClearing.setRemark(remark);
             updateById(fundClearing);
         }
-
     }
 
     @Override
