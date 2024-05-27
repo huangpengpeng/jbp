@@ -200,7 +200,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         double amt2;
 
                         UserCapa PCapa = userCapaService.getByUser(pId);
-                        if (PCapa.getCapaId().intValue() != userCapa.getCapaId().intValue()) {
+                        if (PCapa.getCapaId().intValue() > userCapa.getCapaId().intValue()) {
                             break;
                         }
 
