@@ -8,10 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.TaskConstants;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.RelationScore;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
-import com.jbp.common.model.agent.UserRelation;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -19,6 +16,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.dao.agent.UserRelationDao;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +52,8 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
     private UserCapaXsService userCapaXsService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private TeamUserService teamUserService;
 
     @Override
     public UserRelation getByUid(Integer uId) {
@@ -205,6 +205,8 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
         //星级
         Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
         Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
+        //团队
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
@@ -220,6 +222,9 @@ public class UserRelationServiceImpl extends ServiceImpl<UserRelationDao, UserRe
             e.setUCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
             UserCapaXs pUserCapaXs = capaXsPidMapList.get(e.getPId());
             e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
+            //团队
+            TeamUser teamUser = teamUserMapList.get(e.getUId());
+            e.setTeamName(teamUser!=null?teamUser.getName():"");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -10,6 +10,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.TaskConstants;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserInvitation;
@@ -20,6 +21,7 @@ import com.jbp.common.response.UserInviteInfoResponse;
 import com.jbp.common.response.UserInviteResponse;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.dao.agent.UserInvitationDao;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -61,6 +63,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
     private UserCapaXsService userCapaXsService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private TeamUserService teamUserService;
 
     @Override
     public UserInvitation getByUser(Integer uId) {
@@ -256,6 +260,8 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         Map<Integer, UserCapaXs> capaXsUidMapList = userCapaXsService.getUidMap(uIdList);
         Map<Integer, UserCapaXs> capaXsPidMapList = userCapaXsService.getUidMap(pIdList);
         Map<Integer, UserCapaXs> capaXsMidMapList = userCapaXsService.getUidMap(mIdList);
+        //团队
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
 
         list.forEach(e -> {
             User uUser = uidMapList.get(e.getUId());
@@ -275,7 +281,9 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
             e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
             UserCapaXs mUserCapaXs = capaXsMidMapList.get(e.getMId());
             e.setMCapaXsName(mUserCapaXs!=null?mUserCapaXs.getCapaName():"");
-
+            //团队
+            TeamUser teamUser = teamUserMapList.get(e.getUId());
+            e.setTeamName(teamUser!=null?teamUser.getName():"");
             User pUser = pidMapList.get(e.getPId());
             e.setPAccount(pUser != null ? pUser.getAccount() : "");
             e.setPNickName(pUser != null ? pUser.getNickname() : "");

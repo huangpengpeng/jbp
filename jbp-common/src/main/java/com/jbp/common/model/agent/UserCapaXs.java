@@ -45,4 +45,8 @@ public class UserCapaXs extends BaseModel {
     @ApiModelProperty("等级头像")
     @TableField(exist = false)
     private String capaUrl;
+
+    @ApiModelProperty(value = "手机号码")
+    @TableField(exist = false)
+    private String phone;
 }

@@ -27,7 +27,7 @@ public interface UserCapaService extends IService<UserCapa> {
 
     List<UserCapa> getInvitationUnder(Integer uid, Long capaId);
 
-    PageInfo<UserCapa> pageList(Integer uid, Long capaId, PageParamRequest pageParamRequest);
+    PageInfo<UserCapa> pageList(Integer uid, Long capaId, String phone, PageParamRequest pageParamRequest);
 
     void riseCapa(Integer uid);
 

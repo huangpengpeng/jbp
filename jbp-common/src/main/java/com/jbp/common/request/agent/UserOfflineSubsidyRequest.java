@@ -21,9 +21,9 @@ public class UserOfflineSubsidyRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("省份")
-    private String province;
+    private Integer provinceId;
     @ApiModelProperty("城市")
-    private String city;
+    private Integer cityId;
     @ApiModelProperty("区域")
-    private String area;
+    private Integer areaId;
 }
