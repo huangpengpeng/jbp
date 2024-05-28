@@ -83,7 +83,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
         }
         Set<String> set = Sets.newHashSet();
         for (Rule rule : rules) {
-            if (rule.getCapaId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
+            if (rule.getCapaId() == null || rule.getRatio() == null) {
                 throw new CrmebException(ProductCommEnum.等级平级级差佣金.getName() + "参数不完整");
             }
             if (StringUtils.isNotEmpty(rule.getType())) {
@@ -143,6 +143,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
         }
 
         Map<Integer, List<FundClearingProduct>> productMap = Maps.newConcurrentMap();
+        Map<Integer, String> commNameMap = Maps.newConcurrentMap();
         Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
 
         for (OrderDetail orderDetail : orderDetails) {
@@ -168,6 +169,8 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
             // 已发比例【或者金额】
             BigDecimal usedRatio = BigDecimal.ZERO;
             // 每个人拿钱
+            Boolean ifOrderUser = false;
+            double reduceAmt = 0.0;
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
                 BigDecimal ratio = BigDecimal.ZERO; // 当前头衔获得比例或者金额
@@ -178,7 +181,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                     ratio = ratio.multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
                 }
                 // 佣金
-                if (ArithmeticUtils.gt(ratio, usedRatio)) {
+                if (ArithmeticUtils.gt(ratio, usedRatio) || ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
                     double amt = 0.0;
                     BigDecimal usableRatio = ratio.subtract(usedRatio); // 可发比例 、金额
                     if ("金额".equals(type)) {
@@ -187,48 +190,59 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
                     }
                     usedRatio = ratio;
-
-                    //查询获取到极差的平级用户
-                    Integer i = 0;
-                    Integer pId = invitationService.getPid(userCapa.getUid());
-                    double reduceAmt = 0.0;
-                    do {
-                        if (pId == null) {
-                            break;
-                        }
-                        BigDecimal ratioAmt = BigDecimal.ZERO;
-                        double amt2;
-
-                        UserCapa PCapa = userCapaService.getByUser(pId);
-                        if (PCapa.getCapaId().intValue() > userCapa.getCapaId().intValue()) {
-                            break;
-                        }
-
-                        if (i == 0) {
-                            ratioAmt = rule.getParallelRatioOne();
-                        }
-                        if (i == 1) {
-                            ratioAmt = rule.getParallelRatioTwo();
-                        }
-                        if (i == 2) {
-                            ratioAmt = rule.getParallelRatioThree();
-                        }
-
-                        if ("金额".equals(type)) {
-                            amt2 = ratioAmt.doubleValue();
-                        } else {
-                            amt2 = totalPv.multiply(ratioAmt).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
-                        }
-                        reduceAmt = reduceAmt + amt2;
-                        userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
-                        pId = invitationService.getPid(pId);
-                        i++;
-                    } while (i >= 3);
-
-                    amt = amt - reduceAmt;
+                    if (reduceAmt > 0) {
+                        amt = amt - reduceAmt;
+                    }
                     userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
+                    commNameMap.put(userCapa.getUid(), ProductCommEnum.级差佣金.getName());
                     FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                             orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
+                    reduceAmt = 0.0;
+                    //查询获取到极差的平级用户
+                    if (ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
+                        Integer i = 0;
+                        Integer pId = invitationService.getPid(userCapa.getUid());
+                        if (!ifOrderUser) {
+                            pId = invitationService.getPid(order.getUid());
+                        }
+                        do {
+
+                            if (pId == null) {
+                                break;
+                            }
+                            BigDecimal ratioAmt = BigDecimal.ZERO;
+                            double amt2;
+
+                            UserCapa PCapa = userCapaService.getByUser(pId);
+                            if (PCapa.getCapaId().intValue() > userCapa.getCapaId()) {
+                                break;
+                            }
+
+                            if (i == 0) {
+                                ratioAmt = rule.getParallelRatioOne();
+                            }
+                            if (i == 1) {
+                                ratioAmt = rule.getParallelRatioTwo();
+                            }
+                            if (i == 2) {
+                                ratioAmt = rule.getParallelRatioThree();
+                            }
+
+                            if ("金额".equals(type)) {
+                                amt2 = ratioAmt.multiply(BigDecimal.valueOf(orderDetail.getPayNum())).doubleValue();
+                            } else {
+                                amt2 = totalPv.multiply(ratioAmt).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
+                            }
+                            reduceAmt = reduceAmt + amt2;
+                            userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
+                            commNameMap.put(PCapa.getUid(), ProductCommEnum.等级平级级差佣金.getName());
+                            pId = invitationService.getPid(pId);
+                            i++;
+                        } while (i < 3);
+                        ifOrderUser = true;
+
+                    }
+
 
                     List<FundClearingProduct> productList = productMap.get(userCapa.getUid());
                     if (CollectionUtils.isEmpty(productList)) {
@@ -251,7 +265,8 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
             BigDecimal clearingFee = BigDecimal.valueOf(amt).setScale(2, BigDecimal.ROUND_DOWN);
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
-                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.等级平级级差佣金.getName(), clearingFee, fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.等级平级级差佣金.getName(), "");
+                String name = commNameMap.get(uid);
+                fundClearingService.create(uid, order.getOrderNo(), name, clearingFee, fundClearingProducts, orderUser.getAccount() + "下单获得" + name, "");
             }
         });
     }
