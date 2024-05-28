@@ -179,7 +179,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                     ratio = ratio.multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
                 }
                 // 佣金
-                if (ArithmeticUtils.gt(ratio, usedRatio)) {
+                if (ArithmeticUtils.gt(ratio, usedRatio) || ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
                     double amt = 0.0;
                     BigDecimal usableRatio = ratio.subtract(usedRatio); // 可发比例 、金额
                     if ("金额".equals(type)) {
@@ -192,13 +192,16 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                     //查询获取到极差的平级用户
                     if (ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
                         Integer i = 0;
-                        Integer pId = invitationService.getPid(order.getUid());
-                        if (ifOrderUser) {
-                            pId = invitationService.getPid(userCapa.getUid());
+                        Integer pId = invitationService.getPid(userCapa.getUid());
+                        if (!ifOrderUser) {
+                            pId = invitationService.getPid(order.getUid());
                         }
                         do {
-                            ifOrderUser = true;
-                            List<Capa> capa = capaService.getPre(userCapa.getCapaId());
+
+                            Capa capa = capaService.getPre(userCapa.getCapaId()).get(0);
+                            if (!ifOrderUser) {
+                                capa = capaService.getById(userCapa.getCapaId());
+                            }
                             if (pId == null) {
                                 break;
                             }
@@ -206,7 +209,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             double amt2;
 
                             UserCapa PCapa = userCapaService.getByUser(pId);
-                            if (PCapa.getCapaId().intValue() > capa.get(0).getId()) {
+                            if (PCapa.getCapaId().intValue() > capa.getId()) {
                                 break;
                             }
 
@@ -230,6 +233,8 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             pId = invitationService.getPid(pId);
                             i++;
                         } while (i >= 3);
+                        ifOrderUser = true;
+
                     }
 
                     amt = amt - reduceAmt;
