@@ -169,6 +169,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
             BigDecimal usedRatio = BigDecimal.ZERO;
             // 每个人拿钱
             Boolean ifOrderUser = false;
+            double reduceAmt = 0.0;
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
                 BigDecimal ratio = BigDecimal.ZERO; // 当前头衔获得比例或者金额
@@ -188,7 +189,13 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
                     }
                     usedRatio = ratio;
-                    double reduceAmt = 0.0;
+                    if(reduceAmt>0){
+                        amt = amt - reduceAmt;
+                    }
+                    userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
+                    FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
+                            orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
+                    reduceAmt = 0.0;
                     //查询获取到极差的平级用户
                     if (ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
                         Integer i = 0;
@@ -198,10 +205,6 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         }
                         do {
 
-                            Capa capa = capaService.getPre(userCapa.getCapaId()).get(0);
-                            if (!ifOrderUser) {
-                                capa = capaService.getById(userCapa.getCapaId());
-                            }
                             if (pId == null) {
                                 break;
                             }
@@ -209,7 +212,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             double amt2;
 
                             UserCapa PCapa = userCapaService.getByUser(pId);
-                            if (PCapa.getCapaId().intValue() > capa.getId()) {
+                            if (PCapa.getCapaId().intValue() > userCapa.getCapaId()) {
                                 break;
                             }
 
@@ -232,15 +235,12 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
                             pId = invitationService.getPid(pId);
                             i++;
-                        } while (i >= 3);
+                        } while (i < 3);
                         ifOrderUser = true;
 
                     }
 
-                    amt = amt - reduceAmt;
-                    userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
-                    FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
-                            orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
+
 
                     List<FundClearingProduct> productList = productMap.get(userCapa.getUid());
                     if (CollectionUtils.isEmpty(productList)) {
