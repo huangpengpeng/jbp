@@ -94,10 +94,17 @@ public class UserCapaXsController {
     @ApiOperation(value = "升星查看")
     @ResponseBody
     @GetMapping(value = "/user/upgradeList")
-    public CommonResult<List<UserInvitationFlow>> upgradeList(Integer uid) {
+    public CommonResult<List<UserInvitationFlow>> upgradeList(Integer uid,String uAccount) {
         // 返回对象
         if (uid == null) {
             uid = -1;
+        }
+        if (StringUtils.isNotEmpty(uAccount)) {
+            User user = userService.getByAccount(uAccount);
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
         }
         List<UserInvitationFlow> result = Lists.newArrayList();
         List<CapaXs> capaXsList = capaXsService.list();
