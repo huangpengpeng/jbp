@@ -9,7 +9,7 @@ import com.jbp.common.request.agent.UserOfflineSubsidyEditRequest;
 
 public interface UserOfflineSubsidyService extends IService<UserOfflineSubsidy> {
 
-    PageInfo<UserOfflineSubsidy> pageList(Integer uid, String province, String city, String area, PageParamRequest pageParamRequest);
+    PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, PageParamRequest pageParamRequest);
 
     Boolean add(UserOfflineSubsidyAddRequest request);
 

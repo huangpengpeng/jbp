@@ -166,7 +166,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         //带 Product 类的多条件查询
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
-        Merchant merchant = merchantService.getById(admin.getMerId());
+        //商品id搜索
+        if (request.getId() != null){
+            lqw.eq(Product::getId, request.getId());
+        }
+       Merchant merchant = merchantService.getById(admin.getMerId());
         if (admin.getMerId() == 0) {
             merchant = merchantService.getById(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID));
         }

@@ -39,11 +39,11 @@ public class CbecOrderServiceImpl extends ServiceImpl<CbecOrderDao, CbecOrder> i
         CbecUser cbecAccount = cbecUserService.getOne(new QueryWrapper<CbecUser>().lambda().eq(CbecUser::getAccountNo, dto.getBizId()));
         if (cbecAccount == null) {
             User user = userService.getByAccount(dto.getBizId());
-            if (user == null) {
-                return;
-            }
-            cbecAccount.setUid(user.getId());
-            cbecAccount.setAccountNo(user.getAccount());
+//            if (user == null) {
+//                return;
+//            }
+            cbecAccount.setUid(user == null ? 0 :user.getId());
+            cbecAccount.setAccountNo(user == null ? "yk" : user.getAccount());
         }
         // 跨境订单信息
         CbecOrder cbecOrder = dao.selectOne(new QueryWrapper<CbecOrder>().lambda().eq(CbecOrder::getCbecOrderNo, dto.getOrderSn()));

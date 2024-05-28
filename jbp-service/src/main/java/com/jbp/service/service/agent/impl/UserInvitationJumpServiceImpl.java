@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserInvitationJump;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.UserInvitationJumpListResponse;
 import com.jbp.service.dao.agent.UserInvitationJumpDao;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationJumpService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -33,6 +35,8 @@ public class UserInvitationJumpServiceImpl extends ServiceImpl<UserInvitationJum
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private TeamUserService teamUserService;
 
     @Override
     public UserInvitationJump add(Integer uId, Integer pId, Integer orgPid) {
@@ -81,6 +85,8 @@ public class UserInvitationJumpServiceImpl extends ServiceImpl<UserInvitationJum
         uIdList.addAll(list.stream().map(UserInvitationJump::getPId).collect(Collectors.toList()));
         uIdList.addAll(list.stream().map(UserInvitationJump::getOrgPid).collect(Collectors.toList()));
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        //团队
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         List<UserInvitationJumpListResponse> responseList = list.stream().map(e -> {
             UserInvitationJumpListResponse response = new UserInvitationJumpListResponse();
 
@@ -95,6 +101,10 @@ public class UserInvitationJumpServiceImpl extends ServiceImpl<UserInvitationJum
             User orgPUser = uidMapList.get(e.getOrgPid());
             response.setOrgPid(e.getOrgPid());
             response.setOaccount(orgPUser != null ? orgPUser.getAccount() : "");
+
+            //团队
+            TeamUser teamUser = teamUserMapList.get(e.getUId());
+            response.setTeamName(teamUser!=null?teamUser.getName():"");
 
             response.setGmtCreated(e.getGmtCreated());
             return response;

@@ -6,8 +6,10 @@ import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.common.model.agent.CapaXs;
 import com.jbp.common.model.agent.Oldcapaxs;
 import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderInvoice;
 import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.ConditionChain;
@@ -37,6 +39,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 
 @EnableAsync //开启异步调用
@@ -54,14 +57,14 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 //
-//        FeelGratefulCapaCommHandler productCommChain = run.getBean(FeelGratefulCapaCommHandler.class);
+//        ProductCommChain productCommChain = run.getBean(ProductCommChain.class);
 //       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //       OrderService orderService = run.getBean(OrderService.class);
-//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT600171646333294428146"));
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT359171681076144196357"));
 //
 //       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 //         LinkedList<CommCalculateResult> commList = new LinkedList<>();
-//
+////
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class);
@@ -82,7 +85,16 @@ public class JbpAdminApplication {
 //
 //        productCommChain.aa_8360();
 //
-
+//        OrderInvoiceService orderInvoiceService = run.getBean(OrderInvoiceService.class);
+//        OrderService orderService = run.getBean(OrderService.class);
+//        MerchantOrderService merchantOrderService = run.getBean(MerchantOrderService.class);
+//        MerchantOrder merchantOrder =   merchantOrderService.getOneByOrderNo("PT698171616749741166621");
+//        OrderInvoice orderInvoice = orderInvoiceService.getById(3580);
+//        LogisticService logisticService = run.getBean(LogisticService.class);
+//        logisticService.info(orderInvoice.getTrackingNumber(), null, Optional.ofNullable(orderInvoice.getExpressCode()).orElse(""), merchantOrder.getUserPhone());
+//
+//
+//        orderService.getLogisticsInfoByMerchant(3564);
 
 
 //

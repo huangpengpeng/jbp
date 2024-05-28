@@ -2,16 +2,19 @@ package com.jbp.admin.controller.platform;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.UserCapaXs;
+import com.jbp.common.model.system.SystemConfig;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.UserAdminDetailResponse;
 import com.jbp.common.response.UserResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.util.StringUtils;
@@ -23,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -54,6 +58,9 @@ public class PlatformUserController {
 
     @Autowired
     private UserCapaXsService userCapaXsService;
+
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     @PreAuthorize("hasAuthority('platform:user:page:list')")
     @ApiOperation(value = "平台端用户分页列表")
@@ -125,6 +132,14 @@ public class PlatformUserController {
         User users = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNotEmpty(users)){
             throw new CrmebException("账号已存在");
+        }
+        //读取手机号是否唯一的配置并判断
+        SystemConfig config = systemConfigService.getOne(new QueryWrapper<SystemConfig>().lambda().eq(SystemConfig::getName, "system_phone_is_unique"));
+        if (config != null && "'true'".equals(config.getValue())) {
+            List<User> list = userService.list(new QueryWrapper<User>().lambda().eq(User::getPhone, request.getPhone()));
+            if (!CollectionUtils.isEmpty(list)) {
+                throw new CrmebException("手机号已被注册");
+            }
         }
         userService.registerPhone(request.getUsername(),request.getPhone(),request.getAccount(),
                 request.getUserCapaTemplateRequest(),request.getRegionPAccount(),request.getRegionPNode(),

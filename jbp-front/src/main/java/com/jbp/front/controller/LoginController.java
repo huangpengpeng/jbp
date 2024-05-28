@@ -241,7 +241,7 @@ public class LoginController {
         if (BooleanUtils.isNotTrue(signatureValid)) {
             throw new RuntimeException("验签失败");
         }
-
+         jsonObject = JSON.parseObject(decrypt);
 
         JSONArray orderItems = jsonObject.getJSONArray("orderItems");
         String orderStatus = CbecOrder.parseCode(jsonObject.getString("orderStatus"));

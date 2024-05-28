@@ -43,7 +43,7 @@ public class UserOfflineSubsidyController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(service.pageList(uid, request.getProvince(), request.getCity(), request.getArea(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(service.pageList(uid, request.getProvinceId(), request.getCityId(), request.getAreaId(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:offline:subsidy:add')")

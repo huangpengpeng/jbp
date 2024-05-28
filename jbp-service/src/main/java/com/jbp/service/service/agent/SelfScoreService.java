@@ -25,6 +25,8 @@ public interface SelfScoreService extends IService<SelfScore> {
 
   void orderRefund(String ordersSn);
 
+  void updateScore(Integer uid, BigDecimal score, String ordersSn, Date payTime, String remark, Boolean ifAdd);
+
 
 
 

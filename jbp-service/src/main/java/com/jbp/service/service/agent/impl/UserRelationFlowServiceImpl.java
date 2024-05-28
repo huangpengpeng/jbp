@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserRelationFlow;
@@ -16,6 +17,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.UserRelationFlowDao;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -45,6 +47,8 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
     private UserCapaXsService userCapaXsService;
     @Resource
     private UserCapaService userCapaService;
+    @Resource
+    private TeamUserService teamUserService;
 
 
     @Override
@@ -102,7 +106,8 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         //等级
         Map<Integer, UserCapa> capaMapList = userCapaService.getUidMap(uIdList);
         Map<Integer, UserCapaXs> capaXsMapList = userCapaXsService.getUidMap(uIdList);
-
+        //团队
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         list.forEach(e -> {
             User uUser = userMap.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
@@ -119,6 +124,9 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
             UserCapaXs pUserCapaXs = capaXsMapList.get(e.getPId());
             e.setPCapaXsName(pUserCapaXs != null ? pUserCapaXs.getCapaName() : "");
+            //团队
+            TeamUser teamUser = teamUserMapList.get(e.getUId());
+            e.setTeamName(teamUser!=null?teamUser.getName():"");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -51,4 +51,7 @@ public class ProductSearchRequest implements Serializable {
     private Integer isSelf;
     @ApiModelProperty(value = "物料编码")
     private String materialsCode;
+
+    @ApiModelProperty(value = "商品id")
+    private Integer id;
 }
