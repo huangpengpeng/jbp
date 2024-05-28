@@ -62,7 +62,12 @@ public class DegreePayServiceImpl implements DegreePayService {
                 result.setUser_status("ACTIVATE_PENDING_NEW");
                 // REVIEWING: 申请审核中， REVIEW_BACK 申请已驳回 ,BUSINESS_OPING 业务开通中 , COMPLETED 申请完成
                 if ("COMPLETED".equals(registerQueryResult.getApplicationStatus())) {
-                    result.setUser_status("NORMAL");
+                    WithdrawCardQueryResult cardResult = yopService.withdrawCardQuery(lztAcctOpen.getUserId());
+                    if(cardResult != null && cardResult.validate()){
+                        if(CollectionUtils.isNotEmpty(cardResult.getBankCardAccountList())){
+                            result.setUser_status("NORMAL");
+                        }
+                    }
                 }
                 if ("REVIEW_BACK".equals(registerQueryResult.getApplicationStatus())) {
                     result.setUser_status("ACTIVATE_PENDING");

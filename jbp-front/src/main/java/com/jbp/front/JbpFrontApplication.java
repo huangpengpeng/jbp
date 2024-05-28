@@ -50,13 +50,9 @@ public class JbpFrontApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         System.out.println("ok");
 
-
-
-
-
         YopService yopService = run.getBean(YopService.class);
 
-        yopService.withdrawCardQuery("10090339599");
+//        yopService.withdrawCardQuery("10090339599");
 
 //        String registerMicroH5No = StringUtils.N_TO_10("YOP_OPEN_");
 //        RegisterMicroH5Params params = new RegisterMicroH5Params();
@@ -74,6 +70,8 @@ public class JbpFrontApplication {
 //        transfer(yopService);
 
 //        register(yopService);
+
+
 
 //        queryOpenBank(yopService);
 
@@ -116,7 +114,7 @@ public class JbpFrontApplication {
         String transferNo = StringUtils.N_TO_10("LZT_NDF_");
         // 10090316790  5元最早账户
         // 10089625822
-        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10090316790", "10090334402", "1", null);
+        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10089625822", "10090338239", "1", null);
         System.out.println(JSONObject.toJSONString(transferResult));
     }
 
@@ -136,7 +134,7 @@ public class JbpFrontApplication {
 
 
     private static void queryOpenBank(YopService yopService) {
-        BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090333215", "BO_49554926725273");
+        BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090333124", "BO_36213648233734");
         System.out.println(JSONObject.toJSONString(bankAccountQueryResult));
     }
 
@@ -153,46 +151,46 @@ public class JbpFrontApplication {
         String requestNo2 = StringUtils.N_TO_10("BO_");
         System.out.println(requestNo2);
         params.setRequestNo(requestNo2);
-        params.setMerchantNo("10090333215");
+        params.setMerchantNo("10090333259");
 
-        params.setMerchantName("深圳市千浪文化传媒有限公司");
+        params.setMerchantName("海口龙华弭冷桃百货店（个体工商户）");
         params.setOpenBankCode("SUNINGBANK_MULTICHANNEL");
+//        params.setOpenAccountType("ENTERPRISE");
         params.setOpenAccountType("INDIVIDUAL_BUSINESS_TYPE");
         params.setCertificateType("BUSINESS_LICENCE");
-        params.setCertificateNo("91440300MA5H6C9T1J");
+        params.setCertificateNo("92460000MADH2TRM8B");
         params.setNotifyUrl("https://applet.dys.ink/yop/ew");
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
+        if(params.getOpenAccountType().equals("ENTERPRISE")){
+//            dto.setBindCardType("PUBLIC_CARD");
+//            dto.setBindCardNo("755972046910008");
+//            dto.setBindBankCode("CMBCHINA"); //招商银行股份有限公司深圳南海支行
+//            dto.setBindAccountName("深圳市千银化妆品有限公司");//
+//            dto.setBranchBankNo("308584001813");
+        }
 
-        dto.setSocialCreditCodeImageUrl("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7.jpg");
-        dto.setSocialCreditCodeImageUrl(yopService.upload(dto.getSocialCreditCodeImageUrl()));
-        dto.setLegalCardImageFont("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E6%B3%95%E4%BA%BA%E8%BA%AB%E4%BB%BD%E8%AF%81%E6%AD%A3%E9%9D%A2.jpg");
+        dto.setSocialCreditCodeImageUrl("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/28/merchant-1716878548728-96d226fe-df51-415b-9617-68eb1f486050-qQNzUMhcRJllfsqRxEuX.png");
+        dto.setLegalCardImageFont("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/28/merchant-1716878585406-f85c405c-8b46-44a3-a48f-e89f97ad1123-ejUAGssTOyLeQtstwlGq.jpg");
+        dto.setLegalCardImageBack("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/28/merchant-1716878606958-67700a21-20f1-4d18-9231-0c478307da90-lRgjpjnWFXRnnTtHxmGp.jpg");
 
-        //yopService.upload(dto.getLegalCardImageFont())
-
-
-        dto.setLegalCardImageFont("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/24/merchant-1716548054675-680f3b00-a7ec-47f5-8f97-e062eef6cc01-zCAxMSwpzhyIfSOtgwyP.jpg");
-        dto.setLegalCardImageBack("http://jwebmall.oss-cn-hangzhou.aliyuncs.com/%E6%B3%95%E4%BA%BA%E8%BA%AB%E4%BB%BD%E8%AF%81%E5%8F%8D%E9%9D%A2.jpg");
-       // yopService.upload(dto.getLegalCardImageBack())
-        dto.setLegalCardImageBack("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/24/merchant-1716548053805-d39a29de-cfbe-45dc-8a71-28a1207f0a8d-EjBGOUAsfBDmMqYAlOLR.jpg");
-        dto.setLegalMobileNo("15678516978");
 
         dto.setOperatorName("徐静");
         dto.setMobileNo("13823668660");
 
         List<BenefitDTO> benefitList = Lists.newArrayList();
         BenefitDTO benefit = new BenefitDTO();
-        benefit.setBenefitName("龙海浪");
+        benefit.setBenefitName("梁豪杰");
+        dto.setLegalMobileNo("18027619676");
         benefit.setBenefitIdType("ID_CARD");
-        benefit.setBenefitIdNo("45032219970904051X");
-
-        benefit.setBenefitStartDate("20140207");
-        benefit.setBenefitExpireDate("20240207");
+        benefit.setBenefitIdNo("440982199409163179");
+        benefit.setBenefitStartDate("20150317");
+        benefit.setBenefitExpireDate("20250317");
 
         benefit.setBenefitImageFont(dto.getLegalCardImageFont());
         benefit.setBenefitImageBack(dto.getLegalCardImageBack());
 
-        benefit.setBenefitAddress("广西临桂县六塘镇罗塘村委会上村28号");
+        benefit.setBenefitAddress("广东省化州市合江镇新车村67号");
         benefitList.add(benefit);
 
         dto.setBenefitDTOList(benefitList);

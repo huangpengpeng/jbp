@@ -216,7 +216,6 @@ public class LianLianPayConfig {
 
         待开户("INIT"), // 自定义的
 
-
         已登记("ACTIVATE_PENDING"),
         正常("NORMAL"),
         审核未通过("ACTIVATE_PENDING"),

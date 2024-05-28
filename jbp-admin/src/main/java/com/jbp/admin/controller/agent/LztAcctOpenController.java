@@ -48,14 +48,19 @@ public class LztAcctOpenController {
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
     @ApiOperation(value = "连连个人开户")
     @GetMapping(value = "/apply")
-    public CommonResult<LztAcctOpen> apply(String userId, String userType, String returnUrl, String businessScope) {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(systemAdmin.getMerId(), "连连");
+    public CommonResult<LztAcctOpen> apply(Integer merId, String userId, String userType, String returnUrl, String businessScope) {
+        if (ObjectUtil.isEmpty(merId)) {
+            SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+            merId = systemAdmin.getMerId();
+        }
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(merId, "连连");
         LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(userId, userType, returnUrl, businessScope, lztPayChannel);
         return CommonResult.success(lztAcctOpen);
     }
 
-    @PreAuthorize("hasAuthority('agent:lzt:acct:open:yop:apply')")
+
+
+
     @ApiOperation(value = "易宝个人开户")
     @PostMapping(value = "/yop/apply")
     public CommonResult<LztAcctOpen> yopApply(@RequestBody YopBankApplyRequest request) {

@@ -77,7 +77,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix());
 
         LianLianPayInfoResult payInfo = lianLianPayService.get();
-        String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + txnSeqno;
+        String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
 
         LztOpenacctApplyResult result = lztService.createBankUser(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
                 userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl, openBank);

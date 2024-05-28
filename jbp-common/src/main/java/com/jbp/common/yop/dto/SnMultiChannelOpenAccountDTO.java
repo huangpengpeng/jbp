@@ -27,4 +27,16 @@ public class SnMultiChannelOpenAccountDTO implements Serializable {
 
     private List<BenefitDTO> benefitDTOList; // 最终受益人
 
+
+    private String bindCardType ; // openAccountType为ENTERPRISE时必填，
+
+    private String bindCardNo; // openAccountType为ENTERPRISE时必填， 卡号
+
+    private String bindBankCode;// 绑定银行编码 openAccountType为ENTERPRISE时必填，
+
+    private String bindAccountName;// 绑定账户名称
+
+    private String branchBankNo; // 支行行号
+
+
 }
