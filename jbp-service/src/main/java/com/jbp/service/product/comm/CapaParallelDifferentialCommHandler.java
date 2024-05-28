@@ -143,6 +143,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
         }
 
         Map<Integer, List<FundClearingProduct>> productMap = Maps.newConcurrentMap();
+        Map<Integer, String> commNameMap = Maps.newConcurrentMap();
         Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
 
         for (OrderDetail orderDetail : orderDetails) {
@@ -189,10 +190,11 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
                     }
                     usedRatio = ratio;
-                    if(reduceAmt>0){
+                    if (reduceAmt > 0) {
                         amt = amt - reduceAmt;
                     }
                     userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
+                    commNameMap.put(userCapa.getUid(), ProductCommEnum.级差佣金.getName());
                     FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                             orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
                     reduceAmt = 0.0;
@@ -233,13 +235,13 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             }
                             reduceAmt = reduceAmt + amt2;
                             userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
+                            commNameMap.put(PCapa.getUid(), ProductCommEnum.等级平级级差佣金.getName());
                             pId = invitationService.getPid(pId);
                             i++;
                         } while (i < 3);
                         ifOrderUser = true;
 
                     }
-
 
 
                     List<FundClearingProduct> productList = productMap.get(userCapa.getUid());
@@ -263,7 +265,8 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
             BigDecimal clearingFee = BigDecimal.valueOf(amt).setScale(2, BigDecimal.ROUND_DOWN);
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
-                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.等级平级级差佣金.getName(), clearingFee, fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.等级平级级差佣金.getName(), "");
+                String name = commNameMap.get(uid);
+                fundClearingService.create(uid, order.getOrderNo(), name, clearingFee, fundClearingProducts, orderUser.getAccount() + "下单获得" + name, "");
             }
         });
     }
