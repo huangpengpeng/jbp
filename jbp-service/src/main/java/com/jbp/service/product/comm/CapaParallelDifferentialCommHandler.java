@@ -229,7 +229,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             }
 
                             if ("金额".equals(type)) {
-                                amt2 = ratioAmt.doubleValue();
+                                amt2 = ratioAmt.multiply(BigDecimal.valueOf(orderDetail.getPayNum())).doubleValue();
                             } else {
                                 amt2 = totalPv.multiply(ratioAmt).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
                             }
