@@ -83,7 +83,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
         }
         Set<String> set = Sets.newHashSet();
         for (Rule rule : rules) {
-            if (rule.getCapaId() == null || rule.getRatio() == null || ArithmeticUtils.lessEquals(rule.getRatio(), BigDecimal.ZERO)) {
+            if (rule.getCapaId() == null || rule.getRatio() == null) {
                 throw new CrmebException(ProductCommEnum.等级平级级差佣金.getName() + "参数不完整");
             }
             if (StringUtils.isNotEmpty(rule.getType())) {
@@ -168,6 +168,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
             // 已发比例【或者金额】
             BigDecimal usedRatio = BigDecimal.ZERO;
             // 每个人拿钱
+            Boolean ifOrderUser = false;
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
                 BigDecimal ratio = BigDecimal.ZERO; // 当前头衔获得比例或者金额
@@ -187,43 +188,49 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         amt = totalPv.multiply(usableRatio).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
                     }
                     usedRatio = ratio;
-
-                    //查询获取到极差的平级用户
-                    Integer i = 0;
-                    Integer pId = invitationService.getPid(userCapa.getUid());
                     double reduceAmt = 0.0;
-                    do {
-                        if (pId == null) {
-                            break;
+                    //查询获取到极差的平级用户
+                    if (ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
+                        Integer i = 0;
+                        Integer pId = invitationService.getPid(order.getUid());
+                        if (ifOrderUser) {
+                            pId = invitationService.getPid(userCapa.getUid());
                         }
-                        BigDecimal ratioAmt = BigDecimal.ZERO;
-                        double amt2;
+                        do {
+                            ifOrderUser = true;
+                            List<Capa> capa = capaService.getPre(userCapa.getCapaId());
+                            if (pId == null) {
+                                break;
+                            }
+                            BigDecimal ratioAmt = BigDecimal.ZERO;
+                            double amt2;
 
-                        UserCapa PCapa = userCapaService.getByUser(pId);
-                        if (PCapa.getCapaId().intValue() > userCapa.getCapaId().intValue()) {
-                            break;
-                        }
+                            UserCapa PCapa = userCapaService.getByUser(pId);
+                            if (PCapa.getCapaId().intValue() > capa.get(0).getId()) {
+                                break;
+                            }
 
-                        if (i == 0) {
-                            ratioAmt = rule.getParallelRatioOne();
-                        }
-                        if (i == 1) {
-                            ratioAmt = rule.getParallelRatioTwo();
-                        }
-                        if (i == 2) {
-                            ratioAmt = rule.getParallelRatioThree();
-                        }
+                            if (i == 0) {
+                                ratioAmt = rule.getParallelRatioOne();
+                            }
+                            if (i == 1) {
+                                ratioAmt = rule.getParallelRatioTwo();
+                            }
+                            if (i == 2) {
+                                ratioAmt = rule.getParallelRatioThree();
+                            }
 
-                        if ("金额".equals(type)) {
-                            amt2 = ratioAmt.doubleValue();
-                        } else {
-                            amt2 = totalPv.multiply(ratioAmt).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
-                        }
-                        reduceAmt = reduceAmt + amt2;
-                        userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
-                        pId = invitationService.getPid(pId);
-                        i++;
-                    } while (i >= 3);
+                            if ("金额".equals(type)) {
+                                amt2 = ratioAmt.doubleValue();
+                            } else {
+                                amt2 = totalPv.multiply(ratioAmt).setScale(4, BigDecimal.ROUND_DOWN).doubleValue();
+                            }
+                            reduceAmt = reduceAmt + amt2;
+                            userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
+                            pId = invitationService.getPid(pId);
+                            i++;
+                        } while (i >= 3);
+                    }
 
                     amt = amt - reduceAmt;
                     userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
