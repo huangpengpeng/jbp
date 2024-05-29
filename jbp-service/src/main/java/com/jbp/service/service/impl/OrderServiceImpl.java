@@ -34,10 +34,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.utils.*;
-import com.jbp.common.vo.DateLimitUtilVo;
-import com.jbp.common.vo.LogisticsResultVo;
-import com.jbp.common.vo.MyRecord;
-import com.jbp.common.vo.ProductMaterialsVo;
+import com.jbp.common.vo.*;
 import com.jbp.service.dao.OrderDao;
 import com.jbp.service.dao.OrderInvoiceDao;
 import com.jbp.service.service.*;
@@ -810,7 +807,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (ObjectUtil.isNull(orderInvoice)) {
             throw new CrmebException("发货单不存在");
         }
+        if (orderInvoice.getExpressName().equals("厂家自提")) {
+            LogisticsResultVo logisticsResultVo = new LogisticsResultVo();
+            List<LogisticsResultListVo> list = CollUtil.newArrayList();
+            LogisticsResultListVo logisticsResultListVo = new LogisticsResultListVo();
+            logisticsResultListVo.setStatus("【暂无物流信息】");
+            logisticsResultVo.setExpName("厂家自提");
+            logisticsResultVo.setNumber(orderInvoice.getTrackingNumber());
+            list.add(logisticsResultListVo);
+            return logisticsResultVo.setList(list);
+        }
         MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orderInvoice.getOrderNo());
+
         return logisticService.info(orderInvoice.getTrackingNumber(), null, Optional.ofNullable(orderInvoice.getExpressCode()).orElse(""), merchantOrder.getUserPhone());
     }
 
