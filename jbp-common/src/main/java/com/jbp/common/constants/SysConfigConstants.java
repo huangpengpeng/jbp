@@ -247,6 +247,10 @@ public class SysConfigConstants {
      */
     public static final String CONFIG_KEY_ACCOUNT_LOGIN_OPEN = "account_login_open";
     /**
+     * 开启账号登录
+     */
+    public static final String MOBILE_ACCOUNT_LOGIN_OPEN = "mobile_account_login_open";
+    /**
      * 开启隐私协议
      */
     public static final String CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN = "login_privacy_agreement_open";

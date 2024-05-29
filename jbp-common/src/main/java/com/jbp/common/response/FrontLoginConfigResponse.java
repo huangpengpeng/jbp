@@ -56,6 +56,10 @@ public class FrontLoginConfigResponse implements Serializable {
     @ApiModelProperty(value = "开启账号登录")
     private Boolean openAccountLogin;
 
+    @ApiModelProperty(value = "开启手机号密码登录")
+    private Boolean openMobileAccountLogin;
+
+
     @ApiModelProperty(value = "开启隐私协议")
     private Boolean openPrivacyAgreement;
 

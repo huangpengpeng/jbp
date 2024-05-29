@@ -632,6 +632,7 @@ public class LoginServiceImpl implements LoginService {
         response.setOpenWechatLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_WECHAT_LOGIN_OPEN));
         response.setOpenMobileLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN));
         response.setOpenAccountLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
+        response.setOpenMobileAccountLogin(record.getStrBoolean(SysConfigConstants.MOBILE_ACCOUNT_LOGIN_OPEN));
         response.setOpenPrivacyAgreement(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
         response.setMobilePhoneLengthOpen(record.getStrBoolean(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN));
         response.setOrderRefundOpen(record.getStrBoolean(SysConfigConstants.ORDER_REFUND_OPEN));
