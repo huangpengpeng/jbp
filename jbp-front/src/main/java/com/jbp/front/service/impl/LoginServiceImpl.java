@@ -618,7 +618,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.PERSONAL_BACKGROUND);
         keyList.add(SysConfigConstants.STORE_GOODS_OPEN);
         keyList.add(SysConfigConstants.WORKBENCH_CAPA_OPEN);
-
+        keyList.add(SysConfigConstants.MOBILE_ACCOUNT_LOGIN_OPEN);
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
