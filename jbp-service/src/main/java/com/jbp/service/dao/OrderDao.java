@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.order.Order;
 
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.response.OrderSalesVolumeResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -38,4 +39,7 @@ public interface OrderDao extends BaseMapper<Order> {
 
 
     List<Map<String,Object>> getFgGoodsOrder(@Param(value = "goodsIds") String goodsIds, @Param(value = "month") String month);
+
+
+    List<OrderSalesVolumeResponse> salesVolumeDay();
 }

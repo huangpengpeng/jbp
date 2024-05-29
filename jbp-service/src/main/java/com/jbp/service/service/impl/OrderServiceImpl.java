@@ -1333,6 +1333,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         return merchantOrderService.updateById(merchantOrder);
     }
 
+    @Override
+    public PageInfo<OrderSalesVolumeResponse> salesVolumeDay( PageParamRequest pageParamRequest) {
+
+        Page<Order> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<OrderSalesVolumeResponse> orderList = dao.salesVolumeDay();
+
+        return CommonPage.copyPageInfo(page, orderList);
+    }
+
     /**
      * 根据订单编号获取订单
      *

@@ -130,6 +130,15 @@ public class PlatformOrderController {
 
     }
 
+    @PreAuthorize("hasAuthority('platform:order:sales:day')")
+    @ApiOperation(value = "获取每日销售额")
+    @RequestMapping(value = "/salesVolumeDay", method = RequestMethod.GET)
+ public CommonResult<CommonPage<OrderSalesVolumeResponse>> salesVolumeDay( @Validated PageParamRequest pageParamRequest){
+        return CommonResult.success(CommonPage.restPage(orderService.salesVolumeDay(pageParamRequest)));
+    }
+
+
+
 }
 
 
