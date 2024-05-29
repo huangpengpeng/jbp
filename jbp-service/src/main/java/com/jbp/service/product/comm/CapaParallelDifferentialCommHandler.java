@@ -174,6 +174,9 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
             for (UserCapa userCapa : userList) {
                 Rule rule = ruleMap.get(userCapa.getCapaId());
                 BigDecimal ratio = BigDecimal.ZERO; // 当前头衔获得比例或者金额
+                if(rule == null){
+                    continue;
+                }
                 if (rule != null) {
                     ratio = rule.getRatio();
                 }
@@ -181,7 +184,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                     ratio = ratio.multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
                 }
                 // 佣金
-                if (ArithmeticUtils.gt(ratio, usedRatio) || ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
+                if ( ArithmeticUtils.gt(ratio, usedRatio) || ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
                     double amt = 0.0;
                     BigDecimal usableRatio = ratio.subtract(usedRatio); // 可发比例 、金额
                     if ("金额".equals(type)) {

@@ -57,7 +57,7 @@ public class JbpAdminApplication {
 //        CapaParallelDifferentialCommHandler productCommChain = run.getBean(CapaParallelDifferentialCommHandler.class);
 //       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //       OrderService orderService = run.getBean(OrderService.class);
-//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT482171688743264819859"));
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT616171694842847816185"));
 ////
 //       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 //         LinkedList<CommCalculateResult> commList = new LinkedList<>();
