@@ -215,8 +215,9 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             if (pId == null) {
                                 break;
                             }
-
-                            if(userAmtMap.containsKey( pId.intValue())){
+                            //拿过平级或极差的不能在拿
+                            if(userAmtMap.containsKey(pId)){
+                                pId = invitationService.getPid(pId);
                                 continue;
                             }
 
