@@ -465,7 +465,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         walletMap.put(-1, new WalletConfig().setName("管理费"));
         walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
-            e.setSendAmt(e.getSendAmt().multiply(wallet_pay_integral));
+            e.setSendAmt((e.getSendAmt().multiply(wallet_pay_integral)).stripTrailingZeros());
             if(name.contains("sm") || name.contains("yk")  || name.contains("tf") ){
                 e.setDescription(CommAliasNameSmEnum.getAliasNameReplaceName(e.getDescription()));
             }else if (name.contains("hdf") ){
@@ -476,7 +476,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             for (FundClearingItem item : e.getItems()) {
                 WalletConfig walletConfig = walletMap.get(item.getWalletType());
                 item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
-                item.setAmt(item.getAmt().multiply(wallet_pay_integral));
+                item.setAmt((item.getAmt().multiply(wallet_pay_integral)).stripTrailingZeros());
             }
         });
         return CommonPage.copyPageInfo(page, list);

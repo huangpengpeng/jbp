@@ -26,4 +26,6 @@ public class FrontIndividualCenterConfigResponse implements Serializable {
     private Boolean nicknameChange;
     @ApiModelProperty(value = "更改手机号")
     private Boolean changePhone;
+    @ApiModelProperty(value = "更改手机号无验证")
+    private Boolean changePhoneNosign;
 }

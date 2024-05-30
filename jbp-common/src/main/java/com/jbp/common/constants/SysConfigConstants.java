@@ -45,6 +45,12 @@ public class SysConfigConstants {
     public static final String CHANGE_PHONE="change-phone";
 
     /**
+     * 更改手机号无验证
+     */
+    public static final String CHANGE_PHONE_NOSIGN="change_phone_nosign";
+
+
+    /**
      * 个人中心背景
      */
     public static final String PERSONAL_BACKGROUND = "personal_background";
@@ -246,6 +252,10 @@ public class SysConfigConstants {
      * 开启账号登录
      */
     public static final String CONFIG_KEY_ACCOUNT_LOGIN_OPEN = "account_login_open";
+    /**
+     * 开启账号登录
+     */
+    public static final String MOBILE_ACCOUNT_LOGIN_OPEN = "mobile_account_login_open";
     /**
      * 开启隐私协议
      */

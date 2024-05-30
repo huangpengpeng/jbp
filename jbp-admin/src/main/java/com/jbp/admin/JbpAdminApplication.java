@@ -13,10 +13,7 @@ import com.jbp.common.model.order.OrderInvoice;
 import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
 import com.jbp.service.condition.ConditionChain;
-import com.jbp.service.product.comm.CommCalculateResult;
-import com.jbp.service.product.comm.FeelGratefulCapaCommHandler;
-import com.jbp.service.product.comm.OfflineSubsidyCommHandler;
-import com.jbp.service.product.comm.ProductCommChain;
+import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -57,14 +54,14 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 //
-//        ProductCommChain productCommChain = run.getBean(ProductCommChain.class);
+//        CapaParallelDifferentialCommHandler productCommChain = run.getBean(CapaParallelDifferentialCommHandler.class);
 //       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //       OrderService orderService = run.getBean(OrderService.class);
-//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT359171681076144196357"));
-//
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT578171705154600244593"));
+////
 //       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 //         LinkedList<CommCalculateResult> commList = new LinkedList<>();
-////
+//////
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 //        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class);

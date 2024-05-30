@@ -10,6 +10,7 @@
         <result column="xs_capa_id" property="capaXsId"/>
         <result column="gmt_created" property="gmtCreated"/>
         <result column="gmt_modify" property="gmtModify"/>
+        <result column="u_capa_xs_name" property="uCapaXsName"/>
     </resultMap>
 
     <select id="getUnderCapaList" resultMap="UserInvitationFlowType">
@@ -19,8 +20,9 @@
     </select>
 
     <select id="getUnderXsCapaList" resultMap="UserInvitationFlowType">
-        select f.*, c.capa_id as xs_capa_id  from eb_user_invitation_flow f
+        select f.*, c.capa_id as xs_capa_id  ,x.name  as u_capa_xs_name from eb_user_invitation_flow f
         left join eb_user_capa_xs c on f.uId = c.uid
+        left join eb_capa_xs x on x.id = c.capa_id
         where f.pId = #{pId} and c.capa_id >= #{minXsCapaId}
     </select>
 </mapper>

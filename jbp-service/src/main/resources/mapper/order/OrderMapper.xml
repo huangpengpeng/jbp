@@ -60,7 +60,26 @@
 
 
     </select>
+    <select id="salesVolumeDay" resultType="com.jbp.common.response.OrderSalesVolumeResponse">
 
+
+    select total,day,refund_total,ifnull(user_total,0) as user_total,(total-refund_total ) as ans_total  from(
+
+    select sum(pay_price) as total,DATE_FORMAT( o.`pay_Time`,'%Y-%m-%d') day ,ifnull(r.refund_total,0) as refund_total ,u.user_total from eb_order o
+
+    left join (select sum(r.pay_price) as refund_total ,DATE_FORMAT( r.`pay_Time`,'%Y-%m-%d')  time from eb_order r where r.paid = 1  and r.refund_status >0 and is_del = 0   GROUP BY DATE_FORMAT( r.`pay_Time`,'%Y-%m-%d')  )  r on   DATE_FORMAT( o.`pay_Time`,'%Y-%m-%d')  = r.time
+
+		left join (select count(1)  as user_total,DATE_FORMAT( create_time,'%Y-%m-%d') create_time from eb_user  GROUP BY DATE_FORMAT( create_time,'%Y-%m-%d')) u on  u.create_time= r.time
+    where paid = 1  and is_del = 0
+    GROUP BY DATE_FORMAT( o.`pay_Time`,'%Y-%m-%d')
+
+
+    )  as a
+
+       order by day desc
+
+
+    </select>
 
 
 </mapper>

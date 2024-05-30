@@ -618,7 +618,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.PERSONAL_BACKGROUND);
         keyList.add(SysConfigConstants.STORE_GOODS_OPEN);
         keyList.add(SysConfigConstants.WORKBENCH_CAPA_OPEN);
-
+        keyList.add(SysConfigConstants.MOBILE_ACCOUNT_LOGIN_OPEN);
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
@@ -632,6 +632,7 @@ public class LoginServiceImpl implements LoginService {
         response.setOpenWechatLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_WECHAT_LOGIN_OPEN));
         response.setOpenMobileLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_MOBILE_LOGIN_OPEN));
         response.setOpenAccountLogin(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_ACCOUNT_LOGIN_OPEN));
+        response.setOpenMobileAccountLogin(record.getStrBoolean(SysConfigConstants.MOBILE_ACCOUNT_LOGIN_OPEN));
         response.setOpenPrivacyAgreement(record.getStrBoolean(SysConfigConstants.CONFIG_KEY_LOGIN_PRIVACY_AGREEMENT_OPEN));
         response.setMobilePhoneLengthOpen(record.getStrBoolean(SysConfigConstants.MOBILE_PHONE_LENGTH_OPEN));
         response.setOrderRefundOpen(record.getStrBoolean(SysConfigConstants.ORDER_REFUND_OPEN));
@@ -652,6 +653,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CERTIFICATION_PROVE);
         keyList.add(SysConfigConstants.NICKNAME_CHANGE);
         keyList.add(SysConfigConstants.CHANGE_PHONE);
+        keyList.add(SysConfigConstants.CHANGE_PHONE_NOSIGN);
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
 
         FrontIndividualCenterConfigResponse response = new FrontIndividualCenterConfigResponse();
@@ -660,6 +662,7 @@ public class LoginServiceImpl implements LoginService {
         response.setCertificationProve(record.getStrBoolean(SysConfigConstants.CERTIFICATION_PROVE));
         response.setNicknameChange(record.getStrBoolean(SysConfigConstants.NICKNAME_CHANGE));
         response.setChangePhone(record.getStrBoolean(SysConfigConstants.CHANGE_PHONE));
+        response.setChangePhoneNosign(record.getStrBoolean(SysConfigConstants.CHANGE_PHONE_NOSIGN));
         return response;
     }
 

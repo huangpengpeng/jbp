@@ -642,9 +642,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      */
     @Override
     public Boolean updatePhone(UserBindingPhoneUpdateRequest request) {
-        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
-        Boolean ifBooleand = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
-        if(!ifBooleand) {
+        String changePhoneNosign = systemConfigService.getValueByKey(SysConfigConstants.CHANGE_PHONE_NOSIGN);
+        if(!"'true'".equals(changePhoneNosign)) {
             checkValidateCode(request.getPhone(), request.getCaptcha());
         }
         User user = getInfo();
