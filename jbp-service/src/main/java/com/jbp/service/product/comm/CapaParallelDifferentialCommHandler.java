@@ -205,9 +205,13 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                     if (ArithmeticUtils.gt(rule.getParallelRatioOne(), BigDecimal.ZERO)) {
                         Integer i = 0;
                         Integer pId = invitationService.getPid(userCapa.getUid());
-                        if (!ifOrderUser) {
+                        if (!ifOrderUser  ) {
                             pId = invitationService.getPid(order.getUid());
                         }
+                        if(pId.intValue() == userCapa.getUid().intValue()){
+                            continue;
+                        }
+
                         do {
 
                             if (pId == null) {
