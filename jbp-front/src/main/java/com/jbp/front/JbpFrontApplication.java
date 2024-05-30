@@ -50,10 +50,5 @@ public class JbpFrontApplication {
         OrderInvoice orderInvoice = orderInvoiceService.getById(3564);
         LogisticService logisticService = run.getBean(LogisticService.class);
         logisticService.info(orderInvoice.getTrackingNumber(), null, Optional.ofNullable(orderInvoice.getExpressCode()).orElse(""), merchantOrder.getUserPhone())
-
-
-        orderService.getLogisticsInfoByMerchant(3564);
-
-
     }
 }
