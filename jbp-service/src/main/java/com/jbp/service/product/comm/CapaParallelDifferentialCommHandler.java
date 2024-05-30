@@ -208,7 +208,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         if (!ifOrderUser  ) {
                             pId = invitationService.getPid(order.getUid());
                         }
-                        if(pId.intValue() == userCapa.getUid().intValue()){
+                        if(userAmtMap.containsKey( pId.intValue())){
                             continue;
                         }
 
