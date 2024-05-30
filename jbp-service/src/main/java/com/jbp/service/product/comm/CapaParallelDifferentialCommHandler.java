@@ -216,9 +216,11 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                                 break;
                             }
                             //拿过平级或极差的不能在拿
-                            if(userAmtMap.containsKey(pId)){
-                                pId = invitationService.getPid(pId);
-                                continue;
+                            if(userAmtMap.containsKey(pId) ){
+                                if(userAmtMap.get(pId) > 0) {
+                                    pId = invitationService.getPid(pId);
+                                    continue;
+                                }
                             }
 
                             BigDecimal ratioAmt = BigDecimal.ZERO;
