@@ -63,7 +63,7 @@ public class LztTransferServiceImpl extends ServiceImpl<LztTransferDao, LztTrans
             throw new CrmebException("转账单号已经被使用");
         }
         LztAcct lztAcct = lztAcctService.getByUserId(payerId);
-        BigDecimal feeAmount = lztAcctService.getFee(payerId, amt);
+        BigDecimal feeAmount = lztAcctService.getFee("代付", payerId, amt);
         amt = amt.add(feeAmount);
         LztTransferResult transferResult = degreePayService.transfer(lztAcct, txnPurpose, txnSeqno,
          amt.toString(), feeAmount.toString(), pwd, random_key, payeeType, bankAcctNo, bankCode, bankAcctName,

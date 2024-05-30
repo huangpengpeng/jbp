@@ -73,12 +73,13 @@ public class JbpFrontApplication {
 
 
 
-//        queryOpenBank(yopService);
+        queryOpenBank(yopService);
 
 //        openBank(yopService);
+//        openBank2(yopService);
 
 
-//         RegisterQueryResult result = yopService.registerQuery("LZT_RS_103702359635243");
+//        RegisterQueryResult result = yopService.registerQuery("LZT_RS_103702359635243");
 
 //        yopService.registerQuery("BO_134099286059998");
 //        BO_55378505558965
@@ -134,8 +135,15 @@ public class JbpFrontApplication {
 
 
     private static void queryOpenBank(YopService yopService) {
-        BankAccountQueryResult bankAccountQueryResult = yopService.bankAccountQuery("10090333124", "BO_36213648233734");
-        System.out.println(JSONObject.toJSONString(bankAccountQueryResult));
+        BankAccountQueryResult result1 = yopService.bankAccountQuery("10090348841", "BO_90331316529100");
+        BankAccountQueryResult result2 = yopService.bankAccountQuery("10090348912", "BO_100669981330364");
+//        BankAccountQueryResult result3 = yopService.bankAccountQuery("10090343285", "BO_147300999316495");
+//        BankAccountQueryResult result4 = yopService.bankAccountQuery("10090333170", "BO_188450832013472");
+
+        System.out.println(JSONObject.toJSONString(result1));
+        System.out.println(JSONObject.toJSONString(result2));
+//        System.out.println(JSONObject.toJSONString(result3));
+//        System.out.println(JSONObject.toJSONString(result4));
     }
 
 
@@ -151,28 +159,28 @@ public class JbpFrontApplication {
         String requestNo2 = StringUtils.N_TO_10("BO_");
         System.out.println(requestNo2);
         params.setRequestNo(requestNo2);
-        params.setMerchantNo("10090333259");
+        params.setMerchantNo("10090348841");
 
-        params.setMerchantName("海口龙华弭冷桃百货店（个体工商户）");
+        params.setMerchantName("湖北省好聪聪生物科技有限公司");
         params.setOpenBankCode("SUNINGBANK_MULTICHANNEL");
-//        params.setOpenAccountType("ENTERPRISE");
+        params.setOpenAccountType("ENTERPRISE");
         params.setOpenAccountType("INDIVIDUAL_BUSINESS_TYPE");
         params.setCertificateType("BUSINESS_LICENCE");
-        params.setCertificateNo("92460000MADH2TRM8B");
+        params.setCertificateNo("91420684MADFELGF23");
         params.setNotifyUrl("https://applet.dys.ink/yop/ew");
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
         if(params.getOpenAccountType().equals("ENTERPRISE")){
-//            dto.setBindCardType("PUBLIC_CARD");
-//            dto.setBindCardNo("755972046910008");
-//            dto.setBindBankCode("CMBCHINA"); //招商银行股份有限公司深圳南海支行
-//            dto.setBindAccountName("深圳市千银化妆品有限公司");//
-//            dto.setBranchBankNo("308584001813");
+            dto.setBindCardType("PUBLIC_CARD");
+            dto.setBindCardNo("42050164680800001338");
+            dto.setBindBankCode("CCB"); //招商银行股份有限公司深圳南海支行
+            dto.setBindAccountName("湖北省好聪聪生物科技有限公司");//
+            dto.setBranchBankNo("105100000017");
         }
 
-        dto.setSocialCreditCodeImageUrl("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/28/merchant-1716878548728-96d226fe-df51-415b-9617-68eb1f486050-qQNzUMhcRJllfsqRxEuX.png");
-        dto.setLegalCardImageFont("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/28/merchant-1716878585406-f85c405c-8b46-44a3-a48f-e89f97ad1123-ejUAGssTOyLeQtstwlGq.jpg");
-        dto.setLegalCardImageBack("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/28/merchant-1716878606958-67700a21-20f1-4d18-9231-0c478307da90-lRgjpjnWFXRnnTtHxmGp.jpg");
+        dto.setSocialCreditCodeImageUrl("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044664591-f4184bd5-d42e-44ad-b066-37aebf7d1edb-bKKpSZGtJTPrKAiaazPv.jpg");
+        dto.setLegalCardImageFont("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044684557-80f6dbaa-2f41-4493-b93e-03379e1138a3-LgIHQabVHKqkigraiNoN.jpg");
+        dto.setLegalCardImageBack("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044716846-659ed5bd-f07b-4dd9-b8eb-f1241e218249-VRgjcBRcrbrlIblqiWvk.jpg");
 
 
         dto.setOperatorName("徐静");
@@ -180,17 +188,73 @@ public class JbpFrontApplication {
 
         List<BenefitDTO> benefitList = Lists.newArrayList();
         BenefitDTO benefit = new BenefitDTO();
-        benefit.setBenefitName("梁豪杰");
-        dto.setLegalMobileNo("18027619676");
+        benefit.setBenefitName("付丽珊");
+        dto.setLegalMobileNo("15611823036");
         benefit.setBenefitIdType("ID_CARD");
-        benefit.setBenefitIdNo("440982199409163179");
-        benefit.setBenefitStartDate("20150317");
-        benefit.setBenefitExpireDate("20250317");
+        benefit.setBenefitIdNo("500236199907174727");
+        benefit.setBenefitStartDate("20230901");
+        benefit.setBenefitExpireDate("20330901");
 
         benefit.setBenefitImageFont(dto.getLegalCardImageFont());
         benefit.setBenefitImageBack(dto.getLegalCardImageBack());
 
-        benefit.setBenefitAddress("广东省化州市合江镇新车村67号");
+        benefit.setBenefitAddress("重庆市奉节县吐祥镇大庄村1组322号");
+        benefitList.add(benefit);
+
+        dto.setBenefitDTOList(benefitList);
+        params.setSnMultiChannelOpenAccountDTO(dto);
+
+        BankAccountOpenResult result = yopService.bankAccountOpen(params);
+        System.out.println(JSONObject.toJSONString(result));
+
+    }
+
+    private static void openBank2(YopService yopService) {
+        // {"authType":"NO_AUTH","orderNo":"6dfaa3a38bf84ba7aca8228158ba10ab","requestNo":"BO_65808892927832","returnCode":"AM00000","status":"PROCESS"}
+        BankAccountOpenParams params = new BankAccountOpenParams();
+        String requestNo2 = StringUtils.N_TO_10("BO_");
+        System.out.println(requestNo2);
+        params.setRequestNo(requestNo2);
+        params.setMerchantNo("10090348912");
+
+        params.setMerchantName("宜城市恒聪生物科技有限公司");
+        params.setOpenBankCode("SUNINGBANK_MULTICHANNEL");
+        params.setOpenAccountType("ENTERPRISE");
+        params.setOpenAccountType("INDIVIDUAL_BUSINESS_TYPE");
+        params.setCertificateType("BUSINESS_LICENCE");
+        params.setCertificateNo("91420684MADDPJRF5H");
+        params.setNotifyUrl("https://applet.dys.ink/yop/ew");
+
+        SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
+        if(params.getOpenAccountType().equals("ENTERPRISE")){
+            dto.setBindCardType("PUBLIC_CARD");
+            dto.setBindCardNo("42050164680800001329");
+            dto.setBindBankCode("CCB"); //招商银行股份有限公司深圳南海支行
+            dto.setBindAccountName("宜城市恒聪生物科技有限公司");//
+            dto.setBranchBankNo("105528200662");
+        }
+
+        dto.setSocialCreditCodeImageUrl("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717045132011-601d6ffc-50c0-45ee-9fde-d9b82cb27bd8-qyaRcssZKtjCothcxruC.jpg");
+        dto.setLegalCardImageFont("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044684557-80f6dbaa-2f41-4493-b93e-03379e1138a3-LgIHQabVHKqkigraiNoN.jpg");
+        dto.setLegalCardImageBack("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044716846-659ed5bd-f07b-4dd9-b8eb-f1241e218249-VRgjcBRcrbrlIblqiWvk.jpg");
+
+
+        dto.setOperatorName("徐静");
+        dto.setMobileNo("13823668660");
+
+        List<BenefitDTO> benefitList = Lists.newArrayList();
+        BenefitDTO benefit = new BenefitDTO();
+        benefit.setBenefitName("付丽珊");
+        dto.setLegalMobileNo("15611823036");
+        benefit.setBenefitIdType("ID_CARD");
+        benefit.setBenefitIdNo("500236199907174727");
+        benefit.setBenefitStartDate("20230901");
+        benefit.setBenefitExpireDate("20330901");
+
+        benefit.setBenefitImageFont(dto.getLegalCardImageFont());
+        benefit.setBenefitImageBack(dto.getLegalCardImageBack());
+
+        benefit.setBenefitAddress("重庆市奉节县吐祥镇大庄村1组322号");
         benefitList.add(benefit);
 
         dto.setBenefitDTOList(benefitList);

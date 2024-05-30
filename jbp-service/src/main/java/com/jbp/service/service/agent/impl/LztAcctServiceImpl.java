@@ -113,10 +113,11 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     }
 
     @Override
-    public PageInfo<LztAcct> pageList(Integer merId, String userId, String username, PageParamRequest pageParamRequest) {
+    public PageInfo<LztAcct> pageList(Integer merId, String userId, String username, String userType, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<LztAcct> lqw = new LambdaQueryWrapper<LztAcct>()
                 .eq(StringUtils.isNotEmpty(userId), LztAcct::getUserId, userId)
                 .eq(StringUtils.isNotEmpty(username), LztAcct::getUsername, username)
+                .eq(StringUtils.isNotEmpty(userType), LztAcct::getUserType, userType)
                 .eq(merId != null && merId > 0, LztAcct::getMerId, merId)
                 .orderByDesc(LztAcct::getId);
 
@@ -316,7 +317,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     }
 
     @Override
-    public BigDecimal getFee(String userId, BigDecimal amt) {
+    public BigDecimal getFee(String scane, String userId, BigDecimal amt) {
         LztAcct lztAcct = getByUserId(userId);
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
         BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
@@ -325,8 +326,16 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             feeAmount =
                     amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         }
-        if (lztAcct.getPayChannelType().equals("易宝")) {
+        if(lztAcct.getPayChannelType().equals("易宝")){
             feeAmount = BigDecimal.ONE;
+            if(com.jbp.common.utils.StringUtils.isNotEmpty(scane) && "转账".equals(scane)) {
+                if (lztAcct.getHandlingFee() != null && ArithmeticUtils.gt(lztAcct.getHandlingFee(), BigDecimal.ZERO)) {
+                    BigDecimal fee = amt.multiply(lztAcct.getHandlingFee()).setScale(2, BigDecimal.ROUND_UP);
+                    if(ArithmeticUtils.gt(fee, BigDecimal.valueOf(3))){
+                        feeAmount = fee;
+                    }
+                }
+            }
         }
         return feeAmount;
     }

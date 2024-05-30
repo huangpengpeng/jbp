@@ -46,7 +46,7 @@ public interface DegreePayService {
      * 内部代发
      */
     TransferMorepyeeResult transferMorepyee(LztAcct lztAcct, String orderNo,
-                                            Double amt, String txnPurpose, String pwd, String randomKey,
+                                            Double amt, BigDecimal fee, String txnPurpose, String pwd, String randomKey,
                                             String payeeId, String ip, String notify_url);
     /**
      * 内部代发结果

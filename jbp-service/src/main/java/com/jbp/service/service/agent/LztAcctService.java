@@ -16,10 +16,10 @@ public interface LztAcctService extends IService<LztAcct> {
 
     LztAcct details(String userId);
 
-    PageInfo<LztAcct> pageList(Integer merId, String userId, String username,  PageParamRequest pageParamRequest);
+    PageInfo<LztAcct> pageList(Integer merId, String userId, String username, String userType, PageParamRequest pageParamRequest);
 
 
     LztInfoResponse lztInfo(Integer merId);
 
-    BigDecimal getFee(String userId, BigDecimal amt);
+    BigDecimal getFee(String scane, String userId, BigDecimal amt);
 }

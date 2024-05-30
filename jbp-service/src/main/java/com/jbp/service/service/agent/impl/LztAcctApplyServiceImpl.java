@@ -9,7 +9,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.result.*;
+import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.lianlian.result.LztOpenacctApplyResult;
+import com.jbp.common.lianlian.result.LztQueryAcctInfo;
+import com.jbp.common.lianlian.result.LztQueryAcctInfoResult;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztPayChannel;
@@ -76,8 +79,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通银行虚拟户.getPrefix());
 
-        LianLianPayInfoResult payInfo = lianLianPayService.get();
-        String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
+        String notifyUrl =  "/api/publicly/payment/callback/lianlian/lzt/" + txnSeqno;
 
         LztOpenacctApplyResult result = lztService.createBankUser(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
                 userId, txnSeqno, shopId, shopName, province, city, area, address, notifyUrl, openBank);

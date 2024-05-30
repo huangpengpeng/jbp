@@ -374,18 +374,19 @@ public class DegreePayServiceImpl implements DegreePayService {
         return result;
     }
 
-
     @Override
-    public TransferMorepyeeResult transferMorepyee(LztAcct lztAcct, String orderNo, Double amt, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url) {
+    public TransferMorepyeeResult transferMorepyee(LztAcct lztAcct, String orderNo, Double amt, BigDecimal fee, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url) {
         TransferMorepyeeResult result = new TransferMorepyeeResult();
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         if (lztAcct.getPayChannelType().equals("连连")) {
+            amt = BigDecimal.valueOf(amt).add(fee).doubleValue();
             result = lztService.transferMorepyee(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
                     lztAcct.getUserId(), orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notify_url, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
             LianLianPayInfoResult payInfo = lianLianPayService.get();
             String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + orderNo;
+            amt = BigDecimal.valueOf(amt).add(BigDecimal.ONE).doubleValue();
             AccountTransferOrderResult yopResult = yopService.transferB2bOrder(orderNo, lztAcct.getUserId(), payeeId, amt.toString(), notifyUrl);
             if(yopResult == null){
                 throw new CrmebException(lztAcct.getUserId()+"转账请求异常请联系管理员");
@@ -398,6 +399,11 @@ public class DegreePayServiceImpl implements DegreePayService {
                 result.setRet_code("0000");
             }else{
                 throw new CrmebException(yopResult.getReturnMsg());
+            }
+
+            if(ArithmeticUtils.gt(fee, BigDecimal.valueOf(3))){
+                fee = fee.subtract(BigDecimal.valueOf(3));
+                yopService.transferB2bOrder(StringUtils.N_TO_10("SXF_DNF"), lztAcct.getUserId(), "10090338239", fee.toString(), "");
             }
         }
         return result;
