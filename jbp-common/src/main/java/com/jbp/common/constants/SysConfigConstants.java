@@ -45,6 +45,12 @@ public class SysConfigConstants {
     public static final String CHANGE_PHONE="change-phone";
 
     /**
+     * 更改手机号无验证
+     */
+    public static final String CHANGE_PHONE_NOSIGN="change_phone_nosign";
+
+
+    /**
      * 个人中心背景
      */
     public static final String PERSONAL_BACKGROUND = "personal_background";

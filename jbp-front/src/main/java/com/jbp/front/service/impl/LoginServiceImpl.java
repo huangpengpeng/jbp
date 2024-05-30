@@ -653,6 +653,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.CERTIFICATION_PROVE);
         keyList.add(SysConfigConstants.NICKNAME_CHANGE);
         keyList.add(SysConfigConstants.CHANGE_PHONE);
+        keyList.add(SysConfigConstants.CHANGE_PHONE_NOSIGN);
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
 
         FrontIndividualCenterConfigResponse response = new FrontIndividualCenterConfigResponse();
@@ -661,6 +662,7 @@ public class LoginServiceImpl implements LoginService {
         response.setCertificationProve(record.getStrBoolean(SysConfigConstants.CERTIFICATION_PROVE));
         response.setNicknameChange(record.getStrBoolean(SysConfigConstants.NICKNAME_CHANGE));
         response.setChangePhone(record.getStrBoolean(SysConfigConstants.CHANGE_PHONE));
+        response.setChangePhoneNosign(record.getStrBoolean(SysConfigConstants.CHANGE_PHONE_NOSIGN));
         return response;
     }
 
