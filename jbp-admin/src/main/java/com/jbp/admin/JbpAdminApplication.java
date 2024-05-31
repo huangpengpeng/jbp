@@ -111,11 +111,11 @@ public class JbpAdminApplication {
            if(userInvitation != null){
                continue;
            }
-           if(users == null ){
+           if(users.isEmpty() ){
                System.out.println(oldcapaxs.getPhone() +"//11111111111");
                continue;
            }
-           if(users2 == null ){
+           if(users2.isEmpty()){
                System.out.println(oldcapaxs.getRphone() +"//22222222");
                continue;
            }
