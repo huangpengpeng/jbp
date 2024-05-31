@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.UserInvitationFlow;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.vo.UserInvitationGplotVo;
 
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface UserInvitationFlowService extends IService<UserInvitationFlow> 
     void refreshFlowAndTeam(Integer uId);
 
     PageInfo<UserInvitationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest);
+
+    List<UserInvitationGplotVo> gplotInfo(Integer uid);
 }
