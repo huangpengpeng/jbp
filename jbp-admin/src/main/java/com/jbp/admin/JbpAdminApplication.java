@@ -12,6 +12,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderInvoice;
 import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
+import com.jbp.service.condition.CapaXsJoinCapaHandler;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;

@@ -5,6 +5,7 @@ import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.InvitationScoreService;
 import com.jbp.service.service.agent.SelfScoreService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -64,6 +66,16 @@ public class CapaXsInvitationLineHandler implements ConditionHandler {
 
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
+
+        //过滤指定用户星级
+        String filter =environment.getProperty("teamAmtSelf.filterList");
+        if(!StringUtils.isBlank(filter)) {
+            List<String> filterList = Arrays.asList(filter);
+            if (filterList.contains(uid)) {
+                return false;
+            }
+        }
+
         // 获取规则
         Rule rule = getRule(riseCondition);
         // 1.自己的累积业绩

@@ -189,7 +189,7 @@ historyOrder:
 
 teamAmtSelf:
   ifopen: true
-
+  filterList: 1000036,1000052,1000075
 
 
 
