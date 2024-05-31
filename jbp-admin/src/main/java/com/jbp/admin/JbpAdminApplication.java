@@ -97,27 +97,25 @@ public class JbpAdminApplication {
 
 //
 //
-//        UserOfflineSubsidyService userOfflineSubsidyService = run.getBean(UserOfflineSubsidyService.class, args);
-//        CityRegionService cityRegionService = run.getBean(CityRegionService.class,args);
-//        List<UserOfflineSubsidy> userOfflineSubsidyList = userOfflineSubsidyService.list();
-//        for (UserOfflineSubsidy userOfflineSubsidy : userOfflineSubsidyList) {
-//
-//            if (StringUtils.isNotEmpty(userOfflineSubsidy.getProvince())){
-//                CityRegion province = cityRegionService.getByRegionName(userOfflineSubsidy.getProvince(), 1, 1);
-//                userOfflineSubsidy.setProvinceId(province != null ? province.getRegionId() : 0);
-//                if (StringUtils.isNotEmpty(userOfflineSubsidy.getCity()) && province != null){
-//                    CityRegion city = cityRegionService.getByRegionName(userOfflineSubsidy.getCity(), province.getRegionId(), 2);
-//                     userOfflineSubsidy.setCityId(city != null ? city.getRegionId() : 0);
-//                    if (StringUtils.isNotEmpty(userOfflineSubsidy.getArea()) && city != null){
-//                        CityRegion area = cityRegionService.getByRegionName(userOfflineSubsidy.getArea(), city.getRegionId(), 3);
-//                            userOfflineSubsidy.setAreaId(area != null ? area.getRegionId() : 0);
-//                    }
-//                }
-//            }
-//            userOfflineSubsidyService.updateById(userOfflineSubsidy);
-//
-//        }
-//
+        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class, args);
+       List<Oldcapaxs> list = oldcapaxsService.list();
+        UserService userService  = run.getBean(UserService.class,args);
+        CapaXsService capaXsService  = run.getBean(CapaXsService.class,args);
+        int i=0;
+       for (Oldcapaxs oldcapaxs :list){
+          CapaXs capaXs =  capaXsService.getByName(oldcapaxs.getCapaId());
+
+           List<User> users =    userService.getByPhone(oldcapaxs.getPhone());
+           if(!users.isEmpty()){
+               continue;
+           }
+
+    //    List<User> users =    userService.getByPhone(oldcapaxs.getRphone());
+
+           userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
+            System.out.println(i++);
+       }
+
 
 
 

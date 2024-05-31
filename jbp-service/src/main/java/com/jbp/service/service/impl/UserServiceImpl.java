@@ -263,6 +263,46 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return user;
     }
 
+
+    public User registerNoBandPater2(String username, String phone, String remark, Long xscapaId,Integer spreadUid) {
+        User user = new User();
+        user.setAccount(getAccount().toUpperCase());
+        user.setPwd(CommonUtil.createPwd(phone));
+        if (isUnique4Phone() && CollectionUtils.isNotEmpty(getByPhone(phone))) {
+            throw new CrmebException("手机号重复");
+        }
+        user.setPhone(phone);
+        user.setRegisterType(UserConstants.REGISTER_TYPE_H5);
+        user.setNickname(com.jbp.common.utils.StringUtils.filterEmoji(username));
+        user.setAvatar(systemConfigService.getValueByKey(SysConfigConstants.USER_DEFAULT_AVATAR_CONFIG_KEY));
+        Date nowDate = CrmebDateUtil.nowDateTime();
+        user.setCreateTime(nowDate);
+        user.setLastLoginTime(nowDate);
+        user.setPwd(CrmebUtil.encryptPassword("123456"));
+
+        user.setLevel(1);
+        // 设置活跃时间
+        setActiveTime(user);
+        // 推广人
+        user.setSpreadUid(0);
+        Boolean execute = transactionTemplate.execute(e -> {
+            save(user);
+            // 增加代理星级
+            if(xscapaId != null) {
+                userCapaXsService.saveOrUpdateCapa(user.getId(), xscapaId, false, remark, remark);
+            }
+                userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), remark, remark);
+          //  invitationService.band(user.getId(), spreadUid, false,true, false);
+
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            throw new CrmebException("创建用户失败!");
+        }
+        return user;
+    }
+
+
     @Override
     public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
         User user = new User();
