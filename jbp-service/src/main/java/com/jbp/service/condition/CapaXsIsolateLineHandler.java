@@ -73,7 +73,7 @@ public class CapaXsIsolateLineHandler implements ConditionHandler {
         String filter =environment.getProperty("teamAmtSelf.filterList");
         if(!StringUtils.isBlank(filter)) {
             List<String> filterList = Arrays.asList(filter);
-            if (filterList.contains(uid)) {
+            if (filterList.contains(uid.toString())) {
                 return false;
             }
         }
