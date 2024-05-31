@@ -3,9 +3,7 @@ package com.jbp.admin;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
-import com.jbp.common.model.agent.CapaXs;
-import com.jbp.common.model.agent.Oldcapaxs;
-import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -19,9 +17,9 @@ import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
 
-import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.city.CityRegion;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -100,19 +98,22 @@ public class JbpAdminApplication {
         OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class, args);
        List<Oldcapaxs> list = oldcapaxsService.list();
         UserService userService  = run.getBean(UserService.class,args);
-        CapaXsService capaXsService  = run.getBean(CapaXsService.class,args);
+        UserInvitationService userInvitationService  = run.getBean(UserInvitationService.class,args);
         int i=0;
        for (Oldcapaxs oldcapaxs :list){
-          CapaXs capaXs =  capaXsService.getByName(oldcapaxs.getCapaId());
+         // CapaXs capaXs =  capaXsService.getByName(oldcapaxs.getCapaId());
 
            List<User> users =    userService.getByPhone(oldcapaxs.getPhone());
-           if(!users.isEmpty()){
+
+
+           List<User> users2 =    userService.getByPhone(oldcapaxs.getRphone());
+           UserInvitation userInvitation = userInvitationService.getByUser(users.get(0).getId());
+           if(userInvitation != null){
                continue;
            }
 
-    //    List<User> users =    userService.getByPhone(oldcapaxs.getRphone());
-
-           userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
+           userInvitationService.band(users.get(0).getId(), users2.get(0).getId(), false,true, false);
+       //    userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
             System.out.println(i++);
        }
 
