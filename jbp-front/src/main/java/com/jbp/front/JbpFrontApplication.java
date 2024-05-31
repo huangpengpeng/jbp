@@ -135,12 +135,12 @@ public class JbpFrontApplication {
 
 
     private static void queryOpenBank(YopService yopService) {
-        BankAccountQueryResult result1 = yopService.bankAccountQuery("10090348841", "BO_90331316529100");
-        BankAccountQueryResult result2 = yopService.bankAccountQuery("10090348912", "BO_100669981330364");
+//        BankAccountQueryResult result1 = yopService.bankAccountQuery("10090348841", "BO_90331316529100");
+        BankAccountQueryResult result2 = yopService.bankAccountQuery("10090348912", "BO_78009978360390");
 //        BankAccountQueryResult result3 = yopService.bankAccountQuery("10090343285", "BO_147300999316495");
 //        BankAccountQueryResult result4 = yopService.bankAccountQuery("10090333170", "BO_188450832013472");
 
-        System.out.println(JSONObject.toJSONString(result1));
+//        System.out.println(JSONObject.toJSONString(result1));
         System.out.println(JSONObject.toJSONString(result2));
 //        System.out.println(JSONObject.toJSONString(result3));
 //        System.out.println(JSONObject.toJSONString(result4));
@@ -234,7 +234,7 @@ public class JbpFrontApplication {
             dto.setBranchBankNo("105528200662");
         }
 
-        dto.setSocialCreditCodeImageUrl("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717045132011-601d6ffc-50c0-45ee-9fde-d9b82cb27bd8-qyaRcssZKtjCothcxruC.jpg");
+        dto.setSocialCreditCodeImageUrl("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/31/merchant-1717120864221-3a8eba26-16d3-4aa4-8dcb-01c143ad3555-FMFpwmhFjzzWadjyraSr.jpg");
         dto.setLegalCardImageFont("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044684557-80f6dbaa-2f41-4493-b93e-03379e1138a3-LgIHQabVHKqkigraiNoN.jpg");
         dto.setLegalCardImageBack("http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/05/30/merchant-1717044716846-659ed5bd-f07b-4dd9-b8eb-f1241e218249-VRgjcBRcrbrlIblqiWvk.jpg");
 

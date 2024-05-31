@@ -152,6 +152,7 @@ public class PayCallbackController {
                 LztAcctOpen lztAcctOpen = lztAcctOpenService.getByTxnSeqno(txnSeqno);
                 if(lztAcctOpen != null && stringBuilder != null && stringBuilder.length() > 0){
                     lztAcctOpen.setNotifyInfo(stringBuilder.toString());
+                    lztAcctOpenService.updateById(lztAcctOpen);
                 }
                 if (lztAcctOpen != null) {
                     lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
