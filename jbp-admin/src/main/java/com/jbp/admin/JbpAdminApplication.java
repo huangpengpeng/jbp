@@ -111,6 +111,15 @@ public class JbpAdminApplication {
            if(userInvitation != null){
                continue;
            }
+           if(users == null ){
+               System.out.println(oldcapaxs.getPhone() +"//11111111111");
+               continue;
+           }
+           if(users2 == null ){
+               System.out.println(oldcapaxs.getRphone() +"//22222222");
+               continue;
+           }
+
 
            userInvitationService.band(users.get(0).getId(), users2.get(0).getId(), false,true, false);
        //    userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
