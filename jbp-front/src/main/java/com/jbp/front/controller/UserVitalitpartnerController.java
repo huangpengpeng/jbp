@@ -1,10 +1,10 @@
 package com.jbp.front.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserVitalitpartner;
+import com.jbp.common.response.UserVitalitpartnerResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
@@ -21,9 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -81,7 +79,7 @@ public class UserVitalitpartnerController {
 
     @ApiOperation(value = "店铺图标区域图标")
     @RequestMapping(value = "/getShopImage", method = RequestMethod.GET)
-    public CommonResult<List<String>> getShopImage() {
+    public CommonResult<UserVitalitpartnerResponse> getShopImage() {
 
         String repetition =  systemConfigService.getValueByKey("user_shop_image");
         if(StringUtils.isBlank(repetition) || repetition.equals("'0'") ){
@@ -89,6 +87,7 @@ public class UserVitalitpartnerController {
         }
 
          List<String> list = new ArrayList<>();
+        UserVitalitpartnerResponse response = new UserVitalitpartnerResponse();
          User user =  userService.getInfo();
          if(user.getOpenShop()){
              list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/319940525c414d5e95542616404c0013");
@@ -97,13 +96,17 @@ public class UserVitalitpartnerController {
         UserOfflineSubsidy userOfflineSubsidy =  userOfflineSubsidyService.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getStatus,"已开通").eq(UserOfflineSubsidy::getArea,"").eq(UserOfflineSubsidy::getUid,user.getId()));
          if(userOfflineSubsidy != null){
              list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/e9ff7c1ca4694b14905088f4a36f634b");
+             response.setCity(userOfflineSubsidy.getCity());
          }
         UserOfflineSubsidy userOfflineSubsidy2 =  userOfflineSubsidyService.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getStatus,"已开通").ne(UserOfflineSubsidy::getArea,"").eq(UserOfflineSubsidy::getUid,user.getId()));
         if(userOfflineSubsidy2 != null){
             list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/85b9f50620c84249972809e0cd7b4e48");
+            response.setCity(userOfflineSubsidy2.getCity());
+            response.setArea(userOfflineSubsidy2.getArea());
         }
+        response.setList(list);
 
-        return CommonResult.success(list);
+        return CommonResult.success(response);
     }
 
 
