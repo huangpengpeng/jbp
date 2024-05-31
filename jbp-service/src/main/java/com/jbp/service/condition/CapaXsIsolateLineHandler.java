@@ -72,7 +72,7 @@ public class CapaXsIsolateLineHandler implements ConditionHandler {
         //过滤指定用户星级
         String filter =environment.getProperty("teamAmtSelf.filterList");
         if(!StringUtils.isBlank(filter)) {
-            List<String> filterList = Arrays.asList(filter);
+            List<String> filterList = Arrays.asList(filter.split(","));
             if (filterList.contains(uid.toString())) {
                 return false;
             }

@@ -218,6 +218,11 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             }
             Set<String> strings = riseMap.keySet();
             String join = StringUtils.join(strings, ",");
+
+
+
+
+
             saveOrUpdateCapa(uid, riseCapaId, false, join, orderNo);
         }
     }

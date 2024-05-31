@@ -95,36 +95,36 @@ public class JbpAdminApplication {
 
 //
 //
-        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class, args);
-       List<Oldcapaxs> list = oldcapaxsService.list();
-        UserService userService  = run.getBean(UserService.class,args);
-        UserInvitationService userInvitationService  = run.getBean(UserInvitationService.class,args);
-        int i=0;
-       for (Oldcapaxs oldcapaxs :list){
-         // CapaXs capaXs =  capaXsService.getByName(oldcapaxs.getCapaId());
-
-           List<User> users =    userService.getByPhone(oldcapaxs.getPhone());
-
-
-           List<User> users2 =    userService.getByPhone(oldcapaxs.getRphone());
-           UserInvitation userInvitation = userInvitationService.getByUser(users.get(0).getId());
-           if(userInvitation != null){
-               continue;
-           }
-           if(users.isEmpty() ){
-               System.out.println(oldcapaxs.getPhone() +"//11111111111");
-               continue;
-           }
-           if(users2.isEmpty()){
-               System.out.println(oldcapaxs.getRphone() +"//22222222");
-               continue;
-           }
-
-
-           userInvitationService.band(users.get(0).getId(), users2.get(0).getId(), false,true, false);
-       //    userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
-            System.out.println(i++);
-       }
+//        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class, args);
+//       List<Oldcapaxs> list = oldcapaxsService.list();
+//        UserService userService  = run.getBean(UserService.class,args);
+//        UserInvitationService userInvitationService  = run.getBean(UserInvitationService.class,args);
+//        int i=0;
+//       for (Oldcapaxs oldcapaxs :list){
+//         // CapaXs capaXs =  capaXsService.getByName(oldcapaxs.getCapaId());
+//
+//           List<User> users =    userService.getByPhone(oldcapaxs.getPhone());
+//
+//
+//           List<User> users2 =    userService.getByPhone(oldcapaxs.getRphone());
+//           UserInvitation userInvitation = userInvitationService.getByUser(users.get(0).getId());
+//           if(userInvitation != null){
+//               continue;
+//           }
+//           if(users.isEmpty() ){
+//               System.out.println(oldcapaxs.getPhone() +"//11111111111");
+//               continue;
+//           }
+//           if(users2.isEmpty()){
+//               System.out.println(oldcapaxs.getRphone() +"//22222222");
+//               continue;
+//           }
+//
+//
+//           userInvitationService.band(users.get(0).getId(), users2.get(0).getId(), false,true, false);
+//       //    userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
+//            System.out.println(i++);
+     //  }
 
 
 
