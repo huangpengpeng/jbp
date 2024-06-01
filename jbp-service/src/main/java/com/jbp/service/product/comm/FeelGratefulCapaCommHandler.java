@@ -137,10 +137,12 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                     Capa pCapa = capaService.getById(pidCapa.getCapaId());
                     //上级等级为空，紧缩
                     if (pidCapa == null) {
+                        pid = invitationService.getPid(pid);
                         continue;
                     }
                     //上级等级为小于设计等级，紧缩
                     if (pidCapa.getCapaId() < rule.getCapaId()) {
+                        pid = invitationService.getPid(pid);
                         continue;
                     }
                     //上级等级大于当前用户等级，直接退出
