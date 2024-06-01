@@ -1,4 +1,4 @@
-package com.jbp.common.advice;
+package com.jbp.common.encryptapi;
 
 import java.lang.annotation.*;
 

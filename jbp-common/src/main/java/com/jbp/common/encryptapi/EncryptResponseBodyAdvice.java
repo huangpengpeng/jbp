@@ -1,6 +1,5 @@
-package com.jbp.common.advice;
+package com.jbp.common.encryptapi;
 
-import com.jbp.common.encryptapi.AESUtils;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.JacksonTool;
 import org.apache.commons.codec.binary.Base64;
