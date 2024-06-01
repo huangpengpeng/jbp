@@ -37,6 +37,8 @@ public class CommonResult<T> implements Serializable {
      */
     private T data;
 
+    private String secret;
+
     // ===========构造器开始，构造器私有，外部不可直接创建=========================================
 
     private CommonResult() {
@@ -162,6 +164,14 @@ public class CommonResult<T> implements Serializable {
     public CommonResult<T> setMessage(String message) {
         this.message = message;
         return this;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 
     public T getData() {

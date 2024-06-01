@@ -89,4 +89,5 @@ public class SystemAdmin implements Serializable {
 
     @ApiModelProperty(value = "供应商名称")
     private String supplyName;
+
 }

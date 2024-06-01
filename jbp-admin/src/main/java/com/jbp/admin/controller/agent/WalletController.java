@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;

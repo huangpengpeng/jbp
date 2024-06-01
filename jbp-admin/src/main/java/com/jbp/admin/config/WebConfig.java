@@ -98,4 +98,6 @@ public class WebConfig implements WebMvcConfigurer {
     public MappedInterceptor getMappedInterceptor() {
         return new MappedInterceptor(new String[]{"/doc.html", "/webjars/**"}, new SwaggerInterceptor(username, password, check));
     }
+
+
 }

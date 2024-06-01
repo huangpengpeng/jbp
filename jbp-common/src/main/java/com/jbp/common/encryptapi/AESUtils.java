@@ -21,18 +21,21 @@ public class AESUtils {
     private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final String ENCODING = "UTF-8";
 
-    public static byte[] encrypt(byte[] plainBytes, byte[] keyBytes, String IV)
-        throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
-        InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        SecretKey secretKey = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
-        if (StringUtils.isNotBlank(IV)) {
-            IvParameterSpec ips = new IvParameterSpec(IV.getBytes());
-            cipher.init(1, secretKey, ips);
-        } else {
-            cipher.init(1, secretKey);
+    public static byte[] encrypt(byte[] plainBytes, byte[] keyBytes, String IV) {
+        try {
+            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            SecretKey secretKey = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
+            if (StringUtils.isNotBlank(IV)) {
+                IvParameterSpec ips = new IvParameterSpec(IV.getBytes());
+                cipher.init(1, secretKey, ips);
+            } else {
+                cipher.init(1, secretKey);
+            }
+            return cipher.doFinal(plainBytes);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("加密失败");
         }
-        return cipher.doFinal(plainBytes);
     }
 
     public static byte[] decrypt(byte[] encryptedBytes, byte[] keyBytes, String IV)
