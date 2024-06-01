@@ -36,10 +36,7 @@ public class ResponseBodyAdvice implements org.springframework.web.servlet.mvc.m
         }
         CommonResult result = (CommonResult) body;
         if (result != null && StringUtils.isEmpty(result.getSecret())) {
-
             Integer userId = userService.getUserId();
-
-
             if (userId.intValue() > 0) {
                 User user = userService.getById(userId);
                 result.setSecret(user.getSignature());
