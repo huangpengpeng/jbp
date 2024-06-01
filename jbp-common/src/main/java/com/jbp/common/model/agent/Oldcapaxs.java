@@ -38,9 +38,13 @@ public class Oldcapaxs extends BaseModel {
     @TableField("account")
     private String account;
 
-    @TableField(value = "capa_id", updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "capa_id")
     private String capaId;
 
+    @TableField(value = "phone")
+    private String phone;
 
+    @TableField(value = "rphone" )
+    private String rphone;
 
 }

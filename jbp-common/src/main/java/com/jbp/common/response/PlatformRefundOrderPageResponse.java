@@ -60,4 +60,7 @@ public class PlatformRefundOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
+    @ApiModelProperty(value = "退款时间")
+    private Date refundTime;
+
 }

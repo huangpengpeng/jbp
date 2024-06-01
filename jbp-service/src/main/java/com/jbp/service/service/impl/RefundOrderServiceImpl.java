@@ -872,6 +872,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             response.setCreateTime(order.getCreateTime());
             response.setMerRemark(order.getMerRemark());
             response.setAfterSalesType(order.getAfterSalesType());
+            response.setRefundTime(order.getRefundTime());
             response.setUserNickName(userMap.get(order.getUid()).getNickname());
             Merchant merchant = merchantMap.get(order.getMerId());
             if(merchant != null){

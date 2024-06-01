@@ -3,6 +3,7 @@ package com.jbp.service.condition;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,9 +12,12 @@ import net.logstash.logback.encoder.org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,7 +28,8 @@ public class CapaXsJoinCapaHandler implements ConditionHandler {
 
     @Autowired
     private UserCapaService userCapaService;
-
+    @Resource
+    private Environment environment;
 
     @Override
     public String getName() {
@@ -51,6 +56,16 @@ public class CapaXsJoinCapaHandler implements ConditionHandler {
 
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
+
+        //过滤指定用户星级
+        String filter =environment.getProperty("teamAmtSelf.filterList");
+        if(!StringUtils.isBlank(filter)) {
+            List<String> filterList = Arrays.asList(filter.split(","));
+            if (filterList.contains(uid.toString())) {
+                return false;
+            }
+        }
+
         // 用户当前等级大于指定等级
         Rule rule = getRule(riseCondition);
         UserCapa userCapa = userCapaService.getByUser(uid);

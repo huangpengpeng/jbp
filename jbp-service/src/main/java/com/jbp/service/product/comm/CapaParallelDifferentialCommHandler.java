@@ -208,15 +208,21 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         if (!ifOrderUser  ) {
                             pId = invitationService.getPid(order.getUid());
                         }
-                        if(userAmtMap.containsKey( pId.intValue())){
-                            continue;
-                        }
+
 
                         do {
 
                             if (pId == null) {
                                 break;
                             }
+                            //拿过平级或极差的不能在拿
+                            if(userAmtMap.containsKey(pId) ){
+                                if(userAmtMap.get(pId) > 0) {
+                                    pId = invitationService.getPid(pId);
+                                    continue;
+                                }
+                            }
+
                             BigDecimal ratioAmt = BigDecimal.ZERO;
                             double amt2;
 

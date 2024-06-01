@@ -6,6 +6,7 @@ import com.jbp.common.model.agent.RiseCondition;
 import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.agent.UserRelation;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.agent.RelationScoreService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import com.jbp.service.service.agent.UserInvitationService;
@@ -16,9 +17,12 @@ import lombok.NoArgsConstructor;
 import net.logstash.logback.encoder.org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,7 +39,8 @@ public class CapaXsIsolateLineHandler implements ConditionHandler {
     private UserCapaXsService userCapaXsService;
     @Autowired
     private UserRelationService userRelationService;
-
+    @Resource
+    private Environment environment;
 
     @Override
     public String getName() {
@@ -63,6 +68,17 @@ public class CapaXsIsolateLineHandler implements ConditionHandler {
 
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
+
+        //过滤指定用户星级
+        String filter =environment.getProperty("teamAmtSelf.filterList");
+        if(!StringUtils.isBlank(filter)) {
+            List<String> filterList = Arrays.asList(filter.split(","));
+            if (filterList.contains(uid.toString())) {
+                return false;
+            }
+        }
+
+
         // 当前用户是否满足改升级条件  满足返回 true  不满足返回false
         Rule rule = getRule(riseCondition);
         // 小区业绩

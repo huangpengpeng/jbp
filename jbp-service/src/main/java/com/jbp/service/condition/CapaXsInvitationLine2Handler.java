@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
 
     @Override
     public Rule getRule(RiseCondition riseCondition) {
-        try {
+            try {
             Rule rule = JSONObject.parseObject(riseCondition.getValue()).toJavaObject(Rule.class);
             if (CollectionUtils.isEmpty(rule.getCapaXsList()) || rule.getMinTeamAmt() == null || rule.getTeamAmt() == null) {
                 throw new RuntimeException(getName() + ":升级规则格式错误0");
@@ -73,6 +74,16 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
 
     @Override
     public Boolean isOk(Integer uid, RiseCondition riseCondition) {
+
+        //过滤指定用户星级
+        String filter =environment.getProperty("teamAmtSelf.filterList");
+        if(!StringUtils.isBlank(filter)) {
+            List<String> filterList = Arrays.asList(filter.split(","));
+            if (filterList.contains(uid.toString())) {
+                return false;
+            }
+        }
+
         // 获取规则
         Rule rule = getRule(riseCondition);
         // 1.自己的累积业绩

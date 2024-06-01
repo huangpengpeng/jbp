@@ -3,24 +3,23 @@ package com.jbp.admin;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
-import com.jbp.common.model.agent.CapaXs;
-import com.jbp.common.model.agent.Oldcapaxs;
-import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderInvoice;
 import com.jbp.common.model.user.User;
 import com.jbp.service.condition.CapaXsInvitationLine2Handler;
+import com.jbp.service.condition.CapaXsJoinCapaHandler;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
 
-import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.city.CityRegion;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.agent.UserInvitationService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -96,27 +95,37 @@ public class JbpAdminApplication {
 
 //
 //
-//        UserOfflineSubsidyService userOfflineSubsidyService = run.getBean(UserOfflineSubsidyService.class, args);
-//        CityRegionService cityRegionService = run.getBean(CityRegionService.class,args);
-//        List<UserOfflineSubsidy> userOfflineSubsidyList = userOfflineSubsidyService.list();
-//        for (UserOfflineSubsidy userOfflineSubsidy : userOfflineSubsidyList) {
+//        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class, args);
+//       List<Oldcapaxs> list = oldcapaxsService.list();
+//        UserService userService  = run.getBean(UserService.class,args);
+//        UserInvitationService userInvitationService  = run.getBean(UserInvitationService.class,args);
+//        int i=0;
+//       for (Oldcapaxs oldcapaxs :list){
+//         // CapaXs capaXs =  capaXsService.getByName(oldcapaxs.getCapaId());
 //
-//            if (StringUtils.isNotEmpty(userOfflineSubsidy.getProvince())){
-//                CityRegion province = cityRegionService.getByRegionName(userOfflineSubsidy.getProvince(), 1, 1);
-//                userOfflineSubsidy.setProvinceId(province != null ? province.getRegionId() : 0);
-//                if (StringUtils.isNotEmpty(userOfflineSubsidy.getCity()) && province != null){
-//                    CityRegion city = cityRegionService.getByRegionName(userOfflineSubsidy.getCity(), province.getRegionId(), 2);
-//                     userOfflineSubsidy.setCityId(city != null ? city.getRegionId() : 0);
-//                    if (StringUtils.isNotEmpty(userOfflineSubsidy.getArea()) && city != null){
-//                        CityRegion area = cityRegionService.getByRegionName(userOfflineSubsidy.getArea(), city.getRegionId(), 3);
-//                            userOfflineSubsidy.setAreaId(area != null ? area.getRegionId() : 0);
-//                    }
-//                }
-//            }
-//            userOfflineSubsidyService.updateById(userOfflineSubsidy);
+//           List<User> users =    userService.getByPhone(oldcapaxs.getPhone());
 //
-//        }
 //
+//           List<User> users2 =    userService.getByPhone(oldcapaxs.getRphone());
+//           UserInvitation userInvitation = userInvitationService.getByUser(users.get(0).getId());
+//           if(userInvitation != null){
+//               continue;
+//           }
+//           if(users.isEmpty() ){
+//               System.out.println(oldcapaxs.getPhone() +"//11111111111");
+//               continue;
+//           }
+//           if(users2.isEmpty()){
+//               System.out.println(oldcapaxs.getRphone() +"//22222222");
+//               continue;
+//           }
+//
+//
+//           userInvitationService.band(users.get(0).getId(), users2.get(0).getId(), false,true, false);
+//       //    userService.registerNoBandPater2(oldcapaxs.getAccount(),oldcapaxs.getPhone(),"导入用户",capaXs == null ? null :capaXs.getId(),null);
+//            System.out.println(i++);
+     //  }
+
 
 
 
