@@ -232,17 +232,15 @@ public class KqPayServiceImpl implements KqPayService {
         return returns;
     }
 
-    private String formatStr(String str){
-        String regEx="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
-        String aa = "";//这里是将特殊字符换为aa字符串,""代表直接去掉
+    private static String formatStr(String str){
+        //1. 可以在中括号内加上任何想要删除的字符，实际上是一个正则表达式
+        String regExp="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
 
-        Pattern p = Pattern.compile(regEx);
+        //2. 这里是将特殊字符换为空字符串,""代表直接去掉
+        String replace = "";
 
-        Matcher m = p.matcher("UA1290益生菌固体饮料+UJA1290石榴饮");//这里把想要替换的字符串传进来
-
-        String newString = m.replaceAll(aa).trim();
-        return newString;
+        //3. 要处理的字符串
+        str = str.replaceAll(regExp,replace);
+        return str;
     }
-
-
 }
