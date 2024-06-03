@@ -143,7 +143,7 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
         // 外部转账记录
         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(tradeTxnSeqno);
         if (lztTransfer != null && StringUtils.isEmpty(lztTransfer.getReceiptZip())) {
-            LztAcct lztAcct = lztAcctService.getByUserId(lztWithdrawal.getUserId());
+            LztAcct lztAcct = lztAcctService.getByUserId(lztTransfer.getPayerId());
             result = degreePayService.receiptDownload(lztAcct, lztTransfer.getReceiptAccpTxno(), lztTransfer.getTxnSeqno(), lztTransfer.getReceiptToken(), "PAY", DateTimeUtils.format(lztTransfer.getCreateTime(), DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN));
             lztTransfer.setReceiptZip(result.getReceipt_sum_file());
             lztTransferService.updateById(lztTransfer);
