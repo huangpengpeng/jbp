@@ -3513,7 +3513,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
         });
 
-        String active = environment.getProperty("profiles.active");
+        String active = environment.getProperty("spring.profiles.active");
         if(StringUtils.isNotEmpty(active) && StringUtils.contains(active, "hdf")) {
             walletMap.forEach((k, v) -> {
                 if (BooleanUtils.isNotTrue(v)) {
