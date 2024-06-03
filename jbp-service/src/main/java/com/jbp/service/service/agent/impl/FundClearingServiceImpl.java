@@ -292,7 +292,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                             BigDecimal debtAmt = walletDebt == null ? BigDecimal.ZERO : BigDecimal.valueOf(MapUtils.getDouble(walletDebt, "usable_amt"));
                             if (ArithmeticUtils.gt(debtAmt, BigDecimal.ZERO)) {
                                 BigDecimal min = BigDecimal.valueOf(Math.min(debtAmt.doubleValue(), item.getAmt().doubleValue()));
-                                SqlRunner.db().update("update eb_wallet_debt set usable_amt = usable_amt + {0} where id= {1}", min, walletDebt.get("id"));
+                                SqlRunner.db().update("update eb_wallet_debt set usable_amt = usable_amt - {0} where id= {1}", min, walletDebt.get("id"));
                                 BigDecimal realAmt = item.getAmt().subtract(min);
                                 if (ArithmeticUtils.gt(realAmt, BigDecimal.ZERO)) {
                                     platformWalletService.transferToUser(fundClearing.getUid(), item.getWalletType(), realAmt, WalletFlow.OperateEnum.奖励.toString(), fundClearing.getUniqueNo(), fundClearing.getDescription() + "[发放金额:" + item.getAmt() + " 补缴金额:" + min + "]");
