@@ -1,11 +1,6 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.excel.FundClearingExcel;
-import com.jbp.common.request.agent.FundClearingRequest;
-import com.jbp.common.vo.FileResultVo;
-import com.jbp.service.service.UploadService;
-import com.jbp.service.service.agent.FundClearingService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,8 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.List;
 
 /**
  * 程序主入口
@@ -46,15 +39,5 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-
-//        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
-//        UploadService uploadService = run.getBean(UploadService.class);
-//        FundClearingRequest request = new FundClearingRequest();
-//
-//        List<FundClearingExcel> fundClearingExcels = fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
-//                53744, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList());
-//
-//        FileResultVo fileResultVo = uploadService.excelLocalUpload(fundClearingExcels, FundClearingExcel.class);
-//
     }
 }
