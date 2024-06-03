@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.excel.FundClearingExcel;
@@ -12,8 +13,10 @@ import com.jbp.common.request.agent.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.common.vo.FundClearingVo;
 import com.jbp.service.service.OssService;
+import com.jbp.service.service.UploadService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.FundClearingService;
 import io.swagger.annotations.Api;
@@ -39,6 +42,8 @@ public class FundClearingController {
     private UserService userService;
     @Resource
     private OssService ossService;
+    @Resource
+    private UploadService uploadService;
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:page')")
     @GetMapping("/page")
@@ -213,8 +218,11 @@ public class FundClearingController {
         }
         List<FundClearingExcel> fundClearingExcels = fundClearingService.exportFundClearing(request.getUniqueNo(), request.getExternalNo(), request.getStartClearingTime(), request.getEndClearingTime(), request.getStartCreateTime(), request.getEndCreateTime(), request.getStatus(),
                 uid, request.getTeamName(), request.getDescription(), request.getCommName(), request.getIfRefund(), request.getOrderList());
-        String s = ossService.uploadXlsx(fundClearingExcels, FundClearingExcel.class, "佣金记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        return CommonResult.success(s);
+
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(fundClearingExcels, FundClearingExcel.class);
+        log.info("导出下单信息:"+ JSONObject.toJSONString(fileResultVo));
+//        String s = ossService.uploadXlsx(fundClearingExcels, FundClearingExcel.class, "佣金记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return CommonResult.success(fileResultVo.getUrl());
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "佣金出款导入")

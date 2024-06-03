@@ -7,10 +7,12 @@ import cn.hutool.core.util.StrUtil;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.constants.UploadConstants;
+import com.jbp.common.excel.EasyExcelUtils;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.system.SystemAttachment;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.utils.UploadUtil;
 import com.jbp.common.vo.CloudVo;
 import com.jbp.common.vo.FileResultVo;
@@ -28,6 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
@@ -72,6 +75,8 @@ public class UploadServiceImpl implements UploadService {
     private SystemRoleService systemRoleService;
     @Autowired
     private JdCloudService jdCloudService;
+    @Autowired
+    private Environment environment;
 
 
     /**
@@ -555,6 +560,82 @@ public class UploadServiceImpl implements UploadService {
             // 删除本地文件
             file.delete();
         }
+        return resultFile;
+    }
+
+    @Override
+    public FileResultVo excelLocalUpload(List<?> data, Class<?> excelClass) {
+        MultipartFile multipartFile = EasyExcelUtils.exportExcelToMultipartFile(data, excelClass);
+        if (ObjectUtil.isNull(multipartFile) || multipartFile.isEmpty()) {
+            throw new CrmebException("上载的文件对象不存在...");
+        }
+        // 校验
+        String fileName = "佣金记录.xlsx";
+//        String fileName = multipartFile.getOriginalFilename();
+        float fileSize = (float) multipartFile.getSize() / 1024 / 1024;
+        // 文件后缀名
+        String model = UploadConstants.UPLOAD_MODEL_PATH_EXCEL;
+        String fileType = UploadConstants.UPLOAD_AFTER_FILE_KEYWORD;
+        String extName = uploadValidate(fileName, fileSize, fileType, multipartFile.getContentType());
+        if (fileName.length() > 99) {
+            fileName = StrUtil.subPre(fileName, 90).concat(".").concat(extName);
+        }
+
+        // 服务器存储地址
+        String rootPath = crmebConfig.getImagePath().trim();
+        // 模块
+        String modelPath = "public/" + model + "/";
+        // 类型
+        String type = (fileType.equals(UploadConstants.UPLOAD_FILE_KEYWORD) ? UploadConstants.UPLOAD_FILE_KEYWORD : UploadConstants.UPLOAD_AFTER_FILE_KEYWORD) + "/";
+
+        // 变更文件名
+        String newFileName = UploadUtil.fileName(extName);
+        // 创建目标文件的名称，规则：  子目录/年/月/日.后缀名
+        String webPath = type + modelPath + CrmebDateUtil.nowDate("yyyy/MM/dd") + "/";
+        // 文件分隔符转化为当前系统的格式
+        String destPath = FilenameUtils.separatorsToSystem(rootPath + webPath) + newFileName;
+        // 创建文件
+        File file = null;
+        try {
+            file = UploadUtil.createFile(destPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 拼装返回的数据
+        FileResultVo resultFile = new FileResultVo();
+        resultFile.setFileSize(multipartFile.getSize());
+        resultFile.setFileName(fileName);
+        resultFile.setExtName(extName);
+        String host = environment.getProperty("host");
+        if(StringUtils.isNotEmpty(host)){
+            resultFile.setUrl(host + webPath + newFileName);
+        }else{
+            resultFile.setUrl(webPath + newFileName);
+        }
+        resultFile.setType(multipartFile.getContentType());
+        if (fileType.equals(UploadConstants.UPLOAD_FILE_KEYWORD)) {
+            resultFile.setType(resultFile.getType().replace("image/", ""));
+        } else {
+            resultFile.setType(resultFile.getType().replace("file/", ""));
+        }
+
+        SystemAttachment systemAttachment = new SystemAttachment();
+        systemAttachment.setName(resultFile.getFileName());
+        systemAttachment.setSattDir(resultFile.getUrl());
+        systemAttachment.setAttSize(resultFile.getFileSize().toString());
+        systemAttachment.setAttType(resultFile.getType());
+        systemAttachment.setImageType(1);   //图片上传类型 1本地 2七牛云 3OSS 4COS, 默认本地
+        systemAttachment.setPid(-1);
+        systemAttachment.setOwner(-1);
+
+        // 保存文件
+        try {
+            multipartFile.transferTo(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        systemAttachmentService.save(systemAttachment);
         return resultFile;
     }
 }

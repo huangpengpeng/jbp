@@ -3,6 +3,8 @@ package com.jbp.service.service;
 import com.jbp.common.vo.FileResultVo;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * UploadService 接口
  * +----------------------------------------------------------------------
@@ -61,5 +63,9 @@ public interface UploadService {
      * @return FileResultVo
      */
     FileResultVo base64Upload(String base64, String model, Integer pid);
+
+    FileResultVo excelLocalUpload(List<?> data, Class<?> excelClass);
+
+
 
 }

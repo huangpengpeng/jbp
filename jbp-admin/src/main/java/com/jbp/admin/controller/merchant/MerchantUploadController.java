@@ -46,7 +46,7 @@ public class MerchantUploadController {
     @ApiOperation(value = "图片上传")
     @RequestMapping(value = "/image", method = RequestMethod.POST)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "model", value = "模块 用户user,商品product,微信wechat,文章article,系统system"),
+            @ApiImplicitParam(name = "model", value = "模块 用户user,商品product,微信wechat,文章article,系统system, 报表report"),
             @ApiImplicitParam(name = "pid", value = "分类ID 0编辑器,1商品图片,2拼团图片,3砍价图片,4秒杀图片,5文章图片,6组合数据图,7前台用户,8微信系列 ", allowableValues = "range[0,1,2,3,4,5,6,7,8]")
     })
     public CommonResult<FileResultVo> image(MultipartFile multipart, @RequestParam(value = "model") String model,
