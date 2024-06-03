@@ -962,16 +962,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public void checkTeamAccountTeamCode(Integer uid, Integer receiveUserId) {
         //验证是否同一个团队，不是同一个不允许转账
-        TeamUser teamUser  =  teamUserService.getByUser(uid);
-        TeamUser receiveTeamUser  =  teamUserService.getByUser(receiveUserId);
-        if(teamUser == null){
-            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
-        }
-        if(receiveTeamUser == null){
-            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
-        }
 
-        if(teamUser.getTid() .intValue() != receiveTeamUser.getTid().intValue()  ){
+       Boolean ifInvit =  invitationService.hasChild(uid,receiveUserId);
+        Boolean ifInvit2 =  invitationService.hasChild(receiveUserId,uid);
+
+        if(!ifInvit && !ifInvit2){
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
 
