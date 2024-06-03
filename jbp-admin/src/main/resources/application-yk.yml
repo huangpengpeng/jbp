@@ -190,3 +190,5 @@ historyOrder:
 
 teamAmtSelf:
   ifopen: true
+
+host: https://yk.fnyss.cc

@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.excel.OrderExcel;
 import com.jbp.common.excel.OrderShipmentExcel;
+import com.jbp.common.excel.ScoreDownLoadExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.ProductMaterials;
@@ -19,6 +20,7 @@ import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.response.OrderInvoiceResponse;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.ProductMaterialsService;
@@ -50,9 +52,11 @@ import java.util.stream.Collectors;
 @Service
 public class ExportServiceImpl implements ExportService {
 
+
+    @Autowired
+    private UploadService uploadService;
     @Autowired
     private OrderService orderService;
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -225,9 +229,10 @@ public class ExportServiceImpl implements ExportService {
                 }
             }
         }
-        String s = ossService.uploadXlsx(result, OrderShipmentExcel.class, "订单物料" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        log.info("订单发货导出下载地址:" + s);
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, OrderShipmentExcel.class);
+//        String s = ossService.uploadXlsx(result, OrderShipmentExcel.class, "订单物料" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        log.info("订单发货导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 
     /**
@@ -353,9 +358,10 @@ public class ExportServiceImpl implements ExportService {
             // 保存
             result.add(vo);
         }
-        String s = ossService.uploadXlsx(result, OrderExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        log.info("订单列表导出下载地址:" + s);
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, OrderExcel.class);
+//        String s = ossService.uploadXlsx(result, OrderExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 
     private static void valid(OrderSearchRequest request) {

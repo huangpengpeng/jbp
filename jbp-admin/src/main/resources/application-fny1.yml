@@ -184,3 +184,5 @@ erp:
   userPrefix: A
 fundClearing:
   refundBack: true
+
+host: https://adminbc.fnyjy.com

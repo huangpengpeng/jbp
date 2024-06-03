@@ -191,6 +191,8 @@ erp:
 fundClearing:
   refundBack: true
 
+host: https://admin.fnyjy.com
+
 
 
 

@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.excel.ScoreDownLoadExcel;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
@@ -24,6 +25,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
@@ -46,6 +48,8 @@ import java.util.stream.Collectors;
 public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, InvitationScore> implements InvitationScoreService {
 
 
+    @Resource
+    private UploadService uploadService;
     @Resource
     private OssService ossService;
     @Resource
@@ -351,7 +355,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 }
             }
         }
-        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(list, ScoreDownLoadExcel.class);
+//        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return fileResultVo.getUrl();
     }
 }
