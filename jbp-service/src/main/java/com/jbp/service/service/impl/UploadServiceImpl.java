@@ -614,14 +614,14 @@ public class UploadServiceImpl implements UploadService {
             resultFile.setUrl(webPath + newFileName);
         }
         resultFile.setType("xlsx");
-        SystemAttachment systemAttachment = new SystemAttachment();
-        systemAttachment.setName(resultFile.getFileName());
-        systemAttachment.setSattDir(resultFile.getUrl());
-        systemAttachment.setAttSize(resultFile.getFileSize().toString());
-        systemAttachment.setAttType(resultFile.getType());
-        systemAttachment.setImageType(1);   //图片上传类型 1本地 2七牛云 3OSS 4COS, 默认本地
-        systemAttachment.setPid(-1);
-        systemAttachment.setOwner(-1);
+//        SystemAttachment systemAttachment = new SystemAttachment();
+//        systemAttachment.setName(resultFile.getFileName());
+//        systemAttachment.setSattDir(resultFile.getUrl());
+//        systemAttachment.setAttSize(resultFile.getFileSize().toString());
+//        systemAttachment.setAttType(resultFile.getType());
+//        systemAttachment.setImageType(1);   //图片上传类型 1本地 2七牛云 3OSS 4COS, 默认本地
+//        systemAttachment.setPid(-1);
+//        systemAttachment.setOwner(-1);
 
         // 保存文件
         try {
@@ -629,7 +629,7 @@ public class UploadServiceImpl implements UploadService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        systemAttachmentService.save(systemAttachment);
+//        systemAttachmentService.save(systemAttachment);
         return resultFile;
     }
 }
