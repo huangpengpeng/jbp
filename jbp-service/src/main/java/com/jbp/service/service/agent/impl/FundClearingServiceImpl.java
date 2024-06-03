@@ -288,7 +288,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                     WalletConfig walletConfig = walletMap.get(item.getWalletType());
                     if (walletConfig != null) {
                         if (ifHdf) {
-                            Map<String, Object> walletDebt = SqlRunner.db().selectOne(" select * from eb_wallet_debt where uid= {1}", fundClearing.getUid());
+                            Map<String, Object> walletDebt = SqlRunner.db().selectOne(" select * from eb_wallet_debt where uid= {1} ", fundClearing.getUid());
                             BigDecimal debtAmt = walletDebt == null ? BigDecimal.ZERO : BigDecimal.valueOf(MapUtils.getDouble(walletDebt, "usable_amt"));
                             if (ArithmeticUtils.gt(debtAmt, BigDecimal.ZERO)) {
                                 BigDecimal min = BigDecimal.valueOf(Math.min(debtAmt.doubleValue(), item.getAmt().doubleValue()));
