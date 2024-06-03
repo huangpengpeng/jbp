@@ -131,11 +131,8 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
             return score;
         }
 
-        SelfScore selfScore =  getOne(new QueryWrapper<SelfScore>().lambda().eq(SelfScore::getUid, uid));
-        if(selfScore==null){
-            return score;
-        }
-        return selfScore.getScore().add(score);
+
+        return score;
     }
 
     @Override
