@@ -187,4 +187,4 @@ fundClearing:
 teamAmtSelf:
   ifopen: true
 
-host: https://tf.fnyss.cc
+host: https://tfadmin.fnyss.cc
