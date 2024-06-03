@@ -613,13 +613,7 @@ public class UploadServiceImpl implements UploadService {
         }else{
             resultFile.setUrl(webPath + newFileName);
         }
-        resultFile.setType(multipartFile.getContentType());
-        if (fileType.equals(UploadConstants.UPLOAD_FILE_KEYWORD)) {
-            resultFile.setType(resultFile.getType().replace("image/", ""));
-        } else {
-            resultFile.setType(resultFile.getType().replace("file/", ""));
-        }
-
+        resultFile.setType("xlsx");
         SystemAttachment systemAttachment = new SystemAttachment();
         systemAttachment.setName(resultFile.getFileName());
         systemAttachment.setSattDir(resultFile.getUrl());
