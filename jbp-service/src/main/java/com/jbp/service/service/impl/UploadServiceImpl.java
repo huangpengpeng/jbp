@@ -609,7 +609,7 @@ public class UploadServiceImpl implements UploadService {
         resultFile.setExtName(extName);
         String host = environment.getProperty("host");
         if(StringUtils.isNotEmpty(host)){
-            resultFile.setUrl(host + webPath + newFileName);
+            resultFile.setUrl(host+ "/" + webPath + newFileName);
         }else{
             resultFile.setUrl(webPath + newFileName);
         }
