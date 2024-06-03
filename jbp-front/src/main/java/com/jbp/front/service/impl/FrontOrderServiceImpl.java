@@ -18,10 +18,7 @@ import com.google.common.collect.Maps;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
-import com.jbp.common.model.agent.Wallet;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.cat.Cart;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.coupon.CouponProduct;
@@ -50,6 +47,7 @@ import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -166,7 +164,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private WalletService walletService;
     @Autowired
     private ProductCommChain productCommChain;
-
+    @Autowired
+    private WalletConfigService walletConfigService;
     @Autowired
     private Environment environment;
 
@@ -3502,14 +3501,28 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
 
         Map<Integer, Boolean> walletMap = Maps.newConcurrentMap();
+        Map<Integer, BigDecimal> walletValueMap = Maps.newConcurrentMap();
         walletDeductionMap.forEach((k,v)->{
             Wallet wallet = walletService.getByUser(payUserId, k);
-            if(wallet != null && ArithmeticUtils.gte(wallet.getBalance(), v)){
+            BigDecimal balance = wallet == null ? BigDecimal.ZERO : wallet.getBalance();
+            if(ArithmeticUtils.gte(balance, v)){
                 walletMap.put(k, true);
             }else{
                 walletMap.put(k, false);
+                walletValueMap.put(k, v.subtract(balance));
             }
         });
+
+        String active = environment.getProperty("profiles.active");
+        if(StringUtils.isNotEmpty(active) && StringUtils.contains(active, "hdf")) {
+            walletMap.forEach((k, v) -> {
+                if (BooleanUtils.isNotTrue(v)) {
+                    WalletConfig walletConfig = walletConfigService.getByType(k);
+                    BigDecimal balance = walletValueMap.get(k);
+                    throw new CrmebException(walletConfig.getName() + "不足, 积分差额:" + balance + ", 不允许下单");
+                }
+            });
+        }
 
         for (PreOrderInfoDetailVo detailVo : orderInfoList) {
             List<ProductDeduction> deductionList = Lists.newArrayList();
