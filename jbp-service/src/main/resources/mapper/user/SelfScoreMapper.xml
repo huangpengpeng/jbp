@@ -23,4 +23,16 @@
 
 		GROUP BY f.pid
 	</select>
+	<select id="getUserMonthNext" resultType="java.math.BigDecimal">
+
+		select   ifnull(sum(score),0)  as score ,f.pid as uid  from eb_self_score_flow  e
+		left join eb_user_invitation_flow f on f.uid = e.uid
+		where 1=1
+		<if test="uid !=null">
+			and f.pid =#{uid}
+		</if>
+			and MONTH(pay_time) =  MONTH(CURRENT_DATE)
+			GROUP BY f.pid
+
+	</select>
 </mapper>

@@ -38,4 +38,12 @@ public class SelfScoreController {
     }
 
 
+
+    @ApiOperation("个人当月团队业绩")
+    @RequestMapping(value = "/teamMonth", method = RequestMethod.GET)
+    public CommonResult<BigDecimal> getMonthTeamList() {
+        Integer uid = userService.getUserId();
+        return CommonResult.success(selfScoreService.getUserMonthNext(uid ,true));
+    }
+
 }

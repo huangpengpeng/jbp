@@ -124,6 +124,21 @@ public class SelfScoreServiceImpl extends ServiceImpl<SelfScoreDao, SelfScore> i
     }
 
     @Override
+    public BigDecimal getUserMonthNext(Integer uid, Boolean containsSelf) {
+
+        BigDecimal score = selfScoreDao.getUserMonthNext(uid);
+        if (BooleanUtils.isNotTrue(containsSelf)) {
+            return score;
+        }
+
+        SelfScore selfScore =  getOne(new QueryWrapper<SelfScore>().lambda().eq(SelfScore::getUid, uid));
+        if(selfScore==null){
+            return score;
+        }
+        return selfScore.getScore().add(score);
+    }
+
+    @Override
     public void orderSuccess(Integer uid, BigDecimal score, String ordersSn, Date payTime, List<ProductInfoDto> productInfo) {
         SelfScoreFlow one = selfScoreFlowService.getOne(new QueryWrapper<SelfScoreFlow>().lambda()
                 .eq(SelfScoreFlow::getOrdersSn, ordersSn).last(" limit 1"));

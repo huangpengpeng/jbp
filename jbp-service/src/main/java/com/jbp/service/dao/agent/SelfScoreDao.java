@@ -12,6 +12,8 @@ public interface SelfScoreDao extends BaseMapper<SelfScore> {
 
     BigDecimal getUserNext(Integer uid);
 
+    BigDecimal getUserMonthNext(Integer uid);
+
 
     List<SelfScore> getTeamUserScore(@Param("uid")Integer uid , @Param("startPayTime")String startPayTime,@Param("endPayTime") String endPayTime);
 
