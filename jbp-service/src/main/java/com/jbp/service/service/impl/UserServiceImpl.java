@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -28,7 +27,6 @@ import com.jbp.common.model.bill.UserBill;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.order.OrderRegister;
-import com.jbp.common.model.system.SystemConfig;
 import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
@@ -956,6 +954,24 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
         if(list.get(list.size() - 1).getPId().intValue() != receiveList.get(receiveList.size() - 1).getPId().intValue() ){
+            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
+        }
+
+    }
+
+    @Override
+    public void checkTeamAccountTeamCode(Integer uid, Integer receiveUserId) {
+        //验证是否同一个团队，不是同一个不允许转账
+        TeamUser teamUser  =  teamUserService.getByUser(uid);
+        TeamUser receiveTeamUser  =  teamUserService.getByUser(receiveUserId);
+        if(teamUser == null){
+            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
+        }
+        if(receiveTeamUser == null){
+            throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
+        }
+
+        if(teamUser.getTid() .intValue() != receiveTeamUser.getTid().intValue()  ){
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
 
