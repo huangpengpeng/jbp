@@ -40,7 +40,7 @@
 		left join eb_user_invitation_flow f on f.uid = e.uid
 		where 1=1
 		<if test="uid !=null">
-			( and f.pid =#{uid}  or e.uid = #{uid} )
+			and (  f.pid =#{uid}  or e.uid = #{uid} )
 		</if>
 			and MONTH(pay_time) =  MONTH(CURRENT_DATE)
 
