@@ -296,6 +296,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                                 BigDecimal realAmt = item.getAmt().subtract(min);
                                 if (ArithmeticUtils.gt(realAmt, BigDecimal.ZERO)) {
                                     platformWalletService.transferToUser(fundClearing.getUid(), item.getWalletType(), realAmt, WalletFlow.OperateEnum.奖励.toString(), fundClearing.getUniqueNo(), fundClearing.getDescription() + "[发放金额:" + item.getAmt() + " 补缴金额:" + min + "]");
+                                    fundClearing.setDescription(fundClearing.getDescription()+ "[发放金额:" + item.getAmt() + " 补缴金额:" + min + "]");
                                 }
                             } else {
                                 platformWalletService.transferToUser(fundClearing.getUid(), item.getWalletType(), item.getAmt(), WalletFlow.OperateEnum.奖励.toString(), fundClearing.getUniqueNo(), fundClearing.getDescription());
