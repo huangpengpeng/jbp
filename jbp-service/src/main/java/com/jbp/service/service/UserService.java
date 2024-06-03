@@ -420,4 +420,5 @@ public interface UserService extends IService<User> {
     void checkAccountTeamCode(Integer uid,Integer receiveUserId);
 
 
+    void checkTeamAccountTeamCode(Integer uid,Integer receiveUserId);
 }

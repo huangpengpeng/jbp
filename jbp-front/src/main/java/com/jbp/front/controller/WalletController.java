@@ -261,6 +261,16 @@ public class WalletController {
             userService.checkAccountTeamCode(user.getId(),receiveUser.getId());
         }
 
+        //跨团队互转
+        String verifyTeamTransferAcme = systemConfigService.getValueByKey(SysConfigConstants.VERIFY_TEAM_TRANSFER_ACME);
+        Boolean ifTeamAcme = Constants.CONFIG_FORM_SWITCH_OPEN.equals(verifyTeamTransferAcme);
+
+        if(ifTeamAcme){
+            userService.checkTeamAccountTeamCode(user.getId(),receiveUser.getId());
+        }
+
+
+
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
         walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
         return CommonResult.success();

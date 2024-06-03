@@ -283,7 +283,10 @@ public class SysConfigConstants {
      *  验证转账用户顶点账号
      */
     public static final String VERIFY_TRANSFER_ACME = "verify_transfer_acme";
-
+    /**
+     *  验证转账用户团队账号
+     */
+    public static final String VERIFY_TEAM_TRANSFER_ACME = "verify_team_transfer_acme";
 
     /**
      * 用户默认头像
