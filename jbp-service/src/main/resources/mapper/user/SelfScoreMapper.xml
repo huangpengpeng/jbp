@@ -10,18 +10,29 @@
 		where uid in (select uid from eb_user_invitation_flow where pid = ${uid})
 	</select>
     <select id="getTeamUserScore" resultType="com.jbp.common.model.agent.SelfScore">
-		select   ifnull(sum(score),0)  as score ,f.pid as uid  from eb_self_score_flow  e
-		left join eb_user_invitation_flow f on f.uid = e.uid
-		where 1=1
-		<if test="uid !=null">
-			and f.pid =#{uid}
-		</if>
 
+		select   ifnull(sum(score),0)  as score ,f.pid as uid ,o.selfScore   from eb_self_score_flow  e
+		left join eb_user_invitation_flow f on f.uid = e.uid
+		left join (select ifnull(sum(score),0)  as selfScore ,uid  from  eb_self_score_flow where 1=1
 		<if test="startPayTime !=null and endPayTime !=null and startPayTime !='' and endPayTime !='' ">
 			and DATE(pay_time) BETWEEN #{startPayTime} AND #{endPayTime}
 		</if>
 
+		GROUP BY  uid ) o on o.uid= f.pid
+
+		where 1=1
+
+		<if test="uid !=null">
+			and f.pid =#{uid}
+		</if>
+		<if test="startPayTime !=null and endPayTime !=null and startPayTime !='' and endPayTime !='' ">
+			and DATE(pay_time) BETWEEN #{startPayTime} AND #{endPayTime}
+		</if>
+
+
 		GROUP BY f.pid
+
+
 	</select>
 	<select id="getUserMonthNext" resultType="java.math.BigDecimal">
 
