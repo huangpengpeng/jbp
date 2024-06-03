@@ -52,6 +52,10 @@ public class UserOfflineSubsidy extends BaseModel {
     @TableField(exist = false)
     private String nickname;
 
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
     @ApiModelProperty(value = "省份ID")
     private Integer provinceId;
 
