@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * 更新推广人请求对象
@@ -23,5 +24,5 @@ import java.io.Serializable;
  */
 @Data
 public class UserViseRequest implements Serializable {
-    private String bizContent;
+    private Map<String,Object> bizContent;
 }

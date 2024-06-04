@@ -39,6 +39,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -359,26 +363,33 @@ public class UserVisaController {
 
 
 
-
+    @ApiOperation(value = "法大大回调", httpMethod = "POST")
     @ResponseBody
     @PostMapping(value = "/userVisaCallback")
-    public String userVisaCallback(@RequestHeader HttpHeaders headers,
-                                @RequestBody  UserViseRequest userViseRequest) {
-        log.info("法大大回调 {}",userViseRequest.getBizContent());
+    public String userVisaCallback(
+                              HttpServletRequest httpServletRequest) throws IOException {
 
-        log.info("法大大回调 {}",headers);
-        if (userViseRequest.getBizContent() == null) {
+
+
+        StringBuilder body = new StringBuilder();
+        BufferedReader reader = httpServletRequest.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            body.append(line);
+        }
+        JSONObject jsonObject = JSONObject.parseObject(URLDecoder.decode(URLDecoder.decode(body.toString(),"UTF-8"),"UTF-8").replaceAll("bizContent=",""));
+
+        log.info("法大大回调 {}",jsonObject);
+        if (jsonObject == null) {
             return "success";
         }
 
-      JSONObject jsonObject =JSONObject.parseObject(userViseRequest.getBizContent());
-
-        if (jsonObject.get("signTaskId")  == null) {
+        if (jsonObject.getString("signTaskId")  == null) {
           return "success";
         }
 
-        if (jsonObject.get("signTaskStatus")  != null && jsonObject.get("signTaskStatus").equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.get("signTaskId").toString()  );
+        if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
+                UserVisaResponse userVisa = userVisaService.getVisaTask(  jsonObject.getString("signTaskId") );
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
