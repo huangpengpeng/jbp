@@ -56,6 +56,7 @@ public class CryptoConfig {
 				User user=(User) RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER);
 				String iv = secretKeyConfig.afterCutAndappend(user.getLastCheckCode(), "0", 16);
 
+                log.info("saadgyusgqye:{}",user.getLastCheckCode());
 				byte[] data = AESUtils.encrypt(word.getBytes(secretKeyConfig.getCharset()),
 						key.getBytes(secretKeyConfig.getCharset()), iv);
 				String result = Base64Util.encode(data);
