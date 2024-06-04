@@ -18,6 +18,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.UserVisa;
 import com.jbp.common.model.user.UserVisaOrder;
+import com.jbp.common.request.UserViseRequest;
 import com.jbp.common.request.UserViseSaveRequest;
 import com.jbp.common.response.UserVisaResponse;
 import com.jbp.common.result.CommonResult;
@@ -352,19 +353,27 @@ public class UserVisaController {
     }
 
 
+
+
     @ApiOperation(value = "法大大回调", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String userVisaCallback( @RequestBody  UserViseSaveRequest request) {
+    public String userVisaCallback(@RequestParam String bizContent) {
+        log.info("法大大回调 {}",bizContent);
 
-        if (request.getSignTaskId() == null) {
+
+        if (bizContent  == null) {
+            return "success";
+        }
+
+        JSONObject jsonObject =JSONObject.parseObject(bizContent);
+
+        if (jsonObject.getString("signTaskId")  == null) {
           return "success";
         }
 
-        log.info("法大大回调 {}", request);
-
-        if (request .getSignTaskStatus() != null && request.getSignTaskStatus().equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask(  request.getSignTaskId());
+        if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
+                UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.getString("signTaskId")  );
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
@@ -380,7 +389,6 @@ public class UserVisaController {
                     userVisaOrderService.updateById(userVisaOrder);
 
                 }
-
 
             }
         }
