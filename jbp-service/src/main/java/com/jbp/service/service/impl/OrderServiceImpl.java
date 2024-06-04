@@ -576,6 +576,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
      */
     @Override
     public PageInfo<PlatformOrderPageResponse> getPlatformAdminPage(OrderSearchRequest request, PageParamRequest pageParamRequest) {
+        List<String> orderNoList = Lists.newArrayList();
+        if(StringUtils.isNotEmpty(request.getSupplyName())){
+            orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
+        }
         Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
@@ -594,13 +598,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             lqw.apply("order_no in ( select order_no from eb_order_detail where product_id in " +
                     "(select product_id from eb_product_attr_value where bar_code='"+request.getBarCode()+"'))");
         }
-
-        if(StringUtils.isNotEmpty(request.getSupplyName())){
-            List<String> orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
-            if(!CollectionUtils.isEmpty(orderNoList)){
-                lqw.in(Order::getOrderNo, orderNoList);
-            }
+        if(!CollectionUtils.isEmpty(orderNoList)){
+            lqw.in(Order::getOrderNo, orderNoList);
         }
+
         if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
             lqw.eq(Order::getMerId, request.getMerId());
         }
@@ -647,7 +648,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if (CollectionUtils.isEmpty(merIdList)) {
             merchantMap = merchantService.getMerIdMapByIdList(merIdList);
         }
-        List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
+        orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
         Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNoList);
         Map<String, List<MerchantOrder>> merchantOrderMap = FunctionUtil.valueMap(merchantOrderList, MerchantOrder::getOrderNo);

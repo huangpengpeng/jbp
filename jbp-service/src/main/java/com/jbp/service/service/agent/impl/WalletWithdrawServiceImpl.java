@@ -117,8 +117,8 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
 
     @Override
     public WalletWithdraw create(Integer uid, String account, Integer walletType, String walletName, BigDecimal amt, String postscript) {
-        if (amt == null || ArithmeticUtils.less(amt, BigDecimal.ZERO)) {
-            throw new CrmebException("提现金额异常");
+        if (amt == null || ArithmeticUtils.less(amt, BigDecimal.valueOf(1))) {
+            throw new CrmebException("提现金额异常不能低于1");
         }
         Wallet wallet = walletService.getByUser(uid, walletType);
         if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), amt)) {

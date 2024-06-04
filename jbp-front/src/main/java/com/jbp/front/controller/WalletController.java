@@ -208,6 +208,8 @@ public class WalletController {
         if (walletConfig == null) {
             throw new CrmebException("积分信息不存在");
         }
+
+
         if (walletConfig.getChangeType() == null || walletConfig.getChangeScale() == null
                 || ArithmeticUtils.lessEquals(walletConfig.getChangeScale(), BigDecimal.ZERO)) {
             throw new CrmebException("兑换信息未配置, 请联系管理员");
@@ -217,7 +219,7 @@ public class WalletController {
     }
 
 
-    @PostMapping("/transfer")
+//    @PostMapping("/transfer")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户积分转账")
     @ApiOperation("转账")
     public CommonResult transfer(@RequestBody @Validated WalletTransferRequest request) {
@@ -272,7 +274,7 @@ public class WalletController {
 
 
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
-        walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
+//        walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
         return CommonResult.success();
 }
 
