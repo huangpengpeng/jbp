@@ -270,7 +270,7 @@ public class WalletController {
         if(ifTeamAcme){
             userService.checkTeamAccountTeamCode(user.getId(),receiveUser.getId());
         }
-        
+
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
         walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
         return CommonResult.success();
