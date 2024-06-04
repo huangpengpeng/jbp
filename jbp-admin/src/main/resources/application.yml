@@ -36,7 +36,6 @@
       max-threads: 1000       # 最大线程数量 默认200
       min-spare-threads: 30   # 初始化启动线程数量
 
-
   spring:
     profiles:
       active: hdf

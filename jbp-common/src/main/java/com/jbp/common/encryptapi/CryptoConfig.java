@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.user.User;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.RequestUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 
@@ -19,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CryptoConfig {
 
+	//当前登录用户ID
+		public static final String CUSTOM_RESPONSE_RESULT_LOGINUSER= "CUSTOM_RESPONSE_RESULT_LOGINUSER";
+		
 	@Autowired
 	SecretKeyConfig secretKeyConfig;
 
@@ -46,7 +51,22 @@ public class CryptoConfig {
 				word = result;
 				// code == 2 表示多层加密
 				restulMap.put("modeCode", "2");
-			} else {
+			} 
+			else if(RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER) != null) {
+				User user=(User) RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER);
+				String iv = secretKeyConfig.afterCutAndappend(user.getLastCheckCode(), "0", 16);
+
+				byte[] data = AESUtils.encrypt(word.getBytes(secretKeyConfig.getCharset()),
+						key.getBytes(secretKeyConfig.getCharset()), iv);
+				String result = Base64Util.encode(data);
+				if (secretKeyConfig.isShowLog()) {
+					log.info("Pre-encryptedone data：{}，After encryptionone：{}", word, result);
+				}
+				word = result;
+				// code == 2 表示多层加密
+				restulMap.put("modeCode", "2");
+			}
+			else {
 				// 单层加密
 				restulMap.put("modeCode", "1");
 			}

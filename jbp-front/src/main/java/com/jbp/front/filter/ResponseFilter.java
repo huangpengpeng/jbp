@@ -20,7 +20,9 @@ import org.springframework.security.web.FilterInvocation;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.encryptapi.CryptoConfig;
 import com.jbp.common.encryptapi.SecretKeyConfig;
+import com.jbp.common.token.FrontTokenComponent;
 import com.jbp.common.utils.RequestUtil;
+import com.jbp.service.service.UserService;
 
 
 /**
@@ -44,6 +46,10 @@ public class ResponseFilter implements Filter {
 	CryptoConfig cryptoConfig;
 	@Autowired
 	CrmebConfig crmebConfig;
+	@Autowired
+	FrontTokenComponent tokenComponent;
+	@Autowired
+	UserService userService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse response, FilterChain filterChain)
@@ -67,7 +73,7 @@ public class ResponseFilter implements Filter {
             try {
 				HttpServletRequest req = (HttpServletRequest) request;
 				str = new ResponseRouter().filter(req, str, RequestUtil.getUri(req), crmebConfig, cryptoConfig,
-						secretKeyConfig);
+						secretKeyConfig,userService);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

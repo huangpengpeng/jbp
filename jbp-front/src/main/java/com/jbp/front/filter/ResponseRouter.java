@@ -5,8 +5,11 @@ import com.jbp.common.constants.UploadConstants;
 import com.jbp.common.encryptapi.CryptoConfig;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.encryptapi.SecretKeyConfig;
+import com.jbp.common.model.user.User;
+import com.jbp.common.token.FrontTokenComponent;
 import com.jbp.common.utils.SpringUtil;
 import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,9 +32,10 @@ public class ResponseRouter {
 
 	// 是否忽略签名
 	private static final String CUSTOM_RESPONSE_RESULT_ENCRYPTIGNORE = "CUSTOM-RESPONSE-RESULT-ENCRYPTIGNORE";
+	
 
 	public String filter(HttpServletRequest request, String data, String path, CrmebConfig crmebConfig,
-			CryptoConfig cryptoConfig, SecretKeyConfig secretKeyConfig) {
+			CryptoConfig cryptoConfig, SecretKeyConfig secretKeyConfig, UserService userService) {
 		boolean result = un().contains(path);
 		if (result) {
 			return data;
@@ -60,9 +64,8 @@ public class ResponseRouter {
 				data = SpringUtil.getBean(SystemAttachmentService.class).prefixImage(data);
 			}
 		}
-		
 
-		if(!secretKeyConfig.isOpen()) {
+		if (!secretKeyConfig.isOpen()) {
 			return data;
 		}
 
@@ -70,6 +73,11 @@ public class ResponseRouter {
 		EncryptIgnore EncryptIgnore = (EncryptIgnore) request.getAttribute(CUSTOM_RESPONSE_RESULT_ENCRYPTIGNORE);
 		if (EncryptIgnore == null) {
 			if (secretKeyConfig.isOpen()) {
+				Integer uid = userService.getUserId();
+				if (uid != null) {
+					User loginUser = userService.getById(uid);
+					request.setAttribute(CryptoConfig.CUSTOM_RESPONSE_RESULT_LOGINUSER, loginUser);
+				}
 				data = cryptoConfig.encrypt(data);
 			}
 		}

@@ -1,0 +1,45 @@
+2024-04-06 23:10:05.860 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.activity.ActivityProduct.
+2024-04-06 23:10:06.173 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.admin.SystemRoleMenu.
+2024-04-06 23:10:06.843 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.city.CityRegion.
+2024-04-06 23:10:07.118 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.coupon.CouponProduct.
+2024-04-06 23:10:07.521 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.order.OrderStatus.
+2024-04-06 23:10:07.594 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.order.RefundOrderStatus.
+2024-04-06 23:10:07.673 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.product.MerchantProductGuaranteeGroup.
+2024-04-06 23:10:07.720 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.product.ProductBrandCategory.
+2024-04-06 23:10:07.933 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.record.BrowseRecord.
+2024-04-06 23:10:08.459 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.user.UserMerchantCollect.
+2024-04-06 23:10:14.614 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"associationCommHandler":{"type":5},"collisionCommHandler":{"type":3},"depthCommHandler":{"type":4},"directInvitationHandler":{"type":1},"indirectCommHandler":{"type":8},"managerCommHandler":{"type":6},"shopCommHandler":{"type":7},"threeRetOneHandler":{"type":2}}
+2024-04-06 23:10:33.123 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2},"userWalletHandler":{"type":4},"userWhiteHandler":{"type":3}}
+2024-04-06 23:10:36.774 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"capaInviteOneLevelHandler":{"name":"一阶人数升级"},"capaPaymentHandler":{"name":"单笔金额升级"},"capaRepairDifferenceHandler":{"name":"补差金额升级"},"capaXsIsolateLineHandler":{"name":"业绩独立线升星"}}
+2024-04-06 23:10:42.420 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.wechat.video.PayComponentCat.
+2024-04-06 23:10:44.926 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.wechat.video.PayComponentBrand.
+2024-04-06 23:11:01.205 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.activity.ActivityProduct.
+2024-04-06 23:11:01.812 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.admin.SystemRoleMenu.
+2024-04-06 23:11:03.253 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.city.CityRegion.
+2024-04-06 23:11:03.868 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.coupon.CouponProduct.
+2024-04-06 23:11:04.686 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.order.OrderStatus.
+2024-04-06 23:11:04.855 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.order.RefundOrderStatus.
+2024-04-06 23:11:05.020 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.product.MerchantProductGuaranteeGroup.
+2024-04-06 23:11:05.125 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.product.ProductBrandCategory.
+2024-04-06 23:11:05.594 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.record.BrowseRecord.
+2024-04-06 23:11:06.674 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.user.UserMerchantCollect.
+2024-04-06 23:11:12.364 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"associationCommHandler":{"type":5},"collisionCommHandler":{"type":3},"depthCommHandler":{"type":4},"directInvitationHandler":{"type":1},"indirectCommHandler":{"type":8},"managerCommHandler":{"type":6},"shopCommHandler":{"type":7},"threeRetOneHandler":{"type":2}}
+2024-04-06 23:11:13.671 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2},"userWalletHandler":{"type":4},"userWhiteHandler":{"type":3}}
+2024-04-06 23:11:16.389 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"capaInviteOneLevelHandler":{"name":"一阶人数升级"},"capaPaymentHandler":{"name":"单笔金额升级"},"capaRepairDifferenceHandler":{"name":"补差金额升级"},"capaXsIsolateLineHandler":{"name":"业绩独立线升星"}}
+2024-04-06 23:11:20.149 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.wechat.video.PayComponentCat.
+2024-04-06 23:11:23.753 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.wechat.video.PayComponentBrand.
+2024-04-06 23:16:23.203 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.activity.ActivityProduct.
+2024-04-06 23:16:23.849 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.admin.SystemRoleMenu.
+2024-04-06 23:16:25.469 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.city.CityRegion.
+2024-04-06 23:16:26.076 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.coupon.CouponProduct.
+2024-04-06 23:16:27.058 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.order.OrderStatus.
+2024-04-06 23:16:27.232 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.order.RefundOrderStatus.
+2024-04-06 23:16:27.418 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.product.MerchantProductGuaranteeGroup.
+2024-04-06 23:16:27.521 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.product.ProductBrandCategory.
+2024-04-06 23:16:28.074 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.record.BrowseRecord.
+2024-04-06 23:16:29.399 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.user.UserMerchantCollect.
+2024-04-06 23:16:39.372 [main] WARN  com.jbp.service.product.comm.ProductCommChain - ProductCommChain:{"associationCommHandler":{"type":5},"collisionCommHandler":{"type":3},"depthCommHandler":{"type":4},"directInvitationHandler":{"type":1},"indirectCommHandler":{"type":8},"managerCommHandler":{"type":6},"shopCommHandler":{"type":7},"threeRetOneHandler":{"type":2}}
+2024-04-06 23:16:44.094 [main] WARN  com.jbp.service.product.profit.ProductProfitChain - ProductProfitChain:{"userActiveHandler":{"type":5},"userCapaHandler":{"type":1},"userCapaXsHandler":{"type":2},"userWalletHandler":{"type":4},"userWhiteHandler":{"type":3}}
+2024-04-06 23:16:46.120 [main] WARN  com.jbp.service.condition.ConditionChain - conditionChain:{"capaInviteOneLevelHandler":{"name":"一阶人数升级"},"capaPaymentHandler":{"name":"单笔金额升级"},"capaRepairDifferenceHandler":{"name":"补差金额升级"},"capaXsIsolateLineHandler":{"name":"业绩独立线升星"}}
+2024-04-06 23:16:48.283 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.wechat.video.PayComponentCat.
+2024-04-06 23:16:50.247 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Warn: Could not find @TableId in Class: com.jbp.common.model.wechat.video.PayComponentBrand.

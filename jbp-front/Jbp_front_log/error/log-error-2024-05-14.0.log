@@ -1,0 +1,9 @@
+2024-05-14 13:36:58.925 [main] ERROR com.jbp.service.service.impl.YopServiceImpl - 易宝请求异常:null
+java.lang.NullPointerException: null
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getAuthorizationReq(ClientHandlerImpl.java:117)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getExecutionContext(ClientHandlerImpl.java:81)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.execute(ClientHandlerImpl.java:71)
+	at com.yeepay.yop.sdk.service.common.YopClientImpl.request(YopClientImpl.java:41)
+	at com.jbp.service.service.impl.YopServiceImpl.send(YopServiceImpl.java:191)
+	at com.jbp.service.service.impl.YopServiceImpl.accountBalanceQuery(YopServiceImpl.java:56)
+	at com.jbp.front.JbpFrontApplication.main(JbpFrontApplication.java:45)

@@ -1,0 +1,336 @@
+2024-05-19 16:40:14.286 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on SKHLXQEGEVNZEBJ with PID 1504 (E:\work\workspace\jbp\jbp-front\target\classes started by Administrator in E:\work\workspace\jbp\jbp-front)
+2024-05-19 16:40:14.290 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-05-19 16:40:16.265 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-05-19 16:40:16.269 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-05-19 16:40:16.315 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 24ms. Found 0 Redis repository interfaces.
+2024-05-19 16:40:18.011 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-05-19 16:40:18.024 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-05-19 16:40:18.025 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-05-19 16:40:18.025 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-05-19 16:40:18.337 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-05-19 16:40:18.357 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-05-19 16:40:18.360 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 3996 ms
+2024-05-19 16:40:24.748 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-05-19 16:40:28.567 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-05-19 16:40:29.273 [redisson-netty-2-15] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-05-19 16:40:29.286 [redisson-netty-2-13] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-05-19 16:40:30.122 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-05-19 16:40:30.124 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-05-19 16:40:30.129 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-05-19 16:40:30.145 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@31d51518, ORIGINAL=[Ljava.lang.String;@509bf2d5, PIC_CLICK=[Ljava.lang.String;@68823b6b]
+2024-05-19 16:40:30.145 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-05-19 16:40:30.211 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 16:40:30.229 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@5713e35f, ORIGINAL=[Ljava.lang.String;@1f40bb80, PIC_CLICK=[Ljava.lang.String;@c42ee90]
+2024-05-19 16:40:30.229 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-05-19 16:40:30.243 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 16:40:30.999 [main] INFO  c.y.y.s.c.provider.file.YopFileSdkConfigProvider - 加载默认配置文件config/yop_sdk_config_default.json
+2024-05-19 16:40:32.213 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-05-19 16:40:32.434 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7170da18, org.springframework.security.web.context.SecurityContextPersistenceFilter@7a725c89, org.springframework.security.web.header.HeaderWriterFilter@65899694, org.springframework.security.web.authentication.logout.LogoutFilter@406ea770, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5936e4ba, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@648e25f2, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@20616795, org.springframework.security.web.session.SessionManagementFilter@2bdc2c26, org.springframework.security.web.access.ExceptionTranslationFilter@7b01f056, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@4ebefe31]
+2024-05-19 16:40:32.452 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-05-19 16:40:32.474 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-05-19 16:40:32.475 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-05-19 16:40:32.999 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-05-19 16:40:33.027 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-05-19 16:40:33.064 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 16:40:33.249 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-05-19 16:40:33.278 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-05-19 16:40:33.319 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-05-19 16:40:33.344 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-05-19 16:40:33.485 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-05-19 16:40:33.491 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-05-19 16:40:33.572 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-05-19 16:40:33.610 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-05-19 16:40:33.670 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-05-19 16:40:33.715 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-05-19 16:40:33.754 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-05-19 16:40:33.759 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-05-19 16:40:33.879 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-05-19 16:40:33.883 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-05-19 16:40:33.894 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-05-19 16:40:33.896 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-05-19 16:40:33.903 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-05-19 16:40:33.904 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-05-19 16:40:33.941 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-05-19 16:40:33.944 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-05-19 16:40:34.008 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-05-19 16:40:34.072 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 16:40:34.089 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-05-19 16:40:34.136 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-05-19 16:40:34.140 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 20.612 seconds (JVM running for 21.29)
+2024-05-19 16:40:34.186 [main] INFO  com.jbp.service.service.impl.YopServiceImpl - 易宝请求参数{"merchantNo":["10090108498"]}
+2024-05-19 16:55:46.685 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on SKHLXQEGEVNZEBJ with PID 14084 (E:\work\workspace\jbp\jbp-front\target\classes started by Administrator in E:\work\workspace\jbp\jbp-front)
+2024-05-19 16:55:46.685 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-05-19 16:55:48.275 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-05-19 16:55:48.277 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-05-19 16:55:48.311 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 21ms. Found 0 Redis repository interfaces.
+2024-05-19 16:55:49.652 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-05-19 16:55:49.660 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-05-19 16:55:49.661 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-05-19 16:55:49.661 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-05-19 16:55:49.904 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-05-19 16:55:49.909 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-05-19 16:55:49.910 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 3181 ms
+2024-05-19 16:55:54.932 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-05-19 16:55:58.838 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-05-19 16:55:59.429 [redisson-netty-2-20] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-05-19 16:55:59.442 [redisson-netty-2-15] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-05-19 16:56:00.122 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-05-19 16:56:00.124 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-05-19 16:56:00.129 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-05-19 16:56:00.143 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@772bc4c9, ORIGINAL=[Ljava.lang.String;@152dbf8e, PIC_CLICK=[Ljava.lang.String;@34ea86ff]
+2024-05-19 16:56:00.143 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-05-19 16:56:00.179 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 16:56:00.197 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@1791396b, ORIGINAL=[Ljava.lang.String;@28d7bd6b, PIC_CLICK=[Ljava.lang.String;@7607340f]
+2024-05-19 16:56:00.197 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-05-19 16:56:00.211 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 16:56:00.869 [main] INFO  c.y.y.s.b.c.provider.file.YopFileSdkConfigProvider - 加载配置文件config/yop_sdk_config_default.json
+2024-05-19 16:56:00.972 [main] INFO  com.yeepay.yop.sdk.base.cache.YopDegradeRuleHelper - DegradeRule Inited, rules:[DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}]
+2024-05-19 16:56:02.150 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-05-19 16:56:02.344 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@408bb173, org.springframework.security.web.context.SecurityContextPersistenceFilter@64641998, org.springframework.security.web.header.HeaderWriterFilter@4f239a76, org.springframework.security.web.authentication.logout.LogoutFilter@259ae1a9, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1e9afe4e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@35bb3fea, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@360d0c7a, org.springframework.security.web.session.SessionManagementFilter@27ada0e8, org.springframework.security.web.access.ExceptionTranslationFilter@1bf4a79b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@4bca2a09]
+2024-05-19 16:56:02.362 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-05-19 16:56:02.380 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-05-19 16:56:02.381 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-05-19 16:56:02.850 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-05-19 16:56:02.868 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-05-19 16:56:02.904 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 16:56:03.078 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-05-19 16:56:03.101 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-05-19 16:56:03.137 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-05-19 16:56:03.162 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-05-19 16:56:03.268 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-05-19 16:56:03.274 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-05-19 16:56:03.352 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-05-19 16:56:03.382 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-05-19 16:56:03.436 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-05-19 16:56:03.479 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-05-19 16:56:03.516 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-05-19 16:56:03.521 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-05-19 16:56:03.622 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-05-19 16:56:03.626 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-05-19 16:56:03.633 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-05-19 16:56:03.634 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-05-19 16:56:03.639 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-05-19 16:56:03.640 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-05-19 16:56:03.674 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-05-19 16:56:03.677 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-05-19 16:56:03.722 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-05-19 16:56:03.769 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 16:56:03.782 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-05-19 16:56:03.808 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-05-19 16:56:03.812 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 17.58 seconds (JVM running for 17.894)
+2024-05-19 16:56:03.853 [main] INFO  com.jbp.service.service.impl.YopServiceImpl - 易宝请求参数{"merchantNo":["10090108498"]}
+2024-05-19 16:56:45.161 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on SKHLXQEGEVNZEBJ with PID 7252 (E:\work\workspace\jbp\jbp-front\target\classes started by Administrator in E:\work\workspace\jbp\jbp-front)
+2024-05-19 16:56:45.162 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-05-19 16:56:47.004 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-05-19 16:56:47.007 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-05-19 16:56:47.041 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18ms. Found 0 Redis repository interfaces.
+2024-05-19 16:56:48.943 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-05-19 16:56:48.957 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-05-19 16:56:48.957 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-05-19 16:56:48.957 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-05-19 16:56:49.312 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-05-19 16:56:49.320 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-05-19 16:56:49.320 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4097 ms
+2024-05-19 16:56:55.648 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-05-19 16:56:59.671 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-05-19 16:57:00.354 [redisson-netty-2-19] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-05-19 16:57:00.378 [redisson-netty-2-17] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-05-19 16:57:01.200 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-05-19 16:57:01.202 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-05-19 16:57:01.208 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-05-19 16:57:01.223 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@7649d350, ORIGINAL=[Ljava.lang.String;@37e7e089, PIC_CLICK=[Ljava.lang.String;@58f05266]
+2024-05-19 16:57:01.223 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-05-19 16:57:01.261 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 16:57:01.280 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@336b7da4, ORIGINAL=[Ljava.lang.String;@6019ce4b, PIC_CLICK=[Ljava.lang.String;@1e79b0fc]
+2024-05-19 16:57:01.280 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-05-19 16:57:01.292 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 16:57:02.010 [main] INFO  c.y.y.s.b.c.provider.file.YopFileSdkConfigProvider - 加载配置文件config/yop_sdk_config_default.json
+2024-05-19 16:57:02.132 [main] INFO  com.yeepay.yop.sdk.base.cache.YopDegradeRuleHelper - DegradeRule Inited, rules:[DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}]
+2024-05-19 16:57:03.304 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-05-19 16:57:03.520 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@12c66345, org.springframework.security.web.context.SecurityContextPersistenceFilter@323dd422, org.springframework.security.web.header.HeaderWriterFilter@67a6f2c4, org.springframework.security.web.authentication.logout.LogoutFilter@2c9573f1, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@3cdf8aa5, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@58d9cd6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@24bf95ec, org.springframework.security.web.session.SessionManagementFilter@775c865f, org.springframework.security.web.access.ExceptionTranslationFilter@6f05d5f2, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@5b95a754]
+2024-05-19 16:57:03.536 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-05-19 16:57:03.555 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-05-19 16:57:03.556 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-05-19 16:57:04.018 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-05-19 16:57:04.036 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-05-19 16:57:04.072 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 16:57:04.253 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-05-19 16:57:04.277 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-05-19 16:57:04.318 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-05-19 16:57:04.340 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-05-19 16:57:04.465 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-05-19 16:57:04.471 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-05-19 16:57:04.560 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-05-19 16:57:04.591 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-05-19 16:57:04.653 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-05-19 16:57:04.692 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-05-19 16:57:04.729 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-05-19 16:57:04.737 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-05-19 16:57:04.875 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-05-19 16:57:04.880 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-05-19 16:57:04.887 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-05-19 16:57:04.888 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-05-19 16:57:04.893 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-05-19 16:57:04.893 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-05-19 16:57:04.928 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-05-19 16:57:04.932 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-05-19 16:57:04.984 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-05-19 16:57:05.034 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 16:57:05.050 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-05-19 16:57:05.092 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-05-19 16:57:05.095 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 20.634 seconds (JVM running for 21.237)
+2024-05-19 16:57:05.130 [main] INFO  com.jbp.service.service.impl.YopServiceImpl - 易宝请求参数{"merchantNo":["10090108498"]}
+2024-05-19 17:14:31.475 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on SKHLXQEGEVNZEBJ with PID 10912 (E:\work\workspace\jbp\jbp-front\target\classes started by Administrator in E:\work\workspace\jbp\jbp-front)
+2024-05-19 17:14:31.476 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-05-19 17:14:33.549 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-05-19 17:14:33.553 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-05-19 17:14:33.607 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 28ms. Found 0 Redis repository interfaces.
+2024-05-19 17:14:35.734 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-05-19 17:14:35.749 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-05-19 17:14:35.750 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-05-19 17:14:35.750 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-05-19 17:14:36.162 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-05-19 17:14:36.170 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-05-19 17:14:36.170 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4626 ms
+2024-05-19 17:14:42.935 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-05-19 17:14:47.109 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-05-19 17:14:47.818 [redisson-netty-2-23] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-05-19 17:14:47.841 [redisson-netty-2-22] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-05-19 17:14:48.639 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-05-19 17:14:48.640 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-05-19 17:14:48.646 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-05-19 17:14:48.657 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@13c36d48, ORIGINAL=[Ljava.lang.String;@7e93e396, PIC_CLICK=[Ljava.lang.String;@f1e8753]
+2024-05-19 17:14:48.658 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-05-19 17:14:48.692 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 17:14:48.709 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@14f8fdae, ORIGINAL=[Ljava.lang.String;@4414ee28, PIC_CLICK=[Ljava.lang.String;@3533b614]
+2024-05-19 17:14:48.709 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-05-19 17:14:48.732 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 17:17:24.884 [main] INFO  c.y.y.s.b.c.provider.file.YopFileSdkConfigProvider - 加载配置文件config/yop_sdk_config_default.json
+2024-05-19 17:30:57.665 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on SKHLXQEGEVNZEBJ with PID 14340 (E:\work\workspace\jbp\jbp-front\target\classes started by Administrator in E:\work\workspace\jbp\jbp-front)
+2024-05-19 17:30:57.667 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-05-19 17:30:59.618 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-05-19 17:30:59.621 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-05-19 17:30:59.659 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 19ms. Found 0 Redis repository interfaces.
+2024-05-19 17:31:01.410 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-05-19 17:31:01.425 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-05-19 17:31:01.426 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-05-19 17:31:01.426 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-05-19 17:31:01.745 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-05-19 17:31:01.751 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-05-19 17:31:01.751 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4032 ms
+2024-05-19 17:31:07.477 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-05-19 17:31:11.286 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-05-19 17:31:11.952 [redisson-netty-2-23] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-05-19 17:31:11.967 [redisson-netty-2-17] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-05-19 17:31:12.860 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-05-19 17:31:12.864 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-05-19 17:31:12.868 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-05-19 17:31:12.881 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@296a350, ORIGINAL=[Ljava.lang.String;@4f3a8e3e, PIC_CLICK=[Ljava.lang.String;@4824d077]
+2024-05-19 17:31:12.881 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-05-19 17:31:12.927 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 17:31:12.948 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@75cfb958, ORIGINAL=[Ljava.lang.String;@40ff56f7, PIC_CLICK=[Ljava.lang.String;@64648af1]
+2024-05-19 17:31:12.948 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-05-19 17:31:12.968 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 17:31:45.810 [main] INFO  c.y.y.s.b.c.provider.file.YopFileSdkConfigProvider - 加载配置文件config/yop_sdk_config_default.json
+2024-05-19 17:31:45.968 [main] INFO  com.yeepay.yop.sdk.base.cache.YopDegradeRuleHelper - DegradeRule Inited, rules:[DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}]
+2024-05-19 17:31:47.043 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-05-19 17:31:47.249 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1d9c18b9, org.springframework.security.web.context.SecurityContextPersistenceFilter@5f0bcadb, org.springframework.security.web.header.HeaderWriterFilter@484f7fad, org.springframework.security.web.authentication.logout.LogoutFilter@765650e4, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2d7bfb13, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@59be715a, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@447cdbaa, org.springframework.security.web.session.SessionManagementFilter@474f69d, org.springframework.security.web.access.ExceptionTranslationFilter@573f95b2, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@2258ca14]
+2024-05-19 17:31:47.266 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-05-19 17:31:47.285 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-05-19 17:31:47.285 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-05-19 17:31:47.710 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-05-19 17:31:47.733 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-05-19 17:31:47.781 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 17:31:47.969 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-05-19 17:31:47.996 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-05-19 17:31:48.045 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-05-19 17:31:48.070 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-05-19 17:31:48.188 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-05-19 17:31:48.194 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-05-19 17:31:48.296 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-05-19 17:31:48.331 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-05-19 17:31:48.392 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-05-19 17:31:48.429 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-05-19 17:31:48.465 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-05-19 17:31:48.471 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-05-19 17:31:48.579 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-05-19 17:31:48.583 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-05-19 17:31:48.589 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-05-19 17:31:48.590 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-05-19 17:31:48.596 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-05-19 17:31:48.598 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-05-19 17:31:48.638 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-05-19 17:31:48.641 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-05-19 17:31:48.691 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-05-19 17:31:48.733 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 17:31:48.746 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-05-19 17:31:48.782 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-05-19 17:31:48.784 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 51.75 seconds (JVM running for 52.354)
+2024-05-19 17:31:48.818 [main] INFO  com.jbp.service.service.impl.YopServiceImpl - 易宝请求参数{"merchantNo":["10090108498"]}
+2024-05-19 17:32:37.325 [main] INFO  com.jbp.front.JbpFrontApplication - Starting JbpFrontApplication on SKHLXQEGEVNZEBJ with PID 1340 (E:\work\workspace\jbp\jbp-front\target\classes started by Administrator in E:\work\workspace\jbp\jbp-front)
+2024-05-19 17:32:37.326 [main] INFO  com.jbp.front.JbpFrontApplication - No active profile set, falling back to default profiles: default
+2024-05-19 17:32:39.285 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-05-19 17:32:39.288 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-05-19 17:32:39.332 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 22ms. Found 0 Redis repository interfaces.
+2024-05-19 17:32:41.036 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8182 (http)
+2024-05-19 17:32:41.051 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8182"]
+2024-05-19 17:32:41.052 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-05-19 17:32:41.052 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-05-19 17:32:41.386 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-05-19 17:32:41.392 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-05-19 17:32:41.392 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 3994 ms
+2024-05-19 17:32:47.063 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-05-19 17:32:50.795 [main] INFO  org.redisson.Version - Redisson 3.14.1
+2024-05-19 17:32:51.505 [redisson-netty-2-13] INFO  o.r.connection.pool.MasterPubSubConnectionPool - 1 connections initialized for /127.0.0.1:6379
+2024-05-19 17:32:51.522 [redisson-netty-2-19] INFO  org.redisson.connection.pool.MasterConnectionPool - 24 connections initialized for /127.0.0.1:6379
+2024-05-19 17:32:52.347 [main] INFO  c.j.front.config.AjCaptchaServiceAutoConfiguration - 自定义配置项：
+AjCaptchaProperties{type=DEFAULT, jigsaw='', picClick='', waterMark='Jbp Java', waterFont='WenQuanZhengHei.ttf', fontType='WenQuanZhengHei.ttf', slipOffset='5', aesStatus=true, interferenceOptions='2', cacheNumber='1000', timingClear='180', cacheType=local, reqFrequencyLimitEnable=false, reqGetLockLimit=5, reqGetLockSeconds=300, reqGetMinuteLimit=360, reqCheckMinuteLimit=60, reqVerifyMinuteLimit=60}
+2024-05-19 17:32:52.349 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaCache-service:[local]
+2024-05-19 17:32:52.357 [main] INFO  c.jbp.front.service.captcha.CaptchaServiceFactory - supported-captchaTypes-service:[clickWord, default, blockPuzzle]
+2024-05-19 17:32:52.375 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@13a8cb4e, ORIGINAL=[Ljava.lang.String;@35ec3604, PIC_CLICK=[Ljava.lang.String;@ab5954d]
+2024-05-19 17:32:52.375 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - --->>>初始化验证码底图<<<---clickWord
+2024-05-19 17:32:52.429 [main] INFO  c.j.f.s.captcha.impl.ClickWordCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 17:32:52.448 [main] INFO  com.jbp.common.captcha.util.ImageUtils - 初始化底图:[SLIDING_BLOCK=[Ljava.lang.String;@4075c0d8, ORIGINAL=[Ljava.lang.String;@3670af2b, PIC_CLICK=[Ljava.lang.String;@7c8537e9]
+2024-05-19 17:32:52.449 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - --->>>初始化验证码底图<<<---blockPuzzle
+2024-05-19 17:32:52.465 [main] INFO  c.j.f.s.captcha.impl.BlockPuzzleCaptchaServiceImpl - 初始化local缓存...
+2024-05-19 17:32:53.181 [main] INFO  c.y.y.s.b.c.provider.file.YopFileSdkConfigProvider - 加载配置文件config/yop_sdk_config_default.json
+2024-05-19 17:32:53.315 [main] INFO  com.yeepay.yop.sdk.base.cache.YopDegradeRuleHelper - DegradeRule Inited, rules:[DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://sandbox.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-a.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=2, count=4.0, limitApp=default, timeWindow=300, minRequestAmount=4, slowRatioThreshold=1.0, statIntervalMs=300000}, DegradeRule{resource=https://openapi-h.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}, DegradeRule{resource=https://yos.yeepay.com/yop-center, grade=1, count=0.2, limitApp=default, timeWindow=300, minRequestAmount=5, slowRatioThreshold=1.0, statIntervalMs=5000}]
+2024-05-19 17:32:54.387 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-05-19 17:32:54.640 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5bf9bb2, org.springframework.security.web.context.SecurityContextPersistenceFilter@794c22cd, org.springframework.security.web.header.HeaderWriterFilter@223ed38f, org.springframework.security.web.authentication.logout.LogoutFilter@3e93ee71, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5bb0122, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5a32ab89, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@76c5599b, org.springframework.security.web.session.SessionManagementFilter@34adce96, org.springframework.security.web.access.ExceptionTranslationFilter@307cf289, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@75abbb61]
+2024-05-19 17:32:54.662 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-05-19 17:32:54.681 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-05-19 17:32:54.681 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-05-19 17:32:55.151 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-05-19 17:32:55.180 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 2 custom documentation plugin(s)
+2024-05-19 17:32:55.225 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 17:32:55.437 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-05-19 17:32:55.456 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-05-19 17:32:55.493 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-05-19 17:32:55.520 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-05-19 17:32:55.645 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-05-19 17:32:55.651 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-05-19 17:32:55.740 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_1
+2024-05-19 17:32:55.778 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-05-19 17:32:55.835 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-05-19 17:32:55.871 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getIndexInfoUsingGET_2
+2024-05-19 17:32:55.916 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-05-19 17:32:55.920 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-05-19 17:32:56.098 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getProductListUsingGET_1
+2024-05-19 17:32:56.101 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-05-19 17:32:56.105 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-05-19 17:32:56.106 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-05-19 17:32:56.110 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-05-19 17:32:56.111 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-05-19 17:32:56.145 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-05-19 17:32:56.149 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-05-19 17:32:56.200 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-05-19 17:32:56.243 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-05-19 17:32:56.259 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8182"]
+2024-05-19 17:32:56.287 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8182 (http) with context path ''
+2024-05-19 17:32:56.290 [main] INFO  com.jbp.front.JbpFrontApplication - Started JbpFrontApplication in 19.636 seconds (JVM running for 20.271)
+2024-05-19 17:32:56.327 [main] INFO  com.jbp.service.service.impl.YopServiceImpl - 易宝请求参数{"merchantNo":["10090108498"]}
