@@ -221,6 +221,7 @@ public class PayServiceImpl implements PayService {
             response.setPayWechatOpen(false);
             response.setAliPayStatus(false);
             response.setLianLianStatus(false);
+            response.setKqPayStatus(false);
         }
         return response;
     }

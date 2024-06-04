@@ -18,6 +18,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.UserVisa;
 import com.jbp.common.model.user.UserVisaOrder;
+import com.jbp.common.request.UserViseRequest;
 import com.jbp.common.request.UserViseSaveRequest;
 import com.jbp.common.response.UserVisaResponse;
 import com.jbp.common.result.CommonResult;
@@ -29,15 +30,23 @@ import com.jbp.service.service.UserVisaService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -352,19 +361,35 @@ public class UserVisaController {
     }
 
 
-    @ApiOperation(value = "法大大回调", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String userVisaCallback( @RequestBody  UserViseSaveRequest request) {
 
-        if (request.getSignTaskId() == null) {
+
+    @ApiOperation(value = "法大大回调", httpMethod = "POST")
+    @ResponseBody
+    @PostMapping(value = "/userVisaCallback")
+    public String userVisaCallback(
+                              HttpServletRequest httpServletRequest) throws IOException {
+
+
+
+        StringBuilder body = new StringBuilder();
+        BufferedReader reader = httpServletRequest.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            body.append(line);
+        }
+        JSONObject jsonObject = JSONObject.parseObject(URLDecoder.decode(URLDecoder.decode(body.toString(),"UTF-8"),"UTF-8").replaceAll("bizContent=",""));
+
+        log.info("法大大回调 {}",jsonObject);
+        if (jsonObject == null) {
+            return "success";
+        }
+
+        if (jsonObject.getString("signTaskId")  == null) {
           return "success";
         }
 
-        log.info("法大大回调 {}", request);
-
-        if (request .getSignTaskStatus() != null && request.getSignTaskStatus().equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask(  request.getSignTaskId());
+        if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
+                UserVisaResponse userVisa = userVisaService.getVisaTask(  jsonObject.getString("signTaskId") );
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
@@ -380,7 +405,6 @@ public class UserVisaController {
                     userVisaOrderService.updateById(userVisaOrder);
 
                 }
-
 
             }
         }

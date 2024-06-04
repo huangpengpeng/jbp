@@ -36,4 +36,6 @@ public class UserViseSaveRequest {
     private String signTaskStatus;
     private String transReferenceId;
 
+    private String bizContent;
+
 }

@@ -1005,7 +1005,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Map<Integer, User> getUidMapList(List<Integer> uidList) {
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.select(User::getId, User::getAccount, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel);
+        lqw.select(User::getId, User::getAccount, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel,User::getCreateTime);
         lqw.in(User::getId, uidList);
         List<User> userList = dao.selectList(lqw);
         Map<Integer, User> userMap = new HashMap<>();
