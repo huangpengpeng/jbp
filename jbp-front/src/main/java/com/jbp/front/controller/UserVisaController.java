@@ -363,15 +363,15 @@ public class UserVisaController {
     @ResponseBody
     @PostMapping(value = "/userVisaCallback")
     public String userVisaCallback(@RequestHeader HttpHeaders headers,
-                                   @RequestParam(value = "bizContent", required = false ) String bizContent) {
-        log.info("法大大回调 {}",bizContent);
+                                @RequestBody  UserViseRequest userViseRequest) {
+        log.info("法大大回调 {}",userViseRequest.getBizContent());
 
         log.info("法大大回调 {}",headers);
-        if (bizContent == null) {
+        if (userViseRequest.getBizContent() == null) {
             return "success";
         }
 
-      JSONObject jsonObject =JSONObject.parseObject(bizContent);
+      JSONObject jsonObject =JSONObject.parseObject(userViseRequest.getBizContent());
 
         if (jsonObject.get("signTaskId")  == null) {
           return "success";
