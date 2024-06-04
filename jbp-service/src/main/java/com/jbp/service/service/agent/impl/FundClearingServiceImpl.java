@@ -92,6 +92,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private CapaXsService capaXsService;
     @Resource
     private ProductCommConfigService productCommConfigService;
+    @Resource
+    private PlatformWalletFlowService platformWalletFlowService;
 
 
 
@@ -101,6 +103,18 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                                            String teamName, String description, String commName, Boolean ifRefund, List<String> orderList, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, commName, ifRefund, orderList);
+        //添加回退时间
+        List<PlatformWalletFlow> flowList = platformWalletFlowService.list(new QueryWrapper<PlatformWalletFlow>().lambda().eq(PlatformWalletFlow::getOperate, "退款"));
+        Map<String,PlatformWalletFlow> flowMap = new HashMap<>();
+        flowList.forEach(f -> flowMap.put(f.getExternalNo(),f));
+        List<FundClearing> fundClearingList = list.stream().filter(FundClearing::getIfRefund).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(fundClearingList)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        fundClearingList.forEach(f -> {
+            PlatformWalletFlow flow = flowMap.get(f.getUniqueNo());
+            f.setReturnTime(flow != null ? flow.getGmtCreated() : null);
+        });
         return CommonPage.copyPageInfo(page, list);
     }
 

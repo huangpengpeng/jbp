@@ -1228,6 +1228,27 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         return execute;
     }
 
+    @Override
+    public List<RefundOrder> findExportList(RefundOrderSearchRequest request) {
+        QueryWrapper<RefundOrder> wrapper = Wrappers.query();
+        if (ObjectUtil.isNotNull(request.getMerId()) && request.getMerId() > 0) {
+            wrapper.eq("mer_id", request.getMerId());
+        }
+        if (StrUtil.isNotEmpty(request.getRefundOrderNo())) {
+            wrapper.eq("refund_order_no", request.getRefundOrderNo());
+        }
+        if (StrUtil.isNotEmpty(request.getOrderNo())) {
+            wrapper.eq("order_no", orderService.getOrderNo(request.getOrderNo()));
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            getRequestTimeWhere(wrapper, request.getDateLimit());
+        }
+        getStatusWhere(wrapper, request.getRefundStatus());
+        wrapper.orderByDesc("id");
+        List<RefundOrder> refundOrderList = dao.selectList(wrapper);
+        return refundOrderList;
+    }
+
     /**
      * 退款
      * @param refundOrder 退款单
