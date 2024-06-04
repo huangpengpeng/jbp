@@ -46,17 +46,17 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        WalletService walletService = run.getBean(WalletService.class);
-
-        for (int i = 0; i <50 ; i++) {
-            ExtendsThread extendsThread = new ExtendsThread(i + "");
-            extendsThread.setWalletService(walletService);
-            Thread t = extendsThread;
-
-            t.start();
-
-
-        }
+//        WalletService walletService = run.getBean(WalletService.class);
+//
+//        for (int i = 0; i <50 ; i++) {
+//            ExtendsThread extendsThread = new ExtendsThread(i + "");
+//            extendsThread.setWalletService(walletService);
+//            Thread t = extendsThread;
+//
+//            t.start();
+//
+//
+//        }
 
     }
 }
