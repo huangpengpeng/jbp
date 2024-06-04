@@ -1,19 +1,14 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
-import com.jbp.common.constants.SmsConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
-import com.jbp.common.model.agent.LztTransfer;
-import com.jbp.common.model.agent.LztWithdrawal;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -21,11 +16,11 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.*;
-import com.jbp.service.service.*;
-import com.jbp.service.service.agent.LztAcctApplyService;
-import com.jbp.service.service.agent.LztAcctService;
-import com.jbp.service.service.agent.LztTransferService;
-import com.jbp.service.service.agent.LztWithdrawalService;
+import com.jbp.service.service.DegreePayService;
+import com.jbp.service.service.LztService;
+import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SmsService;
+import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
@@ -38,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -64,9 +58,7 @@ public class LztAcctController {
     @Resource
     private SmsService smsService;
     @Resource
-    private SystemConfigService systemConfigService;
-    @Resource
-    private RedisUtil redisUtil;
+    private LztTransferMorepyeeService lztTransferMorepyeeService;
 
     @GetMapping("/add")
     @ApiOperation("新增账户")
@@ -81,6 +73,7 @@ public class LztAcctController {
         lztAcctService.updateById(lztAcct);
         return CommonResult.success();
     }
+
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:info')")
     @GetMapping("/info")
@@ -112,6 +105,21 @@ public class LztAcctController {
     public CommonResult<LztAcctApply> apply(Integer merId, String userId, String shopId, String shopName, String province,
                                             String city, String area, String address, String openBank) {
         LztAcctApply apply = lztAcctApplyService.apply(merId, userId, shopId, shopName, province, city, area, address, openBank);
+        return CommonResult.success(apply);
+    }
+
+    @ApiOperation(value = "易宝开通银行户")
+    @GetMapping(value = "/yop/bank/apply")
+    public CommonResult<LztAcctApply> yopBankApply(String userId, String merchantName, String openBankCode,
+                                                   String openAccountType, String certificateNo, String socialCreditCodeImageUrl,
+                                                   String legalCardImageFont, String legalCardImageBack, String legalMobile,
+                                                   String operatorName, String operatorMobile, String benefitName, String benefitIdNo,
+                                                   String benefitStartDate, String benefitStartEnd, String benefitAddress) {
+        LztAcctApply apply = lztAcctApplyService.yopApply(userId, merchantName, openBankCode,
+                openAccountType, certificateNo, socialCreditCodeImageUrl,
+                legalCardImageFont, legalCardImageBack, legalMobile,
+                operatorName, operatorMobile, benefitName, benefitIdNo,
+                benefitStartDate, benefitStartEnd, benefitAddress);
         return CommonResult.success(apply);
     }
 
@@ -199,7 +207,8 @@ public class LztAcctController {
     @SneakyThrows
     @ApiOperation(value = "账户资金明细 入账 时间格式 yyyyMMddHHmmss")
     @GetMapping(value = "/serialPage")
-    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, Integer pageNo) {
+    public CommonResult<CommonPage<AcctBalList>> serialPage(String userId, String dateStart, String endStart, Integer pageNo, Integer limit) {
+
         if (StringUtils.isEmpty(userId)) {
             throw new CrmebException("请选择账号查询");
         }
@@ -219,7 +228,7 @@ public class LztAcctController {
         }
         MerchantPayInfo payInfo = merchant.getPayInfo();
         CommonPage<AcctBalList> page = new CommonPage();
-        AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, dateStart, endStart, pageNo);
+        AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, dateStart, endStart, pageNo, limit);
         List<AcctBalList> acctbalList = result.getAcctbal_list();
         if (CollectionUtils.isNotEmpty(acctbalList)) {
             for (AcctBalList acctBalList : acctbalList) {
@@ -237,12 +246,20 @@ public class LztAcctController {
 
                     if (StringUtils.equals("内部代发", acctBalList.getTxn_type())) {
                         acctBalList.setTxn_type("转账");
+                        LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(acctBalList.getJno_cli());
+                        if(lztTransferMorepyee != null){
+                            acctBalList.setFeeAmount(lztTransferMorepyee.getFeeAmount());
+                        }else{
+                            acctBalList.setFeeAmount(BigDecimal.ZERO.setScale(2));
+                        }
                     }
                     if (StringUtils.equals("外部代发", acctBalList.getTxn_type()) && acctBalList.getFeeAmount() == null) {
                         acctBalList.setTxn_type("代付");
                         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
                         if (lztTransfer != null) {
                             acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
+                        }else{
+                            acctBalList.setFeeAmount(BigDecimal.ZERO.setScale(2));
                         }
                     }
                     if (StringUtils.equals("账户提现", acctBalList.getTxn_type()) && acctBalList.getFeeAmount() == null) {
@@ -273,9 +290,11 @@ public class LztAcctController {
         if (lztAcct == null || lztAcct.getMerId() != merId) {
             throw new CrmebException("账户不存在");
         }
+        BigDecimal fee = lztAcctService.getFee(userId, new BigDecimal(amt));
+        BigDecimal totalAmt = new BigDecimal(amt).add(fee);
         Merchant merchant = merchantService.getById(merId);
         MerchantPayInfo payInfo = merchant.getPayInfo();
-        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, amt, token, code);
+        lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, totalAmt.toString(), token, code);
         return CommonResult.success();
     }
 
@@ -426,5 +445,22 @@ public class LztAcctController {
             maps= SqlRunner.db().selectList("select * from yop_bank_bar_code where bankCode='"+bankCode+"' and name like  '%"+name+"%'");
         }
         return CommonResult.success(maps);
+    }
+
+    @ApiOperation(value = "获取手续分")
+    @GetMapping(value = "/feeGet")
+    public CommonResult<BigDecimal> apply(BigDecimal amount, String userId) {
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amount).setScale(2, BigDecimal.ROUND_UP);
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amount.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
+        if(lztAcct.getPayChannelType().equals("易宝")){
+            feeAmount = BigDecimal.ONE;
+        }
+        return CommonResult.success(feeAmount);
     }
 }

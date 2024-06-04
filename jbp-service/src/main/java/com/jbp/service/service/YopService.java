@@ -1,19 +1,63 @@
 package com.jbp.service.service;
 
+import com.jbp.common.yop.params.BankAccountOpenParams;
+import com.jbp.common.yop.params.MerchantInfoModifyParams;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
+import com.jbp.common.yop.params.RegisterMicroH5Params;
 import com.jbp.common.yop.result.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface YopService {
+
+
+    /**
+     * H5注册个人入网
+     *
+     */
+    RegisterMicroH5Result registerMicroH5(RegisterMicroH5Params params);
+
+
+    /**
+     * 小微入网
+     * /rest/v2.0/mer/register/saas/micro
+     */
+    RegisterMicroResult registerMicro(String requestNo, String signName,  String id_card, String frontUrl,
+                                      String backUrl, String mobile,  String province, String city, String district,
+                                      String address, String bankCardNo, String bankCode, String notifyUrl);
+
+
+    /**
+     * 入网进度查询
+     * /rest/v2.0/mer/register/query
+     */
+    RegisterQueryResult registerQuery(String requestNo);
+
+
+    /**
+     * 商户信息变更
+     * /rest/v1.0/mer/merchant/info/modify
+     */
+    MerchantInfoModifyResult  merchantInfoModify(MerchantInfoModifyParams params);
+
+
+    String upload(String url);
+
+    String upload(MultipartFile file);
+
+    /**
+     * 银行开户
+     *
+     */
+    BankAccountOpenResult bankAccountOpen(BankAccountOpenParams params);
 
 
     /**
      * 充值下单
      *
      */
-
     OnlineBankOrderResult onlineBankOrder(OnlineBankOrderParams params);
-
-
 
     /**
      * 开户进度查询
@@ -30,6 +74,20 @@ public interface YopService {
      */
     AccountBalanceQueryResult accountBalanceQuery(String merchantNo);
 
+
+    /**
+     *
+     * 查询全部余额
+     * /rest/v1.0/account/accountinfos/query
+     */
+    AllAccountBalanceQueryResult allAccountBalanceQuery(String merchantNo);
+
+
+    /**
+     * 提现卡绑定
+     * /rest/v1.0/account/withdraw/card/bind
+     */
+
     /**
      * 提现卡bin查询
      */
@@ -38,7 +96,7 @@ public interface YopService {
     /**
      * 提现下单
      */
-    WithdrawOrderResult withdrawOrder(String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl);
+    WithdrawOrderResult withdrawOrder(String parentMerchantNo, String merchantNo, String requestNo, String bankCardId, String orderAmount, String notifyUrl);
 
     /**
      * 提现查询
@@ -84,13 +142,13 @@ public interface YopService {
     /**
      * 资金流水
      */
-    FundBillFlowQueryResult fundBillFlowQuery(String startDate, String endDate, String merchantNo, Integer page, Integer size);
+    FundBillFlowQueryResult fundBillFlowQuery(String parentMerchantNo, String startDate, String endDate, String merchantNo, Integer page, Integer size);
 
 
     /**
      * 回执下载
      */
-    AccountReceiptResult accountReceiptGet(String merchantNo, String requestNo, String tradeType);
+    AccountReceiptResult accountReceiptGet(String merchantNo, String orderNo, String requestNo, String tradeType, String orderData);
 
 
 

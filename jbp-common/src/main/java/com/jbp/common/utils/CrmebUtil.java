@@ -5,10 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbp.common.constants.Constants;
 import com.jbp.common.exception.CrmebException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
@@ -144,6 +142,8 @@ public class CrmebUtil {
         if (map == null) return null;
         return JSONObject.parseObject(JSONObject.toJSONString(map), clz);
     }
+
+
 
 
     /**

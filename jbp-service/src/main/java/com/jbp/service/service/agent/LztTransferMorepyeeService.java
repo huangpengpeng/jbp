@@ -14,7 +14,7 @@ import java.util.List;
 public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee> {
 
     LztTransferMorepyee transferMorepyee(Integer merId, String payerId, String orderNo,
-                                         BigDecimal amt, String txnPurpose, String pwd,
+                                         BigDecimal amt, BigDecimal feeAmount,  String txnPurpose, String pwd,
                                          String randomKey, String payeeId, String ip, String postscript);
 
     LztTransferMorepyee callBack(QueryPaymentResult paymentResult);
@@ -22,8 +22,6 @@ public interface LztTransferMorepyeeService extends IService<LztTransferMorepyee
     LztTransferMorepyee refresh(String txnSeqno);
 
     LztTransferMorepyee getByTxnSeqno(String txnSeqno);
-
-    LztTransferMorepyee getByAccpTxno(String accpTxno);
 
     PageInfo<LztTransferMorepyee> pageList(Integer merId, String payerId, String payeeId, String txnSeqno,
                                        String accpTxno, String status, Date startTime, Date endTime,

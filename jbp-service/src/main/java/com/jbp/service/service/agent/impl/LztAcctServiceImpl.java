@@ -18,6 +18,7 @@ import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.service.DegreePayService;
@@ -51,6 +52,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     private LztPayChannelService lztPayChannelService;
     @Resource
     private DegreePayService degreePayService;
+    @Resource
+    private LztAcctOpenService lztAcctOpenService;
 
     @Override
     public LztAcct getByUserId(String userId) {
@@ -78,7 +81,13 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         }
         AcctInfoResult acctInfoResult = degreePayService.queryAcct(lztAcct);
         if (lztAcct.getIfOpenBankAcct()) {
-            LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcct);
+            if(lztAcctApply == null){
+                lztAcctApply = new LztAcctApply();
+                lztAcctApply.setUserId(userId);
+                lztAcctApply.setPayChannelType(lztAcct.getPayChannelType());
+                lztAcctApply.setPayChannelId(lztAcct.getPayChannelId());
+            }
+            LztQueryAcctInfoResult bankAcctInfoResult = degreePayService.queryBankAcct(lztAcctApply);
             if (bankAcctInfoResult != null) {
                 List<LztQueryAcctInfo> list = bankAcctInfoResult.getList();
                 if (CollectionUtils.isNotEmpty(list)) {
@@ -195,7 +204,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
             do {
-                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, yesterdayStart, yesterdayEnd, pageNo);
+                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, yesterdayStart, yesterdayEnd, pageNo, 10);
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }
@@ -225,7 +234,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         for (LztAcct lztAcct : lztAcctList) {
             Integer pageNo = 1;
             do {
-                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, todayStart, todayEnd, pageNo);
+                AcctSerialResult result = degreePayService.queryAcctSerial(lztAcct, todayStart, todayEnd, pageNo, 10);
+
                 if (CollectionUtils.isEmpty(result.getAcctbal_list())) {
                     break;
                 }
@@ -251,8 +261,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
 
 
 
-    @Resource
-    private LztAcctOpenService lztAcctOpenService;
+
+
 
     public void init(){
         List<Merchant> merchants = merchantService.list();
@@ -298,4 +308,21 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
         }
 
     }
+
+    @Override
+    public BigDecimal getFee(String userId, BigDecimal amt) {
+        LztAcct lztAcct = getByUserId(userId);
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
+        BigDecimal feeAmount = feeScale.multiply(amt).setScale(2, BigDecimal.ROUND_UP);
+        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
+            feeAmount =
+                    amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            feeAmount = BigDecimal.ONE;
+        }
+        return feeAmount;
+    }
+
 }

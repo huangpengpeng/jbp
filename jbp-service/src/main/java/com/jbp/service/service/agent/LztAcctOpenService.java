@@ -4,11 +4,18 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
+import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.request.PageParamRequest;
+
+import java.io.File;
 
 public interface LztAcctOpenService extends IService<LztAcctOpen> {
 
-    LztAcctOpen apply(Integer merId, String userId,  String userType, String returnUrl, String businessScope, Long payChannelId);
+    LztAcctOpen apply( String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel);
+
+    LztAcctOpen yopApply(String signName, String id_card, String frontUrl, String backUrl, String mobile, String province,
+                         String city, String district,
+                         String address, String bankCardNo, String bankCode, LztPayChannel lztPayChannel);
 
 
     void refresh(String accpTxno);

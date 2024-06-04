@@ -236,6 +236,45 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         return login(request, RoleEnum.MERCHANT_ADMIN.getValue(), ip);
     }
 
+    @Override
+    public SystemLoginResponse merchantLogin(Integer id, String ip) {
+        SystemAdmin systemAdmin = systemAdminService.getById(id);
+        // 用户验证
+        Authentication authentication = null;
+        // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+        try {
+            String principal = systemAdmin.getAccount() + RoleEnum.MERCHANT_ADMIN.getValue();
+            String pwd = CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount());
+            authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(principal, pwd));
+        } catch (Exception e) {
+            if (e instanceof BadCredentialsException) {
+                throw new CrmebException("用户不存在或密码错误");
+            }
+            throw new CrmebException(e.getMessage());
+        }
+        LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
+
+        String token = tokenComponent.createToken(loginUser);
+        SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
+        systemAdminResponse.setToken(token);
+        BeanUtils.copyProperties(systemAdmin, systemAdminResponse);
+
+        // 更新最后登录信息
+        systemAdmin.setUpdateTime(DateUtil.date());
+        systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
+        systemAdmin.setLastIp(ip);
+
+        systemAdminService.updateById(systemAdmin);
+        // 返回后台LOGO图标
+        systemAdminResponse.setLeftTopLogo(
+                systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LEFT_TOP));
+        systemAdminResponse.setLeftSquareLogo(
+                systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE));
+        return systemAdminResponse;
+
+    }
+
     /**
      * 用户登出
      */

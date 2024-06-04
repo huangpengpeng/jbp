@@ -2,17 +2,22 @@ package com.jbp.service.service;
 
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
+import com.jbp.common.model.agent.LztAcctApply;
+import com.jbp.common.model.agent.LztAcctOpen;
+import com.jbp.common.model.agent.LztPayChannel;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 public interface DegreePayService {
 
+    UserInfoResult queryUserInfo( LztPayChannel lztPayChannel, LztAcctOpen lztAcctOpen);
+
     AcctInfoResult queryAcct(LztAcct lztAcct);
 
-    LztQueryAcctInfoResult queryBankAcct(LztAcct lztAcct);
+    LztQueryAcctInfoResult queryBankAcct(LztAcctApply lztAcctApply);
 
-    AcctSerialResult queryAcctSerial(LztAcct lztAcct, String startTime, String entTime, Integer pageNo);
+    AcctSerialResult queryAcctSerial(LztAcct lztAcct, String startTime, String entTime, Integer pageNo, Integer limit);
 
     /**
      * 划拨
@@ -61,6 +66,7 @@ public interface DegreePayService {
      */
     QueryWithdrawalResult queryWithdrawal(LztAcct lztAcct, String txnSeqno);
 
-    ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno,  String token, String tradeType);
+    ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno,
+                                          String token, String tradeType, String txnTime);
 
 }

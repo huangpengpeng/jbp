@@ -7,18 +7,22 @@ import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.YopBankApplyRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.service.LztService;
+import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -28,40 +32,40 @@ import javax.annotation.Resource;
 public class LztAcctOpenController {
 
     @Resource
+    private YopService yopService;
+    @Resource
     private LztAcctOpenService lztAcctOpenService;
     @Resource
     private LztPayChannelService lztPayChannelService;
-    @Resource
-    private LztAcctService lztAcctService;
 
+
+    @ApiOperation(value = "图片上传")
+    @RequestMapping(value = "/yop/image", method = RequestMethod.POST)
+    public CommonResult<String> image(MultipartFile multipart) {
+        return CommonResult.success(yopService.upload(multipart));
+    }
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
-    @ApiOperation(value = "开户申请")
+    @ApiOperation(value = "连连个人开户")
     @GetMapping(value = "/apply")
-    public CommonResult<LztAcctOpen> apply(Long payChannelId, String partnerUserId,  Integer merId, String userId, String userType, String returnUrl, String businessScope) {
-        if (ObjectUtil.isEmpty(merId)) {
-            SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-             merId = systemAdmin.getMerId();
-        }
-        if (payChannelId == null && partnerUserId == null) {
-            throw new RuntimeException("请选择支付渠道");
-        }
-        if(partnerUserId != null){
-            LztAcct lztAcct = lztAcctService.getByUserId(partnerUserId);
-            payChannelId = lztAcct.getPayChannelId();
-        }
-        if(payChannelId != null){
-            LztPayChannel lztPayChannel = lztPayChannelService.getById(payChannelId);
-            if (lztPayChannel == null) {
-                throw new RuntimeException("支付渠道不存在");
-            }
-            if (lztPayChannel.getMerId().intValue() != merId.intValue()) {
-                throw new RuntimeException("只能选择当前商户的支付渠道");
-            }
-        }
-        LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(merId, userId, userType, returnUrl, businessScope, payChannelId);
+    public CommonResult<LztAcctOpen> apply(String userId, String userType, String returnUrl, String businessScope) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(systemAdmin.getMerId(), "连连");
+        LztAcctOpen lztAcctOpen = lztAcctOpenService.apply(userId, userType, returnUrl, businessScope, lztPayChannel);
         return CommonResult.success(lztAcctOpen);
     }
+
+    @PreAuthorize("hasAuthority('agent:lzt:acct:open:yop:apply')")
+    @ApiOperation(value = "易宝个人开户")
+    @PostMapping(value = "/yop/apply")
+    public CommonResult<LztAcctOpen> yopApply(@RequestBody YopBankApplyRequest request) {
+        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(systemAdmin.getMerId(), "易宝");
+        LztAcctOpen lztAcctOpen = lztAcctOpenService.yopApply(request.getSignName(), request.getId_card(), request.getFrontUrl(), request.getBackUrl(), request.getMobile(), request.getProvince(), request.getCity(), request.getDistrict(),
+                request.getAddress(), request.getBankCardNo(), request.getBankCode(), lztPayChannel);
+        return CommonResult.success(lztAcctOpen);
+    }
+
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:page')")
     @ApiOperation(value = "开户记录列表")

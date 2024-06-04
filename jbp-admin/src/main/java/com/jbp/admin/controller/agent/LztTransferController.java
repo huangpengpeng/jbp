@@ -62,6 +62,8 @@ public class LztTransferController {
         String ip = CrmebUtil.getClientIp(request);
         LztTransfer lztTransfer = lztTransferService.create(payerId, payCode, amt, payeeType, bankAcctNo,
                 bankCode, bankAcctName, cnapsCode, "服务费", pwd, randomKey, "服务费", ip);
+
+
         if(StringUtils.isNotEmpty(acct.getPhone())){
             String phone = acct.getPhone();
             lztTransfer.setRegMsg("短信已发送至: " + phone.substring(0, 3) + "****" + phone.substring(7, phone.length()) + " 请注意查收");

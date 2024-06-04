@@ -50,6 +50,9 @@ public class LztAcctOpen extends BaseModel {
     @ApiModelProperty(value = "连连外部用户[本平台默认生成]")
     private String userId;
 
+    @ApiModelProperty(value = "账户名称")
+    private String username;
+
     @ApiModelProperty(value = "请求流水号")
     private String txnSeqno;
 

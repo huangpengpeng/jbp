@@ -42,7 +42,7 @@ public class MerchantUploadController {
     /**
      * 图片上传
      */
-    @PreAuthorize("hasAuthority('merchant:upload:image')")
+//    @PreAuthorize("hasAuthority('merchant:upload:image')")
     @ApiOperation(value = "图片上传")
     @RequestMapping(value = "/image", method = RequestMethod.POST)
     @ApiImplicitParams({
