@@ -1,0 +1,106 @@
+2024-05-11 11:59:01.285 [main] ERROR com.jbp.service.service.impl.YopServiceImpl - 易宝请求异常:null
+java.lang.NullPointerException: null
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getAuthorizationReq(ClientHandlerImpl.java:117)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getExecutionContext(ClientHandlerImpl.java:81)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.execute(ClientHandlerImpl.java:71)
+	at com.yeepay.yop.sdk.service.common.YopClientImpl.request(YopClientImpl.java:41)
+	at com.jbp.service.service.impl.YopServiceImpl.send(YopServiceImpl.java:191)
+	at com.jbp.service.service.impl.YopServiceImpl.transferB2bOrder(YopServiceImpl.java:116)
+	at com.jbp.front.JbpFrontApplication.main(JbpFrontApplication.java:49)
+2024-05-11 12:05:20.425 [main] ERROR com.jbp.service.service.impl.YopServiceImpl - 易宝请求异常:null
+java.lang.NullPointerException: null
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getAuthorizationReq(ClientHandlerImpl.java:117)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getExecutionContext(ClientHandlerImpl.java:81)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.execute(ClientHandlerImpl.java:71)
+	at com.yeepay.yop.sdk.service.common.YopClientImpl.request(YopClientImpl.java:41)
+	at com.jbp.service.service.impl.YopServiceImpl.send(YopServiceImpl.java:191)
+	at com.jbp.service.service.impl.YopServiceImpl.accountBalanceQuery(YopServiceImpl.java:56)
+	at com.jbp.front.JbpFrontApplication.main(JbpFrontApplication.java:45)
+2024-05-11 12:24:34.493 [main] ERROR com.jbp.service.service.impl.YopServiceImpl - 易宝请求异常:null
+java.lang.NullPointerException: null
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getAuthorizationReq(ClientHandlerImpl.java:117)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getExecutionContext(ClientHandlerImpl.java:81)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.execute(ClientHandlerImpl.java:71)
+	at com.yeepay.yop.sdk.service.common.YopClientImpl.request(YopClientImpl.java:41)
+	at com.jbp.service.service.impl.YopServiceImpl.send(YopServiceImpl.java:191)
+	at com.jbp.service.service.impl.YopServiceImpl.accountBalanceQuery(YopServiceImpl.java:56)
+	at com.jbp.front.JbpFrontApplication.main(JbpFrontApplication.java:45)
+2024-05-11 12:28:43.367 [main] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8182 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8182 or configure this application to listen on another port.
+
+2024-05-11 12:29:37.157 [main] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8182 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8182 or configure this application to listen on another port.
+
+2024-05-11 12:29:37.198 [redisson-netty-2-32] ERROR org.redisson.client.handler.ErrorsLoggingHandler - Exception occured. Channel: [id: 0xd0c50000, L:/127.0.0.1:50162 - R:/127.0.0.1:6379]
+java.io.IOException: 远程主机强迫关闭了一个现有的连接。
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:43)
+	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223)
+	at sun.nio.ch.IOUtil.read(IOUtil.java:192)
+	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:378)
+	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:253)
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1133)
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:350)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:148)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:714)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:576)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:493)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:989)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.lang.Thread.run(Thread.java:750)
+2024-05-11 12:30:24.741 [main] ERROR com.jbp.service.service.impl.YopServiceImpl - 易宝请求异常:null
+java.lang.NullPointerException: null
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getAuthorizationReq(ClientHandlerImpl.java:117)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getExecutionContext(ClientHandlerImpl.java:81)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.execute(ClientHandlerImpl.java:71)
+	at com.yeepay.yop.sdk.service.common.YopClientImpl.request(YopClientImpl.java:41)
+	at com.jbp.service.service.impl.YopServiceImpl.send(YopServiceImpl.java:191)
+	at com.jbp.service.service.impl.YopServiceImpl.accountBalanceQuery(YopServiceImpl.java:56)
+	at com.jbp.front.JbpFrontApplication.main(JbpFrontApplication.java:45)
+2024-05-11 12:35:00.457 [main] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8182 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8182 or configure this application to listen on another port.
+
+2024-05-11 12:35:28.249 [main] ERROR com.jbp.service.service.impl.YopServiceImpl - 易宝请求异常:null
+java.lang.NullPointerException: null
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getAuthorizationReq(ClientHandlerImpl.java:117)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.getExecutionContext(ClientHandlerImpl.java:81)
+	at com.yeepay.yop.sdk.client.ClientHandlerImpl.execute(ClientHandlerImpl.java:71)
+	at com.yeepay.yop.sdk.service.common.YopClientImpl.request(YopClientImpl.java:41)
+	at com.jbp.service.service.impl.YopServiceImpl.send(YopServiceImpl.java:191)
+	at com.jbp.service.service.impl.YopServiceImpl.accountBalanceQuery(YopServiceImpl.java:56)
+	at com.jbp.front.JbpFrontApplication.main(JbpFrontApplication.java:45)

@@ -1,0 +1,2 @@
+2024-04-08 08:45:44.085 [Druid-ConnectionPool-Create-815632435] INFO  com.alibaba.druid.pool.DruidAbstractDataSource - {dataSource-1} failContinuous is true
+2024-04-08 09:20:32.001 [Druid-ConnectionPool-Create-815632435] INFO  com.alibaba.druid.pool.DruidAbstractDataSource - {dataSource-1} failContinuous is false
