@@ -54,4 +54,8 @@ public class OrderExt extends BaseModel {
 
     @ApiModelProperty(value = "服务码")
     private String serverSn;
+
+
+    @ApiModelProperty(value = "AI服务码")
+    private String aiServerSn;
 }
