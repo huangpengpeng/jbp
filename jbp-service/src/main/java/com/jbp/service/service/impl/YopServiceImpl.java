@@ -3,14 +3,19 @@ package com.jbp.service.service.impl;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.yop.BaseYopRequest;
 import com.jbp.common.yop.BaseYopResponse;
+import com.jbp.common.yop.YopFileSdkConfigProvider;
 import com.jbp.common.yop.dto.ExtParams4BankPay;
 import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
+import com.yeepay.yop.sdk.base.config.provider.YopSdkConfigProviderRegistry;import com.yeepay.yop.sdk.config.YopSdkConfig;
+import com.yeepay.yop.sdk.config.provider.YopSdkConfigProvider;
 import com.yeepay.yop.sdk.service.common.YopClient;
 import com.yeepay.yop.sdk.service.common.request.YopRequest;
 import com.yeepay.yop.sdk.service.common.response.YopResponse;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -177,7 +182,7 @@ public class YopServiceImpl implements YopService {
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);
-        request.withRequestConfig(null);
+       // request.withRequestConfig(null);
         //设置参数
         Map<String, Object> mapObj = JacksonTool.objectToMap(parameters);
         for (Map.Entry<String, Object> entry : mapObj.entrySet()) {

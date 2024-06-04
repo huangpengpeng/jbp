@@ -2,10 +2,13 @@ package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.common.yop.YopFileSdkConfigProvider;
 import com.jbp.common.yop.params.OnlineBankOrderParams;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.impl.LztAcctOpenServiceImpl;
+import com.yeepay.yop.sdk.base.config.provider.YopSdkConfigProviderRegistry;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,6 +44,8 @@ public class JbpFrontApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         System.out.println("ok");
 
+    	YopSdkConfigProviderRegistry.registerProvider(new YopFileSdkConfigProvider());
+    	
         YopService yopService = run.getBean(YopService.class);
         AccountBalanceQueryResult accountBalanceQueryResult = yopService.accountBalanceQuery("10090108498");
 

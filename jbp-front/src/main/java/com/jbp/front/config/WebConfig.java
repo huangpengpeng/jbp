@@ -155,6 +155,7 @@ public class WebConfig implements WebMvcConfigurer {
         return new MappedInterceptor(new String[]{"/doc.html", "/webjars/**"}, new SwaggerInterceptor(username, password, check));
     }
 
+  
 	@Bean
 	public YopClient yopClient(){
 		return YopClientBuilder.builder().build();

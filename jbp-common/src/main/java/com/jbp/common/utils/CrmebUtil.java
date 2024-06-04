@@ -45,8 +45,8 @@ public class CrmebUtil {
      * @param args String[] 字符串数组
      */
     public static void main(String[] args) throws Exception {
-//        System.out.println(encryptPassword("123456", "15871898211"));
-        System.out.println("美质"+decryptPassowrd("L7bxwwqG0x0=", "19011203013"));
+//        System.out.println(encryptPassword("123456", "18444010100"));
+        System.out.println(decryptPassowrd("wpyZM4Otjm4=", "13823668660"));
 
     }
 
