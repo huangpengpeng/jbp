@@ -361,12 +361,12 @@ public class UserVisaController {
 
 
     @ResponseBody
-    @PostMapping(value = "userVisaCallback")
+    @PostMapping(value = "/userVisaCallback")
     public String userVisaCallback(@RequestHeader HttpHeaders headers,
-                                   @RequestParam("bizContent") String bizContent) {
+                                   @RequestParam(value = "bizContent", required = false ) String bizContent) {
         log.info("法大大回调 {}",bizContent);
 
-
+        log.info("法大大回调 {}",headers);
         if (bizContent == null) {
             return "success";
         }
