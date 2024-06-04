@@ -357,15 +357,15 @@ public class UserVisaController {
 
     @ApiOperation(value = "法大大回调")
     @RequestMapping(value = "/userVisaCallback", method = RequestMethod.POST)
-    public String userVisaCallback(@RequestBody UserViseRequest request) {
-        log.info("法大大回调 {}", request.getBizContent());
+    public String userVisaCallback( @RequestParam String bizContent) {
+        log.info("法大大回调 {}",bizContent);
 
 
-        if (request.getBizContent()  == null) {
+        if (bizContent  == null) {
             return "success";
         }
 
-        JSONObject jsonObject =JSONObject.parseObject(request.getBizContent());
+        JSONObject jsonObject =JSONObject.parseObject(bizContent);
 
         if (jsonObject.getString("signTaskId")  == null) {
           return "success";
