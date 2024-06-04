@@ -1,32 +1,32 @@
 # CRMEB 相关配置
 crmeb:
-  version: CRMEB-JAVACORE-MER-DFYHZ-v1.4_beta # 当前代码版本为企业版本 授权给巅峰云（杭州）网络科技有限公司
+  version: CRMEB-JAVACORE-MER-DFYHZ-v1.4_dpzx # 当前代码版本为企业版本 授权给巅峰云（杭州）网络科技有限公司
   domain: #配合swagger使用 # 待部署域名
   wechat-api-url:  #请求微信接口中专服务器
   asyncConfig: false #是否同步config表数据到redis
-  imagePath: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/ # 服务器图片路径配置 斜杠结尾
+  imagePath: /Users/stivepeim/Documents/DPZX/CODEMANGER/BIZ-CODE/JavaMer/V1.4/ # 服务器图片路径配置 斜杠结尾
   retailStoreBrokerageRatio: 30 #佣金返佣比例和上限
   activityStyleCachedTime: 10 #活动边框缓存周期 秒为单位，生产环境适当5-10分钟即可
   activityStyleProductLimit: 100 # 活动边框指定商品上线
   productTagCacheMinutes: 10 # 商品标签缓存分钟数
   orderCancelTime: 30 # 订单支付取消时间，单位分钟
   ignored: #安全路径白名单
-      - swagger-ui/
-      - swagger-resources/**
-      - /**/v2/api-docs
-      - /**/*.html
-      - /**/*.js
-      - /**/*.css
-      - /**/*.png
-      - /**/*.map
-      - /favicon.ico
-      - /actuator/**
-      - /druid/**
-      - api/admin/platform/pagediy/info
-      - /jmreport/**
+    - swagger-ui/
+    - swagger-resources/**
+    - /**/v2/api-docs
+    - /**/*.html
+    - /**/*.js
+    - /**/*.css
+    - /**/*.png
+    - /**/*.map
+    - /favicon.ico
+    - /actuator/**
+    - /druid/**
+    - api/admin/platform/pagediy/info
+    - /jmreport/**
 # 配置端口
 server:
-  port: 8181
+  port: 8282
   servlet:
     context-path: /         # 访问path
   tomcat:
@@ -35,7 +35,7 @@ server:
     min-spare-threads: 30   # 初始化启动线程数量
 spring:
   profiles:
-    active: beta
+    active: dev
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小
@@ -50,9 +50,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-wz9o75s8venhi29r65o.mysql.rds.aliyuncs.com:3306/jbp?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
-    username: kk_account
-    password: kk_account2018
+    url: jdbc:mysql://127.0.0.1:3306/dpzx?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: dpzx
+    password: 12345Aa#
   # quartz
   quartz:
     properties:
@@ -85,9 +85,9 @@ spring:
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
-    password: 
+    password:
     timeout: 30000 # 连接超时时间（毫秒）
-    database: 15  #默认数据库
+    database: 14  #默认数据库
     jedis:
       pool:
         max-active: 200 # 连接池最大连接数（使用负值表示没有限制）
@@ -114,9 +114,23 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
-#      logic-delete-field: isDel  #全局逻辑删除字段值 3.3.0开始支持，详情看下面。
+      #      logic-delete-field: isDel  #全局逻辑删除字段值 3.3.0开始支持，详情看下面。
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+pagehelper:
+  # 设置方言，此处指定 MySQL 数据库
+  helper-dialect: mysql
+  # 是否启动合理化，默认是 false。
+  # 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages（最大页数）会查询最后一页。
+  # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
+  reasonable: true
+  # 是否支持接口参数来传递分页参数，默认false
+  support-methods-arguments: true
+  # 为了支持startPage(Object params)方法，增加了该参数来配置参数映射，用于从对象中根据属性名取值
+  params: count=countSql
+  # 默认值为 false，当该参数设置为 true 时，如果 pageSize=0 或者 RowBounds.limit = 0 就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 Page 类型）
+  page-size-zero: true
+
 #swagger 配置
 swagger:
   basic:
@@ -128,14 +142,14 @@ swagger:
 wx:
   miniapp:
     configs:
-      - appid: wx69627cafde0080bf #微信小程序的appid
-        secret: 6a1851dd9474b745e91779f0a2319390 #微信小程序的Secret
-        token: CrmebJava #微信小程序消息服务器配置的tokenLL
+      - appid: wx991d23e2b8aef95d #微信小程序的appid
+        secret: 9d9a85baa13beacd11defbafdcb2ba66 #微信小程序的Secret
+        token: CrmebJava #微信小程序消息服务器配置的token
         aesKey:  #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON
 
     config-storage:
-       type: redistemplate
+      type: redistemplate
 rsa:
   encrypt:
     open: false # 是否开启加密 true  or  false
@@ -149,7 +163,7 @@ jeecg:
   # local
   path:
     #文件路径
-    upload: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/
+    upload: /Users/stivepeim/Documents/DPZX/CODEMANGER/BIZ-CODE/JavaMer/V1.4/
   #大屏报表参数设置
   jmreport:
     #多租户模式，默认值为空(created:按照创建人隔离、tenant:按照租户隔离)
@@ -159,7 +173,7 @@ jeecg:
       # 数据源安全 (开启后，不允许使用平台数据源、SQL解析加签并且不允许查询数据库)
       dataSourceSafe: false
       # 低代码开发模式（dev:开发模式，prod:发布模式—关闭在线报表设计功能，分配角色admin、lowdeveloper可放开限制）
-      lowCodeMode: dev
+      lowCodeMode: prod
     # 展示列数
     col: 100
     # 展示行数
