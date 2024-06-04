@@ -36,6 +36,8 @@ public class SafetyController {
     @Autowired
     private CaptchaService captchaService;
 
+
+    @EncryptIgnore
     @ApiOperation(value = "获取行为验证码")
     @PostMapping("/get")
     public ResponseModel get(@RequestBody CaptchaVO data, HttpServletRequest request) {

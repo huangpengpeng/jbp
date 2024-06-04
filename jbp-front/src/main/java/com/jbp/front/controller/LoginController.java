@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.jbp.common.dto.CbecOrderSyncDTO;
 import com.jbp.common.dto.EncryptionDTO;
 import com.jbp.common.encryptapi.AESUtils;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.order.CbecOrder;
 import com.jbp.common.model.user.CbecUser;
@@ -74,6 +75,7 @@ public class LoginController {
     @Resource
     private CbecOrderService cbecOrderService;
 
+    @EncryptIgnore
     @ApiOperation(value = "获取登录配置")
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     public CommonResult<FrontLoginConfigResponse> getLoginConfig() {
