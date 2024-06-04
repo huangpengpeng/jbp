@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
@@ -16,6 +17,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.WalletFlowExtResponse;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
@@ -61,6 +63,9 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                           BigDecimal orgBalance, BigDecimal tagBalance, String postscript) {
         WalletFlow walletFlow = new WalletFlow(uid, type, action, operate, StringUtils.N_TO_10("WF_"),
                 externalNo, postscript, amt, orgBalance, tagBalance);
+        if(ArithmeticUtils.equals(orgBalance, tagBalance)){
+            throw new RuntimeException("明细变动前后金额一致，请检查金额是否正确");
+        }
         save(walletFlow);
         return walletFlow;
     }
