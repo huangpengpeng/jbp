@@ -396,6 +396,7 @@ public class ExportServiceImpl implements ExportService {
             vo.setRealName(refundOrder.getRealName());
             vo.setUserPhone(refundOrder.getUserPhone());
             vo.setUserAddress(refundOrder.getUserAddress());
+            vo.setCreateTime(refundOrder.getCreateTime());
             //退单详情
             RefundOrderInfo refundOrderInfo = refundOrderNoMap.get(refundOrder.getRefundOrderNo());
             vo.setProductName(refundOrderInfo.getProductName());
