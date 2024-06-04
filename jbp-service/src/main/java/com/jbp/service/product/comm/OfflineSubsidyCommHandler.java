@@ -120,7 +120,7 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             }
             if (userOfflineSubsidy != null && totalCityAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalCityAmt,
-                        null, user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
+                        null, user.getNickname()+"|"+user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
             }
 
 
@@ -134,7 +134,7 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             }
             if (userOfflineSubsidy2 != null && totalAreaAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy2.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalAreaAmt,
-                        null, user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
+                        null, user.getNickname()+"|"+user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
             }
 
 

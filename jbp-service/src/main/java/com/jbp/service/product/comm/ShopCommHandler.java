@@ -132,7 +132,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             Boolean openShop = userService.getById(uid).getOpenShop();
             if (openShop != null && BooleanUtils.isTrue(openShop)) {
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
-                        productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
+                        productList, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.店铺佣金.getName(),
@@ -151,7 +151,7 @@ public class ShopCommHandler extends AbstractProductCommHandler {
             Boolean openShop = userService.getById(pid).getOpenShop();
             if (openShop != null && BooleanUtils.isTrue(openShop)) {
                 fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.店铺佣金.getName(), amt,
-                         productList, orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
+                         productList, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单, 奖励" + ProductCommEnum.店铺佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(pid, getType(), ProductCommEnum.店铺佣金.getName(),

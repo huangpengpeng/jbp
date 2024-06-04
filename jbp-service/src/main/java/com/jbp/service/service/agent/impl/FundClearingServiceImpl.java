@@ -957,7 +957,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 create(uid, order.getOrderSn(), ProductCommEnum.星级级差佣金.getName(), clearingFee,
-                        fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
+                        fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, 13, ProductCommEnum.星级级差佣金.getName(),
@@ -1011,7 +1011,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                         BigDecimal amt = ratio.multiply(calculateResult.getAmt()).multiply(rule.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                             create(upperDto.getPId(), order.getOrderSn(), ProductCommEnum.级差伯乐佣金.getName(), amt,
-                                    null, user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
+                                    null, orderUser.getNickname()+"|"+user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
                         }
                         i++;
                     }

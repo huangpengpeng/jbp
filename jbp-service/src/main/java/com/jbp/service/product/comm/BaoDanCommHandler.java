@@ -201,7 +201,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 description = description + "培育获奖:" + totalAmt;
             }
             fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.报单佣金.getName(),
-                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
+                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
         });
     }
 

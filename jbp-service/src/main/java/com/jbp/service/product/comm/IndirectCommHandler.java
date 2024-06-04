@@ -152,7 +152,7 @@ public class IndirectCommHandler extends AbstractProductCommHandler{
         if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
             User orderUser = userService.getById(order.getUid());
             fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.间推佣金.getName(), totalAmt,
-                     productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.间推佣金.getName(), "");
+                     productList, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.间推佣金.getName(), "");
         }
     }
 
