@@ -219,7 +219,7 @@ public class WalletController {
     }
 
 
-//    @PostMapping("/transfer")
+    @PostMapping("/transfer")
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "用户积分转账")
     @ApiOperation("转账")
     public CommonResult transfer(@RequestBody @Validated WalletTransferRequest request) {
@@ -270,11 +270,9 @@ public class WalletController {
         if(ifTeamAcme){
             userService.checkTeamAccountTeamCode(user.getId(),receiveUser.getId());
         }
-
-
-
+        
         BigDecimal wallet_pay_integral = new BigDecimal(systemConfigService.getValueByKey(SysConfigConstants.WALLET_PAY_INTEGRAl));
-//        walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
+        walletService.transfer(user.getId(), receiveUser.getId(), request.getAmt().divide(wallet_pay_integral), request.getType(), request.getPostscript());
         return CommonResult.success();
 }
 
