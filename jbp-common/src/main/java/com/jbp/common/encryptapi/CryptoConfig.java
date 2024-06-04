@@ -57,7 +57,7 @@ public class CryptoConfig {
 			String result = SecureUtil.des(key.getBytes(secretKeyConfig.getCharset())).encryptBase64(data);
 
 			if (secretKeyConfig.isShowLog()) {
-				log.info("Pre-encrypted data：{}，After encryption：{}", word, result);
+			//	log.info("Pre-encrypted data：{}，After encryption：{}", word, result);
 			}
 			restulMap.put("data", result);
 
