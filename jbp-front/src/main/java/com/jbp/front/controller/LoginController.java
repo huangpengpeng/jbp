@@ -38,6 +38,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -110,21 +111,24 @@ public class LoginController {
 
     @ApiOperation(value = "手机号验证码登录")
     @RequestMapping(value = "/mobile/captcha", method = RequestMethod.POST)
-    public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest) {
+    public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest, HttpServletRequest request) {
+        loginService.loginOut(request);
         return CommonResult.success(loginService.phoneCaptchaLogin(loginRequest));
     }
 
     @EncryptIgnore
     @ApiOperation(value = "手机号密码登录")
     @RequestMapping(value = "/mobile/password", method = RequestMethod.POST)
-    public CommonResult<LoginResponse> phonePasswordLogin(@RequestBody @Validated LoginPasswordRequest loginRequest) {
+    public CommonResult<LoginResponse> phonePasswordLogin(@RequestBody @Validated LoginPasswordRequest loginRequest, HttpServletRequest request) {
+        loginService.loginOut(request);
         return CommonResult.success(loginService.phonePasswordLogin(loginRequest));
     }
 
     @EncryptIgnore
     @ApiOperation("账号登录")
     @PostMapping("/mobile/account")
-    public CommonResult<LoginResponse> accountLogin(@RequestBody @Validated LoginAccountwordRequest loginRequest) {
+    public CommonResult<LoginResponse> accountLogin(@RequestBody @Validated LoginAccountwordRequest loginRequest, HttpServletRequest request) {
+        loginService.loginOut(request);
         return CommonResult.success(loginService.accountLogin(loginRequest));
     }
 
@@ -185,7 +189,8 @@ public class LoginController {
 
     @ApiOperation(value = "忘记密码")
     @PostMapping(value = "/forgot/password")
-    public CommonResult forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
+    public CommonResult forgotPassword(@RequestBody @Validated ForgotPasswordRequest request, HttpServletRequest request2) {
+        loginService.loginOut(request2);
         loginService.forgotPassword(request.getAccount(), request.getPassword(), request.getCaptcha(), request.getPhone());
         return CommonResult.success();
     }
