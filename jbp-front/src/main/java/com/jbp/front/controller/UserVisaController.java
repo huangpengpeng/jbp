@@ -355,16 +355,19 @@ public class UserVisaController {
     @ApiOperation(value = "法大大回调", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String userVisaCallback( @RequestBody UserViseSaveRequest request) {
+    public String userVisaCallback(  String bizContent ) {
 
-        if (request.getSignTaskId() == null) {
+
+        JSONObject jsonObject =JSONObject.parseObject(bizContent);
+
+        if (jsonObject.getString("signTaskId")  == null) {
           return "success";
         }
 
-        log.info("法大大回调 {}", request);
+        log.info("法大大回调 {}", jsonObject);
 
-        if (request .getSignTaskStatus() != null && request.getSignTaskStatus().equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask(  request.getSignTaskId());
+        if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
+                UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.getString("signTaskId")  );
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
@@ -380,7 +383,6 @@ public class UserVisaController {
                     userVisaOrderService.updateById(userVisaOrder);
 
                 }
-
 
             }
         }
