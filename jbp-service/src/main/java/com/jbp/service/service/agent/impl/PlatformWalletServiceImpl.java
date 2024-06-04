@@ -66,7 +66,7 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
 
     @Override
     public Boolean increase(Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+        if (amt == null || ArithmeticUtils.less(amt, BigDecimal.valueOf(0.01))) {
             throw new CrmebException(type + "增加平台积分金额不能小于0.01:" + amt);
         }
         if (walletConfigService.getByType(type).getRecharge().equals(0)) {
@@ -90,7 +90,7 @@ public class PlatformWalletServiceImpl extends ServiceImpl<PlatformWalletDao, Pl
 
     @Override
     public Boolean reduce(Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+        if (amt == null || ArithmeticUtils.less(amt, BigDecimal.valueOf(0.01))) {
             throw new CrmebException(type + "减少平台积分金额不能小于0.01:" + amt);
         }
         if (walletConfigService.getByType(type).getStatus() == 0) {

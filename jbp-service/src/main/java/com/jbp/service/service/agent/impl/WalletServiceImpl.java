@@ -78,7 +78,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
     @Override
     public Boolean increase(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+        if (amt == null || ArithmeticUtils.less(amt, BigDecimal.valueOf(0.01))) {
             throw new CrmebException(type + "增加用户积分金额不能小于0.01:" + amt);
         }
         Wallet wallet = getByUser(uid, type);
@@ -97,7 +97,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
     @Override
     public Boolean reduce(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+        if (amt == null || ArithmeticUtils.less(amt, BigDecimal.valueOf(0.01))) {
             throw new CrmebException(type + "减少用户积分金额不能小于0.01:" + amt);
         }
         Wallet wallet = getByUser(uid, type);
