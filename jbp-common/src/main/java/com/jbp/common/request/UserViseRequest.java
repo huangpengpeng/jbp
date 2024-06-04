@@ -22,14 +22,6 @@ import java.io.Serializable;
  * +----------------------------------------------------------------------
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@ApiModel(value="UserViseRequest对象", description="")
 public class UserViseRequest implements Serializable {
-
-    private static final long serialVersionUID=1L;
-
-    @ApiModelProperty(value = "")
     private String bizContent;
-
 }
