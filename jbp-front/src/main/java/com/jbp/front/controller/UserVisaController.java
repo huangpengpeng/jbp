@@ -356,6 +356,12 @@ public class UserVisaController {
     @ResponseBody
     @RequestMapping(value = "/userVisaCallback", produces = MediaType.APPLICATION_JSON_VALUE)
     public String userVisaCallback(  String bizContent ) {
+        log.info("法大大回调 {}", bizContent);
+
+
+        if (bizContent  == null) {
+            return "success";
+        }
 
 
         JSONObject jsonObject =JSONObject.parseObject(bizContent);
@@ -364,7 +370,7 @@ public class UserVisaController {
           return "success";
         }
 
-        log.info("法大大回调 {}", jsonObject);
+
 
         if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
                 UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.getString("signTaskId")  );
