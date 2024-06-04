@@ -114,18 +114,21 @@ public class LoginController {
         return CommonResult.success(loginService.phoneCaptchaLogin(loginRequest));
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "手机号密码登录")
     @RequestMapping(value = "/mobile/password", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phonePasswordLogin(@RequestBody @Validated LoginPasswordRequest loginRequest) {
         return CommonResult.success(loginService.phonePasswordLogin(loginRequest));
     }
 
+    @EncryptIgnore
     @ApiOperation("账号登录")
     @PostMapping("/mobile/account")
     public CommonResult<LoginResponse> accountLogin(@RequestBody @Validated LoginAccountwordRequest loginRequest) {
         return CommonResult.success(loginService.accountLogin(loginRequest));
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "退出")
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public CommonResult<String> loginOut(HttpServletRequest request) {
@@ -133,6 +136,7 @@ public class LoginController {
         return CommonResult.success();
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "发送短信登录验证码")
     @RequestMapping(value = "/send/code", method = RequestMethod.POST)
     public CommonResult<String> sendCode(@RequestBody @Validated SendCodeRequest request) {
@@ -172,6 +176,7 @@ public class LoginController {
         return CommonResult.success(loginService.ioslogin(loginRequest));
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "校验token是否有效")
     @RequestMapping(value = "/token/is/exist", method = RequestMethod.POST)
     public CommonResult<Boolean> tokenIsExist() {
@@ -186,6 +191,7 @@ public class LoginController {
     }
 
 
+    @EncryptIgnore
     @ApiOperation(value = "跨境授权")
     @RequestMapping(value = "/cbec_user_account", method = RequestMethod.GET)
     public CommonResult<EncryptionDTO> cbec() {
@@ -226,7 +232,7 @@ public class LoginController {
 
 
 
-
+    @EncryptIgnore
     @ApiOperation(value = "跨境订单同步")
     @RequestMapping(value = "/cbec_order/sync", method = RequestMethod.POST)
     public CommonResult<String> ioslogin(@RequestBody String syncStr) throws Exception {

@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.dto.UserUpperDto;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
@@ -99,6 +100,7 @@ public class UserController {
         return CommonResult.success(userInfo);
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "获取用户手机号验证码")
     @RequestMapping(value = "/phone/code", method = RequestMethod.POST)
     public CommonResult<String> getCurrentPhoneCode() {
