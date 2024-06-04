@@ -78,8 +78,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
     @Override
     public Boolean increase(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
-            throw new CrmebException(type + "增加用户积分金额不能小于0:" + amt);
+        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+            throw new CrmebException(type + "增加用户积分金额不能小于0.01:" + amt);
         }
         Wallet wallet = getByUser(uid, type);
         if (wallet == null) {
@@ -97,8 +97,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
     @Override
     public Boolean reduce(Integer uid, Integer type, BigDecimal amt, String operate, String externalNo, String postscript) {
-        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.ZERO)) {
-            throw new CrmebException(type + "减少用户积分金额不能小于0:" + amt);
+        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+            throw new CrmebException(type + "减少用户积分金额不能小于0.01:" + amt);
         }
         Wallet wallet = getByUser(uid, type);
         if (wallet == null || ArithmeticUtils.less(wallet.getBalance(), amt)) {
@@ -169,6 +169,9 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
 
     @Override
     public Boolean change(Integer uid, BigDecimal amt, Integer type, Integer changeType, String postscript) {
+        if (amt == null || ArithmeticUtils.lessEquals(amt, BigDecimal.valueOf(0.01))) {
+            throw new CrmebException(type + "减少用户积分金额不能小于0.01:" + amt);
+        }
         //扣除用户
         String externalNo = StringUtils.N_TO_10("DH_");
         reduce(uid, type, amt, WalletFlow.OperateEnum.兑换.name(), externalNo, postscript);

@@ -4,6 +4,7 @@ import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.agent.WalletService;
 import com.jbp.service.service.impl.OrderServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +17,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.math.BigDecimal;
 
 /**
  * 程序主入口
@@ -42,6 +45,18 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+        WalletService walletService = run.getBean(WalletService.class);
+
+        for (int i = 0; i <50 ; i++) {
+            ExtendsThread extendsThread = new ExtendsThread(i + "");
+            extendsThread.setWalletService(walletService);
+            Thread t = extendsThread;
+
+            t.start();
+
+
+        }
 
     }
 }

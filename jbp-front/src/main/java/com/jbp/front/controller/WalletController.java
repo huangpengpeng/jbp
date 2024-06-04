@@ -208,6 +208,8 @@ public class WalletController {
         if (walletConfig == null) {
             throw new CrmebException("积分信息不存在");
         }
+
+
         if (walletConfig.getChangeType() == null || walletConfig.getChangeScale() == null
                 || ArithmeticUtils.lessEquals(walletConfig.getChangeScale(), BigDecimal.ZERO)) {
             throw new CrmebException("兑换信息未配置, 请联系管理员");
