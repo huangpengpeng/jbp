@@ -357,7 +357,7 @@ public class UserVisaController {
 
     @ApiOperation(value = "法大大回调")
     @ResponseBody
-    @RequestMapping(value = "/userVisaCallback", method = RequestMethod.POST , produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/userVisaCallback", method = RequestMethod.GET , produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String userVisaCallback(@RequestParam String bizContent) {
         log.info("法大大回调 {}",bizContent);
 
