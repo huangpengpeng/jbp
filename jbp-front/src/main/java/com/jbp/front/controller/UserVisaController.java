@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -358,7 +359,7 @@ public class UserVisaController {
     @ApiOperation(value = "法大大回调")
     @ResponseBody
     @PostMapping(value = "/userVisaCallback",consumes = "application/x-www-form-urlencoded")
-    public String userVisaCallback( @RequestParam JSONObject bizContent) {
+    public String userVisaCallback( @RequestParam Map<String,Object> bizContent) {
         log.info("法大大回调 {}",bizContent);
 
 
@@ -366,14 +367,13 @@ public class UserVisaController {
             return "success";
         }
 
-        JSONObject jsonObject =bizContent;
 
-        if (jsonObject.getString("signTaskId")  == null) {
+        if (bizContent.get("signTaskId")  == null) {
           return "success";
         }
 
-        if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.getString("signTaskId")  );
+        if (bizContent.get("signTaskStatus")  != null && bizContent.get("signTaskStatus").equals("task_finished")) {
+                UserVisaResponse userVisa = userVisaService.getVisaTask( bizContent.get("signTaskId").toString()  );
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
