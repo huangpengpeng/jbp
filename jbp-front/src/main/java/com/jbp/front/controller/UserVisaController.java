@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -359,41 +360,41 @@ public class UserVisaController {
     @ApiOperation(value = "法大大回调")
     @ResponseBody
     @PostMapping(value = "/userVisaCallback",consumes =MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String userVisaCallback(@RequestBody String bizContent) {
-        log.info("法大大回调 {}",bizContent);
-
-
-        if (bizContent == null) {
-            return "success";
-        }
-
-      JSONObject jsonObject =JSONObject.parseObject(bizContent);
-
-        if (jsonObject.get("signTaskId")  == null) {
-          return "success";
-        }
-
-        if (jsonObject.get("signTaskStatus")  != null && jsonObject.get("signTaskStatus").equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.get("signTaskId").toString()  );
-            if (userVisa != null) {
-                String platfrom = "";
-                if (userVisa.getPlatfrom().equals("sm")) {
-                    platfrom = "sm";
-                } else if (userVisa.getPlatfrom().equals("yk")) {
-                    platfrom = "yk";
-                }
-                userVisaService.updateVisa(userVisa.getId(), platfrom);
-
-                UserVisaOrder userVisaOrder = userVisaOrderService.getOne(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getVisaId, userVisa.getId()));
-                if (userVisaOrder != null) {
-                    userVisaOrder.setSignTime(DateTimeUtils.getNow());
-                    userVisaOrderService.updateById(userVisaOrder);
-
-                }
-
-            }
-        }
-        ;
+    public String userVisaCallback(HttpServletRequest request) {
+        log.info("法大大回调 {}",JSONObject.parseObject(request.toString()));
+//
+//
+//        if (bizContent == null) {
+//            return "success";
+//        }
+//
+//      JSONObject jsonObject =JSONObject.parseObject(bizContent);
+//
+//        if (jsonObject.get("signTaskId")  == null) {
+//          return "success";
+//        }
+//
+//        if (jsonObject.get("signTaskStatus")  != null && jsonObject.get("signTaskStatus").equals("task_finished")) {
+//                UserVisaResponse userVisa = userVisaService.getVisaTask( jsonObject.get("signTaskId").toString()  );
+//            if (userVisa != null) {
+//                String platfrom = "";
+//                if (userVisa.getPlatfrom().equals("sm")) {
+//                    platfrom = "sm";
+//                } else if (userVisa.getPlatfrom().equals("yk")) {
+//                    platfrom = "yk";
+//                }
+//                userVisaService.updateVisa(userVisa.getId(), platfrom);
+//
+//                UserVisaOrder userVisaOrder = userVisaOrderService.getOne(new QueryWrapper<UserVisaOrder>().lambda().eq(UserVisaOrder::getVisaId, userVisa.getId()));
+//                if (userVisaOrder != null) {
+//                    userVisaOrder.setSignTime(DateTimeUtils.getNow());
+//                    userVisaOrderService.updateById(userVisaOrder);
+//
+//                }
+//
+//            }
+//        }
+//        ;
 
         return "success";
     }
