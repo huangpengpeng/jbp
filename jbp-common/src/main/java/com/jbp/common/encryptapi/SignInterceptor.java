@@ -95,6 +95,7 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 			String[] tokenValues = frontToken.split("@");
 			if (tokenValues.length > 1) {
 				String checkCode = tokenValues[1];
+
 				String decryptStr = secretKeyConfig.decryptStr(checkCode);
 				origin = secretKeyConfig.afterCutAndappend(decryptStr, "0", 0, 4) + origin;
 			}
