@@ -90,6 +90,8 @@ public class LoginServiceImpl implements LoginService {
     private CapaService capaService;
     @Autowired
     private UserInvitationService userInvitationService;
+    @Autowired
+    private FrontTokenComponent frontTokenComponent;
 
     /**
      * 发送短信验证码
@@ -778,6 +780,10 @@ public class LoginServiceImpl implements LoginService {
     }
 
     private LoginResponse commonLogin(User user, Integer spreadPid) {
+        Object o = redisUtil.get("loginToken" + user.getId());
+        if(o != null && com.jbp.common.utils.StringUtils.isNotEmpty(o.toString())){
+            frontTokenComponent.delLoginUser(o.toString());
+        }
         if (user.getSpreadUid().equals(0) && spreadPid > 0) {
             // 绑定推广关系
             bindSpread(user, spreadPid);

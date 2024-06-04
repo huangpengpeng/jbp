@@ -2,6 +2,7 @@ package com.jbp.common.token;
 
 import cn.hutool.core.util.StrUtil;
 
+import com.jbp.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,6 +67,7 @@ public class FrontTokenComponent {
 	public String createToken(User user) {
 		String token = UUID.randomUUID().toString().replace("-", "") + "@" + secretKeyConfig.encryptStr(secretKeyConfig.encryptStr(getCheck()));
 		redisUtil.set(getTokenKey(token), user.getId(), Constants.TOKEN_EXPRESS_MINUTES, TimeUnit.MINUTES);
+        redisUtil.set("loginToken" + user.getId(), token);
 		return token;
 	}
 
