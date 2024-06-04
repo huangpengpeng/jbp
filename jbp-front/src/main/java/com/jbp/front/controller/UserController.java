@@ -10,6 +10,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.condition.CapaXsInvitationLineHandler;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemConfigService;
@@ -292,6 +293,8 @@ public class UserController {
     @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
     public CommonResult<UserInviteResponse> getAccountUser(String account) {
 
+
+
         List<User> phoneList = userService.getByPhone(account);
         if (phoneList.size() > 1) {
             throw new CrmebException("手机号重复，请输入账号");
@@ -307,8 +310,10 @@ public class UserController {
         if (user == null) {
             throw new CrmebException("账号不存在");
         }
+        User info = userService.getInfo();
         UserInviteResponse userInviteResponse = new UserInviteResponse();
         BeanUtils.copyProperties(user, userInviteResponse);
+        userInviteResponse.setPhone(CrmebUtil.maskMobile(userInviteResponse.getPhone()));
         return CommonResult.success(userInviteResponse);
     }
 
