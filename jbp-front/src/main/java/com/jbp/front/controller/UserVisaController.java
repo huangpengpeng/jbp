@@ -35,6 +35,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -358,12 +359,11 @@ public class UserVisaController {
 
 
 
-    @ApiOperation(value = "法大大回调")
-    @PostMapping(value = "/userVisaCallback",consumes =MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "bizContent", value = "ss", dataType = "String"),
-    })
-    public String userVisaCallback(String bizContent) {
+
+    @ResponseBody
+    @PostMapping(value = "userVisaCallback")
+    public String userVisaCallback(@RequestHeader HttpHeaders headers,
+                                   @RequestParam("bizContent") String bizContent) {
         log.info("法大大回调 {}",bizContent);
 
 
