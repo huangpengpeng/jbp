@@ -34,21 +34,17 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		
-		String path=RequestUtil.getUri(request);
+
+		String path = RequestUtil.getUri(request);
 		if (!path.contains("api/admin/") && !path.contains("api/front/")) {
 			return super.preHandle(request, response, handler);
 		}
-		
-		
+
 		SecretKeyConfig secretKeyConfig = com.jbp.common.utils.SpringUtil.getBean(SecretKeyConfig.class);
 		FrontTokenComponent frontTokenComponent = com.jbp.common.utils.SpringUtil.getBean(FrontTokenComponent.class);
 
 		HandlerMethod hm = (HandlerMethod) handler;
 		Method method = hm.getMethod();
-		
-		
-
 
 		if (method.isAnnotationPresent(EncryptIgnore.class)) {
 			return super.preHandle(request, response, handler);
@@ -89,7 +85,7 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 			origin = secretKeyConfig.afterCutAndappend(decryptStr, "0", 0, 4) + origin;
 		}
 
-		// 前台用户已经登录
+		// 登录页面过滤用户签名信息 兼容 页面token没有清除
 		String frontToken = frontTokenComponent.getToken(request);
 		if (StringUtils.isNotBlank(frontToken)) {
 			String[] tokenValues = frontToken.split("@");
@@ -118,9 +114,9 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 			throw new CrmebException("重复请求");
 		}
 		// 后端MD5签名校验与前端签名sign值比对
-//		if (!(sign.equalsIgnoreCase(signEcrypt))) {
-//			throw new CrmebException("签名验证失败");
-//		}
+		if (!(sign.equalsIgnoreCase(signEcrypt))) {
+			throw new CrmebException("签名验证失败");
+		}
 
 		return super.preHandle(request, response, handler);
 	}
