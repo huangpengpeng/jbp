@@ -44,6 +44,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("api/publicly/jushuitan")
 @Api(tags = "聚水潭控制器")
+@EncryptIgnore
 public class AuthorizeAct {
 
 

@@ -591,37 +591,10 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         String goodsRepetitionIdQua =  systemConfigService.getValueByKey("goods_repetition_id_qua");
 
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String name = environment.getProperty("historyOrder.name");
-        if (name.equals("jymall")) {
-            stringBuilder = new StringBuilder("\n" +
-                    "\t\t\t\t\t\t\t\t\t \n" +
-                    "\t\t\t\t\t\t\t\t\t    SELECT  o.userId,g.goodsId ,o.orderSn ,g.goodsSn ,g.price,g.number FROM jymall.ordergoods AS g \n" +
-                    "\t\t\t\t\t\t\t\t\t\t\tleft join jymall.orders o on o.id  = g.orderId\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\t\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\tWHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,2010,2028,2035,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2074,2077,2078,2079,2080,2090,2089,2081,2095,2096,2085,2097,2098,2103,2114,2116,2117,2119,2120,2124,2125) )\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\t       and   DATE_FORMAT( o.`payTime`,'%Y-%m')  = '2024-04'\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\t\t\tand\t  o.`payTime` IS NOT NULL\n" +
-                    "                    and o.`status` IN ( 201,301,401,402,501 )\n" +
-                    "                   AND o.sellerId IS NULL\n" +
-                    "                   AND o.platform in('商城', '订货') ");
-        } else {
-            stringBuilder = new StringBuilder("\n" +
-                    "\t\t\t\t\t\t\t\t\t \n" +
-                    "\t\t\t\t\t\t\t\t\t    SELECT o.userId, g.goodsId ,o.orderSn ,g.goodsSn ,g.price,g.number FROM wkp42271043176625.ordergoods AS g \n" +
-                    "\t\t\t\t\t\t\t\t\t\t\tleft join wkp42271043176625.orders o on o.id  = g.orderId\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\t\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\tWHERE 1=1 AND ( g.goodsId IN(190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,224,228,276,277,278,279,280,316,332,339,360,371,372,373,374,375,376,378,379,380,381,386,395,396,397,398,407,408,399,403,421,422,415,418,429,444,446,447,449,450,454,455) )\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\t       and   DATE_FORMAT( o.`payTime`,'%Y-%m')  = '2024-04'\n" +
-                    "\t\t\t\t\t\t\t\t\t\t\t\t\tand\t  o.`payTime` IS NOT NULL\n" +
-                    "                    and o.`status` IN ( 201,301,401,402,501 )\n" +
-                    "                   AND o.sellerId IS NULL\n" +
-                    "                   AND o.platform in('商城', '订货')");
-        }
 
 
-        List<Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
+
+        List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
 
 
         //查询新系统复销奖订单
@@ -685,35 +658,11 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 }
 
 
-                if (name.equals("jymall")) {
-                    stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c FROM " + name + ".orders AS o\n" +
-                            "        WHERE  o.`payTime` IS NOT NULL\n" +
-                            "        and o.`status` IN ( 201,301,401,402,501 )\n" +
-                            "        AND o.platform in('商城', '订货')\n" +
-                            "        AND o.id IN (\n" +
-                            "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) OR g.`refGoodsId` IN (190,207,228,237,276,279,280,2010,2016,2028,2032,2035,2044,2054,2059,2061,2062,2063,2064,2065,2066,2068,2069,2070,2071,2073,2074,2077,2079,2080,2081,2089,2090,2095,2096,2085,2097,2098,2100,2103,2114,2116,2117,2118,2119,2120,2124,2125) )\n" +
-                            "\t\t)\n" +
-                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') ='2024-04'\n" +
-                            "        and o.userId  = '" + user.getId() + "'");
-                } else {
-                    stringBuilder = new StringBuilder(" SELECT IFNULL(SUM(o.`payPrice`),0) as c FROM " + name + ".orders AS o\n" +
-                            "        WHERE  o.`payTime` IS NOT NULL\n" +
-                            "        and o.`status` IN ( 201,301,401,402,501 )\n" +
-                            "        AND o.platform in('商城', '订货')\n" +
-                            "        AND o.id IN (\n" +
-                            "                SELECT g.orderId FROM " + name + ".ordergoods AS g WHERE 1=1  AND ( g.goodsId IN(190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) OR g.`refGoodsId` IN (190,207,228,236,237,276,279,280,316,322,332,336,339,350,365,368,371,372,373,374,375,376,378,379,380,381,382,385,386,394,395,397,398,399,407,408,415,418,403,421,422,424,429,436,444,446,447,449,450,454,455) )\n" +
-                            "\t\t)\n" +
-                            "        and   DATE_FORMAT( o.`payTime`,'%Y-%m') ='2024-04'\n" +
-                            "        and o.userId  = '" + user.getId() + "'"
-                    );
-                }
 
-
-                Map<String, Object> map2 = SqlRunner.db().selectOne(stringBuilder.toString());
 
                 BigDecimal salse = orderService.getGoodsPrice(goodsRepetitionIdQua,user.getId(), month+"-01 00:00:00");
 
-                if (ifAddclearing && ((new BigDecimal(map2.get("c").toString())).add(salse)).compareTo(new BigDecimal(199)) == 1) {
+                if (ifAddclearing && (salse).compareTo(new BigDecimal(199)) == 1) {
                   BigDecimal amt = new BigDecimal( map.get("price").toString()).multiply(new BigDecimal( map.get("number").toString())).multiply(new BigDecimal("0.01")).multiply(pv).setScale(2, BigDecimal.ROUND_DOWN);
 
                     create(user.getId(), map.get("orderSn").toString(), "重复消费积分", amt,
