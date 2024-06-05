@@ -57,12 +57,29 @@ public class WebConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		// 添加token拦截器
-		// addPathPatterns添加需要拦截的命名空间；
-		// excludePathPatterns添加排除拦截命名空间
-		registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
-		registry.addInterceptor(new SignInterceptor()).addPathPatterns("/**");
-	}
+        // 添加token拦截器
+        // addPathPatterns添加需要拦截的命名空间；
+        // excludePathPatterns添加排除拦截命名空间
+        registry.addInterceptor(new ResultInterceptor()).addPathPatterns("/**");
+        registry.addInterceptor(new SignInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        "/api/publicly/**",
+                        "/api/publicly/payment/callback/**",
+                        "/api/admin/platform/getLoginPic",
+                        "/api/admin/platform/login",
+                        "/api/admin/merchant/sendCode",
+                        "/api/admin/merchant/getLoginPic",
+                        "/api/admin/merchant/login",
+                        "/jmreport/desreport_/cdn/iview/fonts/**",
+                        "**/admin/platform/getMenus",
+                        "**/admin/merchant/city/region/city/tree",
+                        "/" + UploadConstants.UPLOAD_FILE_KEYWORD + "/**",
+                        "/" + UploadConstants.DOWNLOAD_FILE_KEYWORD + "/**",
+                        "/" + UploadConstants.UPLOAD_AFTER_FILE_KEYWORD + "/**"
+                )
+        ;
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

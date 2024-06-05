@@ -78,6 +78,7 @@ public class PlatformLoginController {
         return CommonResult.success(loginService.getLoginInfo());
     }
 
+    @EncryptIgnore
     @PreAuthorize("hasAuthority('platform:login:menus')")
     @ApiOperation(value = "获取管理员可访问目录")
     @RequestMapping(value = "/getMenus", method = RequestMethod.GET)

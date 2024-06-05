@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.merchant;
 
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.CityVo;
 import com.jbp.service.service.CityRegionService;
@@ -38,6 +39,7 @@ public class MerchantCityRegionController {
     private CityRegionService cityRegionService;
 
 //    @PreAuthorize("hasAuthority('merchant:city:list:tree')")
+    @EncryptIgnore
     @ApiOperation(value = "获取城市tree结构的列表")
     @RequestMapping(value = "/city/tree", method = RequestMethod.GET)
     public CommonResult<List<CityVo>> getCityListTree() {
@@ -45,6 +47,7 @@ public class MerchantCityRegionController {
     }
 
 //    @PreAuthorize("hasAuthority('merchant:city:region:list:tree')")
+    @EncryptIgnore
     @ApiOperation(value = "获取城市区域tree结构的列表")
     @RequestMapping(value = "/list/tree", method = RequestMethod.GET)
     public CommonResult<List<CityVo>> getRegionListTree() {
