@@ -39,8 +39,5 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        UserService userService = run.getBean(UserService.class);
-//        userService.validPayPwd(17809, "121212");
-
     }
 }

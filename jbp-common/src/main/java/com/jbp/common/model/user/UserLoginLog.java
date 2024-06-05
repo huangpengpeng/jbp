@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("user_login_log")
+@TableName("eb_user_login_log")
 @ApiModel(value="UserLoginLog对象", description="用登录日志")
 public class UserLoginLog extends BaseModel {
 
