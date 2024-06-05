@@ -1017,6 +1017,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return userMap;
     }
 
+
+    @Override
+    public Boolean verifyPayPwd(String payPwd){
+        User user = getInfo();
+        if (user.getPayPwd() == null) {
+            throw new CrmebException("用户没有设置交易密码");
+        }
+        boolean equals = user.getPayPwd().equals(CrmebUtil.encryptPassword(payPwd));
+        if(!equals){
+            asyncUpdateError(user.getId());
+        }
+        return equals;
+    }
+
     @Override
     public void validPayPwd(Integer uid, String pwd) {
         User user = getById(uid);
@@ -1980,15 +1994,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         update(lqw);
 
-    }
-
-    @Override
-    public Boolean verifyPayPwd(String payPwd){
-        User user = getInfo();
-        if (user.getPayPwd() == null) {
-            throw new CrmebException("用户没有设置交易密码");
-        }
-        return user.getPayPwd().equals(CrmebUtil.encryptPassword(payPwd));
     }
 
     @Override

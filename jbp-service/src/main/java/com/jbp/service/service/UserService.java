@@ -393,13 +393,13 @@ public interface UserService extends IService<User> {
 
     void updateUser(Integer id, String pwd, Integer sex, String realName, String phone, String country, String province, String city, String district, String address, String payPwd, Boolean openShop);
 
-    Boolean verifyPayPwd(String payPwd);
-
     PageInfo<UserInviteInfoResponse> getUserInviteInfo(UserInviteRequest request);
 
     void registerPhone(String username, String phone, String account,UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd);
 
     String getPhone(String account);
+
+    Boolean verifyPayPwd(String payPwd);
 
     void validPayPwd(Integer uid, String pwd);
 
