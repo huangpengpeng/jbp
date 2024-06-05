@@ -445,6 +445,8 @@ public class CrmebUtil {
      * @since 2020-04-22
      */
     public static String getClientIp(HttpServletRequest request) {
+
+
         String ip = request.getHeader("X-Forwarded-For");
         if (checkIsIp(ip)) {
             return ip;

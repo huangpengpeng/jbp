@@ -788,7 +788,7 @@ public class LoginServiceImpl implements LoginService {
             bindSpread(user, spreadPid);
         }
         // 记录最后一次登录时间
-        user.setLastIp(CrmebUtil.getClientIp(RequestUtil.getRequest()));
+        user.setLastIp(IPUtil.getIpAddress(RequestUtil.getRequest()));
         user.setLastLoginTime(CrmebDateUtil.nowDateTime());
         boolean b = userService.updateById(user);
         userLoginLogService.add(user, type);
