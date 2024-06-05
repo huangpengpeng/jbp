@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.jbp.common.encryptapi.EncryptIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -79,6 +80,7 @@ public class MerchantLoginController {
         return CommonResult.success(loginService.getMerchantLoginInfo());
     }
 
+    @EncryptIgnore
     @PreAuthorize("hasAuthority('merchant:login:menus')")
     @ApiOperation(value = "获取管理员可访问目录")
     @RequestMapping(value = "/getMenus", method = RequestMethod.GET)
