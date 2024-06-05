@@ -31,10 +31,7 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.FundClearingDao;
 import com.jbp.service.product.comm.*;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.WalletConfigService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import com.jbp.service.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +91,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private CapaXsService capaXsService;
     @Resource
     private ProductCommConfigService productCommConfigService;
-
+    @Resource
+    private OldcapaxsService oldcapaxsService;
 
 
     @Override
@@ -645,51 +643,12 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         for (Map<String, Object> map : maps) {
 
             BigDecimal pv = new BigDecimal(0.8);
-            //商品pv
-            if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2023092813398")){
-                pv = new BigDecimal(0.7);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2023092866543")){
-                pv = new BigDecimal(0.7);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"2023121288666774")){
-                pv = new BigDecimal(0.4);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2023122112338999")){
-                pv = new BigDecimal(0.79);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ20231221123381156")){
-                pv = new BigDecimal(0.79);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024013088325639")){
-                pv = new BigDecimal(0.5);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024013077229933")){
-                pv = new BigDecimal(0.5);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"2023122583649936")){
-                pv = new BigDecimal(0.4);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"202401048822334")){
-                pv = new BigDecimal(0.79);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"2024010488639116")){
-                pv = new BigDecimal(0.79);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024013055829421")){
-                pv = new BigDecimal(0.5);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024013062816492")){
-                pv = new BigDecimal(0.5);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024013161812376")){
-                pv = new BigDecimal(0.79);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024013161823616")){
-                pv = new BigDecimal(0.79);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024031486238116")){
-                pv = new BigDecimal(0.5);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024040266881156")){
-                pv = new BigDecimal(0.5);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024040372615986")){
-                pv = new BigDecimal(1);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"6944247206532")){
-                pv = new BigDecimal(1);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"6944247204156")){
-                pv = new BigDecimal(1);
-            }else if(StringUtils.equals(map.get("goodsSn").toString(),"TZ2024041922336611")){
-                pv = new BigDecimal(1);
+            Oldcapaxs oldcapaxs =    oldcapaxsService.getOne(new QueryWrapper<Oldcapaxs>().lambda().eq(Oldcapaxs ::getAccount,   map.get("goodsSn").toString()));
+            if(oldcapaxs != null){
+                pv = new BigDecimal(oldcapaxs.getCapaId().split("%")[0]).divide(new BigDecimal(100));
+            }else{
+                continue;
             }
-
-
-
 
 //            //判断历史复销奖
             User createUser = userService.getById(Integer.valueOf(map.get("userId").toString()));
