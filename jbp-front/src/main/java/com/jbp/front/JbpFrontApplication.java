@@ -39,7 +39,7 @@ import java.math.BigDecimal;
 @SpringBootApplication(exclude = {WxMaAutoConfiguration.class, DataSourceAutoConfiguration.class}) //去掉数据源
 @ComponentScan(basePackages = {"com.jbp", "com.jbp.front"})
 @MapperScan(basePackages = {"com.jbp.**.dao"})
-public class JbpFrontApplication {
+    public class JbpFrontApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpFrontApplication.class, args);
         Environment bean = run.getBean(Environment.class);
