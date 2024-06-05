@@ -146,7 +146,7 @@ wx:
        type: redistemplate
 rsa:
   encrypt:
-    open: false # 是否开启加密 true  or  false
+    open: true # 是否开启加密 true  or  false
     showLog: true # 是否打印加解密log true  or  false
     key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo8jKuU2/N4zvyDVdvlLwUoPTW672DtbGV7Tvek1dlmaaxV4IiA2ZNIfpXfzD3ERzN9/MQii80YkmOkpDlAAPIAOHikMhhfbMqsy13tL/z9pQO5Icu6X2VfdHUdKDEOUTnD/lA0tRwu80dw/+VOkvzg7I3qDcT6gsRs9J92SN+KydMeulqk/AjZomP9/ISgz2i8gLi62jCswbCsvqg9kx7FMq4p/fHTqCXvDPt6ebEQbFh0FP2TmD/f7XISUeplD45u19yheYfPt1UvjePKZrbuHWTmB7YfNSdBv9rCREllxc/nQ6o4LB2alW7ZoGWc3PjlH1MwpTe0Q3Iopi6nT20QIDAQAB
 minidao:

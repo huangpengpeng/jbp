@@ -80,12 +80,14 @@ public class LoginController {
         return CommonResult.success(loginService.getLoginConfig());
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "获取个人中心配置")
     @RequestMapping(value = "/individual/center/config")
     public CommonResult<FrontIndividualCenterConfigResponse> getIndividualCenterConfig() {
         return CommonResult.success(loginService.getIndividualCenterConfig());
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "手机号获取账号")
     @RequestMapping(value = "/account/List", method = RequestMethod.POST)
     public CommonResult<List<AccountCapaResponse>> accountList(@RequestBody @Validated LoginMobileRequest loginRequest) {
@@ -93,6 +95,7 @@ public class LoginController {
         return CommonResult.success(account);
     }
 
+    
     @ApiOperation(value = "校验账号")
     @GetMapping("/check/account")
     public CommonResult<String> checkAccount(String account) {
@@ -106,6 +109,8 @@ public class LoginController {
         return CommonResult.success();
     }
 
+    
+    @EncryptIgnore
     @ApiOperation(value = "手机号验证码登录")
     @RequestMapping(value = "/mobile/captcha", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest) {
@@ -145,12 +150,14 @@ public class LoginController {
         return CommonResult.failed("发送失败");
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "微信公众号号授权登录")
     @RequestMapping(value = "/wechat/public", method = RequestMethod.POST)
     public CommonResult<LoginResponse> wechatPublicLogin(@RequestBody @Validated WechatPublicLoginRequest request) {
         return CommonResult.success(loginService.wechatPublicLogin(request));
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "微信登录小程序授权登录")
     @RequestMapping(value = "/wechat/routine", method = RequestMethod.POST)
     public CommonResult<LoginResponse> wechatRoutineLogin(@RequestBody @Validated RegisterThirdUserRequest request) {
@@ -163,12 +170,14 @@ public class LoginController {
         return CommonResult.success(loginService.wechatRegisterBindingPhone(request));
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "微信登录App授权登录")
     @RequestMapping(value = "/wechat/app/login", method = RequestMethod.POST)
     public CommonResult<LoginResponse> wechatAppLogin(@RequestBody @Validated RegisterAppWxRequest request) {
         return CommonResult.success(loginService.wechatAppLogin(request));
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "ios登录")
     @RequestMapping(value = "/ios/login", method = RequestMethod.POST)
     public CommonResult<LoginResponse> ioslogin(@RequestBody @Validated IosLoginRequest loginRequest) {
