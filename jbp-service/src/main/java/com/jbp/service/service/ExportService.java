@@ -2,6 +2,7 @@ package com.jbp.service.service;
 
 
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.request.ProductDayRecordRequest;
 import com.jbp.common.vo.OrderExcelInfoVo;
 import com.jbp.common.vo.OrderExcelVo;
 import com.jbp.common.vo.OrderShipmentExcelInfoVo;
@@ -31,4 +32,6 @@ public interface ExportService {
     String exportOrderShipment(OrderSearchRequest request);
 
     String exportOrder(OrderSearchRequest request);
+
+    String exportProductStatement(ProductDayRecordRequest request);
 }

@@ -1,10 +1,14 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.excel.OrderExcel;
 import com.jbp.common.excel.OrderShipmentExcel;
+import com.jbp.common.excel.ProductStatementExcel;
 import com.jbp.common.excel.ScoreDownLoadExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
@@ -14,9 +18,14 @@ import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderExt;
+import com.jbp.common.model.product.Product;
+import com.jbp.common.model.product.ProductAttrValue;
 import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.model.record.ProductDayRecord;
 import com.jbp.common.model.user.User;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.request.ProductDayRecordRequest;
 import com.jbp.common.response.OrderInvoiceResponse;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
@@ -31,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +85,12 @@ public class ExportServiceImpl implements ExportService {
     private OssService ossService;
     @Resource
     private OrderInvoiceService orderInvoiceService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private ProductDayRecordService productDayRecordService;
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
     /**
      * 订单导出
@@ -362,6 +378,52 @@ public class ExportServiceImpl implements ExportService {
 //        String s = ossService.uploadXlsx(result, OrderExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
+    }
+
+    @Override
+    public String exportProductStatement(ProductDayRecordRequest request) {
+        LambdaQueryWrapper<ProductDayRecord> lqw = new LambdaQueryWrapper<>();
+        lqw.ne(ProductDayRecord::getOrderSuccessProductFee, 0);
+        if (StringUtils.isNotEmpty(request.getProductName())) {
+            lqw.apply(" product_id in ( select id from eb_product where name like '%"+request.getProductName()+"%') ");
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            lqw.between(ProductDayRecord::getDate, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+        }
+        lqw.orderByDesc(ProductDayRecord::getDate);
+        List<ProductDayRecord> list = productDayRecordService.list(lqw);
+
+        if (CollUtil.isEmpty(list)) {
+            throw new CrmebException("未查询到订单数据");
+        }
+
+        List<Integer> productIdList = list.stream().map(ProductDayRecord::getProductId).collect(Collectors.toList());
+        Map<Integer, Product> mapByIdList = productService.getMapByIdList(productIdList);
+        List<ProductAttrValue> productAttrValueList = productAttrValueService.list(new QueryWrapper<ProductAttrValue>().lambda().in(ProductAttrValue::getProductId, productIdList));
+        Map<Integer,ProductAttrValue> mapByProductId = new HashMap<>();
+        productAttrValueList.forEach(e->{
+            mapByProductId.put(e.getProductId(),e);
+        });
+        log.info("商品信息数据查询完成...");
+        List<ProductStatementExcel> result = new LinkedList<>();
+
+        for (ProductDayRecord productDayRecord : list) {
+            ProductStatementExcel productStatementExcel = new ProductStatementExcel();
+            productStatementExcel.setProductId(productDayRecord.getProductId());
+            Product product = mapByIdList.get(productDayRecord.getProductId());
+            productStatementExcel.setProductName(product != null ? product.getName() : "");
+            productStatementExcel.setBarCode(mapByProductId.get(productDayRecord.getProductId()).getBarCode());
+            productStatementExcel.setSalesNum(productDayRecord.getOrderProductNum());
+            productStatementExcel.setSalesPrice(productDayRecord.getOrderSuccessProductFee());
+            productStatementExcel.setDate(productDayRecord.getDate());
+            result.add(productStatementExcel);
+        }
+//        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, ProductStatementExcel.class);
+//        log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
+//        return fileResultVo.getUrl();
+        String s = ossService.uploadXlsx(result, ProductStatementExcel.class, "商品报表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return s;
     }
 
     private static void valid(OrderSearchRequest request) {
