@@ -153,7 +153,7 @@ public class WalletController {
     @ApiOperation("用户提现")
     public CommonResult<WalletWithdraw> withdraw(@RequestBody @Validated WalletWithdrawRequest request) {
         User user = userService.getInfo();
-        if (!user.getStatus().equals(1)) {
+        if (!user.getStatus()) {
             throw new CrmebException("账户不可用");
         }
         userService.validPayPwd(user.getId(), request.getPwd());
@@ -184,7 +184,7 @@ public class WalletController {
     @ApiOperation("兑换积分获取")
     public CommonResult<JSONObject> changeScore(Integer walletType, BigDecimal amt) {
         User user = userService.getInfo();
-        if (!user.getStatus().equals(1)) {
+        if (!user.getStatus()) {
             throw new CrmebException("账户不可用");
         }
         WalletConfig walletConfig = walletConfigService.getByType(walletType);
@@ -207,7 +207,7 @@ public class WalletController {
     @ApiOperation("兑换")
     public CommonResult change(@RequestBody @Validated WalletChangeRequest request) {
         User user = userService.getInfo();
-        if (!user.getStatus().equals(1)) {
+        if (!user.getStatus()) {
             throw new CrmebException("账户不可用");
         }
         userService.validPayPwd(user.getId(), request.getPwd());
@@ -231,7 +231,7 @@ public class WalletController {
     @ApiOperation("转账")
     public CommonResult transfer(@RequestBody @Validated WalletTransferRequest request) {
         User user = userService.getInfo();
-        if (!user.getStatus().equals(1)) {
+        if (!user.getStatus()) {
             throw new CrmebException("账户不可用");
         }
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
