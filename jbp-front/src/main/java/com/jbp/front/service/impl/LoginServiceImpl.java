@@ -66,10 +66,10 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private UserLoginLogService userLoginLogService;
     @Autowired
     private RedisUtil redisUtil;
-
     @Autowired
     private FrontTokenComponent tokenComponent;
     @Autowired
@@ -186,16 +186,12 @@ public class LoginServiceImpl implements LoginService {
             String capaId = systemConfigService.getValueByKey("capaId");
             //邀请配置 配置关闭时默认强绑定
             userInvitationService.band(userList.get(0).getId(), spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
-
         }
         if (userList.size() == 1) {
-            return commonLogin(userList.get(0), spreadPid);
+            return commonLogin(userList.get(0), spreadPid, "手机号验证码登录");
         }
         User user = userService.getByAccount(loginRequest.getAccount());
-        if (!user.getStatus()) {
-            throw new CrmebException("当前帐户已禁用，请与管理员联系！");
-        }
-        return commonLogin(user, spreadPid);
+        return commonLogin(user, spreadPid, "手机号验证码登录");
     }
 
     @Override
@@ -243,7 +239,7 @@ public class LoginServiceImpl implements LoginService {
             throw new CrmebException("当前帐户已禁用，请与管理员联系！");
         }
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
-        return commonLogin(user, spreadPid);
+        return commonLogin(user, spreadPid, "账号或手机号密码登录");
     }
 
     @Override
@@ -267,7 +263,7 @@ public class LoginServiceImpl implements LoginService {
             throw new CrmebException("当前帐户已禁用，请与管理员联系！");
         }
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
-        return commonLogin(user, spreadPid);
+        return commonLogin(user, spreadPid, "账号或手机号密码登录");
     }
 
     @Override
@@ -306,7 +302,7 @@ public class LoginServiceImpl implements LoginService {
             if (!user.getStatus()) {
                 throw new CrmebException("当前账户已禁用，请联系管理员！");
             }
-            return commonLogin(user, spreadPid);
+            return commonLogin(user, spreadPid, "微信公众号登录");
         }
         // 没有用户，走创建用户流程
         // 从微信获取用户信息，存入Redis中，将key返回给前端，前端在下一步绑定手机号的时候下发
@@ -346,7 +342,7 @@ public class LoginServiceImpl implements LoginService {
             if (!user.getStatus()) {
                 throw new CrmebException("当前账户已禁用，请联系管理员！");
             }
-            return commonLogin(user, spreadPid);
+            return commonLogin(user, spreadPid, "微信小程序登录");
         }
         request.setSpreadPid(spreadPid);
         request.setType(UserConstants.REGISTER_TYPE_ROUTINE);
@@ -779,18 +775,23 @@ public class LoginServiceImpl implements LoginService {
         return userId > 0;
     }
 
-    private LoginResponse commonLogin(User user, Integer spreadPid) {
+    private LoginResponse commonLogin(User user, Integer spreadPid, String type) {
         Object o = redisUtil.get("loginToken" + user.getId());
-        if(o != null && com.jbp.common.utils.StringUtils.isNotEmpty(o.toString())){
+        if (o != null && com.jbp.common.utils.StringUtils.isNotEmpty(o.toString())) {
             frontTokenComponent.delLoginUser(o.toString());
+        }
+        if (!user.getStatus()) {
+            throw new CrmebException("当前帐户已禁用，请与管理员联系！");
         }
         if (user.getSpreadUid().equals(0) && spreadPid > 0) {
             // 绑定推广关系
             bindSpread(user, spreadPid);
         }
         // 记录最后一次登录时间
+        user.setLastIp(CrmebUtil.getClientIp(RequestUtil.getRequest()));
         user.setLastLoginTime(CrmebDateUtil.nowDateTime());
         boolean b = userService.updateById(user);
+        userLoginLogService.add(user, type);
         if (!b) {
             logger.error("用户登录时，记录最后一次登录时间出错,uid = " + user.getId());
         }

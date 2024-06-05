@@ -21,10 +21,7 @@ import com.jbp.common.response.FrontIndividualCenterConfigResponse;
 import com.jbp.common.response.FrontLoginConfigResponse;
 import com.jbp.common.response.LoginResponse;
 import com.jbp.common.result.CommonResult;
-import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.utils.SignType;
-import com.jbp.common.utils.SignatureUtil;
+import com.jbp.common.utils.*;
 import com.jbp.front.service.LoginService;
 import com.jbp.service.service.CbecOrderService;
 import com.jbp.service.service.CbecUserService;
@@ -111,16 +108,14 @@ public class LoginController {
 
     @ApiOperation(value = "手机号验证码登录")
     @RequestMapping(value = "/mobile/captcha", method = RequestMethod.POST)
-    public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest, HttpServletRequest request) {
-        loginService.loginOut(request);
+    public CommonResult<LoginResponse> phoneCaptchaLogin(@RequestBody @Validated LoginMobileRequest loginRequest) {
         return CommonResult.success(loginService.phoneCaptchaLogin(loginRequest));
     }
 
     @EncryptIgnore
     @ApiOperation(value = "手机号密码登录")
     @RequestMapping(value = "/mobile/password", method = RequestMethod.POST)
-    public CommonResult<LoginResponse> phonePasswordLogin(@RequestBody @Validated LoginPasswordRequest loginRequest, HttpServletRequest request) {
-        loginService.loginOut(request);
+    public CommonResult<LoginResponse> phonePasswordLogin(@RequestBody @Validated LoginPasswordRequest loginRequest) {
         return CommonResult.success(loginService.phonePasswordLogin(loginRequest));
     }
 

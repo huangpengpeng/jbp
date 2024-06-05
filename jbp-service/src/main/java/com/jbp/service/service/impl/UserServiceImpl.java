@@ -147,6 +147,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private ChannelIdentityService channelIdentityService;
     @Resource
     private UserCapaXsSnapshotService userCapaXsSnapshotService;
+    @Resource
+    private AsyncUtils asyncUtils;
 
     public static void main(String[] args) {
 
@@ -173,16 +175,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         Date nowDate = CrmebDateUtil.nowDateTime();
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
+        user.setErrorCount(0);
 
-         String mobileDefaultPwd = systemConfigService.getValueByKey(SysConfigConstants.MOBILE_DEFAULT_PWD);
-
-         if(!org.apache.commons.lang3.StringUtils.equals(Constants.CONFIG_FORM_SWITCH_OPEN,mobileDefaultPwd)){
-             user.setPwd(CrmebUtil.encryptPassword("123456"));
-             if(!ObjectUtil.isNull(phone)){
-                 user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
-             }
-         }
-
+        String mobileDefaultPwd = systemConfigService.getValueByKey(SysConfigConstants.MOBILE_DEFAULT_PWD);
+        if (!org.apache.commons.lang3.StringUtils.equals(Constants.CONFIG_FORM_SWITCH_OPEN, mobileDefaultPwd)) {
+            user.setPwd(CrmebUtil.encryptPassword("123456"));
+            if (!ObjectUtil.isNull(phone)) {
+                user.setPayPwd(CrmebUtil.encryptPassword(phone.substring(phone.length() - 6)));
+            }
+        }
 
         user.setLevel(1);
         // 设置活跃时间
@@ -212,10 +213,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         //绑定用户账号
         if (spreadUid != null && spreadUid > 0) {
 
-            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
-            String capaId =  systemConfigService.getValueByKey("capaId");
+            String ifOpen = systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
             //邀请配置 配置关闭时默认强绑定
-             invitationService.band(user.getId(), spreadUid, false, ifOpen.equals("2")?true: Long.valueOf(capaId).equals(capaService.getMinCapa().getId()), false);
+            invitationService.band(user.getId(), spreadUid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).equals(capaService.getMinCapa().getId()), false);
 
         }
         return user;
@@ -245,6 +246,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         setActiveTime(user);
         // 推广人
         user.setSpreadUid(0);
+        user.setErrorCount(0);
         Boolean execute = transactionTemplate.execute(e -> {
             save(user);
             // 增加代理等级
@@ -1023,9 +1025,32 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 throw new CrmebException("请设置交易密码");
             }
             if (!CrmebUtil.encryptPassword(pwd).equals(user.getPayPwd())) {
+                asyncUpdateError(uid);
                 throw new CrmebException("交易密码不正确");
             }
         }
+        user.setErrorCount(0);
+        updateById(user);
+    }
+
+    @Override
+    public void asyncUpdateError(Integer uid) {
+        asyncUtils.exec(uid, param -> updateError((Integer) param));
+    }
+
+    void updateError(Integer uid) {
+        User user = getById(uid);
+        int error = user.getErrorCount() == null ? 0 : user.getErrorCount();
+        user.setErrorCount(error + 1);
+        if (user.getErrorCount() > 5) {
+            Object o = redisUtil.get("loginToken" + user.getId());
+            if (o != null && com.jbp.common.utils.StringUtils.isNotEmpty(o.toString())) {
+                tokenComponent.delLoginUser(o.toString());
+            }
+            user.setErrorCount(0);
+            user.setStatus(false);
+        }
+        updateById(user);
     }
 
     @Override
@@ -1091,6 +1116,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         setActiveTime(user);
         // 推广人
         user.setSpreadUid(0);
+        user.setErrorCount(0);
         save(user);
         // 增加代理等级
         userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
@@ -1879,7 +1905,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("手机号码验证码不能为空");
         }
         User user = getInfo();
-
         //检测验证码
         checkValidateCode(user.getPhone(), code);
         //获取当前用户信息
@@ -1958,12 +1983,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public Boolean verifyPayPwd(String payPwd) throws Exception {
+    public Boolean verifyPayPwd(String payPwd){
         User user = getInfo();
         if (user.getPayPwd() == null) {
             throw new CrmebException("用户没有设置交易密码");
         }
-
         return user.getPayPwd().equals(CrmebUtil.encryptPassword(payPwd));
     }
 

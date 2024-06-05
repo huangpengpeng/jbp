@@ -393,7 +393,7 @@ public interface UserService extends IService<User> {
 
     void updateUser(Integer id, String pwd, Integer sex, String realName, String phone, String country, String province, String city, String district, String address, String payPwd, Boolean openShop);
 
-    Boolean verifyPayPwd(String payPwd) throws Exception;
+    Boolean verifyPayPwd(String payPwd);
 
     PageInfo<UserInviteInfoResponse> getUserInviteInfo(UserInviteRequest request);
 
@@ -402,6 +402,8 @@ public interface UserService extends IService<User> {
     String getPhone(String account);
 
     void validPayPwd(Integer uid, String pwd);
+
+    void  asyncUpdateError(Integer uid);
 
     UserPlatformInfoResponse getUserPlatfromInfo(String dbName,String mobile);
 
