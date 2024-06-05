@@ -274,7 +274,8 @@ public class UserController {
     @ApiOperation(value = "校验交易密码")
     @RequestMapping(value = "/verifyPayPwd", method = RequestMethod.GET)
     public CommonResult<Boolean> verifyPayPwd(String payPwd) throws Exception {
-        return CommonResult.success(userService.verifyPayPwd(payPwd));
+        userService.validPayPwd(userService.getUserId(), payPwd);
+        return CommonResult.success(true);
     }
 
 
