@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
+import com.jbp.common.encryptapi.EncryptIgnore;
 
 @Slf4j
 @Controller
