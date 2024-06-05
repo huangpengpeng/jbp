@@ -69,6 +69,7 @@ public class OrderPullController {
     @Autowired
     private Environment environment;
 
+    @EncryptIgnore
     @ApiOperation(value = "待发货订单列表", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/shipWait", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ErpOrderShipWaitVo> shipWait(String appKey, String timeStr, String method, String sign) {
@@ -144,6 +145,7 @@ public class OrderPullController {
         return list;
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "待发货回执", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/erp/order/shipWaitAck", produces = MediaType.APPLICATION_JSON_VALUE)
     public String shipWaitAck(String appKey, String timeStr, String method, String sign, @RequestBody List<String> ordersSnList) {
@@ -166,7 +168,7 @@ public class OrderPullController {
         return "SUCCESS";
     }
 
-
+    @EncryptIgnore
     @ApiOperation(value = "发货同步", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/erp/order/shipSync", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> shipSync(String appKey, String timeStr, String method, String sign,
