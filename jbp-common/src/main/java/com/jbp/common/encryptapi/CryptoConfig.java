@@ -21,71 +21,68 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CryptoConfig {
 
-	//当前登录用户ID
-		public static final String CUSTOM_RESPONSE_RESULT_LOGINUSER= "CUSTOM_RESPONSE_RESULT_LOGINUSER";
-		
-	@Autowired
-	SecretKeyConfig secretKeyConfig;
+    //当前登录用户ID
+    public static final String CUSTOM_RESPONSE_RESULT_LOGINUSER = "CUSTOM_RESPONSE_RESULT_LOGINUSER";
 
-	public String encrypt(String word) {
-		try {
-			Map<String, Object> restulMap = new HashMap<String, Object>();
-			String key = secretKeyConfig.getSecureKey();
+    @Autowired
+    SecretKeyConfig secretKeyConfig;
 
-			if (!StringUtils.hasText(key)) {
-				throw new NullPointerException("Please configure rsa.encrypt.privatekeyc parameter!");
-			}
+    public String encrypt(String word) {
+        try {
+            Map<String, Object> restulMap = new HashMap<String, Object>();
+            String key = secretKeyConfig.getSecureKey();
 
-			// 如果已经登录 则使用登录验证码 二次加密
-			if (SecurityUtil.hasLogin()) {
-				LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+            if (!StringUtils.hasText(key)) {
+                throw new NullPointerException("Please configure rsa.encrypt.privatekeyc parameter!");
+            }
 
-				String iv = secretKeyConfig.afterCutAndappend(loginUserVo.getUser().getLastCheckCode(), "0", 16);
+            // 如果已经登录 则使用登录验证码 二次加密
+            if (SecurityUtil.hasLogin()) {
+                LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
 
-				byte[] data = AESUtils.encrypt(word.getBytes(secretKeyConfig.getCharset()),
-						key.getBytes(secretKeyConfig.getCharset()), iv);
-				String result = Base64Util.encode(data);
-				if (secretKeyConfig.isShowLog()) {
-					log.info("Pre-encryptedone data：{}，After encryptionone：{}", word, result);
-				}
-				word = result;
-				// code == 2 表示多层加密
-				restulMap.put("modeCode", "2");
-			} 
-			else if(RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER) != null) {
-				User user=(User) RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER);
-				String iv = secretKeyConfig.afterCutAndappend(user.getLastCheckCode(), "0", 16);
+                String iv = secretKeyConfig.afterCutAndappend(loginUserVo.getUser().getLastCheckCode(), "0", 16);
 
-                log.info("saadgyusgqye:{}",user.getLastCheckCode());
-				byte[] data = AESUtils.encrypt(word.getBytes(secretKeyConfig.getCharset()),
-						key.getBytes(secretKeyConfig.getCharset()), iv);
-				String result = Base64Util.encode(data);
-				if (secretKeyConfig.isShowLog()) {
-					log.info("Pre-encryptedone data：{}，After encryptionone：{}", word, result);
-				}
-				word = result;
-				// code == 2 表示多层加密
-				restulMap.put("modeCode", "2");
-			}
-			else {
-				// 单层加密
-				restulMap.put("modeCode", "1");
-			}
+                byte[] data = AESUtils.encrypt(word.getBytes(secretKeyConfig.getCharset()),
+                        key.getBytes(secretKeyConfig.getCharset()), iv);
+                String result = Base64Util.encode(data);
+                if (secretKeyConfig.isShowLog()) {
+//					log.info("Pre-encryptedone data：{}，After encryptionone：{}", word, result);
+                }
+                word = result;
+                // code == 2 表示多层加密
+                restulMap.put("modeCode", "2");
+            } else if (RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER) != null) {
+                User user = (User) RequestUtil.getRequest().getAttribute(CUSTOM_RESPONSE_RESULT_LOGINUSER);
+                String iv = secretKeyConfig.afterCutAndappend(user.getLastCheckCode(), "0", 16);
 
-			byte[] data = word.getBytes();
+                byte[] data = AESUtils.encrypt(word.getBytes(secretKeyConfig.getCharset()),
+                        key.getBytes(secretKeyConfig.getCharset()), iv);
+                String result = Base64Util.encode(data);
+                if (secretKeyConfig.isShowLog()) {
+//					log.info("Pre-encryptedone data：{}，After encryptionone：{}", word, result);
+                }
+                word = result;
+                // code == 2 表示多层加密
+                restulMap.put("modeCode", "2");
+            } else {
+                // 单层加密
+                restulMap.put("modeCode", "1");
+            }
 
-			// 在 aes 加密 两层加密
-			String result = SecureUtil.des(key.getBytes(secretKeyConfig.getCharset())).encryptBase64(data);
+            byte[] data = word.getBytes();
 
-			if (secretKeyConfig.isShowLog()) {
-			//	log.info("Pre-encrypted data：{}，After encryption：{}", word, result);
-			}
-			restulMap.put("data", result);
+            // 在 aes 加密 两层加密
+            String result = SecureUtil.des(key.getBytes(secretKeyConfig.getCharset())).encryptBase64(data);
 
-			return JsonUtils.writeValueAsString(CommonResult.success(restulMap));
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			throw new CrmebException(e.getMessage());
-		}
-	}
+            if (secretKeyConfig.isShowLog()) {
+                //	log.info("Pre-encrypted data：{}，After encryption：{}", word, result);
+            }
+            restulMap.put("data", result);
+
+            return JsonUtils.writeValueAsString(CommonResult.success(restulMap));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new CrmebException(e.getMessage());
+        }
+    }
 }
