@@ -238,10 +238,10 @@ public class WalletController {
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
         Boolean ifOpenPwd = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
         if (userService.ifOpenSecurityPhone()) {
-            if (StringUtils.isNotEmpty(request.getCode())) {
+            if (StringUtils.isBlank(request.getCode())) {
                 throw new CrmebException("验证码不能为空");
             }
-            if (StringUtils.isNotEmpty(user.getSecurityPhone())) {
+            if (StringUtils.isBlank(user.getSecurityPhone())) {
                 throw new CrmebException("请先设置安全手机号");
             }
             loginService.checkValidateCode(user.getSecurityPhone(), request.getCode());

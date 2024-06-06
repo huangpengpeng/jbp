@@ -412,10 +412,10 @@ public class ExportServiceImpl implements ExportService {
             // 保存
             result.add(vo);
         }
-        String s = ossService.uploadXlsx(result, RefundOrderExcel.class, "退单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        log.info("退单列表导出下载地址:" + s);
-
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, RefundOrderExcel.class);
+//        String s = ossService.uploadXlsx(result, RefundOrderExcel.class, "退单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        log.info("退单列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 
     private static void valid(OrderSearchRequest request) {
