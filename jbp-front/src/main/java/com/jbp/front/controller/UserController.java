@@ -358,6 +358,7 @@ public class UserController {
     }
 
 
+    @EncryptIgnore
     @ApiOperation(value = "获取平台登录账号")
     @RequestMapping(value = "/getPlatformUserInfo", method = RequestMethod.GET)
     public CommonResult<List<UserPlatformInfoResponse>> getPlatformUserInfo(String mobile, Long parentId, String appId, Boolean ifregister) {
