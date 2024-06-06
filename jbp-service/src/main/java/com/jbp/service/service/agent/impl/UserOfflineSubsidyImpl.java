@@ -151,6 +151,7 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
         userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
         userOfflineSubsidy.setStatus(request.getStatus());
+        userOfflineSubsidy.setTeamName(request.getTeamName());
         return updateById(userOfflineSubsidy);
     }
     @Override
