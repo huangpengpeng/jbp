@@ -2,6 +2,7 @@ package com.jbp.admin.controller.platform;
 
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.request.RefundOrderSearchRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.ExportService;
@@ -53,6 +54,13 @@ public class PlatformExportController {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         request.setSupplyName(systemAdmin.getSupplyName());
         return CommonResult.success(exportService.exportOrder(request));
+    }
+
+    @PreAuthorize("hasAuthority('platform:export:refund:order:excel')")
+    @ApiOperation(value = "导出退单列表Excel")
+    @RequestMapping(value = "/refund/order/excel", method = RequestMethod.GET)
+    public CommonResult<String> exportRefund(@Validated RefundOrderSearchRequest request) {
+        return CommonResult.success(exportService.exportRefund(request));
     }
 
 

@@ -6,18 +6,19 @@ import com.beust.jcommander.internal.Lists;
 import com.jbp.common.excel.OrderExcel;
 import com.jbp.common.excel.OrderShipmentExcel;
 import com.jbp.common.excel.ScoreDownLoadExcel;
+import com.jbp.common.excel.RefundOrderExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.order.MerchantOrder;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.order.OrderExt;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.request.RefundOrderSearchRequest;
 import com.jbp.common.response.OrderInvoiceResponse;
+import com.jbp.common.response.PlatformRefundOrderPageResponse;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.FileResultVo;
@@ -75,6 +76,12 @@ public class ExportServiceImpl implements ExportService {
     private OssService ossService;
     @Resource
     private OrderInvoiceService orderInvoiceService;
+    @Resource
+    private RefundOrderService refundOrderService;
+    @Resource
+    private MerchantService merchantService;
+    @Resource
+    private RefundOrderInfoService refundOrderInfoService;
 
     /**
      * 订单导出
@@ -362,6 +369,53 @@ public class ExportServiceImpl implements ExportService {
 //        String s = ossService.uploadXlsx(result, OrderExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
+    }
+
+    @Override
+    public String exportRefund(RefundOrderSearchRequest request) {
+        List<RefundOrder> refundOrderList = refundOrderService.findExportList(request);
+        if (CollectionUtils.isEmpty(refundOrderList)) {
+            throw new CrmebException("未查询到订单数据");
+        }
+        log.info("订单导出订单数据查询完成...");
+
+        //商户-用户-订单信息
+        List<Integer> merIdList = refundOrderList.stream().map(RefundOrder::getMerId).distinct().collect(Collectors.toList());
+        Map<Integer, Merchant> merchantMap = merchantService.getMerIdMapByIdList(merIdList);
+        List<Integer> uidList = refundOrderList.stream().map(RefundOrder::getUid).distinct().collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(uidList);
+        List<String> refundOrderNoList = refundOrderList.stream().map(RefundOrder::getRefundOrderNo).distinct().collect(Collectors.toList());
+        Map<String, RefundOrderInfo> refundOrderNoMap = refundOrderInfoService.getByRefundOrderNoMap(refundOrderNoList);
+
+        LinkedList<RefundOrderExcel> result = new LinkedList<>();
+
+        for (RefundOrder refundOrder: refundOrderList) {
+            RefundOrderExcel vo = new RefundOrderExcel();
+            vo.setRefundOrderNo(refundOrder.getRefundOrderNo());
+            vo.setOrderNo(orderService.getPlatOrderNo(refundOrder.getOrderNo()));
+            vo.setUid(refundOrder.getUid());
+            vo.setRefundStatus(refundOrder.getRefundOrderStatus());
+            vo.setRefundPrice(refundOrder.getRefundPrice());
+            vo.setRefundTime(refundOrder.getRefundTime());
+            vo.setAfterSalesType(refundOrder.getAfterSalesTypeStr());
+            vo.setUserNickName(userMap.get(refundOrder.getUid()).getNickname());
+            vo.setRealName(refundOrder.getRealName());
+            vo.setUserPhone(refundOrder.getUserPhone());
+            vo.setUserAddress(refundOrder.getUserAddress());
+            vo.setCreateTime(refundOrder.getCreateTime());
+            //退单详情
+            RefundOrderInfo refundOrderInfo = refundOrderNoMap.get(refundOrder.getRefundOrderNo());
+            vo.setProductName(refundOrderInfo.getProductName());
+            vo.setApplyRefundNum(refundOrderInfo.getApplyRefundNum());
+            Merchant merchant = merchantMap.get(refundOrder.getMerId());
+            vo.setMerName(merchant!=null ? merchant.getName() : "平台");
+            // 保存
+            result.add(vo);
+        }
+        String s = ossService.uploadXlsx(result, RefundOrderExcel.class, "退单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        log.info("退单列表导出下载地址:" + s);
+
+        return s;
     }
 
     private static void valid(OrderSearchRequest request) {

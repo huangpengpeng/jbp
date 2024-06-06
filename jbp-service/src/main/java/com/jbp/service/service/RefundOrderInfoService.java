@@ -3,6 +3,9 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jbp.common.model.order.RefundOrderInfo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
 *  RefundOrderInfoService 接口
 *  +----------------------------------------------------------------------
@@ -23,4 +26,6 @@ public interface RefundOrderInfoService extends IService<RefundOrderInfo> {
      * @return RefundOrderInfo
      */
     RefundOrderInfo getByRefundOrderNo(String refundOrderNo);
+
+    Map<String,RefundOrderInfo> getByRefundOrderNoMap(List<String> refundOrderNoList);
 }

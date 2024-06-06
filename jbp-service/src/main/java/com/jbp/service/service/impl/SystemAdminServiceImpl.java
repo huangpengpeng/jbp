@@ -7,11 +7,14 @@ import cn.hutool.core.util.URLUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.enums.RoleEnum;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.admin.SystemRole;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.SystemAdminAddRequest;
 import com.jbp.common.request.SystemAdminRequest;
@@ -92,8 +95,8 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
      * @return List
      */
     @Override
-    public List<SystemAdminResponse> getList(SystemAdminRequest request, PageParamRequest pageParamRequest) {
-        PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+    public PageInfo<SystemAdminResponse> getList(SystemAdminRequest request, PageParamRequest pageParamRequest) {
+        Page<SystemAdminResponse> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         //带SystemAdminRequest类的多条件查询
         LambdaQueryWrapper<SystemAdmin> lqw = Wrappers.lambdaQuery();
         if (ObjectUtil.isNotNull(request.getStatus())) {
@@ -126,7 +129,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
         }
         List<SystemAdmin> systemAdmins = dao.selectList(lqw);
         if (CollUtil.isEmpty(systemAdmins)) {
-            return CollUtil.newArrayList();
+            return CommonPage.copyPageInfo(page,CollUtil.newArrayList()) ;
         }
         List<SystemAdminResponse> adminResponseList = new ArrayList<>();
         List<SystemRole> roleList = systemRoleService.getListByMerId(currentAdmin.getMerId());
@@ -147,7 +150,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
             sar.setRoleNames(StringUtils.join(roleNames, ","));
             adminResponseList.add(sar);
         }
-        return adminResponseList;
+        return CommonPage.copyPageInfo(page,adminResponseList);
     }
 
     /**
