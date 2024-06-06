@@ -22,7 +22,7 @@ public class LztPayChannel extends BaseModel {
 
     public LztPayChannel(String name, String type, Integer mer_id, String partnerId,
                          String priKey, Integer tradeModel, String frmsWareCategory,
-                         BigDecimal handlingFee) {
+                         BigDecimal handlingFee, String transferUndertaker, String withdrawalUndertaker) {
         this.name = name;
         this.type = type;
         this.merId = mer_id;
@@ -31,6 +31,8 @@ public class LztPayChannel extends BaseModel {
         this.tradeModel = tradeModel;
         this.frmsWareCategory = frmsWareCategory;
         this.handlingFee = handlingFee;
+        this.transferUndertaker = transferUndertaker;
+        this.withdrawalUndertaker = withdrawalUndertaker;
     }
 
     @ApiModelProperty(value = "渠道名称 显示给用户")
@@ -56,6 +58,12 @@ public class LztPayChannel extends BaseModel {
 
     @ApiModelProperty(value = "手续费(%)")
     private BigDecimal handlingFee;
+
+    @ApiModelProperty(value = "转账手续费承担方  平台  个人")
+    private String transferUndertaker;
+
+    @ApiModelProperty(value = "提现手续费承担方  平台  个人")
+    private String withdrawalUndertaker;
 
     @ApiModelProperty(value = "商户名称")
     @TableField(exist = false)

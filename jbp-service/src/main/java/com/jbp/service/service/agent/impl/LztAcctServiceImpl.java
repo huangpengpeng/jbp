@@ -326,14 +326,30 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             feeAmount =
                     amt.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
         }
-        if(lztAcct.getPayChannelType().equals("易宝")){
-            feeAmount = BigDecimal.ONE;
-            if(com.jbp.common.utils.StringUtils.isNotEmpty(scane) && "转账".equals(scane)) {
-                if (lztAcct.getHandlingFee() != null && ArithmeticUtils.gt(lztAcct.getHandlingFee(), BigDecimal.ZERO)) {
-                    BigDecimal fee = amt.multiply(lztAcct.getHandlingFee()).setScale(2, BigDecimal.ROUND_UP);
-                    if(ArithmeticUtils.gt(fee, BigDecimal.valueOf(3))){
-                        feeAmount = fee;
+
+        if (lztAcct.getPayChannelType().equals("易宝")) {
+            LztPayChannel lztPayChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
+            if (com.jbp.common.utils.StringUtils.isNotEmpty(scane) && "转账".equals(scane)) {
+                if ("平台".equals(lztPayChannel.getTransferUndertaker())) {
+                    feeAmount = BigDecimal.ZERO;
+                } else {
+                    feeAmount = BigDecimal.ONE;
+                    if (lztAcct.getHandlingFee() != null && ArithmeticUtils.gt(lztAcct.getHandlingFee(), BigDecimal.ZERO)) {
+                        BigDecimal fee = amt.multiply(lztAcct.getHandlingFee()).setScale(2, BigDecimal.ROUND_UP);
+                        BigDecimal baseAmt = BigDecimal.valueOf(2); // 2次转账2元
+                        if ("个人".equals(lztPayChannel.getWithdrawalUndertaker())) {
+                            baseAmt = baseAmt.add(BigDecimal.ONE);// 多支付一笔给客户 用于提现手续费
+                        }
+                        if (ArithmeticUtils.gt(fee, baseAmt)) {
+                            feeAmount = fee;
+                        }
                     }
+                }
+            } else {
+                if ("平台".equals(lztPayChannel.getWithdrawalUndertaker())) {
+                    feeAmount = BigDecimal.ZERO;
+                } else {
+                    feeAmount = BigDecimal.ONE;
                 }
             }
         }

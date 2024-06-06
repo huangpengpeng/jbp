@@ -86,7 +86,8 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.易宝开通子商户.getPrefix());
         LianLianPayInfoResult payInfo = lianLianPayService.get();
         String notifyUrl = payInfo.getHost() + "/api/publicly/payment/callback/yop/" + txnSeqno;
-        RegisterMicroResult registerMicro = yopService.registerMicro(txnSeqno, signName, id_card, frontUrl, backUrl, mobile, province, city, district, address, bankCardNo, bankCode, notifyUrl);
+        RegisterMicroResult registerMicro = yopService.registerMicro(txnSeqno, signName, id_card, frontUrl, backUrl, mobile, province,
+                city, district, address, bankCardNo, bankCode, notifyUrl, lztPayChannel.getWithdrawalUndertaker());
         boolean validate = registerMicro.validate();
         if (!validate) {
             throw new CrmebException("开户失败:" + registerMicro.getReturnMsg() + "| 请求号:" + txnSeqno);

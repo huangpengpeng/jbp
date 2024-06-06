@@ -126,7 +126,32 @@ public class  YopProducts {
             } else {
                 proInfo.put("percentRate", pro.getRate());
             }
+            proInfo.put("undertaker", "SAAS_SERVICE_PROVIDER");
+            proInfo.put("paymentMethod", "REAL_TIME");
+
             products.add(proInfo);
+
+
+        }
+        return JacksonTool.toJsonString(products);
+    }
+
+    public static String getMicroMerchant2() {
+        List<Map<String, String>> products = new ArrayList<>();
+        for (MicroMerchant pro : MicroMerchant.values()) {
+            Map<String, String> proInfo = new HashMap<>();
+            proInfo.put("productCode", pro.getProductCode());
+            proInfo.put("rateType", pro.getRateType());
+            if (pro.getRateType().equals("SINGLE_FIXED")) {
+                proInfo.put("fixedRate", pro.getRate());
+            } else {
+                proInfo.put("percentRate", pro.getRate());
+            }
+
+
+            products.add(proInfo);
+
+
         }
         return JacksonTool.toJsonString(products);
     }

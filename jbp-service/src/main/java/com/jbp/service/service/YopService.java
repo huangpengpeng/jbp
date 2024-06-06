@@ -25,7 +25,7 @@ public interface YopService {
      */
     RegisterMicroResult registerMicro(String requestNo, String signName,  String id_card, String frontUrl,
                                       String backUrl, String mobile,  String province, String city, String district,
-                                      String address, String bankCardNo, String bankCode, String notifyUrl);
+                                      String address, String bankCardNo, String bankCode, String notifyUrl, String withdrawalUndertaker);
 
 
     /**

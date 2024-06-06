@@ -40,7 +40,7 @@ public class YopServiceImpl implements YopService {
     @Override
     public RegisterMicroResult registerMicro(String requestNo, String signName, String id_card, String frontUrl,
                                              String backUrl, String mobile, String province, String city, String district,
-                                             String address, String bankCardNo, String bankCode, String notifyUrl) {
+                                             String address, String bankCardNo, String bankCode, String notifyUrl, String withdrawalUndertaker) {
         RegisterMicroParams params = new RegisterMicroParams();
         params.setParentMerchantNo("10089625822");
         params.setBusinessRole("SETTLED_MERCHANT");
@@ -78,7 +78,11 @@ public class YopServiceImpl implements YopService {
         params.setAccountInfo(accountInfo.toJSONString());
         // 通知开户产品
         params.setNotifyUrl(notifyUrl);
-        params.setProductInfo(YopProducts.getMicroMerchant());
+        if("个人".equals(withdrawalUndertaker)){
+            params.setProductInfo(YopProducts.getMicroMerchant2());
+        }else{
+            params.setProductInfo(YopProducts.getMicroMerchant());
+        }
         return send("/rest/v2.0/mer/register/saas/micro", "POST", params, RegisterMicroResult.class);
     }
 

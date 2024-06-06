@@ -75,6 +75,14 @@ public class LztPayChannelController {
                 throw new RuntimeException("私钥不能为空");
             }
         }
+        if (StringUtils.equals(request.getType(), "易宝")) {
+            if (StringUtils.isEmpty(request.getTransferUndertaker())) {
+                throw new RuntimeException("易宝渠道转账手续费承担方不能为空");
+            }
+            if (StringUtils.isEmpty(request.getWithdrawalUndertaker())) {
+                throw new RuntimeException("易宝渠道提现手续费承担方不能为空");
+            }
+        }
         LztPayChannel lztPayChannel = lztPayChannelService.getByMer(request.getMerId(), request.getType());
         if (request.getId() == null && lztPayChannel != null){
             throw new RuntimeException("当前商户支付渠道已经存在不允许重复添加");

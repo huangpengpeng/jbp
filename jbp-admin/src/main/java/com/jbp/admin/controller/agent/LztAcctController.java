@@ -443,25 +443,7 @@ public class LztAcctController {
     @ApiOperation(value = "获取手续分 提现|转账")
     @GetMapping(value = "/feeGet")
     public CommonResult<BigDecimal> apply(BigDecimal amount, String userId, String scane) {
-        LztAcct lztAcct = lztAcctService.getByUserId(userId);
-        Merchant merchant = merchantService.getById(lztAcct.getMerId());
-        BigDecimal feeScale = merchant.getHandlingFee() == null ? BigDecimal.valueOf(0.0008) : merchant.getHandlingFee();
-        BigDecimal feeAmount = feeScale.multiply(amount).setScale(2, BigDecimal.ROUND_UP);
-        if (ArithmeticUtils.gt(feeScale, BigDecimal.ZERO)) {
-            feeAmount =
-                    amount.multiply(feeScale).setScale(2, BigDecimal.ROUND_UP);
-        }
-        if(lztAcct.getPayChannelType().equals("易宝")){
-            feeAmount = BigDecimal.ONE;
-            if(StringUtils.isNotEmpty(scane) && "转账".equals(scane)) {
-                if (lztAcct.getHandlingFee() != null && ArithmeticUtils.gt(lztAcct.getHandlingFee(), BigDecimal.ZERO)) {
-                     BigDecimal fee = amount.multiply(lztAcct.getHandlingFee()).setScale(2, BigDecimal.ROUND_UP);
-                     if(ArithmeticUtils.gt(fee, BigDecimal.valueOf(3))){
-                         feeAmount = fee;
-                     }
-                }
-            }
-        }
+        BigDecimal feeAmount = lztAcctService.getFee(scane, userId, amount);
         return CommonResult.success(feeAmount);
     }
 }
