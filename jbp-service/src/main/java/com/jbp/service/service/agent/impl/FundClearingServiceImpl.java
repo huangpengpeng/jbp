@@ -93,6 +93,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private ProductCommConfigService productCommConfigService;
     @Resource
     private OldcapaxsService oldcapaxsService;
+    @Resource
     private PlatformWalletFlowService platformWalletFlowService;
 
 
