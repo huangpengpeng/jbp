@@ -181,7 +181,8 @@ public class LoginServiceImpl implements LoginService {
         }
 
         UserCapa userCapa  = userCapaService.getByUser(userList.get(0).getId());
-        if (spreadPid != null && spreadPid > 0) {
+        UserInvitation userInvitation =  userInvitationService.getByUser(userList.get(0).getId());
+        if (spreadPid != null && spreadPid > 0  && userInvitation == null) {
             String ifOpen =  systemConfigService.getValueByKey("ifOpen");
             String capaId = systemConfigService.getValueByKey("capaId");
             //邀请配置 配置关闭时默认强绑定
