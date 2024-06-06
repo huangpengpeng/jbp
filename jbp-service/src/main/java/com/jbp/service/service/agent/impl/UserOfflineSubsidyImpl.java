@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.agent.UserRegion;
@@ -20,6 +21,7 @@ import com.jbp.common.request.agent.UserOfflineSubsidyEditRequest;
 import com.jbp.common.utils.AddressUtil;
 import com.jbp.service.dao.agent.UserOfflineSubsidyDao;
 import com.jbp.service.service.CityRegionService;
+import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
@@ -44,6 +46,8 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     private CityRegionService cityRegionService;
     @Autowired
     private TeamUserService teamUserService;
+    @Autowired
+    private TeamService teamService;
 
     @Override
     public PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, Integer teamId,PageParamRequest pageParamRequest) {
@@ -60,9 +64,9 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
             lqw.eq(UserOfflineSubsidy::getArea, cityRegionService.getByRegionId(areaId).getRegionName());
         }
         if(teamId!=null){
-            lqw.apply("uid in(select uid from eb_team_user where tid="+teamId+")");
+            Team team = teamService.getOne(new QueryWrapper<Team>().eq("id", teamId));
+            lqw.eq(UserOfflineSubsidy::getTeamName, team.getName());
         }
-
         lqw.orderByDesc(UserOfflineSubsidy::getUid);
         Page<UserRegion> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserOfflineSubsidy> list = list(lqw);
