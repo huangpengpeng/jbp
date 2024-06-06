@@ -131,7 +131,7 @@ public class UserController {
             throw new RuntimeException("安全手机号已存在不允许替换");
         }
 
-       userService.checkValidateCode(user.getPhone(), request.getCaptcha());
+       userService.checkValidateCode(request.getPhone(), request.getCaptcha());
         user.setSecurityPhone(request.getPhone());
         userService.updateById(user);
         return CommonResult.success();
