@@ -142,7 +142,7 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
 
             User orderUser = userService.getById(order.getUid());
             fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.分组推三返一.getName(), totalAmt,
-                    productList, orderUser.getAccount() + "下单获得" + ProductCommEnum.分组推三返一.getName(), "");
+                    productList, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.分组推三返一.getName(), "");
             //一笔订单只计算一次推三返一
             break;
 

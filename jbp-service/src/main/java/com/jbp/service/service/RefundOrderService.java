@@ -191,4 +191,6 @@ public interface RefundOrderService extends IService<RefundOrder> {
      * @param request 拒绝收货请求对象
      */
     Boolean receivingReject(RejectReceivingRequest request);
+
+    List<RefundOrder> findExportList(RefundOrderSearchRequest request);
 }

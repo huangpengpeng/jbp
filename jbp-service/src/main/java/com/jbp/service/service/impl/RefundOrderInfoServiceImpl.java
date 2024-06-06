@@ -10,6 +10,9 @@ import com.jbp.service.service.RefundOrderInfoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
 *  RefundOrderInfoServiceImpl 接口实现
@@ -40,6 +43,18 @@ public class RefundOrderInfoServiceImpl extends ServiceImpl<RefundOrderInfoDao, 
         lqw.eq(RefundOrderInfo::getRefundOrderNo, refundOrderNo);
         lqw.last(" limit 1");
         return dao.selectOne(lqw);
+    }
+
+    @Override
+    public Map<String, RefundOrderInfo> getByRefundOrderNoMap(List<String> refundOrderNoList) {
+        LambdaQueryWrapper<RefundOrderInfo> lqw = Wrappers.lambdaQuery();
+        lqw.in(RefundOrderInfo::getRefundOrderNo, refundOrderNoList);
+        List<RefundOrderInfo> list = dao.selectList(lqw);
+        Map<String,RefundOrderInfo> map = new HashMap<>();
+        list.forEach(e->{
+            map.put(e.getRefundOrderNo(),e);
+        });
+        return map;
     }
 }
 

@@ -8,6 +8,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Team;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.agent.UserRegion;
 import com.jbp.common.model.city.CityRegion;
@@ -19,6 +21,8 @@ import com.jbp.common.request.agent.UserOfflineSubsidyEditRequest;
 import com.jbp.common.utils.AddressUtil;
 import com.jbp.service.dao.agent.UserOfflineSubsidyDao;
 import com.jbp.service.service.CityRegionService;
+import com.jbp.service.service.TeamService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import com.jbp.service.util.StringUtils;
@@ -40,11 +44,16 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     private UserService userService;
     @Autowired
     private CityRegionService cityRegionService;
+    @Autowired
+    private TeamUserService teamUserService;
+    @Autowired
+    private TeamService teamService;
 
     @Override
-    public PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, PageParamRequest pageParamRequest) {
+    public PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, Integer teamId,PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserOfflineSubsidy> lqw = new LambdaQueryWrapper<UserOfflineSubsidy>()
-                .eq(!ObjectUtil.isNull(uid), UserOfflineSubsidy::getUid, uid);
+                .eq(!ObjectUtil.isNull(uid), UserOfflineSubsidy::getUid, uid)
+                .orderByDesc(UserOfflineSubsidy::getId);
         if (provinceId!=null){
             lqw.eq(UserOfflineSubsidy::getProvince, cityRegionService.getByRegionId(provinceId).getRegionName());
         }
@@ -54,6 +63,10 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         if (areaId!=null){
             lqw.eq(UserOfflineSubsidy::getArea, cityRegionService.getByRegionId(areaId).getRegionName());
         }
+        if(teamId!=null){
+            Team team = teamService.getOne(new QueryWrapper<Team>().eq("id", teamId));
+            lqw.eq(UserOfflineSubsidy::getTeamName, team.getName());
+        }
         lqw.orderByDesc(UserOfflineSubsidy::getUid);
         Page<UserRegion> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserOfflineSubsidy> list = list(lqw);
@@ -62,10 +75,13 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         }
         List<Integer> uIdList = list.stream().map(UserOfflineSubsidy::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
             e.setNickname(user != null ? user.getNickname() : "");
+            TeamUser teamUser = teamUserMapList.get(e.getUid());
+            e.setTeamName(teamUser != null ? teamUser.getName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
@@ -86,24 +102,27 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         if (request.getAreaId() != null) {
             area = cityRegionService.getByRegionId(request.getAreaId());
         }
-            List<UserOfflineSubsidy> list = this.list(new QueryWrapper<UserOfflineSubsidy>().eq("uid", user.getId()).eq("status", "已开通"));
-            if (!CollectionUtils.isEmpty(list)) {
-                throw new CrmebException("该用户已有开通区域");
-            }
-            UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
-                    request.getAreaId() != null ? area.getRegionName() : "",
-                    UserOfflineSubsidy.Constants.已开通.toString());
-            if (!ObjectUtil.isNull(userOfflineSubsidy)) {
-                throw new CrmebException("该区域已经被其他用户开通");
-            }
-            userOfflineSubsidy = UserOfflineSubsidy.builder().uid(user.getId()).provinceId(request.getProvinceId()).
-                    province(province.getRegionName()).city(city.getRegionName()).
-                    cityId(request.getCityId()).status(UserRegion.Constants.已开通.toString()).build();
-            userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
-            userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
 
-            this.save(userOfflineSubsidy);
-            return true;
+        List<UserOfflineSubsidy> list = this.list(new QueryWrapper<UserOfflineSubsidy>().eq("uid", user.getId()).eq("status", "已开通"));
+        if (!CollectionUtils.isEmpty(list)) {
+            throw new CrmebException("该用户已有开通区域");
+        }
+        UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
+                request.getAreaId() != null ? area.getRegionName() : "",
+                UserOfflineSubsidy.Constants.已开通.toString(),request.getTeamName());
+        if (!ObjectUtil.isNull(userOfflineSubsidy)) {
+            if (teamUserService.getByUser(user.getId()).getTid().equals(teamUserService.getByUser(userOfflineSubsidy.getUid()).getTid())){
+                throw new CrmebException("该区域已经被该用户团队的其他成员开通");
+            }
+        }
+        userOfflineSubsidy = UserOfflineSubsidy.builder().uid(user.getId()).provinceId(request.getProvinceId()).
+                province(province.getRegionName()).city(city.getRegionName()).
+                cityId(request.getCityId()).status(UserRegion.Constants.已开通.toString()).build();
+        userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
+        userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
+
+        this.save(userOfflineSubsidy);
+        return true;
     }
 
     @Override
@@ -120,9 +139,12 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         if (request.getStatus().equals(UserOfflineSubsidy.Constants.已开通.toString())){
             UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
                     request.getAreaId() != null ? area.getRegionName() : "",
-                    UserOfflineSubsidy.Constants.已开通.toString());
+                    UserOfflineSubsidy.Constants.已开通.toString(),request.getTeamName());
+            UserOfflineSubsidy offlineSubsidy = getById(request.getId());
             if (!ObjectUtil.isNull(userOfflineSubsidy)) {
-                throw new CrmebException("该区域已经被其他用户开通");
+                if (teamUserService.getByUser(offlineSubsidy.getUid()).getTid().equals(teamUserService.getByUser(userOfflineSubsidy.getUid()).getTid())){
+                    throw new CrmebException("该区域已经被该用户团队的其他成员开通");
+                }
             }
         }
         UserOfflineSubsidy userOfflineSubsidy = this.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getId, request.getId()));
@@ -133,12 +155,13 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
         userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
         userOfflineSubsidy.setStatus(request.getStatus());
+        userOfflineSubsidy.setTeamName(request.getTeamName());
         return updateById(userOfflineSubsidy);
     }
     @Override
-    public UserOfflineSubsidy getByArea(String province, String city, String area, String status) {
+    public UserOfflineSubsidy getByArea(String province, String city, String area, String status,String teamName) {
         return getOne(new QueryWrapper<UserOfflineSubsidy>().lambda()
                 .eq(UserOfflineSubsidy::getProvince, province).eq(UserOfflineSubsidy::getCity, city)
-                .eq(UserOfflineSubsidy::getArea, area).eq(UserOfflineSubsidy::getStatus, status));
+                .eq(UserOfflineSubsidy::getArea, area).eq(UserOfflineSubsidy::getStatus, status).eq(UserOfflineSubsidy::getTeamName, teamName));
     }
 }

@@ -9,6 +9,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.PlatformOrderAddressEditRequest;
+import com.jbp.common.request.ProductDayRecordRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
@@ -133,11 +134,17 @@ public class PlatformOrderController {
     @PreAuthorize("hasAuthority('platform:order:sales:day')")
     @ApiOperation(value = "获取每日销售额")
     @RequestMapping(value = "/salesVolumeDay", method = RequestMethod.GET)
- public CommonResult<CommonPage<OrderSalesVolumeResponse>> salesVolumeDay( @Validated PageParamRequest pageParamRequest){
+    public CommonResult<CommonPage<OrderSalesVolumeResponse>> salesVolumeDay(@Validated PageParamRequest pageParamRequest){
         return CommonResult.success(CommonPage.restPage(orderService.salesVolumeDay(pageParamRequest)));
     }
 
 
+    @PreAuthorize("hasAuthority('platform:order:product:statement')")
+    @ApiOperation(value = "获取商品报表")
+    @RequestMapping(value = "/product/statement", method = RequestMethod.GET)
+    public CommonResult<CommonPage<OrderProductStatementResponse>> productStatement(@Validated ProductDayRecordRequest request, @Validated PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(orderService.productStatement(request, pageParamRequest)));
+    }
 
 }
 

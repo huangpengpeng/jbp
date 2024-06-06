@@ -213,7 +213,7 @@ public class CapaDifferentialCommHandler extends AbstractProductCommHandler {
             BigDecimal clearingFee = BigDecimal.valueOf(amt).setScale(2, BigDecimal.ROUND_DOWN);
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
-                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.级差佣金.getName(), clearingFee, fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.级差佣金.getName(), "");
+                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.级差佣金.getName(), clearingFee, fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.级差佣金.getName(), "");
             }
         });
     }

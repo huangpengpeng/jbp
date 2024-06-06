@@ -1,6 +1,7 @@
 package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.SystemAdminAddRequest;
@@ -39,7 +40,7 @@ public interface SystemAdminService extends IService<SystemAdmin> {
      * @param pageParamRequest 分页参数
      * @return List
      */
-    List<SystemAdminResponse> getList(SystemAdminRequest request, PageParamRequest pageParamRequest);
+    PageInfo<SystemAdminResponse> getList(SystemAdminRequest request, PageParamRequest pageParamRequest);
 
     /**
      * 是否存在角色

@@ -166,4 +166,50 @@ public class RefundOrder implements Serializable {
 
     @ApiModelProperty(value = "用户联系电话")
     private String telephone;
+
+    public String getRefundOrderStatus(){
+        String statusStr = "";
+        if (this.getRefundStatus() == null) {
+            return statusStr;
+        }
+        switch (this.getRefundStatus()) {
+            case 0:
+                statusStr = "待审核";
+                break;
+            case 1:
+                statusStr = "商家拒绝";
+                break;
+            case 2:
+                statusStr = "退款中";
+                break;
+            case 3:
+                statusStr = "已退款";
+                break;
+            case 4:
+                statusStr = "用户退货";
+                break;
+            case 5:
+                statusStr = "商家待收货";
+                break;
+            case 6:
+                statusStr = "已撤销";
+        }
+        return statusStr;
+    }
+
+    public String getAfterSalesTypeStr(){
+        String typeStr = "";
+        if (this.getAfterSalesType() == null) {
+            return typeStr;
+        }
+        switch (this.getAfterSalesType()) {
+            case 1:
+                typeStr = "仅退款";
+                break;
+            case 2:
+                typeStr = "退货退款";
+        }
+        return typeStr;
+    }
+
 }

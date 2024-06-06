@@ -167,7 +167,7 @@ public class FeelGratefulCapaCommHandler extends AbstractProductCommHandler {
                     if (levelRatio.number == userList.size()) {
                         for (int i = 0; i < levelRatio.getRatio().size(); i++) {
                             fundClearingService.create(userList.get(i), order.getOrderNo(), ProductCommEnum.感恩奖.getName(), fundClearing.getSendAmt().multiply(levelRatio.getRatio().get(i)),
-                                    null, user.getAccount() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
+                                    null, user.getNickname()+"|"+user.getAccount() + "获取到的" + ProductCommEnum.感恩奖.getName(), "");
 
                             amtRatio= amtRatio.add(levelRatio.getRatio().get(i));
 

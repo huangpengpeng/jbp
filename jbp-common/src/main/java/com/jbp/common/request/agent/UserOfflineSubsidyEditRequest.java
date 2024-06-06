@@ -37,4 +37,6 @@ public class UserOfflineSubsidyEditRequest implements Serializable {
     @ApiModelProperty(value = "区/县id")
     private Integer areaId;
 
+    @ApiModelProperty(value = "团队")
+    private String teamName;
 }

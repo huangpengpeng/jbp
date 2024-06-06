@@ -3,10 +3,7 @@ package com.jbp.service.product.comm;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ProductComm;
-import com.jbp.common.model.agent.ProductCommConfig;
-import com.jbp.common.model.agent.UserOfflineSubsidy;
-import com.jbp.common.model.agent.UserRegion;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -14,6 +11,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.service.service.MerchantOrderService;
 import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
@@ -49,6 +47,9 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
     private ProductCommService productCommService;
     @Resource
     private ProductCommConfigService productCommConfigService;
+    @Resource
+    private TeamUserService teamUserService;
+
 
     @Override
     public Integer getType() {
@@ -109,9 +110,10 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             OfflineSubsidyCommHandler.Rule rule = getRule(productComm);
 
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
+            TeamUser teamUser = teamUserService.getByUser(order.getUid());
 
             //市公司补助
-            UserOfflineSubsidy userOfflineSubsidy = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), "", UserRegion.Constants.已开通.toString());
+            UserOfflineSubsidy userOfflineSubsidy = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), "", UserRegion.Constants.已开通.toString(),teamUser== null? null: teamUser.getName());
             BigDecimal totalCityAmt = BigDecimal.ZERO;
             if (rule.getMode().equals("比例")) {
                 totalCityAmt = totalPv.multiply(rule.getCityComm());
@@ -120,12 +122,12 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             }
             if (userOfflineSubsidy != null && totalCityAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalCityAmt,
-                        null, user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
+                        null, user.getNickname()+"|"+user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
             }
 
 
             //区公司补助
-            UserOfflineSubsidy userOfflineSubsidy2 = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), merchantOrder.getDistrict(), UserRegion.Constants.已开通.toString());
+            UserOfflineSubsidy userOfflineSubsidy2 = userOfflineSubsidyService.getByArea(merchantOrder.getProvince(), merchantOrder.getCity(), merchantOrder.getDistrict(), UserRegion.Constants.已开通.toString(),teamUser== null? null: teamUser.getName());
             BigDecimal totalAreaAmt = BigDecimal.ZERO;
             if (rule.getMode().equals("比例")) {
                 totalAreaAmt = totalPv.multiply(rule.getAreaComm());
@@ -134,7 +136,7 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
             }
             if (userOfflineSubsidy2 != null && totalAreaAmt.compareTo(BigDecimal.ZERO) == 1) {
                 fundClearingService.create(userOfflineSubsidy2.getUid(), order.getOrderNo(), ProductCommEnum.线下补助.getName(), totalAreaAmt,
-                        null, user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
+                        null, user.getNickname()+"|"+user.getAccount() + "下单获得" + ProductCommEnum.线下补助.getName(), "");
             }
 
 

@@ -220,7 +220,7 @@ public class CapaXsDifferentialNoBoleCommHandler extends AbstractProductCommHand
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.星级级差佣金无伯乐.getName(), clearingFee,
-                         fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金无伯乐.getName(), "");
+                         fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金无伯乐.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.星级级差佣金无伯乐.getName(),

@@ -93,6 +93,9 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private ProductCommConfigService productCommConfigService;
     @Resource
     private OldcapaxsService oldcapaxsService;
+    @Resource
+    private PlatformWalletFlowService platformWalletFlowService;
+
 
 
     @Override
@@ -101,6 +104,18 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                                            String teamName, String description, String commName, Boolean ifRefund, List<String> orderList, PageParamRequest pageParamRequest) {
         Page<FundClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<FundClearing> list = fundClearingDao.pageList(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, commName, ifRefund, orderList);
+        //添加回退时间
+        List<PlatformWalletFlow> flowList = platformWalletFlowService.list(new QueryWrapper<PlatformWalletFlow>().lambda().eq(PlatformWalletFlow::getOperate, "退款"));
+        Map<String,PlatformWalletFlow> flowMap = new HashMap<>();
+        flowList.forEach(f -> flowMap.put(f.getExternalNo(),f));
+        List<FundClearing> fundClearingList = list.stream().filter(FundClearing::getIfRefund).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(fundClearingList)) {
+            return CommonPage.copyPageInfo(page, list);
+        }
+        fundClearingList.forEach(f -> {
+            PlatformWalletFlow flow = flowMap.get(f.getUniqueNo());
+            f.setReturnTime(flow != null ? flow.getGmtCreated() : null);
+        });
         return CommonPage.copyPageInfo(page, list);
     }
 
@@ -658,11 +673,42 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 }
 
 
+List<String> extUser =new ArrayList<>();
+                extUser.add("S10168400641021706");
+                extUser.add("S131912216");
+                extUser.add("S131912722");
+                extUser.add("S13198678");
+                extUser.add("S131912171");
+                extUser.add("S131912503");
+                extUser.add("S13192647");
+                extUser.add("S131913110");
+                extUser.add("S131910300");
+                extUser.add("S131910937");
+                extUser.add("S131911150");
+                extUser.add("S131912054");
+                extUser.add("S13192864");
+                extUser.add("S13198725");
+                extUser.add("S131911816");
+                extUser.add("S1032814077876530");
+                extUser.add("S131913261");
+                extUser.add("S13192343");
+                extUser.add("S10173131163915913");
+                extUser.add("S131912169");
+                extUser.add("S131912865");
+                extUser.add("S13199237");
+                extUser.add("S1319718");
+                extUser.add("S13198100");
+                extUser.add("S10141834593414152");
+                extUser.add("S131912169");
+                extUser.add("S131912672");
+
+                extUser.add("S131912535");
+
 
 
                 BigDecimal salse = orderService.getGoodsPrice(goodsRepetitionIdQua,user.getId(), month+"-01 00:00:00");
 
-                if (ifAddclearing && (salse).compareTo(new BigDecimal(199)) == 1) {
+                if (ifAddclearing && ((salse).compareTo(new BigDecimal(199)) == 1  || extUser.contains( user.getAccount()) )) {
                   BigDecimal amt = new BigDecimal( map.get("price").toString()).multiply(new BigDecimal( map.get("number").toString())).multiply(new BigDecimal("0.01")).multiply(pv).setScale(2, BigDecimal.ROUND_DOWN);
 
                     create(user.getId(), map.get("orderSn").toString(), "重复消费积分", amt,
@@ -865,7 +911,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 create(uid, order.getOrderSn(), ProductCommEnum.星级级差佣金.getName(), clearingFee,
-                        fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
+                        fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, 13, ProductCommEnum.星级级差佣金.getName(),
@@ -919,7 +965,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                         BigDecimal amt = ratio.multiply(calculateResult.getAmt()).multiply(rule.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
                         if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                             create(upperDto.getPId(), order.getOrderSn(), ProductCommEnum.级差伯乐佣金.getName(), amt,
-                                    null, user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
+                                    null, orderUser.getNickname()+"|"+user.getAccount() + "获得星级级差佣金奖励上级" + ProductCommEnum.级差伯乐佣金.getName(), "");
                         }
                         i++;
                     }

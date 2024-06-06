@@ -149,7 +149,7 @@ public class CapaXsPointComm2Handler extends AbstractProductCommHandler {
                     fundClearingProducts.add(clearingProduct);
                     User orderUser = userService.getById(order.getUid());
                     fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.星级见点佣金2.getName(), amount,
-                            fundClearingProducts, orderUser.getAccount() + "下单获得" + comm.getType() + ProductCommEnum.星级见点佣金2.getName(), "");
+                            fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + comm.getType() + ProductCommEnum.星级见点佣金2.getName(), "");
                     pid = invitationService.getPid(pid);
                     i++;
                 }

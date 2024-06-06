@@ -229,7 +229,7 @@ public class CollisionCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                 User orderUser = userService.getById(flow.getOrderUid());
                 fundClearingService.create(uid, flow.getOrdersSn(), ProductCommEnum.渠道佣金.getName(), amt,
-                        null, orderUser.getAccount() + "下单获得" + ProductCommEnum.渠道佣金.getName(), "");
+                        null, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.渠道佣金.getName(), "");
                 // 将奖金透传出去
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.渠道佣金.getName(),

@@ -9,13 +9,13 @@ import com.jbp.common.request.agent.UserOfflineSubsidyEditRequest;
 
 public interface UserOfflineSubsidyService extends IService<UserOfflineSubsidy> {
 
-    PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, PageParamRequest pageParamRequest);
+    PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, Integer teamId, PageParamRequest pageParamRequest);
 
     Boolean add(UserOfflineSubsidyAddRequest request);
 
     Boolean edit(UserOfflineSubsidyEditRequest request);
 
-    UserOfflineSubsidy getByArea(String province, String city, String area, String status);
+    UserOfflineSubsidy getByArea(String province, String city, String area, String status,String teamName);
 
 
 

@@ -349,4 +349,6 @@ public interface OrderService extends IService<Order> {
 
     PageInfo<OrderSalesVolumeResponse> salesVolumeDay(  PageParamRequest pageParamRequest);
 
+    PageInfo<OrderProductStatementResponse> productStatement(  ProductDayRecordRequest request,PageParamRequest pageParamRequest);
+
 }
