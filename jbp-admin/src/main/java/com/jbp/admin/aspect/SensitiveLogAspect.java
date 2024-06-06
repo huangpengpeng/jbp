@@ -132,7 +132,9 @@ public class SensitiveLogAspect {
             for (Object o : paramsArray) {
                 if (!isFilterObject(o)) {
                     Object jsonObj = JSON.toJSON(o);
-                    params.append(jsonObj.toString()).append(" ");
+                    if(jsonObj != null){
+                        params.append(jsonObj.toString()).append(" ");
+                    }
                 }
             }
         }
