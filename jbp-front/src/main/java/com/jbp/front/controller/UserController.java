@@ -3,6 +3,7 @@ package com.jbp.front.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.constants.Constants;
+import com.jbp.common.constants.SmsConstants;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.encryptapi.EncryptIgnore;
@@ -14,6 +15,7 @@ import com.jbp.common.request.*;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.RedisUtil;
 import com.jbp.service.condition.CapaXsInvitationLineHandler;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SmsService;
@@ -80,9 +82,9 @@ public class UserController {
     @Autowired
     private CapaXsService capaXsService;
     @Autowired
-    private WalletConfigService walletConfigService;
-    @Autowired
     private SmsService smsService;
+    @Autowired
+    private RedisUtil redisUtil;
 
 
     @ApiOperation(value = "登录密码修改")
@@ -125,10 +127,10 @@ public class UserController {
 
         User currentUser = userService.getInfo();
 
-       if(currentUser.getSecurityPhone() == null){
-           return CommonResult.success(false);
-       }
-        smsService.sendCommonCode( currentUser.getSecurityPhone());
+        if (currentUser.getSecurityPhone() == null) {
+            return CommonResult.success(false);
+        }
+        smsService.sendCommonCode(currentUser.getSecurityPhone());
 
 
         return CommonResult.success(true);
@@ -148,13 +150,13 @@ public class UserController {
     @RequestMapping(value = "/update/securityPhone", method = RequestMethod.POST)
     public CommonResult<String> updateSecurityPhone(@RequestBody @Validated UserBindingPhoneUpdateRequest request) {
         User user = userService.getInfo();
-        if(StringUtils.isNotEmpty(user.getSecurityPhone())){
+        if (StringUtils.isNotEmpty(user.getSecurityPhone())) {
             throw new RuntimeException("安全手机号已存在不允许替换");
         }
-
-       userService.checkValidateCode(request.getPhone(), request.getCaptcha());
+        userService.checkValidateCode(request.getPhone(), request.getCaptcha());
         user.setSecurityPhone(request.getPhone());
         userService.updateById(user);
+        redisUtil.delete(SmsConstants.SMS_VALIDATE_PHONE_NUM + request.getPhone());
         return CommonResult.success();
     }
 
