@@ -43,15 +43,18 @@ public class CrmebUtil {
      * @param args String[] 字符串数组
      */
     public static void main(String[] args) throws Exception {
+
+
+        System.out.println(getRandomPwd(8));
 //        System.out.println(encryptPassword("123456", "15871898211"));
-        System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
-        System.out.println(decryptPassowrd("qNRS8Ah2YmU=", "19979384655"));
-        System.out.println(decryptPassowrd("qYt3rFZLANUI2QE1JaCktQ==", "18929560630"));
-        System.out.println(decryptPassowrd("qT2WGnqYLTT63zbreFYPkg==", "13686668640"));
-        System.out.println(decryptPassowrd("jR0ADu2fShA=", "18598005835"));
-        System.out.println(decryptPassowrd("0g98reb4gO4=", "15618417068"));
-        System.out.println(decryptPassowrd("8FOo2uLVucE=", "19011203013"));
-        System.out.println(decryptPassowrd("bci+CYlEhxw=", "18506051809"));
+//        System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
+//        System.out.println(decryptPassowrd("qNRS8Ah2YmU=", "19979384655"));
+//        System.out.println(decryptPassowrd("qYt3rFZLANUI2QE1JaCktQ==", "18929560630"));
+//        System.out.println(decryptPassowrd("qT2WGnqYLTT63zbreFYPkg==", "13686668640"));
+//        System.out.println(decryptPassowrd("jR0ADu2fShA=", "18598005835"));
+//        System.out.println(decryptPassowrd("0g98reb4gO4=", "15618417068"));
+//        System.out.println(decryptPassowrd("8FOo2uLVucE=", "19011203013"));
+//        System.out.println(decryptPassowrd("bci+CYlEhxw=", "18506051809"));
 
 
 
@@ -953,7 +956,7 @@ public class CrmebUtil {
         if (StrUtil.isBlank(account)) {
             return "";
         }
-        return encryptPassword("000000", account);
+        return encryptPassword(getRandomPwd(8), account);
     }
 
     /**
@@ -967,6 +970,82 @@ public class CrmebUtil {
         StringBuilder stringBuilder = new StringBuilder();
         Arrays.stream(split).forEach(stringBuilder::append);
         return Integer.valueOf(stringBuilder.toString());
+    }
+
+    public static String getRandomPwd(int num) {
+        return getPassword( num,1,1,1);
+    }
+    /**
+     * 根据条件获得复杂密码
+     * @param num  密码的位数 6-32位  8
+     * @param inNum 是否包含数字，默认为1   1
+     * @param inStr 是否包含大写字母，默认为1 1
+     * @param inSpec 是否包含特殊字符，默认为0
+     * 默认包含小写字母，没有条件时，将全部使用小写字母
+     * @return 生成的密码
+     */
+    public static String getPassword(int num,int inNum,int inStr,int inSpec) {
+        String [] strs = new String[num];
+        // 密码的第一位为字母
+        if (inStr==1) {
+            strs[0] = getRandomStr();
+        }else {
+            strs[0] = getRandomStr().toLowerCase();
+        }
+        // 生成从第二位开始的密码
+        for (int i=1;i<num;i++) {
+            String funcIndex = getFormIndex();
+            // funcIndex=num时候，调用生成数字的方法；=str时，生成大写字母；=spec时，生成特殊字符。
+            if (funcIndex.equals("num") && inNum==1) {
+                strs[i] = String.valueOf(getRandomNum());
+            } else if (funcIndex.equals("str") && inStr==1) {
+                strs[i] = getRandomStr();
+            } else if (funcIndex.equals("spec") && inSpec==1) {
+                strs[i] = getSpecStr();
+            } else {
+                // 当不满足生成的条件时，生成小写字母
+                strs[i] = getRandomStr().toLowerCase();
+            }
+        }
+        String str = "";
+        for (String s :strs) {
+            str += s;
+        }
+        return str;
+    }
+
+    private static int getRandomNum() {
+        int num = (int) (Math.random()*10);
+        return num;
+    }
+    private static String getRandomStr() {
+        String [] strs= {
+                "Q","W","E","R","T",
+                "Y","U","I","O","P",
+                "A","S","D","F","G","H","J","K",
+                "L","Z","X","C","V","B","N","M"};
+        int strIndex = (int) (Math.random()*26);
+        int strUpper =  ( (int)(Math.random()*100) )%2;
+        if (strUpper!=1) {
+            return strs[strIndex].toLowerCase();
+        }
+        return strs[strIndex];
+    }
+    private static String getSpecStr() {
+        String [] strs= {"!","@","_","#","$"};
+        int strIndex = (int) (Math.random()*5);
+        return strs[strIndex];
+    }
+
+    private static String getFormIndex() {
+        int formIndex =(int)(Math.random()*16);
+        if ((formIndex%3)==0) {
+            return "num";
+        }else if ((formIndex%5)==1) {
+            return "spec";
+        }else {
+            return "str";
+        }
     }
 
 }
