@@ -16,6 +16,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.service.condition.CapaXsInvitationLineHandler;
 import com.jbp.service.condition.ConditionEnum;
+import com.jbp.service.service.SmsService;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
@@ -80,6 +81,9 @@ public class UserController {
     private CapaXsService capaXsService;
     @Autowired
     private WalletConfigService walletConfigService;
+    @Autowired
+    private SmsService smsService;
+
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -113,6 +117,23 @@ public class UserController {
         }
         return CommonResult.failed();
     }
+
+
+    @ApiOperation(value = "获取用户安全手机号验证码")
+    @RequestMapping(value = "/phone/secureCode", method = RequestMethod.POST)
+    public CommonResult<Boolean> secureCode() {
+
+        User currentUser = userService.getInfo();
+
+       if(currentUser.getSecurityPhone() == null){
+           return CommonResult.success(false);
+       }
+        smsService.sendCommonCode( currentUser.getSecurityPhone());
+
+
+        return CommonResult.success(true);
+    }
+
 
     @ApiOperation(value = "换绑手机号老手机校验验证码 新手机发送验证码")
     @RequestMapping(value = "/update/binding/phone/code", method = RequestMethod.POST)

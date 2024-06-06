@@ -39,7 +39,6 @@ public class WalletTransferRequest implements Serializable {
     @ApiModelProperty("转账用户账号")
     private String account;
 
-    @NotBlank(message = "验证码")
     @ApiModelProperty("验证码")
     private String code;
 }
