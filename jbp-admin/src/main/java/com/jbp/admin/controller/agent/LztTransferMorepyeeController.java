@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
@@ -37,6 +39,7 @@ public class LztTransferMorepyeeController {
     @Resource
     private LztTransferMorepyeeService lztTransferMorepyeeService;
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通内部代发")
     @PreAuthorize("hasAuthority('agent:lzt:transfer:morepyee:create')")
     @ApiOperation(value = "来账通内部代发")
     @GetMapping(value = "/create")

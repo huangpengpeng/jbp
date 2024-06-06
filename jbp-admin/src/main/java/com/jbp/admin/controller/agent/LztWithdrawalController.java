@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
@@ -40,6 +42,7 @@ public class LztWithdrawalController {
     @Resource
     private LztWithdrawalService lztWithdrawalService;
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通提现")
     @PreAuthorize("hasAuthority('agent:lzt:withdrawal:create')")
     @ApiOperation(value = "来账通提现")
     @GetMapping(value = "/create")
@@ -65,6 +68,7 @@ public class LztWithdrawalController {
         return CommonResult.success(result);
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通提现确认")
     @PreAuthorize("hasAuthority('agent:lzt:withdrawal:affrim')")
     @ApiOperation(value = "来账通提现确认")
     @GetMapping(value = "/affrim")
@@ -72,6 +76,7 @@ public class LztWithdrawalController {
         LztWithdrawal result = lztWithdrawalService.check(id, checkReturn, checkReason);
         return CommonResult.success(result);
     }
+
 
     @ApiOperation(value = "来账通提现刷新")
     @GetMapping(value = "/refresh")

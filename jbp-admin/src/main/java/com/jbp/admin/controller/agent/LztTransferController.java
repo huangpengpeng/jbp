@@ -2,6 +2,8 @@ package com.jbp.admin.controller.agent;
 
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CardListInfo;
 import com.jbp.common.lianlian.result.QueryCnapsCodeResult;
@@ -47,6 +49,7 @@ public class LztTransferController {
     @Resource
     private LztTransferService lztTransferService;
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通外部代付")
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:create')")
     @ApiOperation(value = "来账通外部代付")
     @GetMapping(value = "/create")
@@ -93,6 +96,7 @@ public class LztTransferController {
         return CommonResult.success(lztTransferService.detail(id));
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "外部代付确认")
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:affrim')")
     @ApiOperation(value = "外部代付确认")
     @GetMapping(value = "/affrim")

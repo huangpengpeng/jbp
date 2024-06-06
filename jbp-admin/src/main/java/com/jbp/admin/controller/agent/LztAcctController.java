@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.constants.LianLianPayConfig;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
@@ -64,6 +66,7 @@ public class LztAcctController {
     @Resource
     private LztTransferMorepyeeService lztTransferMorepyeeService;
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通新增账户")
     @GetMapping("/add")
     @ApiOperation("新增账户")
     public CommonResult add(Integer merId, Long payChannelId, String userId, String userType, String username,
@@ -103,6 +106,7 @@ public class LztAcctController {
         return CommonResult.success(lztAcctService.details(userId));
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "连连开通银行户")
     @PreAuthorize("hasAuthority('agent:lzt:acct:bank:apply')")
     @ApiOperation(value = "银行虚拟户申请")
     @GetMapping(value = "/bank/apply")
@@ -112,6 +116,7 @@ public class LztAcctController {
         return CommonResult.success(apply);
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "易宝开通银行户")
     @ApiOperation(value = "易宝开通银行户")
     @GetMapping(value = "/yop/bank/apply")
     public CommonResult<LztAcctApply> yopBankApply(String userId, String merchantName, String openBankCode,
@@ -284,6 +289,7 @@ public class LztAcctController {
         return CommonResult.success(page);
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "短信二次校验")
     @SneakyThrows
     @ApiOperation(value = "短信二次校验")
     @GetMapping(value = "/validationSms")
@@ -303,6 +309,7 @@ public class LztAcctController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "忘记密码发送验证码")
     @SneakyThrows
     @ApiOperation(value = "忘记密码发送验证码")
     @GetMapping(value = "/findPwdSendCode")
@@ -331,6 +338,7 @@ public class LztAcctController {
         return CommonResult.success(passwordApply);
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "忘记密码")
     @PreAuthorize("hasAuthority('agent:lzt:acct:findPwd')")
     @SneakyThrows
     @ApiOperation(value = "忘记密码")
@@ -349,6 +357,7 @@ public class LztAcctController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "修改手机号发送验证码")
     @SneakyThrows
     @ApiOperation(value = "修改手机号发送验证码")
     @GetMapping(value = "/changePhoneSendCode")
@@ -375,6 +384,7 @@ public class LztAcctController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "修改手机号确认")
     @PreAuthorize("hasAuthority('agent:lzt:acct:changePhone')")
     @ApiOperation(value = "修改手机号确认")
     @GetMapping(value = "/changePhone")

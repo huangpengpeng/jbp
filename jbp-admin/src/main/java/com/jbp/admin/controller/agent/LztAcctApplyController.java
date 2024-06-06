@@ -1,5 +1,7 @@
 package com.jbp.admin.controller.agent;
 
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.page.CommonPage;
@@ -32,7 +34,9 @@ public class LztAcctApplyController {
         return CommonResult.success(CommonPage.restPage(lztAcctApplyService.pageList(merId,request.getUserId(),request.getUsername(),request.getStatus(),pageParamRequest)));
     }
 
+
     @PreAuthorize("hasAuthority('agent:lzt:acct:apply:del')")
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.DELETE, description = "来账通银行开户记录删除")
     @ApiOperation(value = "删除")
     @GetMapping(value = "/del")
     public CommonResult del(Long id) {

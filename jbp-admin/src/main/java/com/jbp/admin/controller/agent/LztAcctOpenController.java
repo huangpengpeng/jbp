@@ -1,6 +1,8 @@
 package com.jbp.admin.controller.agent;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctOpen;
@@ -45,6 +47,7 @@ public class LztAcctOpenController {
         return CommonResult.success(yopService.upload(multipart));
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "连连个人开户")
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
     @ApiOperation(value = "连连个人开户")
     @GetMapping(value = "/apply")
@@ -60,7 +63,7 @@ public class LztAcctOpenController {
 
 
 
-
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "易宝个人开户")
     @ApiOperation(value = "易宝个人开户")
     @PostMapping(value = "/yop/apply")
     public CommonResult<LztAcctOpen> yopApply(@RequestBody YopBankApplyRequest request) {
@@ -71,7 +74,6 @@ public class LztAcctOpenController {
         return CommonResult.success(lztAcctOpen);
     }
 
-
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:page')")
     @ApiOperation(value = "开户记录列表")
     @GetMapping(value = "/page")
@@ -81,6 +83,7 @@ public class LztAcctOpenController {
         return CommonResult.success(CommonPage.restPage(lztAcctOpenService.pageList(merId, userId, status, pageParamRequest)));
     }
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.DELETE, description = "开户记录删除")
     @PreAuthorize("hasAuthority('agent:lzt:acct:open:del')")
     @ApiOperation(value = "开户记录删除")
     @GetMapping(value = "/del")
