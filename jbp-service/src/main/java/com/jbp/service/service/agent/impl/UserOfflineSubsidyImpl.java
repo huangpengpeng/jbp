@@ -45,8 +45,6 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     @Autowired
     private CityRegionService cityRegionService;
     @Autowired
-    private TeamUserService teamUserService;
-    @Autowired
     private TeamService teamService;
 
     @Override
@@ -75,13 +73,10 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         }
         List<Integer> uIdList = list.stream().map(UserOfflineSubsidy::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
-        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
             e.setNickname(user != null ? user.getNickname() : "");
-            TeamUser teamUser = teamUserMapList.get(e.getUid());
-            e.setTeamName(teamUser != null ? teamUser.getName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
@@ -111,9 +106,7 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
                 request.getAreaId() != null ? area.getRegionName() : "",
                 UserOfflineSubsidy.Constants.已开通.toString(),request.getTeamName());
         if (!ObjectUtil.isNull(userOfflineSubsidy)) {
-            if (teamUserService.getByUser(user.getId()).getTid().equals(teamUserService.getByUser(userOfflineSubsidy.getUid()).getTid())){
                 throw new CrmebException("该区域已经被该用户团队的其他成员开通");
-            }
         }
         userOfflineSubsidy = UserOfflineSubsidy.builder().uid(user.getId()).provinceId(request.getProvinceId()).
                 province(province.getRegionName()).city(city.getRegionName()).
@@ -140,11 +133,8 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
             UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
                     request.getAreaId() != null ? area.getRegionName() : "",
                     UserOfflineSubsidy.Constants.已开通.toString(),request.getTeamName());
-            UserOfflineSubsidy offlineSubsidy = getById(request.getId());
             if (!ObjectUtil.isNull(userOfflineSubsidy)) {
-                if (teamUserService.getByUser(offlineSubsidy.getUid()).getTid().equals(teamUserService.getByUser(userOfflineSubsidy.getUid()).getTid())){
                     throw new CrmebException("该区域已经被该用户团队的其他成员开通");
-                }
             }
         }
         UserOfflineSubsidy userOfflineSubsidy = this.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getId, request.getId()));
