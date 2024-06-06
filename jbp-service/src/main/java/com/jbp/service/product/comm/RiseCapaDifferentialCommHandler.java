@@ -208,7 +208,7 @@ public class RiseCapaDifferentialCommHandler extends AbstractProductCommHandler 
             BigDecimal clearingFee = BigDecimal.valueOf(amt).setScale(2, BigDecimal.ROUND_DOWN);
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid2);
-                fundClearingService.create(uid2, order.getOrderNo(), ProductCommEnum.升单极差.getName(), clearingFee, fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.升单极差.getName(), "");
+                fundClearingService.create(uid2, order.getOrderNo(), ProductCommEnum.升单极差.getName(), clearingFee, fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.升单极差.getName(), "");
             }
         });
     }

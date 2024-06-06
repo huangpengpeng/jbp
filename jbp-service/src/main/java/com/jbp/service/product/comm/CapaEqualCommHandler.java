@@ -213,7 +213,7 @@ public class CapaEqualCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.平级佣金.getName(), clearingFee,
-                        fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.平级佣金.getName(), "");
+                        fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.平级佣金.getName(), "");
             }
         });
     }

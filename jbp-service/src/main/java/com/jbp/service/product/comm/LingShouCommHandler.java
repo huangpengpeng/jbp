@@ -168,7 +168,7 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
                 description = description + "培育获奖:" + totalAmt;
             }
             fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.零售佣金.getName(),
-                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getAccount() + "下单,获得" + ProductCommEnum.零售佣金.getName() + "【" + description + "】", "");
+                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单,获得" + ProductCommEnum.零售佣金.getName() + "【" + description + "】", "");
         });
     }
 

@@ -212,7 +212,7 @@ public class CapaXsDifferentialCommHandler extends AbstractProductCommHandler {
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
                 fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.星级级差佣金.getName(), clearingFee,
-                         fundClearingProducts, orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
+                         fundClearingProducts, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
                 CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.星级级差佣金.getName(),

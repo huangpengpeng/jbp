@@ -27,6 +27,8 @@ import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.Product;
+import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.record.ProductDayRecord;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserToken;
@@ -117,6 +119,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private TeamService teamService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ProductDayRecordService productDayRecordService;
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -1349,6 +1355,46 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         List<OrderSalesVolumeResponse> orderList = dao.salesVolumeDay();
 
         return CommonPage.copyPageInfo(page, orderList);
+    }
+
+    @Override
+    public PageInfo<OrderProductStatementResponse> productStatement(ProductDayRecordRequest request, PageParamRequest pageParamRequest) {
+        Page<ProductDayRecord> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<ProductDayRecord> lqw = new LambdaQueryWrapper<>();
+        lqw.ne(ProductDayRecord::getOrderSuccessProductFee, 0);
+        if (StringUtils.isNotEmpty(request.getProductName())) {
+            lqw.apply(" product_id in ( select id from eb_product where name like '%"+request.getProductName()+"%') ");
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            lqw.between(ProductDayRecord::getDate, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
+        }
+        lqw.orderByDesc(ProductDayRecord::getDate);
+        List<ProductDayRecord> list = productDayRecordService.list(lqw);
+
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
+        }
+
+        List<Integer> productIdList = list.stream().map(ProductDayRecord::getProductId).collect(Collectors.toList());
+        Map<Integer, Product> mapByIdList = productService.getMapByIdList(productIdList);
+        List<ProductAttrValue> productAttrValueList = productAttrValueService.list(new QueryWrapper<ProductAttrValue>().lambda().in(ProductAttrValue::getProductId, productIdList));
+        Map<Integer,ProductAttrValue> mapByProductId = new HashMap<>();
+        productAttrValueList.forEach(e->{
+            mapByProductId.put(e.getProductId(),e);
+        });
+        List<OrderProductStatementResponse> responseList = list.stream().map(e->{
+            OrderProductStatementResponse response = new OrderProductStatementResponse();
+            response.setProductId(e.getProductId());
+            response.setSalesNum(e.getOrderProductNum());
+            response.setSalesPrice(e.getOrderSuccessProductFee());
+            Product product = mapByIdList.get(e.getProductId());
+            response.setProductName(product != null ? product.getName() : "");
+            response.setBarCode(mapByProductId.get(e.getProductId()).getBarCode());
+            response.setDate(e.getDate());
+            return response;
+        }).collect(Collectors.toList());
+        return CommonPage.copyPageInfo(page, responseList);
     }
 
     /**

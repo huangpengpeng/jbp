@@ -371,14 +371,14 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
             User orderUser = userService.getById(flow.getOrderUid());
             if (ArithmeticUtils.gt(amt, BigDecimal.ZERO)) {
                 fundClearingService.create(flow.getUid(), "RE_" + flow.getOrdersSn(), ProductCommEnum.渠道佣金.getName(), amt,
-                        null, orderUser.getAccount() + "退款重碰获得" + ProductCommEnum.渠道佣金.getName(), "");
+                        null, orderUser.getNickname()+"|"+orderUser.getAccount() + "退款重碰获得" + ProductCommEnum.渠道佣金.getName(), "");
 
                 DepthCommHandler.Rule depthRule = userCapa == null ? null : depthRuleMap.get(userCapa.getCapaId());
                 BigDecimal depthRatio = rule == null ? BigDecimal.ZERO : depthRule.getRatio();
                 BigDecimal depthAmt = minScore.multiply(depthRatio).setScale(2, BigDecimal.ROUND_DOWN);
                 if (ArithmeticUtils.gt(depthAmt, BigDecimal.ZERO)) {
                     fundClearingService.create(flow.getUid(), "RE_" + flow.getOrdersSn(), ProductCommEnum.深度佣金.getName(), amt,
-                            null, orderUser.getAccount() + "退款重碰，获得对碰佣金，奖励" + ProductCommEnum.深度佣金.getName(), "");
+                            null, orderUser.getNickname()+"|"+orderUser.getAccount() + "退款重碰，获得对碰佣金，奖励" + ProductCommEnum.深度佣金.getName(), "");
                 }
             }
         }
