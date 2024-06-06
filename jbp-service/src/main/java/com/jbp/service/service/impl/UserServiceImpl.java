@@ -153,9 +153,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Autowired
     private Environment environment;
 
-    public static void main(String[] args) {
-
-    }
     /**
      * 手机号注册用户
      *
@@ -179,6 +176,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setCreateTime(nowDate);
         user.setLastLoginTime(nowDate);
         user.setErrorCount(0);
+        user.setStatus(true);
 
         String mobileDefaultPwd = systemConfigService.getValueByKey(SysConfigConstants.MOBILE_DEFAULT_PWD);
         if (!org.apache.commons.lang3.StringUtils.equals(Constants.CONFIG_FORM_SWITCH_OPEN, mobileDefaultPwd)) {
@@ -250,12 +248,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         // 推广人
         user.setSpreadUid(0);
         user.setErrorCount(0);
+        user.setStatus(true);
         Boolean execute = transactionTemplate.execute(e -> {
             save(user);
             // 增加代理等级
-            if(capaId == null){
+            if (capaId == null) {
                 userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), remark, remark);
-            }else{
+            } else {
                 userCapaService.saveOrUpdateCapa(user.getId(), capaId, remark, remark);
             }
             return Boolean.TRUE;
@@ -286,6 +285,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         setActiveTime(user);
         // 推广人
         user.setSpreadUid(0);
+        user.setErrorCount(0);
+        user.setStatus(true);
 
         Boolean execute = transactionTemplate.execute(e -> {
             save(user);
@@ -647,7 +648,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Boolean updatePhone(UserBindingPhoneUpdateRequest request) {
         String changePhoneNosign = systemConfigService.getValueByKey(SysConfigConstants.CHANGE_PHONE_NOSIGN);
-        if(!"'true'".equals(changePhoneNosign)) {
+        if (!"'true'".equals(changePhoneNosign)) {
             checkValidateCode(request.getPhone(), request.getCaptcha());
         }
         User user = getInfo();
@@ -670,7 +671,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 //        }
         LambdaUpdateWrapper<User> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(User::getPhone, request.getPhone());
-     //   wrapper.set(User::getPwd, CrmebUtil.encryptPassword(user.getPwd()));
+        //   wrapper.set(User::getPwd, CrmebUtil.encryptPassword(user.getPwd()));
         wrapper.eq(User::getId, user.getId());
         return update(wrapper);
     }
@@ -699,7 +700,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             map.put("spreadid", user.getId());
         }
         if (ObjectUtils.isNotEmpty(request.getUid())) {
-            map.put("uid",request.getUid());
+            map.put("uid", request.getUid());
         }
         if (StrUtil.isNotEmpty(request.getNikename())) {
             String nikeName = URLUtil.decode(request.getNikename());
@@ -870,14 +871,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @param code  验证码
      */
     public void checkValidateCode(String phone, String code) {
-        if(StringUtils.isBlank(code)){
+        if (StringUtils.isBlank(code)) {
             throw new CrmebException("请输入验证码");
         }
         Object validateCode = redisUtil.get(getValidateCodeRedisKey(phone));
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
         Boolean ifBooleand = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
 
-        List<User> user =  userService.getByPhone(phone);
+        List<User> user = userService.getByPhone(phone);
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         channelName = com.jbp.service.util.StringUtils.isEmpty(channelName) ? "平台" : channelName;
 
@@ -885,27 +886,27 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("请先获取验证码");
         }
         if (validateCode == null) {
-            validateCode= "";
+            validateCode = "";
         }
 
-        if(ifBooleand){
-            if(user.isEmpty() && !validateCode.toString().equals(code)) {
-              throw new CrmebException("验证码错误");
+        if (ifBooleand) {
+            if (user.isEmpty() && !validateCode.toString().equals(code)) {
+                throw new CrmebException("验证码错误");
             }
-            if(!user.isEmpty()){
-               ChannelIdentity channelIdentity = channelIdentityService.getByUser(user.get(0).getId(), channelName);
-                if(channelIdentity == null && !validateCode.toString().equals(code)){
+            if (!user.isEmpty()) {
+                ChannelIdentity channelIdentity = channelIdentityService.getByUser(user.get(0).getId(), channelName);
+                if (channelIdentity == null && !validateCode.toString().equals(code)) {
                     throw new CrmebException("验证码错误");
                 }
                 //验证码兼容身份证后6位
-                if(channelIdentity != null && !validateCode.toString().equals(code) && !channelIdentity.getIdCardNo().substring(channelIdentity.getIdCardNo().length() - 6).equals(code)){
-                   throw new CrmebException("验证码错误");
+                if (channelIdentity != null && !validateCode.toString().equals(code) && !channelIdentity.getIdCardNo().substring(channelIdentity.getIdCardNo().length() - 6).equals(code)) {
+                    throw new CrmebException("验证码错误");
                 }
             }
         }
 
-        if(!ifBooleand && !validateCode.toString().equals(code)){
-          throw new CrmebException("验证码错误");
+        if (!ifBooleand && !validateCode.toString().equals(code)) {
+            throw new CrmebException("验证码错误");
         }
         redisUtil.delete(getValidateCodeRedisKey(phone));
     }
@@ -914,12 +915,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public void checkAccountTeamCode(Integer uid, Integer receiveUserId) {
 
         //验证是否同一个顶点账号，不是同一个不允许转账
-        List<UserUpperDto> list =  invitationService.getAllUpper(uid);
-        List<UserUpperDto>  receiveList =  invitationService.getAllUpper(receiveUserId);
-        if(list.isEmpty() || receiveList.isEmpty() ){
+        List<UserUpperDto> list = invitationService.getAllUpper(uid);
+        List<UserUpperDto> receiveList = invitationService.getAllUpper(receiveUserId);
+        if (list.isEmpty() || receiveList.isEmpty()) {
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
-        if(list.get(list.size() - 1).getPId().intValue() != receiveList.get(receiveList.size() - 1).getPId().intValue() ){
+        if (list.get(list.size() - 1).getPId().intValue() != receiveList.get(receiveList.size() - 1).getPId().intValue()) {
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
 
@@ -929,10 +930,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public void checkTeamAccountTeamCode(Integer uid, Integer receiveUserId) {
         //验证是否同一个团队，不是同一个不允许转账
 
-       Boolean ifInvit =  invitationService.hasChild(uid,receiveUserId);
-        Boolean ifInvit2 =  invitationService.hasChild(receiveUserId,uid);
+        Boolean ifInvit = invitationService.hasChild(uid, receiveUserId);
+        Boolean ifInvit2 = invitationService.hasChild(receiveUserId, uid);
 
-        if(!ifInvit && !ifInvit2){
+        if (!ifInvit && !ifInvit2) {
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
 
@@ -941,7 +942,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Boolean ifOpenSecurityPhone() {
         String securityPhone = environment.getProperty("pay.securityPhone");
-        if(org.apache.commons.lang3.StringUtils.isNotEmpty(securityPhone) && "1".equals(securityPhone)){
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(securityPhone) && "1".equals(securityPhone)) {
             return true;
         }
         return false;
@@ -976,7 +977,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public String getPhone(String account) {
         LambdaQueryWrapper<User> lqw = Wrappers.lambdaQuery();
-        lqw.eq(User::getAccount,account);
+        lqw.eq(User::getAccount, account);
         User one = getOne(lqw);
         return one.getPhone();
     }
@@ -1020,7 +1021,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Map<Integer, User> getUidMapList(List<Integer> uidList) {
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.select(User::getId, User::getAccount, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel,User::getCreateTime);
+        lqw.select(User::getId, User::getAccount, User::getNickname, User::getPhone, User::getAvatar, User::getIsLogoff, User::getLevel, User::getCreateTime);
         lqw.in(User::getId, uidList);
         List<User> userList = dao.selectList(lqw);
         Map<Integer, User> userMap = new HashMap<>();
@@ -1032,13 +1033,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 
     @Override
-    public Boolean verifyPayPwd(String payPwd){
+    public Boolean verifyPayPwd(String payPwd) {
         User user = getInfo();
         if (user.getPayPwd() == null) {
             throw new CrmebException("用户没有设置交易密码");
         }
         boolean equals = user.getPayPwd().equals(CrmebUtil.encryptPassword(payPwd));
-        if(!equals){
+        if (!equals) {
             asyncUpdateError(user.getId());
         }
         return equals;
@@ -1056,8 +1057,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 throw new CrmebException("交易密码不正确");
             }
         }
-        user.setErrorCount(0);
-        updateById(user);
     }
 
     @Override
@@ -1069,30 +1068,23 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         User user = getById(uid);
         int error = user.getErrorCount() == null ? 0 : user.getErrorCount();
         user.setErrorCount(error + 1);
-        if (user.getErrorCount() > 5) {
-            Object o = redisUtil.get("loginToken" + user.getId());
-            if (o != null && com.jbp.common.utils.StringUtils.isNotEmpty(o.toString())) {
-                tokenComponent.delLoginUser(o.toString());
-            }
-            user.setErrorCount(0);
-            user.setStatus(false);
-        }
+        user.setErrorCount(0);
         updateById(user);
     }
 
     @Override
-    public UserPlatformInfoResponse getUserPlatfromInfo(String dbName,String mobile) {
-        return   dao.getUserPlatfromInfo(mobile,dbName);
+    public UserPlatformInfoResponse getUserPlatfromInfo(String dbName, String mobile) {
+        return dao.getUserPlatfromInfo(mobile, dbName);
     }
 
     @Override
     public UserPlatformInfoResponse getUserPlatfromInfo(String mobile) {
-        return   dao.getUserPlatfromInfo2(mobile);
+        return dao.getUserPlatfromInfo2(mobile);
     }
 
     @Override
     public UserPlatformInfoResponse getPlatfromInfo() {
-        return   dao.getPlatfromInfo();
+        return dao.getPlatfromInfo();
     }
 
     /**
@@ -1144,6 +1136,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         // 推广人
         user.setSpreadUid(0);
         user.setErrorCount(0);
+        user.setStatus(true);
         save(user);
         // 增加代理等级
         userCapaService.saveOrUpdateCapa(user.getId(), capaService.getMinCapa().getId(), "", "手机号验证码注册");
@@ -1174,47 +1167,47 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 throw new CrmebException(importUser.getAccount() + ":账号已经存在");
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getNickname())) {
-                throw new CrmebException("昵称不能为空"+ importUser.getAccount());
+                throw new CrmebException("昵称不能为空" + importUser.getAccount());
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getMobile())) {
-                throw new CrmebException("手机号不能为空"+ importUser.getAccount());
+                throw new CrmebException("手机号不能为空" + importUser.getAccount());
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getPaccount())) {
-                throw new CrmebException("销售账号不能为空"+ importUser.getAccount());
+                throw new CrmebException("销售账号不能为空" + importUser.getAccount());
             }
-            if(importUser.getAccount().equals(importUser.getPaccount())){
-                throw new CrmebException("销售账号不能是注册账号"+ importUser.getPaccount());
+            if (importUser.getAccount().equals(importUser.getPaccount())) {
+                throw new CrmebException("销售账号不能是注册账号" + importUser.getPaccount());
             }
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getOpenShop())) {
-                throw new CrmebException("是否开店不能为空"+ importUser.getAccount());
+                throw new CrmebException("是否开店不能为空" + importUser.getAccount());
             }
             if (!("是".equals(importUser.getOpenShop()) || "否".equals(importUser.getOpenShop()))) {
-                throw new CrmebException("是否开店只能填写是|否"+ importUser.getAccount());
+                throw new CrmebException("是否开店只能填写是|否" + importUser.getAccount());
             }
             if (importUser.getCapaId() == null) {
-                throw new CrmebException("等级编号不能为空"+ importUser.getAccount());
+                throw new CrmebException("等级编号不能为空" + importUser.getAccount());
             }
             if (capaService.getById(importUser.getCapaId()) == null) {
-                throw new CrmebException("等级编号不存在"+ importUser.getAccount());
+                throw new CrmebException("等级编号不存在" + importUser.getAccount());
             }
             if (importUser.getCapaXsId() != null) {
                 if (capaXsService.getById(importUser.getCapaXsId()) == null) {
-                    throw new CrmebException("星级编号不存在"+ importUser.getAccount());
+                    throw new CrmebException("星级编号不存在" + importUser.getAccount());
                 }
             }
             if (com.jbp.common.utils.StringUtils.isNotEmpty(importUser.getRaccount())) {
-                if(importUser.getAccount().equals(importUser.getRaccount())){
-                    throw new CrmebException("服务账号不能是注册账号:"+ importUser.getRaccount());
+                if (importUser.getAccount().equals(importUser.getRaccount())) {
+                    throw new CrmebException("服务账号不能是注册账号:" + importUser.getRaccount());
                 }
                 if (importUser.getNode() == null) {
-                    throw new CrmebException("存在服务上级必须填写安置节点"+ importUser.getAccount());
+                    throw new CrmebException("存在服务上级必须填写安置节点" + importUser.getAccount());
                 }
                 if (importUser.getNode().intValue() != 0 && importUser.getNode().intValue() != 1) {
-                    throw new CrmebException("存在服务上级必须填写安置节点且只能填写0或1"+ importUser.getAccount());
+                    throw new CrmebException("存在服务上级必须填写安置节点且只能填写0或1" + importUser.getAccount());
                 }
             }
             if (ObjectUtils.anyNull(importUser.getUsableScore(), importUser.getUsedScore(), importUser.getGouWu(), importUser.getJiangLi(), importUser.getHuangGou(), importUser.getFuQuan())) {
-                throw new CrmebException("积分数字不能为空，没有则录入0:"+ importUser.getAccount());
+                throw new CrmebException("积分数字不能为空，没有则录入0:" + importUser.getAccount());
             }
             logger.info("正在检查导入数据基础信息:" + i + "###总条数:" + list.size());
             i++;
@@ -1242,7 +1235,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         for (UserImportRequest importUser : list) {
             User pUser = getByAccount(importUser.getPaccount());
             if (pUser == null) {
-                throw new RuntimeException("销售上级账户不存在"+ importUser.getPaccount());
+                throw new RuntimeException("销售上级账户不存在" + importUser.getPaccount());
             }
             String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
             User user = getByAccount(account);
@@ -1258,7 +1251,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
             User rUser = getByAccount(importUser.getRaccount());
             if (rUser == null) {
-                throw new RuntimeException("服务上级账户不存在"+importUser.getRaccount());
+                throw new RuntimeException("服务上级账户不存在" + importUser.getRaccount());
             }
             String account = com.jbp.common.utils.StringUtils.trim(importUser.getAccount());
             User user = getByAccount(account);
@@ -1271,7 +1264,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
 
         // 处理业绩 自己的业绩+给安置上级
-        i=1;
+        i = 1;
         for (UserImportRequest importUser : list) {
             if (com.jbp.common.utils.StringUtils.isEmpty(importUser.getRaccount())) {
                 continue;
@@ -1927,7 +1920,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public void tradePassword( String code, String tradePassword) {
+    public void tradePassword(String code, String tradePassword) {
         if (StrUtil.isBlank(code)) {
             throw new CrmebException("手机号码验证码不能为空");
         }
@@ -1985,7 +1978,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province,
                            String city, String district, String address, String payPwd, Boolean openShop, String securityPhone) {
-        if(StringUtils.isNotBlank(phone) && phone.contains("***")){
+        if (StringUtils.isNotBlank(phone) && phone.contains("***")) {
             throw new CrmebException("手机号格式错误");
         }
         User user = getById(id);
@@ -2018,15 +2011,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 
         userInviteResponseList.forEach(e -> {
-            List<UserCapaXsSnapshot> userCapaXsSnapshotList =  userCapaXsSnapshotService.list(new QueryWrapper<UserCapaXsSnapshot>().lambda().eq(UserCapaXsSnapshot::getUid,e.getUid()));
+            List<UserCapaXsSnapshot> userCapaXsSnapshotList = userCapaXsSnapshotService.list(new QueryWrapper<UserCapaXsSnapshot>().lambda().eq(UserCapaXsSnapshot::getUid, e.getUid()));
             Date xsCreateTime = null;
-              if(!userCapaXsSnapshotList.isEmpty()){
-                  if(userCapaXsSnapshotList.size() == 1){
-                      xsCreateTime = userCapaXsSnapshotList.get(0).getGmtCreated();
-                  }
-              }
+            if (!userCapaXsSnapshotList.isEmpty()) {
+                if (userCapaXsSnapshotList.size() == 1) {
+                    xsCreateTime = userCapaXsSnapshotList.get(0).getGmtCreated();
+                }
+            }
 
-            Date createTime =xsCreateTime == null ? e.getCreateTime(): xsCreateTime;
+            Date createTime = xsCreateTime == null ? e.getCreateTime() : xsCreateTime;
             createTime = DateTimeUtils.addHours(createTime, 24);
             e.setOneCount(invitationService.getInviteNumber(e.getUid()));
             e.setIfMonth(createTime.getTime() >= DateTimeUtils.getNow().getTime());
