@@ -105,7 +105,7 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         }
         UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
                 request.getAreaId() != null ? area.getRegionName() : "",
-                UserOfflineSubsidy.Constants.已开通.toString());
+                UserOfflineSubsidy.Constants.已开通.toString(),request.getTeamName());
         if (!ObjectUtil.isNull(userOfflineSubsidy)) {
             if (teamUserService.getByUser(user.getId()).getTid().equals(teamUserService.getByUser(userOfflineSubsidy.getUid()).getTid())){
                 throw new CrmebException("该区域已经被该用户团队的其他成员开通");
@@ -135,7 +135,7 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         if (request.getStatus().equals(UserOfflineSubsidy.Constants.已开通.toString())){
             UserOfflineSubsidy userOfflineSubsidy = getByArea(province.getRegionName(), city.getRegionName(),
                     request.getAreaId() != null ? area.getRegionName() : "",
-                    UserOfflineSubsidy.Constants.已开通.toString());
+                    UserOfflineSubsidy.Constants.已开通.toString(),request.getTeamName());
             UserOfflineSubsidy offlineSubsidy = getById(request.getId());
             if (!ObjectUtil.isNull(userOfflineSubsidy)) {
                 if (teamUserService.getByUser(offlineSubsidy.getUid()).getTid().equals(teamUserService.getByUser(userOfflineSubsidy.getUid()).getTid())){
@@ -154,9 +154,9 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         return updateById(userOfflineSubsidy);
     }
     @Override
-    public UserOfflineSubsidy getByArea(String province, String city, String area, String status) {
+    public UserOfflineSubsidy getByArea(String province, String city, String area, String status,String teamName) {
         return getOne(new QueryWrapper<UserOfflineSubsidy>().lambda()
                 .eq(UserOfflineSubsidy::getProvince, province).eq(UserOfflineSubsidy::getCity, city)
-                .eq(UserOfflineSubsidy::getArea, area).eq(UserOfflineSubsidy::getStatus, status));
+                .eq(UserOfflineSubsidy::getArea, area).eq(UserOfflineSubsidy::getStatus, status).eq(UserOfflineSubsidy::getTeamName, teamName));
     }
 }
