@@ -190,4 +190,20 @@ public class PlatformOrderAdminDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "钱包抵扣")
     private List<ProductDeduction> walletDeductionList;
+
+//    @ApiModelProperty(value = "省份ID")
+//    private Integer provinceId;
+//
+//    @ApiModelProperty(value = "城市id")
+//    private Integer cityId;
+//
+//    @ApiModelProperty(value = "区/县id")
+//    private Integer areaId;
+
+    @ApiModelProperty(value = "收货省")
+    private String province;
+    @ApiModelProperty(value = "收货市")
+    private String city;
+    @ApiModelProperty(value = "收货区")
+    private String district;
 }
