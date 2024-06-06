@@ -130,16 +130,8 @@ public class UserController {
         if(StringUtils.isNotEmpty(user.getSecurityPhone())){
             throw new RuntimeException("安全手机号已存在不允许替换");
         }
-        if(StringUtils.isNotEmpty(request.getPwd())){
-            throw new RuntimeException("交易密码不能为空");
-        }
-        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
-        Boolean ifOpenPwd = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
-        if(walletConfigService.hasPwd()){
-            userService.validPayPwd(user.getId(), request.getPwd());
-        }else if(ifOpenPwd){
-            userService.checkValidateCode(user.getPhone(), request.getPwd());
-        }
+
+       userService.checkValidateCode(request.getPhone(), request.getCaptcha());
         user.setSecurityPhone(request.getPhone());
         userService.updateById(user);
         return CommonResult.success();
