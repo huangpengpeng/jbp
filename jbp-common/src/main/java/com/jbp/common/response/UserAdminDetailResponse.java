@@ -157,4 +157,7 @@ public class UserAdminDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "会员等级")
     private Integer grade;
+
+    @ApiModelProperty(value = "安全手机号")
+    private String securityPhone;
 }

@@ -32,6 +32,9 @@ public class PlatformUpdateUserRequest implements Serializable {
     @ApiModelProperty(value = "手机号码")
     private String phone;
 
+    @ApiModelProperty(value = "安全手机号")
+    private String securityPhone;
+
     @ApiModelProperty(value = "国家，中国CN，其他OTHER")
     private String country;
 
