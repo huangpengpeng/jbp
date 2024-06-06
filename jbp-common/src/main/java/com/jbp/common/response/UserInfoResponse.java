@@ -63,5 +63,7 @@ public class UserInfoResponse implements Serializable {
     @ApiModelProperty(value = "星级")
     private CapaXs capaXs;
 
+    @ApiModelProperty(value = "安全手机")
+    private String securityPhone;
 
 }

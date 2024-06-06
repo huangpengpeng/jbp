@@ -42,4 +42,7 @@ public class UserBindingPhoneUpdateRequest implements Serializable {
 //    @NotBlank(message = "手机号验证码不能为空")
  //   @Pattern(regexp = RegularConstants.VALIDATE_CODE_NUM_SIX, message = "验证码格式错误，验证码必须为6位数字")
     private String captcha;
+
+    @ApiModelProperty(value = "交易密码", required = true)
+    private String pwd;
 }

@@ -38,4 +38,8 @@ public class WalletTransferRequest implements Serializable {
     @NotBlank(message = "转账用户账号不能为空")
     @ApiModelProperty("转账用户账号")
     private String account;
+
+    @NotBlank(message = "验证码")
+    @ApiModelProperty("验证码")
+    private String code;
 }

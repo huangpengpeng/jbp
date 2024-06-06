@@ -143,6 +143,8 @@ rsa:
 kq:
   config: fny1.properties
 
+pay:
+  securityPhone : 1
 
 historyOrder:
   ifOpenOrder: true

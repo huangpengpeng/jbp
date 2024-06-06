@@ -2,6 +2,8 @@ package com.jbp.front.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.constants.Constants;
+import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
@@ -16,6 +18,7 @@ import com.jbp.service.condition.CapaXsInvitationLineHandler;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -69,14 +72,14 @@ public class UserController {
     private SystemConfigService systemConfigService;
     @Autowired
     private UserInvitationService userInvitationService;
-
     @Autowired
     private SelfScoreService selfScoreService;
-
     @Autowired
     private UserCapaXsService userCapaXsService;
     @Autowired
     private CapaXsService capaXsService;
+    @Autowired
+    private WalletConfigService walletConfigService;
 
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
@@ -100,6 +103,7 @@ public class UserController {
         return CommonResult.success(userInfo);
     }
 
+
     @EncryptIgnore
     @ApiOperation(value = "获取用户手机号验证码")
     @RequestMapping(value = "/phone/code", method = RequestMethod.POST)
@@ -117,6 +121,28 @@ public class UserController {
             return CommonResult.success();
         }
         return CommonResult.failed();
+    }
+
+    @ApiOperation(value = "修改安全手机号")
+    @RequestMapping(value = "/update/securityPhone", method = RequestMethod.POST)
+    public CommonResult<String> updateSecurityPhone(@RequestBody @Validated UserBindingPhoneUpdateRequest request) {
+        User user = userService.getInfo();
+        if(StringUtils.isNotEmpty(user.getSecurityPhone())){
+            throw new RuntimeException("安全手机号已存在不允许替换");
+        }
+        if(StringUtils.isNotEmpty(request.getPwd())){
+            throw new RuntimeException("交易密码不能为空");
+        }
+        String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
+        Boolean ifOpenPwd = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
+        if(walletConfigService.hasPwd()){
+            userService.validPayPwd(user.getId(), request.getPwd());
+        }else if(ifOpenPwd){
+            userService.checkValidateCode(user.getPhone(), request.getPwd());
+        }
+        user.setSecurityPhone(request.getPhone());
+        userService.updateById(user);
+        return CommonResult.success();
     }
 
     @ApiOperation(value = "换绑手机号  新手号+新手机号验证码校验")
@@ -294,7 +320,6 @@ public class UserController {
     @ApiOperation(value = "账号获取用户信息")
     @RequestMapping(value = "/getAccountUser", method = RequestMethod.GET)
     public CommonResult<UserInviteResponse> getAccountUser(String account) {
-
 
 
         List<User> phoneList = userService.getByPhone(account);
@@ -515,12 +540,12 @@ public class UserController {
         Integer uid = userService.getUserId();
         UserCapaXs userCapa = userCapaXsService.getByUser(uid);
 
-        if(userCapa == null){
-            return  CommonResult.success();
+        if (userCapa == null) {
+            return CommonResult.success();
         }
         CapaXs pCapa = capaXsService.getNext(userCapa.getCapaId());
 
-        if(pCapa == null){
+        if (pCapa == null) {
             pCapa = capaXsService.getById(userCapa.getCapaId());
         }
 
@@ -537,8 +562,8 @@ public class UserController {
             }
         }
 
-        if(StringUtils.isBlank(riseCondition.getValue()) ){
-            return  CommonResult.success();
+        if (StringUtils.isBlank(riseCondition.getValue())) {
+            return CommonResult.success();
         }
 
         CapaXsInvitationLineHandler.Rule rule = JSONObject.parseObject(riseCondition.getValue()).toJavaObject(CapaXsInvitationLineHandler.Rule.class);

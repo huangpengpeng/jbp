@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,6 +150,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     private UserCapaXsSnapshotService userCapaXsSnapshotService;
     @Resource
     private AsyncUtils asyncUtils;
+    @Autowired
+    private Environment environment;
 
     public static void main(String[] args) {
 
@@ -574,6 +577,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         UserInfoResponse userInfoResponse = new UserInfoResponse();
         BeanUtils.copyProperties(currentUser, userInfoResponse);
         userInfoResponse.setPhone(CrmebUtil.maskMobile(userInfoResponse.getPhone()));
+        userInfoResponse.setSecurityPhone(CrmebUtil.maskMobile(userInfoResponse.getSecurityPhone()));
         UserCapa userCapa = userCapaService.getByUser(currentUser.getId());
         if (userCapa != null) {
             userInfoResponse.setCapa(capaService.getById(userCapa.getCapaId()));
@@ -932,6 +936,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             throw new CrmebException("转让失败。积分转让仅限同市场团队内进行，请核对接收人信息");
         }
 
+    }
+
+    @Override
+    public Boolean ifOpenSecurityPhone() {
+        String securityPhone = environment.getProperty("pay.securityPhone");
+        if(org.apache.commons.lang3.StringUtils.isNotEmpty(securityPhone) && "1".equals(securityPhone)){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1970,7 +1983,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return CommonPage.copyPageInfo(page, userInviteResponseList);
     }
 
-    public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province, String city, String district, String address, String payPwd, Boolean openShop) {
+    public void updateUser(Integer id, String pwd, Integer sex, String nickname, String phone, String country, String province,
+                           String city, String district, String address, String payPwd, Boolean openShop, String securityPhone) {
         if(StringUtils.isNotBlank(phone) && phone.contains("***")){
             throw new CrmebException("手机号格式错误");
         }
@@ -1985,6 +1999,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 .set(ObjectUtil.isNotEmpty(city) && !city.equals(""), User::getCity, city)
                 .set(ObjectUtil.isNotEmpty(district) && !district.equals(""), User::getDistrict, district)
                 .set(ObjectUtil.isNotEmpty(address) && !address.equals(""), User::getAddress, address)
+                .set(ObjectUtil.isNotEmpty(securityPhone) && !securityPhone.equals(""), User::getSecurityPhone, securityPhone)
                 .set(ObjectUtil.isNotEmpty(openShop), User::getOpenShop, openShop);
         if (ObjectUtils.isNotEmpty(pwd) && !pwd.equals("")) {
             lqw.set(User::getPwd, CrmebUtil.encryptPassword(pwd));

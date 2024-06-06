@@ -137,3 +137,5 @@ zhcx:
   zd: CX000000
   org: CX111111
 
+pay:
+  securityPhone : 1

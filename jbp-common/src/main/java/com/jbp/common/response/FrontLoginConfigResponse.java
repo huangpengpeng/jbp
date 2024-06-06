@@ -86,4 +86,7 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "工作台不可见等级")
     private String workbenchCapaOpen;
+
+    @ApiModelProperty(value = "开启安全手机号")
+    private Boolean openScurityPhone ;
 }
