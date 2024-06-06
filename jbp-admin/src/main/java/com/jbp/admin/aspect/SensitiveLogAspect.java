@@ -116,6 +116,9 @@ public class SensitiveLogAspect {
             return StrUtil.sub(argsArrayToString(joinPoint.getArgs()), 0, 2000);
         } else {
             Map<?, ?> paramsMap = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            if(paramsMap.isEmpty()){
+                return StrUtil.sub(argsArrayToString(joinPoint.getArgs()), 0, 2000);
+            }
             return StrUtil.sub(paramsMap.toString(), 0, 2000);
         }
     }
