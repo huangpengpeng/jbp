@@ -15,7 +15,7 @@ public interface UserOfflineSubsidyService extends IService<UserOfflineSubsidy> 
 
     Boolean edit(UserOfflineSubsidyEditRequest request);
 
-    UserOfflineSubsidy getByArea(String province, String city, String area, String status);
+    UserOfflineSubsidy getByArea(String province, String city, String area, String status,String teamName);
 
 
 

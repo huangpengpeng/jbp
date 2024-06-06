@@ -47,4 +47,7 @@ public class UserOfflineSubsidyAddRequest implements Serializable {
 //    @NotNull(message = "区/县id不能为空")
     private Integer areaId;
 
+    @ApiModelProperty(value = "区/县id")
+//    @NotNull(message = "区/县id不能为空")
+    private String teamName;
 }
