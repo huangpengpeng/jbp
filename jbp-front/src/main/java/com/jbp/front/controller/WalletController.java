@@ -20,6 +20,7 @@ import com.jbp.common.response.UserWalletInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.front.service.LoginService;
 import com.jbp.service.product.comm.CommAliasNameSmEnum;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
@@ -45,6 +46,8 @@ import java.util.Map;
 @Api(tags = "用户积分")
 public class WalletController {
 
+    @Resource
+    private LoginService loginService;
     @Resource
     private UserInvitationService userInvitationService;
     @Resource
@@ -215,8 +218,6 @@ public class WalletController {
         if (walletConfig == null) {
             throw new CrmebException("积分信息不存在");
         }
-
-
         if (walletConfig.getChangeType() == null || walletConfig.getChangeScale() == null
                 || ArithmeticUtils.lessEquals(walletConfig.getChangeScale(), BigDecimal.ZERO)) {
             throw new CrmebException("兑换信息未配置, 请联系管理员");
@@ -236,7 +237,15 @@ public class WalletController {
         }
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.IPHON_CODE_CARD);
         Boolean ifOpenPwd = Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword);
-
+        if (userService.ifOpenSecurityPhone()) {
+            if (StringUtils.isNotEmpty(request.getCode())) {
+                throw new CrmebException("验证码不能为空");
+            }
+            if (StringUtils.isNotEmpty(user.getSecurityPhone())) {
+                throw new CrmebException("请先设置安全手机号");
+            }
+            loginService.checkValidateCode(user.getSecurityPhone(), request.getCode());
+        }
         if(walletConfigService.hasPwd()){
             userService.validPayPwd(user.getId(), request.getPwd());
         }else if(ifOpenPwd){

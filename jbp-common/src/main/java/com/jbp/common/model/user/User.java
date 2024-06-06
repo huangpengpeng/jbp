@@ -178,4 +178,7 @@ public class User implements Serializable {
     @ApiModelProperty(value = "错误次数")
     private Integer errorCount;
 
+    @ApiModelProperty(value = "安全手机号")
+    private String securityPhone;
+
 }

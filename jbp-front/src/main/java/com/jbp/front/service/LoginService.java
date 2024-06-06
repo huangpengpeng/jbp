@@ -40,6 +40,8 @@ public interface LoginService {
      */
     Boolean sendLoginCode(String phone);
 
+    void checkValidateCode(String phone, String code);
+
     /**
      * 手机号验证码登录
      * @param loginRequest 登录信息

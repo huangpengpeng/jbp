@@ -151,3 +151,6 @@ historyOrder:
 internal:
   uid: 1014545,1014667
   shop: 0
+
+pay:
+  securityPhone : 1

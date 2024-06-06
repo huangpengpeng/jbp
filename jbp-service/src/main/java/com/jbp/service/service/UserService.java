@@ -422,4 +422,6 @@ public interface UserService extends IService<User> {
 
 
     void checkTeamAccountTeamCode(Integer uid,Integer receiveUserId);
+
+    Boolean ifOpenSecurityPhone();
 }

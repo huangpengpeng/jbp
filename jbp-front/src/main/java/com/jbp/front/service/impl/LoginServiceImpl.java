@@ -93,6 +93,7 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private FrontTokenComponent frontTokenComponent;
 
+
     /**
      * 发送短信验证码
      *
@@ -110,7 +111,8 @@ public class LoginServiceImpl implements LoginService {
      * @param phone 手机号
      * @param code  验证码
      */
-    private void checkValidateCode(String phone, String code) {
+    @Override
+    public void checkValidateCode(String phone, String code) {
         String value = systemConfigService.getValueByKey("sms_code_valid_open");
         if (StringUtils.isNotEmpty(value) && "0".equals(value)) {
             return;
@@ -641,6 +643,7 @@ public class LoginServiceImpl implements LoginService {
         response.setPersonalBackground(record.getStr(SysConfigConstants.PERSONAL_BACKGROUND));
         response.setStoreGoodsOpen(record.getStrBoolean(SysConfigConstants.STORE_GOODS_OPEN));
         response.setWorkbenchCapaOpen(record.getStr(SysConfigConstants.WORKBENCH_CAPA_OPEN));
+        response.setOpenScurityPhone(userService.ifOpenSecurityPhone());
         return response;
     }
 
