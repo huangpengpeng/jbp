@@ -82,7 +82,7 @@ public class PlatformUserController {
         return CommonResult.failed();
     }
 
-    @PreAuthorize("hasAuthority('platform:user:detail')")
+//    @PreAuthorize("hasAuthority('platform:user:detail')")
     @ApiOperation(value = "用户详情")
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public CommonResult<UserAdminDetailResponse> detail(@PathVariable(value = "id") Integer id) {
