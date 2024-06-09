@@ -6,12 +6,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.product.Product;
 import com.jbp.common.model.system.JushuitanConfig;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.DateTimeUtils;
@@ -143,17 +140,13 @@ public class JushuitanOrderSvc {
     @Autowired
     private UserService userService;
     @Autowired
-    private ProductService productService;
-    @Autowired
     private OrderDetailService orderDetailService;
     @Autowired
     private OrderService orderService;
     @Autowired
     private JushuitanCallSvc callSvc;
-
     @Autowired
     private MerchantOrderService merchantOrderService;
-
     @Autowired
     private UserInvitationService userInvitationService;
 }
