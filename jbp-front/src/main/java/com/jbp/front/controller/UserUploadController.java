@@ -1,5 +1,6 @@
 package com.jbp.front.controller;
 
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.request.BaseUploadRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.FileResultVo;
@@ -43,6 +44,7 @@ public class UserUploadController {
             @ApiImplicitParam(name = "model", value = "模块 用户user,商品product,微信wechat,news文章"),
             @ApiImplicitParam(name = "pid", value = "分类ID 0编辑器,1商品图片,2拼团图片,3砍价图片,4秒杀图片,5文章图片,6组合数据图,7前台用户,8微信系列 ", allowableValues = "range[0,1,2,3,4,5,6,7,8]")
     })
+    @EncryptIgnore
     public CommonResult<FileResultVo> image(MultipartFile multipart, @RequestParam(value = "model") String model,
                                             @RequestParam(value = "pid") Integer pid) {
 

@@ -58,4 +58,6 @@ public class OrderExt extends BaseModel {
 
     @ApiModelProperty(value = "AI服务码")
     private String aiServerSn;
+    @ApiModelProperty(value = "AI服务天数")
+    private Integer aiDay;
 }
