@@ -9,6 +9,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.HistoryOrderResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.HistoryOrderService;
+import com.jbp.service.service.agent.impl.HistoryOrderServiceImpl;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,12 +45,7 @@ public class HistoryOrderController {
         if (StringUtils.isEmpty(request.getDbName())) {
             return CommonResult.success();
         }
-        Map<String, String> map = Maps.newConcurrentMap();
-        map.put("wkp42271043176625", "");
-        map.put("tf138940740527575", "");
-        map.put("xcsmall", "");
-        map.put("jymall", "");
-        request.setShopId(map.get(request.getDbName()));
+        request.setShopId(HistoryOrderServiceImpl.DB_NAME_MAP.get(request.getDbName()));
         historyOrderService.edit(request);
         return CommonResult.success();
     }

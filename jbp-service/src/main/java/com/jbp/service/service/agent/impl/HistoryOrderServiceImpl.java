@@ -21,6 +21,7 @@ import com.jbp.service.service.agent.HistoryOrderService;
 import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.ehcache.shadow.org.terracotta.offheapstore.HashingMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +40,21 @@ import java.util.stream.Collectors;
 public class HistoryOrderServiceImpl implements HistoryOrderService {
 
     public  static  Map<String, String> SHOP_TOKEN = Maps.newConcurrentMap();
+
+    public  static  Map<String, String> DB_NAME_MAP = new HashMap<String, String>(){{
+        put("wkp42271043176625", "1");
+        put("tf138940740527575", "2");
+        put("xcsmall", "3");
+        put("jymall", "4");
+    }};
+
+    public  static  Map<String, String> SHOP_MAP = new HashMap<String, String>(){{
+        put("1", "wkp42271043176625");
+        put("2", "tf138940740527575");
+        put("3", "xcsmall");
+        put("4", "jymall");
+    }};
+
 
     @Autowired
     private JushuitanCallSvc jushuitanCallSvc;

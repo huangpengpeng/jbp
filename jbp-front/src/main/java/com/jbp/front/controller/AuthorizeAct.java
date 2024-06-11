@@ -21,6 +21,7 @@ import com.jbp.service.service.MerchantOrderService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.agent.HistoryOrderService;
+import com.jbp.service.service.agent.impl.HistoryOrderServiceImpl;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,17 +58,11 @@ public class AuthorizeAct {
     @RequestMapping(value = "/jushuitan/callApi/{shopId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void call(@PathVariable("shopId") String shopId, @RequestBody String jsonObject, HttpServletResponse response) throws IOException {
 
-        Map<String, String> map = Maps.newConcurrentMap();
-        map.put("", "wkp42271043176625");
-        map.put("", "tf138940740527575");
-        map.put("", "xcsmall");
-        map.put("", "jymall");
-
         JSONObject jsonObject1 = JSONObject.parseObject(jsonObject);
         String orderSn = jsonObject1.getString("so_id");
         String shipName = jsonObject1.getString("logistics_company");
         String shipSn = jsonObject1.getString("l_id");
-        historyOrderService.jstCall(map.get(shopId), orderSn, shipName, shipSn);
+        historyOrderService.jstCall(HistoryOrderServiceImpl.SHOP_MAP.get(shopId), orderSn, shipName, shipSn);
         response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
     }
 
