@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.HistoryOrderEditRequest;
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
 @Service
 public class HistoryOrderServiceImpl implements HistoryOrderService {
 
+    public  static  Map<String, String> SHOP_TOKEN = Maps.newConcurrentMap();
+
     @Autowired
     private JushuitanCallSvc jushuitanCallSvc;
 
@@ -50,6 +53,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
                 "        FROM " + request.getDbName() + ".orders AS o " +
                 "        LEFT JOIN " + request.getDbName() + ".user AS u ON u.`id` = o.userId " +
                 "        WHERE 1 =1 ";
+
 
         if (request.getUid() != null && request.getUid().intValue() > 0) {
             sql = sql + " and u.id = " + request.getUid();
@@ -203,4 +207,10 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
     }
 
 
+    @Override
+    public Boolean jstCall(String dbName, String orderSn, String shipName, String shipNo) {
+        boolean update = SqlRunner.db().update("update " + dbName + ".orders set status = {0}, shipTime={1}, shipName={2}, shipSn={3} where orderSn ={4}",
+                "301", DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN), shipName, shipNo, orderSn);
+        return update;
+    }
 }

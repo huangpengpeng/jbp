@@ -2,7 +2,7 @@ package com.jbp.front.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.model.express.Express;
@@ -20,6 +20,7 @@ import com.jbp.service.service.ExpressService;
 import com.jbp.service.service.MerchantOrderService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.agent.HistoryOrderService;
 import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,10 +30,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -46,187 +49,209 @@ import java.util.Map;
 @Api(tags = "聚水潭控制器")
 public class AuthorizeAct {
 
+    @Resource
+    private HistoryOrderService historyOrderService;
 
-	@EncryptIgnore
-	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/jushuitan/callApi1", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi1(@RequestBody String jsonObject, HttpServletResponse response) {
+    @EncryptIgnore
+    @ApiOperation(value = "老订单聚水潭推送 shopId 对应店铺ID", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/jushuitan/callApi/{shopId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void call(@PathVariable("shopId") String shopId, @RequestBody String jsonObject, HttpServletResponse response) throws IOException {
 
-		response.setContentType("text/html;charset=UTF-8");
-		response.setHeader("Pragma", "No-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0L);
-		if(StringUtils.isBlank(jsonObject)){
-			try {
-				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-				return;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		{
-			log.info("jushuitancallApi:{} jsonObject:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()),
-					jsonObject);
-		}
-			JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
+        Map<String, String> map = Maps.newConcurrentMap();
+        map.put("", "wkp42271043176625");
+        map.put("", "tf138940740527575");
+        map.put("", "xcsmall");
+        map.put("", "jymall");
 
-		{
-			String orderSn = jsonObject1.getString("so_id");
-			String shipName = jsonObject1.getString("logistics_company");
-			String shipSn = jsonObject1.getString("l_id");
-			Order orders = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getPlatOrderNo,orderSn));
-			if (!orders.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING)) {
-				throw new RuntimeException(orders.getOrderNo() + "状态错误");
-			}
-			Express express =  expressService.getByName(shipName);
+        JSONObject jsonObject1 = JSONObject.parseObject(jsonObject);
+        String orderSn = jsonObject1.getString("so_id");
+        String shipName = jsonObject1.getString("logistics_company");
+        String shipSn = jsonObject1.getString("l_id");
+        historyOrderService.jstCall(map.get(shopId), orderSn, shipName, shipSn);
+        response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+    }
 
-			OrderSendRequest orderSendRequest = new OrderSendRequest();
-			orderSendRequest.setOrderNo(orders.getOrderNo());
-			orderSendRequest.setDeliveryType("express");
-			orderSendRequest.setExpressCode(express.getCode());
-			orderSendRequest.setIsSplit(false);
-			orderSendRequest.setExpressNumber(shipSn);
-			orderSendRequest.setExpressRecordType(1);
-			MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orders.getOrderNo());
-			orderSendRequest.setToName(merchantOrder.getRealName());
-			orderSendRequest.setToTel(merchantOrder.getUserPhone());
-			orderSendRequest.setToAddr(merchantOrder.getUserAddress());
-			List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orders.getOrderNo());
-			List<SplitOrderSendDetailRequest> list = new ArrayList<>();
-			for (OrderDetail orderDetail : orderDetailList) {
-				SplitOrderSendDetailRequest splitOrderSendDetailRequest = new SplitOrderSendDetailRequest();
-				splitOrderSendDetailRequest.setNum(orderDetail.getPayNum());
-				splitOrderSendDetailRequest.setOrderDetailId(orderDetail.getId());
-				list.add(splitOrderSendDetailRequest);
-			}
-			orderSendRequest.setDetailList(list);
-			orderSendRequest.setExpressTempId(shipSn);
-			try {
-				orderService.send(orderSendRequest);
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 
-	}
-	@EncryptIgnore
-	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/jushuitan/callApi2", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi2(String jsonObject,HttpServletResponse response) {
-		{
-			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
-		}
-		response.setContentType("text/html;charset=UTF-8");
-		response.setHeader("Pragma", "No-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0L);
+    @EncryptIgnore
+    @ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/jushuitan/callApi1", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void erpcallApi1(@RequestBody String jsonObject, HttpServletResponse response) {
 
-		if(StringUtils.isBlank(jsonObject)){
-			try {
-				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-				return;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);
+        response.setContentType("text/html;charset=UTF-8");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0L);
+        if (StringUtils.isBlank(jsonObject)) {
+            try {
+                response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        {
+            log.info("jushuitancallApi:{} jsonObject:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()),
+                    jsonObject);
+        }
+        JSONObject jsonObject1 = JSONObject.parseObject(jsonObject);
 
-		String orderSn = jsonObject1.getString("so_id");
-		String refundMark= jsonObject1.getString("remark");
+        {
+            String orderSn = jsonObject1.getString("so_id");
+            String shipName = jsonObject1.getString("logistics_company");
+            String shipSn = jsonObject1.getString("l_id");
+            Order orders = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getPlatOrderNo, orderSn));
+            if (!orders.getStatus().equals(OrderConstants.ORDER_STATUS_WAIT_SHIPPING)) {
+                throw new RuntimeException(orders.getOrderNo() + "状态错误");
+            }
+            Express express = expressService.getByName(shipName);
 
-		Order orders = orderService.getByOrderNo(orderSn);
-		//退款
+            OrderSendRequest orderSendRequest = new OrderSendRequest();
+            orderSendRequest.setOrderNo(orders.getOrderNo());
+            orderSendRequest.setDeliveryType("express");
+            orderSendRequest.setExpressCode(express.getCode());
+            orderSendRequest.setIsSplit(false);
+            orderSendRequest.setExpressNumber(shipSn);
+            orderSendRequest.setExpressRecordType(1);
+            MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(orders.getOrderNo());
+            orderSendRequest.setToName(merchantOrder.getRealName());
+            orderSendRequest.setToTel(merchantOrder.getUserPhone());
+            orderSendRequest.setToAddr(merchantOrder.getUserAddress());
+            List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orders.getOrderNo());
+            List<SplitOrderSendDetailRequest> list = new ArrayList<>();
+            for (OrderDetail orderDetail : orderDetailList) {
+                SplitOrderSendDetailRequest splitOrderSendDetailRequest = new SplitOrderSendDetailRequest();
+                splitOrderSendDetailRequest.setNum(orderDetail.getPayNum());
+                splitOrderSendDetailRequest.setOrderDetailId(orderDetail.getId());
+                list.add(splitOrderSendDetailRequest);
+            }
+            orderSendRequest.setDetailList(list);
+            orderSendRequest.setExpressTempId(shipSn);
+            try {
+                orderService.send(orderSendRequest);
+                response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    @EncryptIgnore
+    @ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/jushuitan/callApi2", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void erpcallApi2(String jsonObject, HttpServletResponse response) {
+        {
+            log.info("jushuitancallApi:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
+        }
+        response.setContentType("text/html;charset=UTF-8");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0L);
+
+        if (StringUtils.isBlank(jsonObject)) {
+            try {
+                response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        JSONObject jsonObject1 = JSONObject.parseObject(jsonObject);
+
+        String orderSn = jsonObject1.getString("so_id");
+        String refundMark = jsonObject1.getString("remark");
+
+        Order orders = orderService.getByOrderNo(orderSn);
+        //退款
 //		ordersMng.refund(orders.getId(), refundMark, "聚水潭", "聚水潭通知");
-		try {
+        try {
 
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	@EncryptIgnore
-	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/jushuitan/callApi3", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi3(HttpServletResponse response) {
-		{
-			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
-		}
-		response.setContentType("text/html;charset=UTF-8");
-		response.setHeader("Pragma", "No-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0L);
-		try {
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	@EncryptIgnore
-	@ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/jushuitan/callApi4", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void erpcallApi4( String jsonObject,HttpServletResponse response) {
-		{
-			log.info("jushuitancallApi:{}",JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
-		}
-		response.setContentType("text/html;charset=UTF-8");
-		response.setHeader("Pragma", "No-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0L);
-		if(StringUtils.isBlank(jsonObject)){
-			try {
-				response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-				return;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		JSONObject jsonObject1  =JSONObject.parseObject(jsonObject);	
-		String orderSn = jsonObject1.getString("so_id");
-		String refundMark= jsonObject1.getString("remark");
+            response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-		//退款
+    @EncryptIgnore
+    @ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/jushuitan/callApi3", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void erpcallApi3(HttpServletResponse response) {
+        {
+            log.info("jushuitancallApi:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
+        }
+        response.setContentType("text/html;charset=UTF-8");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0L);
+        try {
+            response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EncryptIgnore
+    @ApiOperation(value = "erp 聚水潭 消息推送", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/jushuitan/callApi4", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void erpcallApi4(String jsonObject, HttpServletResponse response) {
+        {
+            log.info("jushuitancallApi:{}", JushuitanCallSvc.getLocation(JushuitanCallSvc.getNativeRequest()));
+        }
+        response.setContentType("text/html;charset=UTF-8");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0L);
+        if (StringUtils.isBlank(jsonObject)) {
+            try {
+                response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        JSONObject jsonObject1 = JSONObject.parseObject(jsonObject);
+        String orderSn = jsonObject1.getString("so_id");
+        String refundMark = jsonObject1.getString("remark");
+
+        //退款
 //		Orders orders=ordersMng.getByOrderSn(orderSn);
 //		ordersMng.refund(orders.getId(), refundMark, "聚水潭", "聚水潭通知");
-		try {
-			response.getWriter().write( "{\"code\":\"0\",\"msg\":\"执行成功\"}");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            response.getWriter().write("{\"code\":\"0\",\"msg\":\"执行成功\"}");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
-	@EncryptIgnore
-	@ApiOperation(value = "erp 授权", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping(value = "/auth/callApi", produces = MediaType.APPLICATION_JSON_VALUE)
-	public String callApi(String code, HttpServletResponse response, ModelMap model) {
-		{
-			log.info("code:", code);
-		}
-		{
-			callSvc.getAccessToken(code);
-		}
-		return  "授权成功";
+    @EncryptIgnore
+    @ApiOperation(value = "erp 授权", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/auth/callApi", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String callApi(String code, HttpServletResponse response, ModelMap model) {
+        {
+            log.info("code:", code);
+        }
+        {
+            callSvc.getAccessToken(code);
+        }
+        return "授权成功";
 
-	}
-
-
+    }
 
 
-
-	@Autowired
-	private OrderDetailService orderDetailService;
-	@Autowired
-	private MerchantOrderService merchantOrderService;
-	@Autowired
-	private OrderService orderService;
-	@Autowired
-	private JushuitanCallSvc callSvc;
-	@Autowired
-	private Environment environment;
-	@Autowired
-	private ExpressService expressService;
-	@Autowired
-	private JushuitanOrderSvc jushuitanOrderSvc;
+    @Autowired
+    private OrderDetailService orderDetailService;
+    @Autowired
+    private MerchantOrderService merchantOrderService;
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private JushuitanCallSvc callSvc;
+    @Autowired
+    private Environment environment;
+    @Autowired
+    private ExpressService expressService;
+    @Autowired
+    private JushuitanOrderSvc jushuitanOrderSvc;
 
 }

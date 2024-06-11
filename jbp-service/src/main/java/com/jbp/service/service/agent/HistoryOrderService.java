@@ -12,4 +12,6 @@ public interface HistoryOrderService {
 
     void edit(HistoryOrderEditRequest request);
 
+    Boolean jstCall(String dbName, String orderSn, String shipName, String shipNo);
+
 }
