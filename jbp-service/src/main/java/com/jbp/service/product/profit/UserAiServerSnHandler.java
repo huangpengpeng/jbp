@@ -94,15 +94,6 @@ public class UserAiServerSnHandler implements ProductProfitHandler {
         String serverSn = "";
         for (int i = 0; i < rule.getNum(); i++) {
 
-            TeamUser teamUser = teamUserService.getByUser(order.getUid());
-            Integer teamId = 0;
-            if(teamUser != null){
-                Team team =  teamService.getById( teamUser.getTid());
-                if(team!= null){
-                    teamId = team.getLeaderId();
-                }
-            }
-
             String serverSns = "AI"+ order.getId() + new Random().nextInt(1000) + i;
             serverSn = serverSn + "," + serverSns;
         }
