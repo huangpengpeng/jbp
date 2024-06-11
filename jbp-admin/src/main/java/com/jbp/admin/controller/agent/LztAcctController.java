@@ -267,6 +267,9 @@ public class LztAcctController {
                         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
                         if (lztTransfer != null) {
                             acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
+                            AcctSerialDetailResult detail = acctBalList.getDetail();
+                            detail.setOther_acct_name(lztTransfer.getBankAcctName());
+                            detail.setOther_acct(lztTransfer.getBankAcctNo());
                         }else{
                             acctBalList.setFeeAmount(BigDecimal.ZERO.setScale(2));
                         }
