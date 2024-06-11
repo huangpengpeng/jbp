@@ -3,6 +3,7 @@ package com.jbp.admin;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
+import com.jbp.admin.task.order.OrderAiServerTask;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
@@ -126,10 +127,10 @@ public class JbpAdminApplication {
 //            System.out.println(i++);
      //  }
 
-
-
-
-
+//
+//        OrderAiServerTask order  = run.getBean(OrderAiServerTask.class,args);
+//
+//        order.aiServer();
 
 
     }
