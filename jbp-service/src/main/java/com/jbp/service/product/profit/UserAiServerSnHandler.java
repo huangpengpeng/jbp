@@ -100,6 +100,7 @@ public class UserAiServerSnHandler implements ProductProfitHandler {
 
         OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
         orderExt.setAiServerSn(serverSn);
+        orderExt.setAiDay(rule.getDay());
         orderExtService.updateById(orderExt);
 
     }
