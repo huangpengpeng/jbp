@@ -29,6 +29,7 @@ import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.agent.InvitationScoreDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -43,15 +44,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, InvitationScore> implements InvitationScoreService {
 
-
-    @Resource
-    private UploadService uploadService;
     @Resource
     private OssService ossService;
+    @Resource
+    private UploadService uploadService;
     @Resource
     private TeamUserService teamUserService;
     @Resource
@@ -239,11 +240,14 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         }
 
         // 查询所有的用户上级
-        Map<Integer, List<Integer>> pidListMap = Maps.newConcurrentMap();
+        Map<Integer, LinkedList<Integer>> pidListMap = Maps.newConcurrentMap();
         Map<Integer, UserCapa> capaMap = Maps.newConcurrentMap();
         Map<Integer, UserCapaXs> capaXsMap = Maps.newConcurrentMap();
+
+       int i = 1;
         for (Order order : successList) {
-            List<Integer> pidList = pidListMap.get(order.getUid());
+            log.info("总数:{},当前条数:{}", successList.size(), i++);
+            LinkedList<Integer> pidList = pidListMap.get(order.getUid());
             if (CollectionUtils.isNotEmpty(pidList)) {
                 continue;
             }
@@ -251,8 +255,11 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             if (CollectionUtils.isEmpty(allUpper) || allUpper.get(0).getPId() == null) {
                 continue;
             }
-            pidList = Lists.newArrayList();
+            pidList = new LinkedList<>();
             for (UserUpperDto upperDto : allUpper) {
+                if(upperDto.getPId() == null){
+                    continue;
+                }
                 if (CollectionUtils.isNotEmpty(uidList)) {
                     if (!uidList.contains(upperDto.getPId())) {
                         continue;
@@ -262,7 +269,9 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapa userCapa = capaMap.get(upperDto.getPId());
                     if (userCapa == null) {
                         userCapa = userCapaService.getByUser(upperDto.getPId());
-                        capaMap.put(upperDto.getPId(), userCapa);
+                        if (userCapa != null) {
+                            capaMap.put(upperDto.getPId(), userCapa);
+                        }
                     }
 
                     if (userCapa == null || !request.getCapaIdList().contains(userCapa.getCapaId())) {
@@ -273,7 +282,9 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapaXs userCapaXs = capaXsMap.get(upperDto.getPId());
                     if (userCapaXs == null) {
                         userCapaXs = userCapaXsService.getByUser(upperDto.getPId());
-                        capaXsMap.put(upperDto.getPId(), userCapaXs);
+                        if(userCapaXs != null){
+                            capaXsMap.put(upperDto.getPId(), userCapaXs);
+                        }
                     }
                     if (userCapaXs == null || !request.getCapaIdXsList().contains(userCapaXs.getCapaId())) {
                         continue;
@@ -290,21 +301,26 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
         Map<Integer, User> userMap = Maps.newConcurrentMap();
         Map<Integer, TeamUser> userTeamMap = Maps.newConcurrentMap();
+        i = 1;
         for (Order order : successList) {
-
-            List<Integer> pidList = pidListMap.get(order.getUid());
+            log.info("组装数据，总数:{},当前条数:{}", successList.size(), i++);
+            LinkedList<Integer> pidList = pidListMap.get(order.getUid());
             if (CollectionUtils.isEmpty(pidList)) {
                 continue;
             }
             List<OrderDetail> orderDetailList = orderDetailMap.get(order.getOrderNo());
             for (OrderDetail orderDetail : orderDetailList) {
                 BigDecimal score = orderDetailService.getRealScore(orderDetail);
+                BigDecimal ratio = BigDecimal.ONE;
+                BigDecimal level = BigDecimal.ONE;
                 for (Integer pid : pidList) {
                     ScoreDownLoadExcel excel = new ScoreDownLoadExcel();
                     User puser = userMap.get(pid);
                     if (puser == null) {
                         puser = userService.getById(pid);
-                        userMap.put(pid, puser);
+                        if(puser != null){
+                            userMap.put(pid, puser);
+                        }
                     }
                     excel.setUid(pid);
                     excel.setAccount(puser.getAccount());
@@ -312,7 +328,9 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     TeamUser pUserTeam = userTeamMap.get(pid);
                     if (pUserTeam == null) {
                         pUserTeam = teamUserService.getByUser(pid);
-                        userTeamMap.put(pid, pUserTeam);
+                        if(pUserTeam != null){
+                            userTeamMap.put(pid, pUserTeam);
+                        }
                     }
                     if (pUserTeam != null) {
                         excel.setTeamName(pUserTeam.getName());
@@ -320,7 +338,9 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapa pUserCapa = capaMap.get(pid);
                     if (pUserCapa == null) {
                         pUserCapa = userCapaService.getByUser(pid);
-                        capaMap.put(pid, pUserCapa);
+                        if(pUserCapa != null){
+                            capaMap.put(pid, pUserCapa);
+                        }
                     }
                     if (pUserCapa != null) {
                         excel.setCapaName(pUserCapa.getCapaName());
@@ -328,13 +348,15 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapaXs pUserCapaXs = capaXsMap.get(pid);
                     if (pUserCapaXs == null) {
                         pUserCapaXs = userCapaXsService.getByUser(pid);
-                        capaXsMap.put(pid, pUserCapaXs);
+                        if(pUserCapaXs != null){
+                            capaXsMap.put(pid, pUserCapaXs);
+                        }
                     }
                     if (pUserCapaXs != null) {
                         excel.setCapaXsName(pUserCapaXs.getCapaName());
                     }
-
                     excel.setScore(score);
+                    excel.setScore2(score.divide(level, 2, BigDecimal.ROUND_DOWN));
                     excel.setOrderSn(order.getOrderNo());
                     excel.setProductName(orderDetail.getProductName());
                     excel.setBarCode(orderDetail.getBarCode());
@@ -352,11 +374,15 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     excel.setStartTime(request.getStartTime());
                     excel.setEndTime(request.getEndTime());
                     list.add(excel);
+                    level  = level.add(BigDecimal.ONE);
                 }
             }
         }
-        FileResultVo fileResultVo = uploadService.excelLocalUpload(list, ScoreDownLoadExcel.class);
-//        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        return fileResultVo.getUrl();
+//        FileResultVo fileResultVo = uploadService.excelLocalUpload(list, ScoreDownLoadExcel.class);
+        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+
+        return s;
     }
+
+
 }

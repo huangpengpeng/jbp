@@ -44,7 +44,12 @@ public class OrderAiServerTask {
                     request.charset("utf-8");
                     String response = request.body(body).send().bodyText();
                     logger.info("返回报文 {}", response);
+
+
+
                 });
+                orderExt.setAiPushServer(true);
+                orderExtService.updateById(orderExt);
             }
         } catch (Exception e) {
             e.printStackTrace();

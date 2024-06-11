@@ -23,7 +23,6 @@ import java.util.Optional;
 @ApiModel(value = "CbecOrder对象", description = "跨境订单表")
 public class CbecOrder extends BaseModel {
 
-
     @ApiModelProperty(value = "用户uid")
     private Integer userId;
 
