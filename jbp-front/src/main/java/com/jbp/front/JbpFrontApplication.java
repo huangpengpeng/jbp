@@ -1,6 +1,16 @@
 package com.jbp.front;
 
+import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.request.HistoryOrderEditRequest;
+import com.jbp.common.request.HistoryOrderRequest;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ScoreDownloadRequest;
+import com.jbp.common.response.HistoryOrderResponse;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.service.service.agent.HistoryOrderService;
+import com.jbp.service.service.agent.InvitationScoreService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,5 +49,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+        HistoryOrderService historyOrderService = run.getBean(HistoryOrderService.class);
+        HistoryOrderEditRequest request = new HistoryOrderEditRequest();
+        request.setIfXcs(true);
+        request.setType(1);
+        request.setOrderNoList(Lists.newArrayList("C168357053474186", "C97622064264742"));
+        String dbName = bean.getProperty("historyOrder.name");
+        if(request.getIfXcs()){
+            dbName = "xcsmall";
+        }
+        request.setDbName(dbName);
+        historyOrderService.edit(request);
+        System.out.println("启动完成");
     }
 }

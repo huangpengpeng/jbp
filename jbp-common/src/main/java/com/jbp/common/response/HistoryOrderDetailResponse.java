@@ -16,6 +16,15 @@ import java.util.Date;
 @ApiModel(value="HistoryOrderDetailResponse对象", description="历史订单详情对象")
 public class HistoryOrderDetailResponse implements Serializable {
 
+    @ApiModelProperty(value = "详情ID")
+    private Long id;
+
+    @ApiModelProperty(value = "订单ID")
+    private Long orderId;
+
+    @ApiModelProperty(value = "商品ID")
+    private Long goodsId;
+
     @ApiModelProperty(value = "商品名称")
     private String goodsName;
 
@@ -30,5 +39,7 @@ public class HistoryOrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "单价")
     private BigDecimal price;
+
+
 
 }

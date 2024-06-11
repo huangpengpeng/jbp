@@ -38,4 +38,8 @@ public class HistoryOrderRequest implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty("付款结束时间")
     private Date endPayTime;
+
+    @ApiModelProperty(value = "下拉选 查询历史项目  水母: wkp42271043176625, 同富：tf138940740527575, 雪康: xcsmall, 易康: jymall")
+    private String dbName;
+
 }

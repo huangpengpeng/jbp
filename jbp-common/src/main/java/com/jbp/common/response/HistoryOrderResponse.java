@@ -44,6 +44,15 @@ public class HistoryOrderResponse implements Serializable {
     @ApiModelProperty(value = "收货手机")
     private String receiveMobile;
 
+    @ApiModelProperty(value = "省")
+    private String province;
+
+    @ApiModelProperty(value = "市")
+    private String city;
+
+    @ApiModelProperty(value = "区")
+    private String area;
+
     @ApiModelProperty(value = "地址信息")
     private String address;
 
