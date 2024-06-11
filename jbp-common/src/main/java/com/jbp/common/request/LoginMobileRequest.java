@@ -48,6 +48,8 @@ public class LoginMobileRequest implements Serializable {
     @ApiModelProperty(value = "推广人id")
     private Integer spreadPid;
 
+    @ApiModelProperty(value = "是否元气小站")
+    private Boolean ifvitality = false;
 
 
 }

@@ -16,6 +16,8 @@ import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.coupon.Coupon;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserToken;
+import com.jbp.common.model.user.White;
+import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.request.*;
 import com.jbp.common.response.AccountCapaResponse;
 import com.jbp.common.response.FrontIndividualCenterConfigResponse;
@@ -92,6 +94,11 @@ public class LoginServiceImpl implements LoginService {
     private UserInvitationService userInvitationService;
     @Autowired
     private FrontTokenComponent frontTokenComponent;
+    @Autowired
+    private WhiteService whiteService;
+    @Autowired
+    private WhiteUserService whiteUserService;
+
 
 
     /**
@@ -194,6 +201,19 @@ public class LoginServiceImpl implements LoginService {
             return commonLogin(userList.get(0), spreadPid, "手机号验证码登录");
         }
         User user = userService.getByAccount(loginRequest.getAccount());
+
+        //元气小站配置写死
+        if(loginRequest.getIfvitality()) {
+            White white = whiteService.getByName("元气小站");
+            if (white != null) {
+                WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), white.getId());
+                if (whiteUser == null) {
+                    throw new CrmebException("不在白名单内，无法查看");
+                }
+            }
+        }
+
+
         return commonLogin(user, spreadPid, "手机号验证码登录");
     }
 
@@ -266,6 +286,18 @@ public class LoginServiceImpl implements LoginService {
             throw new CrmebException("当前帐户已禁用，请与管理员联系！");
         }
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
+
+        //元气小站配置写死
+        if(loginRequest.getIfvitality()) {
+            White white = whiteService.getByName("元气小站");
+            if (white != null) {
+                WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), white.getId());
+                if (whiteUser == null) {
+                    throw new CrmebException("不在白名单内，无法查看");
+                }
+            }
+        }
+
         return commonLogin(user, spreadPid, "账号或手机号密码登录");
     }
 

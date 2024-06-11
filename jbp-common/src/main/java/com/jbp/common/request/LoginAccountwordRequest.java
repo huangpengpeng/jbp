@@ -26,4 +26,10 @@ public class LoginAccountwordRequest implements Serializable {
 
     @ApiModelProperty(value = "推广人id")
     private Integer spreadPid = 0;
+
+    @ApiModelProperty(value = "是否元气小站")
+    private Boolean ifvitality = false;
+
+
+
 }
