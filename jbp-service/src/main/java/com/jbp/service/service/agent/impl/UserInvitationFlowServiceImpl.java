@@ -171,8 +171,8 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         //星级
         vo.setCapaXsName(userCapaXs != null ? userCapaXs.getCapaName() : "");
         vo.setUcapaXsId(userCapaXs != null ? userCapaXs.getCapaId() : null);
-        List<UserInvitationFlow> list = list(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, uid));
-        vo.setCount(list.size());
+        int count = count(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, uid));
+        vo.setCount(count);
 
         List<UserInvitationGplotVo> gplotVoList = new ArrayList<>();
         List<UserInvitation> userInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().eq(UserInvitation::getPId, uid));
@@ -184,9 +184,9 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
             Map<Integer, UserCapa> capaMapList = userCapaService.getUidMap(uidList);
             Map<Integer, UserCapaXs> capaXsMapList = userCapaXsService.getUidMap(uidList);
             userInvitationList.forEach(e -> {
-                List<UserInvitation> childrenInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().eq(UserInvitation::getPId, e.getUId()));
+                int uCount = count(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, e.getUId()));
                 UserInvitationGplotVo cvo = new UserInvitationGplotVo();
-                cvo.setIsParent(!CollectionUtils.isEmpty(childrenInvitationList));
+                cvo.setIsParent(uCount > 0);
                 User cUser = userMap.get(e.getUId());
                 cvo.setUAccount(cUser != null ? cUser.getAccount() : "");
                 cvo.setUNickName(cUser != null ? cUser.getNickname() : "");
@@ -199,9 +199,8 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
                 cvo.setCapaXsName(cUserCapaXs != null ? cUserCapaXs.getCapaName() : "");
                 cvo.setUcapaXsId(cUserCapaXs != null ? cUserCapaXs.getCapaId() : null);
                 //下级人数
-                int count = count(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, e.getUId()));
-                cvo.setCount(count);
-                if (count != 0){
+                cvo.setCount(uCount);
+                if (uCount != 0){
                     List<UserInvitationGplotVo> svoList= new ArrayList<>();
                     UserInvitationGplotVo svo = new UserInvitationGplotVo();
                     svoList.add(svo);
