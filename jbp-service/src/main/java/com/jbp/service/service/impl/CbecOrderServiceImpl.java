@@ -1,14 +1,20 @@
 package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.beust.jcommander.internal.Lists;
+import com.jbp.common.dto.CbecOrderDetailDto;
 import com.jbp.common.dto.CbecOrderSyncDTO;
 import com.jbp.common.model.order.CbecOrder;
 import com.jbp.common.model.user.CbecUser;
 import com.jbp.common.model.user.User;
+import com.jbp.common.request.agent.CbecOrderSyncRequest;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.ArticleCategoryDao;
 import com.jbp.service.dao.CbecOrderDao;
 import com.jbp.service.service.CbecOrderService;
@@ -18,18 +24,17 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 
 @Service
 public class CbecOrderServiceImpl extends ServiceImpl<CbecOrderDao, CbecOrder> implements CbecOrderService {
 
-
     @Resource
     private CbecOrderDao dao;
-
     @Resource
     private UserService userService;
-
     @Resource
     private CbecUserService cbecUserService;
 
@@ -62,10 +67,17 @@ public class CbecOrderServiceImpl extends ServiceImpl<CbecOrderDao, CbecOrder> i
             if (pv != null && ArithmeticUtils.gt(pv, BigDecimal.valueOf(0.8))) {
                 pv = BigDecimal.valueOf(0.8);
             }
+            List<CbecOrderDetailDto> goodsDetails = Lists.newArrayList();
+            for (CbecOrderSyncDTO.GoodsDetail goodsDetail : dto.getGoodsDetails()) {
+                CbecOrderDetailDto detailDto = new CbecOrderDetailDto(goodsDetail.getGoodsName(),
+                        goodsDetail.getQuantity(), goodsDetail.getPrice(), pv, "");
+                goodsDetails.add(detailDto);
+            }
+
             CbecOrder cbecOrder2 =
                     new CbecOrder(cbecAccount.getUid(), cbecAccount.getAccountNo(), dto.getMobile(), dto.getOrderSn(), dto.getStatus(),
                             dto.getTotalFee(), dto.getGoodsFee(), dto.getPostFee(), dto.getScore(), pv, dto.getCreateTime(),
-                            dto.getPaymentTime(), dto.getShipmentTime(), JSON.toJSONString(dto.getGoodsDetails()), true);
+                            dto.getPaymentTime(), dto.getShipmentTime(), null, goodsDetails, true, BigDecimal.ZERO);
             save(cbecOrder2);
             return;
         }
@@ -74,6 +86,35 @@ public class CbecOrderServiceImpl extends ServiceImpl<CbecOrderDao, CbecOrder> i
         cbecOrder.setStatus(dto.getStatus());
         cbecOrder.setIfClearing(Boolean.TRUE);
         updateById(cbecOrder);
+    }
+
+
+    @Override
+    public Long save(CbecOrderSyncRequest request) {
+        Boolean ifClearing = false;
+        BigDecimal commAmt = BigDecimal.ZERO;
+        CbecOrder cbecOrder = getOne(new LambdaQueryWrapper<CbecOrder>().eq(CbecOrder::getCbecOrderNo, request.getOrderNo()));
+        if (cbecOrder != null) {
+            ifClearing = cbecOrder.getIfClearing();
+            commAmt = cbecOrder.getCommAmt();
+            removeById(cbecOrder.getId());  // 删除历史
+        }
+        // 保存新的订单
+        User user = userService.getByAccount(request.getAccount());
+        Date shipmentsTime = null;
+        if (StringUtils.isNotEmpty(request.getShipmentsTime())) {
+            shipmentsTime = DateTimeUtils.parseDate(request.getShipmentsTime());
+        }
+        Date refundTimeTime = null;
+        if (StringUtils.isNotEmpty(request.getRefundTime())) {
+            refundTimeTime = DateTimeUtils.parseDate(request.getRefundTime());
+        }
+        cbecOrder = new CbecOrder(user.getId(), user.getAccount(), request.getMobile(), request.getOrderNo(), request.getStatus(),
+                request.getTotalFee(), request.getGoodsFee(), request.getPostFee(), request.getScore(), request.getPv(),
+                DateTimeUtils.parseDate(request.getCreateTime()), DateTimeUtils.parseDate(request.getPaymentTime()),
+                shipmentsTime, refundTimeTime, request.getGoodsDetails(), ifClearing, commAmt);
+        save(cbecOrder);
+        return cbecOrder.getId();
     }
 }
 

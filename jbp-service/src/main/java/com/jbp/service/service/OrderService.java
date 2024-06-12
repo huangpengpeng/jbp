@@ -347,8 +347,11 @@ public interface OrderService extends IService<Order> {
     Boolean editAddress(PlatformOrderAddressEditRequest request);
 
 
-    PageInfo<OrderSalesVolumeResponse> salesVolumeDay(  PageParamRequest pageParamRequest);
+    PageInfo<OrderSalesVolumeResponse> salesVolumeDay(PageParamRequest pageParamRequest);
 
     PageInfo<OrderProductStatementResponse> productStatement(  ProductDayRecordRequest request,PageParamRequest pageParamRequest);
+
+
+
 
 }

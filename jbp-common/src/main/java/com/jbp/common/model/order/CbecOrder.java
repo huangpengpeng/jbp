@@ -1,7 +1,11 @@
 package com.jbp.common.model.order;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.dto.CbecOrderDetailDto;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.mybatis.CbecOrderDetailListHandler;
+import com.jbp.common.mybatis.FundClearingProductListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +17,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -22,7 +27,6 @@ import java.util.Optional;
 @TableName("eb_cbec_order")
 @ApiModel(value = "CbecOrder对象", description = "跨境订单表")
 public class CbecOrder extends BaseModel {
-
 
     @ApiModelProperty(value = "用户uid")
     private Integer userId;
@@ -63,8 +67,12 @@ public class CbecOrder extends BaseModel {
     @ApiModelProperty(value = "订单发货时间")
     private Date shipmentsTime;
 
+    @ApiModelProperty(value = "退款时间")
+    private Date refundTime;
+
     @ApiModelProperty(value = "产品详情")
-    private String goodsDetails;
+    @TableField(typeHandler = CbecOrderDetailListHandler.class)
+    private List<CbecOrderDetailDto> goodsDetails;
 
     @ApiModelProperty(value = "是否结算")
     private Boolean ifClearing;
@@ -72,10 +80,13 @@ public class CbecOrder extends BaseModel {
     @ApiModelProperty(value = "备注信息")
     private String remark;
 
+    @ApiModelProperty(value = "佣金总额")
+    private BigDecimal commAmt;
+
 
     public CbecOrder(Integer userId, String accountNo, String cbecMobile, String cbecOrderNo, String status,
                      BigDecimal totalFee, BigDecimal goodsFee, BigDecimal postFee, BigDecimal score, BigDecimal pv, Date createTime,
-                     Date paymentTime, Date shipmentsTime, String goodsDetails, Boolean ifClearing) {
+                     Date paymentTime, Date shipmentsTime, Date refundTime, List<CbecOrderDetailDto> goodsDetails, Boolean ifClearing, BigDecimal commAmt) {
 
 
         this.userId = userId;
@@ -91,8 +102,10 @@ public class CbecOrder extends BaseModel {
         this.createTime = createTime;
         this.paymentTime = paymentTime;
         this.shipmentsTime = shipmentsTime;
+        this.refundTime = refundTime;
         this.goodsDetails = goodsDetails;
         this.ifClearing = ifClearing;
+        this.commAmt = commAmt;
     }
 
 

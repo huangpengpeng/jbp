@@ -65,4 +65,8 @@ public class ScoreDownLoadExcel implements Serializable {
     @ExcelProperty(value = "结束时间", index = 16, format = "yyyy-MM-dd hh:mm:ss")
     private Date endTime;
 
+    @ExcelProperty(value = "折算后业绩", index = 17)
+    private BigDecimal score2;
+
+
 }

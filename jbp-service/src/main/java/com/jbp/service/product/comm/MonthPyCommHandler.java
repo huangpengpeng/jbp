@@ -108,8 +108,6 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
         Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
 
-
-
         List<Order> successList = orderService.getSuccessList(startTime, endTime);
 
         // 计算积分汇总
@@ -128,7 +126,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                 ProductComm productComm = map.get(orderDetail.getProductId());
                 if (productComm == null) {
                     productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
-                    if(productComm != null){
+                    if (productComm != null) {
                         map.put(orderDetail.getProductId(), productComm);
                     }
                 }
@@ -214,7 +212,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingRelationFlow clearingRelationFlow : clearingRelationFlows) {
                         ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getUId());
-                        if(clearingUser == null){
+                        if (clearingUser == null) {
                             continue;
                         }
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
@@ -255,7 +253,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
                     List<ClearingUser> usableList = Lists.newArrayList();
                     for (ClearingInvitationFlow clearingInvitationFlow : clearingInvitationFlows) {
                         ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getUId());
-                        if(clearingUser == null){
+                        if (clearingUser == null) {
                             continue;
                         }
                         Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
@@ -322,7 +320,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
     public static void main(String[] args) {
 
         List<Rule> list = Lists.newArrayList();
-        for (int i = 1; i <= 3 ; i++) {
+        for (int i = 1; i <= 3; i++) {
             Rule rule = new Rule();
             rule.setLevel(Long.valueOf(i));
             if (i == 1) {

@@ -60,4 +60,8 @@ public class OrderExt extends BaseModel {
     private String aiServerSn;
     @ApiModelProperty(value = "AI服务天数")
     private Integer aiDay;
+
+
+    @ApiModelProperty(value = "AI服务码是否推送")
+    private Boolean aiPushServer;
 }
