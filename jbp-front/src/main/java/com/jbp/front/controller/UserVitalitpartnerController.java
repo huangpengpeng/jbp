@@ -1,7 +1,6 @@
 package com.jbp.front.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserVitalitpartner;
@@ -9,22 +8,23 @@ import com.jbp.common.response.UserVitalitpartnerResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
-import com.jbp.service.service.*;
+import com.jbp.service.service.OrderService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.UserService;
+import com.jbp.service.service.UserVitalitpartnerService;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -40,8 +40,6 @@ public class UserVitalitpartnerController {
     @Autowired
     private SystemConfigService systemConfigService;
     @Autowired
-    private Environment environment;
-    @Autowired
     private OrderService orderService;
     @Autowired
     private UserOfflineSubsidyService userOfflineSubsidyService;
@@ -56,7 +54,7 @@ public class UserVitalitpartnerController {
             return CommonResult.success();
         }
         UserVitalitpartner userVitalitpartner =   userVitalitpartnerService.getOne(new QueryWrapper<UserVitalitpartner>().lambda().eq(UserVitalitpartner::getUserId, userService.getUserId()).eq(UserVitalitpartner::getEnable,true));
-      return CommonResult.success(userVitalitpartner == null?"" : "https://batchatx.oss-cn-shenzhen.aliyuncs.com/2b908fbe27404ddd89348385f2af8a65");
+        return CommonResult.success(userVitalitpartner == null?"" : "https://batchatx.oss-cn-shenzhen.aliyuncs.com/2b908fbe27404ddd89348385f2af8a65");
     }
 
     @ApiOperation(value = "复销奖图标")
@@ -78,8 +76,6 @@ public class UserVitalitpartnerController {
     }
 
 
-
-
     @ApiOperation(value = "店铺图标区域图标")
     @RequestMapping(value = "/getShopImage", method = RequestMethod.GET)
     public CommonResult<UserVitalitpartnerResponse> getShopImage() {
@@ -95,7 +91,6 @@ public class UserVitalitpartnerController {
         if (user.getOpenShop()) {
             list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/319940525c414d5e95542616404c0013");
         }
-
         UserOfflineSubsidy userOfflineSubsidy = userOfflineSubsidyService.getOne(new QueryWrapper<UserOfflineSubsidy>().lambda().eq(UserOfflineSubsidy::getStatus, "已开通").eq(UserOfflineSubsidy::getArea, "").eq(UserOfflineSubsidy::getUid, user.getId()));
         if (userOfflineSubsidy != null) {
             list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/e9ff7c1ca4694b14905088f4a36f634b");
@@ -110,7 +105,6 @@ public class UserVitalitpartnerController {
         response.setList(list);
 
         return CommonResult.success(response);
-
     }
 }
 

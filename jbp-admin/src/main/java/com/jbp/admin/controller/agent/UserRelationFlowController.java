@@ -6,7 +6,9 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserRelationFlowRequest;
+import com.jbp.common.request.agent.UserRelationGplotRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.UserRelationGplotVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserRelationFlowService;
 import com.jbp.service.util.StringUtils;
@@ -51,4 +53,24 @@ public class UserRelationFlowController {
         return CommonResult.success(CommonPage.restPage(userRelationFlowService.pageList(uid, pid, request.getLevel(), pageParamRequest)));
 
     }
+
+    @GetMapping("/gplot")
+    @ApiOperation("服务关系上下层级关系拓扑图")
+    public CommonResult<UserRelationGplotVo> gplot(UserRelationGplotRequest request){
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(userRelationFlowService.gplotInfo(uid));
+
+
+
+    }
+
+
+
 }
