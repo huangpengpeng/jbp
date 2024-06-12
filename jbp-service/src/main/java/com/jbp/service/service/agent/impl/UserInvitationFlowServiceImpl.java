@@ -199,9 +199,9 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
                 cvo.setCapaXsName(cUserCapaXs != null ? cUserCapaXs.getCapaName() : "");
                 cvo.setUcapaXsId(cUserCapaXs != null ? cUserCapaXs.getCapaId() : null);
                 //下级人数
-                List<UserInvitationFlow> cList = list(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, e.getUId()));
-                cvo.setCount(cList.size());
-                if (!cList.isEmpty()){
+                int count = count(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, e.getUId()));
+                cvo.setCount(count);
+                if (count != 0){
                     List<UserInvitationGplotVo> svoList= new ArrayList<>();
                     UserInvitationGplotVo svo = new UserInvitationGplotVo();
                     svoList.add(svo);
