@@ -84,7 +84,7 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     @Override
     public Boolean add(UserOfflineSubsidyAddRequest request) {
 
-        if (StringUtils.isBlank(request.getAccount()) || request.getProvinceId() == null || request.getCityId() == null) {
+        if (StringUtils.isBlank(request.getAccount()) || request.getProvinceId() == null || request.getCityId() == null || StringUtils.isBlank(request.getTeamName())) {
             throw new CrmebException("请填写完整信息");
         }
         User user = userService.getByAccount(request.getAccount());
@@ -110,7 +110,7 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
         }
         userOfflineSubsidy = UserOfflineSubsidy.builder().uid(user.getId()).provinceId(request.getProvinceId()).
                 province(province.getRegionName()).city(city.getRegionName()).
-                cityId(request.getCityId()).status(UserRegion.Constants.已开通.toString()).build();
+                cityId(request.getCityId()).status(UserRegion.Constants.已开通.toString()).teamName(request.getTeamName()).build();
         userOfflineSubsidy.setArea(request.getAreaId() != null ? area.getRegionName() : "");
         userOfflineSubsidy.setAreaId(request.getAreaId() != null ? request.getAreaId() : 0);
 
