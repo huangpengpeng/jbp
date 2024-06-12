@@ -1450,6 +1450,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
             OrderExt orderExt =  orderExtService.getByOrder(order.getOrderNo());
             infoResponse.setServerSn(orderExt.getServerSn());
+            infoResponse.setAiServerSn(orderExt.getAiServerSn());
             infoResponse.setPayGateway(order.getPayGateway());
 
             if(order.getUid().intValue() != order.getPayUid().intValue() && userId.equals(order.getUid())){
