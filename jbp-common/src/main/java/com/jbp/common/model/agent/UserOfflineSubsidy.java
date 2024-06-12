@@ -8,19 +8,18 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
 
 /**
  * 用户线下补助
  */
 @Data
 @Builder
-@TableName(value="eb_user_offline_subsidy",autoResultMap = true)
+@TableName(value = "eb_user_offline_subsidy", autoResultMap = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="UserOfflineSubsidy对象", description="用户线下补助")
+@ApiModel(value = "UserOfflineSubsidy对象", description = "用户线下补助")
 public class UserOfflineSubsidy extends BaseModel {
     private static final long serialVersionUID = 745806610282093367L;
 
@@ -53,6 +52,7 @@ public class UserOfflineSubsidy extends BaseModel {
     private String nickname;
 
     @ApiModelProperty("团队名称")
+    @TableField(exist = false)
     private String teamName;
 
     @ApiModelProperty(value = "省份ID")

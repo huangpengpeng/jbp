@@ -9,13 +9,11 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.Team;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
-import com.jbp.common.model.agent.UserInvitationFlow;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.vo.UserInvitationGplotVo;
 import com.jbp.service.dao.agent.UserInvitationFlowDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
@@ -31,6 +29,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,7 +139,7 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
             User uUser = userMap.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
             e.setUNickName(uUser != null ? uUser.getNickname() : "");
-            //等级
+            //等级、】
             UserCapa uUserCapa = capaMapList.get(e.getUId());
             e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
             UserCapaXs uUserCapaXs = capaXsMapList.get(e.getUId());
@@ -155,5 +154,67 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
             e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public List<UserInvitationGplotVo> gplotInfo(Integer uid) {
+        UserInvitationGplotVo vo = new UserInvitationGplotVo();
+        //当前搜索用户信息
+        User user = userService.getById(uid);
+        UserCapa userCapa = userCapaService.getByUser(uid);
+        UserCapaXs userCapaXs = userCapaXsService.getByUser(uid);
+        vo.setUAccount(user.getAccount());
+        vo.setUNickName(user.getNickname());
+        //等级
+        vo.setCapaName(userCapa != null ? userCapa.getCapaName() : "");
+        vo.setUcapaId(userCapa != null ? userCapa.getCapaId() : null);
+        //星级
+        vo.setCapaXsName(userCapaXs != null ? userCapaXs.getCapaName() : "");
+        vo.setUcapaXsId(userCapaXs != null ? userCapaXs.getCapaId() : null);
+        int count = count(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, uid));
+        vo.setCount(count);
+
+        List<UserInvitationGplotVo> gplotVoList = new ArrayList<>();
+        List<UserInvitation> userInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().eq(UserInvitation::getPId, uid));
+        if (CollectionUtils.isNotEmpty(userInvitationList)) {
+            vo.setIsParent(true);
+            List<Integer> uidList = userInvitationList.stream().map(UserInvitation::getUId).collect(Collectors.toList());
+            Map<Integer, User> userMap = userService.getUidMapList(uidList);
+            //等级
+            Map<Integer, UserCapa> capaMapList = userCapaService.getUidMap(uidList);
+            Map<Integer, UserCapaXs> capaXsMapList = userCapaXsService.getUidMap(uidList);
+            userInvitationList.forEach(e -> {
+                int uCount = count(new QueryWrapper<UserInvitationFlow>().lambda().eq(UserInvitationFlow::getPId, e.getUId()));
+                UserInvitationGplotVo cvo = new UserInvitationGplotVo();
+                cvo.setIsParent(uCount > 0);
+                User cUser = userMap.get(e.getUId());
+                cvo.setUAccount(cUser != null ? cUser.getAccount() : "");
+                cvo.setUNickName(cUser != null ? cUser.getNickname() : "");
+                //等级
+                UserCapa cUserCapa = capaMapList.get(e.getUId());
+                cvo.setCapaName(cUserCapa != null ? cUserCapa.getCapaName() : "");
+                cvo.setUcapaId(cUserCapa != null ? cUserCapa.getCapaId() : null);
+                //星级
+                UserCapaXs cUserCapaXs = capaXsMapList.get(e.getUId());
+                cvo.setCapaXsName(cUserCapaXs != null ? cUserCapaXs.getCapaName() : "");
+                cvo.setUcapaXsId(cUserCapaXs != null ? cUserCapaXs.getCapaId() : null);
+                //下级人数
+                cvo.setCount(uCount);
+                if (uCount != 0){
+                    List<UserInvitationGplotVo> svoList= new ArrayList<>();
+                    UserInvitationGplotVo svo = new UserInvitationGplotVo();
+                    svoList.add(svo);
+                    cvo.setChildren(svoList);
+                }
+                gplotVoList.add(cvo);
+            });
+            vo.setChildren(gplotVoList);
+        } else {
+            vo.setIsParent(false);
+            vo.setChildren(null);
+        }
+        List<UserInvitationGplotVo> list1 = new ArrayList<>();
+        list1.add(vo);
+        return list1;
     }
 }

@@ -6,7 +6,9 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.UserInvitationFlowRequest;
+import com.jbp.common.request.agent.UserInvitationGplotRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.UserInvitationGplotVo;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.util.StringUtils;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/user/invitation/flow")
@@ -52,5 +55,20 @@ public class UserInvitationFlowController {
         }
         return CommonResult.success(CommonPage.restPage(userInvitationFlowService.pageList(uid, pid, request.getLevel(), pageParamRequest)));
     }
+
+    @GetMapping("/gplot")
+    @ApiOperation("销售关系上下层级关系拓扑图")
+    public CommonResult<List<UserInvitationGplotVo>> gplot(UserInvitationGplotRequest request) {
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(userInvitationFlowService.gplotInfo(uid));
+    }
+
 
 }

@@ -9,20 +9,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.model.agent.TeamUser;
-import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserCapaXs;
-import com.jbp.common.model.agent.UserRelationFlow;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.vo.UserRelationGplotVo;
 import com.jbp.service.dao.agent.UserRelationFlowDao;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserCapaXsService;
-import com.jbp.service.service.agent.UserRelationFlowService;
-import com.jbp.service.service.agent.UserRelationService;
+import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -30,8 +25,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,6 +44,10 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
     private UserCapaService userCapaService;
     @Resource
     private TeamUserService teamUserService;
+    @Resource
+    private RelationScoreService relationScoreService;
+    @Resource
+    private CapaService capaService;
 
 
     @Override
@@ -129,5 +128,235 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             e.setTeamName(teamUser!=null?teamUser.getName():"");
         });
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public UserRelationGplotVo gplot(Integer uid,Map<Integer, User> uidMapList,Map<Integer, UserCapa> uidCapaMap) {
+        UserRelationGplotVo vo = new UserRelationGplotVo();
+        UserRelationFlow userRelationFlow = getOne(new QueryWrapper<UserRelationFlow>().select("max(level) as level").eq("uid", uid));
+        vo.setLevel(userRelationFlow != null ? userRelationFlow.getLevel() : 0);
+        User user = uidMapList.get(uid);
+        vo.setUAccount(user.getAccount());
+        vo.setUNickName(user.getNickname());
+        vo.setCreateTime(user.getCreateTime());
+        UserCapa userCapa = uidCapaMap.get(uid);
+        vo.setUcapaId(userCapa.getCapaId());
+
+        //左右区各等级人数
+        UserRelationFlow userRelationFlow1 = getOne(new QueryWrapper<UserRelationFlow>().lambda().eq(UserRelationFlow::getPId, uid).eq(UserRelationFlow::getLevel, 1).eq(UserRelationFlow::getNode, 0));
+        vo.setCapaSumMap(userRelationFlow1 == null ? selectByCapa(0) : selectByCapa(userRelationFlow1.getUId()));
+        UserRelationFlow userRelationFlow2 = getOne(new QueryWrapper<UserRelationFlow>().lambda().eq(UserRelationFlow::getPId, uid).eq(UserRelationFlow::getLevel, 1).eq(UserRelationFlow::getNode, 1));
+        vo.setCapaSumMap2(userRelationFlow2 == null ? selectByCapa(0) : selectByCapa(userRelationFlow2.getUId()));
+
+        //当前用户左右区总业绩
+        BigDecimal tenThousand = new BigDecimal("10000");
+        RelationScore relationScore = relationScoreService.getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, uid).eq(RelationScore::getNode, 0));
+        vo.setTotalScore(relationScore == null ? BigDecimal.ZERO : (relationScore.getUsableScore().add(relationScore.getUsedScore())).divide(tenThousand, 2, BigDecimal.ROUND_HALF_UP));
+        RelationScore relationScore2 = relationScoreService.getOne(new QueryWrapper<RelationScore>().lambda().eq(RelationScore::getUid, uid).eq(RelationScore::getNode, 1));
+        vo.setTotalScore2(relationScore2 == null ? BigDecimal.ZERO : (relationScore2.getUsableScore().add(relationScore2.getUsedScore())).divide(tenThousand, 2, BigDecimal.ROUND_HALF_UP));
+        return vo;
+    }
+
+    @Override
+    public UserRelationGplotVo gplotInfo(Integer uid) {
+        if (uid == null) {
+            return null;
+        }
+
+        List<UserRelationFlow> list = list(new QueryWrapper<UserRelationFlow>().lambda().eq(UserRelationFlow::getPId, uid).in(UserRelationFlow::getLevel, 1, 2, 3));
+        List<Integer> uidList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
+        uidList.add(uid);
+        Map<Integer, User> uidMapList = userService.getUidMapList(uidList);
+        Map<Integer, UserCapa> uidCapaMap = userCapaService.getUidMap(uidList);
+
+        List<UserRelationFlow> FlowList = list.stream().filter(e -> e.getLevel() != 3).collect(Collectors.toList());
+        List<Integer> uidFlowList = FlowList.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
+        uidFlowList.add(uid);
+        List<UserRelation> userRelationList = userRelationService.list(new QueryWrapper<UserRelation>().lambda().in(UserRelation::getPId, uidFlowList));
+        Map<String,UserRelation> map = new HashMap<>();
+        userRelationList.forEach(e->{
+            map.put(e.getPId()+"_"+e.getNode(),e);
+        });
+
+
+        //第一层
+        UserRelationGplotVo top = gplot(uid,uidMapList,uidCapaMap);
+        List<UserRelationGplotVo> topList = new ArrayList<>();
+        UserRelation userRelation = map.get(uid + "_0");
+        if (userRelation != null) {
+            //第二层
+            UserRelationGplotVo relation0 = gplot(userRelation.getUId(),uidMapList,uidCapaMap);
+            relation0.setNode(0);
+            topList.add(relation0);
+            List<UserRelationGplotVo> topList1 = new ArrayList<>();
+            UserRelation userRelation00 = map.get(userRelation.getUId() + "_0");
+            if (userRelation00 != null) {
+                //第三层
+                UserRelationGplotVo relation00 = gplot(userRelation00.getUId(),uidMapList,uidCapaMap);
+                relation00.setNode(0);
+                topList1.add(relation00);
+                List<UserRelationGplotVo> topList21 = new ArrayList<>();
+                UserRelation userRelation000 = map.get(userRelation00.getUId() + "_0");
+                if (userRelation000 != null) {
+                    //第四层
+                    UserRelationGplotVo relation000 = gplot(userRelation000.getUId(),uidMapList,uidCapaMap);
+                    relation000.setNode(0);
+                    topList21.add(relation000);
+                } else {
+                    UserRelationGplotVo relation000 = new UserRelationGplotVo();
+                    topList21.add(relation000);
+                }
+                UserRelation userRelation001 = map.get(userRelation00.getUId() + "_1");
+                if (userRelation001 != null) {
+                    //第四层
+                    UserRelationGplotVo relation001 = gplot(userRelation001.getUId(),uidMapList,uidCapaMap);
+                    relation001.setNode(1);
+                    topList21.add(relation001);
+                } else {
+                    UserRelationGplotVo relation001 = new UserRelationGplotVo();
+                    topList21.add(relation001);
+                }
+                relation00.setChildren(topList21);
+            } else {
+                UserRelationGplotVo relation10 = new UserRelationGplotVo();
+                topList1.add(relation10);
+            }
+            UserRelation userRelation01 = map.get(userRelation.getUId() + "_1");
+            if (userRelation01 != null) {
+                //第三层
+                UserRelationGplotVo relation01 = gplot(userRelation01.getUId(),uidMapList,uidCapaMap);
+                relation01.setNode(1);
+                topList1.add(relation01);
+                List<UserRelationGplotVo> topList22 = new ArrayList<>();
+                UserRelation userRelation010 = map.get(userRelation01.getUId() + "_0");
+                if (userRelation010 != null) {
+                    //第四层
+                    UserRelationGplotVo relation010 = gplot(userRelation010.getUId(),uidMapList,uidCapaMap);
+                    relation010.setNode(0);
+                    topList22.add(relation010);
+                } else {
+                    UserRelationGplotVo relation010 = new UserRelationGplotVo();
+                    topList22.add(relation010);
+                }
+                UserRelation userRelation011 = map.get(userRelation01.getUId() + "_1");
+                if (userRelation011 != null) {
+                    //第四层
+                    UserRelationGplotVo relation011 = gplot(userRelation011.getUId(),uidMapList,uidCapaMap);
+                    relation011.setNode(1);
+                    topList22.add(relation011);
+                } else {
+                    UserRelationGplotVo relation011 = new UserRelationGplotVo();
+                    topList22.add(relation011);
+                }
+                relation01.setChildren(topList22);
+            } else {
+                UserRelationGplotVo relation01 = new UserRelationGplotVo();
+                topList1.add(relation01);
+            }
+            relation0.setChildren(topList1);
+        } else {
+            UserRelationGplotVo relation0 = new UserRelationGplotVo();
+            topList.add(relation0);
+        }
+        UserRelation userRelation1 = map.get(uid + "_1");
+        if (userRelation1 != null) {
+            //第二层
+            UserRelationGplotVo relation1 = gplot(userRelation1.getUId(),uidMapList,uidCapaMap);
+            relation1.setNode(1);
+            topList.add(relation1);
+            List<UserRelationGplotVo> topList2 = new ArrayList<>();
+            UserRelation userRelation10 = map.get(userRelation1.getUId() + "_0");
+            if (userRelation10 != null) {
+                //第三层
+                UserRelationGplotVo relation10 = gplot(userRelation10.getUId(),uidMapList,uidCapaMap);
+                relation10.setNode(0);
+                topList2.add(relation10);
+                List<UserRelationGplotVo> topList23 = new ArrayList<>();
+                UserRelation userRelation100 = map.get(userRelation10.getUId() + "_0");
+                if (userRelation100 != null) {
+                    //第四层
+                    UserRelationGplotVo relation100 = gplot(userRelation100.getUId(),uidMapList,uidCapaMap);
+                    relation100.setNode(0);
+                    topList23.add(relation100);
+                } else {
+                    UserRelationGplotVo relation100 = new UserRelationGplotVo();
+                    topList23.add(relation100);
+                }
+                UserRelation userRelation101 = map.get(userRelation10.getUId() + "_1");
+                if (userRelation101 != null) {
+                    //第四层
+                    UserRelationGplotVo relation101 = gplot(userRelation101.getUId(),uidMapList,uidCapaMap);
+                    relation101.setNode(1);
+                    topList23.add(relation101);
+                } else {
+                    UserRelationGplotVo relation101 = new UserRelationGplotVo();
+                    topList23.add(relation101);
+                }
+                relation10.setChildren(topList23);
+            } else {
+                UserRelationGplotVo relation20 = new UserRelationGplotVo();
+                topList2.add(relation20);
+            }
+            UserRelation userRelation11 = map.get(userRelation1.getUId() + "_1");
+            if (userRelation11 != null) {
+                //第三层
+                UserRelationGplotVo relation11 = gplot(userRelation11.getUId(),uidMapList,uidCapaMap);
+                relation11.setNode(1);
+                topList2.add(relation11);
+                List<UserRelationGplotVo> topList24 = new ArrayList<>();
+                UserRelation userRelation110 = map.get(userRelation11.getUId() + "_0");
+                if (userRelation110 != null) {
+                    //第四层
+                    UserRelationGplotVo relation110 = gplot(userRelation110.getUId(),uidMapList,uidCapaMap);
+                    relation110.setNode(0);
+                    topList24.add(relation110);
+                } else {
+                    UserRelationGplotVo relation110 = new UserRelationGplotVo();
+                    topList24.add(relation110);
+                }
+                UserRelation userRelation111 = map.get(userRelation11.getUId() + "_1");
+                if (userRelation111 != null) {
+                    //第四层
+                    UserRelationGplotVo relation111 = gplot(userRelation111.getUId(),uidMapList,uidCapaMap);
+                    relation111.setNode(1);
+                    topList24.add(relation111);
+                } else {
+                    UserRelationGplotVo relation111 = new UserRelationGplotVo();
+                    topList24.add(relation111);
+                }
+                relation11.setChildren(topList24);
+            } else {
+                UserRelationGplotVo relation11 = new UserRelationGplotVo();
+                topList2.add(relation11);
+            }
+            relation1.setChildren(topList2);
+        } else {
+            UserRelationGplotVo relation1 = new UserRelationGplotVo();
+            topList.add(relation1);
+        }
+        top.setChildren(topList);
+        return top;
+    }
+
+    @Override
+    public List<Integer> selectByCapa(Integer uId) {
+        List<Integer> countList = new ArrayList<>();
+        List<Capa> capaList = capaService.getList();
+
+        List<UserRelationFlow> list = list(new LambdaQueryWrapper<UserRelationFlow>().eq(UserRelationFlow::getPId, uId));
+        List<Integer> uidList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
+        List<UserCapa> userCapaList;
+        if (uId!=0) {
+            uidList.add(uId);
+            userCapaList = new ArrayList<>(userCapaService.getUidMap(uidList).values());
+        } else {
+            userCapaList = new ArrayList<>();
+        }
+        capaList.forEach(e->{
+            List<UserCapa> capas = userCapaList.stream().filter(f -> Objects.equals(f.getCapaId(), e.getId())).collect(Collectors.toList());
+            countList.add(capas.size());
+
+        });
+        return countList;
     }
 }

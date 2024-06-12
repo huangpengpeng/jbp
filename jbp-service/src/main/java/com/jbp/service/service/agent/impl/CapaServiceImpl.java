@@ -134,7 +134,7 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
 
     @Override
     public List<Capa> getList() {
-        return list(new QueryWrapper<Capa>().lambda());
+        return list(new QueryWrapper<Capa>().lambda().orderByAsc(Capa::getId));
     }
 
     @Override
