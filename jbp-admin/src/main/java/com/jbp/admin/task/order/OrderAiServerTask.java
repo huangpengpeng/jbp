@@ -30,7 +30,7 @@ public class OrderAiServerTask {
         logger.info("---OrderAiServerTask task------produce Data with fixed rate task: Execution Time - {}", CrmebDateUtil.nowDateTime());
         try {
 
-            List<OrderExt> orderExts = orderExtService.list(new QueryWrapper<OrderExt>().lambda().eq(OrderExt::getAiPushServer, false).last(" and ai_server_sn is not null"));
+            List<OrderExt> orderExts = orderExtService.list(new QueryWrapper<OrderExt>().lambda().eq(OrderExt::getAiPushServer, false).last(" and order_no like '%PT%'  and ai_server_sn is not null"));
 
             for (OrderExt orderExt : orderExts) {
                 List<String> list = Arrays.asList(orderExt.getAiServerSn().split(","));
