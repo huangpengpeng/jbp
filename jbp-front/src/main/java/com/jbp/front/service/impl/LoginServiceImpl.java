@@ -208,7 +208,7 @@ public class LoginServiceImpl implements LoginService {
             if (white != null) {
                 WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), white.getId());
                 if (whiteUser == null) {
-                    throw new CrmebException("不在白名单内，无法查看");
+                    throw new CrmebException("您暂未开通超元气商城权益，请联系推荐人或客服了解相关事项。");
                 }
             }
         }
@@ -293,7 +293,7 @@ public class LoginServiceImpl implements LoginService {
             if (white != null) {
                 WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), white.getId());
                 if (whiteUser == null) {
-                    throw new CrmebException("不在白名单内，无法查看");
+                    throw new CrmebException("您暂未开通超元气商城权益，请联系推荐人或客服了解相关事项。");
                 }
             }
         }
