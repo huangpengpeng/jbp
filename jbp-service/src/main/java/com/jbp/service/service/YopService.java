@@ -1,9 +1,6 @@
 package com.jbp.service.service;
 
-import com.jbp.common.yop.params.BankAccountOpenParams;
-import com.jbp.common.yop.params.MerchantInfoModifyParams;
-import com.jbp.common.yop.params.OnlineBankOrderParams;
-import com.jbp.common.yop.params.RegisterMicroH5Params;
+import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -82,11 +79,18 @@ public interface YopService {
      */
     AllAccountBalanceQueryResult allAccountBalanceQuery(String merchantNo);
 
+    /**
+     * 修改提现卡
+     * /rest/v1.0/account/withdraw/card/modify
+     */
+    WithdrawCardModifyResult withdrawCardModify(WithdrawCardModifyParams params);
 
     /**
      * 提现卡绑定
      * /rest/v1.0/account/withdraw/card/bind
      */
+    WithdrawCardBindResult withdrawCardBind(WithdrawCardBindParams params);
+
 
     /**
      * 提现卡bin查询

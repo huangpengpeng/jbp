@@ -171,6 +171,16 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
+    public WithdrawCardModifyResult withdrawCardModify(WithdrawCardModifyParams params) {
+        return send("/rest/v1.0/account/withdraw/card/modify", "POST", params, WithdrawCardModifyResult.class);
+    }
+
+    @Override
+    public WithdrawCardBindResult withdrawCardBind(WithdrawCardBindParams params) {
+        return send("/rest/v1.0/account/withdraw/card/bind", "POST", params, WithdrawCardBindResult.class);
+    }
+
+    @Override
     public WithdrawCardQueryResult withdrawCardQuery(String merchantNo) {
         WithdrawCardQueryParams params = new WithdrawCardQueryParams();
         params.setMerchantNo(merchantNo);

@@ -7,12 +7,11 @@ import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.dto.BenefitDTO;
 import com.jbp.common.yop.dto.SnMultiChannelOpenAccountDTO;
-import com.jbp.common.yop.params.BankAccountOpenParams;
-import com.jbp.common.yop.params.MerchantInfoModifyParams;
-import com.jbp.common.yop.params.RegisterMicroH5Params;
+import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.impl.YopServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -52,6 +51,26 @@ public class JbpFrontApplication {
 
         YopService yopService = run.getBean(YopService.class);
 
+//        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090401872");
+//        WithdrawCardBindParams params = new WithdrawCardBindParams();
+//        params.setMerchantNo("10090401872");
+//        params.setAccountNo("6222030502001695215");
+//        params.setBankCardType("DEBIT_CARD");
+//        params.setBankCode("ICBC");
+//        params.setBranchCode("102161000113");
+//
+//         WithdrawCardBindResult withdrawCardBindResult = yopService.withdrawCardBind(params);
+//        System.out.println(JSONObject.toJSONString(withdrawCardBindResult));
+
+//        WithdrawCardModifyParams params = new WithdrawCardModifyParams();
+//        params.setMerchantNo("10090401872");
+//        params.setBindId(cardQueryResult.getBankCardAccountList().get(0).getBindCardId());
+//        params.setBankCardOperateType("CANCELLED");
+//        params.setBankCode("ICBC");
+//        params.setBranchCode("102161000113");
+//        WithdrawCardModifyResult withdrawCardModifyResult = yopService.withdrawCardModify(params);
+//        System.out.println(JSONObject.toJSONString(withdrawCardModifyResult));
+
 //        yopService.withdrawCardQuery("10090339599");
 
 //        String registerMicroH5No = StringUtils.N_TO_10("YOP_OPEN_");
@@ -73,7 +92,7 @@ public class JbpFrontApplication {
 
 
 
-        queryOpenBank(yopService);
+//        queryOpenBank(yopService);
 
 //        openBank(yopService);
 //        openBank2(yopService);
