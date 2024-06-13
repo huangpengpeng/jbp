@@ -267,6 +267,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
+        if (userCapaTemplateRequest.getCapaId() == null) {
+            throw new CrmebException("等级不能为空！");
+        }
         User user = new User();
         user.setAccount(account.toUpperCase());
         user.setPwd(CrmebUtil.encryptPassword(pwd));
@@ -311,7 +314,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 }
                 invitationService.band(user.getId(), pid, false, true, false);
             }
-            if (userCapaTemplateRequest != null && userCapaTemplateRequest.getCapaId() != 0) {
+            if (userCapaTemplateRequest.getCapaId() != 0) {
                 userCapaService.saveOrUpdateCapa(user.getId(), userCapaTemplateRequest.getCapaId(),
                         userCapaTemplateRequest.getRemark(), userCapaTemplateRequest.getDescription());
             } else {
