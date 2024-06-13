@@ -311,7 +311,6 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             List<OrderDetail> orderDetailList = orderDetailMap.get(order.getOrderNo());
             for (OrderDetail orderDetail : orderDetailList) {
                 BigDecimal score = orderDetailService.getRealScore(orderDetail);
-                BigDecimal ratio = BigDecimal.ONE;
                 BigDecimal level = BigDecimal.ONE;
                 for (Integer pid : pidList) {
                     ScoreDownLoadExcel excel = new ScoreDownLoadExcel();
@@ -367,7 +366,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     User user = userMap.get(order.getUid());
                     if (user == null) {
                         user = userService.getById(order.getUid());
-                        userMap.put(order.getUid(), puser);
+                        userMap.put(order.getUid(), user);
                     }
                     excel.setOrderAccount(user.getAccount());
                     excel.setPayTime(order.getPayTime());

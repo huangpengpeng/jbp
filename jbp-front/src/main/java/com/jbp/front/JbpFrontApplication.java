@@ -49,17 +49,21 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        HistoryOrderService historyOrderService = run.getBean(HistoryOrderService.class);
-//        HistoryOrderEditRequest request = new HistoryOrderEditRequest();
-//        request.setIfXcs(true);
-//        request.setType(1);
-//        request.setOrderNoList(Lists.newArrayList("C168357053474186", "C97622064264742"));
-//        String dbName = bean.getProperty("historyOrder.name");
-//        if(request.getIfXcs()){
-//            dbName = "xcsmall";
-//        }
-//        request.setDbName(dbName);
-//        historyOrderService.edit(request);
-  //      System.out.println("启动完成");
+//
+//        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
+//        ScoreDownloadRequest request  = new ScoreDownloadRequest();
+//        request.setCapaIdXsList(Lists.newArrayList(14L, 15L));
+//        request.setStartTime(DateTimeUtils.parseDate("2024-05-01"));
+//        request.setEndTime(DateTimeUtils.parseDate("2024-06-01"));
+//        String download = invitationScoreService.download(request);
+//
+//
+//        request.setCapaIdXsList(Lists.newArrayList(15L));
+//        request.setStartTime(DateTimeUtils.parseDate("2024-05-01"));
+//        request.setEndTime(DateTimeUtils.parseDate("2024-06-01"));
+//        String download1 = invitationScoreService.download(request);
+//        System.out.println("总裁董事:"+ download);
+//        System.out.println("董事:"+ download1);;
+
     }
 }
