@@ -46,6 +46,7 @@ public class FundClearingTask {
         try {
             String yck = systemConfigService.getValueByKey("fund_clearing_status_yck");
             if (StringUtils.isNotEmpty(yck) && !"1".equals(yck)) {
+                logger.info("---FundClearingTask.send------配置未开启");
                 return;
             }
             List<FundClearing> list = fundClearingService.list(new LambdaQueryWrapper<FundClearing>().eq(FundClearing::getStatus, FundClearing.Constants.待出款.toString()).last(" limit 500"));
