@@ -74,7 +74,7 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         redisTemplate.delete("UserInvitationFlowTask.refresh");
         redisTemplate.delete("FundClearingTask.send");
 
-        
+
 
     }
 
