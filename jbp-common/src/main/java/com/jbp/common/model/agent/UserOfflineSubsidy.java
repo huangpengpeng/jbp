@@ -43,16 +43,7 @@ public class UserOfflineSubsidy extends BaseModel {
     @TableField("status")
     private String status;
 
-    @ApiModelProperty("账户")
-    @TableField(exist = false)
-    private String account;
-
-    @ApiModelProperty("用户昵称")
-    @TableField(exist = false)
-    private String nickname;
-
     @ApiModelProperty("团队名称")
-    @TableField(exist = false)
     private String teamName;
 
     @ApiModelProperty(value = "省份ID")
@@ -63,6 +54,14 @@ public class UserOfflineSubsidy extends BaseModel {
 
     @ApiModelProperty(value = "区/县id")
     private Integer areaId;
+
+    @ApiModelProperty("账户")
+    @TableField(exist = false)
+    private String account;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
 
     public static enum Constants {
         申请中, 已开通, 已取消

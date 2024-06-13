@@ -27,10 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -58,8 +55,9 @@ public class CbecController {
     @Resource
     private PlatformWalletService platformWalletService;
 
+    @EncryptIgnore
     @ApiOperation(value = "获取用户信息", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/getUserInfo ", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getUserInfo", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult getUserInfo(String appKey, String timeStr, String method, String sign,
                                  String account, String channel) {
         validSign(appKey, timeStr, method, sign);
@@ -82,8 +80,9 @@ public class CbecController {
     }
 
 
+    @EncryptIgnore
     @ApiOperation(value = "修改用户积分", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/editScore ", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/editScore", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult editScore(String appKey, String timeStr, String method, String sign,
                                  @RequestBody @Validated  CbecScoreEditRequest request) {
         validSign(appKey, timeStr, method, sign);
@@ -97,7 +96,7 @@ public class CbecController {
         if (!ArithmeticUtils.equals(score, request.getScore())) {
             throw new CrmebException("积分金额保留两位小数");
         }
-        if (!ArithmeticUtils.less(score, BigDecimal.valueOf(0.01))) {
+        if (ArithmeticUtils.less(score, BigDecimal.valueOf(0.01))) {
             throw new CrmebException("最小金额0.01");
         }
         User user = userService.getByAccount(request.getAccount());
@@ -145,8 +144,9 @@ public class CbecController {
         return CommonResult.success();
     }
 
+    @EncryptIgnore
     @ApiOperation(value = "跨境订单同步", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/syncOrder ", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/syncOrder", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult syncOrder(String appKey, String timeStr, String method, String sign,
                                   @RequestBody @Validated CbecOrderSyncRequest request) {
         validSign(appKey, timeStr, method, sign);

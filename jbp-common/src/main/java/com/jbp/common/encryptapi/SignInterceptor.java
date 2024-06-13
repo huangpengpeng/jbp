@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
@@ -26,6 +27,7 @@ import com.jbp.common.vo.LoginUserVo;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.crypto.SecureUtil;
 
+@Slf4j
 public class SignInterceptor  extends HandlerInterceptorAdapter {
 	
 	final static com.google.common.cache.Cache<String, Object>  CACHE_NONCE = CacheBuilder.newBuilder().expireAfterWrite(180, TimeUnit.SECONDS).build();
@@ -62,18 +64,21 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 
 		String timestampStr = request.getHeader("m");
 		if (StringUtils.isBlank(timestampStr)) {
-			throw new CrmebException("签名错误");
+			log.error("签名错误");
+			return  false;
 		}
 		String sign = request.getHeader("sign");
 		if (StringUtils.isBlank(sign)) {
 			sign = request.getHeader("s");
 		}
 		if (StringUtils.isBlank(sign)) {
-			throw new CrmebException("签名错误");
+			log.error("签名错误");
+			return  false;
 		}
 		String nonce = request.getHeader("o");
 		if (StringUtils.isBlank(nonce)) {
-			throw new CrmebException("签名错误");
+			log.error("签名错误");
+			return  false;
 		}
 		// 得到正确的sign供检验用
 		String origin = secretKeyConfig.afterCutAndappend(secretKeyConfig.getKey(), "0", 10, 16) + timestampStr + nonce
@@ -102,20 +107,25 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 		try {
 			timestamp = Long.parseLong(timestampStr);
 		} catch (Exception e) {
-			throw new CrmebException("签名错误");
+			log.error("签名错误");
+			return  false;
 		}
-		// 前端的时间戳与服务器当前时间戳相差如果大于180，判定当前请求的timestamp无效"
-		if ((timestamp - System.currentTimeMillis()) / 1000 > 180) {
-			throw new CrmebException("签名到期");
+		// 前端的时间戳与服务器当前时间戳相差如果大于600，判定当前请求的timestamp无效"
+		if ((timestamp - System.currentTimeMillis()) / 1000 > 600) {
+			return  false;
+		//	throw new CrmebException("签名到期");
 		}
 		// nonce是否存在于redis中，检查当前请求是否是重复请求
 		boolean nonceExists = CACHE_NONCE.getIfPresent(timestampStr + nonce) != null;
 		if (nonceExists) {
-			throw new CrmebException("重复请求");
+			log.error("重复请求");
+			return  false;
 		}
 		// 后端MD5签名校验与前端签名sign值比对
 		if (!(sign.equalsIgnoreCase(signEcrypt))) {
-			throw new CrmebException("签名验证失败");
+			log.error("签名验证失败");
+			return  false;
+			//throw new CrmebException("签名验证失败");
 		}
 
 		return super.preHandle(request, response, handler);
