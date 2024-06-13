@@ -104,9 +104,10 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 		} catch (Exception e) {
 			throw new CrmebException("签名错误");
 		}
-		// 前端的时间戳与服务器当前时间戳相差如果大于180，判定当前请求的timestamp无效"
-		if ((timestamp - System.currentTimeMillis()) / 1000 > 180) {
-			throw new CrmebException("签名到期");
+		// 前端的时间戳与服务器当前时间戳相差如果大于600，判定当前请求的timestamp无效"
+		if ((timestamp - System.currentTimeMillis()) / 1000 > 600) {
+			return  false;
+		//	throw new CrmebException("签名到期");
 		}
 		// nonce是否存在于redis中，检查当前请求是否是重复请求
 		boolean nonceExists = CACHE_NONCE.getIfPresent(timestampStr + nonce) != null;
@@ -115,7 +116,8 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 		}
 		// 后端MD5签名校验与前端签名sign值比对
 		if (!(sign.equalsIgnoreCase(signEcrypt))) {
-			throw new CrmebException("签名验证失败");
+			return  false;
+			//throw new CrmebException("签名验证失败");
 		}
 
 		return super.preHandle(request, response, handler);
