@@ -123,9 +123,9 @@ public class SignInterceptor  extends HandlerInterceptorAdapter {
 		}
 		// 后端MD5签名校验与前端签名sign值比对
 		if (!(sign.equalsIgnoreCase(signEcrypt))) {
-//			log.error("签名验证失败");
-//			return  false;
-			throw new CrmebException("签名验证失败");
+			log.error("签名验证失败");
+			return  false;
+//			throw new CrmebException("签名验证失败");
 		}
 
 		return super.preHandle(request, response, handler);
