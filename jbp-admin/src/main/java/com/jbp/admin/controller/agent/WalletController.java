@@ -84,4 +84,11 @@ public class WalletController {
         return CommonResult.success();
     }
 
+    @PreAuthorize("hasAuthority('agent:user:wallet:export')")
+    @ApiOperation("用户积分导出Excel")
+    @GetMapping("/export")
+    public CommonResult<String> export(@Validated WalletRequest request) {
+        return CommonResult.success( walletService.export(request));
+    }
+
 }

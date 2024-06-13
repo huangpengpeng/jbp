@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.excel.OrderShipmentExcel;
+import com.jbp.common.excel.WalletExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.Wallet;
@@ -18,13 +20,14 @@ import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.response.WalletExtResponse;
 import com.jbp.common.utils.ArithmeticUtils;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.agent.WalletDao;
-import com.jbp.service.service.TeamService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.WalletConfigService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.service.agent.WalletService;
@@ -35,9 +38,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -58,6 +61,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     private TeamService teamService;
     @Resource
     private WalletDao walletDao;
+    @Resource
+    private UploadService uploadService;
 
 
     @Override
@@ -315,5 +320,42 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         }
 
         init();
+    }
+    @Override
+    public String export(WalletRequest request) {
+        Integer uid = null;
+        if (com.jbp.service.util.StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        List<WalletExtResponse> list = walletDao.getList(uid, request.getType(), request.getTeamId(), request.getNickname());
+        if (CollectionUtils.isEmpty(list)) {
+            throw new CrmebException("未查询到订单数据");
+        }
+        log.info("用户积分导出用户数据查询完成...");
+        List<Integer> uIdList = list.stream().map(WalletExtResponse::getUId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
+        LinkedList<WalletExcel> result = new LinkedList<>();
+        for (WalletExtResponse e : list) {
+            WalletExcel vo = new WalletExcel();
+            User userVo = uidMapList.get(e.getUId());
+            vo.setNickname(userVo != null ? userVo.getNickname() : "");
+            vo.setAccount(userVo != null ? userVo.getAccount() : "");
+            WalletConfig walletConfig = walletMap.get(e.getType());
+            vo.setTypeName(walletConfig != null ? walletConfig.getName() : "");
+
+            vo.setName(e.getName());
+            vo.setBalance(e.getBalance());
+            vo.setFreeze(e.getFreeze());
+            result.add(vo);
+        }
+
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, WalletExcel.class);
+        log.info("用户积分列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 }

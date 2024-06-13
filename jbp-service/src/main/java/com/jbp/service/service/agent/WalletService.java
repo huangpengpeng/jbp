@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.response.WalletExtResponse;
 
 import java.math.BigDecimal;
@@ -37,4 +38,6 @@ public interface WalletService extends IService<Wallet> {
     void init2();
 
     void init3();
+
+    String export(WalletRequest request);
 }
