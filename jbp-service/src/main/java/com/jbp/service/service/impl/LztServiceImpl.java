@@ -172,7 +172,7 @@ public class LztServiceImpl implements LztService {
         }
         try {
             LztFundTransferResult result = JSON.parseObject(s, LztFundTransferResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
+            if (result == null || !("0000".equals(result.getRet_code()) || "3003".equals(result.getRet_code()))) {
                 throw new CrmebException("划拨资金异常：" + result == null ? "请求结果为空" : result.getRet_msg());
             }
             return result;
@@ -190,21 +190,13 @@ public class LztServiceImpl implements LztService {
         params.setOid_partner(oidPartner);
         params.setUser_id(userId);
         params.setTxn_seqno(txnSeqno);
-        String url = "https://accpapi.lianlianpay.com/v1/acctmgr/query-lzt-fund-transfer";
+        String url = "https://accpgw.lianlianpay.com/v1/acctmgr/query-lzt-fund-transfer";
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
         String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         if (StringUtils.isEmpty(s)) {
             throw new CrmebException("划拨资金查询异常:" + txnSeqno);
         }
-        try {
-            LztQueryFundTransferResult result = JSON.parseObject(s, LztQueryFundTransferResult.class);
-            if (result == null || !"0000".equals(result.getRet_code())) {
-                throw new CrmebException("划拨资金查询异常：" + result == null ? "请求结果为空" : result.getRet_msg());
-            }
-            return result;
-        } catch (Exception e) {
-            throw new CrmebException("划拨资金查询异常:" + s);
-        }
+        return JSON.parseObject(s, LztQueryFundTransferResult.class);
     }
 
     @Override

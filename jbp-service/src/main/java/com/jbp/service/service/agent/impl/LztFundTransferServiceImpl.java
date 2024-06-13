@@ -1,13 +1,16 @@
 package com.jbp.service.service.agent.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.LztFundTransferResult;
+import com.jbp.common.lianlian.result.LztQueryAcctInfo;
 import com.jbp.common.lianlian.result.LztQueryFundTransferResult;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.LztAcct;
@@ -15,6 +18,7 @@ import com.jbp.common.model.agent.LztFundTransfer;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.LztFundTransferDao;
 import com.jbp.service.service.DegreePayService;
@@ -22,11 +26,14 @@ import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztFundTransferService;
 import com.jbp.service.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -34,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, LztFundTransfer> implements LztFundTransferService {
@@ -44,6 +52,13 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
     private MerchantService merchantService;
     @Resource
     private DegreePayService degreePayService;
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @PostConstruct
+    public void init(){
+        redisTemplate.delete("LztFundTransferTask.send");
+    }
 
     @Override
     public LztFundTransfer fundTransfer(Integer merId, String userId, String bankAccountNo, BigDecimal amt, String postscript) {
@@ -73,11 +88,6 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
     @Override
     public LztFundTransfer getByTxnSeqno(String txnSeqno) {
         return getOne(new QueryWrapper<LztFundTransfer>().lambda().eq(LztFundTransfer::getTxnSeqno, txnSeqno));
-    }
-
-    @Override
-    public LztFundTransfer getByAccpTxno(String accpTxno) {
-        return getOne(new QueryWrapper<LztFundTransfer>().lambda().eq(LztFundTransfer::getAccpTxno, accpTxno));
     }
 
     @Override
@@ -112,5 +122,42 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
         });
 
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public void autoFundTransfer() {
+        List<LztAcct> lztAcctList = lztAcctService.list(new LambdaQueryWrapper<LztAcct>().le(LztAcct::getIfOpenBankAcct, true));
+        for (LztAcct lztAcct : lztAcctList) {
+
+            List<LztFundTransfer> list = list(new LambdaQueryWrapper<LztFundTransfer>().in(LztFundTransfer::getStatus, Lists.newArrayList("处理中", "成功")));
+            BigDecimal sum = BigDecimal.ZERO;
+            if (CollectionUtils.isNotEmpty(list)) {
+                for (LztFundTransfer lztFundTransfer : list) {
+                    sum = sum.add(lztFundTransfer.getAmt());
+                }
+                if (ArithmeticUtils.gte(sum, BigDecimal.valueOf(1000000))) {
+                    continue;
+                }
+            }
+            BigDecimal usableAmt = BigDecimal.valueOf(1000000).subtract(sum);
+            LztAcct acctDetail = lztAcctService.details(lztAcct.getUserId());
+            List<LztQueryAcctInfo> bankAcctInfoList = acctDetail.getBankAcctInfoList();
+            if (CollectionUtils.isNotEmpty(bankAcctInfoList)) {
+                LztQueryAcctInfo lztBankAcct = bankAcctInfoList.get(0);
+                BigDecimal balance = StringUtils.isEmpty(lztBankAcct.getBank_acct_balance()) ? BigDecimal.ZERO : new BigDecimal(lztBankAcct.getBank_acct_balance());
+                BigDecimal frzBalance = StringUtils.isEmpty(lztBankAcct.getBank_acct_frz_balance()) ? BigDecimal.ZERO : new BigDecimal(lztBankAcct.getBank_acct_frz_balance());
+                balance = balance.subtract(frzBalance);
+                log.info("正在执行自动划拨账户余额:{}", balance);
+                BigDecimal transferAmt = BigDecimal.valueOf(Math.min(usableAmt.doubleValue(), balance.doubleValue()));
+                if (ArithmeticUtils.gt(transferAmt, BigDecimal.ZERO)) {
+                    try {
+                        LztFundTransfer lztFundTransfer = fundTransfer(lztAcct.getMerId(), lztAcct.getUserId(), lztBankAcct.getBank_acct_no(), transferAmt, "自动划拨");
+                        log.info("自动划拨成功:{}", JSONObject.toJSONString(lztFundTransfer));
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+        }
     }
 }

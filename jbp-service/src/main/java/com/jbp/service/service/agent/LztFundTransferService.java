@@ -18,8 +18,10 @@ public interface LztFundTransferService extends IService<LztFundTransfer> {
 
     LztFundTransfer getByTxnSeqno(String txnSeqno);
 
-    LztFundTransfer getByAccpTxno(String accpTxno);
-
     PageInfo<LztFundTransfer> pageList(Integer merId, String userId, String username,  String bankAccountNo, String txnSeqno,
                                        String accpTxno, Date startTime, Date endTime, PageParamRequest pageParamRequest);
+
+    void autoFundTransfer();
+
+
 }
