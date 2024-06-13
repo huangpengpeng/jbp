@@ -41,7 +41,7 @@ public class IcbcSvc {
     protected static final String HOST = "https://gw.open.icbc.com.cn";
 
     // 商户编号
-    protected static final String MER_ID = "141073750009";
+    protected static final String MER_ID = "141080990049";
 
     // 收单产品协议编号
     protected static final String MER_PRTCL_NO = "141073750009";
