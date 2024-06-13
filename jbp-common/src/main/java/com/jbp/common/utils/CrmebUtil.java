@@ -45,7 +45,7 @@ public class CrmebUtil {
     public static void main(String[] args) throws Exception {
 
 
-        System.out.println(getRandomPwd(8));
+//        System.out.println(getRandomPwd(8));
 //        System.out.println(encryptPassword("123456", "15871898211"));
 //        System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
 //        System.out.println(decryptPassowrd("qNRS8Ah2YmU=", "19979384655"));
@@ -54,7 +54,7 @@ public class CrmebUtil {
 //        System.out.println(decryptPassowrd("jR0ADu2fShA=", "18598005835"));
 //        System.out.println(decryptPassowrd("0g98reb4gO4=", "15618417068"));
 //        System.out.println(decryptPassowrd("8FOo2uLVucE=", "19011203013"));
-//        System.out.println(decryptPassowrd("bci+CYlEhxw=", "18506051809"));
+        System.out.println(decryptPassowrd("wpyZM4Otjm4=", "13823668660"));
 
 
 

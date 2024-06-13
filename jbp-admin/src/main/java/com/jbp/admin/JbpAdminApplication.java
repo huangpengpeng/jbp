@@ -40,6 +40,8 @@ public class JbpAdminApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
+//        LztFundTransferService lztFundTransferService = run.getBean(LztFundTransferService.class);
+//        lztFundTransferService.autoFundTransfer();
     }
 
 }
