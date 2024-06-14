@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.model.agent.OrdersRefundMsg;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.OrdersFundSummaryRequest;
 import com.jbp.common.response.OrdersFundSummaryExtResponse;
 
 import java.math.BigDecimal;
@@ -20,4 +21,6 @@ public interface OrdersFundSummaryService extends IService<OrdersFundSummary> {
     OrdersFundSummary reduceCommAmt(String ordersSn, BigDecimal commAmt);
 
     PageInfo<OrdersFundSummaryExtResponse> pageList(String ordersSn, String teamId, PageParamRequest pageParamRequest);
+
+    String export(OrdersFundSummaryRequest request);
 }

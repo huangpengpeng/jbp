@@ -12,11 +12,14 @@ import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.OrdersFundSummaryRequest;
 import com.jbp.common.response.OrdersFundSummaryExtResponse;
 import com.jbp.service.dao.agent.OrdersFundSummaryDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
 import com.jbp.service.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -28,6 +31,7 @@ import java.util.List;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
+@Slf4j
 public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryDao, OrdersFundSummary> implements OrdersFundSummaryService {
 
 
@@ -40,6 +44,17 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
         List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(teamId,ordersSn);
         Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public String export(OrdersFundSummaryRequest request) {
+        List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(request.getTeamId(),request.getOrdersSn());
+        if (CollectionUtils.isEmpty(list)) {
+            throw new CrmebException("未查询到订单佣金数据");
+        }
+        log.info("订单汇总导出佣金数据查询完成...");
+
+        return null;
     }
 
     @Override
