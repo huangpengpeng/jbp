@@ -130,7 +130,7 @@ public class GroupThreeRetOneHandler extends AbstractProductCommHandler {
             int remainder = orderSize % rule.getGroupComm().size();
 
             if(remainder == 0){
-                remainder = 3;
+                remainder = rule.getGroupComm().size();
             }
 
             GroupThreeRetOneHandler.Comm commList = rule.getGroupComm().get(remainder - 1);
