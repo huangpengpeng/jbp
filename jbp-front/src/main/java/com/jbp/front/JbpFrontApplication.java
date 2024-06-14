@@ -9,6 +9,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ScoreDownloadRequest;
 import com.jbp.common.response.HistoryOrderResponse;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.service.service.SmsService;
 import com.jbp.service.service.agent.HistoryOrderService;
 import com.jbp.service.service.agent.InvitationScoreService;
 import org.mybatis.spring.annotation.MapperScan;
@@ -48,6 +49,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+
 
 //
 //        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
