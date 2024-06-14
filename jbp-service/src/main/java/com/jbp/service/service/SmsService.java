@@ -16,6 +16,8 @@ import java.math.BigDecimal;
  */
 public interface SmsService {
 
+    void checkValidateCode(String phone, String code);
+
     /**
      * 发送公共验证码
      *
