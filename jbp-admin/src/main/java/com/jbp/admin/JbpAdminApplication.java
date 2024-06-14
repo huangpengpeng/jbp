@@ -8,10 +8,13 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.yop.result.AccountRechargeResult;
 import com.jbp.common.yop.result.AllAccountBalanceQueryResult;
+import com.jbp.service.service.OnePassSmsService;
+import com.jbp.service.service.SmsService;
 import com.jbp.service.service.SystemAdminService;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztFundTransferService;
 import com.jbp.service.service.agent.impl.LztFundTransferServiceImpl;
+import com.jbp.service.service.impl.OnePassSmsServiceImpl;
 import com.jbp.service.util.StringUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -42,6 +45,9 @@ public class JbpAdminApplication {
         System.out.println("ok");
 //        LztFundTransferService lztFundTransferService = run.getBean(LztFundTransferService.class);
 //        lztFundTransferService.autoFundTransfer();
+
+        SmsService smsService = run.getBean(SmsService.class);
+        smsService.sendCommonCode("15871898210");
     }
 
 }

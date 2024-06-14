@@ -6,6 +6,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.cloopen.rest.sdk.BodyType;
+import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.sms.SmsTemplate;
@@ -29,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -163,27 +166,33 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
         ValidateFormUtil.isPhone(phone, "手机号码错误");
         beforeSendMessage();
         DateTime dateTime = DateUtil.date();
-        String clientIp = RequestUtil.getClientIp();
-        beforeSendCommonCodeCheck(phone, clientIp, dateTime);
+
+//        String clientIp = RequestUtil.getClientIp();
+        beforeSendCommonCodeCheck(phone, null, dateTime);
+
         //获取短信验证码过期时间
         String codeExpireStr = systemConfigService.getValueByKey(SmsConstants.CONFIG_KEY_SMS_CODE_EXPIRE);
         if (StrUtil.isBlank(codeExpireStr) || Integer.parseInt(codeExpireStr) == 0) {
             codeExpireStr = Constants.NUM_FIVE + "";// 默认5分钟过期
         }
         Integer code = CrmebUtil.randomCount(111111, 999999);
-        HashMap<String, Object> justPram = new HashMap<>();
-        justPram.put("code", code);
-        justPram.put("time", codeExpireStr);
-        Boolean aBoolean = push(phone, SmsConstants.SMS_CONFIG_VERIFICATION_CODE_TEMP_ID, justPram);
+        Boolean aBoolean = false;
+        String ytxOpenStatus = systemConfigService.getValueByKey("ytxOpenStatus");
+        if (StringUtils.isNotEmpty(ytxOpenStatus) && "1".equals(ytxOpenStatus)) {
+            String msgTempId = systemConfigService.getValueByKey("ytxMsgCodeTempId");
+            aBoolean = push4Ytx(phone, msgTempId, new String[]{code.toString()});
+        } else {
+            HashMap<String, Object> justPram = new HashMap<>();
+            justPram.put("code", code);
+            justPram.put("time", codeExpireStr);
+            aBoolean = push(phone, SmsConstants.SMS_CONFIG_VERIFICATION_CODE_TEMP_ID, justPram);
+        }
         if (!aBoolean) {
             throw new CrmebException("发送短信失败，请联系后台管理员");
         }
         // 将验证码存入redis
         redisUtil.set(SmsConstants.SMS_VALIDATE_PHONE + phone, code, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
         redisUtil.set(SmsConstants.SMS_VALIDATE_PHONE_NUM + phone, 1, 60L);
-//        redisUtil.incrAndCreate(StrUtil.format(SmsConstants.SMS_PHONE_HOUR_NUM, phone, dateTime.toDateStr() + dateTime.hour(true)));
-//        redisUtil.incrAndCreate(StrUtil.format(SmsConstants.SMS_PHONE_DAY_NUM, phone, dateTime.toDateStr()));
-//        redisUtil.incrAndCreate(StrUtil.format(SmsConstants.SMS_IP_HOUR_NUM, clientIp, dateTime.toDateStr() + dateTime.hour(true)));
         return aBoolean;
     }
 
@@ -388,6 +397,40 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
         return sendMessage(smsVo);
     }
 
+    public static void main(String[] args) {
+//        push4Ytx("15871898210", "2593107", new String[]{"123456"});
+    }
+
+    private  Boolean push4Ytx(String phone, String msgTempId, String[] datas) {
+        String serverIp = "app.cloopen.com";
+        //请求端口
+        String serverPort = "8883";
+        //主账号,登陆云通讯网站后,可在控制台首页看到开发者主账号ACCOUNT SID和主账号令牌AUTH TOKEN
+        String appId = systemConfigService.getValueByKey("ytxAppId");
+        String accountSId = systemConfigService.getValueByKey("ytxAccountSId");
+        String accountToken = systemConfigService.getValueByKey("ytxAuthToken");
+
+        CCPRestSmsSDK sdk = new CCPRestSmsSDK();
+        sdk.init(serverIp, serverPort);
+        sdk.setAccount(accountSId, accountToken);
+        sdk.setAppId(appId);
+        sdk.setBodyType(BodyType.Type_JSON);
+        HashMap<String, Object> result = sdk.sendTemplateSMS(phone, msgTempId, datas);
+        if ("000000".equals(result.get("statusCode"))) {
+            //正常返回输出data包体信息（map）
+            HashMap<String, Object> data = (HashMap<String, Object>) result.get("data");
+            Set<String> keySet = data.keySet();
+            for (String key : keySet) {
+                Object object = data.get(key);
+                logger.info("云通讯短信发送结果:" + key + " = " + object);
+            }
+        } else {
+            logger.error("云通讯短信发送失败:" + "错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
+            //异常返回输出错误码和错误信息
+        }
+        return true;
+
+    }
     /**
      * 发送短信
      *
@@ -436,4 +479,7 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
         }
         return jsonObject;
     }
+
+
+
 }
