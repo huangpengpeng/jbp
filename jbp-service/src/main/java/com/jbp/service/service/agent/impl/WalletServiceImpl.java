@@ -10,6 +10,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.excel.OrderShipmentExcel;
+import com.jbp.common.excel.OrdersFundSummaryExcel;
 import com.jbp.common.excel.WalletExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
@@ -63,6 +64,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
     private WalletDao walletDao;
     @Resource
     private UploadService uploadService;
+    @Resource
+    private OssService ossService;
 
 
     @Override
@@ -332,15 +335,16 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
             uid = user.getId();
         }
         List<WalletExtResponse> list = walletDao.getList(uid, request.getType(), request.getTeamId(), request.getNickname());
-        if (CollectionUtils.isEmpty(list)) {
+        List<WalletExtResponse> responses = list.stream().filter(e -> e.getBalance().compareTo(BigDecimal.ZERO) != 0).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(responses)) {
             throw new CrmebException("未查询到订单数据");
         }
         log.info("用户积分导出用户数据查询完成...");
-        List<Integer> uIdList = list.stream().map(WalletExtResponse::getUId).collect(Collectors.toList());
+        List<Integer> uIdList = responses.stream().map(WalletExtResponse::getUId).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
         Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
         LinkedList<WalletExcel> result = new LinkedList<>();
-        for (WalletExtResponse e : list) {
+        for (WalletExtResponse e : responses) {
             WalletExcel vo = new WalletExcel();
             User userVo = uidMapList.get(e.getUId());
             vo.setNickname(userVo != null ? userVo.getNickname() : "");
@@ -354,8 +358,11 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
             result.add(vo);
         }
 
-        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, WalletExcel.class);
-        log.info("用户积分列表导出下载地址:" + fileResultVo.getUrl());
-        return fileResultVo.getUrl();
+//        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, WalletExcel.class);
+//        log.info("用户积分列表导出下载地址:" + fileResultVo.getUrl());
+//        return fileResultVo.getUrl();
+        String s = ossService.uploadXlsx(result, WalletExcel.class, "用户积分" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+        return s;
+
     }
 }
