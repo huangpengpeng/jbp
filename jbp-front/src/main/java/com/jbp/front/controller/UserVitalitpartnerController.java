@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.agent.UserOfflineSubsidy;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserVitalitpartner;
+import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.response.UserVitalitpartnerResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.UserVitalitpartnerService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,6 +41,8 @@ public class UserVitalitpartnerController {
     private OrderService orderService;
     @Autowired
     private UserOfflineSubsidyService userOfflineSubsidyService;
+    @Autowired
+    private WhiteUserService whiteUserService;
 
 
     @ApiOperation(value = "元气合伙人图标")
@@ -102,8 +102,13 @@ public class UserVitalitpartnerController {
             response.setCity(userOfflineSubsidy2.getCity());
             response.setArea(userOfflineSubsidy2.getArea());
         }
-        response.setList(list);
 
+        WhiteUser whiteUser = whiteUserService.getOne(new QueryWrapper<WhiteUser>().lambda().eq(WhiteUser::getUid, user.getId())
+                .apply("white_id=(select id from eb_white where name='合伙人')"));
+        if (whiteUser != null) {
+            list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/crmebimage/public/content/2024/06/14/d18da5fd0790431d805022f9811e2965wf5wsvv3fv.png");
+        }
+        response.setList(list);
         return CommonResult.success(response);
     }
 }
