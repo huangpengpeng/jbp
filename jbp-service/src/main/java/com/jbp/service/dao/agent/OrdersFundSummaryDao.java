@@ -12,6 +12,6 @@ public interface OrdersFundSummaryDao extends BaseMapper<OrdersFundSummary> {
 
 
 
-    List<OrdersFundSummaryExtResponse> getList(@Param("teamId")String teamId, @Param("ordersSn")String ordersSn);
+    List<OrdersFundSummaryExtResponse> getList(@Param("teamId")String teamId, @Param("startPayTime")String startPayTime,  @Param("endPayTime")String endPayTime, @Param("ordersSn")String ordersSn);
 
 }

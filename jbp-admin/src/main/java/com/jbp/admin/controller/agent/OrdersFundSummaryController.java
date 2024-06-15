@@ -28,7 +28,7 @@ public class OrdersFundSummaryController {
     @GetMapping("/page")
     @ApiOperation("订单资金汇总列表")
     public CommonResult<CommonPage<OrdersFundSummaryExtResponse>> getList(OrdersFundSummaryRequest request, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(ordersFundSummaryService.pageList(request.getOrdersSn(),request.getTeamId(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(ordersFundSummaryService.pageList(request.getOrdersSn(),request.getTeamId(),request.getStartPayTime(),request.getEndPayTime(),pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:orders:fund:summary:export')")

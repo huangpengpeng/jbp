@@ -21,4 +21,11 @@ public class OrdersFundSummaryRequest implements Serializable {
 
     @ApiModelProperty("团队id")
     private String teamId;
+
+
+    @ApiModelProperty("付款开始时间")
+    private String startPayTime;
+
+    @ApiModelProperty("付款结束时间")
+    private String endPayTime;
 }

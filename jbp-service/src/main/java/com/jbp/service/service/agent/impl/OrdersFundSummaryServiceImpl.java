@@ -52,16 +52,16 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
 
 
     @Override
-    public PageInfo<OrdersFundSummaryExtResponse> pageList(String ordersSn,String teamId,  PageParamRequest pageParamRequest) {
+    public PageInfo<OrdersFundSummaryExtResponse> pageList(String ordersSn, String teamId, String startPayTime, String endPayTime, PageParamRequest pageParamRequest) {
 
-        Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(teamId,ordersSn);
+        Page<OrdersFundSummary> page = PageHelper.startPage(pageParamRequest.getPage(),pageParamRequest.getLimit());
+        List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(teamId,startPayTime,endPayTime,ordersSn);
         return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
     public String export(OrdersFundSummaryRequest request) {
-        List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(request.getTeamId(),request.getOrdersSn());
+        List<OrdersFundSummaryExtResponse> list = ordersFundSummaryDao.getList(request.getTeamId(),request.getStartPayTime(),request.getEndPayTime(),request.getOrdersSn());
         if (CollectionUtils.isEmpty(list)) {
             throw new CrmebException("未查询到订单佣金数据");
         }

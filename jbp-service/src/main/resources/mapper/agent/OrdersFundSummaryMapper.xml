@@ -15,6 +15,12 @@
         <if test="ordersSn !='' and ordersSn!= null ">
             and   f.orders_sn =#{ordersSn}
         </if>
+        <if test="startPayTime !='' and startPayTime!= null ">
+            and   o.pay_time >= #{startPayTime}
+        </if>
+        <if test="endPayTime !='' and endPayTime!= null ">
+            <![CDATA[AND pay_time <= #{endPayTime}]]>
+        </if>
 
         order by f.id desc
 
