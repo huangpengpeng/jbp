@@ -3,6 +3,7 @@ package com.jbp.admin.controller.platform;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.request.OrderSearchRequest;
 import com.jbp.common.request.RefundOrderSearchRequest;
+import com.jbp.common.request.ProductDayRecordRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.service.service.ExportService;
@@ -61,6 +62,14 @@ public class PlatformExportController {
     @RequestMapping(value = "/refund/order/excel", method = RequestMethod.GET)
     public CommonResult<String> exportRefund(@Validated RefundOrderSearchRequest request) {
         return CommonResult.success(exportService.exportRefund(request));
+
+    }
+    @PreAuthorize("hasAuthority('platform:export:product::statement')")
+    @ApiOperation(value = "导出商品报表Excel")
+    @RequestMapping(value = "/product/statement/excel/", method = RequestMethod.GET)
+    public CommonResult<String> exportProductStatement(@Validated ProductDayRecordRequest request) {
+
+        return CommonResult.success(exportService.exportProductStatement(request));
     }
 
 

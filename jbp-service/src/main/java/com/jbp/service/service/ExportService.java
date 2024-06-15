@@ -2,12 +2,8 @@ package com.jbp.service.service;
 
 
 import com.jbp.common.request.OrderSearchRequest;
+import com.jbp.common.request.ProductDayRecordRequest;
 import com.jbp.common.request.RefundOrderSearchRequest;
-import com.jbp.common.vo.OrderExcelInfoVo;
-import com.jbp.common.vo.OrderExcelVo;
-import com.jbp.common.vo.OrderShipmentExcelInfoVo;
-
-import java.util.List;
 
 /**
  * StoreProductService 接口
@@ -35,4 +31,5 @@ public interface ExportService {
 
     String exportRefund(RefundOrderSearchRequest request);
 
+    String exportProductStatement(ProductDayRecordRequest request);
 }

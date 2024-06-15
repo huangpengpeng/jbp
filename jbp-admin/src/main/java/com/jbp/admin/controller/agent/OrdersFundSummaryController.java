@@ -4,12 +4,14 @@ import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.OrdersFundSummaryRequest;
+import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.response.OrdersFundSummaryExtResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,5 +29,12 @@ public class OrdersFundSummaryController {
     @ApiOperation("订单资金汇总列表")
     public CommonResult<CommonPage<OrdersFundSummaryExtResponse>> getList(OrdersFundSummaryRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(ordersFundSummaryService.pageList(request.getOrdersSn(),request.getTeamId(),pageParamRequest)));
+    }
+
+    @PreAuthorize("hasAuthority('agent:orders:fund:summary:export')")
+    @ApiOperation("订单汇总导出Excel")
+    @GetMapping("/export")
+    public CommonResult<String> export(OrdersFundSummaryRequest request) {
+        return CommonResult.success( ordersFundSummaryService.export(request));
     }
 }
