@@ -18,7 +18,7 @@ public interface UserRelationFlowService extends IService<UserRelationFlow> {
 
     PageInfo<UserRelationFlow> pageList(Integer uid, Integer pid, Integer level, PageParamRequest pageParamRequest);
 
-    UserRelationGplotVo gplot(Integer uid,Map<Integer, User> uidMapList, Map<Integer, UserCapa> uidCapaMap);
+    UserRelationGplotVo gplot(Integer uid,Integer uid0,Integer uid1,Map<Integer, User> uidMapList, Map<Integer, UserCapa> uidCapaMap);
 
     UserRelationGplotVo gplotInfo(Integer uid);
 

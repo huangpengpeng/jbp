@@ -43,19 +43,18 @@ public class RefundOrderExcel implements Serializable {
     @ExcelProperty(value = "售后类型",index = 9)
     private String afterSalesType;
 
-    @ExcelProperty(value = "退款时间",index = 10)
-    private Date refundTime;
-
-    @ExcelProperty(value = "收货人姓名",index = 11)
+    @ExcelProperty(value = "收货人姓名",index = 10)
     private String realName;
 
-    @ExcelProperty(value = "收货人电话",index = 12)
+    @ExcelProperty(value = "收货人电话",index = 11)
     private String userPhone;
 
-    @ExcelProperty(value = "收货人详细地址",index = 13)
+    @ExcelProperty(value = "收货人详细地址",index = 12)
     private String userAddress;
 
-    @ExcelProperty(value = "创建时间",index = 14)
+    @ExcelProperty(value = "创建时间",index = 13)
     private Date createTime;
 
+    @ExcelProperty(value = "退款时间",index = 14)
+    private Date refundTime;
 }

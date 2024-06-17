@@ -439,6 +439,17 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     public List<FundClearingExcel> exportFundClearing(String uniqueNo, String externalNo, Date startClearingTime, Date endClearingTime, Date starteCreateTime, Date endCreateTime, String status, Integer uid, String teamName, String description, String commName, Boolean ifRefund , List<String> orderList) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         List<FundClearingExcel> fundClearingVos = fundClearingDao.exportFundClearing(uniqueNo, externalNo, startClearingTime, endClearingTime, starteCreateTime, endCreateTime, status, uid, teamName, description, 0L, channelName, commName, ifRefund, orderList);
+        //添加回退时间
+        List<PlatformWalletFlow> flowList = platformWalletFlowService.list(new QueryWrapper<PlatformWalletFlow>().lambda().eq(PlatformWalletFlow::getOperate, "退款"));
+        Map<String,PlatformWalletFlow> flowMap = new HashMap<>();
+        flowList.forEach(f -> flowMap.put(f.getExternalNo(),f));
+        List<FundClearingExcel> fundClearingList = fundClearingVos.stream().filter(FundClearingExcel::getIfRefund).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(fundClearingList)) {
+            fundClearingList.forEach(f -> {
+                PlatformWalletFlow flow = flowMap.get(f.getUniqueNo());
+                f.setReturnTime(flow != null ? flow.getGmtCreated() : null);
+            });
+        }
         String name = environment.getProperty("spring.profiles.active");
         if(name.contains("sm") || name.contains("yk")  || name.contains("tf") || name.contains("qy") ){
             for (FundClearingExcel fundClearingVo : fundClearingVos) {
