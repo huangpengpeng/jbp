@@ -53,7 +53,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://fny-5-7-4.cl8owfyhsxx3.ap-southeast-1.rds.amazonaws.com:3306/ph?useSSL=false&useUnicode=false&autoReconnect=true&characterEncoding=utf-8&tcpRcvBuf=2048000&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     username: admin
-    password: 12345Aa#
+    password: 123456Aa#
   # quartz
   quartz:
     properties:
