@@ -43,8 +43,8 @@ public class IcbcSvc {
     // 商户编号
     protected static final String MER_ID = "141080990049";
 
-    // 收单产品协议编号
-    protected static final String MER_PRTCL_NO = "141073750009";
+    // 收单产品协议编号 100000020802
+    protected static final String MER_PRTCL_NO = "1410809900490201";
 
     // 微信appid
     private static final String WECHAT_APP_ID="";
@@ -56,7 +56,7 @@ public class IcbcSvc {
 
     public static void main(String[] args) {
         String orderId = "202405170000";
-        payOrder( orderId, "10", "测试", "36.24.41.101", BigDecimal.valueOf(1));
+        payOrder( orderId, "13", "测试", "36.24.41.101", BigDecimal.valueOf(1));
     }
     /**
      * 随机生成秘钥
