@@ -47,7 +47,7 @@ public class CrmebUtil {
 
 //        System.out.println(getRandomPwd(8));
 //        System.out.println(encryptPassword("123456", "15871898211"));
-//        System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
+        System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
 //        System.out.println(decryptPassowrd("qNRS8Ah2YmU=", "19979384655"));
 //        System.out.println(decryptPassowrd("qYt3rFZLANUI2QE1JaCktQ==", "18929560630"));
 //        System.out.println(decryptPassowrd("qT2WGnqYLTT63zbreFYPkg==", "13686668640"));

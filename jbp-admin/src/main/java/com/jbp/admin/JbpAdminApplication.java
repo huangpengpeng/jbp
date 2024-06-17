@@ -22,7 +22,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @MapperScan(basePackages = {"com.jbp.**.dao"})
 public class JbpAdminApplication {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
     }
