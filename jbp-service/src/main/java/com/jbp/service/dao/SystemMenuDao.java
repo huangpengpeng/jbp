@@ -2,6 +2,7 @@ package com.jbp.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jbp.common.model.admin.SystemMenu;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ public interface SystemMenuDao extends BaseMapper<SystemMenu> {
      * @return List
      */
     List<SystemMenu> findPermissionByUserId(Integer userId);
+
+    List<SystemMenu> findPermissionByUserIdAndPerms(@Param("userId") Integer userId, @Param("perms") String perms);
 
     /**
      * 获取用户路由

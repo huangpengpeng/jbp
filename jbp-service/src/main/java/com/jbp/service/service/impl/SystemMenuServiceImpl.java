@@ -84,6 +84,11 @@ public class SystemMenuServiceImpl extends ServiceImpl<SystemMenuDao, SystemMenu
         return dao.findPermissionByUserId(userId);
     }
 
+    @Override
+    public List<SystemMenu> findPermissionByUserIdAndPerms(Integer userId, String perms) {
+        return dao.findPermissionByUserIdAndPerms(userId, perms);
+    }
+
     /**
      * 获取所有菜单
      *

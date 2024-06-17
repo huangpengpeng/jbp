@@ -5,6 +5,7 @@ import com.jbp.common.model.admin.SystemMenu;
 import com.jbp.common.request.SystemMenuRequest;
 import com.jbp.common.request.SystemMenuSearchRequest;
 import com.jbp.common.vo.MenuCheckVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -33,6 +34,8 @@ public interface SystemMenuService extends IService<SystemMenu> {
      * 通过用户id获取权限
      */
     List<SystemMenu> findPermissionByUserId(Integer userId);
+
+    List<SystemMenu> findPermissionByUserIdAndPerms(Integer userId, String perms);
 
     /**
      * 获取所有菜单

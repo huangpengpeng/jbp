@@ -135,15 +135,19 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
             List<LztFundTransfer> list = list(new LambdaQueryWrapper<LztFundTransfer>().eq(LztFundTransfer::getUserId, lztAcct.getUserId())
                     .in(LztFundTransfer::getStatus, Lists.newArrayList("处理中", "成功")).between(LztFundTransfer::getGmtCreated, startDate, finallyDate));
             BigDecimal sum = BigDecimal.ZERO;
+            BigDecimal max = BigDecimal.valueOf(1000000);
+            if ("xwbank".equals(lztAcct.getOpenBank())) {
+                max = BigDecimal.valueOf(100000000);
+            }
             if (CollectionUtils.isNotEmpty(list)) {
                 for (LztFundTransfer lztFundTransfer : list) {
                     sum = sum.add(lztFundTransfer.getAmt());
                 }
-                if (ArithmeticUtils.gte(sum, BigDecimal.valueOf(1000000))) {
+                if (ArithmeticUtils.gte(sum, max)) {
                     continue;
                 }
             }
-            BigDecimal usableAmt = BigDecimal.valueOf(1000000).subtract(sum);
+            BigDecimal usableAmt = max.subtract(sum);
             LztAcct acctDetail = lztAcctService.details(lztAcct.getUserId());
             List<LztQueryAcctInfo> bankAcctInfoList = acctDetail.getBankAcctInfoList();
             if (CollectionUtils.isNotEmpty(bankAcctInfoList)) {
