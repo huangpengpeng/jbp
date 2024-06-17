@@ -74,9 +74,12 @@ public class FundClearingExcel implements Serializable {
     @ExcelProperty(value = "创建时间", index = 18, format="yyyy-MM-dd hh:mm:ss")
     private Date createTime;
 
-    @ExcelProperty(value = "描述", index = 19)
+    @ExcelProperty(value = "回退时间", index = 19)
+    private Date returnTime;
+
+    @ExcelProperty(value = "描述", index = 20)
     private String description;
 
-    @ExcelProperty(value = "备注", index = 20)
+    @ExcelProperty(value = "备注", index = 21)
     private String remark;
 }

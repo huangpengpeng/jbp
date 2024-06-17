@@ -137,7 +137,7 @@ public class FundClearing extends VersionModel {
     @TableField(exist = false)
     private String teamName;
 
-    @ApiModelProperty("退回时间")
+    @ApiModelProperty("回退时间")
     @TableField(exist = false)
     private Date returnTime;
 
