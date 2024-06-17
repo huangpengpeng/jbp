@@ -26,7 +26,7 @@ crmeb:
       - /jmreport/**
 # 配置端口
 server:
-  port: 8181
+  port: 8080
   servlet:
     context-path: /         # 访问path
   tomcat:
