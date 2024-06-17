@@ -3,6 +3,7 @@ package com.jbp.service.erp.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import com.jbp.common.model.system.JushuitanConfig;
 import com.jbp.common.utils.DateTimeUtils;
@@ -212,6 +213,85 @@ public class JushuitanCallSvc {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return requestAttributes == null ? null : requestAttributes.getRequest();
     }
+
+
+
+
+	/**
+	 * 历史发货订单上传
+	 *
+	 * @param upload
+	 */
+	public void historyOrderUpload( JSONArray upload,Integer dbName) {
+		Map<String, Object> params = Maps.newConcurrentMap();
+		params.put("biz", upload.toJSONString());
+		JSONObject jsonObject = historyCallapi(Constants.ORDER_UPLOAD, params, "jushuitan.orders.upload",dbName);
+		{
+			log.info("jushuitanorderUpload:{}",jsonObject.toJSONString());
+		}
+		if (!ifSuccess(jsonObject)) {
+			throw new RuntimeException(jsonObject.toJSONString());
+		}
+	}
+
+	protected JSONObject historyCallapi(String url, Map<String, Object> params, String method,Integer dbName) {
+		params.put("app_key", environment.getProperty("jushuitan.appKey"));
+		params.put("access_token", historyGetAccessToken(dbName));
+		params.put("charset", "utf-8");
+		params.put("version", "2");
+		params.put("timestamp", System.currentTimeMillis() / 1000);
+		String sign = SignUtil.getSign(environment.getProperty("jushuitan.appSecret"), params);
+		params.put("sign", sign);
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		MediaType mediaType = MediaType.parse(Constants.REQUEST_CHARSET);
+		String requestBody=toRequestBody(params);
+		{
+			log.info("requestBody:{}",requestBody);
+		}
+		RequestBody body = RequestBody.create(mediaType,
+				requestBody);
+		Request request = new Request.Builder().url(url)
+				.method("POST", body).addHeader("Content-Type", Constants.REQUEST_CHARSET)
+				.build();
+		try {
+			Response response = client.newCall(request).execute();
+			String text = new String(response.body().bytes(), "utf-8");
+			return JSONObject.parseObject(text);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+
+	public String  historyGetAccessToken(Integer dbName) {
+		JushuitanConfig jushuitanConfig = jushuitanConfigService.getOne(new QueryWrapper<JushuitanConfig>().lambda().eq(JushuitanConfig ::getId,dbName));
+		/**
+		 * 判断是否过期
+		 */
+		if (ifExpire(jushuitanConfig)) {
+			Map<String, Object> params = Maps.newConcurrentMap();
+			params.put("app_key", environment.getProperty("jushuitan.appKey"));
+			params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
+			params.put("grant_type", "refresh_token");
+			params.put("charset", "utf-8");
+			params.put("refresh_token", jushuitanConfig.getRefreshToken());
+			params.put("scope", "scope");
+			String sign = SignUtil.getSign(environment.getProperty("jushuitan.appSecret"), params);
+			params.put("sign", sign);
+			JSONObject	jsonObject = callapi(Constants.ACCESS_TOKEN_REFRESH_URL,params);
+			if (!ifSuccess(jsonObject)) {
+				throw new RuntimeException(jsonObject.toJSONString());
+			}
+			JSONObject config = jsonObject.getJSONObject("data");
+			jushuitanConfig.setAccessToken(config.getString("access_token"));
+			jushuitanConfig.setExpiresIn(config.getLong("expires_in"));
+			jushuitanConfig.setRefreshToken(config.getString("refresh_token"));
+			jushuitanConfig.setScope(config.getString("scope"));
+			jushuitanConfigService.updateById(jushuitanConfig);
+		}
+		return jushuitanConfig.getAccessToken();
+	}
+
 
 
 	@Resource

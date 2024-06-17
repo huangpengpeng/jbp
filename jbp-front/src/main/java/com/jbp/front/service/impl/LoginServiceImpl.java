@@ -287,6 +287,16 @@ public class LoginServiceImpl implements LoginService {
         }
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
 
+
+        UserInvitation userInvitation =  userInvitationService.getByUser(user.getId());
+        if (spreadPid != null && spreadPid > 0  && userInvitation == null) {
+            UserCapa userCapa  = userCapaService.getByUser(user.getId());
+            String ifOpen = systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
+            //邀请配置 配置关闭时默认强绑定
+            userInvitationService.band(user.getId(), spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
+        }
+
         //元气小站配置写死
         if(loginRequest.getIfvitality()) {
             White white = whiteService.getByName("元气小站");

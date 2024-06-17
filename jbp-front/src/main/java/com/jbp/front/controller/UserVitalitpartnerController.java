@@ -106,7 +106,7 @@ public class UserVitalitpartnerController {
         WhiteUser whiteUser = whiteUserService.getOne(new QueryWrapper<WhiteUser>().lambda().eq(WhiteUser::getUid, user.getId())
                 .apply("white_id=(select id from eb_white where name='合伙人')"));
         if (whiteUser != null) {
-            list.add("https://fnyhdf.oss-cn-shenzhen.aliyuncs.com/crmebimage/public/content/2024/06/14/d18da5fd0790431d805022f9811e2965wf5wsvv3fv.png");
+            list.add("crmebimage/public/content/2024/06/14/d18da5fd0790431d805022f9811e2965wf5wsvv3fv.png");
         }
         response.setList(list);
         return CommonResult.success(response);
