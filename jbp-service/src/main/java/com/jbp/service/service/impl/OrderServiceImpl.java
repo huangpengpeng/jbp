@@ -762,6 +762,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             BeanUtils.copyProperties(e, dataResponse);
             return dataResponse;
         }).collect(Collectors.toList());
+        response.setIfUserVerifyReceive("否");
+        if (order.getIfUserVerifyReceive() != null && order.getIfUserVerifyReceive()) {
+            response.setIfUserVerifyReceive("是");
+        }
         response.setOrderDetailList(orderInfoList);
         // 用户信息
         if(order.getUid() != null){
@@ -779,6 +783,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             response.setMerName(merchant.getName());
             response.setMerIsSelf(merchant.getIsSelf());
         }
+        List<OrderInvoiceResponse> shopList = orderInvoiceService.findByOrderNo(orderNo);
+        response.setShipTime(shopList.isEmpty() ? null : shopList.get(0).getCreateTime());
         return response;
     }
 

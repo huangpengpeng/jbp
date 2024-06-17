@@ -206,4 +206,16 @@ public class PlatformOrderAdminDetailResponse implements Serializable {
     private String city;
     @ApiModelProperty(value = "收货区")
     private String district;
+
+    @ApiModelProperty(value = "发货时间")
+    private Date shipTime;
+
+    @ApiModelProperty(value = "确认收货时间")
+    private Date receivingTime;
+
+    @ApiModelProperty(value = "用户是否确认收货")
+    private String ifUserVerifyReceive;
+
+
+
 }
