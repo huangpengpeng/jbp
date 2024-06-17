@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,18 +37,18 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
 
     public  static  Map<String, String> SHOP_TOKEN = Maps.newConcurrentMap();
 
-    public  static  Map<String, String> DB_NAME_MAP = new HashMap<String, String>(){{
-        put("wkp42271043176625", "1");
-        put("tf138940740527575", "2");
-        put("xcsmall", "3");
-        put("jymall", "4");
+    public  static LinkedHashMap<String, String> DB_NAME_MAP = new LinkedHashMap<String, String>(){{
+        put("wkp42271043176625", "12980053");
+        put("tf138940740527575", "12980074");
+        put("xcsmall", "14343407");
+        put("jymall", "13990361");
     }};
 
-    public  static  Map<String, String> SHOP_MAP = new HashMap<String, String>(){{
-        put("1", "wkp42271043176625");
-        put("2", "tf138940740527575");
-        put("3", "xcsmall");
-        put("4", "jymall");
+    public  static  LinkedHashMap<String, String> SHOP_MAP = new LinkedHashMap<String, String>(){{
+        put("12980053", "wkp42271043176625");
+        put("12980074", "tf138940740527575");
+        put("14343407", "xcsmall");
+        put("13990361", "jymall");
     }};
 
 
@@ -212,7 +209,10 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
                     {
                         log.info("upload:{}", upload.toJSONString());
                     }
-                    jushuitanCallSvc.orderUpload(upload);
+                    Set<String> keys = SHOP_MAP.keySet();
+                    List<String> keyList = new ArrayList<>(keys);
+
+                    jushuitanCallSvc.historyOrderUpload(upload,  keyList.indexOf(request.getDbName())+2 );
                     SqlRunner.db().update("update " + request.getDbName() + ".orders set platformMsg = {0} where id={1} ", "发货已经同步聚水潭", order.getOrderId());
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
