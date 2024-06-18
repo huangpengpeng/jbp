@@ -235,12 +235,14 @@ public class JushuitanCallSvc {
 	}
 
 	protected JSONObject historyCallapi(String url, Map<String, Object> params, String method,Integer dbName) {
-		params.put("app_key", environment.getProperty("jushuitan.appKey"));
+
+		JushuitanConfig jushuitanConfig = jushuitanConfigService.getOne(new QueryWrapper<JushuitanConfig>().lambda().eq(JushuitanConfig ::getId,dbName));
+		params.put("app_key", jushuitanConfig.getAppKey());
 		params.put("access_token", historyGetAccessToken(dbName));
 		params.put("charset", "utf-8");
 		params.put("version", "2");
 		params.put("timestamp", System.currentTimeMillis() / 1000);
-		String sign = SignUtil.getSign(environment.getProperty("jushuitan.appSecret"), params);
+		String sign = SignUtil.getSign(jushuitanConfig.getAppSecret(), params);
 		params.put("sign", sign);
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse(Constants.REQUEST_CHARSET);
@@ -270,13 +272,13 @@ public class JushuitanCallSvc {
 		 */
 		if (ifExpire(jushuitanConfig)) {
 			Map<String, Object> params = Maps.newConcurrentMap();
-			params.put("app_key", environment.getProperty("jushuitan.appKey"));
+			params.put("app_key", jushuitanConfig.getAppKey());
 			params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
 			params.put("grant_type", "refresh_token");
 			params.put("charset", "utf-8");
 			params.put("refresh_token", jushuitanConfig.getRefreshToken());
 			params.put("scope", "scope");
-			String sign = SignUtil.getSign(environment.getProperty("jushuitan.appSecret"), params);
+			String sign = SignUtil.getSign(jushuitanConfig.getAppSecret(), params);
 			params.put("sign", sign);
 			JSONObject	jsonObject = callapi(Constants.ACCESS_TOKEN_REFRESH_URL,params);
 			if (!ifSuccess(jsonObject)) {
