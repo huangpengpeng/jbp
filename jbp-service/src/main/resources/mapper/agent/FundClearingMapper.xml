@@ -46,7 +46,8 @@
                c.create_time,
                u.account,
                u.nickname,
-               t.name
+               t.name,
+               c.gmt_modify as return_time
         FROM eb_fund_clearing AS c
                  LEFT JOIN eb_user AS u ON c.uid = u.id
                  LEFT JOIN eb_team_user as tu ON c.uid = tu.uid
