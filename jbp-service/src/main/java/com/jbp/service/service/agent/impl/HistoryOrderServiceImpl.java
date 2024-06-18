@@ -157,7 +157,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
             for (HistoryOrderResponse order : list) {
                 JSONObject jsonObject = new JSONObject();
                 {
-                    jsonObject.put("shop_id", request.getShopId());
+                    jsonObject.put("shop_id", Integer.parseInt( request.getShopId()));
                     jsonObject.put("so_id", order.getOrderNo());
                     jsonObject.put("order_date",
                             DateTimeUtils.format(order.getPayTime() == null ? order.getCreateTime() : order.getPayTime(),
@@ -212,7 +212,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
                     Set<String> keys = SHOP_MAP.keySet();
                     List<String> keyList = new ArrayList<>(keys);
 
-                    jushuitanCallSvc.historyOrderUpload(upload,  keyList.indexOf(request.getDbName())+2 );
+                    jushuitanCallSvc.historyOrderUpload(upload,  keyList.indexOf(request.getShopId())+2 );
                     SqlRunner.db().update("update " + request.getDbName() + ".orders set platformMsg = {0} where id={1} ", "发货已经同步聚水潭", order.getOrderId());
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
