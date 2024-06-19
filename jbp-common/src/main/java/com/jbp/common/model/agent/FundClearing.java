@@ -141,5 +141,9 @@ public class FundClearing extends VersionModel {
     @TableField(exist = false)
     private Date returnTime;
 
+    @ApiModelProperty("商品名称")
+    @TableField(exist = false)
+    private String productName;
+
 
 }

@@ -20,6 +20,7 @@ import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.excel.FundClearingExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -95,6 +96,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private OldcapaxsService oldcapaxsService;
     @Resource
     private PlatformWalletFlowService platformWalletFlowService;
+    @Resource
+    private OrderDetailService orderDetailService;
 
 
 
@@ -483,6 +486,15 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         List<FundClearing> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, Lists.newArrayList());
+        }
+        //获取平台订单商品名是否显示配置
+        if (systemConfigService.getValueByKey("fund_product_isshow").equals("1")) {
+            List<String> orderNoList = list.stream().map(FundClearing::getExternalNo).collect(Collectors.toList());
+            Map<String, List<OrderDetail>> mapByOrderNoList = orderDetailService.getMapByOrderNoList(orderNoList);
+            list.forEach(e -> {
+                OrderDetail orderDetail = mapByOrderNoList.get(e.getExternalNo()).get(0);
+                e.setProductName(orderDetail!= null ? orderDetail.getProductName() : "");
+            });
         }
         Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
         walletMap.put(-1, new WalletConfig().setName("管理费"));
