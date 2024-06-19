@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * H5端订单操作
@@ -168,6 +169,16 @@ public class OrderController {
     public CommonResult<LogisticsResultVo> getLogisticsInfo(@PathVariable(value = "invoiceId") Integer invoiceId) {
         return CommonResult.success(orderService.getLogisticsInfo(invoiceId));
     }
+
+
+    @ApiOperation(value = "历史订单系统物流信息查询")
+    @RequestMapping(value = "/logistics/history/{invoiceId}", method = RequestMethod.GET)
+    public CommonResult<LogisticsResultVo> getHistoryLogisticsInfo(@PathVariable(value = "invoiceId") String  orderNo) {
+
+        return CommonResult.success(orderService.getHistoryLogisticsInfo(orderNo));
+    }
+
+
 
     @ApiOperation(value = "获取订单状态图")
     @RequestMapping(value = "/status/image", method = RequestMethod.GET)

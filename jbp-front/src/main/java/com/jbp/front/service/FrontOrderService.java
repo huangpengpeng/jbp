@@ -141,6 +141,10 @@ public interface FrontOrderService {
      */
     LogisticsResultVo getLogisticsInfo(Integer invoiceId);
 
+
+    LogisticsResultVo getHistoryLogisticsInfo(String orderNo);
+
+
     /**
      * 获取发货单列表
      * @param orderNo 订单号
