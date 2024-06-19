@@ -487,31 +487,30 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, Lists.newArrayList());
         }
+
         //获取平台订单商品名是否显示配置
-        if (systemConfigService.getValueByKey("fund_product_isshow").equals("1")) {
-            List<String> orderNoList = list.stream().map(FundClearing::getExternalNo).collect(Collectors.toList());
-            Map<String, List<OrderDetail>> mapByOrderNoList = orderDetailService.getMapByOrderNoList(orderNoList);
-            list.forEach(e -> {
-                OrderDetail orderDetail = mapByOrderNoList.get(e.getExternalNo()).get(0);
-                e.setProductName(orderDetail!= null ? orderDetail.getProductName() : "");
-            });
-        }
+        String fund_product_isshow = systemConfigService.getValueByKey("fund_product_isshow");
+
         Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
         walletMap.put(-1, new WalletConfig().setName("管理费"));
         walletMap.put(-2, new WalletConfig().setName("手续费"));
         list.forEach(e -> {
             e.setSendAmt(new BigDecimal((e.getSendAmt().multiply(wallet_pay_integral)).stripTrailingZeros().toPlainString()));
-            if(name.contains("sm") || name.contains("yk")  || name.contains("tf") ){
+            if (name.contains("sm") || name.contains("yk") || name.contains("tf")) {
                 e.setDescription(CommAliasNameSmEnum.getAliasNameReplaceName(e.getDescription()));
-            }else if (name.contains("hdf") ){
+            } else if (name.contains("hdf")) {
                 e.setDescription(CommAliasNameHdfEnum.getAliasNameReplaceName(e.getDescription()));
-            }else{
+            } else {
                 e.setDescription(CommAliasNameEnum.getAliasNameByName(e.getCommName()));
             }
             for (FundClearingItem item : e.getItems()) {
                 WalletConfig walletConfig = walletMap.get(item.getWalletType());
                 item.setWalletName(walletConfig != null ? walletConfig.getName() : "");
                 item.setAmt(new BigDecimal((item.getAmt().multiply(wallet_pay_integral)).stripTrailingZeros().toPlainString()));
+            }
+            if (fund_product_isshow.equals("1")) {
+                List<FundClearingProduct> productList = e.getProductList();
+                e.setProductName(!productList.isEmpty() ? productList.get(0).getProductName() : "");
             }
         });
         return CommonPage.copyPageInfo(page, list);
