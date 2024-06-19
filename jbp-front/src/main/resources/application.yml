@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: hdf
+    active: sm
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小

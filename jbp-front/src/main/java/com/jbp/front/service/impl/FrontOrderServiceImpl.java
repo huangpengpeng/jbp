@@ -169,6 +169,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private LogisticService logisticService;
+
+
     /**
      * 订单预下单V1.3
      *
@@ -1949,6 +1953,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Override
     public LogisticsResultVo getLogisticsInfo(Integer invoiceId) {
         return orderService.getLogisticsInfo(invoiceId);
+    }
+
+    @Override
+    public LogisticsResultVo getHistoryLogisticsInfo(String orderNo) {
+
+        List<OrderFrontDataResponse> orderFrontDataResponses = new ArrayList<>();
+        String name =environment.getProperty("historyOrder.name");
+        StringBuilder stringBuilder = new StringBuilder("select *  from "+name+".orders   where 1=1 and orderSn = '"+orderNo+"'" );
+        Map<String,Object> maps =  SqlRunner.db().selectOne(stringBuilder.toString());
+        return logisticService.info(maps.get("shipSn").toString(), null, "", maps.get("mobile").toString());
+
     }
 
     /**
