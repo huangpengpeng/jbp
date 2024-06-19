@@ -92,6 +92,73 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     @Autowired
     private RedisUtil redisUtil;
 
+    private SystemLoginResponse login2(SystemAdminLoginRequest request, Integer adminType, String ip) {
+        // 手机好 + 验证码登录
+        if (StringUtils.isNotBlank(request.getPhone()) && StringUtils.isNotBlank(request.getCaptchaPhone())) {
+            //验证短信
+            checkValidateCode(request.getPhone(), request.getCaptchaPhone());
+            LambdaQueryWrapper<SystemAdmin> lqw = Wrappers.lambdaQuery();
+            lqw.eq(SystemAdmin::getPhone, request.getPhone());
+            SystemAdmin systemAdmin = systemAdminService.getOne(lqw);
+            if (systemAdmin == null) {
+                throw new CrmebException("手机号不存在或验证码错误");
+            }
+            try {
+                request.setPwd(CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount()));
+                request.setAccount(systemAdmin.getAccount());
+            } catch (Exception e) {
+                throw new CrmebException(e.getMessage());
+            }
+        }
+
+        // 用户验证
+        Authentication authentication = null;
+        // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+        try {
+            String principal = request.getAccount() + adminType;
+            authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(principal, request.getPwd()));
+        } catch (AuthenticationException e) {
+            if (e instanceof BadCredentialsException) {
+                throw new CrmebException("用户不存在或密码错误");
+            }
+            throw new CrmebException(e.getMessage());
+        }
+        LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
+        SystemAdmin systemAdmin = loginUser.getUser();
+
+        Merchant merchant = null;
+        if (systemAdmin.getMerId() != null && systemAdmin.getMerId() > 0) {
+            merchant = merchantService.getById(systemAdmin.getMerId());
+        }
+
+        String token = tokenComponent.createToken(loginUser);
+        SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
+        systemAdminResponse.setToken(token);
+        BeanUtils.copyProperties(systemAdmin, systemAdminResponse);
+
+        // 更新最后登录信息
+        systemAdmin.setUpdateTime(DateUtil.date());
+        systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
+        systemAdmin.setLastIp(ip);
+
+        systemAdminService.updateById(systemAdmin);
+
+        // 返回后台LOGO图标
+        if (adminType.equals(RoleEnum.PLATFORM_ADMIN.getValue())) {
+            systemAdminResponse.setLeftTopLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP));
+            systemAdminResponse.setLeftSquareLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE));
+        } else {
+            systemAdminResponse.setLeftTopLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LEFT_TOP));
+            systemAdminResponse.setLeftSquareLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE));
+        }
+        return systemAdminResponse;
+
+    }
     /**
      * PC登录
      *
@@ -234,6 +301,11 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     @Override
     public SystemLoginResponse merchantLogin(SystemAdminLoginRequest request, String ip) {
         return login(request, RoleEnum.MERCHANT_ADMIN.getValue(), ip);
+    }
+
+    @Override
+    public SystemLoginResponse merchantLogin2(SystemAdminLoginRequest request, String ip) {
+        return login2(request, RoleEnum.MERCHANT_ADMIN.getValue(), ip);
     }
 
     @Override

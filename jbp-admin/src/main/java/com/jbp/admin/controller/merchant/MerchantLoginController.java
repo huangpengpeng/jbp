@@ -60,6 +60,14 @@ public class MerchantLoginController {
     @Autowired
     private SystemAdminService systemAdminService;
 
+    @ApiOperation(value="登录")
+    @RequestMapping(value = "/login2", method = RequestMethod.POST)
+    public CommonResult<SystemLoginResponse> login2(@RequestBody @Validated SystemAdminLoginRequest systemAdminLoginRequest, HttpServletRequest request) {
+        String ip = CrmebUtil.getClientIp(request);
+        SystemLoginResponse systemAdminResponse = loginService.merchantLogin2(systemAdminLoginRequest, ip);
+        return CommonResult.success(systemAdminResponse);
+    }
+
 
     @ApiOperation(value="登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)

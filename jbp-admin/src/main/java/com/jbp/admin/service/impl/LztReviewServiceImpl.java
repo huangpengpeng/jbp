@@ -5,11 +5,16 @@ import com.beust.jcommander.internal.Lists;
 import com.jbp.admin.service.LztReviewService;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.dto.LztReviewDto;
+import com.jbp.common.lianlian.result.QueryWithdrawalResult;
+import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztTransfer;
 import com.jbp.common.model.agent.LztWithdrawal;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.service.service.DegreePayService;
+import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztTransferService;
 import com.jbp.service.service.agent.LztWithdrawalService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -31,16 +36,22 @@ public class LztReviewServiceImpl implements LztReviewService {
     private LztWithdrawalService lztWithdrawalService;
     @Resource
     private LztTransferService lztTransferService;
+    @Resource
+    private DegreePayService degreePayService;
+    @Resource
+    private LztAcctService lztAcctService;
 
+    @SneakyThrows
     @Override
     public List<LztReviewDto> list(Integer merId, Boolean ifDraw, Boolean ifPay, String status) {
+        List<String> statuss = Lists.newArrayList(LianLianPayConfig.TxnStatus.交易失败.getName(), LianLianPayConfig.TxnStatus.交易关闭.getName(), LianLianPayConfig.TxnStatus.交易成功.getName());
         List<LztReviewDto> list = Lists.newArrayList();
         // 提现
         if (BooleanUtils.isTrue(ifDraw)) {
             LambdaQueryWrapper<LztWithdrawal> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(LztWithdrawal::getMerId, merId);
             if ("复核".equals(status)) {
-                wrapper.eq(LztWithdrawal::getTxnStatus, LianLianPayConfig.TxnStatus.待确认.getName());
+                wrapper.in(LztWithdrawal::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.待确认.getName(), LianLianPayConfig.TxnStatus.交易处理中.getName()));
             }
             if ("成功".equals(status)) {
                 wrapper.eq(LztWithdrawal::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName());
@@ -49,10 +60,28 @@ public class LztReviewServiceImpl implements LztReviewService {
                 wrapper.in(LztWithdrawal::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.交易处理中.getName(), LianLianPayConfig.TxnStatus.预付完成.getName(), "已复核"));
             }
             if ("取消".equals(status)) {
-                wrapper.eq(LztWithdrawal::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.交易失败.getName(), LianLianPayConfig.TxnStatus.交易关闭.getName()));
+                wrapper.in(LztWithdrawal::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.交易失败.getName(), LianLianPayConfig.TxnStatus.交易关闭.getName()));
             }
             List<LztWithdrawal> withdrawalList = lztWithdrawalService.list(wrapper);
+
             for (LztWithdrawal lztWithdrawal : withdrawalList) {
+                if (!statuss.contains(lztWithdrawal.getTxnStatus())) {
+                    LztAcct lztAcct = lztAcctService.getByUserId(lztWithdrawal.getUserId());
+                    QueryWithdrawalResult result = degreePayService.queryWithdrawal(lztAcct, lztWithdrawal.getTxnSeqno());
+                    if(result != null && "订单查询无记录".equals(result.getRet_msg())){
+                        lztWithdrawal.setTxnStatus(LianLianPayConfig.TxnStatus.交易关闭.getName());
+                        lztWithdrawal.setQueryRet(result);
+                        lztWithdrawalService.updateById(lztWithdrawal);
+                    }else{
+                        LztWithdrawal query = lztWithdrawalService.callBack(result);
+                        if(query != null){
+                            lztWithdrawal = query;
+                        }
+                    }
+                }
+                if ("复核".equals(status) && !LianLianPayConfig.TxnStatus.待确认.getName().equals(lztWithdrawal.getTxnStatus())) {
+                    continue;
+                }
                 LztReviewDto lztReview = LztReviewDto.builder()
                         .id(lztWithdrawal.getId())
                         .type("提现")
@@ -62,7 +91,7 @@ public class LztReviewServiceImpl implements LztReviewService {
                         .username(lztWithdrawal.getUsername())
                         .amt(lztWithdrawal.getAmt().toString())
                         .feeAmount(lztWithdrawal.getFeeAmount() == null ? "0" : lztWithdrawal.getFeeAmount().toString())
-                        .updateTime(DateTimeUtils.format(lztWithdrawal.getGmtCreated(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN))
+                        .updateTime(DateTimeUtils.format(lztWithdrawal.getGmtModify(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN))
                         .status(statusConversion(lztWithdrawal.getTxnStatus()))
 
                         .build();
@@ -75,7 +104,7 @@ public class LztReviewServiceImpl implements LztReviewService {
             LambdaQueryWrapper<LztTransfer> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(LztTransfer::getMerId, merId);
             if ("复核".equals(status)) {
-                wrapper.eq(LztTransfer::getTxnStatus, LianLianPayConfig.TxnStatus.待确认.getName());
+                wrapper.in(LztTransfer::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.待确认.getName(), LianLianPayConfig.TxnStatus.交易处理中.getName()));
             }
             if ("成功".equals(status)) {
                 wrapper.eq(LztTransfer::getTxnStatus, LianLianPayConfig.TxnStatus.交易成功.getName());
@@ -84,10 +113,31 @@ public class LztReviewServiceImpl implements LztReviewService {
                 wrapper.in(LztTransfer::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.交易处理中.getName(), LianLianPayConfig.TxnStatus.预付完成.getName(), "已复核"));
             }
             if ("取消".equals(status)) {
-                wrapper.eq(LztTransfer::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.交易失败.getName(), LianLianPayConfig.TxnStatus.交易关闭.getName()));
+                wrapper.in(LztTransfer::getTxnStatus, Lists.newArrayList(LianLianPayConfig.TxnStatus.交易失败.getName(), LianLianPayConfig.TxnStatus.交易关闭.getName()));
             }
             List<LztTransfer> transferList = lztTransferService.list(wrapper);
             for (LztTransfer lztTransfer : transferList) {
+                if (!statuss.contains(lztTransfer.getTxnStatus())) {
+                    LztAcct lztAcct = lztAcctService.getByUserId(lztTransfer.getPayerId());
+                    QueryWithdrawalResult result = degreePayService.transferQuery(lztAcct, lztTransfer.getTxnSeqno());
+                    if(result != null && "订单查询无记录".equals(result.getRet_msg())){
+                        lztTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.交易关闭.getName());
+                        lztTransfer.setQueryRet(result);
+                        lztTransferService.updateById(lztTransfer);
+                    }
+
+                    if(result != null && result.getTxn_status() != null){
+                        if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(result.getTxn_status())) {
+                            lztTransfer.setFinishTime(DateTimeUtils.parseDate(result.getFinish_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                        }
+                        lztTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.getName(result.getTxn_status()));
+                        lztTransfer.setQueryRet(result);
+                        lztTransferService.updateById(lztTransfer);
+                    }
+                }
+                if ("复核".equals(status) && !LianLianPayConfig.TxnStatus.待确认.getName().equals(lztTransfer.getTxnStatus())) {
+                    continue;
+                }
                 LztReviewDto lztReview = LztReviewDto.builder()
                         .id(lztTransfer.getId())
                         .type("代付")
@@ -98,13 +148,13 @@ public class LztReviewServiceImpl implements LztReviewService {
                         .amt(lztTransfer.getAmt().toString())
                         .status(statusConversion(lztTransfer.getTxnStatus()))
                         .feeAmount(lztTransfer.getFeeAmount() == null ? "0" : lztTransfer.getFeeAmount().toString())
-                        .updateTime(DateTimeUtils.format(lztTransfer.getGmtCreated(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN))
+                        .updateTime(DateTimeUtils.format(lztTransfer.getGmtModify(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN))
                         .build();
                 list.add(lztReview);
             }
         }
         if (CollectionUtils.isNotEmpty(list)) {
-            list = list.stream().sorted(Comparator.comparing(LztReviewDto::getCreateTime).reversed()).collect(Collectors.toList());
+            list = list.stream().sorted(Comparator.comparing(LztReviewDto::getUpdateTime).reversed()).collect(Collectors.toList());
         }
         return list;
     }

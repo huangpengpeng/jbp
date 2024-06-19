@@ -108,8 +108,11 @@ public class  YopProducts {
             /**
              * 费率变更必填，开户可以不填
              */
-            proInfo.put("undertaker", "ORDINARY_MERCHANT");
             proInfo.put("paymentMethod", "REAL_TIME");
+
+            //            proInfo.put("undertaker", "PLATFORM_MERCHANT"); // 平台商
+//            proInfo.put("undertaker", "SAAS_SERVICE_PROVIDER");  // 服务商
+//            proInfo.put("undertaker", "ORDINARY_MERCHANT");  // 标准商户
             products.add(proInfo);
         }
         return JacksonTool.toJsonString(products);
@@ -126,12 +129,13 @@ public class  YopProducts {
             } else {
                 proInfo.put("percentRate", pro.getRate());
             }
-            proInfo.put("undertaker", "SAAS_SERVICE_PROVIDER");
             proInfo.put("paymentMethod", "REAL_TIME");
 
+
+//            proInfo.put("undertaker", "PLATFORM_MERCHANT"); // 平台商
+//            proInfo.put("undertaker", "SAAS_SERVICE_PROVIDER");  // 服务商
+//            proInfo.put("undertaker", "ORDINARY_MERCHANT");  // 标准商户
             products.add(proInfo);
-
-
         }
         return JacksonTool.toJsonString(products);
     }

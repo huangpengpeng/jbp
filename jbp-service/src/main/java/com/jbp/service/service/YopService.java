@@ -26,6 +26,13 @@ public interface YopService {
 
 
     /**
+     * 企业入网
+     */
+    RegisterResult register(RegisterParams params);
+
+
+
+    /**
      * 入网进度查询
      * /rest/v2.0/mer/register/query
      */

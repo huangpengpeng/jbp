@@ -86,6 +86,16 @@ public class YopServiceImpl implements YopService {
         return send("/rest/v2.0/mer/register/saas/micro", "POST", params, RegisterMicroResult.class);
     }
 
+    /**
+     * 企业入网
+     */
+    @Override
+    public RegisterResult register(RegisterParams params) {
+        params.setParentMerchantNo("10089066338");
+        params.setProductInfo(YopProducts.getMerchant());
+        return send("/rest/v2.0/mer/register/saas/merchant", "POST", params, RegisterResult.class);
+    }
+
     @Override
     public RegisterQueryResult registerQuery(String requestNo) {
         return send("/rest/v2.0/mer/register/query", "GET", new RegisterQueryParams(requestNo), RegisterQueryResult.class);

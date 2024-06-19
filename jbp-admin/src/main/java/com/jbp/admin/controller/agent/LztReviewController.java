@@ -15,7 +15,7 @@ import com.jbp.service.service.agent.LztWithdrawalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.data.annotation.Reference;
+import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,15 +26,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/admin/agent/lzt/review")
 @Api(tags = "来账通小程序接口")
-public class LztController {
+public class LztReviewController {
 
-    @Reference
+    @Resource
     private SystemMenuService systemMenuService;
-    @Reference
+    @Resource
     private LztReviewService lztReviewService;
-    @Reference
+    @Resource
     private LztWithdrawalService lztWithdrawalService;
-    @Reference
+    @Resource
     private LztTransferService lztTransferService;
 
 

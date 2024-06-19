@@ -179,6 +179,11 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
         }
         if (StringUtils.isNotEmpty(notifyInfo)) {
             lztAcctApply.setNotifyInfo(notifyInfo);
+            com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(notifyInfo);
+            if (jsonObject != null && jsonObject.getString("acct_status") != null && "FAIL".equals(jsonObject.getString("acct_status"))) {
+                lztAcctApply.setStatus(LianLianPayConfig.AcctState.FAIL.getCode());
+                lztAcctApply.setRetMsg(jsonObject.getString("remark"));
+            }
         }
         updateById(lztAcctApply);
         return lztAcctApply;

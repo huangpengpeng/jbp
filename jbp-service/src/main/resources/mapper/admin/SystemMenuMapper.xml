@@ -18,7 +18,7 @@
 				 right join eb_system_role_menu rm on rm.menu_id = m.id
 				 right join eb_system_role r on rm.rid = r.id
 				 right join eb_system_admin a on FIND_IN_SET(r.id, a.roles)
-		where  m.is_delte = 0 and r.`status` = 1 and a.id = #{userId} and  rm.perms=#{perms}
+		where  m.is_delte = 0 and r.`status` = 1 and a.id = #{userId} and  m.perms=#{perms}
 		GROUP BY m.id
 	</select>
 

@@ -51,23 +51,25 @@ public class JbpFrontApplication {
 
         YopService yopService = run.getBean(YopService.class);
 
-//        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090401872");
+//        merRegister(yopService);
+
+//        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090420584");
 //        WithdrawCardBindParams params = new WithdrawCardBindParams();
-//        params.setMerchantNo("10090401872");
-//        params.setAccountNo("6222030502001695215");
-//        params.setBankCardType("DEBIT_CARD");
-//        params.setBankCode("ICBC");
-//        params.setBranchCode("102161000113");
+//        params.setMerchantNo("10090420584");
+//        params.setAccountNo("120924643310006");
+//        params.setBankCardType("ENTERPRISE_ACCOUNT");
+//        params.setBankCode("CMBCHINA");
+////        params.setBranchCode("102161000113");
 //
 //         WithdrawCardBindResult withdrawCardBindResult = yopService.withdrawCardBind(params);
 //        System.out.println(JSONObject.toJSONString(withdrawCardBindResult));
-
+//
 //        WithdrawCardModifyParams params = new WithdrawCardModifyParams();
-//        params.setMerchantNo("10090401872");
+//        params.setMerchantNo("10090420584");
 //        params.setBindId(cardQueryResult.getBankCardAccountList().get(0).getBindCardId());
 //        params.setBankCardOperateType("CANCELLED");
-//        params.setBankCode("ICBC");
-//        params.setBranchCode("102161000113");
+//        params.setBankCode("CMBCHINA");
+//        params.setBranchCode("120924643310001");
 //        WithdrawCardModifyResult withdrawCardModifyResult = yopService.withdrawCardModify(params);
 //        System.out.println(JSONObject.toJSONString(withdrawCardModifyResult));
 
@@ -146,11 +148,46 @@ public class JbpFrontApplication {
                 "竹根滩镇黑流渡村一组", "6228480329262404075", "ABC", "http://fky.natapp1.cc/yop/registerMicro", "平台");
 
         System.out.println(JSONObject.toJSONString(registerMicroResult));
-
-
 //        RegisterQueryResult result = yopService.registerQuery("LZT_RS_157329444997738");
 //        System.out.println(JSONObject.toJSONString(result));
     }
+    private static void merRegister(YopService yopService) {
+        RegisterParams params = new RegisterParams();
+        params.setRequestNo(StringUtils.N_TO_10("LZT_RS_"));
+        params.setBusinessRole("PLATFORM_MERCHANT");// 平台商户
+
+        // 商户资质信息
+        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/19/merchant-1718770597693-62b1a85b-58ad-43fb-8755-61fc6e0cf36d-NeBZsFDLdcAZlmJdrDeU.jpg\", \"signName\":\"广州户连科技有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91440106MAD5TRBY56\", \"shortName\":\"广州户连\" }";
+        params.setMerchantSubjectInfo(merchantSubjectInfo);
+
+        // 法人信息
+        String merchantCorporationInfo = "{ \"legalName\":\"何青青\", \"legalLicenceType\":\"ID_CARD\", \"legalLicenceNo\":\"45042319991017022X\", \"legalLicenceFrontUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/19/merchant-1718770629145-53c6ddee-8e6d-4a53-a565-936acfd1232b-TFPEoZQbApWqpniLenlp.jpg\", \"legalLicenceBackUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/19/merchant-1718770675571-8d0e7807-6754-498e-8039-e421cb8eb641-pKJDTsstkRrIXhxaoZBb.jpg\" }";
+        params.setMerchantCorporationInfo(merchantCorporationInfo);
+
+        // 联系人信息
+        String merchantContactInfo="{ \"contactName\":\"肖慈清\", \"contactMobile\":\"15306500433\", \"contactEmail\":\"63294176@qq.com\", \"contactLicenceNo\":\"510322198101078968\" ,\"adminEmail\":\"63294176@qq.com\",\"adminMobile\":\"15306500433\" }";
+        params.setMerchantContactInfo(merchantContactInfo);
+
+        // 地址信息
+        String businessAddressInfo = "{ \"province\":\"440000\", \"city\":\"440100\", \"district\":\"440106\", \"address\":\"高唐路221号5楼503房0093\" }";
+        params.setBusinessAddressInfo(businessAddressInfo);
+
+        // 结算账户信息  招商银行股份有限公司广州机场路支行
+        String settlementAccountInfo = "{ \"settlementDirection\":\"BANKCARD\", \"bankCode\":\"CMBCHINA\", \"bankAccountType\":\"ENTERPRISE_ACCOUNT\", \"bankCardNo\":\"120924643310001\" }";
+        params.setSettlementAccountInfo(settlementAccountInfo);
+
+        // 通知地址
+        params.setNotifyUrl("http://fky.natapp1.cc/yop");
+
+        // 开通产品资质不能为空
+        String productQualificationInfoDto = "{ \"scenePhotoUrl\":\"440000\", \"businessPlacePhotoUrl\":\"440100\" }";
+        params.setProductQualificationInfo(productQualificationInfoDto);
+        RegisterResult register = yopService.register(params);
+        System.out.println(JSONObject.toJSONString(register));
+
+    }
+
+
 
 
     private static void queryOpenBank(YopService yopService) {
