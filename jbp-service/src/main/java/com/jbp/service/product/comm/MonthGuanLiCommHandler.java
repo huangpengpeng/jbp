@@ -86,9 +86,8 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
         BigDecimal totalFee = BigDecimal.ZERO;
         for (ClearingUser clearingUser : clearingUserList) {
             Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
-            totalScore = totalScore.add(rule.getUsableScore());
+            totalScore = rule.getTotalScore();
             BigDecimal fee = rule.getUsableScore().multiply(rule.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
-            totalFee = totalFee.add(fee);
             if (ArithmeticUtils.gt(fee, BigDecimal.ZERO)) {
                 ClearingBonus clearingBonus = new ClearingBonus(clearingUser.getUid(), clearingUser.getAccountNo(), clearingUser.getLevel(), clearingUser.getLevelName(),
                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(), StringUtils.N_TO_10("MGL_"), fee);
@@ -120,6 +119,7 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
                     }
                 }
             }
+            totalFee = totalFee.add(clearingBonus.getCommAmt());
             clearingBonusService.updateById(clearingBonus);
         }
 
@@ -202,6 +202,13 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
          * 可用业绩
          */
         private BigDecimal usableScore;
+
+
+        /**
+         * 总业绩
+         */
+        private BigDecimal totalScore;
+
     }
 
 
