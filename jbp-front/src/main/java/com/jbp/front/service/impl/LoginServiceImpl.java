@@ -328,6 +328,24 @@ public class LoginServiceImpl implements LoginService {
 
     }
 
+    @Override
+    public void phoneCaptchaRegister(RegisterMobileRequest loginRequest) {
+
+        List<User> userList = userService.getByPhone(loginRequest.getPhone());
+        if(!userList.isEmpty()){
+            throw new CrmebException("手机号已存在");
+        }
+
+        //检测验证码
+        checkValidateCode(loginRequest.getPhone(), loginRequest.getCaptcha());
+        Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
+        User user = userService.registerPhone(loginRequest.getNickName(), loginRequest.getPhone(), spreadPid);
+        user.setPayPwd(CrmebUtil.encryptPassword(loginRequest.getPayPwd()));
+        user.setPwd(CrmebUtil.encryptPassword(loginRequest.getPwd()));
+        userService.updateById(user);
+
+    }
+
     /**
      * 微信公众号授权登录
      *

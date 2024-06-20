@@ -105,4 +105,9 @@ public interface LoginService {
     FrontIndividualCenterConfigResponse getIndividualCenterConfig();
 
     void forgotPassword(String account, String password, String captcha, String phone);
+
+
+
+    void phoneCaptchaRegister(RegisterMobileRequest loginRequest);
+
 }

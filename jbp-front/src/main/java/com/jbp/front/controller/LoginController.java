@@ -41,10 +41,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用户登陆 前端控制器
@@ -294,6 +291,19 @@ public class LoginController {
                         .build();
         cbecOrderService.orderSync(orderSyncDTO);
 
+
+
+        return CommonResult.success();
+    }
+
+
+
+
+    @EncryptIgnore
+    @ApiOperation(value = "手机号验证码注册")
+    @RequestMapping(value = "/mobile/register", method = RequestMethod.POST)
+    public CommonResult<LoginResponse> phoneCaptchaRegister(@RequestBody @Validated RegisterMobileRequest loginRequest) {
+        loginService.phoneCaptchaRegister(loginRequest);
 
 
         return CommonResult.success();
