@@ -131,8 +131,8 @@ swagger:
 wx:
   miniapp:
     configs:
-      - appid: wx69627cafde0080bf #微信小程序的appid
-        secret: 6a1851dd9474b745e91779f0a2319390 #微信小程序的Secret
+      - appid: wxb71ba1a076920d7a #微信小程序的appid
+        secret: 409a65c30ce1e7d00cd7f1a435a41b51 #微信小程序的Secret
         token: CrmebJava #微信小程序消息服务器配置的token
         aesKey:  #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON

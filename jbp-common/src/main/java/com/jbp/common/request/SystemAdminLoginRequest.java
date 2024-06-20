@@ -46,4 +46,7 @@ public class SystemAdminLoginRequest {
     @ApiModelProperty(value = "手机验证码", required = false)
     private String captchaPhone;
 
+    @ApiModelProperty(value = "微信授权code", required = false)
+    private String code;
+
 }

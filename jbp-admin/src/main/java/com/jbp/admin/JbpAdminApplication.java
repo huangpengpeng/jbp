@@ -1,6 +1,8 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.service.service.WechatService;
+import com.jbp.service.service.impl.WechatServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,6 +27,8 @@ public class JbpAdminApplication {
     public static void main(String[] args){
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
+
+        run.getBean(WechatService.class).miniAuthCode("code");
     }
 
 }

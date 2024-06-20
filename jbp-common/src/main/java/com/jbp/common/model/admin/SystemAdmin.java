@@ -87,5 +87,7 @@ public class SystemAdmin implements Serializable {
     @ApiModelProperty(value = "后台管理员最后一次登录时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "openid")
+    private String openId;
 
 }

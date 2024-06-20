@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.jbp.admin.filter.TokenComponent;
 import com.jbp.admin.service.AdminLoginService;
@@ -29,6 +30,7 @@ import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.vo.LoginUserVo;
 import com.jbp.common.vo.MenuTree;
+import com.jbp.common.vo.WeChatMiniAuthorizeVo;
 import com.jbp.service.service.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -91,8 +93,78 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     private SmsService smsService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private WechatService wechatService;
+
+    private SystemLoginResponse login3(String code, Integer adminType, String ip) {
+        WeChatMiniAuthorizeVo weChatMiniAuthorizeVo  = null;
+        if(StringUtils.isNotEmpty(code)){
+            try {
+                weChatMiniAuthorizeVo = wechatService.miniAuthCode(code);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        if(weChatMiniAuthorizeVo == null){
+            return null;
+        }
+        SystemAdmin systemAdmin = systemAdminService.getOne(new QueryWrapper<SystemAdmin>().lambda().eq(SystemAdmin::getOpenId, weChatMiniAuthorizeVo.getOpenId()));
+        if(systemAdmin == null){
+            return null;
+        }
+        // 用户验证
+        Authentication authentication = null;
+        // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+        try {
+            String principal = systemAdmin.getAccount() + adminType;
+            authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(principal, CrmebUtil.encryptPassword(systemAdmin.getPwd(), systemAdmin.getAccount())));
+        } catch (AuthenticationException e) {
+            if (e instanceof BadCredentialsException) {
+                throw new CrmebException("用户不存在或密码错误");
+            }
+            throw new CrmebException(e.getMessage());
+        }
+        LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
+        String token = tokenComponent.createToken(loginUser);
+        SystemLoginResponse systemAdminResponse = new SystemLoginResponse();
+        systemAdminResponse.setToken(token);
+        BeanUtils.copyProperties(systemAdmin, systemAdminResponse);
+
+        // 更新最后登录信息
+        systemAdmin.setUpdateTime(DateUtil.date());
+        systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
+        systemAdmin.setLastIp(ip);
+        if(weChatMiniAuthorizeVo != null && StringUtils.isNotEmpty(weChatMiniAuthorizeVo.getOpenId())){
+            systemAdmin.setOpenId(weChatMiniAuthorizeVo.getOpenId());
+        }
+        systemAdminService.updateById(systemAdmin);
+
+        // 返回后台LOGO图标
+        if (adminType.equals(RoleEnum.PLATFORM_ADMIN.getValue())) {
+            systemAdminResponse.setLeftTopLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP));
+            systemAdminResponse.setLeftSquareLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_SITE_LOGO_SQUARE));
+        } else {
+            systemAdminResponse.setLeftTopLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_LOGIN_LOGO_LEFT_TOP));
+            systemAdminResponse.setLeftSquareLogo(
+                    systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_MERCHANT_SITE_LOGO_SQUARE));
+        }
+        return systemAdminResponse;
+
+    }
 
     private SystemLoginResponse login2(SystemAdminLoginRequest request, Integer adminType, String ip) {
+        WeChatMiniAuthorizeVo weChatMiniAuthorizeVo  = null;
+        if(StringUtils.isNotEmpty(request.getCode())){
+            try {
+                weChatMiniAuthorizeVo = wechatService.miniAuthCode(request.getCode());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         // 手机好 + 验证码登录
         if (StringUtils.isNotBlank(request.getPhone()) && StringUtils.isNotBlank(request.getCaptchaPhone())) {
             //验证短信
@@ -141,7 +213,14 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         systemAdmin.setUpdateTime(DateUtil.date());
         systemAdmin.setLoginCount(systemAdmin.getLoginCount() + 1);
         systemAdmin.setLastIp(ip);
-
+        if(weChatMiniAuthorizeVo != null && StringUtils.isNotEmpty(weChatMiniAuthorizeVo.getOpenId())){
+            List<SystemAdmin> list = systemAdminService.list(new QueryWrapper<SystemAdmin>().lambda().eq(SystemAdmin::getOpenId, weChatMiniAuthorizeVo.getOpenId()));
+            for (SystemAdmin admin : list) {
+                admin.setOpenId("0000");
+                systemAdminService.updateById(systemAdmin);
+            }
+            systemAdmin.setOpenId(weChatMiniAuthorizeVo.getOpenId());
+        }
         systemAdminService.updateById(systemAdmin);
 
         // 返回后台LOGO图标
@@ -306,6 +385,11 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     @Override
     public SystemLoginResponse merchantLogin2(SystemAdminLoginRequest request, String ip) {
         return login2(request, RoleEnum.MERCHANT_ADMIN.getValue(), ip);
+    }
+
+    @Override
+    public SystemLoginResponse merchantLogin3(String code, String ip) {
+        return login3(code, RoleEnum.MERCHANT_ADMIN.getValue(), ip);
     }
 
     @Override

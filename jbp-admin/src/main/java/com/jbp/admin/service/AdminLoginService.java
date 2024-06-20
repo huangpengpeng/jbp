@@ -36,6 +36,8 @@ public interface AdminLoginService {
 
     SystemLoginResponse merchantLogin2(SystemAdminLoginRequest request, String ip);
 
+    SystemLoginResponse merchantLogin3(String code, String ip);
+
     SystemLoginResponse merchantLogin(Integer id, String ip);
 
     /**
