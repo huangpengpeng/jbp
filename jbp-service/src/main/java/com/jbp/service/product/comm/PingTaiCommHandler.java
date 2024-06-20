@@ -124,6 +124,8 @@ public class PingTaiCommHandler extends AbstractProductCommHandler {
                 totalScore = totalScore.add(realScore);
             }
         }
+        BigDecimal adjustScore = clearingFinal.getAdjustScore() == null ? BigDecimal.ZERO : clearingFinal.getAdjustScore();
+        totalScore = totalScore.add(adjustScore);
         if (ArithmeticUtils.lessEquals(totalScore, BigDecimal.ZERO)) {
             log.error(clearingFinal.getName() + "结算积分为0");
             clearingFinal.setStatus(ClearingFinal.Constants.待出款.name());
