@@ -244,6 +244,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             // 支付成功的订单
             Map<Integer, Double> userScoreMap = Maps.newConcurrentMap();
             List<Order> successList = orderService.getSuccessList(startTime, endTime);
+
+            BigDecimal totalScore = BigDecimal.ZERO;
             for (Order order : successList) {
                 BigDecimal score = BigDecimal.ZERO;
                 List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
@@ -258,6 +260,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     Double d = MapUtils.getDouble(userScoreMap, order.getUid(), 0.0);
                     userScoreMap.put(order.getUid(), BigDecimal.valueOf(d).add(score).doubleValue());
                 }
+                totalScore = totalScore.add(score);
             }
             if (userScoreMap.isEmpty()) {
                 return;
@@ -282,9 +285,11 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     }
                 }
             });
+
             // 更具团队业绩确定结算等级
             List<MonthGuanLiCommHandler.Rule> ruleList = ruleMap.values().stream().sorted(Comparator.comparing(MonthGuanLiCommHandler.Rule::getMinScore).reversed()).collect(Collectors.toList());
             List<ClearingUser> clearingUserList = Lists.newArrayList();
+            BigDecimal finalTotalScore = totalScore;
             userTeamScoreMap.forEach((uid, score) -> {
                 ClearingUser perUser = perMap.get(uid);
                 if (perUser == null) {
@@ -292,6 +297,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     if (tagRule != null) {
                         // 说明满足结算条件
                         tagRule.setUsableScore(BigDecimal.valueOf(score));
+                        tagRule.setTotalScore(finalTotalScore);
                         User user = userService.getById(uid);
                         ClearingUser clearingUser = new ClearingUser(clearingId, uid, user.getAccount(),
                                 tagRule.getLevel(), tagRule.getLevelName(), JSONObject.toJSONString(tagRule));

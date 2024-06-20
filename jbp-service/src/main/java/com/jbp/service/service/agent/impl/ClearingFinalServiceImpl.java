@@ -66,7 +66,7 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
         LinkedList<String> logSet = new LinkedList<>();
         // 1.创建结算记录
         ClearingFinal clearingFinal = create(clearingRequest.getCommName(), clearingRequest.getCommType(),
-                clearingRequest.getStartTime(), clearingRequest.getEndTime());
+                clearingRequest.getStartTime(), clearingRequest.getEndTime(), clearingRequest.getAdjustScore());
         redisUtil.delete("clearing_final" + clearingFinal.getId());
         logSet.add(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN) + "结算任务完成创建");
         redisUtil.set("clearing_final" + clearingFinal.getId(), logSet);
@@ -180,14 +180,16 @@ public class ClearingFinalServiceImpl extends UnifiedServiceImpl<ClearingFinalDa
     }
 
     @Override
-    public ClearingFinal create(String commName, Integer commType, String startTime, String endTime) {
+    public ClearingFinal create(String commName, Integer commType, String startTime, String endTime, BigDecimal adjustScore) {
         String name = commName + "_" + startTime + "-" + endTime;
         ClearingFinal clearingFinal = getByName(name);
         if (clearingFinal != null) {
             throw new CrmebException(commName + "结算开始-结束,时间周期已经存在请勿重复操作");
         }
+        adjustScore = adjustScore == null ? BigDecimal.ZERO : adjustScore;
         clearingFinal = ClearingFinal.builder().name(name).commName(commName).commType(commType).startTime(startTime)
-                .endTime(endTime).status(ClearingFinal.Constants.待结算.name()).totalScore(BigDecimal.ZERO).totalAmt(BigDecimal.ZERO).build();
+                .endTime(endTime).status(ClearingFinal.Constants.待结算.name()).totalScore(BigDecimal.ZERO)
+                .totalAmt(BigDecimal.ZERO).adjustScore(adjustScore).build();
         save(clearingFinal);
         return clearingFinal;
     }

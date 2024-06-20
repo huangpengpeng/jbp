@@ -23,4 +23,8 @@ public interface UserInvitationJumpService extends IService<UserInvitationJump> 
 
     PageInfo<UserInvitationJumpListResponse> pageList(Integer uid, Integer pid, Integer orgPid, PageParamRequest pageParamRequest);
 
+    UserInvitationJump getFirst4User(Integer uid);
+
+    Integer getOrgPid(Integer uid);
+
 }
