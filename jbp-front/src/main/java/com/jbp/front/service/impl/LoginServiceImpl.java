@@ -329,7 +329,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void phoneCaptchaRegister(RegisterMobileRequest loginRequest) {
+    public LoginResponse phoneCaptchaRegister(RegisterMobileRequest loginRequest) {
 
         List<User> userList = userService.getByPhone(loginRequest.getPhone());
         if(!userList.isEmpty()){
@@ -343,6 +343,8 @@ public class LoginServiceImpl implements LoginService {
         user.setPayPwd(CrmebUtil.encryptPassword(loginRequest.getPayPwd()));
         user.setPwd(CrmebUtil.encryptPassword(loginRequest.getPwd()));
         userService.updateById(user);
+
+        return commonLogin(user, spreadPid, "手机号验证码注册登录");
 
     }
 

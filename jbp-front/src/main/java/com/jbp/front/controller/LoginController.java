@@ -303,10 +303,9 @@ public class LoginController {
     @ApiOperation(value = "手机号验证码注册")
     @RequestMapping(value = "/mobile/register", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phoneCaptchaRegister(@RequestBody @Validated RegisterMobileRequest loginRequest) {
-        loginService.phoneCaptchaRegister(loginRequest);
 
 
-        return CommonResult.success();
+        return CommonResult.success(loginService.phoneCaptchaRegister(loginRequest));
     }
 
 
