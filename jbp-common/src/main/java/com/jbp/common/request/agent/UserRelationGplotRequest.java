@@ -16,4 +16,7 @@ public class UserRelationGplotRequest implements Serializable {
 
     @ApiModelProperty("用户账号")
     private String account;
+
+    @ApiModelProperty("层级")
+    private Integer level;
 }
