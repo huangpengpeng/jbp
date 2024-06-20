@@ -65,7 +65,7 @@ public class UserRelationFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(userRelationFlowService.gplotInfo(uid));
+        return CommonResult.success(userRelationFlowService.gplotInfo(uid,request.getLevel()));
 
 
 

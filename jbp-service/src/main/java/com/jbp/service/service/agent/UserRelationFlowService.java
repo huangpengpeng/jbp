@@ -20,7 +20,7 @@ public interface UserRelationFlowService extends IService<UserRelationFlow> {
 
     UserRelationGplotVo gplot(Integer uid,Integer uid0,Integer uid1,Map<Integer, User> uidMapList, Map<Integer, UserCapa> uidCapaMap);
 
-    UserRelationGplotVo gplotInfo(Integer uid);
+    UserRelationGplotVo gplotInfo(Integer uid,Integer level);
 
     List<Integer> selectByCapa(Integer uId);
 }
