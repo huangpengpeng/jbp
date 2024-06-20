@@ -118,12 +118,14 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         try {
             String principal = systemAdmin.getAccount() + adminType;
             authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(principal, CrmebUtil.encryptPassword(systemAdmin.getPwd(), systemAdmin.getAccount())));
+                    .authenticate(new UsernamePasswordAuthenticationToken(principal, CrmebUtil.decryptPassowrd(systemAdmin.getPwd(), systemAdmin.getAccount())));
         } catch (AuthenticationException e) {
             if (e instanceof BadCredentialsException) {
                 throw new CrmebException("用户不存在或密码错误");
             }
             throw new CrmebException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         LoginUserVo loginUser = (LoginUserVo) authentication.getPrincipal();
         String token = tokenComponent.createToken(loginUser);
@@ -440,6 +442,10 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         if (ObjectUtil.isNotNull(loginUserVo)) {
             // 删除用户缓存记录
             tokenComponent.delLoginUser(loginUserVo);
+
+            SystemAdmin systemAdmin = systemAdminService.getById(loginUserVo.getUser().getId());
+            systemAdmin.setOpenId("0000");
+            systemAdminService.updateById(systemAdmin);
         }
         return true;
     }
