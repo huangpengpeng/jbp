@@ -116,6 +116,8 @@ public class ProductCommChain implements ApplicationContextAware {
         }
         List<Long> ids = fundClearingList.stream().map(FundClearing::getId).collect(Collectors.toList());
         fundClearingService.updateIntercept(ids, "订单申请退款自动拦截");
+
+
     }
 
     /**

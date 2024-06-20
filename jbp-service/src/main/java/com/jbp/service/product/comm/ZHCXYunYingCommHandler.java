@@ -2,22 +2,16 @@ package com.jbp.service.product.comm;
 
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.google.common.collect.Lists;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.FundClearing;
-import com.jbp.common.model.agent.FundClearingProduct;
 import com.jbp.common.model.agent.ProductComm;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.agent.ProductCommService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +23,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,6 +42,10 @@ public class ZHCXYunYingCommHandler extends AbstractProductCommHandler {
     private UserService userService;
     @Resource
     private UserInvitationService invitationService;
+    @Resource
+    private UserInvitationJumpService userInvitationJumpService;
+    @Resource
+    private FundClearingRecordService fundClearingRecordService;
 
     @Override
     public Integer getType() {
@@ -98,16 +95,46 @@ public class ZHCXYunYingCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
-
-        Integer pid = invitationService.getPid(order.getUid());
+        Integer pid = userInvitationJumpService.getOrgPid(order.getUid());
         if (pid == null) {
             return;
         }
-        BigDecimal totalAmt = BigDecimal.ZERO;
-        // 获取订单产品
-        List<FundClearingProduct> productList = Lists.newArrayList();
-        // 历史推三返一单量
-        List<FundClearing> fundClearingList = fundClearingService.getByUser(pid, ProductCommEnum.推三返一.getName(), FundClearing.interceptStatus());
+
+        Integer max = 0;
+        for (OrderDetail orderDetail : orderDetails) {
+            ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), getType());
+            if (productComm == null || BooleanUtils.isNotTrue(productComm.getStatus())) {
+                continue;
+            }
+            List<Rule> rule = getRule(productComm);
+            if (CollectionUtils.isNotEmpty(rule) && rule.size() > max) {
+                max = rule.size();
+            }
+        }
+        if (max.intValue() == 0) {
+            return;
+        }
+        // 获取最近的几个店铺  查询的店铺数量根据商品设置的最大分佣人数确认
+        LinkedList<Integer> pidList = new LinkedList<>();
+        do {
+            if (pid == null) {
+                break;
+            }
+            if (pidList.size() >= max.intValue()) {
+                break;
+            }
+            Boolean openShop = userService.getById(pid).getOpenShop();
+            if (openShop != null && openShop) {
+                pidList.add(pid);
+            }
+            pid = userInvitationJumpService.getOrgPid(pid);
+        } while (true);
+
+        if (pidList.isEmpty()) {
+            return;
+        }
+
+        User orderUser = userService.getById(order.getUid());
         // 根据产品算钱
         for (OrderDetail orderDetail : orderDetails) {
             Integer productId = orderDetail.getProductId();
@@ -120,36 +147,25 @@ public class ZHCXYunYingCommHandler extends AbstractProductCommHandler {
             BigDecimal totalPv = orderDetailService.getRealScore(orderDetail);
             totalPv = totalPv.multiply(productComm.getScale());
             // 获取佣金规则
-            List<ThreeRetOneHandler.Rule> rules = getRule(productComm);
-            int i = 1;
-            if (CollectionUtils.isNotEmpty(fundClearingList)) {
-                i = fundClearingList.size() % rules.size();
-                i = i == 0 ? rules.size() : i;
-            }
-            Map<Integer, ThreeRetOneHandler.Rule> ruleMap = FunctionUtil.keyValueMap(rules, ThreeRetOneHandler.Rule::getLevel);
-            ThreeRetOneHandler.Rule rule = ruleMap.get(i);
-            BigDecimal amt = BigDecimal.ZERO;
-            if (rule != null) {
-                if (rule.getType().equals("金额")) {
-                    amt = rule.getValue().multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
-                } else {
-                    amt = rule.getValue().multiply(totalPv);
+            List<Rule> rules = getRule(productComm);
+            for (int i = 1; i <= rules.size(); i++) {
+                Rule rule = rules.get(i - 1);
+                if (pidList.size() >= i) {
+                    BigDecimal amt = BigDecimal.ZERO;
+
+                    if (rule.getType().equals("金额")) {
+                        amt = rule.getValue().multiply(BigDecimal.valueOf(orderDetail.getPayNum()));
+                    } else {
+                        amt = rule.getValue().multiply(totalPv);
+                    }
+                    User user = userService.getById(pidList.get(i - 1));
+                    fundClearingRecordService.create(user, orderUser, orderDetail, ProductCommEnum.运营佣金.getName(), amt, totalPv, rule.getValue(), rule.getType(), "获得层级:" + i);
                 }
             }
-            // 计算订单金额
-            totalAmt = totalAmt.add(amt);
-            FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
-                    orderDetail.getPayNum(), BigDecimal.valueOf(i), amt);
-            productList.add(clearingProduct);
-        }
-        // 按订单保存佣金
-        totalAmt = totalAmt.setScale(2, BigDecimal.ROUND_DOWN);
-        if (ArithmeticUtils.gt(totalAmt, BigDecimal.ZERO)) {
-            User orderUser = userService.getById(order.getUid());
-            fundClearingService.create(pid, order.getOrderNo(), ProductCommEnum.推三返一.getName(), totalAmt,
-                    productList, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单获得" + ProductCommEnum.推三返一.getName(), "");
         }
     }
+
+
 
     @Data
     @NoArgsConstructor

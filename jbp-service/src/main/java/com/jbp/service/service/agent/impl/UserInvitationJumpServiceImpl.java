@@ -17,6 +17,7 @@ import com.jbp.service.dao.agent.UserInvitationJumpDao;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationJumpService;
+import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,8 @@ public class UserInvitationJumpServiceImpl extends ServiceImpl<UserInvitationJum
     private UserService userService;
     @Autowired
     private TeamUserService teamUserService;
+    @Autowired
+    private UserInvitationService userInvitationService;
 
     @Override
     public UserInvitationJump add(Integer uId, Integer pId, Integer orgPid) {
@@ -110,5 +113,23 @@ public class UserInvitationJumpServiceImpl extends ServiceImpl<UserInvitationJum
             return response;
         }).collect(Collectors.toList());
         return CommonPage.copyPageInfo(page, responseList);
+    }
+
+    @Override
+    public UserInvitationJump getFirst4User(Integer uid) {
+        List<UserInvitationJump> list = list(new LambdaQueryWrapper<UserInvitationJump>().eq(UserInvitationJump::getUId, uid).orderByAsc(UserInvitationJump::getId));
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }
+        return list.get(0);
+    }
+
+    @Override
+    public Integer getOrgPid(Integer uid) {
+        UserInvitationJump first4User = getFirst4User(uid);
+        if(first4User == null){
+           return  userInvitationService.getPid(uid);
+        }
+        return first4User.getOrgPid();
     }
 }
