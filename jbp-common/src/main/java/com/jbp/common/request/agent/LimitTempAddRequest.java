@@ -80,4 +80,7 @@ public class LimitTempAddRequest implements Serializable {
 
     @ApiModelProperty(value = "说明")
     private String description;
+
+    @ApiModelProperty(value = "单次购买最小数量")
+    private Integer oneTimeNumMin;
 }

@@ -33,7 +33,7 @@ public class LimitTemp extends BaseModel {
                      List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation,
                      List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
                      int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum,
-                     String description) {
+                     String description,Integer oneTimeNumMin) {
         this.name = name;
         this.type = type;
         this.capaIdList = capaIdList;
@@ -52,6 +52,7 @@ public class LimitTemp extends BaseModel {
         this.buyLimitStartTime=buyLimitStartTime;
         this.buyLimitEndTime=buyLimitEndTime;
         this.oneTimeNum = oneTimeNum;
+        this.oneTimeNumMin = oneTimeNumMin;
     }
 
     public void init(){
@@ -130,6 +131,11 @@ public class LimitTemp extends BaseModel {
     @ApiModelProperty(value = "说明")
     @TableField(value = "description")
     private String  description;
+
+
+    @ApiModelProperty(value = "单次购买最小数量")
+    @TableField(value="one_time_num_min", updateStrategy = FieldStrategy.IGNORED)
+    private Integer oneTimeNumMin;
 
 
     public Boolean check(Long capaId, Long capaXsId, List<Long> whiteIdList, List<Long> teamIdList,

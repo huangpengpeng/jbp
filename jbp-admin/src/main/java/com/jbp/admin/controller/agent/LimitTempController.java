@@ -68,7 +68,7 @@ public class LimitTempController {
         limitTempService.add(request.getName(), request.getType(), request.getCapaIdList(), request.getCapaXsIdList(), request.getWhiteIdList(),
                 request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(), request.getPCapaXsIdList(), request.getHasRelation(),
                 request.getRCapaIdList(), request.getRCapaXsIdList(), request.getHasBuyLimit(), request.getBuyLimitNum(), request.getBuyLimitStartTime(),
-                request.getBuyLimitEndTime(), request.getOneTimeNum(), request.getDescription());
+                request.getBuyLimitEndTime(), request.getOneTimeNum(), request.getDescription(),request.getOneTimeNumMin());
         return CommonResult.success();
     }
 
@@ -100,7 +100,7 @@ public class LimitTempController {
                 request.getWhiteIdList(), request.getTeamIdList(), request.getHasPartner(), request.getPCapaIdList(),
                 request.getPCapaXsIdList(), request.getHasRelation(), request.getRCapaIdList(), request.getRCapaXsIdList(),
                 request.getHasBuyLimit(), request.getBuyLimitNum(), request.getBuyLimitStartTime(), request.getBuyLimitEndTime(), request.getOneTimeNum(),
-                request.getDescription());
+                request.getDescription(),request.getOneTimeNumMin());
         return CommonResult.success();
     }
 

@@ -81,10 +81,10 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
                          List<Long> whiteIdList, List<Long> teamIdList, Boolean hasPartner,
                          List<Long> pCapaIdList, List<Long> pCapaXsIdList, Boolean hasRelation,
                          List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
-                         int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum, String description) {
+                         int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum, String description,Integer oneTimeNumMin) {
         LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner,
                 pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList, hasBuyLimit, buyLimitNum, buyLimitStartTime, buyLimitEndTime, oneTimeNum,
-                description);
+                description,oneTimeNumMin);
         temp.init();
         save(temp);
         async(temp);
@@ -190,6 +190,13 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
                         throw new CrmebException(product.getName() + ":单次购买已超出限购数量:" + temp.getOneTimeNum());
                     }
                 }
+
+                if(temp.getOneTimeNumMin() != null){
+                    if (productNumMap.get(product.getId()).intValue() < temp.getOneTimeNumMin().intValue()) {
+                        throw new CrmebException(product.getName() + ":单次购买小于限购数量:" + temp.getOneTimeNumMin());
+                    }
+                }
+
             }
         }
     }
@@ -215,10 +222,10 @@ public class LimitTempServiceImpl extends ServiceImpl<LimitTempDao, LimitTemp> i
     public void update(Long id, String name, String type, List<Long> capaIdList, List<Long> capaXsIdList, List<Long> whiteIdList,
                        List<Long> teamIdList, Boolean hasPartner, List<Long> pCapaIdList, List<Long> pCapaXsIdList,
                        Boolean hasRelation, List<Long> rCapaIdList, List<Long> rCapaXsIdList, Boolean hasBuyLimit,
-                       int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum, String description) {
+                       int buyLimitNum, Date buyLimitStartTime, Date buyLimitEndTime, Integer oneTimeNum, String description,Integer oneTimeNumMin) {
         LimitTemp temp = new LimitTemp(name, type, capaIdList, capaXsIdList, whiteIdList, teamIdList, hasPartner,
                 pCapaIdList, pCapaXsIdList, hasRelation, rCapaIdList, rCapaXsIdList, hasBuyLimit, buyLimitNum, buyLimitStartTime,
-                buyLimitEndTime, oneTimeNum, description);
+                buyLimitEndTime, oneTimeNum, description,oneTimeNumMin);
         temp.setId(id);
         temp.init();
         updateById(temp);
