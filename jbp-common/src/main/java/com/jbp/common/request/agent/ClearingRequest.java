@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -34,5 +35,8 @@ public class ClearingRequest implements Serializable {
     private LinkedList<String> logSet;
 
     private ClearingFinal clearingFinal;
+
+    @ApiModelProperty("调配积分")
+    private BigDecimal adjustScore;
 
 }

@@ -7,6 +7,7 @@ import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ClearingRequest;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 public interface ClearingFinalService extends IService<ClearingFinal> {
@@ -19,7 +20,7 @@ public interface ClearingFinalService extends IService<ClearingFinal> {
 
     Boolean oneKeySend(Long clearingId);
 
-    ClearingFinal create(String commName, Integer commType, String startTime, String endTime);
+    ClearingFinal create(String commName, Integer commType, String startTime, String endTime, BigDecimal adjustScore);
 
     ClearingFinal getByName(String name);
 

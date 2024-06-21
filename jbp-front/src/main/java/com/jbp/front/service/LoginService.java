@@ -108,6 +108,6 @@ public interface LoginService {
 
 
 
-    void phoneCaptchaRegister(RegisterMobileRequest loginRequest);
+    LoginResponse phoneCaptchaRegister(RegisterMobileRequest loginRequest);
 
 }

@@ -58,4 +58,9 @@ public class ClearingFinal extends BaseModel {
     @ApiModelProperty("结算日志")
     @TableField("logs")
     private String logs;
+
+    @ApiModelProperty("调配积分")
+    @TableField("adjustScore")
+    private BigDecimal adjustScore;
+
 }

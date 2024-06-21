@@ -1,17 +1,6 @@
 package com.jbp.front;
 
-import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.github.pagehelper.PageInfo;
-import com.jbp.common.request.HistoryOrderEditRequest;
-import com.jbp.common.request.HistoryOrderRequest;
-import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.agent.ScoreDownloadRequest;
-import com.jbp.common.response.HistoryOrderResponse;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.service.service.SmsService;
-import com.jbp.service.service.agent.HistoryOrderService;
-import com.jbp.service.service.agent.InvitationScoreService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,24 +38,5 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-
-
-//
-//        InvitationScoreService invitationScoreService = run.getBean(InvitationScoreService.class);
-//        ScoreDownloadRequest request  = new ScoreDownloadRequest();
-//        request.setCapaIdXsList(Lists.newArrayList(14L, 15L));
-//        request.setStartTime(DateTimeUtils.parseDate("2024-05-01"));
-//        request.setEndTime(DateTimeUtils.parseDate("2024-06-01"));
-//        String download = invitationScoreService.download(request);
-//
-//
-//        request.setCapaIdXsList(Lists.newArrayList(15L));
-//        request.setStartTime(DateTimeUtils.parseDate("2024-05-01"));
-//        request.setEndTime(DateTimeUtils.parseDate("2024-06-01"));
-//        String download1 = invitationScoreService.download(request);
-//        System.out.println("总裁董事:"+ download);
-//        System.out.println("董事:"+ download1);;
-
     }
 }

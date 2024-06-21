@@ -5,6 +5,7 @@ import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.FundClearingService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +51,10 @@ public class FundClearingTask {
                 return;
             }
             List<FundClearing> list = fundClearingService.list(new LambdaQueryWrapper<FundClearing>().eq(FundClearing::getStatus, FundClearing.Constants.待出款.toString()).last(" limit 500"));
-            List<Long> ids = list.stream().map(FundClearing::getId).collect(Collectors.toList());
-            fundClearingService.updateSend(ids, "自动已出款");
+            if(CollectionUtils.isNotEmpty(list)){
+                List<Long> ids = list.stream().map(FundClearing::getId).collect(Collectors.toList());
+                fundClearingService.updateSend(ids, "自动已出款");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("FundClearingTask.send" + " | msg : " + e.getMessage());
