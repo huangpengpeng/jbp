@@ -190,20 +190,20 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         RegisterOrderRequest registerInfo = preOrderInfoVo.getRegisterInfo();
         OrderExt orderExt = new OrderExt();
         orderExt.setShardUid(request.getShardUid());
-        if(registerInfo != null){
+        if (registerInfo != null) {
             OrderRegister orderRegister = new OrderRegister();
             BeanUtils.copyProperties(registerInfo, orderRegister);
             orderExt.setOrderRegister(orderRegister);
         }
         RiseOrderRequest riseInfo = preOrderInfoVo.getRiseInfo();
-        if(riseInfo != null){
+        if (riseInfo != null) {
             User user = userService.getByAccount(riseInfo.getAccount());
             UserCapa userCapa = userCapaService.getByUser(user.getId());
             UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
             orderExt.setCapaId(userCapa == null ? null : userCapa.getCapaId());
             orderExt.setCapaXsId(userCapaXs == null ? null : userCapaXs.getCapaId());
         }
-        if(registerInfo == null && riseInfo == null){
+        if (registerInfo == null && riseInfo == null) {
             UserCapa userCapa = userCapaService.getByUser(payUser.getId());
             UserCapaXs userCapaXs = userCapaXsService.getByUser(payUser.getId());
             orderExt.setCapaId(userCapa == null ? null : userCapa.getCapaId());
@@ -618,7 +618,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         if (ObjectUtil.isNull(coupon)) {
             coupon = couponService.getById(couponUser.getCouponId());
         }
-        List<PreOrderInfoDetailVo> orderInfoList  = new ArrayList<>();
+        List<PreOrderInfoDetailVo> orderInfoList = new ArrayList<>();
         for (PreMerchantOrderVo preMerchantOrderVo : preOrderInfoVo.getMerchantOrderVoList()) {
             orderInfoList.addAll(preMerchantOrderVo.getOrderInfoList());
         }
@@ -733,7 +733,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         String orderVoString = redisUtil.get(key);
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
-        if(!userInfo.getId().equals(orderInfoVo.getPayUserId())){
+        if (!userInfo.getId().equals(orderInfoVo.getPayUserId())) {
             throw new CrmebException("不能操作其他人的订单");
         }
         PreOrderResponse preOrderResponse = new PreOrderResponse();
@@ -936,7 +936,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         String orderVoString = redisUtil.get(key).toString();
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         User user = userService.getInfo();
-        if(!user.getId().equals(orderInfoVo.getPayUserId())){
+        if (!user.getId().equals(orderInfoVo.getPayUserId())) {
             throw new CrmebException("不能操作其他人的订单");
         }
         return computedPrice(request, orderInfoVo, user);
@@ -1001,7 +1001,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             e.setMerCouponFee(BigDecimal.ZERO);
             e.setWalletDeductionFee(BigDecimal.ZERO);
             OrderMerchantRequest o = orderMerchantRequestMap.get(e.getMerId());
-            if(Objects.nonNull(o)){
+            if (Objects.nonNull(o)) {
                 e.setShippingType(o.getShippingType());
                 e.setUserCouponId(o.getUserCouponId());
             }
@@ -1130,7 +1130,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 orderDetail.setSku(detailVo.getSku());
                 orderDetail.setPrice(detailVo.getPrice());
                 orderDetail.setPayNum(detailVo.getPayNum());
-                BigDecimal scoreValue = detailVo.getScoreValue() == null ? BigDecimal.ZERO :  detailVo.getScoreValue();
+                BigDecimal scoreValue = detailVo.getScoreValue() == null ? BigDecimal.ZERO : detailVo.getScoreValue();
                 orderDetail.setScoreValue(scoreValue.multiply(BigDecimal.valueOf(orderDetail.getPayNum())));
                 orderDetail.setWeight(detailVo.getWeight());
                 orderDetail.setVolume(detailVo.getVolume());
@@ -1405,6 +1405,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     /**
      * 撤销退款单
+     *
      * @param refundOrderNo 退款单号
      */
     @Override
@@ -1415,6 +1416,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     /**
      * 订单列表(v1.4.0)
+     *
      * @param request 搜索参数
      * @return PageInfo
      */
@@ -1452,25 +1454,25 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 infoResponse.setCancelTime(cancelTime.getTime());
             }
 
-            OrderExt orderExt =  orderExtService.getByOrder(order.getOrderNo());
+            OrderExt orderExt = orderExtService.getByOrder(order.getOrderNo());
             infoResponse.setServerSn(orderExt.getServerSn());
             infoResponse.setAiServerSn(orderExt.getAiServerSn());
             infoResponse.setPayGateway(order.getPayGateway());
 
-            if(order.getUid().intValue() != order.getPayUid().intValue() && userId.equals(order.getUid())){
-                infoResponse.setPayPrice(order.getPayPrice() .add(order.getWalletDeductionFee()));
+            if (order.getUid().intValue() != order.getPayUid().intValue() && userId.equals(order.getUid())) {
+                infoResponse.setPayPrice(order.getPayPrice().add(order.getWalletDeductionFee()));
             }
 
             responseList.add(infoResponse);
         }
         //查询历史订单
-        String ifOpenOrder =environment.getProperty("historyOrder.ifOpenOrder");
-        if( Boolean.parseBoolean(ifOpenOrder)  && request.getPage() >= pageInfo.getPages() ){
-            String ifAgent =environment.getProperty("historyOrder.ifAgent");
-            if(Boolean.parseBoolean(ifAgent)){
+        String ifOpenOrder = environment.getProperty("historyOrder.ifOpenOrder");
+        if (Boolean.parseBoolean(ifOpenOrder) && request.getPage() >= pageInfo.getPages()) {
+            String ifAgent = environment.getProperty("historyOrder.ifAgent");
+            if (Boolean.parseBoolean(ifAgent)) {
                 request.setAgent(false);
             }
-            responseList.addAll(getHistoryOrder(request.getStatus(),userId,request.getAgent()));
+            responseList.addAll(getHistoryOrder(request.getStatus(), userId, request.getAgent()));
         }
 
         return CommonPage.copyPageInfo(pageInfo, responseList);
@@ -1534,14 +1536,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public OrderFrontDetailResponse frontDetail(String orderNo) {
         User currentUser = userService.getInfo();
         Order order = orderService.getByOrderNo(orderNo);
-        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId())  && !order.getUid().equals(currentUser.getId())  )) {
+        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId()))) {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
 
         //报单用户看到的金额不展示优惠金额
-        if(order.getUid().intValue() != order.getPayUid().intValue() && currentUser.getId().equals(order.getUid())){
-            order.setPayPrice(order.getPayPrice() .add(order.getWalletDeductionFee()));
+        if (order.getUid().intValue() != order.getPayUid().intValue() && currentUser.getId().equals(order.getUid())) {
+            order.setPayPrice(order.getPayPrice().add(order.getWalletDeductionFee()));
             order.setWalletDeductionFee(BigDecimal.ZERO);
         }
 
@@ -1579,8 +1581,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             DateTime cancelTime = DateUtil.offset(order.getCreateTime(), DateField.MINUTE, crmebConfig.getOrderCancelTime());
             response.setCancelTime(cancelTime.getTime());
         }
-        User user =  userService.getById(order.getUid())  ;
-        if(user != null){
+        User user = userService.getById(order.getUid());
+        if (user != null) {
             response.setDealaccount(user.getAccount());
         }
         return response;
@@ -1743,7 +1745,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         order.setIsUserDel(true);
         return transactionTemplate.execute(e -> {
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             orderStatusService.createLog(orderNo, OrderStatusConstants.ORDER_STATUS_USER_DELETE, OrderStatusConstants.ORDER_LOG_USER_DELETE);
@@ -1864,7 +1866,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral());
             refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral());
             refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
-            refundOrderInfo.getRefundWalletList().forEach(w->{
+            refundOrderInfo.getRefundWalletList().forEach(w -> {
                 w.setRefundFee(w.getDeductionFee());
             });
         } else {
@@ -1887,7 +1889,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
                 refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
-            if(CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
+            if (CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
                 BigDecimal refundWalletFee = BigDecimal.ZERO;
                 for (ProductDeduction deduction : refundOrderInfo.getRefundWalletList()) {
                     if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
@@ -1911,7 +1913,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
         Boolean execute = transactionTemplate.execute(e -> {
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new CrmebException("操作人数过多申请退款失败");
             }
             orderDetailService.updateById(orderDetail);
@@ -1959,9 +1961,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public LogisticsResultVo getHistoryLogisticsInfo(String orderNo) {
 
         List<OrderFrontDataResponse> orderFrontDataResponses = new ArrayList<>();
-        String name =environment.getProperty("historyOrder.name");
-        StringBuilder stringBuilder = new StringBuilder("select *  from "+name+".orders   where 1=1 and orderSn = '"+orderNo+"'" );
-        Map<String,Object> maps =  SqlRunner.db().selectOne(stringBuilder.toString());
+        String name = environment.getProperty("historyOrder.name");
+        StringBuilder stringBuilder = new StringBuilder("select *  from " + name + ".orders   where 1=1 and orderSn = '" + orderNo + "'");
+        Map<String, Object> maps = SqlRunner.db().selectOne(stringBuilder.toString());
         return logisticService.info(maps.get("shipSn").toString(), null, "", maps.get("mobile").toString());
 
     }
@@ -2252,14 +2254,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
 
             BigDecimal storePostage = BigDecimal.ZERO;
-            if(!feeList.isEmpty()){
+            if (!feeList.isEmpty()) {
                 storePostage = Collections.min(feeList);
             }
             merchantOrderVo.setFreightFee(storePostage);
             freightFee = freightFee.add(storePostage);
-            if(!tempIdSet.isEmpty()){
-                ShippingTemplates shippingTemplates =  shippingTemplatesService.getById(tempIdSet.iterator().next());
-                orderInfoVo.setFreightName(shippingTemplates!= null ? shippingTemplates.getName() : "");
+            if (!tempIdSet.isEmpty()) {
+                ShippingTemplates shippingTemplates = shippingTemplatesService.getById(tempIdSet.iterator().next());
+                orderInfoVo.setFreightName(shippingTemplates != null ? shippingTemplates.getName() : "");
             }
         }
         orderInfoVo.setFreightFee(freightFee);
@@ -2280,14 +2282,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         Set<Integer> payTypeSet = Sets.newHashSet();
         for (PreOrderDetailRequest orderDetail : request.getOrderDetails()) {
             //购物车下单，没有商品id
-            if(orderDetail.getProductId() == null && orderDetail.getShoppingCartId() != null){
-                Cart cart  = cartService.getById(orderDetail.getShoppingCartId()) ;
+            if (orderDetail.getProductId() == null && orderDetail.getShoppingCartId() != null) {
+                Cart cart = cartService.getById(orderDetail.getShoppingCartId());
                 orderDetail.setProductId(cart.getProductId());
             }
             Product product = productService.getById(orderDetail.getProductId());
             payTypeSet.add(product.getPayType());
         }
-        if(payTypeSet.isEmpty() || payTypeSet.size() > 1){
+        if (payTypeSet.isEmpty() || payTypeSet.size() > 1) {
             throw new CrmebException("购物车结算只能选中相同支付方式的产品");
         }
         switch (request.getPreOrderType()) {
@@ -2381,7 +2383,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             if (NumberUtil.compare(riseInfo.getCapaId(), userCapaService.getByUser(user.getId()).getCapaId()) <= 0) {
                 throw new CrmebException("等级不能小于当前等级");
             }
-            capaId =  userCapaService.getByUser(user.getId()).getCapaId();
+            capaId = userCapaService.getByUser(user.getId()).getCapaId();
             UserCapaXs userCapaXs = userCapaXsService.getByUser(user.getId());
             capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
             whiteIdList = whiteUserService.getByUser(user.getId());
@@ -2396,7 +2398,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         productList = productList.stream().filter(p -> p.getBuyLimitTempId() != null).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(productList)) {
-            Map<Integer, Integer> productNumMap = FunctionUtil.keyValueMap(request.getOrderDetails(), PreOrderDetailRequest::getProductId, PreOrderDetailRequest::getProductNum);
+//            Map<Integer, Integer> productNumMap = FunctionUtil.keyValueMap(request.getOrderDetails(), PreOrderDetailRequest::getProductId, PreOrderDetailRequest::getProductNum);
+
+            Map<Integer, Integer> productNumMap = request.getOrderDetails().stream()
+                    .collect(Collectors.groupingBy(
+                            PreOrderDetailRequest::getProductId,
+                            Collectors.summingInt(PreOrderDetailRequest::getProductNum)
+                    ));
+
             limitTempService.validBuy(preOrderInfoVo.getUid(), capaId, capaXsId, whiteIdList,
                     teamIdList.stream().map(t -> Long.valueOf(t)).collect(Collectors.toList()), pId, rId, productList, productNumMap);
         }
@@ -2657,7 +2666,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             e.setMerCouponFee(BigDecimal.ZERO);
             e.setWalletDeductionFee(BigDecimal.ZERO);
             OrderMerchantRequest o = orderMerchantRequestMap.get(e.getMerId());
-            if(Objects.nonNull(o)){
+            if (Objects.nonNull(o)) {
                 e.setShippingType(o.getShippingType());
                 e.setUserCouponId(o.getUserCouponId());
             }
@@ -2748,7 +2757,6 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         return priceResponse;
     }
-
 
 
     private List<CouponUser> computedPriceGetPlatOrderList(PreOrderInfoVo orderInfoVo) {
@@ -3479,13 +3487,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     /**
      * 设置积分抵扣
+     *
      * @param orderInfoVo
      * @param payUserId
      */
     private void getDeductionFee_V1_3(PreOrderInfoVo orderInfoVo, Integer payUserId) {
         List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
         List<PreOrderInfoDetailVo> orderInfoList = Lists.newArrayList();
-        merchantOrderVoList.forEach(m->{
+        merchantOrderVoList.forEach(m -> {
             orderInfoList.addAll(m.getOrderInfoList());
         });
 
@@ -3503,9 +3512,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                     deduction.setPvFee(BigDecimal.ZERO);
                     if (deduction.getScale() != null && ArithmeticUtils.gt(deduction.getScale(), BigDecimal.ZERO)) {
                         BigDecimal walletDeductionFee = realPrice.multiply(deduction.getScale()).setScale(2, BigDecimal.ROUND_DOWN);
-                        if(ArithmeticUtils.gt(walletDeductionFee, BigDecimal.ZERO)){
+                        if (ArithmeticUtils.gt(walletDeductionFee, BigDecimal.ZERO)) {
                             deduction.setDeductionFee(walletDeductionFee);
-                            if(BooleanUtil.isTrue(deduction.getHasPv())){
+                            if (BooleanUtil.isTrue(deduction.getHasPv())) {
                                 deduction.setPvFee(walletDeductionFee);
                             }
                             BigDecimal orgWalletDeductionFee = BigDecimal.valueOf(MapUtils.getDoubleValue(walletDeductionMap, deduction.getWalletType(), 0d));
@@ -3518,19 +3527,19 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         Map<Integer, Boolean> walletMap = Maps.newConcurrentMap();
         Map<Integer, BigDecimal> walletValueMap = Maps.newConcurrentMap();
-        walletDeductionMap.forEach((k,v)->{
+        walletDeductionMap.forEach((k, v) -> {
             Wallet wallet = walletService.getByUser(payUserId, k);
             BigDecimal balance = wallet == null ? BigDecimal.ZERO : wallet.getBalance();
-            if(ArithmeticUtils.gte(balance, v)){
+            if (ArithmeticUtils.gte(balance, v)) {
                 walletMap.put(k, true);
-            }else{
+            } else {
                 walletMap.put(k, false);
                 walletValueMap.put(k, v.subtract(balance));
             }
         });
 
         String active = environment.getProperty("spring.profiles.active");
-        if(StringUtils.isNotEmpty(active) && StringUtils.contains(active, "hdf")) {
+        if (StringUtils.isNotEmpty(active) && StringUtils.contains(active, "hdf")) {
             walletMap.forEach((k, v) -> {
                 if (BooleanUtils.isNotTrue(v)) {
                     WalletConfig walletConfig = walletConfigService.getByType(k);
@@ -3576,36 +3585,36 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             // 将商户明细所有的抵扣汇总list
             for (PreOrderInfoDetailVo detailVo : preMerchantOrderVo.getOrderInfoList()) {
                 preMerchantOrderVo.setWalletDeductionFee(preMerchantOrderVo.getWalletDeductionFee().add(detailVo.getWalletDeductionFee()));
-                if(CollectionUtils.isNotEmpty(detailVo.getWalletDeductionList())){
+                if (CollectionUtils.isNotEmpty(detailVo.getWalletDeductionList())) {
                     deductionList.addAll(detailVo.getWalletDeductionList());
                 }
             }
             // 商户归档
             Map<Integer, ProductDeduction> map = Maps.newConcurrentMap();
             for (ProductDeduction deduction : deductionList) {
-                 ProductDeduction newDeduction = map.get(deduction.getWalletType());
-                 if(newDeduction == null){
-                     newDeduction = new ProductDeduction();
-                     newDeduction.setWalletType(deduction.getWalletType());
-                     newDeduction.setWalletName(deduction.getWalletName());
-                     newDeduction.setDeductionFee(deduction.getDeductionFee());
-                     newDeduction.setPvFee(deduction.getPvFee());
-                 }else{
-                     newDeduction.setDeductionFee(newDeduction.getDeductionFee().add(deduction.getDeductionFee()));
-                     newDeduction.setPvFee(newDeduction.getPvFee().add(deduction.getPvFee()));
-                 }
-                map.put(deduction.getWalletType(), newDeduction);
-            }
-            // 平台归档
-            for (ProductDeduction deduction : deductionList) {
-                ProductDeduction newDeduction = totalMap.get(deduction.getWalletType());
-                if(newDeduction == null){
+                ProductDeduction newDeduction = map.get(deduction.getWalletType());
+                if (newDeduction == null) {
                     newDeduction = new ProductDeduction();
                     newDeduction.setWalletType(deduction.getWalletType());
                     newDeduction.setWalletName(deduction.getWalletName());
                     newDeduction.setDeductionFee(deduction.getDeductionFee());
                     newDeduction.setPvFee(deduction.getPvFee());
-                }else{
+                } else {
+                    newDeduction.setDeductionFee(newDeduction.getDeductionFee().add(deduction.getDeductionFee()));
+                    newDeduction.setPvFee(newDeduction.getPvFee().add(deduction.getPvFee()));
+                }
+                map.put(deduction.getWalletType(), newDeduction);
+            }
+            // 平台归档
+            for (ProductDeduction deduction : deductionList) {
+                ProductDeduction newDeduction = totalMap.get(deduction.getWalletType());
+                if (newDeduction == null) {
+                    newDeduction = new ProductDeduction();
+                    newDeduction.setWalletType(deduction.getWalletType());
+                    newDeduction.setWalletName(deduction.getWalletName());
+                    newDeduction.setDeductionFee(deduction.getDeductionFee());
+                    newDeduction.setPvFee(deduction.getPvFee());
+                } else {
                     newDeduction.setDeductionFee(newDeduction.getDeductionFee().add(deduction.getDeductionFee()));
                     newDeduction.setPvFee(newDeduction.getPvFee().add(deduction.getPvFee()));
                 }
@@ -3621,38 +3630,37 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     }
 
 
-
-    public   List<OrderFrontDataResponse>  getHistoryOrder(Integer status,Integer userId,Boolean agent){
+    public List<OrderFrontDataResponse> getHistoryOrder(Integer status, Integer userId, Boolean agent) {
         List<OrderFrontDataResponse> orderFrontDataResponses = new ArrayList<>();
-        String name =environment.getProperty("historyOrder.name");
-        StringBuilder stringBuilder = new StringBuilder("select *  from "+name+".orders   where 1=1 ");
-        if(status== -1){
+        String name = environment.getProperty("historyOrder.name");
+        StringBuilder stringBuilder = new StringBuilder("select *  from " + name + ".orders   where 1=1 ");
+        if (status == -1) {
             stringBuilder.append(" and status IN (201,301,401,402,501 )");
-        }else if (status == 1){
+        } else if (status == 1) {
             stringBuilder.append(" and status IN (201)");
-        }else if (status == 6){
+        } else if (status == 6) {
             stringBuilder.append(" and status IN (401)");
-        }else if (status == 4){
+        } else if (status == 4) {
             stringBuilder.append(" and status IN (301)");
-        }else{
+        } else {
             stringBuilder.append(" and status IN (1)");
         }
 
-        if(agent != null && !agent){
-            stringBuilder.append(" and userId = "+userId+"");
-        }else{
-            stringBuilder.append(" and payuserId = "+userId+" and userId !=  "+userId+"");
+        if (agent != null && !agent) {
+            stringBuilder.append(" and userId = " + userId + "");
+        } else {
+            stringBuilder.append(" and payuserId = " + userId + " and userId !=  " + userId + "");
         }
 
 
-        List<Map<String,Object>> maps =  SqlRunner.db().selectList(stringBuilder.toString());
-        for(Map<String,Object> map : maps){
+        List<Map<String, Object>> maps = SqlRunner.db().selectList(stringBuilder.toString());
+        for (Map<String, Object> map : maps) {
 
-            StringBuilder goodsSql = new StringBuilder("select * from "+name+".ordergoods   where  orderId =  "+map.get("id")+"");
+            StringBuilder goodsSql = new StringBuilder("select * from " + name + ".ordergoods   where  orderId =  " + map.get("id") + "");
 
-            List<Map<String,Object>> goodsMaps =  SqlRunner.db().selectList(goodsSql.toString());
+            List<Map<String, Object>> goodsMaps = SqlRunner.db().selectList(goodsSql.toString());
             List<OrderInfoFrontDataResponse> infoResponseList = CollUtil.newArrayList();
-            for(Map<String,Object> goodsMap :goodsMaps) {
+            for (Map<String, Object> goodsMap : goodsMaps) {
                 OrderInfoFrontDataResponse orderInfoFrontDataResponse = new OrderInfoFrontDataResponse();
                 orderInfoFrontDataResponse.setProductName(goodsMap.get("goodsName").toString());
                 orderInfoFrontDataResponse.setImage(goodsMap.get("picUrl").toString());
@@ -3663,17 +3671,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
 
             Integer status2 = 0;
-            if(map.get("status").toString().equals("201")){
+            if (map.get("status").toString().equals("201")) {
                 status2 = 1;
-            }else if (map.get("status").toString().equals("301")){
+            } else if (map.get("status").toString().equals("301")) {
                 status2 = 4;
-            }else if (map.get("status").toString().equals("401") || map.get("status").toString().equals("402") ){
-                status2 =6;
+            } else if (map.get("status").toString().equals("401") || map.get("status").toString().equals("402")) {
+                status2 = 6;
             }
             OrderFrontDataResponse orderFrontDataResponse = new OrderFrontDataResponse();
             orderFrontDataResponse.setOrderNo(map.get("orderSn").toString());
             orderFrontDataResponse.setPaid(true);
-            orderFrontDataResponse.setPayTime( DateUtil.parse(map.get("payTime").toString()) );
+            orderFrontDataResponse.setPayTime(DateUtil.parse(map.get("payTime").toString()));
             orderFrontDataResponse.setPayPrice(new BigDecimal(map.get("payPrice").toString()));
             orderFrontDataResponse.setStatus(status2);
             orderFrontDataResponse.setCreateTime(DateUtil.parse(map.get("createTime").toString()));
