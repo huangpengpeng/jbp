@@ -364,9 +364,8 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         List<UserCapa> userCapaList = new ArrayList<>(userCapaService.getUidMap(uidList).values());
         List<Capa> capaList = capaService.getList();
         capaList.forEach(e->{
-            List<UserCapa> capas = userCapaList.stream().filter(f -> Objects.equals(f.getCapaId(), e.getId())).collect(Collectors.toList());
-            countList.add(capas.size());
-
+            long count = userCapaList.stream().filter(f -> Objects.equals(f.getCapaId(), e.getId())).count();
+            countList.add((int) count);
         });
         return countList;
     }
