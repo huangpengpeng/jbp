@@ -14,6 +14,7 @@ import com.fasc.open.api.v5_1.req.signtask.*;
 import com.fasc.open.api.v5_1.res.service.AccessTokenRes;
 import com.fasc.open.api.v5_1.res.signtask.CreateSignTaskRes;
 import com.fasc.open.api.v5_1.res.signtask.SignTaskActorGetUrlRes;
+import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelIdentity;
 import com.jbp.common.model.user.UserVisa;
@@ -362,7 +363,7 @@ public class UserVisaController {
 
 
 
-
+    @EncryptIgnore
     @ApiOperation(value = "法大大回调", httpMethod = "POST")
     @ResponseBody
     @PostMapping(value = "/userVisaCallback")
