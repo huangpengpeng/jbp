@@ -117,11 +117,11 @@ public class UserInvitationController {
             throw new CrmebException("上级账户不存在");
         }
 
-       TeamUser teamUser = teamUserService.getByUser(user.getId());
-        TeamUser teamUser2 = teamUserService.getByUser(pUser.getId());
-        if(teamUser != null && teamUser.getTid() != teamUser2.getTid()){
-            throw new CrmebException("团队信息不一致");
-        }
+//       TeamUser teamUser = teamUserService.getByUser(user.getId());
+//        TeamUser teamUser2 = teamUserService.getByUser(pUser.getId());
+//        if(teamUser != null && teamUser.getTid() != teamUser2.getTid()){
+//            throw new CrmebException("团队信息不一致");
+//        }
 
        Integer pid =  userInvitationService.getPid(user.getId());
 
