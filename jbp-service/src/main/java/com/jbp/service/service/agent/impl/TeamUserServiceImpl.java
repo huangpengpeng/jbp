@@ -14,7 +14,6 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.TeamUserDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
-import com.jbp.service.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +29,6 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
     @Resource
     private TeamUserDao teamUserDao;
     @Resource
-    private UserService userService;
-    @Resource
     private TeamService teamService;
 
     @Override
@@ -43,13 +40,21 @@ public class TeamUserServiceImpl extends ServiceImpl<TeamUserDao, TeamUser> impl
 
     @Override
     public TeamUser getByUser(Integer uId) {
-         TeamUser one = getOne(new LambdaQueryWrapper<TeamUser>().eq(TeamUser::getUid, uId));
-         if(one != null && one.getTid() != null){
-             Team team = teamService.getById(one.getTid());
-             if(team != null){
-                 one.setName(team.getName());
-             }
-         }
+        TeamUser one = getOne(new LambdaQueryWrapper<TeamUser>().eq(TeamUser::getUid, uId));
+        if (one != null && one.getTid() != null) {
+            Team team = teamService.getById(one.getTid());
+            if (team != null) {
+                one.setName(team.getName());
+            }
+        }
+        if (one == null) {
+            Team team = teamService.getByLeader(uId);
+            if (team != null) {
+                TeamUser teamUser = new TeamUser(uId, team.getId());
+                teamUser.setName(team.getName());
+                return teamUser;
+            }
+        }
         return one;
     }
 
