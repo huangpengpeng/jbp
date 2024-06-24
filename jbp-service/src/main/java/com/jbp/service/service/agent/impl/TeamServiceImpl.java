@@ -13,6 +13,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
 
     @Resource
     private UserInvitationFlowService userInvitationFlowService;
+    @Resource
+    private TeamUserService teamUserService;
 
     /**
      * 获取最近的一个团队
@@ -85,6 +88,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
         Team team = new Team(name, leaderId);
         save(team);
         userInvitationFlowService.clear(team.getLeaderId());
+        teamUserService.save(leaderId, team.getId());
     }
 
     @Override
