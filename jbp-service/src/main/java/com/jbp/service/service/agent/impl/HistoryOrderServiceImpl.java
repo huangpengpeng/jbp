@@ -63,7 +63,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         String sql = "  SELECT o.userId as uid, u.username as nickname, u.numberCode as account, " +
                 "                o.orderSn as orderNo, o.status , o.payPrice, o.freightPrice, o.goodsPrice, " +
                 "                o.receiveName, o.mobile as receiveMobile, o.province, o.city, o.area, o.address, " +
-                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId " +
+                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId ,o.shipTime " +
                 "        FROM " + request.getDbName() + ".orders AS o " +
                 "        LEFT JOIN " + request.getDbName() + ".user AS u ON u.`id` = o.userId " +
                 "        WHERE 1 =1 ";
@@ -79,7 +79,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
             sql = sql + " and o.orderSn = '" + request.getOrderNo() + "'";
         }
         if (StringUtils.isNotEmpty(request.getStatus())) {
-            sql = sql + " and o.status = '" + request.getStatus() + "'";
+            sql = sql + " and o.status in (" + request.getStatus() + " )";
         }
         if (request.getStartPayTime() != null) {
             sql = sql + " and o.payTime >= '" + DateTimeUtils.format(request.getStartPayTime(), "yyyy-MM-dd") + "'";
