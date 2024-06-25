@@ -9,6 +9,7 @@ import com.jbp.common.yop.dto.ProductQualificationInfoDto;
 import com.jbp.common.yop.dto.SnMultiChannelOpenAccountDTO;
 import com.jbp.common.yop.params.BankAccountOpenParams;
 import com.jbp.common.yop.params.RegisterParams;
+import com.jbp.common.yop.params.WechatAlipayPayParams;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
 
@@ -79,7 +80,55 @@ public class YopDemo {
 
     }
 
+    public static void merRegister2(YopService yopService) {
+        RegisterParams params = new RegisterParams();
+        params.setRequestNo(StringUtils.N_TO_10("LZT_RS_"));
+        params.setBusinessRole("PLATFORM_MERCHANT");// 平台商户
 
+        // 商户资质信息
+        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/25/merchant-1719308385706-4a4a0357-d70e-4e98-bfa2-2db4432196ab-QsuGRcQefGvYetgnxBnA.jpg\", \"signName\":\"福建众合创享健康管理有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91350800MAC7GWB50Y\", \"shortName\":\"众合创享\" }";
+        params.setMerchantSubjectInfo(merchantSubjectInfo);
+
+        // 法人信息
+        String merchantCorporationInfo = "{ \"legalName\":\"彭美勤\", \"legalLicenceType\":\"ID_CARD\", \"legalLicenceNo\":\"352601197105224020\", \"legalLicenceFrontUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/25/merchant-1719308449905-4fea2055-93e5-4ba2-b22c-58d957022682-mNcIYTIqAIMQdkWNdGZt.jpg\", \"legalLicenceBackUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/25/merchant-1719308485303-4bd98e65-699e-4786-b26f-c22d97d90d35-WfBByekvNpgYlSzDNGfk.jpg\" }";
+        params.setMerchantCorporationInfo(merchantCorporationInfo);
+
+        // 联系人信息
+        String merchantContactInfo="{ \"contactName\":\"吴健平\", \"contactMobile\":\"13850686330\", \"contactEmail\":\"105809899@qq.com\", \"contactLicenceNo\":\"350802198205025010\" ,\"adminEmail\":\"105809899@qq.com\",\"adminMobile\":\"13850686330\" }";
+        params.setMerchantContactInfo(merchantContactInfo);
+
+        // 地址信息
+        String businessAddressInfo = "{ \"province\":\"350000\", \"city\":\"350800\", \"district\":\"350802\", \"address\":\"工业西路115号935室\" }";
+        params.setBusinessAddressInfo(businessAddressInfo);
+
+        // 结算账户信息  招商银行股份有限公司广州机场路支行
+        String settlementAccountInfo = "{ \"settlementDirection\":\"BANKCARD\", \"bankCode\":\"ICBC\", \"bankAccountType\":\"ENTERPRISE_ACCOUNT\", \"bankCardNo\":\"1410090119900282930\" }";
+        params.setSettlementAccountInfo(settlementAccountInfo);
+
+        // 通知地址
+        params.setNotifyUrl("http://fky.natapp1.cc/yop");
+
+        // 开通产品资质不能为空
+        params.setProductQualificationInfo(JacksonTool.toJsonString(new ProductQualificationInfoDto()));
+        RegisterResult register = yopService.register(params);
+        System.out.println(JSONObject.toJSONString(register));
+
+    }
+
+
+    public static void quickPay(YopService yopService){
+        String orderId = StringUtils.N_TO_10("YB_");
+        String s = yopService.quickPay("10090436581",  "10000", orderId, "0.1", "测试商品", "http://fky.natapp1.cc/yop", "", "http://fky.natapp1.cc/yop");
+        System.out.println(s);
+    }
+
+    public static void wechatAliPay(YopService yopService){
+        String orderId = StringUtils.N_TO_10("YB_");
+        WechatAliPayPayResult result =yopService.wechatAlipayPay("10090436581", "10000",  orderId, "0.1", "测试商品",
+                "http://fky.natapp1.cc/yop", "", "http://fky.natapp1.cc/yop", WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),
+                WechatAlipayPayParams.CHANNEL.ALIPAY.name(), "", "", "115.220.223.185");
+        System.out.println(result);
+    }
 
 
     private static void queryOpenBank(YopService yopService) {

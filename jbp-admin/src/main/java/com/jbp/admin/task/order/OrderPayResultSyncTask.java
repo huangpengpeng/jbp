@@ -7,6 +7,7 @@ import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.common.yop.result.TradeOrderQueryResult;
 import com.jbp.service.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,10 @@ public class OrderPayResultSyncTask {
     private RechargeOrderService rechargeOrderService;
     @Resource
     private KqPayService kqPayService;
+    @Resource
+    private YopService yopService;
+    @Resource
+    private SystemConfigService systemConfigService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrderPayResultSyncTask.class);
 
@@ -50,6 +55,12 @@ public class OrderPayResultSyncTask {
                     if (result != null && result.ifSuccess()) {
                         payCallbackService.kqPayCallback(result);
                     }
+                }else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_YOP)) {
+                    String yopMerchantNo = systemConfigService.getValueByKey("yopMerchantNo");
+                    TradeOrderQueryResult tradeOrderQueryResult = yopService.queryPayResult(yopMerchantNo, order.getOrderNo());
+                    if (tradeOrderQueryResult.ifSuccess()) {
+                        payCallbackService.yopPayCallback(tradeOrderQueryResult);
+                    }
                 }
             }
             List<RechargeOrder> rechargeOrders = rechargeOrderService.getWaitPayList(15);
@@ -63,6 +74,12 @@ public class OrderPayResultSyncTask {
                     KqPayQueryResult result = kqPayService.queryPayResult(order.getOrderNo());
                     if (result != null && result.ifSuccess()) {
                         payCallbackService.kqPayCallback(result);
+                    }
+                }else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_YOP)) {
+                    String yopMerchantNo = systemConfigService.getValueByKey("yopMerchantNo");
+                    TradeOrderQueryResult tradeOrderQueryResult = yopService.queryPayResult(yopMerchantNo, order.getOrderNo());
+                    if (tradeOrderQueryResult.ifSuccess()) {
+                        payCallbackService.yopPayCallback(tradeOrderQueryResult);
                     }
                 }
             }

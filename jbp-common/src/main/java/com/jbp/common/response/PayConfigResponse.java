@@ -57,4 +57,13 @@ public class PayConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "用户积分")
     private BigDecimal walletBalance;
+
+    @ApiModelProperty(value = "易宝支付宝")
+    private Boolean yopAliPayStatus;
+
+    @ApiModelProperty(value = "易宝快捷")
+    private Boolean yopQuickPay;
+
+    @ApiModelProperty(value = "易宝微信")
+    private Boolean yopWechatPay;
 }

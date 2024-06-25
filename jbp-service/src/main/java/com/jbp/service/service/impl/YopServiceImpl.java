@@ -4,12 +4,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.yop.BaseYopRequest;
 import com.jbp.common.yop.BaseYopResponse;
+import com.jbp.common.yop.constants.YopEnums;
 import com.jbp.common.yop.constants.YopProducts;
 import com.jbp.common.yop.dto.ExtParams4BankPay;
 import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.YopService;
 import com.yeepay.yop.sdk.exception.YopClientException;
+import com.yeepay.yop.sdk.security.DigestAlgEnum;
+import com.yeepay.yop.sdk.security.rsa.RSA;
+import com.yeepay.yop.sdk.security.rsa.RSAKeyUtils;
 import com.yeepay.yop.sdk.service.common.YopClient;
 import com.yeepay.yop.sdk.service.common.request.YopRequest;
 import com.yeepay.yop.sdk.service.common.response.YopResponse;
@@ -22,7 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.security.PrivateKey;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -31,6 +39,12 @@ public class YopServiceImpl implements YopService {
 
     @Resource
     private YopClient yopClient;
+    @Resource
+    private SystemConfigService systemConfigService;
+
+    private static final String PRIVATE_KEY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCccn7+/zVkSQT6Jvlt8JrB3wTuiFG8xO385NVjsPl+SHdjxjV171+AIZK+S0bm9vcFQWnVQ8o5i145oaiR2Ye7j/dC5YziweHyUuotWzCVCK6GJmxxfA8pbxA8ZhsSUec5neoTu+bNH6WAuj7zbU1TcqROytK1Ck2jLNGQiam2AjvLwo4Ee2eOOXYks3Dwm0vboWLpa9rrUZm7BAr8uydWvTrH0RPdcRBNxL75bRttP7p/8QuPoK8zS7Z8EFMemS1UPL+MmmGi9piTsQEonoFZgIStuRjyvQaaOCAz4J2PzNqWqFhox3mm8fIx4vQNmuLzxcT5z1leuXey+JOIsemdAgMBAAECggEALGPyc+EvIZ70ahRP9ulrx/HDYPlOE/1et8CoaaqICFSAh89wUN/UXbNpA1SxsAxIJ/YZFPmwsiZA3KJphcTO1iHx20nt8VNpDIyJRMhYnxkBCDBz2bmFRdDtLu4b5VVXAgq0JdhNk0tU9xMhlImhhLmFNJQpOFRNliy748Kj5HAJHxdcCXfrpPUuzFoUwJYSTwWOcorgfQDm1oinndittvBN9QOKr5LWGApJUaNkcG+UxPZNaNfGzKPsVSV3+JmLHex09IOpd3xMAB3pAWR6wpuFQ0VqjV6kIH50Ejqn/YxK7gNQo1mB8Tg6g7JmjMsmCSLJU4lQUYJT6vb4CEiXEwKBgQC/TUL8TIJpVXwMK0gWgqY+KOlcGjFjElh0Nw7gMtIYcbazoYK3sBnKIZ2RepMvA1X1iPalT6YAE6O3GCyYqmAf6rR5llsCKlPLpAKpo6wdtA6u93jWOZov4je0pqPn2mjJWrU8xjNp6+sVnF7V5iS++TTnJDNceVK2A7fmamcKHwKBgQDRW476tpp5yXcomjB6a9NosfhtkDTfHR7JfguCL+I43i7i+78CxGkH67urBaADMzlxFxFGUN5WGhrsSa/vpdoUT1HCL8/LI52YzXxPzkaXcw3uXv6oUy09VZwC4ycGLCqsiG11Quk7gXq2c3xdG18ccAM9zFJbuVwGwV1InExMwwKBgQCEdHl5+XuedTsDrgAm3eU/StJxHA2v/CbUqL6bC3UeybVn4N+CUeM5alcQQJ+iQJwG+wNT6LcWfIKxpoJSXj1aPAcj3LA86pPEf1X8oT/t/RrhmKXJJm8U0nwhj/QS983wBOdSIiW9JEVMXE3pqoUs2Z4AoLcTQ0m6jw6I8olPnwKBgB41B7xE/KT13KuPE8+WHzrL8vxcAkTu/rIz7ZUrM4jhBgLaMAVGMaFi8gELHrtXeMJIgcWThYEG4zuUpj39wCmOCE3seB7nVKXngDhDmwvfHfN24WeIGM7wu0HvZIIPfVjHloOE1AIx/HK21wrYGDESOGWCRZ/WbuDKpZsEcj3hAoGAUod2XKj+MmOg4lIiVZ4RyElis603MunPbs88KMMmfZul52h5PTHc0LRMvCQOZQxlWMml0fZ9hI+G/MSvivHlopCYJ6JOLKvKrtnLTJff/K7oIBs3q3hVpXVmHq3fdkXZDhgWA1Gsfaots+XcjdmQ66si6ixC7ymlCPqtwc3/aeI=";
+
+    private static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6p0XWjscY+gsyqKRhw9MeLsEmhFdBRhT2emOck/F1Omw38ZWhJxh9kDfs5HzFJMrVozgU+SJFDONxs8UB0wMILKRmqfLcfClG9MyCNuJkkfm0HFQv1hRGdOvZPXj3Bckuwa7FrEXBRYUhK7vJ40afumspthmse6bs6mZxNn/mALZ2X07uznOrrc2rk41Y2HftduxZw6T4EmtWuN2x4CZ8gwSyPAW5ZzZJLQ6tZDojBK4GZTAGhnn3bg5bBsBlw2+FLkCQBuDsJVsFPiGh/b6K/+zGTvWyUcu+LUj2MejYQELDO3i2vQXVDk7lVi2/TcUYefvIcssnzsfCfjaorxsuwIDAQAB";
 
     @Override
     public RegisterMicroH5Result registerMicroH5(RegisterMicroH5Params params) {
@@ -78,9 +92,9 @@ public class YopServiceImpl implements YopService {
         params.setAccountInfo(accountInfo.toJSONString());
         // 通知开户产品
         params.setNotifyUrl(notifyUrl);
-        if("个人".equals(withdrawalUndertaker)){
+        if ("个人".equals(withdrawalUndertaker)) {
             params.setProductInfo(YopProducts.getMicroMerchant2());
-        }else{
+        } else {
             params.setProductInfo(YopProducts.getMicroMerchant());
         }
         return send("/rest/v2.0/mer/register/saas/micro", "POST", params, RegisterMicroResult.class);
@@ -126,7 +140,7 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
-    public String upload(MultipartFile file)  {
+    public String upload(MultipartFile file) {
         try {
             return upload(file.getInputStream()).getMerQualUrl();
         } catch (IOException e) {
@@ -300,7 +314,7 @@ public class YopServiceImpl implements YopService {
     }
 
     @Override
-    public AccountReceiptResult accountReceiptGet(String merchantNo, String orderNo, String requestNo,  String tradeType, String orderData) {
+    public AccountReceiptResult accountReceiptGet(String merchantNo, String orderNo, String requestNo, String tradeType, String orderData) {
         AccountReceiptParams params = new AccountReceiptParams();
         params.setParentMerchantNo("10089066338");
         params.setMerchantNo(merchantNo);
@@ -314,8 +328,125 @@ public class YopServiceImpl implements YopService {
     @Override
     public TradeOrderResult tradeOrder(String merchantNo, String orderId, String orderAmount, String goodsName, String notifyUrl, String memo, String redirectUrl) {
         TradeOrderParams params = new TradeOrderParams(merchantNo, orderId, orderAmount, goodsName, notifyUrl, memo, redirectUrl);
-        params.setParentMerchantNo("10089066338");
+        String valueByKey = systemConfigService.getValueByKey("yopParentMerchantNo");
+        if(StringUtils.isNotEmpty(valueByKey)){
+            params.setParentMerchantNo(valueByKey);
+        }else{
+            params.setParentMerchantNo("10089066338");
+        }
         return send("/rest/v1.0/trade/order", "POST", params, TradeOrderResult.class);
+    }
+
+    @Override
+    public String quickPay(String merchantNo, String userNo, String orderId, String orderAmount, String goodsName,
+                           String notifyUrl, String memo, String redirectUrl) {
+        TradeOrderResult tradeOrderResult = tradeOrder(merchantNo, orderId, orderAmount, goodsName, notifyUrl, memo, redirectUrl);
+        if (tradeOrderResult == null || !tradeOrderResult.validate()) {
+            throw new RuntimeException("调用快捷支付失败");
+        }
+        // 易宝收银台地址
+        Map<String, String> params = new HashMap<>();
+        params.put("appKey", "app_10089066338");
+        params.put("merchantNo", tradeOrderResult.getParentMerchantNo());
+        params.put("token", tradeOrderResult.getToken());
+        params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
+        params.put("directPayType", "YJZF");
+        params.put("cardType", "");
+        params.put("userNo", userNo);
+        params.put("userType", "USER_ID");
+        params.put("ext", "");
+        StringBuilder sb = new StringBuilder();
+        String[] CASHIER = {"appKey", "merchantNo", "token", "timestamp", "directPayType", "cardType", "userNo", "userType", "ext"};
+        for (int i = 0; i < CASHIER.length; i++) {
+            String name = CASHIER[i];
+            String value = params.get(name);
+            if (i != 0) {
+                sb.append("&");
+            }
+            sb.append(name).append("=").append(value);
+        }
+        PrivateKey privateKey = RSAKeyUtils.string2PrivateKey(PRIVATE_KEY);
+        String sign = RSA.sign(sb.toString(), privateKey, DigestAlgEnum.SHA256) + "$SHA256";
+        return "https://cash.yeepay.com/cashier/std" + "?sign=" + sign + "&" + sb;
+    }
+
+    @Override
+    public WechatAliPayPayResult wechatAlipayPay(String merchantNo, String userNo, String orderId, String orderAmount, String goodsName,
+                                                 String notifyUrl, String memo, String redirectUrl, String payWay, String channel, String appId, String openId, String ip) {
+        // 交易下单
+        TradeOrderResult tradeOrderResult = tradeOrder(merchantNo, orderId, orderAmount, goodsName, notifyUrl, memo, redirectUrl);
+        if (tradeOrderResult == null || !tradeOrderResult.validate()) {
+            throw new RuntimeException("调用快捷支付失败");
+        }
+        // 易宝聚合支付下单
+        WechatAlipayPayParams params = new WechatAlipayPayParams(orderId, new BigDecimal(orderAmount),
+                notifyUrl, payWay, channel,
+                appId, openId, ip, "OFFLINE", "REAL_TIME");
+        params.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
+        params.setToken(tradeOrderResult.getToken());
+        params.setMerchantNo(merchantNo);
+        params.setParentMerchantNo(tradeOrderResult.getParentMerchantNo());
+        return send("/rest/v1.0/aggpay/pre-pay", "POST", params, WechatAliPayPayResult.class);
+    }
+
+    @Override
+    public TradeOrderQueryResult queryPayResult(String merchantNo, String orderId) {
+        String parentMerchantNo = "10089066338";
+        String valueByKey = systemConfigService.getValueByKey("yopParentMerchantNo");
+        if(StringUtils.isNotEmpty(valueByKey)) {
+            parentMerchantNo = valueByKey;
+        }
+        TradeOrderQueryParams params = new TradeOrderQueryParams(parentMerchantNo, merchantNo, orderId);
+        return send("/rest/v1.0/trade/order/query", "GET", params, TradeOrderQueryResult.class);
+    }
+
+    @Override
+    public TradeRefundResult tradeRefund(String merchantNo, String orderId, String refundOrderId, String amt) {
+        TradeRefundResult tradeRefundResult = new TradeRefundResult();
+
+        // 支付支付订单
+        TradeOrderQueryResult tradeOrderQueryResult = queryPayResult(merchantNo, orderId);
+        if (tradeOrderQueryResult == null || !tradeOrderQueryResult.ifSuccess()) {
+            throw new RuntimeException("订单未支付成功不允许退款:" + orderId);
+        }
+
+        // 是否已经退款
+        RefundQueryResult refundQueryResult = refundQuery(merchantNo, orderId, refundOrderId);
+        if (refundQueryResult != null && !StringUtils.isEmpty(refundQueryResult.getCode())) {
+            if (refundQueryResult.ifSuccess()) {
+                tradeRefundResult.setStatus("SUCCESS");
+                return tradeRefundResult;
+            }
+            if (!refundQueryResult.ifCanRefund()) {
+                tradeRefundResult.setStatus("PROCESSING");
+                return tradeRefundResult;
+            }
+        }
+
+        TradeRefundParams params = new TradeRefundParams(orderId, refundOrderId, amt);
+        params.setParentMerchantNo(tradeOrderQueryResult.getParentMerchantNo());
+        params.setMerchantNo(merchantNo);
+        params.setRefundAccountType(YopEnums.AccountTypeEnum.待结算账户.getValue());
+        tradeRefundResult = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);
+        if (!tradeRefundResult.validate()) {
+            params.setRefundAccountType(YopEnums.AccountTypeEnum.商户资金账户.getValue());
+            tradeRefundResult = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);
+        }
+        if (!tradeRefundResult.validate()) {
+            throw new RuntimeException("调用退款异常:" + refundOrderId);
+        }
+        return tradeRefundResult;
+    }
+
+    @Override
+    public RefundQueryResult refundQuery(String merchantNo, String orderId, String refundOrderId) {
+        RefundQueryParams params = new RefundQueryParams(merchantNo, orderId, refundOrderId);
+        params.setParentMerchantNo("10089066338");
+        String valueByKey = systemConfigService.getValueByKey("yopParentMerchantNo");
+        if(StringUtils.isNotEmpty(valueByKey)) {
+            params.setParentMerchantNo(valueByKey);
+        }
+        return send("/rest/v1.0/trade/refund/query", "GET", params, RefundQueryResult.class);
     }
 
     public <T> T send3(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
@@ -342,6 +473,7 @@ public class YopServiceImpl implements YopService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
     public <T> T send(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);

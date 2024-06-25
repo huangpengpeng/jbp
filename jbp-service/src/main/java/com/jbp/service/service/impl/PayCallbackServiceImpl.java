@@ -22,6 +22,8 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.AttachVo;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.common.vo.WechatPayCallbackVo;
+import com.jbp.common.yop.constants.YopEnums;
+import com.jbp.common.yop.result.TradeOrderQueryResult;
 import com.jbp.service.service.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -593,6 +595,83 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
         redisTemplate.delete("PaySuccessCall" + orderNo);
         return "Success";
+    }
+
+
+    @Override
+    public String yopPayCallback(TradeOrderQueryResult tradeOrderQueryResult) {
+        if (!tradeOrderQueryResult.ifSuccess()) {
+            return "FAIL";
+        }
+        // 业务单号
+        String orderNo = tradeOrderQueryResult.getOrderId();
+        Boolean task = redisTemplate.opsForValue().setIfAbsent("PaySuccessCall" + orderNo, 1);
+        //2.设置锁的过期时间,防止死锁
+        if (!task) {
+            //没有争抢(设置)到锁
+            logger.info("锁住订单回调退出");
+            return "FAIL";
+        }
+        redisTemplate.expire("PaySuccessCall" + orderNo, 1, TimeUnit.MINUTES);
+        if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+            Order order = orderService.getByOrderNo(orderNo);
+            if (order != null) {
+                if (BooleanUtils.isTrue(order.getPaid())) {
+                    logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
+                    return "SUCCESS";
+                }
+                Boolean execute = transactionTemplate.execute(e -> {
+                    Boolean b = orderService.updatePaid(orderNo);
+                    if (!b) {
+                        e.setRollbackOnly();
+                        return Boolean.FALSE;
+                    }
+                    Order update = orderService.getByOrderNo(orderNo);
+                    YopEnums.PayWayEnum payWayEnum = YopEnums.PayWayEnum.getByValue(tradeOrderQueryResult.getPayWay());
+                    if (payWayEnum != null) {
+                        update.setPayMethod(payWayEnum.name());
+                    }
+                    update.setPayTime(DateTimeUtils.parseDate(tradeOrderQueryResult.getPaySuccessDate()));
+                    update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                    boolean b1 = orderService.updateById(update);
+                    if (!b1) {
+                        throw new RuntimeException("当前操作人数过多");
+                    }
+                    return Boolean.TRUE;
+                });
+                if (!execute) {
+                    throw new CrmebException("订单回执失败" + orderNo);
+                }
+                order = orderService.getById(order.getId());
+                asyncService.orderPaySuccessSplit(order.getOrderNo());
+
+            }
+        }
+        if (orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
+            RechargeOrder rechargeOrder = rechargeOrderService.getByOrderNo(orderNo);
+            // 充值
+            if (rechargeOrder != null) {
+                if (BooleanUtils.isTrue(rechargeOrder.getPaid())) {
+                    logger.info("lianlian pay error : 充值订单已支付 ===》" + orderNo);
+                    return "SUCCESS";
+                }
+                Boolean execute = transactionTemplate.execute(e -> {
+                    YopEnums.PayWayEnum payWayEnum = YopEnums.PayWayEnum.getByValue(tradeOrderQueryResult.getPayWay());
+                    if (payWayEnum != null) {
+                        rechargeOrder.setPayMethod(payWayEnum.name());
+                    }
+                    rechargeOrder.setPayTime(DateTimeUtils.parseDate(tradeOrderQueryResult.getPaySuccessDate()));
+                    rechargeOrderService.paySuccessAfter(rechargeOrder);
+                    return true;
+                });
+                if (!execute) {
+                    throw new CrmebException("充值订单回执失败" + orderNo);
+                }
+            }
+        }
+
+        redisTemplate.delete("PaySuccessCall" + orderNo);
+        return "SUCCESS";
     }
 
     @Override

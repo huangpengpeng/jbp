@@ -32,7 +32,7 @@ public class OrderPayRequest {
     @NotBlank(message = "订单编号不能为空")
     private String orderNo;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet, lianlian,kq", required = true)
+    @ApiModelProperty(value = "支付方式: weixin, alipay,yue, wallet, lianlian, kq", required = true)
     @NotBlank(message = "支付方式不能为空")
     @StringContains(limitValues = {"weixin","alipay","yue", "wallet", "lianlian","kq"}, message = "未知的支付方式")
     private String payType;

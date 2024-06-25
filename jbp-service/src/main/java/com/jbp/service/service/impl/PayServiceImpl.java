@@ -47,6 +47,8 @@ import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
+import com.jbp.common.yop.params.WechatAlipayPayParams;
+import com.jbp.common.yop.result.WechatAliPayPayResult;
 import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;
 
@@ -159,6 +161,8 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private LianLianPayService lianLianPayService;
     @Autowired
+    private YopService yopPayService;
+    @Autowired
     private ProductCommChain productCommChain;
     @Autowired
     private SelfScoreService selfScoreService;
@@ -193,6 +197,10 @@ public class PayServiceImpl implements PayService {
         String walletPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_STATUS);
         String walletPayOpenPassword = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_WALLET_PAY_OPEN_PASSWORD);
 
+        String yopWechatPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_WALLET_PAY_STATUS);
+        String yopAliPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_ALI_PAY_STATUS);
+        String yopQuickPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_QUICK_PAY_STATUS);
+
         PayConfigResponse response = new PayConfigResponse();
         response.setYuePayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus));
         response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(payWxOpen));
@@ -223,6 +231,10 @@ public class PayServiceImpl implements PayService {
             response.setLianLianStatus(false);
             response.setKqPayStatus(false);
         }
+        // 易宝支付开关
+        response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
+        response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
+        response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
         return response;
     }
 
@@ -311,7 +323,6 @@ public class PayServiceImpl implements PayService {
             response.setStatus("0000".equals(result.getRet_code()));
             response.setLianLianCashierConfig(result);
             logger.info("连连支付 response : {}", JSON.toJSONString(response));
-
             return response;
         }
         // 快钱支付
@@ -324,6 +335,14 @@ public class PayServiceImpl implements PayService {
             response.setStatus(true);
             response.setKqGatewayUrl(result);
             logger.info("快钱支付 response : {}", JSON.toJSONString(response));
+            return response;
+        }
+        // 易宝支付
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_YOP)) {
+            CashierPayCreateResult result = yopPay(order);
+            response.setStatus("0000".equals(result.getRet_code()));
+            response.setYopConfig(result);
+            logger.info("易宝支付 response : {}", JSON.toJSONString(response));
             return response;
         }
         // 微信视频号下单 需要额外调用支付参数
@@ -1930,6 +1949,31 @@ public class PayServiceImpl implements PayService {
         }
         order = orderService.getById(order.getId());
         return cashier;
+    }
+
+    private CashierPayCreateResult yopPay(Order order) {
+        CashierPayCreateResult result = new CashierPayCreateResult();
+        List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
+        String yopMerchantNo = systemConfigService.getValueByKey("yopMerchantNo");
+        String yopNotifyUrl = systemConfigService.getValueByKey("yopNotifyUrl") + "/" + order.getOrderNo();
+        String yopReturnUrl = systemConfigService.getValueByKey("yopReturnUrl") + "/" + order.getOrderNo();
+        String productName = details.get(0).getProductName();
+        if ("quickPay".equals(order.getPayType())) {
+            String gateWay = yopPayService.quickPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName, yopNotifyUrl, "", yopReturnUrl);
+            result.setGateway_url(gateWay);
+        }
+        if ("alipay".equals(order.getPayType())) {
+            WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
+                    yopNotifyUrl, "", yopReturnUrl, WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),
+                    WechatAlipayPayParams.CHANNEL.ALIPAY.name(), "", "", order.getIp());
+            result.setGateway_url(wechatAlipayPay.getPrePayTn());
+        }
+        boolean b = orderService.updateById(order);
+        if (!b) {
+            throw new RuntimeException("当前操作人数过多");
+        }
+        order = orderService.getById(order.getId());
+        return result;
     }
 
     private String kqCashierPay(Order order) {

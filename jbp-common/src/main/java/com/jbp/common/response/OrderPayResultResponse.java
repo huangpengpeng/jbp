@@ -57,5 +57,8 @@ public class OrderPayResultResponse {
     @ApiModelProperty(value = "快钱收银台")
     private String kqGatewayUrl;
 
+    @ApiModelProperty(value = "易宝返回")
+    private CashierPayCreateResult yopConfig;
+
 
 }

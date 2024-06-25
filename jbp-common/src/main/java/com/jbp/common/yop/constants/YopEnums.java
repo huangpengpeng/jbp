@@ -1,5 +1,6 @@
 package com.jbp.common.yop.constants;
 
+import com.jbp.common.utils.StringUtils;
 import lombok.Getter;
 
 public class YopEnums {
@@ -161,7 +162,46 @@ public class YopEnums {
     }
 
 
+    public enum PayWayEnum {
 
+        用户扫码("USER_SCAN"),
+
+        商家扫码("MERCHANT_SCAN"),
+
+        JS支付("JS_PAY"),
+        小程序支付("MINI_PROGRAM"),
+        微信公众号支付("WECHAT_OFFIACCOUNT"),
+        生活号支付("ALIPAY_LIFE"),
+        刷脸支付("FACE_SCAN_PAY"),
+        SDK支付("SDK_PAY"),
+        H5支付("H5_PAY"),
+        一键支付("ONEKEYPAY"),
+        绑卡支付("BINDCARDPAY"),
+        网银支付("E_BANK"),
+        企业账户支付("ENTERPRISE_ACCOUNT_PAY"),
+        记帐簿支付("ACCOUNT_BOOK_PAY"),
+        ;
+
+        @Getter
+        private String value;
+
+        PayWayEnum(String value) {
+            this.value = value;
+        }
+
+        public static PayWayEnum getByValue(String value) {
+            if(StringUtils.isEmpty(value)){
+                return null;
+            }
+            for (PayWayEnum payWayEnum : PayWayEnum.values()) {
+                if (payWayEnum.value.equals(value)) {
+                    return payWayEnum;
+                }
+            }
+            return null;
+        }
+
+    }
 
 
 

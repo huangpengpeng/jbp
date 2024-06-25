@@ -106,6 +106,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     @Autowired
     private LianLianPayService lianLianPayService;
     @Autowired
+    private YopService yopService;
+    @Autowired
     private WalletConfigService walletConfigService;
     @Autowired
     private ProductProfitChain productProfitChain;
@@ -1395,7 +1397,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 throw new CrmebException("连连退款失败！" + e.getMessage());
             }
         }
-
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_YOP) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                String yopMerchantNo = systemConfigService.getValueByKey("yopMerchantNo");
+                yopService.tradeRefund(yopMerchantNo, order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CrmebException("易宝退款失败！" + e.getMessage());
+            }
+        }
         if (order.getPayType().equals(PayConstants.PAY_TYPE_KQ) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
             try {
                 kqPayService.refund(order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice, new Date());

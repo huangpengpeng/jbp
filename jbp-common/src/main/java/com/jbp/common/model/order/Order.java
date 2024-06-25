@@ -89,7 +89,7 @@ public class Order implements Serializable {
     @ApiModelProperty(value = "支付方法")
     private String payMethod;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet, lianlian, confirmPay")
+    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet, lianlian, confirmPay, quickPay")
     private String payType;
 
     @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App, wallet, lianlian")

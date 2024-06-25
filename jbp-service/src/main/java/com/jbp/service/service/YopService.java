@@ -4,14 +4,11 @@ import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 public interface YopService {
 
 
     /**
      * H5注册个人入网
-     *
      */
     RegisterMicroH5Result registerMicroH5(RegisterMicroH5Params params);
 
@@ -20,8 +17,8 @@ public interface YopService {
      * 小微入网
      * /rest/v2.0/mer/register/saas/micro
      */
-    RegisterMicroResult registerMicro(String requestNo, String signName,  String id_card, String frontUrl,
-                                      String backUrl, String mobile,  String province, String city, String district,
+    RegisterMicroResult registerMicro(String requestNo, String signName, String id_card, String frontUrl,
+                                      String backUrl, String mobile, String province, String city, String district,
                                       String address, String bankCardNo, String bankCode, String notifyUrl, String withdrawalUndertaker);
 
 
@@ -31,19 +28,17 @@ public interface YopService {
     RegisterResult register(RegisterParams params);
 
 
-
     /**
      * 入网进度查询
      * /rest/v2.0/mer/register/query
      */
     RegisterQueryResult registerQuery(String requestNo);
 
-
     /**
      * 商户信息变更
      * /rest/v1.0/mer/merchant/info/modify
      */
-    MerchantInfoModifyResult  merchantInfoModify(MerchantInfoModifyParams params);
+    MerchantInfoModifyResult merchantInfoModify(MerchantInfoModifyParams params);
 
 
     String upload(String url);
@@ -52,14 +47,12 @@ public interface YopService {
 
     /**
      * 银行开户
-     *
      */
     BankAccountOpenResult bankAccountOpen(BankAccountOpenParams params);
 
 
     /**
      * 充值下单
-     *
      */
     OnlineBankOrderResult onlineBankOrder(OnlineBankOrderParams params);
 
@@ -80,7 +73,6 @@ public interface YopService {
 
 
     /**
-     *
      * 查询全部余额
      * /rest/v1.0/account/accountinfos/query
      */
@@ -136,9 +128,7 @@ public interface YopService {
 
     /**
      * 代付
-     *
      */
-
     AccountPayOrderResult accountPayOrder(String merchantNo, String requestNo,
                                           String orderAmount, String receiverAccountName,
                                           String receiverAccountNo, String receiverBankCode,
@@ -146,7 +136,6 @@ public interface YopService {
 
     /**
      * 代付查询
-     *
      */
     AccountPayOrderQueryResult accountPayOrderQuery(String merchantNo, String requestNo);
 
@@ -165,8 +154,35 @@ public interface YopService {
     /**
      * 交易下单
      */
-    TradeOrderResult tradeOrder(String merchantNo,String orderId, String orderAmount, String goodsName, String notifyUrl, String memo, String redirectUrl);
+    TradeOrderResult tradeOrder(String merchantNo, String orderId, String orderAmount, String goodsName, String notifyUrl, String memo, String redirectUrl);
+
+    /**
+     * 快捷支付
+     */
+    String quickPay(String merchantNo, String userNo, String orderId, String orderAmount, String goodsName, String notifyUrl, String memo, String redirectUrl);
+
+    /**
+     * 微信支付宝支付
+     */
+    WechatAliPayPayResult wechatAlipayPay(String merchantNo, String userNo, String orderId, String orderAmount, String goodsName,
+                                          String notifyUrl, String memo, String redirectUrl, String payWay, String channel,
+                                          String appId, String openId, String ip);
+
+    /**
+     * 查询支付结果
+     */
+    TradeOrderQueryResult queryPayResult(String merchantNo, String orderId);
 
 
-    
+    /**
+     * 退款
+     */
+    TradeRefundResult tradeRefund(String merchantNo, String orderId, String refundOrderId, String amt);
+
+
+    /**
+     * 查询退款结果
+     */
+    RefundQueryResult refundQuery(String merchantNo, String orderId, String refundOrderId);
+
 }

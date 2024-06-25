@@ -7,8 +7,11 @@ import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.*;
+import com.jbp.common.yop.result.TradeOrderQueryResult;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.PayCallbackService;
+import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,6 +60,10 @@ public class PayCallbackController {
     private LztAcctOpenService lztAcctOpenService;
     @Resource
     private LztFundTransferService lztFundTransferService;
+    @Resource
+    private YopService yopService;
+    @Resource
+    private SystemConfigService systemConfigService;
 
     @ApiOperation(value = "微信支付回调")
     @RequestMapping(value = "/wechat", method = RequestMethod.POST)
@@ -196,10 +203,15 @@ public class PayCallbackController {
                 }
             }
         }
-
-
-
         return "SUCCESS";
+    }
+
+    @ApiOperation(value = "易宝支付回调")
+    @RequestMapping(value = "/yop/{txnSeqno}")
+    public String yop(@PathVariable("txnSeqno") String txnSeqno, HttpServletRequest request) {
+        String yopMerchantNo = systemConfigService.getValueByKey("yopMerchantNo");
+        TradeOrderQueryResult tradeOrderQueryResult = yopService.queryPayResult(yopMerchantNo, txnSeqno);
+        return callbackService.yopPayCallback(tradeOrderQueryResult);
     }
 }
 
