@@ -39,6 +39,8 @@
   spring:
     profiles:
       active: zhcx
+    jmx:
+      enabled: false
 
 
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>jbp</groupId>
@@ -35,6 +35,7 @@
 
         <!-- JSTL for JSP  spring
         boot搭建web项目，跳转到jsp一定要添加下面的jar包，否则出现跳转的时候，变成下载的功能，保存该页面-->
+
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -360,6 +361,8 @@
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
         </dependency>
+
+        <!--易宝支付-->
         <dependency>
             <groupId>com.yeepay.yop.sdk</groupId>
             <artifactId>yop-java-sdk</artifactId>
@@ -376,7 +379,7 @@
             <version>4.1.5</version>
         </dependency>
 
-
+        <!--容联短信-->
         <dependency>
             <groupId>com.cloopen</groupId>
             <artifactId>java-sms-sdk</artifactId>
