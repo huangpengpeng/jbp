@@ -1,11 +1,14 @@
 package com.jbp.admin.controller.merchant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.jbp.common.encryptapi.EncryptIgnore;
+import com.jbp.common.model.agent.UserCapaXs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,13 +52,21 @@ public class MerchantLoginController {
 
     @Autowired
     private AdminLoginService loginService;
+    @Autowired
+    private Environment environment;
 
     @ApiOperation(value="登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public CommonResult<SystemLoginResponse> login(@RequestBody @Validated SystemAdminLoginRequest systemAdminLoginRequest, HttpServletRequest request) {
         String ip = CrmebUtil.getClientIp(request);
-        SystemLoginResponse systemAdminResponse = loginService.merchantLogin(systemAdminLoginRequest, ip);
-        return CommonResult.success(systemAdminResponse);
+
+        String ifOpen = environment.getProperty("rsa.encrypt.openMerchantLogin");
+        if(Boolean.parseBoolean(ifOpen)) {
+            SystemLoginResponse systemAdminResponse = loginService.merchantLogin(systemAdminLoginRequest, ip);
+            return CommonResult.success(systemAdminResponse);
+        }
+        return CommonResult.success();
+
     }
     
 

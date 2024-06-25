@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.HistoryOrderEditRequest;
 import com.jbp.common.request.HistoryOrderRequest;
+import com.jbp.common.request.HistoryOrderShipRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.HistoryOrderResponse;
 import com.jbp.common.result.CommonResult;
@@ -54,6 +55,18 @@ public class HistoryOrderController {
         }
         request.setShopId(HistoryOrderServiceImpl.DB_NAME_MAP.get(request.getDbName()));
         historyOrderService.edit(request);
+        return CommonResult.success();
+    }
+
+
+
+    @PostMapping("/ship")
+    @ApiOperation("人工发货")
+    public CommonResult edit(@RequestBody HistoryOrderShipRequest request) {
+        if (StringUtils.isEmpty(request.getDbName())) {
+            return CommonResult.success();
+        }
+        historyOrderService.ship(request);
         return CommonResult.success();
     }
 

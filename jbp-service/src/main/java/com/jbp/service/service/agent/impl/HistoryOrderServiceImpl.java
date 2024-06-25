@@ -11,6 +11,7 @@ import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.HistoryOrderEditRequest;
 import com.jbp.common.request.HistoryOrderRequest;
+import com.jbp.common.request.HistoryOrderShipRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.HistoryOrderDetailResponse;
 import com.jbp.common.response.HistoryOrderResponse;
@@ -62,7 +63,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         String sql = "  SELECT o.userId as uid, u.username as nickname, u.numberCode as account, " +
                 "                o.orderSn as orderNo, o.status , o.payPrice, o.freightPrice, o.goodsPrice, " +
                 "                o.receiveName, o.mobile as receiveMobile, o.province, o.city, o.area, o.address, " +
-                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId " +
+                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId ,o.shipTime " +
                 "        FROM " + request.getDbName() + ".orders AS o " +
                 "        LEFT JOIN " + request.getDbName() + ".user AS u ON u.`id` = o.userId " +
                 "        WHERE 1 =1 ";
@@ -78,7 +79,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
             sql = sql + " and o.orderSn = '" + request.getOrderNo() + "'";
         }
         if (StringUtils.isNotEmpty(request.getStatus())) {
-            sql = sql + " and o.status = '" + request.getStatus() + "'";
+            sql = sql + " and o.status in (" + request.getStatus() + " )";
         }
         if (request.getStartPayTime() != null) {
             sql = sql + " and o.payTime >= '" + DateTimeUtils.format(request.getStartPayTime(), "yyyy-MM-dd") + "'";
@@ -228,5 +229,12 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         boolean update = SqlRunner.db().update("update " + dbName + ".orders set status = {0}, shipTime={1}, shipName={2}, shipSn={3} where orderSn ={4}",
                 "301", DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN), shipName, shipNo, orderSn);
         return update;
+    }
+
+    @Override
+    public void ship(HistoryOrderShipRequest request) {
+          SqlRunner.db().update("update " + request.getDbName() + ".orders set status = {0}, shipTime={1}, shipName={2}, shipSn={3} where orderSn ={4}",
+                "301", DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN), request.getShopNme(), request.getShipNo(), request.getOrderNo());
+
     }
 }
