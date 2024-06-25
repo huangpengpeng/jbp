@@ -87,8 +87,6 @@ public class ExportServiceImpl implements ExportService {
     @Resource
     private CapaService capaService;
     @Resource
-    private OssService ossService;
-    @Resource
     private OrderInvoiceService orderInvoiceService;
     @Resource
     private RefundOrderService refundOrderService;
@@ -386,7 +384,6 @@ public class ExportServiceImpl implements ExportService {
             result.add(vo);
         }
         FileResultVo fileResultVo = uploadService.excelLocalUpload(result, OrderExcel.class);
-//        String s = ossService.uploadXlsx(result, OrderExcel.class, "订单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
     }
@@ -433,7 +430,6 @@ public class ExportServiceImpl implements ExportService {
             result.add(vo);
         }
         FileResultVo fileResultVo = uploadService.excelLocalUpload(result, RefundOrderExcel.class);
-//        String s = ossService.uploadXlsx(result, RefundOrderExcel.class, "退单列表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         log.info("退单列表导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
     }
@@ -479,8 +475,6 @@ public class ExportServiceImpl implements ExportService {
         FileResultVo fileResultVo = uploadService.excelLocalUpload(result, ProductStatementExcel.class);
         log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
-//        String s = ossService.uploadXlsx(result, ProductStatementExcel.class, "商品报表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-//        return s;
     }
 
     private static void valid(OrderSearchRequest request) {

@@ -77,11 +77,9 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
             vo.setPayPrice(response.getPayPrice());
             result.add(vo);
         }
-//        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, OrdersFundSummaryExcel.class);
-//        log.info("订单汇总列表导出下载地址:" + fileResultVo.getUrl());
-//        return fileResultVo.getUrl();
-        String s = ossService.uploadXlsx(result, OrdersFundSummaryExcel.class, "订单汇总" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, OrdersFundSummaryExcel.class);
+        log.info("订单汇总列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 
     @Override

@@ -377,10 +377,8 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 }
             }
         }
-//        FileResultVo fileResultVo = uploadService.excelLocalUpload(list, ScoreDownLoadExcel.class);
-        String s = ossService.uploadXlsx(list, ScoreDownLoadExcel.class, "团队业绩记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(list, ScoreDownLoadExcel.class);
+        return fileResultVo.getUrl();
     }
 
 

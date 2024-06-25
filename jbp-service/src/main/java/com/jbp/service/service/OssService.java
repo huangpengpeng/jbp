@@ -25,6 +25,5 @@ public interface OssService {
 
     String upload(InputStream is, String fileName);
 
-    String uploadXlsx(List<?> data, Class<?> excelClass, String fileName);
 
 }

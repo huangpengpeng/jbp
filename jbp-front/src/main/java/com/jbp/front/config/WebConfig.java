@@ -1,5 +1,7 @@
 package com.jbp.front.config;
 
+import com.yeepay.yop.sdk.service.common.YopClient;
+import com.yeepay.yop.sdk.service.common.YopClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -166,4 +168,9 @@ public class WebConfig implements WebMvcConfigurer {
     public MappedInterceptor getMappedInterceptor() {
         return new MappedInterceptor(new String[]{"/doc.html", "/webjars/**"}, new SwaggerInterceptor(username, password, check));
     }
+
+	@Bean
+	public YopClient yopClient(){
+		return YopClientBuilder.builder().build();
+	}
 }

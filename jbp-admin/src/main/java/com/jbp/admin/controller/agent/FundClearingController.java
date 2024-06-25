@@ -41,8 +41,6 @@ public class FundClearingController {
     @Resource
     private UserService userService;
     @Resource
-    private OssService ossService;
-    @Resource
     private UploadService uploadService;
 
     @PreAuthorize("hasAuthority('agent:fund:clearing:page')")
@@ -221,7 +219,6 @@ public class FundClearingController {
 
         FileResultVo fileResultVo = uploadService.excelLocalUpload(fundClearingExcels, FundClearingExcel.class);
         log.info("导出下单信息:"+ JSONObject.toJSONString(fileResultVo));
-//        String s = ossService.uploadXlsx(fundClearingExcels, FundClearingExcel.class, "佣金记录" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         return CommonResult.success(fileResultVo.getUrl());
     }
 

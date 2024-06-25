@@ -103,23 +103,5 @@ public class OssServiceImpl implements OssService {
         return cloudVo.getDomain() + "/" + webPth;
     }
 
-    @Override
-    public String uploadXlsx(List<?> data, Class<?> excelClass, String fileName) {
-        InputStream is = null;
-        try {
-            is = EasyExcelUtils.exportByExcel(data, excelClass);
-        } catch (Exception e) {
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return upload(is, fileName + ".xlsx");
-    }
 }
 

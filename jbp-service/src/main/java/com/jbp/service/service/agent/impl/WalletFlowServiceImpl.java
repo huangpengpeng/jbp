@@ -9,8 +9,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.SysConfigConstants;
-import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -24,13 +22,11 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.dao.agent.WalletFlowDao;
 import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -55,8 +51,6 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     SystemConfigService systemConfigService;
     @Resource
     private WalletFlowDao dao;
-    @Resource
-    private TeamService teamService;
 
     @Override
     public WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
@@ -197,8 +191,5 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             log.info("增在执行更新转账附言:{}, 总数:{} ", i, list.size());
         }
         dao.updateBatch(updateList);
-
-        System.out.println(111);
-
     }
 }

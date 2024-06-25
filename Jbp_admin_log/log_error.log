@@ -184,3 +184,18 @@ com.mysql.cj.jdbc.exceptions.MySQLTransactionRollbackException: Lock wait timeou
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1215)
 	at com.jbp.admin.JbpAdminApplication.main(JbpAdminApplication.java:52)
+2024-06-25 12:55:35.552 [main] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+A component required a bean of type 'com.yeepay.yop.sdk.service.common.YopClient' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.yeepay.yop.sdk.service.common.YopClient' in your configuration.
+

@@ -1,19 +1,14 @@
 package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jbp.common.excel.OrderShipmentExcel;
-import com.jbp.common.excel.OrdersFundSummaryExcel;
 import com.jbp.common.excel.WalletExcel;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Team;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
@@ -24,7 +19,6 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletRequest;
 import com.jbp.common.response.WalletExtResponse;
 import com.jbp.common.utils.ArithmeticUtils;
-import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.agent.WalletDao;
@@ -39,6 +33,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -361,11 +356,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
             result.add(vo);
         }
 
-//        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, WalletExcel.class);
-//        log.info("用户积分列表导出下载地址:" + fileResultVo.getUrl());
-//        return fileResultVo.getUrl();
-        String s = ossService.uploadXlsx(result, WalletExcel.class, "用户积分" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        return s;
-
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, WalletExcel.class);
+        log.info("用户积分列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 }
