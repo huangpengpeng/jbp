@@ -5280,3 +5280,10 @@
 2024-06-25 14:18:20.686 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：40
 2024-06-25 14:18:20.707 [task-executor-1] INFO  com.jbp.admin.task.order.OrderPayResultSyncTask - ---OrderPayResultSyncTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:18:20 CST 2024
 2024-06-25 14:18:20.998 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：40  总共耗时：313毫秒
+2024-06-25 14:19:00.511 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-06-25 14:19:00.515 [task-executor-2] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:19:00 CST 2024
+2024-06-25 14:19:00.539 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-06-25 14:19:00.540 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：29毫秒
+2024-06-25 14:19:01.661 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：44
+2024-06-25 14:19:01.704 [task-executor-3] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---WalletGivePlanTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:19:01 CST 2024
+2024-06-25 14:19:02.055 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：44  总共耗时：394毫秒
