@@ -360,11 +360,7 @@
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.yeepay.yop.sdk</groupId>
-            <artifactId>yop-java-sdk</artifactId>
-            <version>4.0.1</version>
-        </dependency>
+
 
         <dependency>
             <groupId>com.cloopen</groupId>
@@ -442,6 +438,16 @@
             </systemPath>
         </dependency>
 
+
+        <!-- 易宝依赖 -->
+        <dependency>
+            <groupId>com.yeepay.yop.sdk</groupId>
+            <artifactId>yop-java-sdk</artifactId>
+            <version>4.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/java/com/jbp/common/yop/yop-java-sdk-4.0.1.jar
+            </systemPath>
+        </dependency>
 
     </dependencies>
 
