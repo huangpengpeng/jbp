@@ -55,8 +55,8 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://fny-5-7-4.cl8owfyhsxx3.ap-southeast-1.rds.amazonaws.com:3306/fnynew?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
-    username: admin
-    password: 123456Aa#
+    username: fnyadmin
+    password: yrwrfLlOS0
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
