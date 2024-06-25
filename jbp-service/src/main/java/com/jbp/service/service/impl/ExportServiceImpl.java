@@ -476,11 +476,11 @@ public class ExportServiceImpl implements ExportService {
             productStatementExcel.setDate(productDayRecord.getDate());
             result.add(productStatementExcel);
         }
-//        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, ProductStatementExcel.class);
-//        log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
-//        return fileResultVo.getUrl();
-        String s = ossService.uploadXlsx(result, ProductStatementExcel.class, "商品报表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
-        return s;
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, ProductStatementExcel.class);
+        log.info("订单列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
+//        String s = ossService.uploadXlsx(result, ProductStatementExcel.class, "商品报表" + DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+//        return s;
     }
 
     private static void valid(OrderSearchRequest request) {

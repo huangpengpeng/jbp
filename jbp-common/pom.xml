@@ -360,6 +360,11 @@
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yeepay.yop.sdk</groupId>
+            <artifactId>yop-java-sdk</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
         <dependency>
             <groupId>com.cloopen</groupId>
