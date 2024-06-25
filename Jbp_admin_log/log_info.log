@@ -4654,3 +4654,629 @@
 2024-06-25 14:09:02.951 [task-executor-2] INFO  com.jbp.admin.task.order.OrderAutoCancelTask - ---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:09:02 CST 2024
 2024-06-25 14:09:02.952 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.autoCancel | size:0
 2024-06-25 14:09:02.952 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：5  总共耗时：2毫秒
+2024-06-25 14:10:00.568 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：3
+2024-06-25 14:10:00.700 [task-executor-3] INFO  com.jbp.admin.task.coupon.CouponOverdueTask - ---CouponOverdueTask task------produce Data with fixed rate task: Execution Time - 2024-06-25 14:10:00
+2024-06-25 14:10:00.957 [task-executor-3] INFO  com.jbp.service.service.impl.CouponUserServiceImpl - 批量更新优惠券过期无可更新优惠券,当前时间：2024-06-25 14:10:00
+2024-06-25 14:10:00.957 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：3  总共耗时：389毫秒
+2024-06-25 14:10:01.751 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：38
+2024-06-25 14:10:01.755 [task-executor-4] INFO  com.jbp.admin.task.user.UserCapaXsTask - ---UserCapaXsTask refreshUserCapaXs------produce Data with fixed rate task: Execution Time - 2024-06-25 14:10:01
+2024-06-25 14:10:03.102 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：44
+2024-06-25 14:10:03.106 [task-executor-5] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---WalletGivePlanTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:10:03 CST 2024
+2024-06-25 14:10:03.868 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：44  总共耗时：766毫秒
+2024-06-25 14:10:27.346 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：38  总共耗时：25596毫秒
+2024-06-25 14:11:00.584 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-06-25 14:11:00.590 [task-executor-6] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:11:00 CST 2024
+2024-06-25 14:11:00.598 [task-executor-6] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-06-25 14:11:00.598 [task-executor-6] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：14毫秒
+2024-06-25 14:11:01.833 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：44
+2024-06-25 14:11:01.840 [task-executor-7] INFO  com.jbp.admin.task.order.OrderPaySuccessTask - ---WalletGivePlanTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:11:01 CST 2024
+2024-06-25 14:11:02.069 [task-executor-7] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：44  总共耗时：235毫秒
+2024-06-25 14:11:42.109 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-06-25 14:11:42.335 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'jmReportTaskExecutor'
+2024-06-25 14:11:42.387 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-06-25 14:11:42.421 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
+2024-06-25 14:11:42.421 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2024-06-25 14:11:42.421 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-06-25 14:11:42.427 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2024-06-25 14:11:42.620 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-06-25 14:11:42.677 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-06-25 14:16:17.790 [main] INFO  com.jbp.admin.JbpAdminApplication - Starting JbpAdminApplication on 192.168.0.207 with PID 55292 (/Users/franky/work/jbp/jbp-admin/target/classes started by kaycm in /Users/franky/work/jbp)
+2024-06-25 14:16:17.791 [main] INFO  com.jbp.admin.JbpAdminApplication - The following profiles are active: zhcx
+2024-06-25 14:16:20.995 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-06-25 14:16:20.999 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-06-25 14:16:21.063 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 37ms. Found 0 Redis repository interfaces.
+2024-06-25 14:16:21.218 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  ******************* init miniDao config [ begin ] *********************** 
+2024-06-25 14:16:21.218 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  ------ minidao.base-package ------- org.jeecg.modules.jmreport.*
+2024-06-25 14:16:21.219 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  *******************  init miniDao config  [ end ] *********************** 
+2024-06-25 14:16:21.349 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDao }
+2024-06-25 14:16:21.349 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDataSourceDao }
+2024-06-25 14:16:21.349 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbDao }
+2024-06-25 14:16:21.349 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbFieldDao }
+2024-06-25 14:16:21.349 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbParamDao }
+2024-06-25 14:16:21.349 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDictDao }
+2024-06-25 14:16:21.350 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDictItemDao }
+2024-06-25 14:16:21.350 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportLinkDao }
+2024-06-25 14:16:21.350 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportMapDao }
+2024-06-25 14:16:21.351 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportShareDao }
+2024-06-25 14:16:21.862 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#9' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.866 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportShareDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.867 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#8' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.867 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportMapDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.868 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#7' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.868 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportLinkDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.869 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#6' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.869 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDictItemDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.870 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#5' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.870 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDictDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.871 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#4' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.872 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbParamDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.872 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#3' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.873 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbFieldDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.874 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#2' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.875 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.876 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a#1' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.877 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDataSourceDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.878 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#7708b66a' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:21.879 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:22.144 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:22.154 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:22.160 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@77ccded4' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:22.161 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:22.173 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-06-25 14:16:22.687 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8181 (http)
+2024-06-25 14:16:22.697 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8181"]
+2024-06-25 14:16:22.698 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-06-25 14:16:22.698 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-06-25 14:16:23.123 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-06-25 14:16:23.132 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-06-25 14:16:23.144 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 5283 ms
+2024-06-25 14:16:28.414 [main] INFO  o.j.m.jmreport.config.init.JimuReportConfiguration -  Init JimuReport Config [ Token Interceptor & Resource Locations ] 
+2024-06-25 14:16:30.689 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-06-25 14:16:49.030 [main] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
+2024-06-25 14:16:49.033 [main] INFO  org.quartz.simpl.SimpleThreadPool - Job execution threads will use class loader of thread: main
+2024-06-25 14:16:49.045 [main] INFO  org.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2024-06-25 14:16:49.045 [main] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v.2.3.2 created.
+2024-06-25 14:16:49.050 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Using db table-based data access locking (synchronization).
+2024-06-25 14:16:49.053 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - JobStoreCMT initialized.
+2024-06-25 14:16:49.054 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2024-06-25 14:16:49.054 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2024-06-25 14:16:49.054 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.3.2
+2024-06-25 14:16:49.054 [main] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@2181144e
+2024-06-25 14:17:18.692 [main] INFO  c.y.y.s.c.provider.file.YopFileSdkConfigProvider - 加载默认配置文件config/yop_sdk_config_default.json
+2024-06-25 14:17:51.034 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-06-25 14:17:54.054 [main] INFO  o.j.modules.jmreport.config.JmReportExecutorConfig -  Init JimuReport Config [ 线程池 ] 
+2024-06-25 14:17:55.113 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-06-25 14:17:56.337 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-06-25 14:17:56.355 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-06-25 14:17:58.711 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@3d1254b9, org.springframework.security.web.context.SecurityContextPersistenceFilter@7b4791d9, org.springframework.security.web.header.HeaderWriterFilter@5891bd6d, org.springframework.web.filter.CorsFilter@3b850bb7, org.springframework.web.filter.CorsFilter@3b850bb7, org.springframework.web.filter.CorsFilter@3b850bb7, org.springframework.security.web.authentication.logout.LogoutFilter@48ac4201, com.jbp.admin.filter.JwtAuthenticationTokenFilter@54fffa5a, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@24c04958, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@46092840, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6a49b3c7, org.springframework.security.web.session.SessionManagementFilter@38067d41, org.springframework.security.web.access.ExceptionTranslationFilter@2c05ccdb, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@4ba056ab]
+2024-06-25 14:18:00.634 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-06-25 14:18:00.635 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'jmReportTaskExecutor'
+2024-06-25 14:18:04.301 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-06-25 14:18:04.394 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 4 custom documentation plugin(s)
+2024-06-25 14:18:04.751 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-06-25 14:18:05.679 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_1
+2024-06-25 14:18:05.681 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: conditionListUsingGET_1
+2024-06-25 14:18:05.683 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: conditionSaveUsingPOST_1
+2024-06-25 14:18:05.692 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingPOST_1
+2024-06-25 14:18:05.694 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_1
+2024-06-25 14:18:05.698 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_1
+2024-06-25 14:18:05.705 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_1
+2024-06-25 14:18:05.784 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_1
+2024-06-25 14:18:05.790 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_1
+2024-06-25 14:18:05.804 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_2
+2024-06-25 14:18:05.815 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_3
+2024-06-25 14:18:05.847 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_4
+2024-06-25 14:18:05.850 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_2
+2024-06-25 14:18:05.888 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_5
+2024-06-25 14:18:05.897 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_6
+2024-06-25 14:18:05.904 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_7
+2024-06-25 14:18:05.915 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_2
+2024-06-25 14:18:06.065 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_8
+2024-06-25 14:18:06.096 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_2
+2024-06-25 14:18:06.105 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_9
+2024-06-25 14:18:06.110 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_2
+2024-06-25 14:18:06.112 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_3
+2024-06-25 14:18:06.149 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_3
+2024-06-25 14:18:06.231 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_10
+2024-06-25 14:18:06.331 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_11
+2024-06-25 14:18:06.354 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_12
+2024-06-25 14:18:06.369 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_3
+2024-06-25 14:18:06.427 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_3
+2024-06-25 14:18:06.464 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_2
+2024-06-25 14:18:06.537 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_13
+2024-06-25 14:18:06.611 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailsUsingGET_1
+2024-06-25 14:18:06.619 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_4
+2024-06-25 14:18:06.625 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_4
+2024-06-25 14:18:06.647 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: applyUsingGET_1
+2024-06-25 14:18:06.651 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_5
+2024-06-25 14:18:06.665 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_6
+2024-06-25 14:18:06.688 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: applyUsingGET_2
+2024-06-25 14:18:06.730 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_7
+2024-06-25 14:18:06.732 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: refreshUsingGET_1
+2024-06-25 14:18:06.787 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: applyUsingGET_3
+2024-06-25 14:18:06.852 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_8
+2024-06-25 14:18:06.854 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: refreshUsingGET_2
+2024-06-25 14:18:06.957 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_14
+2024-06-25 14:18:07.253 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_15
+2024-06-25 14:18:07.290 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_16
+2024-06-25 14:18:07.414 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_17
+2024-06-25 14:18:07.438 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: excelUsingGET_1
+2024-06-25 14:18:07.446 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_18
+2024-06-25 14:18:07.454 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_19
+2024-06-25 14:18:07.461 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_1
+2024-06-25 14:18:07.464 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_4
+2024-06-25 14:18:07.467 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_4
+2024-06-25 14:18:07.476 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_20
+2024-06-25 14:18:07.479 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: closeUsingGET_1
+2024-06-25 14:18:07.487 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_21
+2024-06-25 14:18:07.489 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: openUsingGET_1
+2024-06-25 14:18:07.510 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_2
+2024-06-25 14:18:07.738 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_5
+2024-06-25 14:18:07.741 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_5
+2024-06-25 14:18:07.767 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: excelUsingGET_2
+2024-06-25 14:18:07.794 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_22
+2024-06-25 14:18:07.799 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: increaseUsingPOST_1
+2024-06-25 14:18:07.808 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: reduceUsingPOST_1
+2024-06-25 14:18:07.860 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: excelUsingGET_3
+2024-06-25 14:18:07.890 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_23
+2024-06-25 14:18:07.913 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_24
+2024-06-25 14:18:07.936 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_25
+2024-06-25 14:18:07.964 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: excelUsingGET_4
+2024-06-25 14:18:07.972 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_26
+2024-06-25 14:18:08.010 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_27
+2024-06-25 14:18:08.044 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_6
+2024-06-25 14:18:08.055 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_1
+2024-06-25 14:18:08.125 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_28
+2024-06-25 14:18:08.139 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_5
+2024-06-25 14:18:08.150 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_3
+2024-06-25 14:18:08.174 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_29
+2024-06-25 14:18:08.185 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_7
+2024-06-25 14:18:08.204 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_30
+2024-06-25 14:18:08.271 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_31
+2024-06-25 14:18:08.308 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_8
+2024-06-25 14:18:08.374 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_32
+2024-06-25 14:18:08.419 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_33
+2024-06-25 14:18:08.470 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_9
+2024-06-25 14:18:08.510 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: bandUsingGET_1
+2024-06-25 14:18:08.575 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageListUsingGET_1
+2024-06-25 14:18:08.601 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageListUsingGET_2
+2024-06-25 14:18:08.608 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_9
+2024-06-25 14:18:08.612 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: delUsingGET_1
+2024-06-25 14:18:08.616 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_6
+2024-06-25 14:18:08.633 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_10
+2024-06-25 14:18:08.635 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingGET_1
+2024-06-25 14:18:08.666 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_11
+2024-06-25 14:18:08.676 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: bandUsingGET_2
+2024-06-25 14:18:08.685 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: bandUsingGET_3
+2024-06-25 14:18:08.717 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageListUsingGET_3
+2024-06-25 14:18:08.728 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: gplotUsingGET_1
+2024-06-25 14:18:08.742 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageListUsingGET_4
+2024-06-25 14:18:08.748 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_34
+2024-06-25 14:18:09.147 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_35
+2024-06-25 14:18:09.150 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_36
+2024-06-25 14:18:09.153 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_37
+2024-06-25 14:18:09.156 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_38
+2024-06-25 14:18:09.158 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_39
+2024-06-25 14:18:09.159 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_40
+2024-06-25 14:18:09.161 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_41
+2024-06-25 14:18:09.163 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_1
+2024-06-25 14:18:09.164 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_2
+2024-06-25 14:18:09.165 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_3
+2024-06-25 14:18:09.166 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_4
+2024-06-25 14:18:09.167 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_5
+2024-06-25 14:18:09.168 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_6
+2024-06-25 14:18:09.169 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: savesUsingPOST_7
+2024-06-25 14:18:09.177 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_42
+2024-06-25 14:18:09.178 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_43
+2024-06-25 14:18:09.179 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_44
+2024-06-25 14:18:09.180 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_45
+2024-06-25 14:18:09.181 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_46
+2024-06-25 14:18:09.182 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_47
+2024-06-25 14:18:09.183 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_48
+2024-06-25 14:18:09.185 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_49
+2024-06-25 14:18:09.189 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_4
+2024-06-25 14:18:09.191 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_5
+2024-06-25 14:18:09.193 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_6
+2024-06-25 14:18:09.194 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_7
+2024-06-25 14:18:09.195 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_8
+2024-06-25 14:18:09.196 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_9
+2024-06-25 14:18:09.197 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_10
+2024-06-25 14:18:09.198 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_11
+2024-06-25 14:18:09.248 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_6
+2024-06-25 14:18:09.308 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageListUsingGET_5
+2024-06-25 14:18:09.313 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_12
+2024-06-25 14:18:09.388 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: exportUsingGET_1
+2024-06-25 14:18:09.418 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_50
+2024-06-25 14:18:09.421 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: increaseUsingPOST_2
+2024-06-25 14:18:09.423 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: reduceUsingPOST_2
+2024-06-25 14:18:09.424 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: transferUsingPOST_1
+2024-06-25 14:18:09.456 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: excelUsingGET_5
+2024-06-25 14:18:09.493 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_51
+2024-06-25 14:18:09.519 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: pageUsingGET_12
+2024-06-25 14:18:09.540 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: excelUsingGET_6
+2024-06-25 14:18:09.550 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_52
+2024-06-25 14:18:09.557 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_2
+2024-06-25 14:18:09.571 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_53
+2024-06-25 14:18:09.573 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_7
+2024-06-25 14:18:09.622 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_54
+2024-06-25 14:18:09.846 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-06-25 14:18:09.888 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_3
+2024-06-25 14:18:09.896 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_55
+2024-06-25 14:18:09.898 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_1
+2024-06-25 14:18:09.900 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_13
+2024-06-25 14:18:09.908 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_4
+2024-06-25 14:18:09.914 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_56
+2024-06-25 14:18:09.919 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_1
+2024-06-25 14:18:09.955 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_2
+2024-06-25 14:18:09.958 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_14
+2024-06-25 14:18:09.973 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_57
+2024-06-25 14:18:09.988 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_1
+2024-06-25 14:18:10.007 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_58
+2024-06-25 14:18:10.024 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_2
+2024-06-25 14:18:10.032 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_3
+2024-06-25 14:18:10.039 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_15
+2024-06-25 14:18:10.092 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_2
+2024-06-25 14:18:10.118 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_59
+2024-06-25 14:18:10.150 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_3
+2024-06-25 14:18:10.157 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_4
+2024-06-25 14:18:10.186 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_60
+2024-06-25 14:18:10.218 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: exportOrderUsingGET_1
+2024-06-25 14:18:10.338 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_4
+2024-06-25 14:18:10.435 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_61
+2024-06-25 14:18:10.585 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_3
+2024-06-25 14:18:10.634 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_62
+2024-06-25 14:18:10.680 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_5
+2024-06-25 14:18:10.687 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: sendUsingPOST_1
+2024-06-25 14:18:10.692 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_5
+2024-06-25 14:18:10.697 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_63
+2024-06-25 14:18:10.699 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_6
+2024-06-25 14:18:10.702 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_5
+2024-06-25 14:18:10.704 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_16
+2024-06-25 14:18:10.705 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_1
+2024-06-25 14:18:10.710 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_10
+2024-06-25 14:18:10.711 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_4
+2024-06-25 14:18:10.718 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_64
+2024-06-25 14:18:10.719 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_17
+2024-06-25 14:18:10.972 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_5
+2024-06-25 14:18:11.101 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_65
+2024-06-25 14:18:11.175 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_7
+2024-06-25 14:18:11.422 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_6
+2024-06-25 14:18:11.426 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_18
+2024-06-25 14:18:11.439 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_11
+2024-06-25 14:18:11.440 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_6
+2024-06-25 14:18:11.442 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_7
+2024-06-25 14:18:11.446 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: listUsingGET_8
+2024-06-25 14:18:11.461 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_7
+2024-06-25 14:18:11.479 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_66
+2024-06-25 14:18:11.495 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_8
+2024-06-25 14:18:11.513 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_67
+2024-06-25 14:18:11.517 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_8
+2024-06-25 14:18:11.520 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_7
+2024-06-25 14:18:11.522 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_19
+2024-06-25 14:18:11.525 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_9
+2024-06-25 14:18:11.532 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_68
+2024-06-25 14:18:11.536 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_9
+2024-06-25 14:18:11.538 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_8
+2024-06-25 14:18:11.540 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_20
+2024-06-25 14:18:11.542 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_2
+2024-06-25 14:18:11.788 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_3
+2024-06-25 14:18:11.800 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_69
+2024-06-25 14:18:11.803 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_6
+2024-06-25 14:18:11.810 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_70
+2024-06-25 14:18:11.813 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_10
+2024-06-25 14:18:11.815 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_9
+2024-06-25 14:18:11.817 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_21
+2024-06-25 14:18:11.823 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_7
+2024-06-25 14:18:11.916 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_71
+2024-06-25 14:18:11.937 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_11
+2024-06-25 14:18:11.960 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_10
+2024-06-25 14:18:11.968 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_22
+2024-06-25 14:18:12.006 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveGoodsOnSaleUsingPOST_1
+2024-06-25 14:18:12.063 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_72
+2024-06-25 14:18:12.067 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_73
+2024-06-25 14:18:12.072 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_12
+2024-06-25 14:18:12.073 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_8
+2024-06-25 14:18:12.089 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_23
+2024-06-25 14:18:12.090 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_9
+2024-06-25 14:18:12.114 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_74
+2024-06-25 14:18:12.172 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_75
+2024-06-25 14:18:12.176 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_76
+2024-06-25 14:18:12.204 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_77
+2024-06-25 14:18:12.208 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getOrderStatusNumUsingGET_1
+2024-06-25 14:18:12.210 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: markUsingPOST_1
+2024-06-25 14:18:12.218 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_10
+2024-06-25 14:18:12.231 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_78
+2024-06-25 14:18:12.253 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_12
+2024-06-25 14:18:12.266 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_11
+2024-06-25 14:18:12.270 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_24
+2024-06-25 14:18:12.311 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-06-25 14:18:12.348 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_10
+2024-06-25 14:18:12.379 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_79
+2024-06-25 14:18:12.381 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_12
+2024-06-25 14:18:12.382 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_25
+2024-06-25 14:18:12.384 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_3
+2024-06-25 14:18:12.430 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_13
+2024-06-25 14:18:12.432 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_11
+2024-06-25 14:18:12.434 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_80
+2024-06-25 14:18:12.435 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_26
+2024-06-25 14:18:12.438 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_12
+2024-06-25 14:18:12.445 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_81
+2024-06-25 14:18:12.449 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_13
+2024-06-25 14:18:12.452 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_13
+2024-06-25 14:18:12.453 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_27
+2024-06-25 14:18:12.456 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_14
+2024-06-25 14:18:12.457 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_13
+2024-06-25 14:18:12.461 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editUsingPOST_8
+2024-06-25 14:18:12.464 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListTreeUsingGET_1
+2024-06-25 14:18:12.469 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_15
+2024-06-25 14:18:12.531 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_28
+2024-06-25 14:18:12.533 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_29
+2024-06-25 14:18:12.540 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_1
+2024-06-25 14:18:12.543 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_14
+2024-06-25 14:18:12.547 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_4
+2024-06-25 14:18:12.556 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: findPageListUsingGET_1
+2024-06-25 14:18:12.563 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_2
+2024-06-25 14:18:12.564 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_15
+2024-06-25 14:18:12.579 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: findPageListUsingGET_2
+2024-06-25 14:18:12.582 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_16
+2024-06-25 14:18:12.589 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: findPageListUsingGET_3
+2024-06-25 14:18:12.592 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_30
+2024-06-25 14:18:12.594 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_31
+2024-06-25 14:18:12.597 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInfoUsingGET_1
+2024-06-25 14:18:12.605 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_82
+2024-06-25 14:18:12.607 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_14
+2024-06-25 14:18:12.610 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_32
+2024-06-25 14:18:12.613 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_33
+2024-06-25 14:18:12.625 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDailyStatementListUsingGET_1
+2024-06-25 14:18:12.629 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getFundsFlowUsingGET_1
+2024-06-25 14:18:12.635 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMerchantClosingDetailUsingGET_1
+2024-06-25 14:18:12.639 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMerchantClosingPageListUsingGET_1
+2024-06-25 14:18:12.640 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMonthStatementListUsingGET_1
+2024-06-25 14:18:12.661 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: indexDateUsingGET_1
+2024-06-25 14:18:12.663 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: operatingDataUsingGET_1
+2024-06-25 14:18:12.679 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getConfigUsingGET_1
+2024-06-25 14:18:12.681 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateConfigUsingPOST_1
+2024-06-25 14:18:12.702 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_3
+2024-06-25 14:18:12.714 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_17
+2024-06-25 14:18:12.717 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_16
+2024-06-25 14:18:12.720 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_83
+2024-06-25 14:18:12.721 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_34
+2024-06-25 14:18:12.793 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_18
+2024-06-25 14:18:12.802 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_1
+2024-06-25 14:18:12.813 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getPageListUsingGET_1
+2024-06-25 14:18:12.828 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: recommendSwitchUsingPOST_1
+2024-06-25 14:18:12.837 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_35
+2024-06-25 14:18:12.844 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_19
+2024-06-25 14:18:12.846 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: allListUsingGET_1
+2024-06-25 14:18:12.848 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_17
+2024-06-25 14:18:12.852 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_84
+2024-06-25 14:18:12.853 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_36
+2024-06-25 14:18:12.899 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInfoUsingGET_2
+2024-06-25 14:18:12.935 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updatePhoneUsingPOST_1
+2024-06-25 14:18:12.937 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updatePhoneUsingPOST_2
+2024-06-25 14:18:13.008 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_11
+2024-06-25 14:18:13.036 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_85
+2024-06-25 14:18:13.222 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_15
+2024-06-25 14:18:13.518 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_14
+2024-06-25 14:18:13.520 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_37
+2024-06-25 14:18:13.523 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_12
+2024-06-25 14:18:13.533 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_86
+2024-06-25 14:18:13.538 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_16
+2024-06-25 14:18:13.544 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_15
+2024-06-25 14:18:13.545 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_38
+2024-06-25 14:18:13.546 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_39
+2024-06-25 14:18:13.563 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_13
+2024-06-25 14:18:13.570 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_87
+2024-06-25 14:18:13.572 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_17
+2024-06-25 14:18:13.575 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_16
+2024-06-25 14:18:13.577 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_40
+2024-06-25 14:18:13.578 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getUsingGET_1
+2024-06-25 14:18:13.618 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_88
+2024-06-25 14:18:13.648 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: sendUserCodeUsingGET_1
+2024-06-25 14:18:13.652 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getUsingGET_2
+2024-06-25 14:18:13.670 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_89
+2024-06-25 14:18:13.682 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_20
+2024-06-25 14:18:13.683 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_14
+2024-06-25 14:18:13.691 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDraftInfoUsingGET_1
+2024-06-25 14:18:13.695 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDraftListUsingGET_1
+2024-06-25 14:18:13.696 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: reviewUsingPOST_1
+2024-06-25 14:18:13.697 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_41
+2024-06-25 14:18:13.698 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_18
+2024-06-25 14:18:13.704 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInfoUsingGET_3
+2024-06-25 14:18:13.748 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopRegisterFinishAccessInfoUsingPOST_1
+2024-06-25 14:18:13.781 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopBrandListUsingGET_1
+2024-06-25 14:18:13.789 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopCatGetUsingPOST_1
+2024-06-25 14:18:13.823 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopImgUploadUsingPOST_1
+2024-06-25 14:18:13.829 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: shopUsableBrandListUsingGET_1
+2024-06-25 14:18:13.925 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_15
+2024-06-25 14:18:13.930 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_90
+2024-06-25 14:18:13.940 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_18
+2024-06-25 14:18:13.942 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_17
+2024-06-25 14:18:13.950 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_42
+2024-06-25 14:18:13.953 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingGET_1
+2024-06-25 14:18:13.955 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_19
+2024-06-25 14:18:13.963 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_91
+2024-06-25 14:18:13.965 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateAttrIdUsingPOST_1
+2024-06-25 14:18:13.968 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_20
+2024-06-25 14:18:13.974 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getByIdsUsingGET_1
+2024-06-25 14:18:13.975 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getByIdsUsingPOST_1
+2024-06-25 14:18:13.979 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_92
+2024-06-25 14:18:13.982 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListTreeUsingGET_2
+2024-06-25 14:18:13.984 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_19
+2024-06-25 14:18:13.993 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_18
+2024-06-25 14:18:13.995 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_43
+2024-06-25 14:18:14.014 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_21
+2024-06-25 14:18:14.029 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_21
+2024-06-25 14:18:14.039 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_2
+2024-06-25 14:18:14.054 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_93
+2024-06-25 14:18:14.059 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_94
+2024-06-25 14:18:14.063 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_44
+2024-06-25 14:18:14.070 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: exportOrderUsingGET_2
+2024-06-25 14:18:14.073 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: exportOrderShipmentUsingGET_1
+2024-06-25 14:18:14.083 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_95
+2024-06-25 14:18:14.092 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getAdminInfoUsingGET_1
+2024-06-25 14:18:14.099 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getLoginPicUsingGET_1
+2024-06-25 14:18:14.103 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getMenusUsingGET_1
+2024-06-25 14:18:14.106 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: loginAdminUpdateUsingPOST_1
+2024-06-25 14:18:14.136 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_22
+2024-06-25 14:18:14.140 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_22
+2024-06-25 14:18:14.148 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_96
+2024-06-25 14:18:14.153 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_20
+2024-06-25 14:18:14.154 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_45
+2024-06-25 14:18:14.155 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_1
+2024-06-25 14:18:14.157 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_23
+2024-06-25 14:18:14.158 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_23
+2024-06-25 14:18:14.159 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_97
+2024-06-25 14:18:14.161 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_21
+2024-06-25 14:18:14.162 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_46
+2024-06-25 14:18:14.162 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_2
+2024-06-25 14:18:14.167 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: confirmPayUsingGET_1
+2024-06-25 14:18:14.173 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getInvoiceListUsingGET_1
+2024-06-25 14:18:14.181 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_98
+2024-06-25 14:18:14.182 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getLogisticsInfoUsingGET_1
+2024-06-25 14:18:14.185 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getOrderStatusNumUsingGET_2
+2024-06-25 14:18:14.200 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_22
+2024-06-25 14:18:14.213 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getDetailUsingGET_3
+2024-06-25 14:18:14.218 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_99
+2024-06-25 14:18:14.220 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getOrderStatusNumUsingGET_3
+2024-06-25 14:18:14.221 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: markUsingPOST_2
+2024-06-25 14:18:14.222 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_24
+2024-06-25 14:18:14.225 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_100
+2024-06-25 14:18:14.228 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_23
+2024-06-25 14:18:14.229 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_19
+2024-06-25 14:18:14.229 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_47
+2024-06-25 14:18:14.230 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateStatusUsingPOST_4
+2024-06-25 14:18:14.232 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: fileUsingPOST_1
+2024-06-25 14:18:14.233 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: imageUsingPOST_1
+2024-06-25 14:18:14.242 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: detailUsingGET_5
+2024-06-25 14:18:14.247 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: foundsUsingGET_1
+2024-06-25 14:18:14.254 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_101
+2024-06-25 14:18:14.291 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_1
+2024-06-25 14:18:14.292 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_2
+2024-06-25 14:18:14.293 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_3
+2024-06-25 14:18:14.294 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_4
+2024-06-25 14:18:14.294 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_5
+2024-06-25 14:18:14.295 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_6
+2024-06-25 14:18:14.295 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveVitalityXscapeUserUsingPOST_7
+2024-06-25 14:18:14.299 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_48
+2024-06-25 14:18:14.303 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_25
+2024-06-25 14:18:14.308 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_102
+2024-06-25 14:18:14.309 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_20
+2024-06-25 14:18:14.310 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_49
+2024-06-25 14:18:14.312 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_16
+2024-06-25 14:18:14.316 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_103
+2024-06-25 14:18:14.317 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_24
+2024-06-25 14:18:14.319 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_21
+2024-06-25 14:18:14.319 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: sortUsingGET_1
+2024-06-25 14:18:14.322 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveDeleteGoodsInRoomUsingGET_1
+2024-06-25 14:18:14.322 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveDeleteRoomUsingGET_1
+2024-06-25 14:18:14.333 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveListRoomUsingPOST_1
+2024-06-25 14:18:14.335 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveRoomGetShareCodeUsingGET_1
+2024-06-25 14:18:14.338 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveRoomGoodsListUsingGET_1
+2024-06-25 14:18:14.342 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveUpdateCommentUsingGET_1
+2024-06-25 14:18:14.343 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveUpdateFeedPublicUsingGET_1
+2024-06-25 14:18:14.344 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: WechatMPLiveUpdateReplayUsingGET_1
+2024-06-25 14:18:14.347 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_24
+2024-06-25 14:18:14.347 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_26
+2024-06-25 14:18:14.349 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getCacheAllListUsingGET_1
+2024-06-25 14:18:14.352 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_104
+2024-06-25 14:18:14.353 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_50
+2024-06-25 14:18:14.354 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_3
+2024-06-25 14:18:14.356 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_25
+2024-06-25 14:18:14.357 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_27
+2024-06-25 14:18:14.359 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_105
+2024-06-25 14:18:14.361 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_51
+2024-06-25 14:18:14.362 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_4
+2024-06-25 14:18:14.365 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: auditUsingPOST_4
+2024-06-25 14:18:14.374 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getActivitySearchPageUsingGET_1
+2024-06-25 14:18:14.379 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_106
+2024-06-25 14:18:14.382 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getTabsHeaderUsingGET_1
+2024-06-25 14:18:14.389 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_25
+2024-06-25 14:18:14.393 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_26
+2024-06-25 14:18:14.393 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_28
+2024-06-25 14:18:14.395 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_107
+2024-06-25 14:18:14.396 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_52
+2024-06-25 14:18:14.397 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateShowStatusUsingPOST_5
+2024-06-25 14:18:14.398 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_17
+2024-06-25 14:18:14.401 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_108
+2024-06-25 14:18:14.403 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_18
+2024-06-25 14:18:14.411 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_109
+2024-06-25 14:18:14.413 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_26
+2024-06-25 14:18:14.413 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_27
+2024-06-25 14:18:14.415 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_22
+2024-06-25 14:18:14.416 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_53
+2024-06-25 14:18:14.422 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_110
+2024-06-25 14:18:14.462 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addUsingPOST_27
+2024-06-25 14:18:14.463 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_29
+2024-06-25 14:18:14.465 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_111
+2024-06-25 14:18:14.471 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_54
+2024-06-25 14:18:14.487 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: activityDetailUsingGET_1
+2024-06-25 14:18:14.490 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: activityPageUsingGET_1
+2024-06-25 14:18:14.492 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: addProductUsingPOST_1
+2024-06-25 14:18:14.505 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteProductUsingPOST_1
+2024-06-25 14:18:14.506 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: downProductUsingPOST_1
+2024-06-25 14:18:14.512 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getSeckillProductPageUsingGET_1
+2024-06-25 14:18:14.521 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: setProductPriceUsingPOST_1
+2024-06-25 14:18:14.534 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_30
+2024-06-25 14:18:14.553 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: editBaseConfigUsingPOST_1
+2024-06-25 14:18:14.564 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getConfigUsingGET_2
+2024-06-25 14:18:14.587 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_28
+2024-06-25 14:18:14.587 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: justGetUniqUsingGET_1
+2024-06-25 14:18:14.599 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_112
+2024-06-25 14:18:14.601 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_29
+2024-06-25 14:18:14.604 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: nameInfoUsingGET_1
+2024-06-25 14:18:14.605 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_23
+2024-06-25 14:18:14.606 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_55
+2024-06-25 14:18:14.608 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_19
+2024-06-25 14:18:14.615 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_113
+2024-06-25 14:18:14.617 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_30
+2024-06-25 14:18:14.620 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_24
+2024-06-25 14:18:14.622 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_56
+2024-06-25 14:18:14.623 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_20
+2024-06-25 14:18:14.628 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_114
+2024-06-25 14:18:14.629 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_31
+2024-06-25 14:18:14.630 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_25
+2024-06-25 14:18:14.631 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_57
+2024-06-25 14:18:14.645 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_115
+2024-06-25 14:18:14.651 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_32
+2024-06-25 14:18:14.654 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_58
+2024-06-25 14:18:14.658 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingPOST_31
+2024-06-25 14:18:14.661 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getConfigUsingGET_3
+2024-06-25 14:18:14.663 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_116
+2024-06-25 14:18:14.665 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_26
+2024-06-25 14:18:14.665 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_59
+2024-06-25 14:18:14.667 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateConfigUsingPOST_2
+2024-06-25 14:18:14.688 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_117
+2024-06-25 14:18:14.695 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: deleteUsingGET_21
+2024-06-25 14:18:14.700 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getListUsingGET_118
+2024-06-25 14:18:14.702 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: infoUsingGET_33
+2024-06-25 14:18:14.704 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: saveUsingPOST_27
+2024-06-25 14:18:14.705 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_60
+2024-06-25 14:18:14.705 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: updateUsingPOST_61
+2024-06-25 14:18:14.720 [main] INFO  s.d.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2024-06-25 14:18:14.803 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: getUsingGET_3
+2024-06-25 14:18:14.806 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: webHookUsingPOST_1
+2024-06-25 14:18:14.806 [main] INFO  s.d.s.w.r.operation.CachingOperationNameGenerator - Generating unique operation named: webHookUsingGET_1
+2024-06-25 14:18:14.820 [main] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
+2024-06-25 14:18:15.145 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Freed 1 triggers from 'acquired' / 'blocked' state.
+2024-06-25 14:18:15.225 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Recovering 0 jobs that were in-progress at the time of the last shut-down.
+2024-06-25 14:18:15.225 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Recovery complete.
+2024-06-25 14:18:15.255 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Removed 0 'complete' triggers.
+2024-06-25 14:18:15.289 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Removed 1 stale fired job entries.
+2024-06-25 14:18:15.352 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2024-06-25 14:18:15.394 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8181"]
+2024-06-25 14:18:15.826 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8181 (http) with context path ''
+2024-06-25 14:18:15.850 [main] INFO  com.jbp.admin.JbpAdminApplication - Started JbpAdminApplication in 118.949 seconds (JVM running for 119.908)
+2024-06-25 14:18:17.659 [RMI TCP Connection(34)-192.168.0.207] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-06-25 14:18:17.659 [RMI TCP Connection(34)-192.168.0.207] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-06-25 14:18:17.766 [RMI TCP Connection(34)-192.168.0.207] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 106 ms
+2024-06-25 14:18:20.686 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：40
+2024-06-25 14:18:20.707 [task-executor-1] INFO  com.jbp.admin.task.order.OrderPayResultSyncTask - ---OrderPayResultSyncTask task------produce Data with fixed rate task: Execution Time - Tue Jun 25 14:18:20 CST 2024
+2024-06-25 14:18:20.998 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：40  总共耗时：313毫秒
