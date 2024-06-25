@@ -131,6 +131,9 @@ public class LztFundTransferServiceImpl extends ServiceImpl<LztFundTransferDao, 
         Date finallyDate = DateTimeUtils.getFinallyDate(now);
         List<LztAcct> lztAcctList = lztAcctService.list(new LambdaQueryWrapper<LztAcct>().eq(LztAcct::getIfOpenBankAcct, true));
         for (LztAcct lztAcct : lztAcctList) {
+            if (lztAcct.getMerId().intValue() == 14) {
+                continue;
+            }
             log.info("正在执行自动划拨账户:{}, 名称:{}", lztAcct.getUserId(), lztAcct.getUsername());
             List<LztFundTransfer> list = list(new LambdaQueryWrapper<LztFundTransfer>().eq(LztFundTransfer::getUserId, lztAcct.getUserId())
                     .in(LztFundTransfer::getStatus, Lists.newArrayList("处理中", "成功")).between(LztFundTransfer::getGmtCreated, startDate, finallyDate));
