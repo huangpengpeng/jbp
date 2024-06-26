@@ -25,6 +25,7 @@ crmeb:
     - api/front/pagediy/info
     - /**/getPlatformUserInfo
     - /jushuitan/**
+    - api/publicly/**
 
 # 配置端口
 server:

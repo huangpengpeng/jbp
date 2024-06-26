@@ -86,6 +86,26 @@ public class SwaggerConfig{
                 .pathMapping("/");
     }
 
+    @Bean("public2")
+    public Docket create3RestApis() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("public2")
+                .host(crmebConfig.getDomain())
+                .apiInfo(apiInfo())
+                // 是否开启
+                .enable(swaggerEnabled)
+                .select()
+                // 扫描的路径包
+                .apis(RequestHandlerSelectors.basePackage("com.jbp.front"))
+                // 指定路径处理PathSelectors.any()代表所有的路径
+                .paths(publicPathsAnt2()) //只监听
+                .build()
+                .securitySchemes(security())
+                .securityContexts(securityContexts())
+//                .globalOperationParameters(pars) // 针对单个url的验证 如果需要的话
+                .pathMapping("/");
+    }
+
     private Predicate<String> frontPathsAnt() {
         return PathSelectors.ant("/api/front/**");
     }
@@ -93,6 +113,11 @@ public class SwaggerConfig{
     private Predicate<String> publicPathsAnt() {
         return PathSelectors.ant("/api/public/**");
     }
+
+    private Predicate<String> publicPathsAnt2() {
+        return PathSelectors.ant("/api/publicly/**");
+    }
+
 
     private List<ApiKey> security() {
         return newArrayList(

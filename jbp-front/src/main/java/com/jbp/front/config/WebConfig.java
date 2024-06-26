@@ -78,7 +78,7 @@ public class WebConfig implements WebMvcConfigurer {
 		// excludePathPatterns添加排除拦截命名空间
 
 		// 前端用户登录token
-		registry.addInterceptor(frontTokenInterceptor()).addPathPatterns("/api/front/**")
+		registry.addInterceptor(frontTokenInterceptor()).addPathPatterns("/api/front/**").addPathPatterns("/api/publicly/**")
 				.excludePathPatterns("/api/front/safety/**").excludePathPatterns("/api/front/captcha/**")
 				.excludePathPatterns("/api/front/index/**").excludePathPatterns("/api/front/product/category/**")
 				.excludePathPatterns("/api/front/product/**").excludePathPatterns("/api/front/qrcode/**")
@@ -97,7 +97,7 @@ public class WebConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/api/front/cbec/getUserInfo")
 				.excludePathPatterns("/api/front/cbec/editScore")
 				.excludePathPatterns("/api/front/cbec/syncOrder")
-
+				.excludePathPatterns("/api/publicly/**")
 				//
 				.excludePathPatterns("/api/front/login/account/List")
 				.excludePathPatterns("/api/front/user/visa/userVisaCallback")

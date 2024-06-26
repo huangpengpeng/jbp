@@ -24,6 +24,7 @@ crmeb:
     - /druid/**
     - api/front/pagediy/info
     - /**/getPlatformUserInfo
+    - api/publicly/**
 # 配置端口
 server:
   port: 9797

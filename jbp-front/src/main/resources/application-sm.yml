@@ -28,6 +28,7 @@ crmeb:
     - /**/visa/userVisaCallback
     - /**/tankOrder/callapi
     - /**/cbec_order/sync
+    - api/publicly/**
 # 配置端口
 server:
   port: 8182
