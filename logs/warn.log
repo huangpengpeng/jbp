@@ -1,180 +1,120 @@
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 11:50:49,495,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:42:11,445,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 11:50:57,589,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
+				级别:WARN,类名:org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext,时间:2024-06-27 15:42:11,950,输出行:554,输出消息:"Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'xxxSyncUserJOB': Lookup method resolution failed; nested exception is java.lang.IllegalStateException: Failed to introspect Class [com.Jwebmall.job.XxxSyncUserJOB] from ClassLoader [sun.misc.Launcher$AppClassLoader@18b4aac2]"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 11:50:57,962,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:43:49,429,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 11:53:21,771,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-27 15:43:59,331,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 11:53:30,512,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
+				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-27 15:43:59,659,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 11:53:30,939,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:44:57,203,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 11:57:06,922,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-27 15:45:05,978,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 11:57:16,423,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
+				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-27 15:45:06,331,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 11:57:16,755,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:47:07,551,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 11:59:15,095,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-27 15:47:16,919,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 11:59:23,148,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
+				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-27 15:47:17,289,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 11:59:23,442,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:51:21,505,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 12:00:53,651,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-27 15:51:32,418,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 12:01:02,588,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
+				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-27 15:51:32,762,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 12:01:02,919,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:55:33,076,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 12:08:56,214,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-27 15:55:41,644,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 12:09:04,501,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
+				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-27 15:55:41,990,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 12:09:04,804,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-27 15:58:09,620,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 12:10:58,412,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
+				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-27 15:58:18,751,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
 -------------------------------------------------------
 
 [host:] [param:]
 				[URL:]
 
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 12:11:06,855,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 12:11:07,191,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 12:13:25,988,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 12:13:33,929,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 12:13:34,236,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 12:16:31,492,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 12:16:39,656,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 12:16:39,954,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.Jwebmall.business.BusinessSystemChain,时间:2024-06-21 12:24:26,470,输出行:34,输出消息:"businessSystemChain:{"commSystemHandler":{"order":10},"userLevelHandler":{"order":9},"userOrderCourseHandler":{"order":11}}"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration,时间:2024-06-21 12:24:34,467,输出行:70,输出消息:"Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)"
--------------------------------------------------------
-
-[host:] [param:]
-				[URL:]
-
-				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-21 12:24:34,762,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
+				级别:WARN,类名:com.alibaba.druid.pool.DruidDataSource,时间:2024-06-27 15:58:19,142,输出行:1231,输出消息:"removeAbandoned is true, not use in production."
 -------------------------------------------------------
 
