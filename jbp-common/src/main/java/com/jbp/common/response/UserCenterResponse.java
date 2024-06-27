@@ -94,4 +94,8 @@ public class UserCenterResponse implements Serializable {
     @ApiModelProperty(value = "用户等级")
     private Long capaLevel;
 
+    @ApiModelProperty(value = "是否开店")
+    private Boolean openShop;
+
+
 }

@@ -48,7 +48,7 @@ public class FundClearingRecord extends BaseModel {
         this.rewardType = rewardType;
         this.description = description;
         this.createTime = DateTimeUtils.getNow();
-        this.time = DateTimeUtils.format(this.createTime, DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN);
+        this.time = DateTimeUtils.format(this.createTime, DateTimeUtils.DEFAULT_YYYY_MM_FORMAT_PATTERN);
     }
 
     /**
@@ -125,4 +125,8 @@ public class FundClearingRecord extends BaseModel {
     @ApiModelProperty("统计时间")
     @TableField("time")
     private String time;
+
+    @ApiModelProperty("下单时间")
+    @TableField(exist = false)
+    private String payTime;
 }
