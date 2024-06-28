@@ -410,18 +410,19 @@
             <systemPath>${project.basedir}/src/main/java/com/jbp/common/kqbill/crypto-sdk-1.0.1.jar</systemPath>
         </dependency>
 
-        <!--  京东支付版本将此注释打开
+        <!--  京东支付版本将此注释打开 1.49-->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.49</version>
+<!--            <version>1.49</version>-->
+            <version>1.65</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.49</version>
+<!--            <version>1.49</version>-->
+            <version>1.65</version>
         </dependency>
-        -->
     </dependencies>
 
 
