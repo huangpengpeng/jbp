@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.FundClearingRecordDao">
+    <resultMap id="FundClearingRecord" type="com.jbp.common.model.agent.FundClearingRecord">
+        <id column="id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="account" property="account"/>
+        <result column="nickname" property="nickname"/>
+        <result column="order_uid" property="orderUid"/>
+        <result column="order_account" property="orderAccount"/>
+        <result column="order_nickname" property="orderNickname"/>
+        <result column="status" property="status"/>
+        <result column="unique_no" property="uniqueNo"/>
+        <result column="external_no" property="externalNo"/>
+        <result column="comm_name" property="commName"/>
+        <result column="comm_amt" property="commAmt"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="price" property="price"/>
+        <result column="score" property="score"/>
+        <result column="quantity" property="quantity"/>
+        <result column="reward_value" property="rewardValue"/>
+        <result column="reward_type" property="rewardType"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="time" property="time"/>
+    </resultMap>
+
+    <sql id="selectFundClearingRecordVo">
+        SELECT c.id,
+               c.uid,
+               c.external_no,
+               o.pay_time,
+               c.status,
+               c.order_account,
+               c.order_nickname,
+               c.account,
+               c.nickname,
+               c.comm_amt,
+               c.price
+        FROM eb_fund_clearing_record AS c
+                 LEFT JOIN eb_order AS o ON c.external_no = o.order_no
+    </sql>
+    <select id="pageList" resultMap="FundClearingRecord">
+        <include refid="selectFundClearingRecordVo"/>
+        <where>
+            <if test="orderList!=null and orderList.size > 0 ">
+                and c.external_no in
+                <foreach collection="orderList" item ="orderNo" index="i" open="(" close=")" separator=",">
+                    #{orderNo}
+                </foreach>
+            </if>
+            <if test="orderAccount!=null and orderAccount !=''">
+                and (c.order_account=#{orderAccount} or c.order_nickname like CONCAT('%', #{orderAccount}, '%'))
+            </if>
+            <if test="account!=null and account !=''">
+                and (c.account=#{account} or c.nickname like CONCAT('%', #{account}, '%'))
+            </if>
+            <if test="starteCreateTime!=null and endCreateTime!=null">
+                and DATE(o.pay_time) BETWEEN #{starteCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY c.id DESC
+    </select>
+
+    <select id="total" resultType="com.jbp.common.response.FundClearingRecordResponse">
+        SELECT c.id,c.account,c.nickname,c.time AS month,SUM(c.comm_amt) AS amount
+        FROM eb_fund_clearing_record AS c
+        <where>
+            <if test="orderAccount!=null and orderAccount !=''">
+                and (c.order_account=#{orderAccount} or c.order_nickname like CONCAT('%', #{orderAccount}, '%'))
+            </if>
+            <if test="account!=null and account !=''">
+                and (c.account=#{account} or c.nickname like CONCAT('%', #{account}, '%'))
+            </if>
+            <if test="month!=null and month!=''">
+                and c.time=#{month}
+            </if>
+            and c.status='正常'
+        </where>
+        GROUP BY c.account,month
+        ORDER BY c.create_time DESC
+    </select>
+
+    <select id="selfTotal" resultType="com.jbp.common.response.FundClearingRecordResponse">
+        SELECT c.time AS month,SUM(c.comm_amt) AS amount,c.id
+        FROM eb_fund_clearing_record AS c
+        <where>
+            and c.uid=#{uid}
+            and c.status='正常'
+        </where>
+        GROUP BY month
+        ORDER BY c.create_time DESC
+    </select>
+
+    <select id="selfTotalAmount" resultType="java.math.BigDecimal">
+        SELECT SUM(c.comm_amt)
+        FROM eb_fund_clearing_record AS c
+        <where>
+            and c.uid=#{uid}
+            and c.status='正常'
+        </where>
+    </select>
+
+    <select id="detail" resultMap="FundClearingRecord">
+        SELECT c.id,c.order_account,c.order_nickname,c.price,c.external_no,o.pay_time
+        FROM eb_fund_clearing_record AS c
+                 LEFT JOIN eb_order AS o ON c.external_no = o.order_no
+        <where>
+            and c.uid=#{uid}
+            and c.status='正常'
+            <if test="day!=null and day!=''">
+            and c.time=#{day}
+            </if>
+        </where>
+        ORDER BY c.id DESC
+    </select>
+</mapper>
