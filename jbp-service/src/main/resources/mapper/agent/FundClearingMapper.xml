@@ -47,11 +47,12 @@
                u.account,
                u.nickname,
                t.name,
-               c.gmt_modify as return_time
+               e.gmt_modify as return_time
         FROM eb_fund_clearing AS c
                  LEFT JOIN eb_user AS u ON c.uid = u.id
                  LEFT JOIN eb_team_user as tu ON c.uid = tu.uid
                  LEFT JOIN eb_team as t on tu.tid = t.id
+                 left join eb_fund_clearing e on e.id = c.id and e.if_refund=TRUE
     </sql>
     <select id="pageList" resultMap="FundClearing">
         <include refid="selectFundClearingVo"/>
@@ -118,13 +119,14 @@
                card.phone,
                card.bank_name,
                card.bank_card_no,
-               c.gmt_modify as return_time
+               e.gmt_modify as return_time
         FROM eb_fund_clearing AS c
                  LEFT JOIN eb_user AS u ON c.uid = u.id
                  LEFT JOIN eb_team_user as tu ON c.uid = tu.uid
                  LEFT JOIN eb_team as t on tu.tid = t.id
                  LEFT JOIN eb_channel_identity AS asentity on asentity.uid = c.uid and asentity.channel=#{channelName}
                  left join eb_channel_card as card on card.uid = c.uid  and card.channel=#{channelName}
+                 left join eb_fund_clearing e on e.id = c.id and e.if_refund=TRUE
     </sql>
     <resultMap id="FundClearingVo" type="com.jbp.common.excel.FundClearingExcel">
         <id column="id" property="id"/>
