@@ -490,7 +490,6 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
         //获取平台订单商品名是否显示配置
         String fund_product_isshow = systemConfigService.getValueByKey("fund_product_isshow");
-
         Map<Integer, WalletConfig> walletMap = walletConfigService.getWalletMap();
         walletMap.put(-1, new WalletConfig().setName("管理费"));
         walletMap.put(-2, new WalletConfig().setName("手续费"));
@@ -509,8 +508,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 item.setAmt(new BigDecimal((item.getAmt().multiply(wallet_pay_integral)).stripTrailingZeros().toPlainString()));
             }
             if (fund_product_isshow.equals("1")) {
-                List<FundClearingProduct> productList = e.getProductList();
-                e.setProductName(!productList.isEmpty() ? productList.get(0).getProductName() : "");
+                List<OrderDetail> detailList = orderDetailService.getByOrderNo(e.getExternalNo());
+                e.setProductName(!detailList.isEmpty() ? detailList.get(0).getProductName() : "");
             }
         });
         return CommonPage.copyPageInfo(page, list);

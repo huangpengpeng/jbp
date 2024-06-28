@@ -1962,7 +1962,7 @@ public class PayServiceImpl implements PayService {
             String gateWay = yopPayService.quickPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName, yopNotifyUrl, "", yopReturnUrl);
             result.setGateway_url(gateWay);
         }
-        if ("alipay".equals(order.getPayType())) {
+        if ("ybalipay".equals(order.getPayType())) {
             WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
                     yopNotifyUrl, "", yopReturnUrl, WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),
                     WechatAlipayPayParams.CHANNEL.ALIPAY.name(), "", "", order.getIp());
