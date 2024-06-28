@@ -1,6 +1,8 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.jdpay.sdk.JdPay;
+import com.jbp.service.service.YopService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,6 +40,16 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//        JdPay jdPay = run.getBean(JdPay.class);
+//        JdPayDemo jdPayDemo = new JdPayDemo();
+//        jdPayDemo.createOrder(jdPay);
+
+        YopService yopService = run.getBean(YopService.class);
+
+        YopDemo.registerQuery(yopService);
+
+
 
     }
 }

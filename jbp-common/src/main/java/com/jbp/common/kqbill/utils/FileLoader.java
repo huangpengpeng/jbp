@@ -29,4 +29,20 @@ public class FileLoader {
         }
         return null;
     }
+
+    public static byte[] inputStream2byte(InputStream inputStream) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] buff = new byte[100];
+        int rc = 0;
+        while (true) {
+            try {
+                if (!((rc = inputStream.read(buff, 0, 100)) > 0)) break;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            byteArrayOutputStream.write(buff, 0, rc);
+        }
+        return byteArrayOutputStream.toByteArray();
+    }
+
 }

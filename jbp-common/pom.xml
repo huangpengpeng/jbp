@@ -410,54 +410,20 @@
             <systemPath>${project.basedir}/src/main/java/com/jbp/common/kqbill/crypto-sdk-1.0.1.jar</systemPath>
         </dependency>
 
-
-        <!-- 工商银行相关依赖 -->
+        <!--  京东支付版本将此注释打开
         <dependency>
-            <groupId>com.icbc</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/java/com/jbp/common/icbc/commons-logging-1.2.jar</systemPath>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.49</version>
         </dependency>
         <dependency>
-            <groupId>com.icbc</groupId>
-            <artifactId>hsm-software-share</artifactId>
-            <version>1.0.5</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/java/com/jbp/common/icbc/hsm-software-share-1.0.5.jar</systemPath>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.49</version>
         </dependency>
-        <dependency>
-            <groupId>com.icbc</groupId>
-            <artifactId>icbc-api-sdk-cop</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/java/com/jbp/common/icbc/icbc-api-sdk-cop.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.icbc</groupId>
-            <artifactId>icbc-api-sdk-cop-io</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/java/com/jbp/common/icbc/icbc-api-sdk-cop-io.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.icbc</groupId>
-            <artifactId>icbc-ca</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/java/com/jbp/common/icbc/icbc-ca.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.icbc</groupId>
-            <artifactId>InfosecCrypto_Java1_02_JDK14</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/java/com/jbp/common/icbc/InfosecCrypto_Java1_02_JDK14+.jar
-            </systemPath>
-        </dependency>
-
-
+        -->
     </dependencies>
+
 
     <build>
         <plugins>

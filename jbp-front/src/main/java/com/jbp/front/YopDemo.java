@@ -18,6 +18,11 @@ import java.util.List;
 public class YopDemo {
 
 
+    public static void registerQuery(YopService yopService) {
+        RegisterQueryResult result = yopService.registerQuery("LZT_RS_109673520641391");
+        System.out.println(JSONObject.toJSONString(result));
+    }
+
     private static void withdraw(YopService yopService) {
         String withdrawNo = StringUtils.N_TO_10("LZT_DW_");
         WithdrawCardQueryResult card = yopService.withdrawCardQuery("10090334402");

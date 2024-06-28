@@ -140,3 +140,6 @@ zhcx:
 
 pay:
   securityPhone : 1
+
+jdpay:
+  config: fny1.properties
