@@ -147,6 +147,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
         Map<Integer, Double> userAmtMap = Maps.newConcurrentMap();
 
         for (OrderDetail orderDetail : orderDetails) {
+            Map<Integer, Double> userAmt2 = Maps.newConcurrentMap();
             Integer productId = orderDetail.getProductId();
             // 佣金配置
             ProductComm productComm = productCommService.getByProduct(productId, getType());
@@ -197,6 +198,8 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                         amt = amt - reduceAmt;
                     }
                     userAmtMap.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, userCapa.getUid(), 0d) + amt);
+                    userAmt2.put(userCapa.getUid(), MapUtils.getDoubleValue(userAmt2, userCapa.getUid(), 0d) + amt);
+
                     commNameMap.put(userCapa.getUid(), ProductCommEnum.级差佣金.getName());
                     FundClearingProduct clearingProduct = new FundClearingProduct(productId, orderDetail.getProductName(), totalPv,
                             orderDetail.getPayNum(), ratio, BigDecimal.valueOf(amt));
@@ -216,8 +219,8 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                                 break;
                             }
                             //拿过平级或极差的不能在拿
-                            if(userAmtMap.containsKey(pId) ){
-                                if(userAmtMap.get(pId) > 0) {
+                            if(userAmt2.containsKey(pId) ){
+                                if(userAmt2.get(pId) > 0) {
                                     pId = invitationService.getPid(pId);
                                     continue;
                                 }
@@ -248,6 +251,7 @@ public class CapaParallelDifferentialCommHandler extends AbstractProductCommHand
                             }
                             reduceAmt = reduceAmt + amt2;
                             userAmtMap.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmtMap, PCapa.getUid(), 0d) + amt2);
+                            userAmt2.put(PCapa.getUid(), MapUtils.getDoubleValue(userAmt2, PCapa.getUid(), 0d) + amt2);
                             commNameMap.put(PCapa.getUid(), ProductCommEnum.等级平级级差佣金.getName());
                             pId = invitationService.getPid(pId);
                             i++;
