@@ -3,6 +3,7 @@ package com.jbp.service.product.comm;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
@@ -84,6 +85,7 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
         List<ClearingUser> clearingUserList = clearingUserService.getByClearing(clearingFinal.getId());
         BigDecimal totalScore = BigDecimal.ZERO;
         BigDecimal totalFee = BigDecimal.ZERO;
+        List<ClearingBonusFlow> flows = Lists.newArrayList();
         for (ClearingUser clearingUser : clearingUserList) {
             Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
             totalScore = rule.getTotalScore();
@@ -98,6 +100,7 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
                         clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
                         fee, "月度管理补贴-" + "可用积分:" + rule.getUsableScore() + "增加总金额:" + fee, clearingUser.getRule());
                 clearingBonusFlowService.save(clearingBonusFlow);
+                flows.add(clearingBonusFlow);
             }
         }
 
@@ -114,9 +117,21 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
                                 clearingFinal.getId(), child.getName(), child.getCommName(),
                                 BigDecimal.valueOf(-1).multiply(child.getCommAmt()), "月度管理补贴-减少一阶总金额:" + child.getCommAmt() + "一阶账户:" + child.getAccountNo(), null);
                         clearingBonusFlowService.save(clearingBonusFlow);
-
-                        clearingBonus.setCommAmt(clearingBonus.getCommAmt().subtract(child.getCommAmt()));
+                        flows.add(clearingBonusFlow);
                     }
+                }
+            }
+
+        }
+
+        Map<Integer, List<ClearingBonusFlow>> folwListMap = FunctionUtil.valueMap(flows, ClearingBonusFlow::getUid);
+        for (ClearingBonus clearingBonus : clearingBonusList) {
+
+            List<ClearingBonusFlow> userFlow = folwListMap.get(clearingBonus);
+            clearingBonus.setCommAmt(BigDecimal.ZERO);
+            if (CollectionUtils.isNotEmpty(userFlow)) {
+                for (ClearingBonusFlow clearingBonusFlow : userFlow) {
+                    clearingBonus.setCommAmt(clearingBonus.getCommAmt().add(clearingBonusFlow.getCommAmt()));
                 }
             }
             totalFee = totalFee.add(clearingBonus.getCommAmt());
