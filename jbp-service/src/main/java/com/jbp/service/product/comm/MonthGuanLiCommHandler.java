@@ -126,8 +126,7 @@ public class MonthGuanLiCommHandler extends AbstractProductCommHandler {
 
         Map<Integer, List<ClearingBonusFlow>> folwListMap = FunctionUtil.valueMap(flows, ClearingBonusFlow::getUid);
         for (ClearingBonus clearingBonus : clearingBonusList) {
-
-            List<ClearingBonusFlow> userFlow = folwListMap.get(clearingBonus);
+            List<ClearingBonusFlow> userFlow = folwListMap.get(clearingBonus.getUid());
             clearingBonus.setCommAmt(BigDecimal.ZERO);
             if (CollectionUtils.isNotEmpty(userFlow)) {
                 for (ClearingBonusFlow clearingBonusFlow : userFlow) {
