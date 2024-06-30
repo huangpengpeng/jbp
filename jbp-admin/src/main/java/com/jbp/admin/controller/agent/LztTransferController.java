@@ -6,6 +6,7 @@ import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CardListInfo;
+import com.jbp.common.lianlian.result.LztTransferResult;
 import com.jbp.common.lianlian.result.QueryCnapsCodeResult;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
@@ -17,6 +18,7 @@ import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SecurityUtil;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
@@ -48,6 +50,8 @@ public class LztTransferController {
     private LztAcctService lztAcctService;
     @Resource
     private LztTransferService lztTransferService;
+    @Resource
+    private LianLianPayService lianLianPayService;
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通外部代付")
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:create')")
@@ -115,5 +119,15 @@ public class LztTransferController {
         List<CardListInfo> cardList = queryCnapsCodeResult == null ? Lists.newArrayList() : queryCnapsCodeResult.getCard_list();
         return CommonResult.success(cardList);
     }
+
+
+//    @ApiOperation(value = "平台代付")
+//    @GetMapping(value = "/create2")
+//    public CommonResult<LztTransferResult> create2(String payerId, String payCode,
+//                                                   String pwd, BigDecimal amt, String randomKey,
+//                                                   String bankCode, String bankAcctName) {
+//        LztTransferResult transferResult = lianLianPayService.transferSpanPlatform(payCode, amt, payerId, pwd, randomKey, bankCode, bankAcctName);
+//        return CommonResult.success(transferResult);
+//    }
 
 }

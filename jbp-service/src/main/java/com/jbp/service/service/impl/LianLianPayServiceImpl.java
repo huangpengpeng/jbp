@@ -7,12 +7,16 @@ import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
+import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.LianLianPayService;
+import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -343,5 +347,33 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         WithdrawalResult drawalResult = JSON.parseObject(resultJsonStr, WithdrawalResult.class);
         return drawalResult;
+    }
+
+    @Resource
+    private MerchantService merchantService;
+    @Override
+    public LztTransferResult transferSpanPlatform(String txn_seqno, BigDecimal total_amount, String userId, String password, String random_key, String sub_acctno, String sub_acctname) {
+        TransferSpanPlatformParams params = new TransferSpanPlatformParams();
+        Merchant merchant = merchantService.getById(4);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(payInfo.getOidPartner());
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4009", sub_acctno, "", registerTime, "提现");
+        riskItemInfo.setFrms_ip_addr("60.177.228.155");
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+        params.setOrderInfo(new  TransferOrderInfo( txn_seqno, timestamp, total_amount.doubleValue(), "服务费", "平台转账"));
+        params.setPayerInfo(new TransferPayerInfo("USER", userId, "USEROWN", password, random_key));
+        params.setPayeeInfo(new TransferPayeeInfo2(sub_acctno, sub_acctname));
+
+
+        LianLianPayInfoResult lianLianPayInfoResult = get();
+        String url = "https://accpapi.lianlianpay.com/v1/txn/trader-transfer-span-platform";
+        LLianPayClient lLianPayClient = new LLianPayClient(payInfo.getPriKey(), lianLianPayInfoResult.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        LztTransferResult result = JSON.parseObject(resultJsonStr, LztTransferResult.class);
+        return result;
     }
 }

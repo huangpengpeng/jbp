@@ -137,6 +137,7 @@ public class LztAcctController {
     public CommonResult<ApplyPasswordElementResult> pwd(String userId, BigDecimal amt, String scan) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
+        merId = merId.intValue() == 0 ? 4: merId;
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
         if (lztAcct == null || lztAcct.getMerId() != merId) {
             throw new CrmebException("账户不存在");

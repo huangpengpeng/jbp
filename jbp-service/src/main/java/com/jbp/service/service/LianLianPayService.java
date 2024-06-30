@@ -28,4 +28,6 @@ public interface LianLianPayService {
 
     WithdrawalResult withdrawal(String drawNo, BigDecimal amt, String postscript, String password, String random_key);
 
+    LztTransferResult transferSpanPlatform(String txn_seqno, BigDecimal total_amount, String userId, String password, String random_key, String sub_acctno, String sub_acctname);
+
 }
