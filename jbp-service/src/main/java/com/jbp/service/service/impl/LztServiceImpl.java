@@ -102,9 +102,9 @@ public class LztServiceImpl implements LztService {
         businessInfo.setBusiness_scope(businessScope);
         params.setBusinessInfo(businessInfo);
 
-        LztBasicInfo lztBasicInfo  = new LztBasicInfo();
-        lztBasicInfo.setOpen_bank(open_bank);
-        params.setLztBasicInfo(lztBasicInfo);
+//        LztBasicInfo lztBasicInfo  = new LztBasicInfo();
+//        lztBasicInfo.setOpen_bank(open_bank);
+//        params.setLztBasicInfo(lztBasicInfo);
 
         String url = "https://accpgw.lianlianpay.com/v1/acctmgr/openacct-apply";
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, payInfo.getPubKey());
