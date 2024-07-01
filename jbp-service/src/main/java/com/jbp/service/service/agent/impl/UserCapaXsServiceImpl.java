@@ -154,6 +154,7 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             User user = userMap.get(e.getUid());
             e.setPhone(user!= null ? user.getPhone() : "");
             e.setAccount(userMap.get(e.getUid()).getAccount());
+            e.setNickName(user != null ? user.getNickname() : "");
             CapaXs capaXs = capaXsMap.get(e.getCapaId());
             e.setCapaName(capaXs.getName());
             e.setCapaUrl(capaXs.getIconUrl());

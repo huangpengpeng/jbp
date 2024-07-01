@@ -44,4 +44,8 @@ public class UserCapa extends BaseModel {
     @ApiModelProperty(value = "手机号码")
     @TableField(exist = false)
     private String phone;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickName;
 }
