@@ -1,25 +1,6 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.admin.controller.tank.TankStoreRelationAct;
-import com.jbp.admin.task.order.OrderAiServerTask;
-import com.jbp.common.model.agent.*;
-import com.jbp.common.model.order.MerchantOrder;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.model.order.OrderInvoice;
-import com.jbp.common.model.user.User;
-import com.jbp.common.request.agent.ClearingRequest;
-import com.jbp.service.condition.CapaXsInvitationLine2Handler;
-import com.jbp.service.condition.CapaXsJoinCapaHandler;
-import com.jbp.service.condition.ConditionChain;
-import com.jbp.service.product.comm.*;
-import com.jbp.service.service.*;
-import com.jbp.service.service.agent.*;
-
-import com.jbp.common.model.city.CityRegion;
-import com.jbp.common.utils.StringUtils;
-
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -47,10 +28,6 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-
-
-
 
     }
 }
