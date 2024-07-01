@@ -97,6 +97,9 @@ public class LztAcctController {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         PageInfo<LztAcct> page = lztAcctService.pageList(merId, userId, username, userType, pageParamRequest);
+
+
+
         return CommonResult.success(CommonPage.restPage(page));
     }
 

@@ -3,16 +3,14 @@ package com.jbp.service.service.agent.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.result.*;
-import com.jbp.common.model.agent.LztAcct;
-import com.jbp.common.model.agent.LztAcctApply;
-import com.jbp.common.model.agent.LztAcctOpen;
-import com.jbp.common.model.agent.LztPayChannel;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
@@ -20,7 +18,9 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.agent.LztAcctDao;
+import com.jbp.service.dao.agent.LztPermsFilterDao;
 import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctApplyService;
@@ -54,6 +54,9 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     private DegreePayService degreePayService;
     @Resource
     private LztAcctOpenService lztAcctOpenService;
+    @Resource
+    private LztPermsFilterDao lztPermsFilterDao;
+
 
     @Override
     public LztAcct getByUserId(String userId) {
@@ -114,6 +117,11 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
 
     @Override
     public PageInfo<LztAcct> pageList(Integer merId, String userId, String username, String userType, PageParamRequest pageParamRequest) {
+
+         List<LztPermsFilter> lztPermsFilters = lztPermsFilterDao.selectList(new QueryWrapper<LztPermsFilter>());
+         Map<String, List<LztPermsFilter>> lztPermsListMap = FunctionUtil.valueMap(lztPermsFilters, LztPermsFilter::getUserId);
+
+
         LambdaQueryWrapper<LztAcct> lqw = new LambdaQueryWrapper<LztAcct>()
                 .eq(StringUtils.isNotEmpty(userId), LztAcct::getUserId, userId)
                 .eq(StringUtils.isNotEmpty(username), LztAcct::getUsername, username)
@@ -167,8 +175,22 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             s.setAmtBankBalaval(amtBankBalaval);
             s.setAmtBalfrz(amtBalfrz);
             s.setAmtUnClearing(amtUnClearing);
+            s.setIfTransfer(true);
+            s.setIfPayment(true);
+            if(lztPermsListMap != null){
+                List<LztPermsFilter> lztPermsFiltersList = lztPermsListMap.get(s.getUserId());
+                if(CollectionUtils.isNotEmpty(lztPermsFiltersList)){
+                    for (LztPermsFilter lztPermsFilter : lztPermsFiltersList) {
+                        if ("转账".equals(lztPermsFilter.getOperation())) {
+                            s.setIfTransfer(false);
+                        }
+                        if ("代付".equals(lztPermsFilter.getOperation())) {
+                            s.setIfPayment(false);
+                        }
+                    }
+                }
+            }
         });
-
         return CommonPage.copyPageInfo(page, list);
     }
 

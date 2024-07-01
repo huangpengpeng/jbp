@@ -118,5 +118,11 @@ public class LztAcct extends BaseModel {
     @TableField(exist = false)
     private String bankAcctNo;
 
+    @ApiModelProperty(value = "是否可以转账")
+    @TableField(exist = false)
+    private Boolean ifTransfer;
 
+    @ApiModelProperty(value = "是否可以代付")
+    @TableField(exist = false)
+    private Boolean ifPayment;
 }

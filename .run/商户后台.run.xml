@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="商户后台" type="DEPLOY_HOST_RUN_CONFIGURATION" factoryName="Deploy to Host" focusToolWindowBeforeRun="true">
+  <configuration default="false" name="商户后台" type="DEPLOY_HOST_RUN_CONFIGURATION" factoryName="Deploy to Host" focusToolWindowBeforeRun="true" singleton="false">
     <option name="accountModel" />
     <option name="accountModels" />
     <option name="address" />
     <option name="afterCommand" value="" />
     <option name="alreadyReset" value="true" />
-    <option name="autoOpen" value="false" />
+    <option name="autoOpen" value="true" />
     <option name="beforeCommand" value="" />
     <option name="defaultTabIdx" value="0" />
     <option name="ecsInstance">
@@ -30,7 +30,7 @@
     <option name="location" value="/opt/jbp/admin2" />
     <option name="pathOrUrl" value="$PROJECT_DIR$/jbp-admin/target/Jbp-admin.jar" />
     <option name="tagId" value="0" />
-    <option name="terminalCommand" />
+    <option name="terminalCommand" value="tail -f  /opt/jbp/admin/Jbp-admin.log" />
     <option name="type" value="HOST" />
     <option name="uploadType" value="FILE" />
     <method v="2" />
