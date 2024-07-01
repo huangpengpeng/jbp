@@ -103,8 +103,7 @@ public class WhiteCapaXsDifferentialCommHandler extends AbstractProductCommHandl
     @Override
     public Rule getRule(ProductComm productComm) {
         try {
-            ProductCommConfig config = productCommConfigService.getByType(getType());
-            WhiteCapaXsDifferentialCommHandler.Rule rules = JSONObject.parseObject(config.getRatioJson(), WhiteCapaXsDifferentialCommHandler.Rule.class);
+            WhiteCapaXsDifferentialCommHandler.Rule rules = JSONObject.parseObject(productComm.getRule(), WhiteCapaXsDifferentialCommHandler.Rule.class);
             return rules;
         } catch (Exception e) {
             throw new CrmebException(getType() + ":佣金格式解析失败:" + productComm.getRule());
