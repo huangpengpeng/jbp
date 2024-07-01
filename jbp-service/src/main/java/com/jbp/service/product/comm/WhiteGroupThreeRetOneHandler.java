@@ -108,16 +108,14 @@ public class WhiteGroupThreeRetOneHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
-
-        // 没有上级直接返回
-        List<UserUpperDto> allUpper = invitationService.getNoMountAllUpper(order.getUid());
-        if (CollectionUtils.isEmpty(allUpper)) {
-            return;
-        }
         // 获取订单产品
         List<FundClearingProduct> productList = Lists.newArrayList();
 
-        Integer pid =  0;
+        Integer pid = invitationService.getPid(order.getUid());
+        UserCapa userCapa = userCapaService.getByUser(pid);
+        if(userCapa == null){
+            return;
+        }
 
         for (OrderDetail orderDetail : orderDetails) {
 
@@ -127,22 +125,10 @@ public class WhiteGroupThreeRetOneHandler extends AbstractProductCommHandler {
             }
             WhiteGroupThreeRetOneHandler.Rule rule = getRule(productComm);
 
-            //获取白名单内的上级
-            for (UserUpperDto upperDto : allUpper) {
-                if (upperDto.getPId() != null) {
-                    WhiteUser whiteUser = whiteUserService.getByUser(upperDto.getPId(), rule.getWhiteId());
-                    if (whiteUser != null) {
-                        pid = upperDto.getPId();
-                        break;
-                    }
-                }
+            WhiteUser whiteUser = whiteUserService.getByUser(pid, rule.getWhiteId());
+            if(whiteUser == null){
+                break;
             }
-            UserCapa userCapa = userCapaService.getByUser(pid);
-            if(userCapa == null){
-                return;
-            }
-
-
 
             Map<String, Object> map = productCommService.getMap(new QueryWrapper<ProductComm>().select(" group_concat(product_id) as product_id ").last(" where  type = " + getType() + " and `status` =1 and  JSON_EXTRACT(rule, '$.amt') = " + rule.getAmt() + ""));
 
