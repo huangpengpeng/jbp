@@ -1,5 +1,6 @@
 package com.jbp.common.response;
 
+import com.jbp.common.model.product.ProductExtConfig;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -89,5 +90,8 @@ public class PreOrderResponse implements Serializable {
 
     @ApiModelProperty(value = "运费模板")
     private String freightName;
+
+    @ApiModelProperty(value = "商品拓展信息")
+    private List<ProductExtConfig> productExtConfigList;
 
 }

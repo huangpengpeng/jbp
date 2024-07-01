@@ -10,6 +10,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
@@ -168,9 +169,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private WalletConfigService walletConfigService;
     @Autowired
     private Environment environment;
-
     @Autowired
     private LogisticService logisticService;
+    @Autowired
+    private ProductExtConfigService productExtConfigService;
+
 
 
     /**
@@ -738,6 +741,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         PreOrderResponse preOrderResponse = new PreOrderResponse();
         BeanUtils.copyProperties(orderInfoVo, preOrderResponse);
+        Integer productId = orderInfoVo.getMerchantOrderVoList().get(0).getOrderInfoList().get(0).getProductId();
+        List<ProductExtConfig> list = productExtConfigService.list(new QueryWrapper<ProductExtConfig>().lambda().eq(ProductExtConfig::getProductId, productId));
+        preOrderResponse.setProductExtConfigList(list);
 
         List<PreOrderMerchantInfoResponse> infoResponseList = new ArrayList<>();
         List<PreMerchantOrderVo> merchantOrderVoList = orderInfoVo.getMerchantOrderVoList();
@@ -1054,7 +1060,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
-
+        if (!orderRequest.getContent().isEmpty()){
+            orderExt.setOrderGoodsInfo(orderRequest.getContent());
+        }
         // 商户订单
         List<Integer> couponIdList = CollUtil.newArrayList();
         if (orderRequest.getPlatUserCouponId() > 0) {

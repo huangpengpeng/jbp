@@ -152,4 +152,7 @@ public class OrderShipmentExcel implements Serializable {
     @ExcelProperty(value = "福券抵扣", index = 45)
     private BigDecimal fuquan;
 
+    @ExcelProperty(value = "订单商品扩展信息", index = 46)
+    private String productExtInfo;
+
 }

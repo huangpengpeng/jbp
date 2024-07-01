@@ -236,6 +236,7 @@ public class ExportServiceImpl implements ExportService {
                             Capa capa = capaMap.get(orderExt.getCapaId());
                             vo.setSuccessCapaName(capa != null ? capa.getName() : "");
                         }
+                        vo.setProductExtInfo(orderExt.getOrderGoodsInfo());
                     }
                     List<ProductDeduction> deductionList = orderDetail.getWalletDeductionList();
                     if (CollectionUtils.isNotEmpty(deductionList)) {
@@ -359,6 +360,7 @@ public class ExportServiceImpl implements ExportService {
                     Capa capa = capaMap.get(orderExt.getCapaId());
                     vo.setSuccessCapaName(capa != null ? capa.getName() : "");
                 }
+                vo.setProductExtInfo(orderExt.getOrderGoodsInfo());
             }
             vo.setIfUserVerifyReceive("否");
             if (order.getIfUserVerifyReceive() != null && order.getIfUserVerifyReceive()) {

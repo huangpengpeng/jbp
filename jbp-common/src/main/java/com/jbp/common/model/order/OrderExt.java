@@ -64,4 +64,7 @@ public class OrderExt extends BaseModel {
 
     @ApiModelProperty(value = "AI服务码是否推送")
     private Boolean aiPushServer;
+
+    @ApiModelProperty(value = "订单商品扩展信息")
+    private String orderGoodsInfo;
 }
