@@ -80,4 +80,8 @@ public class ClearingBonus extends BaseModel {
     @ApiModelProperty("创建时间")
     @TableField("createTime")
     private Date createTime;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickName;
 }

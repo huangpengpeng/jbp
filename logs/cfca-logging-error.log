@@ -1,1 +1,2 @@
 2024-06-05 21:05:12.431 [task-executor-3] [ERROR] [environmentLogger:110] - autoConfig logback-cfca.xml: WARNNING: [configureByResource] jar:file:/Users/franky/work/jbp/jbp-common/src/main/java/com/jbp/common/kqbill/logback-cfca-jdk1.6-4.2.1.0.jar!/logback-cfca.xml
+2024-07-01 14:23:06.639 [task-executor-3] [ERROR] [environmentLogger:110] - autoConfig logback-cfca.xml: WARNNING: [configureByResource] jar:file:/D:/IdeaProjects/jbp/jbp-common/src/main/java/com/jbp/common/kqbill/logback-cfca-jdk1.6-4.2.1.0.jar!/logback-cfca.xml
