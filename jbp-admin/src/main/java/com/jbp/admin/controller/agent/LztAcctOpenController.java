@@ -62,6 +62,20 @@ public class LztAcctOpenController {
     }
 
 
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "连连个人开户")
+    @PreAuthorize("hasAuthority('agent:lzt:acct:open:apply')")
+    @ApiOperation(value = "连连个人开户")
+    @GetMapping(value = "/apply2")
+    public CommonResult<LztAcctOpen> apply2(Integer merId, String userId, String userType, String returnUrl,
+                                            String businessScope, String syncOpenLzt, String openBank) {
+        if (ObjectUtil.isEmpty(merId)) {
+            SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+            merId = systemAdmin.getMerId();
+        }
+        LztPayChannel lztPayChannel = lztPayChannelService.getByMer(merId, "连连");
+        LztAcctOpen lztAcctOpen = lztAcctOpenService.apply2(userId, userType, returnUrl, businessScope, lztPayChannel, syncOpenLzt, openBank);
+        return CommonResult.success(lztAcctOpen);
+    }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "易宝个人开户")
     @ApiOperation(value = "易宝个人开户")

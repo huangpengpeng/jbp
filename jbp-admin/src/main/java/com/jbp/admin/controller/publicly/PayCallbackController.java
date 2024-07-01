@@ -204,6 +204,52 @@ public class PayCallbackController {
         return "SUCCESS";
     }
 
+    @ApiOperation(value = "来账通回调")
+    @RequestMapping(value = "/lianlian/lzt2/{txnSeqno}")
+    public String lzt2(@PathVariable("txnSeqno") String txnSeqno, HttpServletRequest request) {
+        BufferedReader reader = null;
+        // 从请求体中获取源串
+        try {
+            // 从请求体中获取源串
+            reader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            log.info("[接收来自连连下发的异步通知] 签名源串为：" + stringBuilder.toString());
+            if (txnSeqno.startsWith(LianLianPayConfig.TxnSeqnoPrefix.来账通开通子商户.getPrefix())) {
+                LztAcctOpen lztAcctOpen = lztAcctOpenService.getByTxnSeqno(txnSeqno);
+                if(lztAcctOpen != null && stringBuilder != null && stringBuilder.length() > 0){
+                    lztAcctOpen.setNotifyInfo(stringBuilder.toString());
+                    lztAcctOpenService.updateById(lztAcctOpen);
+                }
+                if (lztAcctOpen != null) {
+                    lztAcctOpenService.refresh(lztAcctOpen.getAccpTxno());
+                }
+                LztAcctApply lztAcctApply = lztAcctApplyService.getByTxnSeqno(txnSeqno);
+                if(lztAcctApply != null){
+                    lztAcctApplyService.refresh(lztAcctApply.getUserId(), stringBuilder.toString());
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        return "SUCCESS";
+    }
 
     @ApiOperation(value = "来账通回调")
     @RequestMapping(value = "/yop/{txnSeqno}")

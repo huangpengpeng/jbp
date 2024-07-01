@@ -75,6 +75,55 @@ public class LztServiceImpl implements LztService {
     }
 
     @Override
+    public OpenacctApplyResult createUser2(String oidPartner, String priKey, String txnSeqno, String userId, String userType,
+                                           String notifyUrl,  String returnUrl, String businessScope, String sync_open_lzt, String open_bank) {
+        LianLianPayInfoResult payInfo = lianLianPayService.get();
+        OpenacctApplyParams params = new OpenacctApplyParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setUser_id(userId);
+        params.setTxn_seqno(txnSeqno);
+        params.setTxn_time(timestamp);
+        params.setFlag_chnl("H5");
+        params.setNotify_url(payInfo.getHost() + notifyUrl);
+        params.setReturn_url(returnUrl);
+        params.setUser_type(userType);
+        params.setCust_trade_serial_type("OpenNormalUser");
+        params.setSync_open_lzt(sync_open_lzt);
+        OpenacctApplyAccountInfo accountInfo = new OpenacctApplyAccountInfo();
+        accountInfo.setAccount_type("INNERUSER".equals(userType) ? "PERSONAL_PAYMENT_ACCOUNT" : "ENTERPRISE_PAYMENT_ACCOUNT");
+        if ("INNERUSER".equals(userType)) {
+            accountInfo.setAccount_need_level("V3");
+        }
+        params.setAccountInfo(accountInfo);
+        // 行业类目
+        OpenacctApplyBusinessInfo businessInfo = new OpenacctApplyBusinessInfo();
+        businessInfo.setBusiness_scope(businessScope);
+        params.setBusinessInfo(businessInfo);
+
+        LztBasicInfo lztBasicInfo  = new LztBasicInfo();
+        lztBasicInfo.setOpen_bank(open_bank);
+        params.setLztBasicInfo(lztBasicInfo);
+
+        String url = "https://accpgw.lianlianpay.com/v1/acctmgr/openacct-apply";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, payInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("请求开户异常");
+        }
+        try {
+            OpenacctApplyResult result = JSON.parseObject(s, OpenacctApplyResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new CrmebException("请求开户异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("请求开户异常:" + s);
+        }
+    }
+
+    @Override
     public UserInfoResult queryUserInfo(String oidPartner, String priKey, String userId) {
         LianLianPayInfoResult payInfo = lianLianPayService.get();
         UserInfoParams params = new UserInfoParams();

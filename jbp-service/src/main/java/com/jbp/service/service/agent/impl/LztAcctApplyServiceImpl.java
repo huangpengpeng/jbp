@@ -162,6 +162,11 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     @Override
     public LztAcctApply refresh(String userId, String notifyInfo) {
         LztAcctApply lztAcctApply = getByUserId(userId);
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if(lztAcct != null){
+            lztAcctApply.setUsername(lztAcct.getUsername());
+            lztAcctApply.setUserNo(lztAcct.getUserNo());
+        }
         LztQueryAcctInfoResult result = degreePayService.queryBankAcct(lztAcctApply);
         if (result != null) {
             List<LztQueryAcctInfo> list = result.getList();
@@ -170,7 +175,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                 LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
                 lztAcctApply.setStatus(acctState.getCode());
                 if(lztAcctApply.getPayChannelType().equals("易宝")){
-                    LztAcct lztAcct = lztAcctService.getByUserId(userId);
+
                     lztAcct.setBankAccount(list.get(0).getBank_acct_no());
                     lztAcctService.updateById(lztAcct);
                 }
@@ -227,6 +232,9 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                     JSONObject jsonObject = new JSONObject(s.getNotifyInfo());
                     if (jsonObject.has("gateway_url")) {
                         s.setGateway_url2(jsonObject.getString("gateway_url"));
+                    }
+                    if (jsonObject.has("open_account_will_url")) {
+                        s.setGateway_url2(jsonObject.getString("open_account_will_url"));
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

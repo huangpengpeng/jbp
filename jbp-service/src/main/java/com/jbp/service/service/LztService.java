@@ -14,6 +14,9 @@ public interface LztService {
     OpenacctApplyResult createUser(String oidPartner, String priKey, String txnSeqno,
                                    String userId, String userType, String notifyUrl, String returnUrl, String flagChnl, String businessScope);
 
+    OpenacctApplyResult createUser2(String oidPartner, String priKey, String txnSeqno, String userId, String userType,
+                                    String notifyUrl,  String returnUrl, String businessScope, String sync_open_lzt, String open_bank);
+
     /**
      * 查询连连用户
      */

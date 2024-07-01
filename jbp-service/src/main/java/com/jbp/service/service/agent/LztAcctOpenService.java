@@ -13,10 +13,11 @@ public interface LztAcctOpenService extends IService<LztAcctOpen> {
 
     LztAcctOpen apply( String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel);
 
-    LztAcctOpen yopApply(String signName, String id_card, String frontUrl, String backUrl, String mobile, String province,
-                         String city, String district,
-                         String address, String bankCardNo, String bankCode, LztPayChannel lztPayChannel);
+    LztAcctOpen apply2( String userId, String userType, String returnUrl, String businessScope,
+                        LztPayChannel lztPayChannel, String sync_open_lzt, String open_bank);
 
+    LztAcctOpen yopApply(String signName, String id_card, String frontUrl, String backUrl, String mobile, String province,
+                         String city, String district, String address, String bankCardNo, String bankCode, LztPayChannel lztPayChannel);
 
     void refresh(String accpTxno);
 

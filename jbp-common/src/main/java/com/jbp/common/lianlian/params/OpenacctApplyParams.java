@@ -19,6 +19,8 @@ public class OpenacctApplyParams {
     private String notify_url;
     private String user_type;
     private String cust_trade_serial_type;
+    private String sync_open_lzt; // 是：Y 否：N
+
 
     // 开户基本信息
     private OpenacctApplyBasicInfo basicInfo;
@@ -34,4 +36,6 @@ public class OpenacctApplyParams {
     private OpenacctApplyTheme theme;
     // 开户账户申请信息
     private OpenacctApplyAccountInfo accountInfo;
+
+    private LztBasicInfo lztBasicInfo;
 }

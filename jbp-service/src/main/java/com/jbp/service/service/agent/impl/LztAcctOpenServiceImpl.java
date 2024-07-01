@@ -14,6 +14,7 @@ import com.jbp.common.lianlian.result.LianLianPayInfoResult;
 import com.jbp.common.lianlian.result.OpenacctApplyResult;
 import com.jbp.common.lianlian.result.UserInfoResult;
 import com.jbp.common.model.agent.LztAcct;
+import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
 import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.merchant.Merchant;
@@ -24,6 +25,7 @@ import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.yop.result.RegisterMicroResult;
 import com.jbp.service.dao.agent.LztAcctOpenDao;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
@@ -57,6 +59,8 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
     private YopService yopService;
     @Resource
     private LianLianPayService lianLianPayService;
+    @Resource
+    private LztAcctApplyService lztAcctApplyService;
 
     @Override
     public LztAcctOpen apply(String userId, String userType, String returnUrl, String businessScope, LztPayChannel lztPayChannel) {
@@ -77,6 +81,36 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         LztAcctOpen lztAcctOpen = new LztAcctOpen(lztPayChannel.getMerId(), userId, txnSeqno, result.getAccp_txno(),
                 userType, flagChnl, DateTimeUtils.getNow(), result.getGateway_url(), lztPayChannel.getId(), lztPayChannel.getName(), lztPayChannel.getType());
         save(lztAcctOpen);
+        return lztAcctOpen;
+    }
+
+    @Override
+    public LztAcctOpen apply2(String userId, String userType,  String returnUrl, String businessScope,
+                              LztPayChannel lztPayChannel, String sync_open_lzt, String open_bank) {
+        if (has(userId)) {
+            throw new CrmebException("当前账户已存在，建议使用企业全拼加序号");
+        }
+        Merchant merchant = merchantService.getById(lztPayChannel.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        if (payInfo == null || StringUtils.isEmpty(payInfo.getOidPartner()) || StringUtils.isEmpty(payInfo.getPriKey())) {
+            throw new CrmebException("当前商户号配置缺少，请联系管理员");
+        }
+        String txnSeqno = StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通开通子商户.getPrefix());
+        String flagChnl = "H5";
+        String code = LianLianPayConfig.UserType.getCode(userType);
+        String notifyUrl = "/api/publicly/payment/callback/lianlian/lzt2/" + txnSeqno;
+
+        OpenacctApplyResult result = lztService.createUser2(payInfo.getOidPartner(), payInfo.getPriKey(), txnSeqno, userId, code,
+                notifyUrl, returnUrl, businessScope, sync_open_lzt, open_bank);
+
+        LztAcctOpen lztAcctOpen = new LztAcctOpen(lztPayChannel.getMerId(), userId, txnSeqno, result.getAccp_txno(),
+                userType, flagChnl, DateTimeUtils.getNow(), result.getGateway_url(), lztPayChannel.getId(), lztPayChannel.getName(), lztPayChannel.getType());
+        save(lztAcctOpen);
+        if ("Y".equals(sync_open_lzt)) {
+            LztAcctApply lztAcctApply = new LztAcctApply(lztPayChannel.getMerId(), userId, userType, "", "",
+                    txnSeqno, result.getAccp_txno(), result.getGateway_url(), open_bank, lztPayChannel.getId(), lztPayChannel.getName(), lztPayChannel.getType());
+            lztAcctApplyService.save(lztAcctApply);
+        }
         return lztAcctOpen;
     }
 
