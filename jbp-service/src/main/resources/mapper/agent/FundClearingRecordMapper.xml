@@ -103,7 +103,7 @@
     </select>
 
     <select id="detail" resultMap="FundClearingRecord">
-        SELECT c.id,c.order_account,c.order_nickname,c.price,c.external_no,o.pay_time
+        SELECT c.id,c.comm_amt,c.order_nickname,c.price,c.external_no,o.pay_time
         FROM eb_fund_clearing_record AS c
                  LEFT JOIN eb_order AS o ON c.external_no = o.order_no
         <where>
