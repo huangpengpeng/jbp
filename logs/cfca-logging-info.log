@@ -244,3 +244,10 @@
 2024-07-01 14:24:42.268 [task-executor-10] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
 2024-07-01 14:24:42.557 [task-executor-10] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
 2024-07-01 14:24:42.845 [task-executor-10] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:06.919 [task-executor-8] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:07.297 [task-executor-8] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:07.572 [task-executor-8] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:22.980 [task-executor-9] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:23.474 [task-executor-9] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:24.097 [task-executor-9] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
+2024-07-01 14:32:41.974 [task-executor-10] [INFO ] [com.bill99.crypto.utils.Bill99CertLoader:83] - load private cert file success. location = classpath:certs/fny/20240329.3300000480031808.pfx
