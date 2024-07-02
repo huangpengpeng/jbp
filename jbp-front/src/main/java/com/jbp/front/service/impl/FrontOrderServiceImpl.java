@@ -1060,7 +1060,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
-        if (!orderRequest.getContent().isEmpty()){
+        if (StringUtils.isNotEmpty(orderRequest.getContent())){
             orderExt.setOrderGoodsInfo(orderRequest.getContent());
         }
         // 商户订单
