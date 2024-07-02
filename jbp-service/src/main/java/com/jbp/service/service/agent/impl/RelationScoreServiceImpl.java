@@ -382,7 +382,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 }
             }
         }
-
         // 删除明细
         relationScoreFlowService.removeByIds(idSet);
     }
