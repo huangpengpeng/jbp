@@ -42,21 +42,6 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 
-        ProductCommChain productCommChain = run.getBean(ProductCommChain.class);
-       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
-       OrderService orderService = run.getBean(OrderService.class);
-        OldcapaxsService oldcapaxsService = run.getBean(OldcapaxsService.class);
-
-     List<Oldcapaxs> list  = oldcapaxsService.list();
-
-     for(Oldcapaxs oldcapaxs : list){
-         Order order = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,oldcapaxs.getAccount()));
-         List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
-         LinkedList<CommCalculateResult> commList = new LinkedList<>();
-
-         productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
-     }
-
 
 
     }
