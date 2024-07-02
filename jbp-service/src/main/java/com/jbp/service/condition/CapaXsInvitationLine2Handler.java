@@ -91,7 +91,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
             BigDecimal teamAmt = BigDecimal.ZERO;
            String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
             if(Boolean.parseBoolean(ifOpen)){
-                teamAmt =  selfScoreService.getUserNext(uid,true);
+                teamAmt =  selfScoreService.getUserNext(uid,false);
             }else{
                 teamAmt = invitationScoreService.getInvitationScore(uid, true);
             }
@@ -121,7 +121,7 @@ public class CapaXsInvitationLine2Handler implements ConditionHandler {
                         String ifOpen =environment.getProperty("teamAmtSelf.ifopen");
                         BigDecimal nextTotal =BigDecimal.ZERO;
                         if(Boolean.parseBoolean(ifOpen)){
-                            nextTotal =  selfScoreService.getUserNext(uid,true);
+                            nextTotal =  selfScoreService.getUserNext(uid,false);
                         }else{
                             nextTotal = invitationScoreService.getInvitationScore(userInvitation.getUId(), true);
                         }
