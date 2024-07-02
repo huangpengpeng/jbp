@@ -136,7 +136,7 @@ public class WhiteGroupThreeRetOneHandler extends AbstractProductCommHandler {
             Integer orderSize = orderDetailService.getNextOrderGoods(pid, map.get("product_id").toString(), userCapa.getCapaId(),rule.getAmt().toString());
 
             //计算当前笔数
-            orderSize = orderSize + 1;
+            orderSize = orderSize ;
 
             int remainder = orderSize % rule.getGroupComm().size();
 
