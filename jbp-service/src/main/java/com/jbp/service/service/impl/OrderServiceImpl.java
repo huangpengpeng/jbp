@@ -697,6 +697,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                     Capa successCapa = capaService.getById(orderExt.getSuccessCapaId());
                     pageResponse.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
                 }
+                pageResponse.setProductExtInfo(orderExt.getOrderGoodsInfo());
             }
             Merchant merchant = finalMerchantMap.get(e.getMerId());
             if (merchant != null) {
@@ -785,6 +786,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         }
         List<OrderInvoiceResponse> shopList = orderInvoiceService.findByOrderNo(orderNo);
         response.setShipTime(shopList.isEmpty() ? null : shopList.get(0).getCreateTime());
+        OrderExt orderExt = orderExtService.getByOrder(orderNo);
+        response.setProductExtInfo(orderExt.getOrderGoodsInfo());
         return response;
     }
 

@@ -47,14 +47,24 @@ public class UserVitalitpartnerController {
 
     @ApiOperation(value = "元气合伙人图标")
     @RequestMapping(value = "/getUser", method = RequestMethod.GET)
-    public CommonResult<String> getList( ) {
+    public CommonResult<List<String>> getList( ) {
 
         String repetition =  systemConfigService.getValueByKey("goods_partner");
         if(StringUtils.isBlank(repetition) ||repetition.equals("'0'")){
             return CommonResult.success();
         }
-        UserVitalitpartner userVitalitpartner =   userVitalitpartnerService.getOne(new QueryWrapper<UserVitalitpartner>().lambda().eq(UserVitalitpartner::getUserId, userService.getUserId()).eq(UserVitalitpartner::getEnable,true));
-        return CommonResult.success(userVitalitpartner == null?"" : "https://batchatx.oss-cn-shenzhen.aliyuncs.com/2b908fbe27404ddd89348385f2af8a65");
+        User user = userService.getInfo();
+        List<String> list = new ArrayList<>();
+        UserVitalitpartner userVitalitpartner = userVitalitpartnerService.getOne(new QueryWrapper<UserVitalitpartner>().lambda().eq(UserVitalitpartner::getUserId, userService.getUserId()).eq(UserVitalitpartner::getEnable,true));
+        if (userVitalitpartner != null) {
+            list.add("https://batchatx.oss-cn-shenzhen.aliyuncs.com/2b908fbe27404ddd89348385f2af8a65");
+        }
+        WhiteUser whiteUser = whiteUserService.getOne(new QueryWrapper<WhiteUser>().lambda().eq(WhiteUser::getUid, user.getId())
+                .apply("white_id=(select id from eb_white where name='时光达人')"));
+        if (whiteUser != null){
+            list.add("crmebimage/public/content/2024/07/02/deda7376279943e5a73a2e00929a9c8a4r40jmsjqn.png");
+        }
+        return CommonResult.success(list);
     }
 
     @ApiOperation(value = "复销奖图标")

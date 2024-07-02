@@ -135,4 +135,7 @@ public class OrderExcel implements Serializable {
 
     @ExcelProperty(value = "发货时间", index = 39)
     private Date shipTime;
+
+    @ExcelProperty(value = "订单商品扩展信息", index = 40)
+    private String productExtInfo;
 }

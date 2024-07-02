@@ -216,6 +216,10 @@ public class PlatformOrderAdminDetailResponse implements Serializable {
     @ApiModelProperty(value = "用户是否确认收货")
     private String ifUserVerifyReceive;
 
+    @ApiModelProperty(value = "订单商品扩展信息")
+    private String productExtInfo;
+
+
 
 
 }

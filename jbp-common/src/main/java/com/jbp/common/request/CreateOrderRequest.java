@@ -62,4 +62,7 @@ public class CreateOrderRequest implements Serializable {
     @ApiModelProperty(value = "下单场景（报单，换购）", required = false)
     private String platform;
 
+    @ApiModelProperty(value = "订单商品扩展信息", required = false)
+    private String content;
+
 }
