@@ -1,5 +1,6 @@
 package com.jbp.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.controller.tank.TankStoreRelationAct;
 import com.jbp.admin.task.order.OrderAiServerTask;
@@ -32,6 +33,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.LinkedList;
+import java.util.List;
+
 
 @EnableAsync //开启异步调用
 @EnableSwagger2
@@ -49,7 +53,15 @@ public class JbpAdminApplication {
         System.out.println("启动完成");
 
 
-
+//        ProductCommChain productCommChain = run.getBean(ProductCommChain.class);
+//       OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+//       OrderService orderService = run.getBean(OrderService.class);
+//     Order order  = orderService.getOne(new QueryWrapper<Order>().lambda().eq(Order::getOrderNo,"PT826171989041490571007"));
+////
+//       List<OrderDetail> platOrderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+//         LinkedList<CommCalculateResult> commList = new LinkedList<>();
+//////
+//        productCommChain.orderSuccessCalculateAmt(order,platOrderDetailList,commList);
 
 
     }

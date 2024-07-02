@@ -118,29 +118,6 @@ public class WhiteCapaXsDifferentialCommHandler extends AbstractProductCommHandl
             return;
         }
         Map<Integer, UserCapaXs> uidCapaXsMap = userCapaXsService.getUidMap(allUpper.stream().filter(u -> u.getPId() != null).map(UserUpperDto::getPId).collect(Collectors.toList()));
-        // 最大星级
-        CapaXs maxCapa = capaXsService.getMaxCapa();
-        // 更高头衔的用户【拿钱用户】
-        LinkedList<UserCapaXs> userList = Lists.newLinkedList();
-        Long capaId = 0L;
-        for (UserUpperDto upperDto : allUpper) {
-            if (upperDto.getPId() != null) {
-                UserCapaXs userCapaXs = uidCapaXsMap.get(upperDto.getPId());
-                if (userCapaXs != null) {
-                    if (NumberUtils.compare(userCapaXs.getCapaId(), capaId) > 0) {
-                        userList.add(userCapaXs);
-                        capaId = userCapaXs.getCapaId();
-                    }
-                    if (NumberUtils.compare(maxCapa.getId(), capaId) == 0) {
-                        break;
-                    }
-                }
-            }
-        }
-        // 没人退出
-        if (CollectionUtils.isEmpty(userList)) {
-            return;
-        }
 
         // 分钱用户产品
         LinkedHashMap<Integer, List<FundClearingProduct>> productMap = Maps.newLinkedHashMap();
@@ -160,6 +137,36 @@ public class WhiteCapaXsDifferentialCommHandler extends AbstractProductCommHandl
             totalPv = totalPv.multiply(productComm.getScale());
             // 佣金规则
             Rule rule = getRule(productComm);
+
+            // 最大星级
+            CapaXs maxCapa = capaXsService.getMaxCapa();
+            // 更高头衔的用户【拿钱用户】
+            LinkedList<UserCapaXs> userList = Lists.newLinkedList();
+            Long capaId = 0L;
+            for (UserUpperDto upperDto : allUpper) {
+                if (upperDto.getPId() != null) {
+                    UserCapaXs userCapaXs = uidCapaXsMap.get(upperDto.getPId());
+                    if (userCapaXs != null) {
+                        if (NumberUtils.compare(userCapaXs.getCapaId(), capaId) > 0) {
+                            WhiteUser whiteUser = whiteUserService.getByUser(userCapaXs.getUid(), rule.getWhiteId());
+                            if (whiteUser == null) {
+                                continue;
+                            }
+                            userList.add(userCapaXs);
+                            capaId = userCapaXs.getCapaId();
+                        }
+                        if (NumberUtils.compare(maxCapa.getId(), capaId) == 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+            // 没人退出
+            if (CollectionUtils.isEmpty(userList)) {
+                return;
+            }
+
+
             List<XsCapaRule> xsCapaRuleList = rule.getXsCapaRuleList();
             String type = xsCapaRuleList.get(0).getType();
             if (StringUtils.isNotEmpty(type) && "金额".equals(type)) {
@@ -174,10 +181,6 @@ public class WhiteCapaXsDifferentialCommHandler extends AbstractProductCommHandl
             // 每个人拿
             for (UserCapaXs userCapa : userList) {
 
-                WhiteUser whiteUser = whiteUserService.getByUser(userCapa.getUid(), rule.getWhiteId());
-                if (whiteUser == null) {
-                    continue;
-                }
 
                 XsCapaRule xsCapaRule = ruleMap.get(userCapa.getCapaId());
                 BigDecimal ratio = BigDecimal.ZERO;
@@ -220,11 +223,11 @@ public class WhiteCapaXsDifferentialCommHandler extends AbstractProductCommHandl
             BigDecimal clearingFee = BigDecimal.valueOf(amt).setScale(2, BigDecimal.ROUND_DOWN);
             if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
                 List<FundClearingProduct> fundClearingProducts = productMap.get(uid);
-                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.星级级差佣金.getName(), clearingFee,
-                        fundClearingProducts, orderUser.getNickname() + "|" + orderUser.getAccount() + "下单获得" + ProductCommEnum.星级级差佣金.getName(), "");
+                fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.白名单星级级差佣金.getName(), clearingFee,
+                        fundClearingProducts, orderUser.getNickname() + "|" + orderUser.getAccount() + "下单获得" + ProductCommEnum.白名单星级级差佣金.getName(), "");
 
                 int sort = resultList.size() + 1;
-                CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.星级级差佣金.getName(),
+                CommCalculateResult calculateResult = new CommCalculateResult(uid, getType(), ProductCommEnum.白名单星级级差佣金.getName(),
                         null, null, null,
                         1, null, BigDecimal.ONE, null, clearingFee, sort);
                 resultList.add(calculateResult);
