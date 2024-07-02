@@ -166,6 +166,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             User user = userMap.get(e.getUid());
             e.setAccount(userMap.get(e.getUid()).getAccount());
             e.setPhone(user!= null ? user.getPhone() : "");
+            e.setNickName(user!= null ? user.getNickname() : "");
             Capa capa = capaMap.get(e.getCapaId());
             e.setCapaName(capa.getName());
             e.setCapaUrl(capa.getIconUrl());

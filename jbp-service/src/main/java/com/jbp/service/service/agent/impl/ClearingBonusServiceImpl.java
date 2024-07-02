@@ -1,15 +1,18 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.ClearingBonus;
+import com.jbp.common.model.user.User;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ClearingBonusListResponse;
 import com.jbp.service.dao.agent.ClearingBonusDao;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.ClearingBonusService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -25,6 +30,8 @@ public class ClearingBonusServiceImpl extends UnifiedServiceImpl<ClearingBonusDa
 
     @Resource
     private ClearingBonusDao dao;
+    @Resource
+    private UserService userService;
 
     @Override
     public void insertBatchList(List<ClearingBonus> list) {
@@ -50,7 +57,17 @@ public class ClearingBonusServiceImpl extends UnifiedServiceImpl<ClearingBonusDa
         lqw.eq(StringUtils.isNotEmpty(uniqueNo), ClearingBonus::getUniqueNo, uniqueNo);
         lqw.eq(StringUtils.isNotEmpty(account), ClearingBonus::getAccountNo, account);
         lqw.orderByDesc(ClearingBonus::getId);
-        return CommonPage.copyPageInfo(page, list(lqw));
+        List<ClearingBonus> list = list(lqw);
+        if (list.isEmpty()){
+            return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
+        }
+        List<Integer> uidList = list.stream().map(ClearingBonus::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uidList);
+        list.forEach(e->{
+            User user = uidMapList.get(e.getUid());
+            e.setNickName(user!= null ? user.getNickname() : "");
+        });
+        return CommonPage.copyPageInfo(page, list);
     }
 
     @Override
