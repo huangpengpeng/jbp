@@ -163,6 +163,9 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     public LztAcctApply refresh(String userId, String notifyInfo) {
         LztAcctApply lztAcctApply = getByUserId(userId);
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        lztAcct.setIfOpenBankAcct(true);
+        lztAcct.setOpenBank(lztAcctApply.getOpenBank());
+        lztAcctService.updateById(lztAcct);
         if(lztAcct != null){
             lztAcctApply.setUsername(lztAcct.getUsername());
             lztAcctApply.setUserNo(lztAcct.getUserNo());
