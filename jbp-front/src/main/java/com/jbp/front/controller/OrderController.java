@@ -19,6 +19,7 @@ import com.jbp.service.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.statement.create.table.Index;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -199,6 +200,14 @@ public class OrderController {
         OrderExt orderExt = orderExtService.getByOrder(orderSn);
         return CommonResult.success(orderExt);
     }
+
+
+    @ApiOperation(value = "订单状态")
+    @RequestMapping(value = "/detail/status/{orderNo}", method = RequestMethod.GET)
+    public CommonResult<Integer> orderDetailStatus(@PathVariable String orderNo) {
+       Order order =  service.getByOrderNo(orderNo);
+        return CommonResult.success(order.getStatus());
+}
 
 
 }
