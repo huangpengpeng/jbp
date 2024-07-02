@@ -38,7 +38,7 @@
 
   spring:
     profiles:
-      active: yk
+      active: fny1
     jmx:
       enabled: false
 

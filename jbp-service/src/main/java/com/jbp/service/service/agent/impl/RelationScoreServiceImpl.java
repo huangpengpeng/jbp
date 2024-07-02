@@ -292,7 +292,7 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
             RelationScore relationScore = getByUser(flow.getUid(), flow.getNode());
             relationScore.setUsableScore(relationScore.getUsableScore().subtract(flow.getScore()));
             if (ArithmeticUtils.less(relationScore.getUsableScore(), BigDecimal.ZERO)) {
-                relationScore.setUsedScore(BigDecimal.ZERO);
+                relationScore.setUsableScore(BigDecimal.ZERO);
             }
             updateById(relationScore);
             idSet.add(flow.getId());
@@ -382,7 +382,6 @@ public class RelationScoreServiceImpl extends ServiceImpl<RelationScoreDao, Rela
                 }
             }
         }
-
         // 删除明细
         relationScoreFlowService.removeByIds(idSet);
     }
