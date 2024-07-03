@@ -208,6 +208,10 @@ public class PayServiceImpl implements PayService {
         response.setLianLianStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianStatus));
         response.setWalletStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus));
         response.setKqPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(kqPayStatus));
+        // 易宝支付开关
+        response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
+        response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
+        response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
@@ -223,11 +227,6 @@ public class PayServiceImpl implements PayService {
         if (payGateway != null && 0 == payGateway) {
             response.setWalletStatus(false);
             response.setYuePayStatus(false);
-            // 易宝支付开关
-            response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
-            response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
-            response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
-
         }
         // 积分支付
         if (payGateway != null && 1 == payGateway) {
@@ -235,6 +234,9 @@ public class PayServiceImpl implements PayService {
             response.setAliPayStatus(false);
             response.setLianLianStatus(false);
             response.setKqPayStatus(false);
+            response.setYopWechatPay(false);
+            response.setYopQuickPay(false);
+            response.setYopAliPayStatus(false);
         }
         return response;
     }
