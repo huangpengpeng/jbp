@@ -14,6 +14,9 @@ public class MerchantInfoModifyParams extends BaseYopRequest {
 
     private String merchantSubjectInfo; // { "licenceUrl":"商户证件照片地址", "signName":"商户签约名", "licenceNo":"商户证件号码", "shortName":"商户简称" }
 
+    private String businessAddressInfo;
+
+    private String accountInfo;
     //
     private String merchantCorporationInfo;
 

@@ -53,27 +53,25 @@ public class JbpFrontApplication {
 
         YopService yopService = run.getBean(YopService.class);
 
-        merRegister(yopService);
 
-//        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090420584");
-//        WithdrawCardBindParams params = new WithdrawCardBindParams();
-//        params.setMerchantNo("10090420584");
-//        params.setAccountNo("120924643310006");
-//        params.setBankCardType("ENTERPRISE_ACCOUNT");
-//        params.setBankCode("CMBCHINA");
-////        params.setBranchCode("102161000113");
+        modify(yopService);
+        if(true){
+            return;
+        }
+
+//        merRegister(yopService);
+
+//        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090455403");
+        WithdrawCardBindParams params = new WithdrawCardBindParams();
+        params.setMerchantNo("10090455403");
+        params.setAccountNo("6226221705366711");
+        params.setBankCardType("DEBIT_CARD");
+        params.setBankCode("CMBC");
+
+        WithdrawCardBindResult withdrawCardBindResult = yopService.withdrawCardBind(params);
+        System.out.println(JSONObject.toJSONString(withdrawCardBindResult));
 //
-//         WithdrawCardBindResult withdrawCardBindResult = yopService.withdrawCardBind(params);
-//        System.out.println(JSONObject.toJSONString(withdrawCardBindResult));
-//
-//        WithdrawCardModifyParams params = new WithdrawCardModifyParams();
-//        params.setMerchantNo("10090420584");
-//        params.setBindId(cardQueryResult.getBankCardAccountList().get(0).getBindCardId());
-//        params.setBankCardOperateType("CANCELLED");
-//        params.setBankCode("CMBCHINA");
-//        params.setBranchCode("120924643310001");
-//        WithdrawCardModifyResult withdrawCardModifyResult = yopService.withdrawCardModify(params);
-//        System.out.println(JSONObject.toJSONString(withdrawCardModifyResult));
+//        cancelWithdrawCard(yopService);
 
 //        yopService.withdrawCardQuery("10090339599");
 
@@ -124,6 +122,44 @@ public class JbpFrontApplication {
         System.out.println("111");
 //        SqlRunner.db().selectList("select * from ")
 
+    }
+
+    private static void modify(YopService yopService) {
+
+        MerchantInfoModifyParams params = new MerchantInfoModifyParams();
+        params.setMerchantNo("10090455403");
+        params.setRequestNo(StringUtils.N_TO_10("MD_"));
+        params.setNotifyUrl("http://fky.natapp1.cc/yop/registerMicro");
+
+        // 签约信息
+        params.setMerchantSubjectInfo("{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/03/merchant-1719980038302-653e37ef-d0f0-48f7-86b4-3395c65e5d3e-DsqFvRjFiuaNUiaGBvxj.jpg\", \"signName\":\"冯开英\", \"licenceNo\":\"429005199305060899\", \"shortName\":\"冯开英\" , \"householdRegisterUrl\":\"冯开英\"}");
+
+        // 实名信息
+        params.setMerchantCorporationInfo("{ \"legalName\":\"冯开英\", \"legalLicenceType\":\"ID_CARD\", \"legalLicenceNo\":\"429005199305060899\", \"legalLicenceFrontUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/03/merchant-1719980038302-653e37ef-d0f0-48f7-86b4-3395c65e5d3e-DsqFvRjFiuaNUiaGBvxj.jpg\", \"legalLicenceBackUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/03/merchant-1719980056054-74fd32cb-e83c-4700-a165-5f9fc0a5b86f-dLKALhuUQedzWIytUkrw.jpg\" }");
+
+        // 地址信息
+        params.setBusinessAddressInfo("{ \"province\":\"420000\", \"city\":\"429000\", \"district\":\"429005\", \"address\":\"竹根滩镇黑流渡村一组\" }");
+
+        // 账户信息
+        JSONObject accountInfo = new JSONObject();
+        accountInfo.put("settlementDirection", "BANKCARD");
+        accountInfo.put("bankAccountType", "DEBIT_CARD");
+        accountInfo.put("bankCardNo", "6228480329262404075");
+        accountInfo.put("bankCode", "ABC");
+        params.setAccountInfo(accountInfo.toJSONString());
+
+        MerchantInfoModifyResult merchantInfoModifyResult = yopService.merchantInfoModify(params);
+        System.out.println(JSONObject.toJSONString(merchantInfoModifyResult));
+    }
+
+    private static void cancelWithdrawCard(YopService yopService) {
+        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090455403");
+        WithdrawCardModifyParams params = new WithdrawCardModifyParams();
+        params.setMerchantNo("10090455403");
+        params.setBindId(cardQueryResult.getBankCardAccountList().get(0).getBindCardId());
+        params.setBankCardOperateType("CANCELLED");
+        WithdrawCardModifyResult withdrawCardModifyResult = yopService.withdrawCardModify(params);
+        System.out.println(JSONObject.toJSONString(withdrawCardModifyResult));
     }
 
     private static void withdraw(YopService yopService) {
