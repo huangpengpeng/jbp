@@ -223,6 +223,11 @@ public class PayServiceImpl implements PayService {
         if (payGateway != null && 0 == payGateway) {
             response.setWalletStatus(false);
             response.setYuePayStatus(false);
+            // 易宝支付开关
+            response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
+            response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
+            response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
+
         }
         // 积分支付
         if (payGateway != null && 1 == payGateway) {
@@ -231,10 +236,6 @@ public class PayServiceImpl implements PayService {
             response.setLianLianStatus(false);
             response.setKqPayStatus(false);
         }
-        // 易宝支付开关
-        response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
-        response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
-        response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
         return response;
     }
 
