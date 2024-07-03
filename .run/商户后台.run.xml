@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="商户后台" type="DEPLOY_HOST_RUN_CONFIGURATION" factoryName="Deploy to Host" focusToolWindowBeforeRun="true" singleton="false">
+  <configuration default="false" name="商户后台" type="DEPLOY_HOST_RUN_CONFIGURATION" factoryName="Deploy to Host" focusToolWindowBeforeRun="true">
     <option name="accountModel" />
     <option name="accountModels" />
     <option name="address" />
     <option name="afterCommand" value="" />
     <option name="alreadyReset" value="true" />
-    <option name="autoOpen" value="true" />
+    <option name="autoOpen" value="false" />
     <option name="beforeCommand" value="" />
     <option name="defaultTabIdx" value="0" />
     <option name="ecsInstance">

@@ -163,10 +163,12 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
     public LztAcctApply refresh(String userId, String notifyInfo) {
         LztAcctApply lztAcctApply = getByUserId(userId);
         LztAcct lztAcct = lztAcctService.getByUserId(userId);
-        lztAcct.setIfOpenBankAcct(true);
-        lztAcct.setOpenBank(lztAcctApply.getOpenBank());
-        lztAcctService.updateById(lztAcct);
-        if(lztAcct != null){
+        if (StringUtils.isEmpty(lztAcctApply.getOpenBank())) {
+            lztAcct.setIfOpenBankAcct(true);
+            lztAcct.setOpenBank(lztAcctApply.getOpenBank());
+            lztAcctService.updateById(lztAcct);
+        }
+        if (lztAcct != null) {
             lztAcctApply.setUsername(lztAcct.getUsername());
             lztAcctApply.setUserNo(lztAcct.getUserNo());
         }
@@ -177,8 +179,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
                 list = list.stream().filter(s -> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
                 LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
                 lztAcctApply.setStatus(acctState.getCode());
-                if(lztAcctApply.getPayChannelType().equals("易宝")){
-
+                if (lztAcctApply.getPayChannelType().equals("易宝")) {
                     lztAcct.setBankAccount(list.get(0).getBank_acct_no());
                     lztAcctService.updateById(lztAcct);
                 }
@@ -230,6 +231,7 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             } else {
                 s.setMerName(merchant.getName());
             }
+            s = refresh(s.getUserId(), s.getNotifyInfo());
             if (StringUtils.isNotEmpty(s.getNotifyInfo())) {
                 try {
                     JSONObject jsonObject = new JSONObject(s.getNotifyInfo());

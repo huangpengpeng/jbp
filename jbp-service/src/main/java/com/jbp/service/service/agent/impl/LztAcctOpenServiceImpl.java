@@ -150,9 +150,14 @@ public class LztAcctOpenServiceImpl extends ServiceImpl<LztAcctOpenDao, LztAcctO
         if (lztAcctOpen.getStatus().equals(LianLianPayConfig.UserStatus.正常.name())) {
             if (lztAcct == null) {
                 lztAcct = lztAcctService.create(lztAcctOpen.getMerId(), lztAcctOpen.getUserId(), lztAcctOpen.getUserType(), result.getOid_userno(), result.getUser_name(), result.getBank_account(), lztAcctOpen.getPayChannelId());
+                LztAcctApply lztAcctApply = lztAcctApplyService.getByUserId(lztAcctOpen.getUserId());
+                if(lztAcctApply != null && StringUtils.isEmpty(lztAcct.getOpenBank())){
+                    lztAcct.setOpenBank(lztAcctApply.getOpenBank());
+                    lztAcct.setIfOpenBankAcct(true);
+                    lztAcctService.updateById(lztAcct);
+                }
             }
         }
-
         // 通知手机号码 连连需要
         if (lztAcct != null && StringUtils.isNotEmpty(lztAcctOpen.getNotifyInfo()) && StringUtils.isEmpty(lztAcct.getPhone())) {
             try {
