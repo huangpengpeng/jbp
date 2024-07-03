@@ -167,9 +167,7 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         uidList.add(uid);
         Map<Integer, User> uidMapList = userService.getUidMapList(uidList);
         Map<Integer, UserCapa> uidCapaMap = userCapaService.getUidMap(uidList);
-                List<Integer> uidFlowList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
-        uidFlowList.add(uid);
-        List<UserRelation> userRelationList = userRelationService.list(new QueryWrapper<UserRelation>().lambda().in(UserRelation::getPId, uidFlowList));
+        List<UserRelation> userRelationList = userRelationService.list(new QueryWrapper<UserRelation>().lambda().in(UserRelation::getPId, uidList));
         Map<String,UserRelation> map = new HashMap<>();
         userRelationList.forEach(e->{
             map.put(e.getPId()+"_"+e.getNode(),e);
@@ -186,7 +184,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             UserRelation userRelation01 = map.get(userRelation.getUId() + "_1");
             UserRelationGplotVo relation0 = gplot(userRelation.getUId(),userRelation00!=null ? userRelation00.getUId() : 0,userRelation01!=null ? userRelation01.getUId() : 0,uidMapList,uidCapaMap);
             relation0.setLevel(lv+1);
-            relation0.setNode(0);
             topList.add(relation0);
             List<UserRelationGplotVo> topList1 = new ArrayList<>();
             if (userRelation00 != null) {
@@ -195,7 +192,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                 UserRelation userRelation001 = map.get(userRelation00.getUId() + "_1");
                 UserRelationGplotVo relation00 = gplot(userRelation00.getUId(),userRelation000!=null ? userRelation000.getUId() : 0,userRelation001!=null ? userRelation001.getUId() : 0,uidMapList,uidCapaMap);
                 relation00.setLevel(lv+2);
-                relation00.setNode(0);
                 topList1.add(relation00);
                 List<UserRelationGplotVo> topList21 = new ArrayList<>();
                 if (userRelation000 != null) {
@@ -204,7 +200,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation0001 = map.get(userRelation000.getUId() + "_1");
                     UserRelationGplotVo relation000 = gplot(userRelation000.getUId(),userRelation0000!=null ? userRelation0000.getUId() : 0,userRelation0001!=null ? userRelation0001.getUId() : 0,uidMapList,uidCapaMap);
                     relation000.setLevel(lv+3);
-                    relation000.setNode(0);
                     topList21.add(relation000);
                 } else {
                     topList21.add(relation);
@@ -215,7 +210,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation0011 = map.get(userRelation001.getUId() + "_1");
                     UserRelationGplotVo relation001 = gplot(userRelation001.getUId(),userRelation0010!=null ? userRelation0010.getUId() : 0,userRelation0011!=null ? userRelation0011.getUId() : 0,uidMapList,uidCapaMap);
                     relation001.setLevel(lv+3);
-                    relation001.setNode(1);
                     topList21.add(relation001);
                 } else {
                     topList21.add(relation);
@@ -230,7 +224,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                 UserRelation userRelation011 = map.get(userRelation01.getUId() + "_1");
                 UserRelationGplotVo relation01 = gplot(userRelation01.getUId(),userRelation010!=null ? userRelation010.getUId() : 0,userRelation011!=null ? userRelation011.getUId() : 0,uidMapList,uidCapaMap);
                 relation01.setLevel(lv+2);
-                relation01.setNode(1);
                 topList1.add(relation01);
                 List<UserRelationGplotVo> topList22 = new ArrayList<>();
                 if (userRelation010 != null) {
@@ -239,7 +232,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation0101 = map.get(userRelation010.getUId() + "_1");
                     UserRelationGplotVo relation010 = gplot(userRelation010.getUId(),userRelation0100!=null ? userRelation0100.getUId() : 0,userRelation0101!=null ? userRelation0101.getUId() : 0,uidMapList,uidCapaMap);
                     relation010.setLevel(lv+3);
-                    relation010.setNode(0);
                     topList22.add(relation010);
                 } else {
                     topList22.add(relation);
@@ -250,7 +242,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation0111 = map.get(userRelation011.getUId() + "_1");
                     UserRelationGplotVo relation011 = gplot(userRelation011.getUId(),userRelation0110!=null ? userRelation0110.getUId() : 0,userRelation0111!=null ? userRelation0111.getUId() : 0,uidMapList,uidCapaMap);
                     relation011.setLevel(lv+3);
-                    relation011.setNode(1);
                     topList22.add(relation011);
                 } else {
                     topList22.add(relation);
@@ -270,7 +261,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
             UserRelation userRelation11 = map.get(userRelation1.getUId() + "_1");
             UserRelationGplotVo relation1 = gplot(userRelation1.getUId(),userRelation10!=null ? userRelation10.getUId() : 0,userRelation11!=null ? userRelation11.getUId() : 0,uidMapList,uidCapaMap);
             relation1.setLevel(lv+1);
-            relation1.setNode(1);
             topList.add(relation1);
             List<UserRelationGplotVo> topList2 = new ArrayList<>();
             if (userRelation10 != null) {
@@ -279,7 +269,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                 UserRelation userRelation101 = map.get(userRelation10.getUId() + "_1");
                 UserRelationGplotVo relation10 = gplot(userRelation10.getUId(),userRelation100!=null ? userRelation100.getUId() : 0,userRelation101!=null ? userRelation101.getUId() : 0,uidMapList,uidCapaMap);
                 relation10.setLevel(lv+2);
-                relation10.setNode(0);
                 topList2.add(relation10);
                 List<UserRelationGplotVo> topList23 = new ArrayList<>();
                 if (userRelation100 != null) {
@@ -288,7 +277,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation1001 = map.get(userRelation100.getUId() + "_1");
                     UserRelationGplotVo relation100 = gplot(userRelation100.getUId(),userRelation1000!=null ? userRelation1000.getUId() : 0,userRelation1001!=null ? userRelation1001.getUId() : 0,uidMapList,uidCapaMap);
                     relation100.setLevel(lv+3);
-                    relation100.setNode(0);
                     topList23.add(relation100);
                 } else {
                     topList23.add(relation);
@@ -299,7 +287,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation1011 = map.get(userRelation101.getUId() + "_1");
                     UserRelationGplotVo relation101 = gplot(userRelation101.getUId(),userRelation1010!=null ? userRelation1010.getUId() : 0,userRelation1011!=null ? userRelation1011.getUId() : 0,uidMapList,uidCapaMap);
                     relation101.setLevel(lv+3);
-                    relation101.setNode(1);
                     topList23.add(relation101);
                 } else {
                     topList23.add(relation);
@@ -314,7 +301,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                 UserRelation userRelation111 = map.get(userRelation11.getUId() + "_1");
                 UserRelationGplotVo relation11 = gplot(userRelation11.getUId(),userRelation110!=null ? userRelation110.getUId() : 0,userRelation111!=null ? userRelation111.getUId() : 0,uidMapList,uidCapaMap);
                 relation11.setLevel(lv+2);
-                relation11.setNode(1);
                 topList2.add(relation11);
                 List<UserRelationGplotVo> topList24 = new ArrayList<>();
                 if (userRelation110 != null) {
@@ -323,7 +309,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation1101 = map.get(userRelation110.getUId() + "_1");
                     UserRelationGplotVo relation110 = gplot(userRelation110.getUId(),userRelation1100!=null ? userRelation1100.getUId() : 0,userRelation1101!=null ? userRelation1101.getUId() : 0,uidMapList,uidCapaMap);
                     relation110.setLevel(lv+3);
-                    relation110.setNode(0);
                     topList24.add(relation110);
                 } else {
                     topList24.add(relation);
@@ -334,7 +319,6 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
                     UserRelation userRelation1111 = map.get(userRelation111.getUId() + "_1");
                     UserRelationGplotVo relation111 = gplot(userRelation111.getUId(),userRelation1110!=null ? userRelation1110.getUId() : 0,userRelation1111!=null ? userRelation1111.getUId() : 0,uidMapList,uidCapaMap);
                     relation111.setLevel(lv+3);
-                    relation111.setNode(1);
                     topList24.add(relation111);
                 } else {
                     topList24.add(relation);
@@ -361,11 +345,12 @@ public class UserRelationFlowServiceImpl extends ServiceImpl<UserRelationFlowDao
         List<UserRelationFlow> list = list(new LambdaQueryWrapper<UserRelationFlow>().eq(UserRelationFlow::getPId, uId));
         List<Integer> uidList = list.stream().map(UserRelationFlow::getUId).collect(Collectors.toList());
         uidList.add(uId);
-        List<UserCapa> userCapaList = new ArrayList<>(userCapaService.getUidMap(uidList).values());
+        List<UserCapa> userCapaList = userCapaService.list(new QueryWrapper<UserCapa>().lambda().in(UserCapa::getUid, uidList));
+        Map<Long, Long> userCapaMap = userCapaList.stream().collect(Collectors.groupingBy(UserCapa::getCapaId, Collectors.counting()));
         List<Capa> capaList = capaService.getList();
         capaList.forEach(e->{
-            long count = userCapaList.stream().filter(f -> Objects.equals(f.getCapaId(), e.getId())).count();
-            countList.add((int) count);
+            Long count = userCapaMap.get(e.getId());
+            countList.add(count == null ? 0: count.intValue());
         });
         return countList;
     }
