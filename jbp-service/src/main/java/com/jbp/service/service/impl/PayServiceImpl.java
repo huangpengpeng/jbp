@@ -208,6 +208,10 @@ public class PayServiceImpl implements PayService {
         response.setLianLianStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianStatus));
         response.setWalletStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayStatus));
         response.setKqPayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(kqPayStatus));
+        // 易宝支付开关
+        response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
+        response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
+        response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
@@ -230,11 +234,10 @@ public class PayServiceImpl implements PayService {
             response.setAliPayStatus(false);
             response.setLianLianStatus(false);
             response.setKqPayStatus(false);
+            response.setYopWechatPay(false);
+            response.setYopQuickPay(false);
+            response.setYopAliPayStatus(false);
         }
-        // 易宝支付开关
-        response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
-        response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
-        response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
         return response;
     }
 
@@ -1960,7 +1963,7 @@ public class PayServiceImpl implements PayService {
         String productName = details.get(0).getProductName();
         if ("quickPay".equals(order.getPayType())) {
             String gateWay = yopPayService.quickPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName, yopNotifyUrl, "", yopReturnUrl);
-            result.setGateway_url(gateWay);
+            result.setGateway_url(gateWay.replace("cash.yeepay.com","cashsec.yeepay.com"));
         }
         if ("ybalipay".equals(order.getPayType())) {
             WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
