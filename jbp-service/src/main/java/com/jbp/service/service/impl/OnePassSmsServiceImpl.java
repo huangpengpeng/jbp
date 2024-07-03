@@ -10,6 +10,7 @@ import com.cloopen.rest.sdk.BodyType;
 import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.MsgCode;
 import com.jbp.common.model.sms.SmsTemplate;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.request.PageParamRequest;
@@ -18,6 +19,7 @@ import com.jbp.common.request.SmsModifySignRequest;
 import com.jbp.common.utils.*;
 import com.jbp.common.vo.*;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.MsgCodeService;
 import com.jbp.service.util.OnePassUtil;
 
 import org.slf4j.Logger;
@@ -65,6 +67,8 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
     private SmsTemplateService smsTemplateService;
     @Autowired
     private SystemNotificationService systemNotificationService;
+    @Autowired
+    private MsgCodeService msgCodeService;
 
 
     @Override
@@ -164,7 +168,7 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
     @Override
     public Boolean sendCommonCode(String phone) {
         // ValidateFormUtil.isPhone(phone, "手机号码错误");
-        beforeSendMessage();
+//        beforeSendMessage();
         DateTime dateTime = DateUtil.date();
 
 //        String clientIp = RequestUtil.getClientIp();
@@ -190,6 +194,8 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
         if (!aBoolean) {
             throw new CrmebException("发送短信失败，请联系后台管理员");
         }
+        // 保存数据库
+        msgCodeService.save(new MsgCode(phone, code.toString()));
         // 将验证码存入redis
         redisUtil.set(SmsConstants.SMS_VALIDATE_PHONE + phone, code, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
         redisUtil.set(SmsConstants.SMS_VALIDATE_PHONE_NUM + phone, 1, 60L);
