@@ -10,6 +10,7 @@ import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.OldcapaxsService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.agent.FundClearingService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,6 +42,9 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+
+        fundClearingService.addFgComm("2024-06");
 
 
 

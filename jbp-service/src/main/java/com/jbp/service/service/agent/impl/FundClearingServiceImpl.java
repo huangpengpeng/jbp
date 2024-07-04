@@ -23,6 +23,7 @@ import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.tank.TankOrders;
 import com.jbp.common.model.user.User;
+import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.FundClearingImportRequest;
@@ -98,7 +99,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
     private PlatformWalletFlowService platformWalletFlowService;
     @Resource
     private OrderDetailService orderDetailService;
-
+    @Resource
+    private WhiteUserService whiteUserService;
 
 
     @Override
@@ -650,9 +652,23 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             Integer J = 1;
             // 增加复销奖
             do {
+
                 if (user == null) {
                     break;
                 }
+
+                if(oldcapaxs.getPhone().equals("白名单跑复消奖")) {
+                    WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), 42L);
+                    if (whiteUser != null) {
+                        UserInvitation userInvitation2 = userInvitationService.getByUser(user.getId());
+                        if (userInvitation2 == null) {
+                            break;
+                        }
+                        user = userService.getById(userInvitation2.getPId());
+                        continue;
+                    }
+                }
+
 
                 Boolean ifAddclearing = false;
 
@@ -671,42 +687,42 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 }
 
 
-List<String> extUser =new ArrayList<>();
-                extUser.add("S10168400641021706");
-                extUser.add("S131912216");
-                extUser.add("S131912722");
-                extUser.add("S13198678");
-                extUser.add("S131912171");
-                extUser.add("S131912503");
-                extUser.add("S13192647");
-                extUser.add("S131913110");
-                extUser.add("S131910300");
-                extUser.add("S131910937");
-                extUser.add("S131911150");
-                extUser.add("S131912054");
-                extUser.add("S13192864");
-                extUser.add("S13198725");
-                extUser.add("S131911816");
-                extUser.add("S1032814077876530");
-                extUser.add("S131913261");
-                extUser.add("S13192343");
-                extUser.add("S10173131163915913");
-                extUser.add("S131912169");
-                extUser.add("S131912865");
-                extUser.add("S13199237");
-                extUser.add("S1319718");
-                extUser.add("S13198100");
-                extUser.add("S10141834593414152");
-                extUser.add("S131912169");
-                extUser.add("S131912672");
-
-                extUser.add("S131912535");
+//List<String> extUser =new ArrayList<>();
+//                extUser.add("S10168400641021706");
+//                extUser.add("S131912216");
+//                extUser.add("S131912722");
+//                extUser.add("S13198678");
+//                extUser.add("S131912171");
+//                extUser.add("S131912503");
+//                extUser.add("S13192647");
+//                extUser.add("S131913110");
+//                extUser.add("S131910300");
+//                extUser.add("S131910937");
+//                extUser.add("S131911150");
+//                extUser.add("S131912054");
+//                extUser.add("S13192864");
+//                extUser.add("S13198725");
+//                extUser.add("S131911816");
+//                extUser.add("S1032814077876530");
+//                extUser.add("S131913261");
+//                extUser.add("S13192343");
+//                extUser.add("S10173131163915913");
+//                extUser.add("S131912169");
+//                extUser.add("S131912865");
+//                extUser.add("S13199237");
+//                extUser.add("S1319718");
+//                extUser.add("S13198100");
+//                extUser.add("S10141834593414152");
+//                extUser.add("S131912169");
+//                extUser.add("S131912672");
+//
+//                extUser.add("S131912535");
 
 
 
                 BigDecimal salse = orderService.getGoodsPrice(goodsRepetitionIdQua,user.getId(), month+"-01 00:00:00");
 
-                if (ifAddclearing && ((salse).compareTo(new BigDecimal(199)) == 1  || extUser.contains( user.getAccount()) )) {
+                if (ifAddclearing && ((salse).compareTo(new BigDecimal(199)) == 1   )) {
                   BigDecimal amt = new BigDecimal( map.get("price").toString()).multiply(new BigDecimal( map.get("number").toString())).multiply(new BigDecimal("0.01")).multiply(pv).setScale(2, BigDecimal.ROUND_DOWN);
 
                     create(user.getId(), map.get("orderSn").toString(), "重复消费积分", amt,
