@@ -7,6 +7,7 @@ import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.*;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.result.TradeOrderQueryResult;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.PayCallbackService;
@@ -209,6 +210,9 @@ public class PayCallbackController {
     @ApiOperation(value = "易宝支付回调")
     @RequestMapping(value = "/yop/{txnSeqno}")
     public String yop(@PathVariable("txnSeqno") String txnSeqno, HttpServletRequest request) {
+        if(StringUtils.startsWith(txnSeqno, "YOP_RW_")){
+            return "SUCCESS";
+        }
         String yopMerchantNo = systemConfigService.getValueByKey("yopMerchantNo");
         TradeOrderQueryResult tradeOrderQueryResult = yopService.queryPayResult(yopMerchantNo, txnSeqno);
         return callbackService.yopPayCallback(tradeOrderQueryResult);

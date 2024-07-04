@@ -49,8 +49,6 @@ public class WalletController {
     @Resource
     private LoginService loginService;
     @Resource
-    private UserInvitationService userInvitationService;
-    @Resource
     private ChannelCardService channelCardService;
     @Resource
     private ChannelIdentityService channelIdentityService;
