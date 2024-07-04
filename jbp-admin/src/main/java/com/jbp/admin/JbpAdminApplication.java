@@ -32,10 +32,6 @@ public class JbpAdminApplication {
     public static void main(String[] args){
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
-        LztTransferMorepyeeService lztTransferMorepyeeService = run.getBean(LztTransferMorepyeeService.class);
-
-        String payCode = "LZT_NDF_76480031869492_5";
-        LztTransferMorepyee result = lztTransferMorepyeeService.transferMorepyee(17, "10090455403", payCode, BigDecimal.valueOf(2), null,"服务费", null, null, "10090336294", "60.177.228.155", "服务费");
     }
 
 }
