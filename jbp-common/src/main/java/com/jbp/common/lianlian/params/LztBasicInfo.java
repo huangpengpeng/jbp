@@ -16,6 +16,7 @@ public class LztBasicInfo {
     private String area;//	区县编码。可参考区县编码表。
     private String address	;//	详细地址。
     private String  memo	;//	备注。
+    private String  notify_url	;//	备注。
     /**
      *     新网银行：xwbank
      *     华通银行：onebank
