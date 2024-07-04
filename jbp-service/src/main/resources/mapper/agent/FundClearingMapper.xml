@@ -69,7 +69,7 @@
             <if test="commName !=null and commName !=''">
                 and c.comm_name=#{commName}
             </if>
-            <if test="ifRefund !=null and ifRefund !=''">
+            <if test="ifRefund !=null">
                 and c.if_refund = #{ifRefund}
             </if>
             <if test="externalNo !=null and externalNo!=''">
