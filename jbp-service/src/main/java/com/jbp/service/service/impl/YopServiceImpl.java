@@ -243,6 +243,8 @@ public class YopServiceImpl implements YopService {
     public AccountTransferOrderResult transferB2bOrder(String requestNo, String fromMerchantNo, String toMerchantNo, String orderAmount, String notifyUrl) {
         AccountTransferOrderParams params = new AccountTransferOrderParams();
         params.setParentMerchantNo("10089066338");
+//        params.setParentMerchantNo("10089625822");
+
         params.setRequestNo(requestNo);
         params.setFromMerchantNo(fromMerchantNo);
         params.setToMerchantNo(toMerchantNo);

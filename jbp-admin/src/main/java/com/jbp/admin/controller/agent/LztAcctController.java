@@ -208,12 +208,21 @@ public class LztAcctController {
 
     @ApiOperation(value = "来账通账户下拉选")
     @GetMapping(value = "/list")
-    public CommonResult<List<LztAcct>> list() {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        Integer merId = systemAdmin.getMerId();
-        QueryWrapper<LztAcct> query = new QueryWrapper<>();
-        query.lambda().eq(merId > 0, LztAcct::getMerId, merId);
-        return CommonResult.success(lztAcctService.list(query));
+    public CommonResult<List<LztAcct>> list(String orgUserId) {
+        if (StringUtils.isEmpty(orgUserId)) {
+            SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
+            Integer merId = systemAdmin.getMerId();
+            QueryWrapper<LztAcct> query = new QueryWrapper<>();
+            query.lambda().eq(merId > 0, LztAcct::getMerId, merId);
+            return CommonResult.success(lztAcctService.list(query));
+        } else {
+            LztAcct lztAcct = lztAcctService.getByUserId(orgUserId);
+            Integer merId = lztAcct.getMerId();
+            QueryWrapper<LztAcct> query = new QueryWrapper<>();
+            query.lambda().eq(merId > 0, LztAcct::getMerId, merId).eq(LztAcct::getPayChannelType, lztAcct.getPayChannelType())
+                    .eq(lztAcct.getIfTransferUser() != null && !lztAcct.getIfTransferUser(), LztAcct::getUserType, "企业用户");
+            return CommonResult.success(lztAcctService.list(query));
+        }
     }
 
     @PreAuthorize("hasAuthority('agent:lzt:acct:serialPage')")

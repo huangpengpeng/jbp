@@ -54,7 +54,7 @@ public class JbpFrontApplication {
         YopService yopService = run.getBean(YopService.class);
 
 
-        modify(yopService);
+//        modify(yopService);
         if(true){
             return;
         }
@@ -62,15 +62,16 @@ public class JbpFrontApplication {
 //        merRegister(yopService);
 
 //        WithdrawCardQueryResult cardQueryResult = yopService.withdrawCardQuery("10090455403");
-        WithdrawCardBindParams params = new WithdrawCardBindParams();
-        params.setMerchantNo("10090455403");
-        params.setAccountNo("6226221705366711");
-        params.setBankCardType("DEBIT_CARD");
-        params.setBankCode("CMBC");
-
-        WithdrawCardBindResult withdrawCardBindResult = yopService.withdrawCardBind(params);
-        System.out.println(JSONObject.toJSONString(withdrawCardBindResult));
+//        WithdrawCardBindParams params = new WithdrawCardBindParams();
+//        params.setMerchantNo("10090455403");
+//        params.setAccountNo("6226221705366711");
+//        params.setBankCardType("DEBIT_CARD");
+//        params.setBankCode("CMBC");
 //
+//        WithdrawCardBindResult withdrawCardBindResult = yopService.withdrawCardBind(params);
+//        System.out.println(JSONObject.toJSONString(withdrawCardBindResult));
+
+        //
 //        cancelWithdrawCard(yopService);
 
 //        yopService.withdrawCardQuery("10090339599");

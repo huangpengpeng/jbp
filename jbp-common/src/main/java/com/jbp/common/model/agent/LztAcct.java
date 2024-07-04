@@ -33,6 +33,7 @@ public class LztAcct extends BaseModel {
         this.username = username;
         this.bankAccount = bankAccount;
         this.ifOpenBankAcct = false;
+        this.ifTransferUser = true;
 
     }
 
@@ -77,6 +78,9 @@ public class LztAcct extends BaseModel {
 
     @ApiModelProperty(value = "手续费(%)")
     private BigDecimal handlingFee;
+
+    @ApiModelProperty(value = "转账给用户")
+    private Boolean ifTransferUser;
 
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)
