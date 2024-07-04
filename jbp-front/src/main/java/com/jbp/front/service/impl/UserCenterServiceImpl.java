@@ -129,6 +129,8 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         List<Long> whiteIdList = Lists.newArrayList(), teamIdList = Lists.newArrayList();
 
         Integer currentUser = userService.getUserId();
+        List<HashMap<String, Object>> mapList = new LinkedList<>();
+
         if (currentUser != 0) {
             whiteIdList = whiteUserService.getByUser(currentUser);
             TeamUser teamUser = teamUserService.getByUser(currentUser);
@@ -142,20 +144,18 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             UserCapaXs userCapaXs = userCapaXsService.getByUser(currentUser);
             List<Long> tempIds = limitTempService.hasLimits(userCapa == null ? null : userCapa.getCapaId(), userCapaXs == null ? null : userCapaXs.getCapaId(), whiteIdList, teamIdList, pId, rId);
 
-            for(int i= 0 ;i<hashMapList.size();i++) {
-                Map<String, Object> map = hashMapList.get(i);
-                if (StringUtils.isNotBlank( MapUtils.getString(map, "capaId", ""))) {
-                    if (!tempIds.contains(Long.valueOf(map.get("capaId").toString()))) {
-                        hashMapList.remove(i);
+            hashMapList.forEach(map-> {
+                if (StringUtils.isBlank(MapUtils.getString(map, "capaId", ""))) {
+                    mapList.add(map);
+                } else {
+                    if (tempIds.contains(Long.valueOf(map.get("capaId").toString()))) {
+                        mapList.add(map);
                     }
-
                 }
-            }
+            });
+
         }
-
-        response.setCenterMenu(hashMapList);
-
-
+        response.setCenterMenu(mapList);
         response.setOrderMenu(systemGroupDataService.getListMapByGid(GroupDataConstants.GROUP_DATA_ID_USER_ORDER));
 
         if (uid <= 0) {
