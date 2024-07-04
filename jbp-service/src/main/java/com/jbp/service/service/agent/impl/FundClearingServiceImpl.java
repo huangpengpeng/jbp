@@ -659,7 +659,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
                 if(oldcapaxs.getPhone().equals("白名单跑复消奖")) {
                     WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), 42L);
-                    if (whiteUser != null) {
+                    if (whiteUser == null) {
                         UserInvitation userInvitation2 = userInvitationService.getByUser(user.getId());
                         if (userInvitation2 == null) {
                             break;
