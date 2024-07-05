@@ -722,7 +722,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
                 BigDecimal salse = orderService.getGoodsPrice(goodsRepetitionIdQua,user.getId(), month+"-01 00:00:00");
 
-                if (ifAddclearing && ((salse).compareTo(new BigDecimal(199)) == 1   )) {
+                if (ifAddclearing && ((salse).compareTo(new BigDecimal(199)) == 1  ||  (salse).compareTo(new BigDecimal(199)) == 0 )) {
                   BigDecimal amt = new BigDecimal( map.get("price").toString()).multiply(new BigDecimal( map.get("number").toString())).multiply(new BigDecimal("0.01")).multiply(pv).setScale(2, BigDecimal.ROUND_DOWN);
 
                     create(user.getId(), map.get("orderSn").toString(), "重复消费积分", amt,
