@@ -14,7 +14,7 @@ package com.jbp.common.constants;
  */
 public class Constants {
 
-    public static final long TOKEN_EXPRESS_MINUTES = (60 * 24 * 3); //3天
+    public static final long TOKEN_EXPRESS_MINUTES = (60 * 24 * 365); //365天
 
     public static final int NUM_ZERO = 0;
     public static final int NUM_ONE = 1;
