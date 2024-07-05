@@ -63,6 +63,6 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction()));
+        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(),request.getTeamId()));
     }
 }
