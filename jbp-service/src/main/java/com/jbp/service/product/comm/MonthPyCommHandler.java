@@ -208,7 +208,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
         // 服务关系上拿
         List<String> finalInternalList = internalList;
         underRelationUserFeeMap.forEach((uid, commFee) -> {
-            if(!finalInternalList.contains(uid)){
+            if(!finalInternalList.contains(uid.toString())){
                 // 查询下级客户
                 ClearingUser self = cleaingUserMap.get(uid);
                 BigDecimal totalFee = commFee.multiply(JSONObject.parseObject(self.getRule(), Rule.class).getUpperScale());
@@ -252,7 +252,7 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
 
         // 销售关系上拿
         uuperInvitationUserFeeMap.forEach((uid, commFee) -> {
-            if(!finalInternalList.contains(uid)){
+            if(!finalInternalList.contains(uid.toString())){
                 // 查询下级客户
                 ClearingUser self = cleaingUserMap.get(uid);
                 BigDecimal totalFee = commFee.multiply(JSONObject.parseObject(self.getRule(), Rule.class).getUpperScale());
