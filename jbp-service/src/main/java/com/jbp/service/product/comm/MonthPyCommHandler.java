@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -57,6 +58,8 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
     private ClearingInvitationFlowService invitationFlowService;
     @Resource
     private ClearingRelationFlowService relationFlowService;
+    @Resource
+    private Environment environment;
 
     @Override
     public Integer getType() {
@@ -196,80 +199,92 @@ public class MonthPyCommHandler extends AbstractProductCommHandler {
             }
         }
 
+        // 内部账户
+        String internalUid = environment.getProperty("internal.uid");
+        List<String> internalList = com.beust.jcommander.internal.Lists.newArrayList();
+        if(StringUtils.isNotEmpty(internalUid)){
+            internalList = Arrays.stream(internalUid.split(",")).collect(Collectors.toList());
+        }
         // 服务关系上拿
+        List<String> finalInternalList = internalList;
         underRelationUserFeeMap.forEach((uid, commFee) -> {
-            // 查询下级客户
-            ClearingUser self = cleaingUserMap.get(uid);
-            BigDecimal totalFee = commFee.multiply(JSONObject.parseObject(self.getRule(), Rule.class).getUpperScale());
-            List<ClearingRelationFlow> relationFlows = relationFlowService.getByPUser(uid);
-            if (CollectionUtils.isNotEmpty(relationFlows)) {
-                Map<Integer, List<ClearingRelationFlow>> relationListMap = FunctionUtil.valueMap(relationFlows, ClearingRelationFlow::getLevel);
-                for (int i = 1; i <= 10; i++) {
-                    List<ClearingRelationFlow> clearingRelationFlows = relationListMap.get(Integer.valueOf(i));
-                    if (CollectionUtils.isEmpty(clearingRelationFlows)) {
-                        break;
-                    }
-                    List<ClearingUser> usableList = Lists.newArrayList();
-                    for (ClearingRelationFlow clearingRelationFlow : clearingRelationFlows) {
-                        ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getUId());
-                        if (clearingUser == null) {
-                            continue;
+            if(!finalInternalList.contains(uid)){
+                // 查询下级客户
+                ClearingUser self = cleaingUserMap.get(uid);
+                BigDecimal totalFee = commFee.multiply(JSONObject.parseObject(self.getRule(), Rule.class).getUpperScale());
+                List<ClearingRelationFlow> relationFlows = relationFlowService.getByPUser(uid);
+                if (CollectionUtils.isNotEmpty(relationFlows)) {
+                    Map<Integer, List<ClearingRelationFlow>> relationListMap = FunctionUtil.valueMap(relationFlows, ClearingRelationFlow::getLevel);
+                    for (int i = 1; i <= 10; i++) {
+                        List<ClearingRelationFlow> clearingRelationFlows = relationListMap.get(Integer.valueOf(i));
+                        if (CollectionUtils.isEmpty(clearingRelationFlows)) {
+                            break;
                         }
-                        Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
-                        if (rule.getUpperRelationNum() >= i) {
-                            usableList.add(clearingUser);
+                        List<ClearingUser> usableList = Lists.newArrayList();
+                        for (ClearingRelationFlow clearingRelationFlow : clearingRelationFlows) {
+                            ClearingUser clearingUser = cleaingUserMap.get(clearingRelationFlow.getUId());
+                            if (clearingUser == null) {
+                                continue;
+                            }
+                            Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
+                            if (rule.getUpperRelationNum() >= i) {
+                                usableList.add(clearingUser);
+                            }
                         }
-                    }
 
-                    if (CollectionUtils.isNotEmpty(usableList)) {
-                        BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_DOWN);
-                        if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
-                            for (ClearingUser clearingUser : usableList) {
-                                ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
-                                        clearingUser.getLevel(), clearingUser.getLevelName(),
-                                        clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                                        clearingFee, "服务上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
-                                clearingBonusFlowList.add(clearingBonusFlow);
+                        if (CollectionUtils.isNotEmpty(usableList)) {
+                            BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_DOWN);
+                            if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
+                                for (ClearingUser clearingUser : usableList) {
+                                    ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
+                                            clearingUser.getLevel(), clearingUser.getLevelName(),
+                                            clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
+                                            clearingFee, "服务上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
+                                    clearingBonusFlowList.add(clearingBonusFlow);
+                                }
                             }
                         }
                     }
                 }
             }
+
         });
 
         // 销售关系上拿
         uuperInvitationUserFeeMap.forEach((uid, commFee) -> {
-            // 查询下级客户
-            ClearingUser self = cleaingUserMap.get(uid);
-            BigDecimal totalFee = commFee.multiply(JSONObject.parseObject(self.getRule(), Rule.class).getUpperScale());
-            List<ClearingInvitationFlow> invitationFlows = invitationFlowService.getByPUser(uid);
-            if (CollectionUtils.isNotEmpty(invitationFlows)) {
-                Map<Integer, List<ClearingInvitationFlow>> invitationListMap = FunctionUtil.valueMap(invitationFlows, ClearingInvitationFlow::getLevel);
-                for (int i = 1; i <= 10; i++) {
-                    List<ClearingInvitationFlow> clearingInvitationFlows = invitationListMap.get(Integer.valueOf(i));
-                    if (CollectionUtils.isEmpty(clearingInvitationFlows)) {
-                        break;
-                    }
-                    List<ClearingUser> usableList = Lists.newArrayList();
-                    for (ClearingInvitationFlow clearingInvitationFlow : clearingInvitationFlows) {
-                        ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getUId());
-                        if (clearingUser == null) {
-                            continue;
+            if(!finalInternalList.contains(uid)){
+                // 查询下级客户
+                ClearingUser self = cleaingUserMap.get(uid);
+                BigDecimal totalFee = commFee.multiply(JSONObject.parseObject(self.getRule(), Rule.class).getUpperScale());
+                List<ClearingInvitationFlow> invitationFlows = invitationFlowService.getByPUser(uid);
+                if (CollectionUtils.isNotEmpty(invitationFlows)) {
+                    Map<Integer, List<ClearingInvitationFlow>> invitationListMap = FunctionUtil.valueMap(invitationFlows, ClearingInvitationFlow::getLevel);
+                    for (int i = 1; i <= 10; i++) {
+                        List<ClearingInvitationFlow> clearingInvitationFlows = invitationListMap.get(Integer.valueOf(i));
+                        if (CollectionUtils.isEmpty(clearingInvitationFlows)) {
+                            break;
                         }
-                        Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
-                        if (rule.getUpperInvitationNum() >= i) {
-                            usableList.add(clearingUser);
+                        List<ClearingUser> usableList = Lists.newArrayList();
+                        for (ClearingInvitationFlow clearingInvitationFlow : clearingInvitationFlows) {
+                            ClearingUser clearingUser = cleaingUserMap.get(clearingInvitationFlow.getUId());
+                            if (clearingUser == null) {
+                                continue;
+                            }
+                            Rule rule = JSONObject.parseObject(clearingUser.getRule(), Rule.class);
+                            if (rule.getUpperInvitationNum() >= i) {
+                                usableList.add(clearingUser);
+                            }
                         }
-                    }
-                    if (CollectionUtils.isNotEmpty(usableList)) {
-                        BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_DOWN);
-                        if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
-                            for (ClearingUser clearingUser : usableList) {
-                                ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
-                                        clearingUser.getLevel(), clearingUser.getLevelName(),
-                                        clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
-                                        clearingFee, "销售上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
-                                clearingBonusFlowList.add(clearingBonusFlow);
+                        if (CollectionUtils.isNotEmpty(usableList)) {
+                            BigDecimal clearingFee = totalFee.divide(BigDecimal.valueOf(usableList.size()), 2, BigDecimal.ROUND_DOWN);
+                            if (ArithmeticUtils.gt(clearingFee, BigDecimal.ZERO)) {
+                                for (ClearingUser clearingUser : usableList) {
+                                    ClearingBonusFlow clearingBonusFlow = new ClearingBonusFlow(clearingUser.getUid(), clearingUser.getAccountNo(),
+                                            clearingUser.getLevel(), clearingUser.getLevelName(),
+                                            clearingFinal.getId(), clearingFinal.getName(), clearingFinal.getCommName(),
+                                            clearingFee, "销售上拿-" + "层数:" + i + "总金额:" + totalFee + "提供账户:" + self.getAccountNo(), clearingUser.getRule());
+                                    clearingBonusFlowList.add(clearingBonusFlow);
+                                }
                             }
                         }
                     }
