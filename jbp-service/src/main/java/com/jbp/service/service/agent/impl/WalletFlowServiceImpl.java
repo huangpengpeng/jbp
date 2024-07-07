@@ -9,6 +9,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.SysConfigConstants;
+import com.jbp.common.model.agent.Team;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.WalletConfig;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
@@ -21,9 +23,7 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletFlowVo;
 import com.jbp.service.dao.agent.WalletFlowDao;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.WalletConfigService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.WalletFlowService;
 import com.jbp.service.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +51,10 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     SystemConfigService systemConfigService;
     @Resource
     private WalletFlowDao dao;
+    @Resource
+    private TeamUserService teamUserService;
+    @Resource
+    private TeamService teamService;
 
     @Override
     public WalletFlow add(Integer uid, Integer type, BigDecimal amt, String operate, String action, String externalNo,
@@ -132,7 +136,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action) {
+    public List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action,String teamId) {
         Long id = 0L;
         List<WalletFlowVo> result = Lists.newArrayList();
         do {
@@ -141,7 +145,12 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                     .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
                     .eq(StringUtils.isNotEmpty(externalNo), WalletFlow::getExternalNo, externalNo)
                     .eq(StringUtils.isNotEmpty(action), WalletFlow::getAction, action);
-            getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
+
+                getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
+            if(com.jbp.common.utils.StringUtils.isNotBlank(teamId)) {
+                Team team =  teamService.getOne(new QueryWrapper<Team>().lambda().eq(Team::getLeaderId,teamId));
+                walletLambdaQueryWrapper.apply("  uid in (select uid from eb_team_user where tid = " + team.getId() + ") ");
+            }
             walletLambdaQueryWrapper.orderByAsc(WalletFlow::getId);
             walletLambdaQueryWrapper.gt(WalletFlow::getId, id).last("LIMIT 1000");
             List<WalletFlow> list = list(walletLambdaQueryWrapper);
@@ -150,13 +159,16 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
             }
             List<Integer> uIdList = list.stream().map(WalletFlow::getUid).collect(Collectors.toList());
             Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+            Map<Integer, TeamUser> teamUserUidMap = teamUserService.getUidMapList(uIdList);
             list.forEach(e -> {
                 WalletConfig walletConfig = walletConfigService.getByType(e.getWalletType());
                 e.setTypeName(walletConfig != null ? walletConfig.getName() : "");
                 User user = uidMapList.get(e.getUid());
                 e.setAccount(user != null ? user.getAccount() : "");
+                TeamUser teamUser = teamUserUidMap.get(e.getUid());
                 WalletFlowVo walletFlowVo = new WalletFlowVo();
                 BeanUtils.copyProperties(e, walletFlowVo);
+                walletFlowVo.setTeamName(teamUser != null ? teamUser.getName() : "");
                 result.add(walletFlowVo);
             });
             id = list.get(list.size()-1).getId();

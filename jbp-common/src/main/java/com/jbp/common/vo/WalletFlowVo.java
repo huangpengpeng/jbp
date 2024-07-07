@@ -44,5 +44,7 @@ public class WalletFlowVo{
     private String typeName;
     @ApiModelProperty("创建时间")
     private Date gmtModify;
+    @ApiModelProperty("团队")
+    private String teamName;
 
 }

@@ -22,7 +22,7 @@ public interface WalletFlowService extends IService<WalletFlow> {
 
     List<WalletFlow> details(Integer uid, String action);
 
-    List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action);
+    List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action,String teamId);
 
     void init();
 }
