@@ -1,9 +1,5 @@
 package com.jbp.common.kqbill.invoke;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bill99.crypto.service.CryptoService;
@@ -26,9 +22,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
 
 @Service
 public class BuildHttpsClient {
