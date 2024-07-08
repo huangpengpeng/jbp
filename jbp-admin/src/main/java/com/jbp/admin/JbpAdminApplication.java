@@ -59,8 +59,11 @@ public class JbpAdminApplication {
         List<OrdersFundSummary> list =  ordersFundSummaryService.list();
         int i=0 ;
         List<String> list1 =new ArrayList<>();
-        list1.add("已取消");
-        list1.add("已拦截");
+        list1.add("已创建");
+        list1.add("待审核");
+        list1.add("待出款");
+        list1.add("已出款");
+
         for(OrdersFundSummary ordersFundSummary : list){
             i++;
             List<FundClearing> fundClearings = fundClearingService.getByExternalNo(ordersFundSummary.getOrdersSn(),list1);
