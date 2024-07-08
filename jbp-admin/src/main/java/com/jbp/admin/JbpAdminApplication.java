@@ -63,7 +63,7 @@ public class JbpAdminApplication {
         int i=0 ;
         for(OrdersFundSummary ordersFundSummary : list){
             i++;
-            List<FundClearing> fundClearings = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo,ordersFundSummary.getOrdersSn()));
+            List<FundClearing> fundClearings = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo,ordersFundSummary.getOrdersSn()).ne(FundClearing::getStatus, "已取消"));
             BigDecimal commamt  = BigDecimal.ZERO;
             for(FundClearing fundClearing : fundClearings){
                 commamt = commamt.add(fundClearing.getCommAmt());
