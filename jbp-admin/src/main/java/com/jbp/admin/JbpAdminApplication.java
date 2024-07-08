@@ -55,23 +55,23 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 //
-        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
-
-        OrdersFundSummaryService ordersFundSummaryService = run.getBean(OrdersFundSummaryService.class);
-
-        List<OrdersFundSummary> list =  ordersFundSummaryService.list();
-        int i=0 ;
-        for(OrdersFundSummary ordersFundSummary : list){
-            i++;
-            List<FundClearing> fundClearings = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo,ordersFundSummary.getOrdersSn()).ne(FundClearing::getStatus, "已取消"));
-            BigDecimal commamt  = BigDecimal.ZERO;
-            for(FundClearing fundClearing : fundClearings){
-                commamt = commamt.add(fundClearing.getCommAmt());
-            }
-            ordersFundSummary.setCommAmt(commamt);
-            ordersFundSummaryService.updateById(ordersFundSummary);
-            System.out.println("初始化"+ i);
-        }
+//        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+//
+//        OrdersFundSummaryService ordersFundSummaryService = run.getBean(OrdersFundSummaryService.class);
+//
+//        List<OrdersFundSummary> list =  ordersFundSummaryService.list();
+//        int i=0 ;
+//        for(OrdersFundSummary ordersFundSummary : list){
+//            i++;
+//            List<FundClearing> fundClearings = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo,ordersFundSummary.getOrdersSn()).ne(FundClearing::getStatus, "已取消"));
+//            BigDecimal commamt  = BigDecimal.ZERO;
+//            for(FundClearing fundClearing : fundClearings){
+//                commamt = commamt.add(fundClearing.getCommAmt());
+//            }
+//            ordersFundSummary.setCommAmt(commamt);
+//            ordersFundSummaryService.updateById(ordersFundSummary);
+//            System.out.println("初始化"+ i);
+//        }
 
 
 //
