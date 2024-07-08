@@ -2,15 +2,10 @@ package com.jbp.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.model.agent.Oldcapaxs;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.service.product.comm.CommCalculateResult;
-import com.jbp.service.product.comm.ProductCommChain;
-import com.jbp.service.service.OldcapaxsService;
-import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderService;
+import com.jbp.common.model.agent.FundClearing;
+import com.jbp.common.model.agent.OrdersFundSummary;
 import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.OrdersFundSummaryService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.LinkedList;
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -42,9 +37,26 @@ public class JbpAdminApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 //
-//        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
+
+        OrdersFundSummaryService ordersFundSummaryService = run.getBean(OrdersFundSummaryService.class);
+
+        List<OrdersFundSummary> list =  ordersFundSummaryService.list();
+        int i=0 ;
+        for(OrdersFundSummary ordersFundSummary : list){
+            i++;
+            List<FundClearing> fundClearings = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo,ordersFundSummary.getOrdersSn()));
+            BigDecimal commamt  = BigDecimal.ZERO;
+            for(FundClearing fundClearing : fundClearings){
+                commamt = commamt.add(fundClearing.getCommAmt());
+            }
+            ordersFundSummary.setCommAmt(commamt);
+            ordersFundSummaryService.updateById(ordersFundSummary);
+            System.out.println("初始化"+ i);
+        }
+
+
 //
-//        fundClearingService.addFgComm("2024-06");
 
 
 
