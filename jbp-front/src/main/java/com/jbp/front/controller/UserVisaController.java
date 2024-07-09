@@ -1,5 +1,6 @@
 package com.jbp.front.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasc.open.api.bean.base.BaseRes;
@@ -21,6 +22,7 @@ import com.jbp.common.model.user.UserVisa;
 import com.jbp.common.model.user.UserVisaOrder;
 import com.jbp.common.request.UserViseRequest;
 import com.jbp.common.request.UserViseSaveRequest;
+import com.jbp.common.request.YzhSignRequest;
 import com.jbp.common.response.UserVisaResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
@@ -30,12 +32,20 @@ import com.jbp.service.service.UserVisaOrderService;
 import com.jbp.service.service.UserVisaService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.util.StringUtils;
+import com.yunzhanghu.sdk.apiusersign.ApiUserSignServiceClient;
+import com.yunzhanghu.sdk.apiusersign.domain.ApiUserSignRequest;
+import com.yunzhanghu.sdk.apiusersign.domain.ApiUserSignResponse;
+import com.yunzhanghu.sdk.base.YzhConfig;
+import com.yunzhanghu.sdk.base.YzhRequest;
+import com.yunzhanghu.sdk.base.YzhResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import jodd.http.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +76,8 @@ public class UserVisaController {
     private ChannelIdentityService channelIdentityService;
     @Autowired
     private SystemConfigService systemConfigService;
+    @Autowired
+    private Environment environment;
 
 
     @ApiOperation(value = "增加用户签署法大大", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -362,14 +374,12 @@ public class UserVisaController {
     }
 
 
-
     @EncryptIgnore
     @ApiOperation(value = "法大大回调", httpMethod = "POST")
     @ResponseBody
     @PostMapping(value = "/userVisaCallback")
     public String userVisaCallback(
-                              HttpServletRequest httpServletRequest) throws IOException {
-
+            HttpServletRequest httpServletRequest) throws IOException {
 
 
         StringBuilder body = new StringBuilder();
@@ -378,19 +388,19 @@ public class UserVisaController {
         while ((line = reader.readLine()) != null) {
             body.append(line);
         }
-        JSONObject jsonObject = JSONObject.parseObject(URLDecoder.decode(URLDecoder.decode(body.toString(),"UTF-8"),"UTF-8").replaceAll("bizContent=",""));
+        JSONObject jsonObject = JSONObject.parseObject(URLDecoder.decode(URLDecoder.decode(body.toString(), "UTF-8"), "UTF-8").replaceAll("bizContent=", ""));
 
-        log.info("法大大回调 {}",jsonObject);
+        log.info("法大大回调 {}", jsonObject);
         if (jsonObject == null) {
             return "success";
         }
 
-        if (jsonObject.getString("signTaskId")  == null) {
-          return "success";
+        if (jsonObject.getString("signTaskId") == null) {
+            return "success";
         }
 
-        if (jsonObject.getString("signTaskStatus")  != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
-                UserVisaResponse userVisa = userVisaService.getVisaTask(  jsonObject.getString("signTaskId") );
+        if (jsonObject.getString("signTaskStatus") != null && jsonObject.getString("signTaskStatus").equals("task_finished")) {
+            UserVisaResponse userVisa = userVisaService.getVisaTask(jsonObject.getString("signTaskId"));
             if (userVisa != null) {
                 String platfrom = "";
                 if (userVisa.getPlatfrom().equals("sm")) {
@@ -455,5 +465,55 @@ public class UserVisaController {
 //
 //    }
 //
+
+
+    @ApiOperation(value = "灵活用工云账户-用户签约", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/yunzhanghuSign", method = {
+            RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<String> yunzhanghuSign(@RequestBody YzhSignRequest yzhSignRequest)
+            throws Exception {
+        String publicSign = environment.getProperty("yunzhanghu.public");
+        String privateSign = environment.getProperty("yunzhanghu.privateSign");
+// 配置基础信息
+        YzhConfig config = new YzhConfig();
+        config.setDealerId("06278954");
+        config.setBrokerId("yiyun73");
+        config.setYzhAppKey("4O4WPf0YK7Bla13lph3ihklQSFhsR6C4");
+        config.setYzh3DesKey("zVcv55cLS2YYS093fUhtMIHu");
+        config.setYzhRsaPrivateKey(privateSign);
+        config.setYzhRsaPublicKey(publicSign);
+        config.setSignType(YzhConfig.SignType.RSA);
+        config.setYzhUrl("https://api-service.yunzhanghu.com");
+        ApiUserSignServiceClient client = new ApiUserSignServiceClient(config);
+// 配置请求参数
+        ApiUserSignRequest request = new ApiUserSignRequest();
+        request.setDealerId("06278954");
+        request.setBrokerId("yiyun73");
+        request.setRealName(yzhSignRequest.getRealName());
+        request.setIdCard(yzhSignRequest.getIdCard());
+        request.setCardType("idcard");
+        YzhResponse<ApiUserSignResponse> response = null;
+        try {
+            // request-id：请求ID，请求的唯一标识
+            // 建议平台企业自定义 request-id，并记录在日志中，便于问题发现及排查
+            // 如未自定义 request-id，将使用 SDK 中的 UUID 方法自动生成。注意：UUID 方法生成的 request-id 不能保证全局唯一，推荐自定义 request-id
+            response = client.apiUserSign(YzhRequest.build("requestId", request));
+            if (response.isSuccess()) {
+                // 操作成功
+                ApiUserSignResponse data = response.getData();
+                System.out.println("操作成功 " + data);
+            } else {
+                // 失败返回
+                System.out.println("失败返回 code：" + response.getCode() + " message：" + response.getMessage() + " requestId：" + response.getRequestId());
+            }
+        } catch (Exception e) {
+            // 发生异常
+            e.printStackTrace();
+        }
+
+        return CommonResult.success();
+    }
+
 
 }

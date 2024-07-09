@@ -354,6 +354,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
             for (FundClearing fundClearing : fundClearingList) {
                 fundClearing.setStatus(FundClearing.Constants.已拦截.toString());
                 fundClearing.setRemark(remark);
+                // 减少金额
+                ordersFundSummaryService.reduceCommAmt(fundClearing.getExternalNo(), fundClearing.getSendAmt());
             }
             updateBatchById(fundClearingList);
         }

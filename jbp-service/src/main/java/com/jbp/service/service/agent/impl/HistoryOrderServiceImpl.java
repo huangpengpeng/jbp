@@ -63,9 +63,11 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         String sql = "  SELECT o.userId as uid, u.username as nickname, u.numberCode as account, " +
                 "                o.orderSn as orderNo, o.status , o.payPrice, o.freightPrice, o.goodsPrice, " +
                 "                o.receiveName, o.mobile as receiveMobile, o.province, o.city, o.area, o.address, " +
-                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId ,o.shipTime " +
+                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId ,o.shipTime, leaderu.grouponName teamName " +
                 "        FROM " + request.getDbName() + ".orders AS o " +
                 "        LEFT JOIN " + request.getDbName() + ".user AS u ON u.`id` = o.userId " +
+                "        LEFT JOIN " + request.getDbName() + ".userreflection AS uf ON uf.userId = o.userId " +
+                "        LEFT JOIN " + request.getDbName() + ".USER AS leaderu ON leaderu.id = uf.leaderId " +
                 "        WHERE 1 =1 ";
 
 
@@ -94,7 +96,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         }
         List<HistoryOrderResponse> list = JSONArray.parseArray(JSONArray.toJSONString(maps), HistoryOrderResponse.class);
         String orderIdStr = list.stream().map(s -> String.valueOf(s.getOrderId())).collect(Collectors.joining(","));
-        List<Map<String, Object>> goodsList = SqlRunner.db().selectList("select * from " + request.getDbName() + ".ordergoods where orderId in({0})", orderIdStr);
+        List<Map<String, Object>> goodsList = SqlRunner.db().selectList("select * from " + request.getDbName() + ".ordergoods where orderId in("+orderIdStr+")" );
         List<HistoryOrderDetailResponse> details = JSONArray.parseArray(JSONArray.toJSONString(goodsList), HistoryOrderDetailResponse.class);
         Map<Long, List<HistoryOrderDetailResponse>> detailsMap = FunctionUtil.valueMap(details, HistoryOrderDetailResponse::getOrderId);
         for (HistoryOrderResponse order : list) {
