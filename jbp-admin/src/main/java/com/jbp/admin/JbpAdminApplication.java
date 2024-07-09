@@ -2,20 +2,22 @@ package com.jbp.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.model.agent.FundClearing;
-import com.jbp.common.model.agent.OrdersFundSummary;
+import com.jbp.admin.task.user.UserCapaXsQueueTask;
+import com.jbp.common.model.agent.*;
 import com.google.common.collect.Maps;
-import com.jbp.common.model.agent.ClearingFinal;
-import com.jbp.common.model.agent.Oldcapaxs;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.request.agent.ClearingRequest;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.condition.CapaXsInvitationLine2Handler;
+import com.jbp.service.condition.CapaXsInviteOneLevelHandler;
+import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.service.OldcapaxsService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
@@ -51,6 +53,21 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+
+
+//
+//        UserCapaXsQueueTask userCapaXsQueueTask = run.getBean(UserCapaXsQueueTask.class);
+//        userCapaXsQueueTask.UserCapaXsQueueTask();
+
+//        ConditionChain conditionChain = run.getBean(ConditionChain.class);
+//        CapaXsService  capaXsService = run.getBean(CapaXsService.class);
+//        CapaXs capaXs = capaXsService.getById(4);
+//        List<RiseCondition> conditionList = capaXs.getConditionList();
+//        for (RiseCondition riseCondition :conditionList ) {
+//            conditionChain.isOk(75517,riseCondition );
+//        }
+
 //
 //        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
 //
