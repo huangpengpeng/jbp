@@ -50,7 +50,7 @@ public class InvitationScoreController {
     @PreAuthorize("hasAuthority('agent:invitation:score:download')")
     @PostMapping("/download")
     @ApiOperation("业绩下载")
-    public CommonResult<String> download(@Validated @RequestBody ScoreDownloadRequest request) {
+    public CommonResult<Boolean> download(@Validated @RequestBody ScoreDownloadRequest request) {
         return CommonResult.success(invitationScoreService.download(request));
     }
 }

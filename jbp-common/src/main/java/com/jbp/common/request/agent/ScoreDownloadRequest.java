@@ -17,6 +17,9 @@ import java.util.List;
 @ApiModel(value = "ScoreDownloadRequest对象", description = "业绩下载")
 public class ScoreDownloadRequest {
 
+    @ApiModelProperty("表格名称")
+    private String name;
+
     @ApiModelProperty("账户列表 可以为空 复选框多个账号换行")
     private List<String> accountList;
 

@@ -425,4 +425,10 @@ public interface UserService extends IService<User> {
     void checkTeamAccountTeamCode(Integer uid,Integer receiveUserId);
 
     Boolean ifOpenSecurityPhone();
+
+    void registerSix(String account, String nickname);
+
+    String getRandomPhone(String head);
+
+    void registerThree(String account, String nickname);
 }

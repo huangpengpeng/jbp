@@ -12,8 +12,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
-import com.jbp.common.excel.FundClearingExcel;
-import com.jbp.common.excel.ScoreDownLoadExcel;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -25,8 +23,8 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
-import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.agent.InvitationScoreDao;
+import com.jbp.service.dao.agent.ScoreDownloadExcelDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +48,7 @@ import java.util.stream.Collectors;
 public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, InvitationScore> implements InvitationScoreService {
 
     @Resource
-    private OssService ossService;
+    private ScoreDownloadExcelDao scoreDownloadExcelDao;
     @Resource
     private UploadService uploadService;
     @Resource
@@ -216,7 +214,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
     }
 
     @Override
-    public String download(ScoreDownloadRequest request) {
+    public boolean download(ScoreDownloadRequest request) {
         if (CollectionUtils.isEmpty(request.getAccountList())) {
             if (request.getStartTime() == null || request.getEndTime() == null) {
                 throw new RuntimeException("未指定固定账户,业绩开始时间-结束时间不能为空");
@@ -244,7 +242,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
         Map<Integer, UserCapa> capaMap = Maps.newConcurrentMap();
         Map<Integer, UserCapaXs> capaXsMap = Maps.newConcurrentMap();
 
-       int i = 1;
+        int i = 1;
         for (Order order : successList) {
             log.info("总数:{},当前条数:{}", successList.size(), i++);
             LinkedList<Integer> pidList = pidListMap.get(order.getUid());
@@ -257,7 +255,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
             }
             pidList = new LinkedList<>();
             for (UserUpperDto upperDto : allUpper) {
-                if(upperDto.getPId() == null){
+                if (upperDto.getPId() == null) {
                     continue;
                 }
                 if (CollectionUtils.isNotEmpty(uidList)) {
@@ -282,7 +280,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapaXs userCapaXs = capaXsMap.get(upperDto.getPId());
                     if (userCapaXs == null) {
                         userCapaXs = userCapaXsService.getByUser(upperDto.getPId());
-                        if(userCapaXs != null){
+                        if (userCapaXs != null) {
                             capaXsMap.put(upperDto.getPId(), userCapaXs);
                         }
                     }
@@ -297,7 +295,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
 
         List<String> orderNoList = successList.stream().map(Order::getOrderNo).collect(Collectors.toList());
         Map<String, List<OrderDetail>> orderDetailMap = orderDetailService.getMapByOrderNoList(orderNoList);
-        List<ScoreDownLoadExcel> list = Lists.newArrayList();
+        List<ScoreDownloadExcel> list = Lists.newArrayList();
 
         Map<Integer, User> userMap = Maps.newConcurrentMap();
         Map<Integer, TeamUser> userTeamMap = Maps.newConcurrentMap();
@@ -313,11 +311,12 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                 BigDecimal score = orderDetailService.getRealScore(orderDetail);
                 BigDecimal level = BigDecimal.ONE;
                 for (Integer pid : pidList) {
-                    ScoreDownLoadExcel excel = new ScoreDownLoadExcel();
+                    ScoreDownloadExcel excel = new ScoreDownloadExcel();
+                    excel.setName(request.getName());
                     User puser = userMap.get(pid);
                     if (puser == null) {
                         puser = userService.getById(pid);
-                        if(puser != null){
+                        if (puser != null) {
                             userMap.put(pid, puser);
                         }
                     }
@@ -327,7 +326,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     TeamUser pUserTeam = userTeamMap.get(pid);
                     if (pUserTeam == null) {
                         pUserTeam = teamUserService.getByUser(pid);
-                        if(pUserTeam != null){
+                        if (pUserTeam != null) {
                             userTeamMap.put(pid, pUserTeam);
                         }
                     }
@@ -337,7 +336,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapa pUserCapa = capaMap.get(pid);
                     if (pUserCapa == null) {
                         pUserCapa = userCapaService.getByUser(pid);
-                        if(pUserCapa != null){
+                        if (pUserCapa != null) {
                             capaMap.put(pid, pUserCapa);
                         }
                     }
@@ -347,7 +346,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     UserCapaXs pUserCapaXs = capaXsMap.get(pid);
                     if (pUserCapaXs == null) {
                         pUserCapaXs = userCapaXsService.getByUser(pid);
-                        if(pUserCapaXs != null){
+                        if (pUserCapaXs != null) {
                             capaXsMap.put(pid, pUserCapaXs);
                         }
                     }
@@ -356,6 +355,7 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     }
                     excel.setScore(score);
                     excel.setScore2(score.divide(level, 2, BigDecimal.ROUND_DOWN));
+
                     excel.setOrderSn(order.getOrderNo());
                     excel.setProductName(orderDetail.getProductName());
                     excel.setBarCode(orderDetail.getBarCode());
@@ -373,13 +373,15 @@ public class InvitationScoreServiceImpl extends ServiceImpl<InvitationScoreDao, 
                     excel.setStartTime(request.getStartTime());
                     excel.setEndTime(request.getEndTime());
                     list.add(excel);
-                    level  = level.add(BigDecimal.ONE);
+                    level = level.multiply(BigDecimal.valueOf(2));
                 }
             }
         }
-        FileResultVo fileResultVo = uploadService.excelLocalUpload(list, ScoreDownLoadExcel.class);
-        return fileResultVo.getUrl();
+        List<List<ScoreDownloadExcel>> partition = Lists.partition(list, 1000);
+        for (List<ScoreDownloadExcel> scoreDownloadExcels : partition) {
+            scoreDownloadExcelDao.insertBatch(scoreDownloadExcels);
+        }
+        return true;
     }
-
 
 }

@@ -1,6 +1,5 @@
 package com.jbp.admin;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.admin.task.user.UserCapaXsQueueTask;
 import com.jbp.common.model.agent.*;
@@ -21,6 +20,7 @@ import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.OrdersFundSummaryService;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,11 +32,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.math.BigDecimal;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 
 @EnableAsync //开启异步调用
@@ -92,6 +87,7 @@ public class JbpAdminApplication {
 //            ordersFundSummaryService.updateById(ordersFundSummary);
 //            System.out.println("初始化"+ i);
 //        }
+
 
 
 

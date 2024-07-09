@@ -30,5 +30,5 @@ public interface InvitationScoreService extends IService<InvitationScore> {
 
     void orderRefund(String orderSn);
 
-    String download(ScoreDownloadRequest request);
+    boolean download(ScoreDownloadRequest request);
 }
