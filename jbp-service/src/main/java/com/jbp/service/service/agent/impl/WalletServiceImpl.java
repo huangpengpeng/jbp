@@ -221,7 +221,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletDao, Wallet> implements
         List<Map<String, Object>> maps = SqlRunner.db().selectList("select * from tmp_score where action='增加' and ifSuccess is false ");
 
        int i = 0;
-        String externalNo = "CS_202405052001";
+        String externalNo = "CS_202407092037";
         for (Map<String, Object> map : maps) {
             Integer id = MapUtils.getInteger(map, "id");
             Integer uid = MapUtils.getInteger(map, "uid");
