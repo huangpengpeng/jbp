@@ -76,4 +76,12 @@ public class WhiteUserController {
         whiteUserService.batchSave(userWhiteList);
         return CommonResult.success();
     }
+
+    @PreAuthorize("hasAuthority('agent:white:user:export')")
+    @GetMapping( value = "/export")
+    @ApiOperation(value = "导出白名单Excel")
+    public CommonResult<String> exportUserWhite(WhiteUserRequest request) {
+        return CommonResult.success(whiteUserService.export(request));
+    }
+
 }

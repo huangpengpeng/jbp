@@ -7,29 +7,34 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserWhiteDto;
+import com.jbp.common.excel.WhiteUserExcel;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.White;
 import com.jbp.common.model.user.WhiteUser;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.WhiteUserRequest;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.WhiteUserDao;
+import com.jbp.service.service.UploadService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.WhiteService;
 import com.jbp.service.service.WhiteUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> implements WhiteUserService {
     @Resource
     private WhiteUserDao whiteUserDao;
@@ -39,12 +44,15 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
     private WhiteService whiteService;
     @Resource
     private TransactionTemplate transactionTemplate;
+    @Autowired
+    private UploadService uploadService;
 
     @Override
     public PageInfo<WhiteUser> pageList(Integer uid, Long whiteId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<WhiteUser> lambdaQueryWrapper = new LambdaQueryWrapper<WhiteUser>()
                 .eq(!Objects.isNull(uid), WhiteUser::getUid, uid)
-                .eq(!Objects.isNull(whiteId), WhiteUser::getWhiteId, whiteId);
+                .eq(!Objects.isNull(whiteId), WhiteUser::getWhiteId, whiteId)
+                .orderByDesc(WhiteUser::getId);
         Page<WhiteUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WhiteUser> whites = whiteUserDao.selectList(lambdaQueryWrapper);
         if (CollectionUtils.isEmpty(list())) {
@@ -76,6 +84,44 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
         userWhite.setUid(uid);
         userWhite.setOrdersSn(ordersSn);
         save(userWhite);
+    }
+
+    @Override
+    public String export(WhiteUserRequest request) {
+        Integer uid = null;
+        if (com.jbp.service.util.StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        LambdaQueryWrapper<WhiteUser> lqw = new LambdaQueryWrapper<WhiteUser>()
+                .eq(WhiteUser::getUid, uid)
+                .eq(!Objects.isNull(request.getWhiteId()), WhiteUser::getWhiteId, request.getWhiteId());
+        List<WhiteUser> whites = whiteUserDao.selectList(lqw);
+        if (CollectionUtils.isEmpty(list())) {
+            throw new CrmebException("未查询到数据");
+        }
+        List<Integer> uIdList = list().stream().map(WhiteUser::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+
+        List<WhiteUserExcel> result = new LinkedList<>();
+        for (WhiteUser whiteUser : whites) {
+            WhiteUserExcel vo = new WhiteUserExcel();
+            vo.setWhiteId(whiteUser.getWhiteId());
+            vo.setOrdersSn(whiteUser.getOrdersSn());
+            vo.setCreateTime(whiteUser.getGmtCreated());
+            vo.setUid(whiteUser.getUid());
+            User user = uidMapList.get(whiteUser.getUid());
+            vo.setAccount(user != null ? user.getAccount() : "");
+            White white = whiteService.getById(whiteUser.getWhiteId());
+            vo.setWhiteName(white != null ? white.getName() : "");
+            result.add(vo);
+        }
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, WhiteUserExcel.class);
+        log.info("白名单列表导出下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 
     @Override

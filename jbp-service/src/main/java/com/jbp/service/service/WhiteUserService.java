@@ -23,4 +23,6 @@ public interface WhiteUserService extends IService<WhiteUser> {
     List<WhiteUser> getByUserList(Integer uid);
 
     void add(Integer uid, Long whiteId,String ordersSn);
+
+    String export(WhiteUserRequest request);
 }

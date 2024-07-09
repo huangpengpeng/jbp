@@ -45,6 +45,7 @@ import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -266,7 +267,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     }
 
     @Override
-    public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest, String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
+    public void registerPhone(String username, String phone, String account, UserCapaTemplateRequest userCapaTemplateRequest,
+                              String regionPAccount, Integer regionPNode, String invitationPAccount, String pwd) {
         if (userCapaTemplateRequest.getCapaId() == null) {
             throw new CrmebException("等级不能为空！");
         }
@@ -950,6 +952,78 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
         return false;
     }
+
+    @Override
+    public void registerSix(String account, String nickname) {
+        User user = userService.getByAccount(account);
+        if (user == null) {
+            throw new RuntimeException("用户编号错误");
+        }
+        for (int i = 1; i < 4; i++) {
+            //一阶-三个一星账号
+            String nickname1 = nickname + "-" + i;
+            String phone1 = getRandomPhone("9");
+            User user1 = registerPhone(nickname1, phone1, user.getId());
+            UserCapaXs userCapaXs1 = new UserCapaXs();
+            userCapaXs1.setUid(user1.getId());
+            userCapaXs1.setCapaId(3L);
+            userCapaXsService.save(userCapaXs1);
+
+            //二阶-三个一星账号
+            String nickname2 = nickname + "-" + i + "-1";
+            String phone2 = getRandomPhone("9");
+            User user2 = registerPhone(nickname2, phone2, user1.getId());
+            UserCapaXs userCapaXs2 = new UserCapaXs();
+            userCapaXs2.setUid(user2.getId());
+            userCapaXs2.setCapaId(3L);
+            userCapaXsService.save(userCapaXs2);
+        }
+    }
+
+    @Override
+    public void registerThree(String account, String nickname) {
+        User user = userService.getByAccount(account);
+        if (user == null) {
+            throw new RuntimeException("用户编号错误");
+        }
+        //一阶-一个二星账号
+        String nickname1 = nickname + "-1";
+        String phone1 = getRandomPhone("8");
+        User user1 = registerPhone(nickname1, phone1, user.getId());
+        UserCapaXs userCapaXs1 = new UserCapaXs();
+        userCapaXs1.setUid(user1.getId());
+        userCapaXs1.setCapaId(4L);
+        userCapaXsService.save(userCapaXs1);
+        for (int i = 1; i < 4; i++) {
+            //二阶-三个一星账号
+            String nickname2 = nickname + "-1-" + i;
+            String phone2 = getRandomPhone("8");
+            User user2 = registerPhone(nickname2, phone2, user1.getId());
+            UserCapaXs userCapaXs2 = new UserCapaXs();
+            userCapaXs2.setUid(user2.getId());
+            userCapaXs2.setCapaId(3L);
+            userCapaXsService.save(userCapaXs2);
+        }
+    }
+
+
+    @Override
+    public String getRandomPhone(String head) {
+
+        //添加随机生成的手机号
+        String cPhone = head + RandomStringUtils.random(8, "0123456789");
+        while (true){
+            List<User> byPhone = getByPhone(cPhone);
+            if (!byPhone.isEmpty()) {
+                cPhone = head + RandomStringUtils.random(8, "0123456789");
+                continue;
+            }
+            break;
+        }
+        return cPhone;
+    }
+
+
 
     /**
      * 检测手机验证码key

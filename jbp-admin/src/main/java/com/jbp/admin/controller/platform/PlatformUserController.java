@@ -17,7 +17,6 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserCapaXsService;
-import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +24,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.ModelMap;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.UUID;
 
 import java.util.List;
 
@@ -206,6 +201,32 @@ public class PlatformUserController {
     @ApiOperation("用户导入")
     public CommonResult importUser(@RequestBody @Validated List<UserImportRequest> request) {
         userService.importUser(request);
+        return CommonResult.success();
+    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "6个1星")
+    @PostMapping("/register/six")
+    @ApiOperation("6个1星")
+    public CommonResult<User> registerSix(@Validated @RequestBody RegisterChildrenRequest request) {
+        //获取配置信息
+        String value = systemConfigService.getValueByKey("user_upgrade_capaxs");
+        if (value.isEmpty() || value.equals("0")) {
+            throw new CrmebException("未开启配置信息");
+        }
+        userService.registerSix(request.getAccount(),request.getNickname());
+        return CommonResult.success();
+    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "3个1星")
+    @PostMapping("/register/three")
+    @ApiOperation("3个1星")
+    public CommonResult<User> registerThree(@Validated @RequestBody RegisterChildrenRequest request) {
+        //获取配置信息
+        String value = systemConfigService.getValueByKey("user_upgrade_capaxs");
+        if (value.isEmpty() || value.equals("0")) {
+            throw new CrmebException("未开启配置信息");
+        }
+        userService.registerThree(request.getAccount(),request.getNickname());
         return CommonResult.success();
     }
 

@@ -22,6 +22,7 @@ public class WhiteUserRequest  implements Serializable {
 
     @ApiModelProperty("用户账户")
     private String account;
+
     @ApiModelProperty("单号")
     private String ordersSn;
 
