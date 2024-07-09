@@ -96,7 +96,7 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         }
         List<HistoryOrderResponse> list = JSONArray.parseArray(JSONArray.toJSONString(maps), HistoryOrderResponse.class);
         String orderIdStr = list.stream().map(s -> String.valueOf(s.getOrderId())).collect(Collectors.joining(","));
-        List<Map<String, Object>> goodsList = SqlRunner.db().selectList("select * from " + request.getDbName() + ".ordergoods where orderId in({0})", orderIdStr);
+        List<Map<String, Object>> goodsList = SqlRunner.db().selectList("select * from " + request.getDbName() + ".ordergoods where orderId in("+orderIdStr+")" );
         List<HistoryOrderDetailResponse> details = JSONArray.parseArray(JSONArray.toJSONString(goodsList), HistoryOrderDetailResponse.class);
         Map<Long, List<HistoryOrderDetailResponse>> detailsMap = FunctionUtil.valueMap(details, HistoryOrderDetailResponse::getOrderId);
         for (HistoryOrderResponse order : list) {
