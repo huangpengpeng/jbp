@@ -55,7 +55,7 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
                 .orderByDesc(WhiteUser::getId);
         Page<WhiteUser> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<WhiteUser> whites = whiteUserDao.selectList(lambdaQueryWrapper);
-        if (CollectionUtils.isEmpty(list())) {
+        if (CollectionUtils.isEmpty(whites)) {
             return CommonPage.copyPageInfo(page, whites);
         }
         List<Integer> uIdList = list().stream().map(WhiteUser::getUid).collect(Collectors.toList());
@@ -97,10 +97,10 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
             uid = user.getId();
         }
         LambdaQueryWrapper<WhiteUser> lqw = new LambdaQueryWrapper<WhiteUser>()
-                .eq(WhiteUser::getUid, uid)
+                .eq(!Objects.isNull(uid), WhiteUser::getUid, uid)
                 .eq(!Objects.isNull(request.getWhiteId()), WhiteUser::getWhiteId, request.getWhiteId());
         List<WhiteUser> whites = whiteUserDao.selectList(lqw);
-        if (CollectionUtils.isEmpty(list())) {
+        if (CollectionUtils.isEmpty(whites)) {
             throw new CrmebException("未查询到数据");
         }
         List<Integer> uIdList = list().stream().map(WhiteUser::getUid).collect(Collectors.toList());
