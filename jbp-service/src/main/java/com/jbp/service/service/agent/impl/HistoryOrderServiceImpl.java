@@ -63,9 +63,11 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         String sql = "  SELECT o.userId as uid, u.username as nickname, u.numberCode as account, " +
                 "                o.orderSn as orderNo, o.status , o.payPrice, o.freightPrice, o.goodsPrice, " +
                 "                o.receiveName, o.mobile as receiveMobile, o.province, o.city, o.area, o.address, " +
-                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId ,o.shipTime " +
+                "                o.shipName, o.shipSn, o.createTime, o.payTime, o.shipTime, o.id as orderId ,o.shipTime, leaderu.grouponName teamName " +
                 "        FROM " + request.getDbName() + ".orders AS o " +
                 "        LEFT JOIN " + request.getDbName() + ".user AS u ON u.`id` = o.userId " +
+                "        LEFT JOIN " + request.getDbName() + ".userreflection AS uf ON uf.userId = o.userId " +
+                "        LEFT JOIN " + request.getDbName() + ".USER AS leaderu ON leaderu.id = uf.leaderId " +
                 "        WHERE 1 =1 ";
 
 

@@ -77,4 +77,7 @@ public class HistoryOrderResponse implements Serializable {
     @ApiModelProperty(value = "订单商品")
     private List<HistoryOrderDetailResponse> goodsDetails;
 
+    @ApiModelProperty(value = "团队")
+    private String teamName;
+
 }
