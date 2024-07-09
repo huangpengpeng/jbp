@@ -2,12 +2,11 @@ package com.jbp.admin;
 
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
-import com.jbp.common.jdpay.sdk.JdPay;
 import com.jbp.common.request.agent.ScoreDownloadRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.agent.InvitationScoreService;
 
-public class ScoreDownloadDemo {
+public class Demo {
 
     public void init(InvitationScoreService service) {
 
