@@ -64,6 +64,8 @@ public class LianLianPayConfig {
 
         待确认("待确认", "TRADE_CHECKING"),
 
+        已创建("已创建", "TRADE_CREATE"),
+
 
 
 
@@ -173,6 +175,7 @@ public class LianLianPayConfig {
         来账通划拨资金("LZT_FT_"),
         来账通内部代发("LZT_NDF_"),
         来账通外部代发("LZT_WDF_"),
+        来账通外部代发2("LZT_WDF2_"),
         来账通提现("LZT_DW_"),
         设置密码("LZT_SP_"),
         换绑卡("LZT_HBK_"),
