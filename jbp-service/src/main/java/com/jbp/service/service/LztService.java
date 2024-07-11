@@ -141,6 +141,14 @@ public interface LztService {
                                String ip, String phone, Date registerTime, String frmsWareCategory);
 
     /**
+     * 连续代发
+     */
+    LztTransferResult transfer2(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
+                               String amt, String feeAmt, String pwd, String random_key, String payee_type,
+                               String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
+                               String ip, String phone, Date registerTime, String frmsWareCategory);
+
+    /**
      * 修改手机号
      *
      */

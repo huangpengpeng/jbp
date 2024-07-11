@@ -36,6 +36,14 @@ public interface DegreePayService {
                                String amt, String feeAmt, String pwd, String random_key, String payee_type,
                                String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
                                String ip);
+
+    /**
+     * 连续代付
+     */
+    LztTransferResult transfer2(LztAcct lztAcct, String txnPurpose, String txn_seqno,
+                               String amt, String feeAmt, String pwd, String random_key, String payee_type,
+                               String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
+                               String ip);
     /**
      * 代付结果
      */

@@ -133,7 +133,7 @@ public class  YopProducts {
 
 
 //            proInfo.put("undertaker", "PLATFORM_MERCHANT"); // 平台商
-//            proInfo.put("undertaker", "SAAS_SERVICE_PROVIDER");  // 服务商
+            proInfo.put("undertaker", "SAAS_SERVICE_PROVIDER");  // 服务商
 //            proInfo.put("undertaker", "ORDINARY_MERCHANT");  // 标准商户
             products.add(proInfo);
         }

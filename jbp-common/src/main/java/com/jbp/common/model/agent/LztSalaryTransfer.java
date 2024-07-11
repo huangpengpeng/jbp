@@ -139,4 +139,7 @@ public class LztSalaryTransfer extends BaseModel {
     @TableField(exist = false)
     private String regMsg;
 
+    @ApiModelProperty(value = "总金额")
+    @TableField(exist = false)
+    private BigDecimal totalFee;
 }

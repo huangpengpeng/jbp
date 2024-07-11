@@ -76,7 +76,7 @@ public class LztServiceImpl implements LztService {
 
     @Override
     public OpenacctApplyResult createUser2(String oidPartner, String priKey, String txnSeqno, String userId, String userType,
-                                           String notifyUrl,  String returnUrl, String businessScope, String sync_open_lzt, String open_bank) {
+                                           String notifyUrl, String returnUrl, String businessScope, String sync_open_lzt, String open_bank) {
         LianLianPayInfoResult payInfo = lianLianPayService.get();
         OpenacctApplyParams params = new OpenacctApplyParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
@@ -102,7 +102,7 @@ public class LztServiceImpl implements LztService {
         businessInfo.setBusiness_scope(businessScope);
         params.setBusinessInfo(businessInfo);
 
-        LztBasicInfo lztBasicInfo  = new LztBasicInfo();
+        LztBasicInfo lztBasicInfo = new LztBasicInfo();
         lztBasicInfo.setOpen_bank(open_bank);
         lztBasicInfo.setNotify_url(payInfo.getHost() + notifyUrl);
         params.setLztBasicInfo(lztBasicInfo);
@@ -346,7 +346,7 @@ public class LztServiceImpl implements LztService {
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(amt.doubleValue());
         orderInfo.setFee_amount(fee.doubleValue());
-        if(ArithmeticUtils.gte(amt, BigDecimal.valueOf(49999))){
+        if (ArithmeticUtils.gte(amt, BigDecimal.valueOf(49999))) {
             orderInfo.setPostscript("提现");
         }
         params.setOrderInfo(orderInfo);
@@ -502,15 +502,15 @@ public class LztServiceImpl implements LztService {
             } else {
                 break;
             }
-        }while (true);
+        } while (true);
 
         AcctSerialResult acctSerialResult = new AcctSerialResult();
-        if(CollectionUtils.isEmpty(acctbal_list)){
+        if (CollectionUtils.isEmpty(acctbal_list)) {
             acctSerialResult.setAcctbal_list(acctbal_list);
             acctSerialResult.setTotal_page(1);
             acctSerialResult.setPage_no(pageNo);
             acctSerialResult.setTotal_num(0);
-        }else {
+        } else {
             List<List<AcctBalList>> partition = Lists.partition(acctbal_list, limit);
             if (pageNo.intValue() > partition.size()) {
                 acctSerialResult.setAcctbal_list(Lists.newLinkedList());
@@ -527,7 +527,6 @@ public class LztServiceImpl implements LztService {
         }
         return acctSerialResult;
     }
-
 
 
     @Override
@@ -719,7 +718,49 @@ public class LztServiceImpl implements LztService {
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
-        if(ArithmeticUtils.lessEquals(new BigDecimal(amt), BigDecimal.valueOf(49999))){
+        if (ArithmeticUtils.lessEquals(new BigDecimal(amt), BigDecimal.valueOf(49999))) {
+            postscript = "";
+        }
+        TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose, postscript);
+        orderInfo.setFee_amount(Double.valueOf(feeAmt));
+        params.setOrderInfo(orderInfo);
+        TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,
+                "USEROWN", pwd, random_key);
+        params.setPayerInfo(payerInfo);
+        TransferPayeeInfo payeeInfo = new TransferPayeeInfo(payee_type, bank_acctno, bank_code, bank_acctname, cnaps_code);
+        params.setPayeeInfo(payeeInfo);
+        String url = "https://accpapi.lianlianpay.com/v1/txn/transfer";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("代付失败" + payerId);
+        }
+        try {
+            LztTransferResult result = JSON.parseObject(s, LztTransferResult.class);
+            if (result == null || !("8889".equals(result.getRet_code()) || "0000".equals(result.getRet_code()) ||
+                    "8888".equals(result.getRet_code()))) {
+                throw new CrmebException("代付失败：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("代付失败:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public LztTransferResult transfer2(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno, String amt, String feeAmt, String pwd, String random_key, String payee_type, String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip, String phone, Date registerTime, String frmsWareCategory) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        TransferParams params = new TransferParams(timestamp, oidPartner);
+        params.setContinuously_flag("Y");
+        // 风控参数
+        String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payerId, phone, registerTimeStr, txnPurpose);
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setFrms_client_chnl("13");
+        riskItemInfo.setUser_auth_flag("1");
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+        if (ArithmeticUtils.lessEquals(new BigDecimal(amt), BigDecimal.valueOf(49999))) {
             postscript = "";
         }
         TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose, postscript);
@@ -759,10 +800,10 @@ public class LztServiceImpl implements LztService {
         params.setTimestamp(timestamp);
         params.setOid_partner(oidPartner);
         params.setUser_id(user_id);
-         String txn_seqno = StringUtils.N_TO_10("CRP_");
+        String txn_seqno = StringUtils.N_TO_10("CRP_");
         params.setTxn_seqno(StringUtils.N_TO_10("CRP_"));
         params.setTxn_time(timestamp);
-        params.setNotify_url(lianLianInfo.getHost()+"/api/publicly/payment/callback/lianlian/lzt/" + txn_seqno);
+        params.setNotify_url(lianLianInfo.getHost() + "/api/publicly/payment/callback/lianlian/lzt/" + txn_seqno);
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, user_id, reg_phone, registerTimeStr, "修改手机号");
         riskItemInfo.setFrms_ip_addr(ip);

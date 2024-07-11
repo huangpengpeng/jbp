@@ -65,6 +65,8 @@ public class LztAcctController {
     private SmsService smsService;
     @Resource
     private LztTransferMorepyeeService lztTransferMorepyeeService;
+    @Resource
+    private LztSalaryTransferService lztSalaryTransferService;
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通新增账户")
     @GetMapping("/add")
@@ -176,7 +178,10 @@ public class LztAcctController {
                 scan = "bind_card_password";
                 payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.换绑卡.getPrefix());
                 break;
-
+            case "代发薪资":
+                scan = "pay_password";
+                payCode = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通外部代发2.getPrefix());
+                break;
 
         }
         Merchant merchant = merchantService.getById(lztAcct.getMerId());
@@ -321,6 +326,12 @@ public class LztAcctController {
         Merchant merchant = merchantService.getById(merId);
         MerchantPayInfo payInfo = merchant.getPayInfo();
         lztService.validationSms(payInfo.getOidPartner(), payInfo.getPriKey(), userId, payCode, totalAmt.toString(), token, code);
+
+        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.getByTxnSeqno(payCode);
+        if(lztSalaryTransfer != null && lztSalaryTransfer.getTxnStatus().equals(LianLianPayConfig.TxnStatus.已创建.getName())){
+            lztSalaryTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.交易处理中.getName());
+            lztSalaryTransferService.updateById(lztSalaryTransfer);
+        }
         return CommonResult.success();
     }
 

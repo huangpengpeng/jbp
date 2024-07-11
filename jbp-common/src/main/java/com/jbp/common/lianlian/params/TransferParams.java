@@ -30,6 +30,13 @@ public class TransferParams {
      */
     private String check_flag;
 
+    /**
+     * 标识该笔代发交易是否是连续代发，默认：N
+     * Y：连续代发
+     * N：普通代发
+     */
+    private String continuously_flag;
+
 
     /**
      * 风控标识

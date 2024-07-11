@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.dto.BenefitDTO;
@@ -53,6 +54,8 @@ public class JbpFrontApplication {
 
         YopService yopService = run.getBean(YopService.class);
 
+
+//        AccountReceiptResult yopResult = yopService.accountReceiptGet("10090476232", null, "LZT_DW_101587422746215", "WITHDRAW", "2024-07-10");
 
 //        modify(yopService);
         if(true){

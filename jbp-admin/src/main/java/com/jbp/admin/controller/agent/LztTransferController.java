@@ -50,8 +50,6 @@ public class LztTransferController {
     private LztAcctService lztAcctService;
     @Resource
     private LztTransferService lztTransferService;
-    @Resource
-    private LianLianPayService lianLianPayService;
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通外部代付")
     @PreAuthorize("hasAuthority('agent:lzt:transfer:out:create')")
