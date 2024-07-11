@@ -53,8 +53,8 @@ public class JbpAdminApplication {
 
 
 //
-        OrderAutoReceiptTask userCapaXsQueueTask = run.getBean(OrderAutoReceiptTask.class);
-        userCapaXsQueueTask.autoTakeDelivery();
+//        OrderAutoReceiptTask userCapaXsQueueTask = run.getBean(OrderAutoReceiptTask.class);
+//        userCapaXsQueueTask.autoTakeDelivery();
 
 //        ConditionChain conditionChain = run.getBean(ConditionChain.class);
 //        CapaXsService  capaXsService = run.getBean(CapaXsService.class);
