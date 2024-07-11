@@ -1494,6 +1494,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         long count = detailList.stream().filter(e -> e.getPayNum() > (e.getDeliveryNum() + e.getRefundNum())).count();
         if (count <= 0) {
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_RECEIPT);
+            order.setUpdateTime(DateUtil.date());
             updateById(order);
         }
 
@@ -1555,6 +1556,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
 
         merchantOrder.setDeliveryType(OrderConstants.ORDER_DELIVERY_TYPE_EXPRESS);
         order.setStatus(OrderConstants.ORDER_STATUS_WAIT_RECEIPT);
+        order.setUpdateTime(DateUtil.date());
 
         String message = OrderStatusConstants.ORDER_LOG_MESSAGE_EXPRESS.replace("{deliveryName}", express.getName()).replace("{deliveryCode}", trackingNumber);
 

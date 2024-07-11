@@ -1,6 +1,7 @@
 package com.jbp.admin;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.admin.task.order.OrderAutoReceiptTask;
 import com.jbp.admin.task.user.UserCapaXsQueueTask;
 import com.jbp.common.model.agent.*;
 import com.google.common.collect.Maps;
@@ -52,8 +53,8 @@ public class JbpAdminApplication {
 
 
 //
-//        UserCapaXsQueueTask userCapaXsQueueTask = run.getBean(UserCapaXsQueueTask.class);
-//        userCapaXsQueueTask.UserCapaXsQueueTask();
+        OrderAutoReceiptTask userCapaXsQueueTask = run.getBean(OrderAutoReceiptTask.class);
+        userCapaXsQueueTask.autoTakeDelivery();
 
 //        ConditionChain conditionChain = run.getBean(ConditionChain.class);
 //        CapaXsService  capaXsService = run.getBean(CapaXsService.class);
