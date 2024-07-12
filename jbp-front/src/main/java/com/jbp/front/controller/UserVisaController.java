@@ -487,7 +487,7 @@ public class UserVisaController {
     @ResponseBody
     @RequestMapping(value = "/yunzhanghuSign", method = {
             RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult<String> yunzhanghuSign(@RequestBody YzhSignRequest yzhSignRequest)
+    public CommonResult<Boolean> yunzhanghuSign(@RequestBody YzhSignRequest yzhSignRequest)
             throws Exception {
         String publicSign = environment.getProperty("yunzhanghu.publicSign");
         String privateSign = environment.getProperty("yunzhanghu.privateSign");
@@ -523,22 +523,24 @@ public class UserVisaController {
                 // 操作成功
                 ApiUserSignResponse data = response.getData();
 
-                UserVisa userVisa = new UserVisa();
-                userVisa.setContract("灵活用工云账户签约");
-                userVisa.setUid(userService.getUserId());
-                userVisa.setVisa(true);
-                userVisaService.save(userVisa);
-
+                UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid, userService.getUserId()).eq(UserVisa::getContract, "灵活用工云账户签约"));
+                if(userVisa == null) {
+                    userVisa = new UserVisa();
+                    userVisa.setContract("灵活用工云账户签约");
+                    userVisa.setUid(userService.getUserId());
+                    userVisa.setVisa(true);
+                    userVisaService.save(userVisa);
+                }
+                return CommonResult.success(true);
             } else {
-                // 失败返回
-                System.out.println("失败返回 code：" + response.getCode() + " message：" + response.getMessage() + " requestId：" + response.getRequestId());
+                log.info("云账户响应：{}", response.getMessage());
             }
         } catch (Exception e) {
             // 发生异常
             e.printStackTrace();
         }
 
-        return CommonResult.success();
+        return CommonResult.success(false);
     }
 
 
@@ -546,7 +548,7 @@ public class UserVisaController {
     @ResponseBody
     @RequestMapping(value = "/yunzhanghuUrl", method = {
             RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult<String> yunzhanghuUrl()
+    public CommonResult<ApiUserSignContractResponse> yunzhanghuUrl()
             throws Exception {
         String publicSign = environment.getProperty("yunzhanghu.publicSign");
         String privateSign = environment.getProperty("yunzhanghu.privateSign");
@@ -578,8 +580,7 @@ public class UserVisaController {
             if (response.isSuccess()) {
                 // 操作成功
                 ApiUserSignContractResponse data = response.getData();
-                System.out.println("操作成功 " + data);
-                return CommonResult.success(data.toString());
+                return CommonResult.success(data);
             }
         } catch (Exception e) {
             // 发生异常
