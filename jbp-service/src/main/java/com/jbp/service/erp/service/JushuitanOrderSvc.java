@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderExt;
 import com.jbp.common.model.system.JushuitanConfig;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.DateTimeUtils;
@@ -72,7 +73,10 @@ public class JushuitanOrderSvc {
                 jsonObject.put("pay_amount", o.getPayPrice());
                 jsonObject.put("freight", o.getTotalPostage());
                 JSONObject mark = isJSONValidate(merchantOrder.getUserRemark());
-                jsonObject.put("buyer_message", merchantOrder.getUserRemark());
+
+                OrderExt orderExt =  orderExtService.getByOrder( o.getPlatOrderNo());
+
+                jsonObject.put("buyer_message", merchantOrder.getUserRemark() +orderExt.getOrderGoodsInfo()==null?"" : orderExt.getOrderGoodsInfo());
                 JSONArray items = new JSONArray();
 
                 List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(o.getPlatOrderNo());
@@ -149,4 +153,6 @@ public class JushuitanOrderSvc {
     private MerchantOrderService merchantOrderService;
     @Autowired
     private UserInvitationService userInvitationService;
+    @Autowired
+    private OrderExtService orderExtService;
 }
