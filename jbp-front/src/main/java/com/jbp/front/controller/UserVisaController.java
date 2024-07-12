@@ -469,6 +469,20 @@ public class UserVisaController {
 //
 
 
+    @ApiOperation(value = "获取用户是否签署云账户", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/getUserYzhVisa", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<Boolean> getUserYzhVisa() {
+
+        UserVisa userVisa = userVisaService.getOne(new QueryWrapper<UserVisa>().lambda().eq(UserVisa::getUid, userService.getUserId()).eq(UserVisa::getContract, "灵活用工云账户签约"));
+        if (userVisa == null) {
+            return CommonResult.success(false);
+        }
+        return CommonResult.success(true);
+    }
+
+
+
     @ApiOperation(value = "灵活用工云账户-用户签约", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/yunzhanghuSign", method = {
@@ -477,12 +491,16 @@ public class UserVisaController {
             throws Exception {
         String publicSign = environment.getProperty("yunzhanghu.publicSign");
         String privateSign = environment.getProperty("yunzhanghu.privateSign");
+        String dealerId = environment.getProperty("yunzhanghu.dealerId");
+        String brokerId = environment.getProperty("yunzhanghu.brokerId");
+        String yzhAppKey = environment.getProperty("yunzhanghu.yzhAppKey");
+        String yzh3DesKey = environment.getProperty("yunzhanghu.yzh3DesKey");
 // 配置基础信息
         YzhConfig config = new YzhConfig();
-        config.setDealerId("06278954");
-        config.setBrokerId("yiyun73");
-        config.setYzhAppKey("4O4WPf0YK7Bla13lph3ihklQSFhsR6C4");
-        config.setYzh3DesKey("zVcv55cLS2YYS093fUhtMIHu");
+        config.setDealerId(dealerId);
+        config.setBrokerId(brokerId);
+        config.setYzhAppKey(yzhAppKey);
+        config.setYzh3DesKey(yzh3DesKey);
         config.setYzhRsaPrivateKey(privateSign);
         config.setYzhRsaPublicKey(publicSign);
         config.setSignType(YzhConfig.SignType.RSA);
@@ -490,8 +508,8 @@ public class UserVisaController {
         ApiUserSignServiceClient client = new ApiUserSignServiceClient(config);
 // 配置请求参数
         ApiUserSignRequest request = new ApiUserSignRequest();
-        request.setDealerId("06278954");
-        request.setBrokerId("yiyun73");
+        request.setDealerId(dealerId);
+        request.setBrokerId(brokerId);
         request.setRealName(yzhSignRequest.getRealName());
         request.setIdCard(yzhSignRequest.getIdCard());
         request.setCardType("idcard");
@@ -504,7 +522,13 @@ public class UserVisaController {
             if (response.isSuccess()) {
                 // 操作成功
                 ApiUserSignResponse data = response.getData();
-                System.out.println("操作成功 " + data);
+
+                UserVisa userVisa = new UserVisa();
+                userVisa.setContract("灵活用工云账户签约");
+                userVisa.setUid(userService.getUserId());
+                userVisa.setVisa(true);
+                userVisaService.save(userVisa);
+
             } else {
                 // 失败返回
                 System.out.println("失败返回 code：" + response.getCode() + " message：" + response.getMessage() + " requestId：" + response.getRequestId());
@@ -518,7 +542,7 @@ public class UserVisaController {
     }
 
 
-    @ApiOperation(value = "灵活用工云账户-用户签约", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "灵活用工云账户-协议URl", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @RequestMapping(value = "/yunzhanghuUrl", method = {
             RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -526,12 +550,16 @@ public class UserVisaController {
             throws Exception {
         String publicSign = environment.getProperty("yunzhanghu.publicSign");
         String privateSign = environment.getProperty("yunzhanghu.privateSign");
+        String dealerId = environment.getProperty("yunzhanghu.dealerId");
+        String brokerId = environment.getProperty("yunzhanghu.brokerId");
+        String yzhAppKey = environment.getProperty("yunzhanghu.yzhAppKey");
+        String yzh3DesKey = environment.getProperty("yunzhanghu.yzh3DesKey");
 // 配置基础信息
         YzhConfig config = new YzhConfig();
-        config.setDealerId("06278954");
-        config.setBrokerId("yiyun73");
-        config.setYzhAppKey("4O4WPf0YK7Bla13lph3ihklQSFhsR6C4");
-        config.setYzh3DesKey("zVcv55cLS2YYS093fUhtMIHu");
+        config.setDealerId(dealerId);
+        config.setBrokerId(brokerId);
+        config.setYzhAppKey(yzhAppKey);
+        config.setYzh3DesKey(yzh3DesKey);
         config.setYzhRsaPrivateKey(privateSign);
         config.setYzhRsaPublicKey(publicSign);
         config.setSignType(YzhConfig.SignType.RSA);
@@ -539,8 +567,8 @@ public class UserVisaController {
         ApiUserSignServiceClient client = new ApiUserSignServiceClient(config);
         // 配置请求参数
         ApiUserSignContractRequest request = new ApiUserSignContractRequest();
-        request.setDealerId("06278954");
-        request.setBrokerId("yiyun73");
+        request.setDealerId(dealerId);
+        request.setBrokerId(brokerId);
         YzhResponse<ApiUserSignContractResponse> response = null;
         try {
             // request-id：请求ID，请求的唯一标识
@@ -551,9 +579,7 @@ public class UserVisaController {
                 // 操作成功
                 ApiUserSignContractResponse data = response.getData();
                 System.out.println("操作成功 " + data);
-            } else {
-                // 失败返回
-                System.out.println("失败返回 code：" + response.getCode() + " message：" + response.getMessage() + " requestId：" + response.getRequestId());
+                return CommonResult.success(data.toString());
             }
         } catch (Exception e) {
             // 发生异常
