@@ -33,6 +33,8 @@ import com.jbp.service.service.UserVisaService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.util.StringUtils;
 import com.yunzhanghu.sdk.apiusersign.ApiUserSignServiceClient;
+import com.yunzhanghu.sdk.apiusersign.domain.ApiUserSignContractRequest;
+import com.yunzhanghu.sdk.apiusersign.domain.ApiUserSignContractResponse;
 import com.yunzhanghu.sdk.apiusersign.domain.ApiUserSignRequest;
 import com.yunzhanghu.sdk.apiusersign.domain.ApiUserSignResponse;
 import com.yunzhanghu.sdk.base.YzhConfig;
@@ -473,7 +475,7 @@ public class UserVisaController {
             RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult<String> yunzhanghuSign(@RequestBody YzhSignRequest yzhSignRequest)
             throws Exception {
-        String publicSign = environment.getProperty("yunzhanghu.public");
+        String publicSign = environment.getProperty("yunzhanghu.publicSign");
         String privateSign = environment.getProperty("yunzhanghu.privateSign");
 // 配置基础信息
         YzhConfig config = new YzhConfig();
@@ -514,6 +516,52 @@ public class UserVisaController {
 
         return CommonResult.success();
     }
+
+
+    @ApiOperation(value = "灵活用工云账户-用户签约", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/yunzhanghuUrl", method = {
+            RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult<String> yunzhanghuUrl()
+            throws Exception {
+        String publicSign = environment.getProperty("yunzhanghu.publicSign");
+        String privateSign = environment.getProperty("yunzhanghu.privateSign");
+// 配置基础信息
+        YzhConfig config = new YzhConfig();
+        config.setDealerId("06278954");
+        config.setBrokerId("yiyun73");
+        config.setYzhAppKey("4O4WPf0YK7Bla13lph3ihklQSFhsR6C4");
+        config.setYzh3DesKey("zVcv55cLS2YYS093fUhtMIHu");
+        config.setYzhRsaPrivateKey(privateSign);
+        config.setYzhRsaPublicKey(publicSign);
+        config.setSignType(YzhConfig.SignType.RSA);
+        config.setYzhUrl("https://api-service.yunzhanghu.com");
+        ApiUserSignServiceClient client = new ApiUserSignServiceClient(config);
+        // 配置请求参数
+        ApiUserSignContractRequest request = new ApiUserSignContractRequest();
+        request.setDealerId("06278954");
+        request.setBrokerId("yiyun73");
+        YzhResponse<ApiUserSignContractResponse> response = null;
+        try {
+            // request-id：请求ID，请求的唯一标识
+            // 建议平台企业自定义 request-id，并记录在日志中，便于问题发现及排查
+            // 如未自定义 request-id，将使用 SDK 中的 UUID 方法自动生成。注意：UUID 方法生成的 request-id 不能保证全局唯一，推荐自定义 request-id
+            response = client.apiUserSignContract(YzhRequest.build("requestId", request));
+            if (response.isSuccess()) {
+                // 操作成功
+                ApiUserSignContractResponse data = response.getData();
+                System.out.println("操作成功 " + data);
+            } else {
+                // 失败返回
+                System.out.println("失败返回 code：" + response.getCode() + " message：" + response.getMessage() + " requestId：" + response.getRequestId());
+            }
+        } catch (Exception e) {
+            // 发生异常
+            e.printStackTrace();
+        }
+        return CommonResult.success();
+    }
+
 
 
 }
