@@ -51,6 +51,10 @@ public class TeamItemServiceImpl extends ServiceImpl<TeamItemDao, TeamItem> impl
         if (tid == null || StringUtils.isEmpty(name)) {
             throw new CrmebException("参数不完整");
         }
+        Team team = teamService.getById(tid);
+        if (team == null){
+            throw new CrmebException("该团队不存在");
+        }
         TeamItem teamItem = new TeamItem();
         teamItem.setTid(tid);
         teamItem.setName(name);
@@ -61,6 +65,10 @@ public class TeamItemServiceImpl extends ServiceImpl<TeamItemDao, TeamItem> impl
     public void edit(Integer id, Integer tid, String name) {
         if (id == null || StringUtils.isEmpty(name) || tid == null) {
             throw new CrmebException("参数不完整");
+        }
+        Team team = teamService.getById(tid);
+        if (team == null){
+            throw new CrmebException("该团队不存在");
         }
         TeamItem teamItem = getById(id);
         if (teamItem == null) {
