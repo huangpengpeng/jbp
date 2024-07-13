@@ -80,13 +80,6 @@ public class TeamItemServiceImpl extends ServiceImpl<TeamItemDao, TeamItem> impl
         if (teamItem == null) {
             throw new CrmebException("团队项目不存在");
         }
-        TeamItem item = getOne(new QueryWrapper<TeamItem>().lambda().eq(TeamItem::getTid, tid).eq(TeamItem::getId, id));
-        if (item == null){
-            TeamItem one = getOne(new QueryWrapper<TeamItem>().lambda().eq(TeamItem::getTid, tid));
-            if (one  != null){
-                throw new CrmebException("该团队已存在项目,请勿重复添加！");
-            }
-        }
         teamItem.setTid(tid);
         teamItem.setName(name);
         updateById(teamItem);
