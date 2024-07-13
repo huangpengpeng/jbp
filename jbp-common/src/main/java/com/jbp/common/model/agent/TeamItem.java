@@ -25,4 +25,8 @@ public class TeamItem extends BaseModel {
     @ApiModelProperty("项目名称")
     @TableField("name")
     private String name;
+
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
 }
