@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.order.OrderPayChannel;
 import com.jbp.common.model.order.OrderScanPay;
 import com.jbp.common.request.OrderScanPayRequest;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.OrderScanPayDao;
-import com.jbp.service.service.LianLianPayService;
-import com.jbp.service.service.OrderPayChannelService;
-import com.jbp.service.service.OrderScanPayService;
-import com.jbp.service.service.YopService;
+import com.jbp.service.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +23,10 @@ public class OrderScanPayServiceImpl extends ServiceImpl<OrderScanPayDao, OrderS
     private LianLianPayService lianLianPayService;
     @Resource
     private YopService yopService;
+    @Resource
+    private UserService userService;
+    @Resource
+    private SystemAdminService systemAdminService;
 
     @Override
     public OrderScanPay create(OrderScanPayRequest request) {
@@ -32,12 +34,17 @@ public class OrderScanPayServiceImpl extends ServiceImpl<OrderScanPayDao, OrderS
         if (orderPayChannel == null) {
             throw new RuntimeException("当前支付渠道未开通:" + request.getPayMethod());
         }
+//        systemAdminService.get
+//        OrderScanPay order = OrderScanPay.builder().orderNo(StringUtils.N_TO_10("OSP_")).merId().uid(request.getPayerId()).build();
+
         // 微信  支付宝  银行卡
         if (OrderScanPay.Enum.微信.toString().equals(request.getPayMethod())) {
 
             if (orderPayChannel.getPayChannel().equals("易宝")) {
 
-//                yopService.wechatAlipayPay()
+//                yopService.wechatAlipayPay(orderPayChannel.getMerchantNo(), request.getPayerId(), String orderId, String orderAmount, String goodsName,
+//                        String notifyUrl, String memo, String redirectUrl, String payWay, String channel,
+//                        String appId, String openId, String ip)
             }
             if (orderPayChannel.getPayChannel().equals("连连")) {
 

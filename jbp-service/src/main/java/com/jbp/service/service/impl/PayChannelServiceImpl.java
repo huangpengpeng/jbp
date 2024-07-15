@@ -35,7 +35,7 @@ public class PayChannelServiceImpl extends ServiceImpl<OrderPayChannelDao, Order
     @Setter
     private Map<String, List<OrderPayChannel>> serverList= Maps.newConcurrentMap(); //服务器集合
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         List<OrderPayChannel> list = list(new LambdaQueryWrapper<OrderPayChannel>().gt(OrderPayChannel::getWeight, 0));
         serverList = FunctionUtil.valueMap(list, OrderPayChannel::getPayMethod);
