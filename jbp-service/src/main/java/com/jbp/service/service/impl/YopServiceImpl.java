@@ -380,13 +380,28 @@ public class YopServiceImpl implements YopService {
         }
         // 易宝聚合支付下单
         WechatAlipayPayParams params = new WechatAlipayPayParams(orderId, new BigDecimal(orderAmount),
-                notifyUrl, payWay, channel,
-                appId, openId, ip, "OFFLINE", "REAL_TIME");
+                notifyUrl, payWay, channel, appId, openId, ip, "OFFLINE", "REAL_TIME");
         params.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
         params.setToken(tradeOrderResult.getToken());
         params.setMerchantNo(merchantNo);
         params.setParentMerchantNo(tradeOrderResult.getParentMerchantNo());
         return send("/rest/v1.0/aggpay/pre-pay", "POST", params, WechatAliPayPayResult.class);
+    }
+
+    @Override
+    public WechatAlipayTutelagePayResult wechatAlipayTutelagePay(String merchantNo, String orderId, String orderAmount, String goodsName, String notifyUrl, String redirectUrl, String payWay, String channel, String userIp, String memo) {
+        // 交易下单
+        TradeOrderResult tradeOrderResult = tradeOrder(merchantNo, orderId, orderAmount, goodsName, notifyUrl, memo, redirectUrl);
+        if (tradeOrderResult == null || !tradeOrderResult.validate()) {
+            throw new RuntimeException("调用快捷支付失败");
+        }
+        // 易宝聚合支付下单
+        WechatAlipayTutelagePayParams params = new WechatAlipayTutelagePayParams(tradeOrderResult.getParentMerchantNo(), merchantNo, orderId,
+                orderAmount, goodsName, notifyUrl, payWay, channel, userIp, tradeOrderResult.getToken());
+        params.setToken(tradeOrderResult.getToken());
+        params.setMerchantNo(merchantNo);
+        params.setParentMerchantNo(tradeOrderResult.getParentMerchantNo());
+        return send("/rest/v1.0/aggpay/tutelage/pre-pay", "POST", params, WechatAlipayTutelagePayResult.class);
     }
 
     @Override

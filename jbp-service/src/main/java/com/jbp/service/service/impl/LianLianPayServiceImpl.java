@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
@@ -12,6 +13,7 @@ import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.SystemConfigService;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LianLianPayServiceImpl implements LianLianPayService {
@@ -152,6 +155,79 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         return result;
     }
 
+
+    @Override
+    public CashierPayCreateResult cashier(String parentMerchantNo, String merchantNo, String account, String payCode, String amount,
+                                          String goodsName, String method, String notifyUrl, String returnUrl, String priKey,
+                                          String pubKey, String ip, JSONObject otherJson) {
+        CashierPayCreateParams params = new CashierPayCreateParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(parentMerchantNo);
+        params.setAllow_method(method); // 支付方法
+        // 普通消费
+        params.setTxn_type("GENERAL_CONSUME");
+        params.setUser_id(account);
+        params.setUser_type("ANONYMOUS");
+        params.setNotify_url(notifyUrl);
+        params.setReturn_url(returnUrl);
+
+        // 设置分控参数【造假】
+        Map<String, Object> map = SqlRunner.db().selectOne("SELECT * FROM `tmp_lian_lian_risk_user` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `tmp_lian_lian_risk_user`)-(SELECT MIN(id) FROM `tmp_lian_lian_risk_user`)) + (SELECT MIN(id) FROM `tmp_lian_lian_risk_user`))) ORDER BY id LIMIT 1 ");
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String frms_ware_category = otherJson.getString("frms_ware_category");
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frms_ware_category, account, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        // 交易发起渠道设置
+        params.setFlag_chnl("H5");
+        JSONObject extendJson = new JSONObject();
+        extendJson.put("req_domain", otherJson.getString("req_domain"));
+        params.setExtend(extendJson);
+
+        // 设置商户订单信息
+        CashierPayCreateOrderInfo orderInfo = new CashierPayCreateOrderInfo();
+        orderInfo.setTxn_seqno(payCode);
+        orderInfo.setTxn_time(timestamp);
+        orderInfo.setTotal_amount(Double.valueOf(amount));
+        orderInfo.setGoods_name(goodsName);
+        params.setOrderInfo(orderInfo);
+
+        // 设置付款方信息
+        CashierPayCreatePayerInfo payerInfo = new CashierPayCreatePayerInfo();
+        payerInfo.setPayer_id(account);
+        payerInfo.setPayer_type("USER");
+        params.setPayerInfo(payerInfo);
+
+        // 收款方
+        CashierPayCreatePayeeInfo payeeInfo = new CashierPayCreatePayeeInfo();
+        payeeInfo.setPayee_id(merchantNo); // 不允许改变
+        payeeInfo.setPayee_type("USER");
+        payeeInfo.setPayee_accttype("USEROWN");
+        payeeInfo.setPayee_amount(amount.toString());
+        params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{payeeInfo});
+
+        String url = "https://accpgw.lianlianpay.com/v1/cashier/paycreate";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, pubKey);
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        CashierPayCreateResult result = JSON.parseObject(resultJsonStr, CashierPayCreateResult.class);
+        if (result == null || !"0000".equals(result.getRet_code())) {
+            throw new RuntimeException("请求三方交易失败:" + JSONObject.toJSONString(result));
+        }
+        return result;
+    }
 
     @Override
     public MorePayeeRefundResult refund(String account, String payCode, String refundNo, BigDecimal refundAmt) {

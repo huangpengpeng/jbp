@@ -169,6 +169,7 @@ public class Order implements Serializable {
     private Boolean ifUserVerifyReceive;
 
 
+
     @Version
     @TableField(value = "version", fill = FieldFill.INSERT)
     private Integer version = 1;

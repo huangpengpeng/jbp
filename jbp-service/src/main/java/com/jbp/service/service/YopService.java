@@ -169,6 +169,13 @@ public interface YopService {
                                           String appId, String openId, String ip);
 
     /**
+     * 微信支付宝托管下单
+     */
+    WechatAlipayTutelagePayResult wechatAlipayTutelagePay(String merchantNo, String orderId, String orderAmount, String goodsName,
+                                                          String notifyUrl, String redirectUrl, String payWay, String channel,
+                                                          String userIp, String memo);
+
+    /**
      * 查询支付结果
      */
     TradeOrderQueryResult queryPayResult(String merchantNo, String orderId);
