@@ -28,4 +28,7 @@ public class OrderScanPayRequest implements Serializable {
     @ApiModelProperty(value = "支付金额")
     @NotNull(message = "支付金额不能为空")
     private BigDecimal payPrice;
+
+    @ApiModelProperty(value = "请求IP")
+    private String ip;
 }
