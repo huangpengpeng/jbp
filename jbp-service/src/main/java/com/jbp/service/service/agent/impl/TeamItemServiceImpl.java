@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -35,6 +36,7 @@ public class TeamItemServiceImpl extends ServiceImpl<TeamItemDao, TeamItem> impl
         LambdaQueryWrapper<TeamItem> lqw = new LambdaQueryWrapper<>();
         lqw.eq(!Objects.isNull(tid), TeamItem::getTid, tid);
         lqw.like(!StringUtils.isEmpty(name), TeamItem::getName, name);
+        lqw.orderByDesc(TeamItem::getId);
         List<TeamItem> list = list(lqw);
         if (list.isEmpty()){
             return CommonPage.copyPageInfo(page, list);
@@ -54,6 +56,10 @@ public class TeamItemServiceImpl extends ServiceImpl<TeamItemDao, TeamItem> impl
         Team team = teamService.getById(tid);
         if (team == null){
             throw new CrmebException("该团队不存在");
+        }
+        TeamItem item = getOne(new QueryWrapper<TeamItem>().lambda().eq(TeamItem::getTid, tid));
+        if (item != null){
+            throw new CrmebException("该团队已存在项目,请勿重复添加！");
         }
         TeamItem teamItem = new TeamItem();
         teamItem.setTid(tid);
