@@ -43,11 +43,32 @@ public class RiskItemInfo implements Serializable {
      */
     private String goods_name;
 
-    // 业务来源。H5。
+    // 业务来源。H5。   //  传16
     private String frms_client_chnl;
     // 用户交易请求IP
     private String frms_ip_addr;
     // 用户授权标记。0  1
     private String  user_auth_flag;
+
+
+    // 用户姓名
+    private String  user_info_full_name;
+    // 用户身份证号
+    private String  user_info_id_no;
+    // 用户是否实名认证
+    private String  user_info_identify_state;
+    // 是传 1  实名认证方式 1：银行卡认证 2：线上认证 3：身份证远程认证 4：其他认证
+    private String user_info_identify_type;
+    //  0：身份证
+    private String user_info_id_type;
+
+    // 收货人姓名
+    private String delivery_full_name ;
+    // 收货人联系方式
+    private String delivery_phone ;
+    // 收货省
+    private String delivery_addr_province;
+    // 收货市
+    private String delivery_addr_city;
 
 }

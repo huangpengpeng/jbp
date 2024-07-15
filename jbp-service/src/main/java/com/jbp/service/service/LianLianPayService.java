@@ -16,6 +16,10 @@ public interface LianLianPayService {
 
     CashierPayCreateResult cashier(String account, String phone, String payCode, BigDecimal amount, String goodsName, String ip);
 
+    CashierPayCreateResult cashier(String parentMerchantNo, String merchantNo, String account, String payCode,
+                                   String amount, String goodsName, String method, String notifyUrl, String returnUrl,
+                                   String priKey, String pubKey, String ip, JSONObject otherJson);
+
     MorePayeeRefundResult refund(String account, String payCode, String refundNo, BigDecimal refundAmt);
 
     GetRandomResult getRandom(String account);
