@@ -82,6 +82,9 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "转账给用户")
     private Boolean ifTransferUser;
 
+    @ApiModelProperty(value = "指定转账用户")
+    private String transferUserList;
+
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)
     private String  gatewayUrl;

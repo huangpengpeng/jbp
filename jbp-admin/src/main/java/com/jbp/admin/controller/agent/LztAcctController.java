@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/admin/agent/lzt/acct")
@@ -222,11 +224,20 @@ public class LztAcctController {
             return CommonResult.success(lztAcctService.list(query));
         } else {
             LztAcct lztAcct = lztAcctService.getByUserId(orgUserId);
-            Integer merId = lztAcct.getMerId();
-            QueryWrapper<LztAcct> query = new QueryWrapper<>();
-            query.lambda().eq(merId > 0, LztAcct::getMerId, merId).eq(LztAcct::getPayChannelType, lztAcct.getPayChannelType())
-                    .eq(lztAcct.getIfTransferUser() != null && !lztAcct.getIfTransferUser(), LztAcct::getUserType, "企业用户");
-            return CommonResult.success(lztAcctService.list(query));
+            if (StringUtils.isEmpty(lztAcct.getTransferUserList())) {
+                Integer merId = lztAcct.getMerId();
+                QueryWrapper<LztAcct> query = new QueryWrapper<>();
+                query.lambda().eq(merId > 0, LztAcct::getMerId, merId).eq(LztAcct::getPayChannelType, lztAcct.getPayChannelType())
+                        .eq(lztAcct.getIfTransferUser() != null && !lztAcct.getIfTransferUser(), LztAcct::getUserType, "企业用户");
+                return CommonResult.success(lztAcctService.list(query));
+            } else {
+                String transferUserList = lztAcct.getTransferUserList();
+                JSONArray array = JSONArray.parseArray(transferUserList);
+                List<Object> collect = array.stream().collect(Collectors.toList());
+                QueryWrapper<LztAcct> query = new QueryWrapper<>();
+                query.lambda().in(LztAcct::getUserId, collect);
+                return CommonResult.success(lztAcctService.list(query));
+            }
         }
     }
 
@@ -483,4 +494,10 @@ public class LztAcctController {
         BigDecimal feeAmount = lztAcctService.getFee(scane, userId, amount);
         return CommonResult.success(feeAmount);
     }
+
+//    public static void main(String[] args) {
+//        JSONArray array = new JSONArray();
+//        array.add("d0002");
+//        System.out.println(array.toJSONString());
+//    }
 }
