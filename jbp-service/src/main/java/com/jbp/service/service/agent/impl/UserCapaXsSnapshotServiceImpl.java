@@ -38,9 +38,9 @@ import java.util.stream.Collectors;
 public class UserCapaXsSnapshotServiceImpl extends ServiceImpl<UserCapaXsSnapshotDao, UserCapaXsSnapshot> implements UserCapaXsSnapshotService {
 
     @Resource
-    UserService userService;
+    private UserService userService;
     @Resource
-    CapaXsService capaXsService;
+    private CapaXsService capaXsService;
     @Resource
     private UploadService uploadService;
 
@@ -66,10 +66,10 @@ public class UserCapaXsSnapshotServiceImpl extends ServiceImpl<UserCapaXsSnapsho
         Map<Long, CapaXs> capaXsMap = capaXsService.getCapaXsMap();
         list.forEach(e -> {
             User user = uidMapList.get(e.getUid());
-            e.setAccount(user!=null?user.getAccount():"");
+            e.setAccount(user != null ? user.getAccount() : "");
             CapaXs capaXs = capaXsMap.get(e.getCapaId());
-            e.setCapaName(capaXs.getName());
-            e.setCapaUrl(capaXs.getIconUrl());
+            e.setCapaName(capaXs != null ? capaXs.getName() : "");
+            e.setCapaUrl(capaXs != null ? capaXs.getIconUrl() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }
@@ -106,6 +106,5 @@ public class UserCapaXsSnapshotServiceImpl extends ServiceImpl<UserCapaXsSnapsho
         FileResultVo fileResultVo = uploadService.excelLocalUpload(result, UserCapaXsSnapshotExcel.class);
         log.info("用户星级快照列表导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
-
     }
 }

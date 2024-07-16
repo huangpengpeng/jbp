@@ -24,4 +24,5 @@ public class TankStoreClerkManagerListResponse implements Serializable {
     private Date createdTime;
     private Long id;
     private String name;
+    private String clerkUserId;
 }
