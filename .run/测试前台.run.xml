@@ -28,7 +28,7 @@
     </option>
     <option name="hostTagId" value="0" />
     <option name="location" value="/opt/jbp/front" />
-    <option name="pathOrUrl" value="C:\Users\30831\Desktop\pay\jbp\jbp-front\target\Jbp-front.jar" />
+    <option name="pathOrUrl" value="$PROJECT_DIR$/jbp-front/target/Jbp-front.jar" />
     <option name="tagId" value="0" />
     <option name="terminalCommand" value="tail -f  /opt/jbp/front/Jbp-front.log" />
     <option name="type" value="HOST" />
