@@ -31,4 +31,10 @@ public interface LianLianPayService {
     LztTransferResult transferSpanPlatform(String txn_seqno, BigDecimal total_amount, String userId, String password, String random_key, String sub_acctno, String sub_acctname);
 
 
+    /**
+     * https://accpapi.lianlianpay.com/v1/acctmgr/modify-userinfo-individual
+     */
+
+//     modifyUserinfo
+
 }
