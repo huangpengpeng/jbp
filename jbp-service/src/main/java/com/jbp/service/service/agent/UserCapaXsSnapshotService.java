@@ -13,4 +13,6 @@ public interface UserCapaXsSnapshotService extends IService<UserCapaXsSnapshot> 
     List<UserCapaXsSnapshot> getByDescription(String description);
 
     PageInfo<UserCapaXsSnapshot> pageList(Integer uid, Long capaId, String type, PageParamRequest pageParamRequest);
+
+    String export(Integer uid, Long capaId, String type);
 }

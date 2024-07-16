@@ -48,5 +48,4 @@ public class PreOrderRequest {
 
     @ApiModelProperty(value = "分享用户ID", required = false)
     private Integer shardUid;
-
 }
