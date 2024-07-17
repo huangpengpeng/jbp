@@ -171,10 +171,6 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private OrdersFundSummaryService ordersFundSummaryService;
     @Autowired
-    private UserCapaService userCapaService;
-    @Autowired
-    private UserCapaXsService userCapaXsService;
-    @Autowired
     private ProductMaterialsService productMaterialsService;
     @Autowired
     private TankOrdersService tankOrdersService;
@@ -182,6 +178,8 @@ public class PayServiceImpl implements PayService {
     private TankEquipmentNumberService tankEquipmentNumberService;
     @Resource
     private FundClearingService fundClearingService;
+    @Resource
+    private TeamUserService teamUserService;
 
 
     /**
@@ -1981,9 +1979,10 @@ public class PayServiceImpl implements PayService {
 
     private String kqCashierPay(Order order) {
         User user = userService.getById(order.getPayUid());
+        TeamUser teamUser = teamUserService.getByUser(user.getId());
         List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
         String cashier = kqPayService.cashier(user.getAccount(), order.getIp(), order.getOrderNo(),
-                order.getPayPrice(), details.get(0).getProductName(), order.getCreateTime());
+                order.getPayPrice(), details.get(0).getProductName(), order.getCreateTime(), teamUser != null ? teamUser.getName() : "");
         // 更新商户订单号
         return cashier;
     }

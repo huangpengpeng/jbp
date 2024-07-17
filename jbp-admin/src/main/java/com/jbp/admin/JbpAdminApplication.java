@@ -49,51 +49,5 @@ public class JbpAdminApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-
-
-//
-//        OrderAutoReceiptTask userCapaXsQueueTask = run.getBean(OrderAutoReceiptTask.class);
-//        userCapaXsQueueTask.autoTakeDelivery();
-
-//        ConditionChain conditionChain = run.getBean(ConditionChain.class);
-//        CapaXsService  capaXsService = run.getBean(CapaXsService.class);
-//        CapaXs capaXs = capaXsService.getById(4);
-//        List<RiseCondition> conditionList = capaXs.getConditionList();
-//        for (RiseCondition riseCondition :conditionList ) {
-//            conditionChain.isOk(75517,riseCondition );
-//        }
-
-//
-//        FundClearingService fundClearingService = run.getBean(FundClearingService.class);
-//
-//        OrdersFundSummaryService ordersFundSummaryService = run.getBean(OrdersFundSummaryService.class);
-//
-//        List<OrdersFundSummary> list =  ordersFundSummaryService.list();
-//        int i=0 ;
-//        List<String> list1 =new ArrayList<>();
-//        list1.add("已创建");
-//        list1.add("待审核");
-//        list1.add("待出款");
-//        list1.add("已出款");
-//
-//        for(OrdersFundSummary ordersFundSummary : list){
-//            i++;
-//            List<FundClearing> fundClearings = fundClearingService.getByExternalNo(ordersFundSummary.getOrdersSn(),list1);
-//            BigDecimal commamt  = BigDecimal.ZERO;
-//            for(FundClearing fundClearing : fundClearings){
-//                commamt = commamt.add(fundClearing.getCommAmt());
-//            }
-//            ordersFundSummary.setCommAmt(commamt);
-//            ordersFundSummaryService.updateById(ordersFundSummary);
-//            System.out.println("初始化"+ i);
-//        }
-
-
-
-
-
-
-
     }
 }

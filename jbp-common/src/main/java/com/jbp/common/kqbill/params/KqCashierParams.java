@@ -66,6 +66,8 @@ public class KqCashierParams {
 
     private String ext1;
 
+    private String ext2;
+
     //支付方式，一般为00
     private String payType = "00";
 

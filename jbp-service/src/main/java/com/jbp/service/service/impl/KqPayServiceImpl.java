@@ -56,7 +56,7 @@ public class KqPayServiceImpl implements KqPayService {
 
 
     @Override
-    public String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, Date orderTime) {
+    public String cashier(String payerId, String payerIP, String orderId, BigDecimal orderAmount, String productName, Date orderTime, String teamName) {
         KqPayInfoResult kpInfo = get();
         KqCashierParams params = new KqCashierParams();
         params.setMerchantAcctId(kpInfo.getMerchantId());
@@ -70,6 +70,7 @@ public class KqPayServiceImpl implements KqPayService {
         params.setOrderAmount(String.valueOf(orderAmount.multiply(BigDecimal.valueOf(100)).intValue()));
         params.setProductName(formatStr(productName));
         params.setExt1(kpInfo.getApplyName());
+        params.setExt2(formatStr(teamName));
         params.setOrderTime(DateTimeUtils.format(orderTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         params.setOrderTimestamp(params.getOrderTime());
 
@@ -213,6 +214,7 @@ public class KqPayServiceImpl implements KqPayService {
         signMsgVal = appendParam(signMsgVal, "orderTimestamp", params.getOrderTimestamp());
         signMsgVal = appendParam(signMsgVal, "productName", params.getProductName());
         signMsgVal = appendParam(signMsgVal, "ext1", params.getExt1());
+        signMsgVal = appendParam(signMsgVal, "ext2", params.getExt2());
         signMsgVal = appendParam(signMsgVal, "payType", params.getPayType());
         signMsgVal = appendParam(signMsgVal, "redoFlag", params.getRedoFlag());
         signMsgVal = appendParam(signMsgVal, "mobileGateway", params.getMobileGateway());
@@ -233,6 +235,9 @@ public class KqPayServiceImpl implements KqPayService {
     }
 
     private static String formatStr(String str){
+        if(StringUtils.isEmpty(str)){
+            return StringUtils.EMPTY;
+        }
         //1. 可以在中括号内加上任何想要删除的字符，实际上是一个正则表达式
         String regExp="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
 
