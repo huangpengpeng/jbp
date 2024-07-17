@@ -376,4 +376,36 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         LztTransferResult result = JSON.parseObject(resultJsonStr, LztTransferResult.class);
         return result;
     }
+
+    @Override
+    public BindCardH5ApplyResult bindCardH5Apply(String user_id, String user_type, String bind_cardtype, String txn_seqno,
+                                                 String notify_url) {
+        Merchant merchant = merchantService.getById(4);
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+
+        BindCardH5ApplyParams params = new BindCardH5ApplyParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(payInfo.getOidPartner());
+        params.setUser_id(user_id);
+        params.setUser_type(user_type);
+        params.setBind_cardtype(bind_cardtype);
+        params.setNotify_url(notify_url);
+        params.setTxn_time(timestamp);
+        params.setTxn_seqno(txn_seqno);
+
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4009", user_id, "", registerTime, bind_cardtype);
+        riskItemInfo.setFrms_ip_addr("115.196.4.80");
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+
+
+        LianLianPayInfoResult lianLianPayInfoResult = get();
+        String url = "https://accpgw.lianlianpay.com/v1/acctmgr/bindcard-h5-apply";
+        LLianPayClient lLianPayClient = new LLianPayClient(payInfo.getPriKey(), lianLianPayInfoResult.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        BindCardH5ApplyResult result = JSON.parseObject(resultJsonStr, BindCardH5ApplyResult.class);
+        return result;
+    }
 }

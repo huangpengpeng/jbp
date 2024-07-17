@@ -1,10 +1,14 @@
 package com.jbp.admin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.lianlian.result.BindCardH5ApplyResult;
 import com.jbp.common.model.agent.LztTransferMorepyee;
 import com.jbp.common.vo.WeChatMiniAuthorizeVo;
+import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.WechatService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
+import com.jbp.service.service.impl.LianLianPayServiceImpl;
 import com.jbp.service.service.impl.WechatServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -32,6 +36,10 @@ public class JbpAdminApplication {
     public static void main(String[] args){
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
+
+//        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_2",
+//                "https://join.jubaopeng.cc");
+//        System.out.println(JSONObject.toJSONString(bindCardH5ApplyResult));
     }
 
 }
