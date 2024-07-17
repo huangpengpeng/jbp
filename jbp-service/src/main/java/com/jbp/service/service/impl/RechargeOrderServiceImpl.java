@@ -17,6 +17,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.model.agent.TeamUser;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
@@ -94,11 +95,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     @Autowired
     private LianLianPayService lianLianPayService;
     @Autowired
-    private WalletService walletService;
-    @Autowired
     private PlatformWalletService platformWalletService;
     @Autowired
     private KqPayService kqPayService;
+    @Autowired
+    private TeamUserService teamUserService;
 
 
     /**
@@ -224,8 +225,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
             rechargeOrder.setOutTradeNo(cashier.getAccp_txno());
         }
         if (request.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
+            TeamUser teamUser = teamUserService.getByUser(user.getId());
             String cashier = kqPayService.cashier(user.getAccount(),  request.getIp(),rechargeNo,
-                    rechargePrice, "补差", new Date());
+                    rechargePrice, "补差", new Date(), teamUser != null ? teamUser.getName() : "");
             response.setStatus(true);
             response.setKqGatewayUrl(cashier);
             response.setPayType(PayConstants.PAY_TYPE_KQ);
