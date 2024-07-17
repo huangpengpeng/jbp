@@ -14,13 +14,21 @@ import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
 import com.jbp.service.service.agent.LztWithdrawalService;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
+import javax.crypto.Cipher;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -752,6 +760,7 @@ public class LztServiceImpl implements LztService {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
         TransferParams params = new TransferParams(timestamp, oidPartner);
+        params.setCheck_flag("N");
         params.setContinuously_flag("Y");
         // 风控参数
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
@@ -768,6 +777,7 @@ public class LztServiceImpl implements LztService {
         params.setOrderInfo(orderInfo);
         TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,
                 "USEROWN", pwd, random_key);
+        payerInfo.setPap_agree_no(encrypt("2024071700495461", lianLianInfo.getPubKey() ));
         params.setPayerInfo(payerInfo);
         TransferPayeeInfo payeeInfo = new TransferPayeeInfo(payee_type, bank_acctno, bank_code, bank_acctname, cnaps_code);
         params.setPayeeInfo(payeeInfo);
@@ -788,6 +798,26 @@ public class LztServiceImpl implements LztService {
             throw new CrmebException("代付失败:" + e.getMessage());
         }
     }
+
+    @SneakyThrows
+    public  String encrypt(String source, String public_key){
+
+        BASE64Decoder b64d = new BASE64Decoder();
+        byte[] keyByte = b64d.decodeBuffer(public_key);
+        X509EncodedKeySpec x509ek = new X509EncodedKeySpec(keyByte);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(x509ek);
+
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] sbt = source.getBytes(StandardCharsets.UTF_8); // //本地测试可以使用这个
+        byte[] epByte = cipher.doFinal(sbt);
+        BASE64Encoder encoder = new BASE64Encoder();
+        String epStr = encoder.encode(epByte);
+        return epStr;
+
+    }
+
 
     @Override
     public ChangeRegPhoneApplyResult changeRegPhoneApply(String oidPartner, String priKey, String user_id,

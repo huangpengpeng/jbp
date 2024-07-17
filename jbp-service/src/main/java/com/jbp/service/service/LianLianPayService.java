@@ -33,4 +33,13 @@ public interface LianLianPayService {
     BindCardH5ApplyResult bindCardH5Apply(String user_id, String user_type, String bind_cardtype, String txn_seqno,
                                           String notify_url);
 
+
+    /**
+     * 申请免密
+     * https://accpgw.lianlianpay.com/v1/txn/pap-agree-apply
+     */
+    LztPapAgreeApplyResult  papAgreeApply(String oidPartner, String priKey,  String user_id, PapSignInfo papSignInfo);
+
+
+
 }

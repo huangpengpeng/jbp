@@ -351,6 +351,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
 
     @Resource
     private MerchantService merchantService;
+
     @Override
     public LztTransferResult transferSpanPlatform(String txn_seqno, BigDecimal total_amount, String userId, String password, String random_key, String sub_acctno, String sub_acctname) {
         TransferSpanPlatformParams params = new TransferSpanPlatformParams();
@@ -364,7 +365,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         RiskItemInfo riskItemInfo = new RiskItemInfo("4009", sub_acctno, "", registerTime, "提现");
         riskItemInfo.setFrms_ip_addr("60.177.228.155");
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
-        params.setOrderInfo(new  TransferOrderInfo( txn_seqno, timestamp, total_amount.doubleValue(), "服务费", "平台转账"));
+        params.setOrderInfo(new TransferOrderInfo(txn_seqno, timestamp, total_amount.doubleValue(), "服务费", "平台转账"));
         params.setPayerInfo(new TransferPayerInfo("USER", userId, "USEROWN", password, random_key));
         params.setPayeeInfo(new TransferPayeeInfo2(sub_acctno, sub_acctname));
 
@@ -400,12 +401,30 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
 
 
-
         LianLianPayInfoResult lianLianPayInfoResult = get();
         String url = "https://accpgw.lianlianpay.com/v1/acctmgr/bindcard-h5-apply";
         LLianPayClient lLianPayClient = new LLianPayClient(payInfo.getPriKey(), lianLianPayInfoResult.getPubKey());
         String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         BindCardH5ApplyResult result = JSON.parseObject(resultJsonStr, BindCardH5ApplyResult.class);
+        return result;
+    }
+
+    @Override
+    public LztPapAgreeApplyResult papAgreeApply(String oidPartner, String priKey, String user_id, PapSignInfo papSignInfo) {
+        if (papSignInfo == null) {
+            papSignInfo = new PapSignInfo();
+        }
+        papSignInfo.setSign_start_time("20240717");
+        papSignInfo.setSign_invalid_time("20250717");
+        papSignInfo.setAgreement_type("WITH_WITHDRAW");
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        LztPapAgreeApplyParams params = new LztPapAgreeApplyParams(timestamp, oidPartner, user_id, papSignInfo);
+        params.setNotify_url("https://join.jubaopeng.cc");
+        String url = "https://accpgw.lianlianpay.com/v1/txn/pap-agree-apply";
+        LianLianPayInfoResult lianLianInfo = get();
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        LztPapAgreeApplyResult result = JSON.parseObject(s, LztPapAgreeApplyResult.class);
         return result;
     }
 }

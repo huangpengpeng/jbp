@@ -37,6 +37,9 @@ public class TransferParams {
      */
     private String continuously_flag;
 
+    // 2024071700495461
+
+
 
     /**
      * 风控标识

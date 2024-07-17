@@ -1,12 +1,14 @@
 package com.jbp.service.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.params.QueryPaymentOrderInfo;
-import com.jbp.common.lianlian.params.QueryPaymentPayeeInfo;
-import com.jbp.common.lianlian.params.QueryPaymentPayerInfo;
+import com.jbp.common.lianlian.client.LLianPayClient;
+import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
+import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
 import com.jbp.common.model.agent.LztAcctOpen;
@@ -606,6 +608,17 @@ public class DegreePayServiceImpl implements DegreePayService {
         return result;
     }
 
+    @Override
+    public JSONObject papAgreeQuery(PapAgreeQueryParams params, String priKey) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        params.setTimestamp(LLianPayDateUtils.getTimestamp());
+        String url = "https://accpapi.lianlianpay.com/v1/txn/pap-agree-query";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+
+        JSONObject result = JSON.parseObject(s, JSONObject.class);
+        return result;
+    }
 
     private static List<LztQueryAcctInfo> getAcctInfoList(LztAcct lztAcct, BankAccountBalanceQueryResult result) {
         List<LztQueryAcctInfo> list = Lists.newArrayList();

@@ -1,5 +1,7 @@
 package com.jbp.service.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.jbp.common.lianlian.params.PapAgreeQueryParams;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztAcctApply;
@@ -76,5 +78,10 @@ public interface DegreePayService {
 
     ReceiptDownloadResult receiptDownload(LztAcct lztAcct, String receipt_accp_txno, String txnSeqno,
                                           String token, String tradeType, String txnTime);
+
+    /**
+     * 	https://accpapi.lianlianpay.com/v1/txn/pap-agree-query
+     */
+    JSONObject papAgreeQuery(PapAgreeQueryParams params, String priKey);
 
 }
