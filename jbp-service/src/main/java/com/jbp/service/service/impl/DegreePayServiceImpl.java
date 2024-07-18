@@ -325,13 +325,15 @@ public class DegreePayServiceImpl implements DegreePayService {
     }
 
     @Override
-    public LztTransferResult transfer2(LztAcct lztAcct, String txnPurpose, String txn_seqno, String amt, String feeAmt, String pwd, String random_key, String payee_type, String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip) {
+    public LztTransferResult papAgreeTransfer(LztAcct lztAcct, String txnPurpose, String txn_seqno, String amt, String feeAmt, String payee_type,
+                                       String bank_acctno, String bank_code, String bank_acctname,
+                                       String cnaps_code, String postscript, String ip, String papAgreeNo) {
         LztTransferResult result = new LztTransferResult();
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         if (lztAcct.getPayChannelType().equals("连连")) {
-            result = lztService.transfer2(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(), txnPurpose, txn_seqno,
-                    amt, feeAmt, pwd, random_key, payee_type, bank_acctno, bank_code, bank_acctname,
-                    cnaps_code, postscript, ip, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
+            result = lztService.papAgreeTransfer(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId(), txnPurpose, txn_seqno,
+                    amt, feeAmt, payee_type, bank_acctno, bank_code, bank_acctname,
+                    cnaps_code, postscript, ip, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory(), papAgreeNo);
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
             if ("BANKACCT_PRI".equals(payee_type)) {

@@ -10,6 +10,7 @@ import com.jbp.common.lianlian.result.LztTransferResult;
 import com.jbp.common.lianlian.result.QueryWithdrawalResult;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.merchant.MerchantPayInfo;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.LztSalaryTransferRequest;
@@ -19,6 +20,7 @@ import com.jbp.service.dao.agent.LztLianLianBankCodeDao;
 import com.jbp.service.dao.agent.LztSalaryPayerDao;
 import com.jbp.service.dao.agent.LztSalaryTransferDao;
 import com.jbp.service.service.DegreePayService;
+import com.jbp.service.service.LztService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztSalaryTransferService;
@@ -31,7 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -48,6 +53,8 @@ public class LztSalaryTransferServiceImpl extends ServiceImpl<LztSalaryTransferD
     private MerchantService merchantService;
     @Resource
     private LztSalaryPayerDao lztSalaryPayerDao;
+    @Resource
+    private LztService lztService;
 
     @Override
     public LztSalaryPayer getSalaryPayer(Integer merId) {
@@ -170,7 +177,7 @@ public class LztSalaryTransferServiceImpl extends ServiceImpl<LztSalaryTransferD
     }
 
     @Override
-    public LztSalaryTransfer send(LztAcct payer, Long id, String pwd, String random_key, String payCode, String ip) {
+    public LztSalaryTransfer send(LztAcct payer, Long id, String ip) {
         if (id == null) {
             throw new RuntimeException("请选择发放记录");
         }
@@ -181,35 +188,26 @@ public class LztSalaryTransferServiceImpl extends ServiceImpl<LztSalaryTransferD
         if (!StringUtils.equals(lztSalaryTransfer.getTxnStatus(), LianLianPayConfig.TxnStatus.已创建.getName())) {
             throw new RuntimeException("只允许发放已创建的记录:" + lztSalaryTransfer.getTxnSeqno() + "状态:" + lztSalaryTransfer.getTxnStatus());
         }
-        lztSalaryTransfer.setTxnSeqno(payCode);
-        LztTransferResult transferResult = degreePayService.transfer2(payer, "服务费", lztSalaryTransfer.getTxnSeqno(),
-                lztSalaryTransfer.getAmt().add(lztSalaryTransfer.getFeeAmount()).toString(), lztSalaryTransfer.getFeeAmount().toString(), pwd, random_key, "BANKACCT_PRI",
+        LztTransferResult transferResult = degreePayService.papAgreeTransfer(payer, "服务费", lztSalaryTransfer.getTxnSeqno(),
+                lztSalaryTransfer.getAmt().toString(), lztSalaryTransfer.getFeeAmount().toString(), "BANKACCT_PRI",
                 lztSalaryTransfer.getBankAcctNo(), lztSalaryTransfer.getBankCode(), lztSalaryTransfer.getBankAcctName(),
-                "", "服务费", ip);
+                "", "服务费", ip, payer.getTransferPapAgreeNo());
         lztSalaryTransfer.setOrderRet(transferResult);
+        lztSalaryTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.交易处理中.getName());
         updateById(lztSalaryTransfer);
         return lztSalaryTransfer;
     }
 
     @Override
-    public LztSalaryTransfer autoSend(LztAcct payer, Long id, String ip, String pwd, String randomKey) {
-        if (id == null) {
-            throw new RuntimeException("请选择发放记录");
-        }
+    public LztSalaryTransfer check(Long id, String checkReturn, String checkReason) {
         LztSalaryTransfer lztSalaryTransfer = getById(id);
-        if (lztSalaryTransfer.getMerId().intValue() != payer.getMerId().intValue()) {
-            throw new RuntimeException("发放权限不足");
-        }
-        if (!StringUtils.equals(lztSalaryTransfer.getTxnStatus(), LianLianPayConfig.TxnStatus.已创建.getName())) {
-            throw new RuntimeException("只允许发放已创建的记录:" + lztSalaryTransfer.getTxnSeqno() + "状态:" + lztSalaryTransfer.getTxnStatus());
-        }
-        LztTransferResult transferResult = degreePayService.transfer2(payer, "服务费", lztSalaryTransfer.getTxnSeqno(),
-                lztSalaryTransfer.getAmt().toString(), lztSalaryTransfer.getFeeAmount().toString(), pwd, randomKey, "BANKACCT_PRI",
-                lztSalaryTransfer.getBankAcctNo(), lztSalaryTransfer.getBankCode(), lztSalaryTransfer.getBankAcctName(),
-                "", "服务费", ip);
-        lztSalaryTransfer.setTxnStatus(LianLianPayConfig.TxnStatus.交易处理中.getName());
-        lztSalaryTransfer.setOrderRet(transferResult);
+        LztAcct lztAcct = lztAcctService.getByUserId(lztSalaryTransfer.getPayerId());
+        Merchant merchant = merchantService.getById(lztAcct.getMerId());
+        MerchantPayInfo payInfo = merchant.getPayInfo();
+        lztService.withdrawalCheck(payInfo.getOidPartner(), payInfo.getPriKey(), lztSalaryTransfer.getTxnSeqno(),
+                lztSalaryTransfer.getAmt().toString(), checkReturn, checkReason, lztSalaryTransfer.getFeeAmount().toString());
+        lztSalaryTransfer.setTxnStatus("已复核");
         updateById(lztSalaryTransfer);
-        return lztSalaryTransfer;
+        return getById(id);
     }
 }

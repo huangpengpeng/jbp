@@ -2,6 +2,7 @@ package com.jbp.admin;
 
 import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.captcha.util.RandomUtils;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.params.PapAgreeQueryParams;
 import com.jbp.common.lianlian.result.BindCardH5ApplyResult;
@@ -17,6 +18,7 @@ import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.WechatService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
+import com.jbp.service.service.agent.LztSalaryTransferService;
 import com.jbp.service.service.agent.LztTransferMorepyeeService;
 import com.jbp.service.service.impl.LianLianPayServiceImpl;
 import com.jbp.service.service.impl.WechatServiceImpl;
@@ -33,6 +35,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 
 
 @EnableAsync //开启异步调用	
@@ -48,26 +51,25 @@ public class JbpAdminApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
 
-        DegreePayService degreePayService = run.getBean(DegreePayService.class);
-        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
-        LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
-        LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
+//        DegreePayService degreePayService = run.getBean(DegreePayService.class);
+//        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
+//        LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
+//        LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
 //        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_11113",
 //                "https://join.jubaopeng.cc");
-        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
-        LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
+//        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
+//        LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
 //        LztPapAgreeApplyResult lztPapAgreeApplyResult = lianLianPayService.papAgreeApply(payChannel.getPartnerId(), payChannel.getPriKey(), lztAcct.getUserId(), null);
 //        System.out.println(JSONObject.toJSONString(lztPapAgreeApplyResult));
 
-        String txnSeqno = com.jbp.service.util.StringUtils.N_TO_10(LianLianPayConfig.TxnSeqnoPrefix.来账通外部代发.getPrefix());
-        LztTransferResult transferResult = degreePayService.transfer2(lztAcct, "服务费", txnSeqno,
-                "1", "0", null, null, "BANKACCT_PRI",
-                "6228480329262404075", "1030000", "中国农业银行", "", "",
-                "60.186.153.50");
-        System.out.println(JSONObject.toJSONString(transferResult));
-//        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), "ruicirenli", "LZT_PA_174750003978179");
+
+//        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), "ruicirenli", "LZT_PA_99170906256415");
 //        degreePayService.papAgreeQuery( params, payChannel.getPriKey());
 
+//        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
+//        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
+//        LztSalaryTransferService lztSalaryTransferService = run.getBean(LztSalaryTransferService.class);
+//        lztSalaryTransferService.send(lztAcct, 24L, "60.186.153.50");
     }
 
 }

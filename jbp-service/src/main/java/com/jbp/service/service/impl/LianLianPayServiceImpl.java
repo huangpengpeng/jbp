@@ -414,9 +414,9 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         if (papSignInfo == null) {
             papSignInfo = new PapSignInfo();
         }
-        papSignInfo.setSign_start_time("20240717");
-        papSignInfo.setSign_invalid_time("20250717");
-        papSignInfo.setAgreement_type("WITH_WITHDRAW");
+        papSignInfo.setSign_start_time("20240718");
+        papSignInfo.setSign_invalid_time("20250718");
+        papSignInfo.setAgreement_type("WITH_HOLD");
         String timestamp = LLianPayDateUtils.getTimestamp();
         LztPapAgreeApplyParams params = new LztPapAgreeApplyParams(timestamp, oidPartner, user_id, papSignInfo);
         params.setNotify_url("https://join.jubaopeng.cc");

@@ -40,12 +40,12 @@ public interface DegreePayService {
                                String ip);
 
     /**
-     * 连续代付
+     * 协议转账
      */
-    LztTransferResult transfer2(LztAcct lztAcct, String txnPurpose, String txn_seqno,
-                               String amt, String feeAmt, String pwd, String random_key, String payee_type,
+    LztTransferResult papAgreeTransfer(LztAcct lztAcct, String txnPurpose, String txn_seqno,
+                               String amt, String feeAmt, String payee_type,
                                String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript,
-                               String ip);
+                               String ip, String papAgreeNo);
     /**
      * 代付结果
      */

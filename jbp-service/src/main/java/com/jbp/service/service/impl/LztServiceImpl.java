@@ -7,6 +7,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
+import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
@@ -756,12 +757,14 @@ public class LztServiceImpl implements LztService {
     }
 
     @Override
-    public LztTransferResult transfer2(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno, String amt, String feeAmt, String pwd, String random_key, String payee_type, String bank_acctno, String bank_code, String bank_acctname, String cnaps_code, String postscript, String ip, String phone, Date registerTime, String frmsWareCategory) {
+    public LztTransferResult papAgreeTransfer(String oidPartner, String priKey, String payerId, String txnPurpose, String txn_seqno,
+                                       String amt, String feeAmt, String payee_type,
+                                       String bank_acctno, String bank_code, String bank_acctname, String cnaps_code,
+                                       String postscript, String ip, String phone, Date registerTime, String frmsWareCategory, String transferPapAgreeNo) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         String timestamp = LLianPayDateUtils.getTimestamp();
         TransferParams params = new TransferParams(timestamp, oidPartner);
-        params.setCheck_flag("N");
-        params.setContinuously_flag("Y");
+        params.setCheck_flag("Y");
         // 风控参数
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payerId, phone, registerTimeStr, txnPurpose);
@@ -775,9 +778,9 @@ public class LztServiceImpl implements LztService {
         TransferOrderInfo orderInfo = new TransferOrderInfo(txn_seqno, timestamp, Double.valueOf(amt), txnPurpose, postscript);
         orderInfo.setFee_amount(Double.valueOf(feeAmt));
         params.setOrderInfo(orderInfo);
-        TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,
-                "USEROWN", pwd, random_key);
-        payerInfo.setPap_agree_no(encrypt("2024071700495461", lianLianInfo.getPubKey() ));
+        TransferPayerInfo payerInfo = new TransferPayerInfo("USER", payerId,"USEROWN", null, null);
+
+        payerInfo.setPap_agree_no(LLianPayAccpSignature.getInstance().localEncrypt(transferPapAgreeNo));
         params.setPayerInfo(payerInfo);
         TransferPayeeInfo payeeInfo = new TransferPayeeInfo(payee_type, bank_acctno, bank_code, bank_acctname, cnaps_code);
         params.setPayeeInfo(payeeInfo);

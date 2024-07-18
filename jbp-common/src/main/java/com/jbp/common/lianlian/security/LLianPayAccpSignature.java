@@ -60,6 +60,16 @@ public class LLianPayAccpSignature {
         return false;
     }
 
+    public String localEncrypt(String sourceStr) {
+        String encryptStr = null;
+        try {
+            encryptStr = RSASign.getInstance().encrypt(sourceStr, LLianPayConstant.LLianPayPublicKey);
+            log.info(String.format("本地RSA加密，源串：%s，加密后值：%s", sourceStr, encryptStr));
+        } catch (Exception e) {
+            log.error("本地RSA加密异常,{}", e.getMessage());
+        }
+        return encryptStr;
+    }
 
 
 }

@@ -2,10 +2,13 @@ package com.jbp.admin.controller.agent;
 
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.annotation.LogControllerAnnotation;
+import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztSalaryPayer;
 import com.jbp.common.model.agent.LztSalaryTransfer;
+import com.jbp.common.model.agent.LztTransfer;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.LztSalaryTransferRequest;
 import com.jbp.common.result.CommonResult;
@@ -87,7 +90,7 @@ public class LztSalaryTransferController {
     @PreAuthorize("hasAuthority('agent:lzt:salary:transfer:send')")
     @ApiOperation(value = "发放")
     @GetMapping(value = "/send")
-    public CommonResult<LztSalaryTransfer> send(HttpServletRequest request, String pwd, String randomKey, Long id, String payCode) {
+    public CommonResult<LztSalaryTransfer> send(HttpServletRequest request, Long id) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         Integer merId = systemAdmin.getMerId();
         LztSalaryPayer salaryPayer = lztSalaryTransferService.getSalaryPayer(merId);
@@ -96,30 +99,16 @@ public class LztSalaryTransferController {
         }
         String ip = CrmebUtil.getClientIp(request);
         LztAcct acct = lztAcctService.getByUserId(salaryPayer.getPayerId());
-        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.send(acct, id, pwd, randomKey, payCode, ip);
-        if (StringUtils.isNotEmpty(acct.getPhone())) {
-            String phone = acct.getPhone();
-            lztSalaryTransfer.setRegMsg("短信已发送至: " + phone.substring(0, 3) + "****" + phone.substring(7, phone.length()) + " 请注意查收");
-        } else {
-            lztSalaryTransfer.setRegMsg("短信已发送请注意查收");
-        }
+        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.send(acct, id, ip);
         return CommonResult.success(lztSalaryTransfer);
     }
 
-    @PreAuthorize("hasAuthority('agent:lzt:salary:transfer:send')")
-    @ApiOperation(value = "自动发放")
-    @GetMapping(value = "/autoSend")
-    public CommonResult<LztSalaryTransfer> autoSend(HttpServletRequest request, Long id, String pwd, String randomKey) {
-        SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
-        Integer merId = systemAdmin.getMerId();
-        LztSalaryPayer salaryPayer = lztSalaryTransferService.getSalaryPayer(merId);
-        if (salaryPayer == null) {
-            throw new RuntimeException("出款账户未设置请联系管理员");
-        }
-        String ip = CrmebUtil.getClientIp(request);
-        LztAcct acct = lztAcctService.getByUserId(salaryPayer.getPayerId());
-        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.autoSend(acct, id, ip, pwd, randomKey);
-        return CommonResult.success(lztSalaryTransfer);
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "工资代发复合")
+    @PreAuthorize("hasAuthority('agent:lzt:salary:transfer:affrim')")
+    @ApiOperation(value = "工资代发复合")
+    @GetMapping(value = "/affrim")
+    public CommonResult<LztSalaryTransfer> affrim(Long id, String checkReturn, String checkReason) {
+        return CommonResult.success(lztSalaryTransferService.check(id, checkReturn, checkReason));
     }
 
 }
