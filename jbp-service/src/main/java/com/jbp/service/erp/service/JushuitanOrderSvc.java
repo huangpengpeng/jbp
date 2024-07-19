@@ -75,8 +75,8 @@ public class JushuitanOrderSvc {
                 JSONObject mark = isJSONValidate(merchantOrder.getUserRemark());
 
                 OrderExt orderExt =  orderExtService.getByOrder( o.getPlatOrderNo());
-
-                jsonObject.put("buyer_message", merchantOrder.getUserRemark() + (orderExt.getOrderGoodsInfo()==null?"" : orderExt.getOrderGoodsInfo()));
+                String orderGoodsInfo =orderExt.getOrderGoodsInfo()==null?"" : orderExt.getOrderGoodsInfo();
+                jsonObject.put("buyer_message", merchantOrder.getUserRemark() +orderGoodsInfo);
                 JSONArray items = new JSONArray();
 
                 List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(o.getPlatOrderNo());
