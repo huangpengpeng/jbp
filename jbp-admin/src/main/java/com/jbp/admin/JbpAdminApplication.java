@@ -51,20 +51,21 @@ public class JbpAdminApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
 
-//        DegreePayService degreePayService = run.getBean(DegreePayService.class);
-//        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
-//        LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
-//        LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
+        DegreePayService degreePayService = run.getBean(DegreePayService.class);
+        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
+        LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
+        LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
+        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli4");
+        LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
 //        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_11113",
 //                "https://join.jubaopeng.cc");
-//        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
-//        LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
+
 //        LztPapAgreeApplyResult lztPapAgreeApplyResult = lianLianPayService.papAgreeApply(payChannel.getPartnerId(), payChannel.getPriKey(), lztAcct.getUserId(), null);
 //        System.out.println(JSONObject.toJSONString(lztPapAgreeApplyResult));
 
 
-//        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), "ruicirenli", "LZT_PA_99170906256415");
-//        degreePayService.papAgreeQuery( params, payChannel.getPriKey());
+        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_202371926473158");
+        degreePayService.papAgreeQuery(params, payChannel.getPriKey());
 
 //        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
 //        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
