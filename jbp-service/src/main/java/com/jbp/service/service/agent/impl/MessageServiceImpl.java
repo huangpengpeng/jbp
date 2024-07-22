@@ -111,9 +111,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
             pId = userInvitationService.getPid(uid);
             rId = userRelationService.getPid(uid);
             UserCapa userCapa = userCapaService.getByUser(uid);
-            capaId = userCapa != null ? userCapa.getId() : null;
+            capaId = userCapa != null ? userCapa.getCapaId() : null;
             UserCapaXs userCapaXs = userCapaXsService.getByUser(uid);
-            capaXsId = userCapaXs != null ? userCapaXs.getId() : null;
+            capaXsId = userCapaXs != null ? userCapaXs.getCapaId() : null;
         }
         List<Long> tempIds = limitTempService.hasLimits(capaId, capaXsId, whiteIdList, teamIdList, pId, rId);
         return tempIds;
