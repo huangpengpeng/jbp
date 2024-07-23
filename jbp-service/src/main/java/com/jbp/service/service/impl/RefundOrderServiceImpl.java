@@ -1256,7 +1256,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
      * 退款
      * @param refundOrder 退款单
      */
-    private Boolean refundPrice(RefundOrder refundOrder, Order order) {
+    public Boolean refundPrice(RefundOrder refundOrder, Order order) {
         RefundOrderInfo refundOrderInfo = refundOrderInfoService.getByRefundOrderNo(refundOrder.getRefundOrderNo());
         OrderDetail orderDetail = orderDetailService.getById(refundOrderInfo.getOrderDetailId());
         BigDecimal refundPrice;
@@ -1465,6 +1465,10 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             if (order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
+            if (order.getPayType().equals(PayConstants.PAY_CHANNEL_YOP_QUICK)) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+            }
+
             if (order.getPayType().equals("confirmPay")) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }

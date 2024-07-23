@@ -60,6 +60,10 @@ public class PayConstants {
     /** 支付渠道-易宝支付 */
     public static final String PAY_CHANNEL_YOP = "yop";
 
+    /** 支付渠道-易宝绑卡支付 */
+    public static final String PAY_CHANNEL_YOP_QUICK = "quickPay";
+
+
 
     /** 支付渠道-快钱支付 */
     public static final String PAY_CHANNEL_KQ = "kq";
