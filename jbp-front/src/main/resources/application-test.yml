@@ -137,6 +137,7 @@ wx:
 zhcx:
   zd: CX000000
   org: CX111111
+  two: 1
 rsa:
   encrypt:
     open: false # 是否开启加密 true  or  false

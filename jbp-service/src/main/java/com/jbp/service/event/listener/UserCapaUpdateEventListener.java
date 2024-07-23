@@ -87,7 +87,13 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         List<UserInvitation> nextList = userInvitationService.getNextList(userCapa.getUid());
         // 5.获取培育下级 有且仅有2个培育下级
         List<UserInvitation> mNextList = userInvitationService.getByMid(userCapa.getUid());
-        Integer num = 2 - mNextList.size();
+
+        Integer maxNum = 2;
+        String property = environment.getProperty("zhcx.two");
+        if(StringUtils.isNotEmpty(property) && StringUtils.equals("1", property)){
+            maxNum = 1000;
+        }
+        Integer num = maxNum - mNextList.size();
         Set<Integer> peiyuNextList = Sets.newHashSet();
         if (num > 0) {
             List<Integer> mUserList = mNextList.stream().map(UserInvitation::getUId).collect(Collectors.toList());
