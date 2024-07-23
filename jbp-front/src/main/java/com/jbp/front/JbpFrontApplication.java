@@ -1,6 +1,7 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.service.service.YopService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,6 +40,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+
+        YopDemo.transfer(run.getBean(YopService.class));
 
     }
 }

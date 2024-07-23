@@ -31,11 +31,11 @@ public class YopDemo {
         System.out.println(JSONObject.toJSONString(withdrawResult));
     }
 
-    private static void transfer(YopService yopService) {
+    public static void transfer(YopService yopService) {
         String transferNo = StringUtils.N_TO_10("LZT_NDF_");
         // 10090316790  5元最早账户
         // 10089625822
-        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10089625822", "10090338239", "1", null);
+        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10090466492", "10090413808", "1", null);
         System.out.println(JSONObject.toJSONString(transferResult));
     }
 
