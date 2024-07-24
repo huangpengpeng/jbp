@@ -547,6 +547,37 @@ public class UserController {
     }
 
 
+
+
+    @ApiOperation(value = "新增用户手机号绑定关系")
+    @RequestMapping(value = "/addPhoneInvitation", method = RequestMethod.GET)
+    public CommonResult addPhoneInvitation(String phone) {
+
+        if (phone == null) {
+            throw new RuntimeException("请输入邀请人手机号");
+        }
+        Integer uid = userService.getUserId();
+        List<User> user = userService.getByPhone(phone);
+        if (user.isEmpty()) {
+            throw new RuntimeException("邀请人手机号不存在");
+        }
+        if(user.size()>1){
+            throw new RuntimeException("邀请人手机号重复，无法绑定");
+        }
+        UserInvitation userInvitation = invitationService.getByUser(uid);
+        if (userInvitation == null) {
+            UserCapa userCapa = userCapaService.getByUser(uid);
+            String ifOpen = systemConfigService.getValueByKey("ifOpen");
+            String capaId = systemConfigService.getValueByKey("capaId");
+            invitationService.band(uid, user.get(0).getId(), false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
+        }
+
+        return CommonResult.success();
+    }
+
+
+
+
     @ApiOperation("获取用户独立线会员业绩")
     @RequestMapping(value = "/getUserLineResult", method = RequestMethod.GET)
     public CommonResult<UserRiseIndexResponse> getTeamList() {
