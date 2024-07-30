@@ -66,4 +66,19 @@ public class ArticleResponse implements Serializable {
 
     @ApiModelProperty(value = "文章简介")
     private String synopsis;
+
+    @ApiModelProperty(value = "权益模板id")
+    private Long limitTempId;
+
+    @ApiModelProperty(value = "权益模板名称")
+    private String limitTempName;
+
+    @ApiModelProperty(value = "文章板块id")
+    private Long plateId;
+
+    @ApiModelProperty(value = "文章板块名称")
+    private String plateName;
+
+    @ApiModelProperty(value = "文章分类名称")
+    private String cName;
 }

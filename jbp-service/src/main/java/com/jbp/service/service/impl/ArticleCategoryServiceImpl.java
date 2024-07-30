@@ -9,10 +9,14 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.article.ArticleCategory;
+import com.jbp.common.model.article.ArticlePlate;
+import com.jbp.common.request.ArticleCategoryFrontRequest;
+import com.jbp.common.request.ArticleCategoryListRequest;
 import com.jbp.common.request.ArticleCategoryRequest;
 import com.jbp.common.response.ArticleCategoryResponse;
 import com.jbp.service.dao.ArticleCategoryDao;
 import com.jbp.service.service.ArticleCategoryService;
+import com.jbp.service.service.ArticlePlateService;
 import com.jbp.service.service.ArticleService;
 import com.jbp.service.service.SystemAttachmentService;
 
@@ -22,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ArticleCategoryServiceImpl 接口实现
@@ -40,29 +46,35 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryDao, 
 
     @Resource
     private ArticleCategoryDao dao;
-
     @Autowired
     private ArticleService articleService;
-
     @Autowired
     private SystemAttachmentService systemAttachmentService;
+    @Autowired
+    private ArticlePlateService articlePlateService;
 
     /**
      * 获取文章分类列表
      */
     @Override
-    public List<ArticleCategoryResponse> getAdminList() {
+    public List<ArticleCategoryResponse> getAdminList(ArticleCategoryListRequest request) {
         LambdaQueryWrapper<ArticleCategory> lqw = Wrappers.lambdaQuery();
         lqw.eq(ArticleCategory::getIsDel, false);
+        lqw.eq(!ObjectUtil.isNull(request.getPlateId()),ArticleCategory::getPlateId,request.getPlateId());
+        lqw.orderByDesc(ArticleCategory::getPlateId);
         lqw.orderByDesc(ArticleCategory::getSort, ArticleCategory::getId);
         List<ArticleCategory> categoryList = dao.selectList(lqw);
         if (CollUtil.isEmpty(categoryList)) {
             return CollUtil.newArrayList();
         }
+        List<Long> plateIdList = categoryList.stream().map(ArticleCategory::getPlateId).collect(Collectors.toList());
+        Map<Long, ArticlePlate> plateIdMapList = articlePlateService.getPlateIdMapList(plateIdList);
         List<ArticleCategoryResponse> responseList = CollUtil.newArrayList();
         for (ArticleCategory category : categoryList) {
             ArticleCategoryResponse response = new ArticleCategoryResponse();
             BeanUtils.copyProperties(category, response);
+            ArticlePlate articlePlate = plateIdMapList.get(category.getPlateId());
+            response.setPlateName(articlePlate != null ? articlePlate.getName() : "");
             responseList.add(response);
         }
         return responseList;
@@ -150,10 +162,14 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryDao, 
      * 获取移动端文章分类列表
      */
     @Override
-    public List<ArticleCategoryResponse> getFrontList() {
+    public List<ArticleCategoryResponse> getFrontList(ArticleCategoryFrontRequest request) {
+        if (ObjectUtil.isNull(request.getId())) {
+            throw new CrmebException("板块id不能为空！");
+        }
         LambdaQueryWrapper<ArticleCategory> lqw = Wrappers.lambdaQuery();
         lqw.eq(ArticleCategory::getIsDel, false);
         lqw.eq(ArticleCategory::getStatus, true);
+        lqw.eq(ArticleCategory::getPlateId, request.getId());
         lqw.orderByDesc(ArticleCategory::getSort, ArticleCategory::getId);
         List<ArticleCategory> categoryList = dao.selectList(lqw);
         if (CollUtil.isEmpty(categoryList)) {
@@ -166,6 +182,23 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryDao, 
             responseList.add(response);
         }
         return responseList;
+    }
+
+    /**
+     * 获取文章分类详情
+     * @param id 分类ID
+     * @return ArticleCategory
+     */
+    @Override
+    public ArticleCategory detail(Integer id) {
+        if (ObjectUtil.isNull(id)) {
+            throw new CrmebException("分类ID不能为空！");
+        }
+        ArticleCategory articleCategory = getById(id);
+        if (ObjectUtil.isNull(articleCategory)) {
+            throw new CrmebException("该分类不存在！");
+        }
+        return articleCategory;
     }
 }
 

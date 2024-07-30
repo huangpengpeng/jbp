@@ -32,10 +32,16 @@ public class ArticleSearchRequest implements Serializable {
     @ApiModelProperty(value = "分类id")
     private Integer cid;
 
+    @ApiModelProperty(value = "板块id")
+    private Integer plateId;
+
     @ApiModelProperty(value = "文章标题")
     private String title;
 
     @ApiModelProperty(value = "文章作者")
     private String author;
+
+    @ApiModelProperty(value = "是否展示")
+    private Boolean status;
 
 }
