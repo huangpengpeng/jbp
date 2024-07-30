@@ -190,11 +190,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
             throw new CrmebException("文章不存在");
         }
         if (!article.getStatus()) {
-            throw new CrmebException("文章不存在");
+            throw new CrmebException("文章未开启");
         }
         ArticleInfoResponse articleResponse = new ArticleInfoResponse();
         BeanUtils.copyProperties(article, articleResponse);
-        if (addArticleVisit(id)) {
+        if (!addArticleVisit(id)) {
             logger.error("增加文章阅读次数失败，文章id = {}", id);
         }
         return articleResponse;
