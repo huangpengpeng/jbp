@@ -3,8 +3,10 @@ package com.jbp.admin.controller.platform;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.model.article.ArticleCategory;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.ArticleCategoryListRequest;
 import com.jbp.common.request.ArticleCategoryRequest;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleCategoryResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ArticleCategoryService;
@@ -44,8 +46,8 @@ public class ArticleCategoryController {
     @PreAuthorize("hasAuthority('platform:article:category:list')")
     @ApiOperation(value = "文章分类分页列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResult<List<ArticleCategoryResponse>> getList(ArticleCategoryListRequest request) {
-        return CommonResult.success(articleCategoryService.getAdminList(request));
+    public CommonResult<CommonPage<ArticleCategoryResponse>> getList(ArticleCategoryListRequest request, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(articleCategoryService.getAdminList(request,pageParamRequest)));
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "新增文章分类")

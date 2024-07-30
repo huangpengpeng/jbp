@@ -25,6 +25,8 @@ import com.jbp.common.request.ArticleSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleInfoResponse;
 import com.jbp.common.response.ArticleResponse;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.ArticleDao;
 import com.jbp.service.service.*;
 
@@ -133,6 +135,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
         if (ObjectUtil.isNotNull(request.getPlateId())) {
             lqw.eq(Article::getPlateId, request.getPlateId());
         }
+        if (ObjectUtil.isNotNull(request.getLimitTempId())) {
+            lqw.eq(Article::getLimitTempId, request.getLimitTempId());
+        }
         if (ObjectUtil.isNotNull(request.getStatus())) {
             lqw.eq(Article::getStatus,true);
         }
@@ -142,6 +147,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
         }
         if (StrUtil.isNotBlank(request.getAuthor())) {
             lqw.eq(Article::getAuthor, URLUtil.decode(request.getAuthor()));
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            lqw.between(Article::getCreateTime, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
         }
         lqw.eq(Article::getIsDel, false);
         lqw.orderByDesc(Article::getSort).orderByDesc(Article::getId);

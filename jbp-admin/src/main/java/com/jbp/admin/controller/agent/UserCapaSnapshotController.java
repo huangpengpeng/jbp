@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -41,5 +42,20 @@ public class UserCapaSnapshotController {
             uid = user.getId();
         }
         return CommonResult.success(CommonPage.restPage(userCapaSnapshotService.pageList(uid, request.getCapaId(), request.getType(), pageParamRequest)));
+    }
+
+    @PreAuthorize("hasAuthority('agent:user:capa:snapshot:export')")
+    @ApiOperation(value = "用户等级快照列表Excel")
+    @RequestMapping(value = "/excel", method = RequestMethod.GET)
+    public CommonResult<String> export(UserCapaSnapshotRequest request) {
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (user == null) {
+                throw new CrmebException("账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(userCapaSnapshotService.export(uid, request.getCapaId(), request.getType()));
     }
 }

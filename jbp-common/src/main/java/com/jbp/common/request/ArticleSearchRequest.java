@@ -32,9 +32,6 @@ public class ArticleSearchRequest implements Serializable {
     @ApiModelProperty(value = "分类id")
     private Integer cid;
 
-    @ApiModelProperty(value = "板块id")
-    private Integer plateId;
-
     @ApiModelProperty(value = "文章标题")
     private String title;
 
@@ -43,5 +40,14 @@ public class ArticleSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "是否展示")
     private Boolean status;
+
+    @ApiModelProperty(value = "板块id")
+    private Integer plateId;
+
+    @ApiModelProperty(value = "权益模板id")
+    private Long limitTempId;
+
+    @ApiModelProperty(value = "创建时间区间")
+    private String dateLimit;
 
 }

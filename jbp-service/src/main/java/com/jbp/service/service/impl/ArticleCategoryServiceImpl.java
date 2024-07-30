@@ -7,12 +7,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.article.ArticleCategory;
 import com.jbp.common.model.article.ArticlePlate;
+import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.ArticleCategoryFrontRequest;
 import com.jbp.common.request.ArticleCategoryListRequest;
 import com.jbp.common.request.ArticleCategoryRequest;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleCategoryResponse;
 import com.jbp.service.dao.ArticleCategoryDao;
 import com.jbp.service.service.ArticleCategoryService;
@@ -57,7 +62,8 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryDao, 
      * 获取文章分类列表
      */
     @Override
-    public List<ArticleCategoryResponse> getAdminList(ArticleCategoryListRequest request) {
+    public PageInfo<ArticleCategoryResponse> getAdminList(ArticleCategoryListRequest request, PageParamRequest pageParamRequest) {
+        Page<ArticleCategory> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<ArticleCategory> lqw = Wrappers.lambdaQuery();
         lqw.eq(ArticleCategory::getIsDel, false);
         lqw.eq(!ObjectUtil.isNull(request.getPlateId()),ArticleCategory::getPlateId,request.getPlateId());
@@ -65,7 +71,7 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryDao, 
         lqw.orderByDesc(ArticleCategory::getSort, ArticleCategory::getId);
         List<ArticleCategory> categoryList = dao.selectList(lqw);
         if (CollUtil.isEmpty(categoryList)) {
-            return CollUtil.newArrayList();
+            return CommonPage.copyPageInfo(page,CollUtil.newArrayList());
         }
         List<Long> plateIdList = categoryList.stream().map(ArticleCategory::getPlateId).collect(Collectors.toList());
         Map<Long, ArticlePlate> plateIdMapList = articlePlateService.getPlateIdMapList(plateIdList);
@@ -77,7 +83,8 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryDao, 
             response.setPlateName(articlePlate != null ? articlePlate.getName() : "");
             responseList.add(response);
         }
-        return responseList;
+        return CommonPage.copyPageInfo(page,responseList);
+
     }
 
     /**
