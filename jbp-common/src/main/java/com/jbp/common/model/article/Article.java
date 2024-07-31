@@ -78,5 +78,10 @@ public class Article implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "权益模板")
+    private Long limitTempId;
+
+    @ApiModelProperty(value = "文章板块id")
+    private Long plateId;
 
 }

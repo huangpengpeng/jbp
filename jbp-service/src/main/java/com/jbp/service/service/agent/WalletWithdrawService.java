@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.WalletWithdrawCancelRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 import com.jbp.common.vo.WalletWithdrawVo;
@@ -20,7 +21,7 @@ public interface WalletWithdrawService extends IService<WalletWithdraw> {
 
     void send(List<WalletWithdrawRequest> walletWithdrawList);
 
-    void cancel(List<WalletWithdrawRequest> walletWithdrawList);
+    void cancel(WalletWithdrawCancelRequest request);
 
     PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest);
 

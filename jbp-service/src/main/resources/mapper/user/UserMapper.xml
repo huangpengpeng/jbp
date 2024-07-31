@@ -63,6 +63,9 @@
                     </otherwise>
                 </choose>
             </if>
+            <if test="regStartTime != null and regStartTime != ''">
+                and u.create_time between #{regStartTime} and #{regEndTime}
+            </if>
         </where>
         ORDER BY u.id desc
     </select>

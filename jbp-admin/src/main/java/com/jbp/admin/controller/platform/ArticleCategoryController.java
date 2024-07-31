@@ -2,7 +2,11 @@ package com.jbp.admin.controller.platform;
 
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.model.article.ArticleCategory;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.ArticleCategoryListRequest;
 import com.jbp.common.request.ArticleCategoryRequest;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleCategoryResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ArticleCategoryService;
@@ -42,8 +46,8 @@ public class ArticleCategoryController {
     @PreAuthorize("hasAuthority('platform:article:category:list')")
     @ApiOperation(value = "文章分类分页列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResult<List<ArticleCategoryResponse>> getList() {
-        return CommonResult.success(articleCategoryService.getAdminList());
+    public CommonResult<CommonPage<ArticleCategoryResponse>> getList(ArticleCategoryListRequest request, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(articleCategoryService.getAdminList(request,pageParamRequest)));
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "新增文章分类")
@@ -91,6 +95,12 @@ public class ArticleCategoryController {
             return CommonResult.success("切换文章分类开关成功");
         }
         return CommonResult.failed("切换文章分类开关失败");
+    }
+
+    @ApiOperation(value = "获取文章分类详情")
+    @RequestMapping(value = "/diy/{id}", method = RequestMethod.GET)
+    public CommonResult<ArticleCategory> detail(@PathVariable(value = "id") Integer id) {
+        return CommonResult.success(articleCategoryService.detail(id));
     }
 }
 

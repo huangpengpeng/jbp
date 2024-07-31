@@ -16,6 +16,7 @@ import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.WalletWithdrawCancelRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
@@ -173,18 +174,18 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     }
 
     @Override
-    public void cancel(List<WalletWithdrawRequest> walletWithdrawList) {
-        if (CollectionUtils.isEmpty(walletWithdrawList)) {
-            throw new CrmebException("提现信息不能为空");
+    public void cancel(WalletWithdrawCancelRequest request) {
+        if (CollectionUtils.isEmpty(request.getUniqueNos())) {
+            throw new CrmebException("提现单号不能为空");
         }
         List<WalletWithdraw> list = Lists.newArrayList();
         Date now = DateTimeUtils.getNow();
         int i = 1;
-        for (WalletWithdrawRequest withdrawRequest : walletWithdrawList) {
-            if (StringUtils.isEmpty(withdrawRequest.getUniqueNo())) {
+        for (String uniqueNo : request.getUniqueNos()) {
+            if (StringUtils.isEmpty(uniqueNo)) {
                 throw new CrmebException("提现信息单号不能为空，行号:" + i);
             }
-            WalletWithdraw walletWithdraw = getByUniqueNo(withdrawRequest.getUniqueNo());
+            WalletWithdraw walletWithdraw = getByUniqueNo(uniqueNo);
             if (walletWithdraw == null) {
                 throw new CrmebException("提现信息不存在，行号:" + i);
             }
@@ -192,7 +193,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
                 throw new CrmebException("提现状态不是待出款，行号:" + i);
             }
             walletWithdraw.setStatus(WalletWithdraw.StatusEnum.已取消.toString());
-            walletWithdraw.setRemark(withdrawRequest.getRemark());
+            walletWithdraw.setRemark(request.getRemark());
             walletWithdraw.setSuccessTime(now);
             list.add(walletWithdraw);
             i++;
