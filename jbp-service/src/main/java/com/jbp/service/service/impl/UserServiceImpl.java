@@ -739,6 +739,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             map.put("endTime", dateLimit.getEndTime());
             map.put("accessType", request.getAccessType());
         }
+        DateLimitUtilVo regDateLimit = CrmebDateUtil.getDateLimit(request.getRegDateLimit());
+        if (StrUtil.isNotBlank(regDateLimit.getStartTime())) {
+            map.put("regStartTime", regDateLimit.getStartTime());
+            map.put("regEndTime", regDateLimit.getEndTime());
+        }
         List<User> userList = dao.findAdminList(map);
         List<UserResponse> userResponses = new ArrayList<>();
         if (CollUtil.isEmpty(userList)) {
