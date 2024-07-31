@@ -40,8 +40,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+//        YopDemo.merRegister(run.getBean(YopService.class));
 
-        YopDemo.transfer(run.getBean(YopService.class));
+        YopDemo.registerQuery(run.getBean(YopService.class));
 
     }
 }

@@ -81,6 +81,11 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         userInvitationService.del(userCapa.getUid());
         // 4.自己绑定总店
         userInvitationService.band(userCapa.getUid(), zdUser.getId(), false, true, true);
+        // 5.保存转挂
+        UserInvitation newUserInvitation = userInvitationService.getByUser(userCapa.getUid());
+        newUserInvitation.setMId(userInvitation.getMId());
+        userInvitationService.updateById(newUserInvitation);
+        // 6.新增跳转
         invitationJumpService.add(userCapa.getUid(), zdUser.getId(), orgPid);
 
         // 获取自己的一阶
@@ -88,12 +93,8 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         // 5.获取培育下级 有且仅有2个培育下级
         List<UserInvitation> mNextList = userInvitationService.getByMid(userCapa.getUid());
 
-        Integer maxNum = 2;
-        String property = environment.getProperty("zhcx.two");
-        if(StringUtils.isNotEmpty(property) && StringUtils.equals("1", property)){
-            maxNum = 1000;
-        }
-        Integer num = maxNum - mNextList.size();
+        int max = 10000; // 最大限制
+        int num = max - mNextList.size();
         Set<Integer> peiyuNextList = Sets.newHashSet();
         if (num > 0) {
             List<Integer> mUserList = mNextList.stream().map(UserInvitation::getUId).collect(Collectors.toList());

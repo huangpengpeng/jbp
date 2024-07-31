@@ -24,7 +24,7 @@ public class  YopProducts {
         用户扫码_支付宝_线下("USER_SCAN_ALIPAY_OFFLINE", "SINGLE_PERCENT", "0.35", "0.23"),
         企业账户充值标准版_银行汇款("ENTERPRISE_RECHARGE_STANDARD_BANK_TRASFER", "SINGLE_FIXED", "10", "10"),
         企业账户提现标准版_实时到账("ENTERPRISE_WITHDRAW_STANDARD_REALTIME", "SINGLE_FIXED", "1", "1"),
-        企业账户转账_公对公("ENTERPRISE_TRANSFER_B2B", "SINGLE_FIXED", "1", "1"),
+//        企业账户转账_公对公("ENTERPRISE_TRANSFER_B2B", "SINGLE_FIXED", "1", "1"),
 
 //        企业付款_实时到账_对公("ENTERPRISE_PAYMENT_REALTIME_PUBLIC", "SINGLE_FIXED", "2", "2"),
 //        企业付款_实时到账_对私("ENTERPRISE_PAYMENT_REALTIME_PRIVATE", "SINGLE_FIXED", "2", "2"),
