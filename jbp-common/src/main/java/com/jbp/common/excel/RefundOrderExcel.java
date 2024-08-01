@@ -55,6 +55,9 @@ public class RefundOrderExcel implements Serializable {
     @ExcelProperty(value = "创建时间",index = 13)
     private Date createTime;
 
-    @ExcelProperty(value = "退款时间",index = 14)
+    @ExcelProperty(value = "支付时间",index = 14)
+    private Date payTime;
+
+    @ExcelProperty(value = "退款时间",index = 15)
     private Date refundTime;
 }

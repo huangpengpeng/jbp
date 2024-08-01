@@ -66,7 +66,6 @@ public class OrderExcel implements Serializable {
     @ExcelProperty(value = "退款状态", index = 16)
     private String refundStatus;
 
-
     @ExcelProperty(value = "商品信息", index = 17)
     private String productInfo;
 
@@ -106,36 +105,39 @@ public class OrderExcel implements Serializable {
     @ExcelProperty(value = "付款时间", index = 29, format = "yyyy-MM-dd hh:mm:ss")
     private Date payTime;
 
-    @ExcelProperty(value = "下单前等级", index = 30)
+    @ExcelProperty(value = "退款时间", index = 30, format = "yyyy-MM-dd hh:mm:ss")
+    private Date refundTime;
+
+    @ExcelProperty(value = "下单前等级", index = 31)
     private String capaName;
 
-    @ExcelProperty(value = "下单后等级", index = 31)
+    @ExcelProperty(value = "下单后等级", index = 32)
     private String successCapaName;
 
-    @ExcelProperty(value = "用户是否确认收货", index = 32)
+    @ExcelProperty(value = "用户是否确认收货", index = 33)
     private String ifUserVerifyReceive;
 
-    @ExcelProperty(value = "确认收货时间", index = 33)
+    @ExcelProperty(value = "确认收货时间", index = 34)
     private Date receiveTime;
 
-    @ExcelProperty(value = "取消时间", index = 34, format = "yyyy-MM-dd hh:mm:ss")
+    @ExcelProperty(value = "取消时间", index = 35, format = "yyyy-MM-dd hh:mm:ss")
     private Date cancelTime;
 
-    @ExcelProperty(value = "购物抵扣", index = 35)
+    @ExcelProperty(value = "购物抵扣", index = 36)
     private BigDecimal gouwu;
 
-    @ExcelProperty(value = "奖励抵扣", index = 36)
+    @ExcelProperty(value = "奖励抵扣", index = 37)
     private BigDecimal jiangli;
 
-    @ExcelProperty(value = "换购抵扣", index = 37)
+    @ExcelProperty(value = "换购抵扣", index = 38)
     private BigDecimal huangou;
 
-    @ExcelProperty(value = "福券抵扣", index = 38)
+    @ExcelProperty(value = "福券抵扣", index = 39)
     private BigDecimal fuquan;
 
-    @ExcelProperty(value = "发货时间", index = 39)
+    @ExcelProperty(value = "发货时间", index = 40)
     private Date shipTime;
 
-    @ExcelProperty(value = "订单商品扩展信息", index = 40)
+    @ExcelProperty(value = "订单商品扩展信息", index = 41)
     private String productExtInfo;
 }
