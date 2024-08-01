@@ -42,7 +42,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 //        YopDemo.merRegister(run.getBean(YopService.class));
 
-        YopDemo.registerQuery(run.getBean(YopService.class));
+//        YopDemo.registerQuery(run.getBean(YopService.class));
 
     }
 }
