@@ -63,4 +63,7 @@ public class PlatformRefundOrderPageResponse implements Serializable {
     @ApiModelProperty(value = "退款时间")
     private Date refundTime;
 
+    @ApiModelProperty(value = "支付时间")
+    private Date payTime;
+
 }

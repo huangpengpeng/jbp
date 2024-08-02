@@ -28,6 +28,7 @@ import com.jbp.service.dao.agent.UserCapaDao;
 import com.jbp.service.event.EventPublisherContext;
 import com.jbp.service.event.UserCapaUpdateEvent;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import org.apache.commons.lang3.BooleanUtils;
@@ -71,6 +72,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
     private EventPublisherContext eventPublisherContext;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private TeamUserService teamUserService;
 
     @Override
     public UserCapa getByUser(Integer uid) {
@@ -160,8 +163,10 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
-        Map<Integer, User> userMap = userService.getUidMapList(list.stream().map(UserCapa::getUid).collect(Collectors.toList()));
+        List<Integer> uidList = list.stream().map(UserCapa::getUid).collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(uidList);
         Map<Long, Capa> capaMap = capaService.getCapaMap();
+        Map<Integer, TeamUser> uidMapList = teamUserService.getUidMapList(uidList);
         list.forEach(e -> {
             User user = userMap.get(e.getUid());
             e.setAccount(userMap.get(e.getUid()).getAccount());
@@ -170,6 +175,8 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
             Capa capa = capaMap.get(e.getCapaId());
             e.setCapaName(capa.getName());
             e.setCapaUrl(capa.getIconUrl());
+            TeamUser teamUser = uidMapList.get(e.getUid());
+            e.setTeamName(teamUser!= null ? teamUser.getName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
 

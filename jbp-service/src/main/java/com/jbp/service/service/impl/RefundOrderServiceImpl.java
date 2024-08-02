@@ -866,6 +866,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
         List<PlatformRefundOrderPageResponse> responseList = refundOrderList.stream().map(order -> {
             PlatformRefundOrderPageResponse response = new PlatformRefundOrderPageResponse();
+            Order byOrderNo = orderService.getByOrderNo(order.getOrderNo());
+            response.setPayTime(byOrderNo == null ? null : byOrderNo.getPayTime());
             response.setRefundOrderNo(order.getRefundOrderNo());
             response.setOrderNo(orderService.getPlatOrderNo(order.getOrderNo()));
             response.setUid(order.getUid());
