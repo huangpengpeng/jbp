@@ -9,11 +9,13 @@ import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
+import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.LztService;
+import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztWithdrawalService;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,6 +40,8 @@ public class LztServiceImpl implements LztService {
 
     @Resource
     private LianLianPayService lianLianPayService;
+    @Resource
+    private LztAcctService lztAcctService;
 
     @Override
     public OpenacctApplyResult createUser(String oidPartner, String priKey, String txnSeqno, String userId,
@@ -260,7 +264,7 @@ public class LztServiceImpl implements LztService {
 
     @Override
     public TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
-                                                   Double amt, String txnPurpose, String pwd, String randomKey,
+                                                   Double amt, Double feeAmt, String txnPurpose, String pwd, String randomKey,
                                                    String payeeId, String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory) {
         LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
         TransferMorepyeeParams params = new TransferMorepyeeParams();
@@ -289,14 +293,98 @@ public class LztServiceImpl implements LztService {
         params.setPayerInfo(payerInfo);
 
         // 收款方信息
+        LztAcct lztAcct = lztAcctService.getByUserId(payeeId);
+        if(lztAcct.getMerId().intValue() == 14 && "企业用户".equals(lztAcct.getUserType())){
+            List<TransferMorepyeePayeeInfo> list = Lists.newArrayList();
+            TransferMorepyeePayeeInfo payeeInfo = new TransferMorepyeePayeeInfo();
+            payeeInfo.setPayee_type("USER");
+            payeeInfo.setPayee_id(payeeId);
+            payeeInfo.setPayee_amount(String.valueOf(amt));
+            list.add(payeeInfo);
+            if(feeAmt != null && ArithmeticUtils.gt(BigDecimal.valueOf(feeAmt), BigDecimal.ZERO)){
+                TransferMorepyeePayeeInfo payeeInfo2 = new TransferMorepyeePayeeInfo();
+                payeeInfo2.setPayee_type("MERCHANT");
+                payeeInfo2.setPayee_id("402403180000017645");
+                payeeInfo2.setPayee_accttype("MCHOWN");
+                payeeInfo2.setPayee_amount(String.valueOf(feeAmt));
+                list.add(payeeInfo2);
+            }
+            params.setPayeeInfo(list);
+        }else{
+            TransferMorepyeePayeeInfo payeeInfo = new TransferMorepyeePayeeInfo();
+            payeeInfo.setPayee_type("USER");
+            payeeInfo.setPayee_id(payeeId);
+            payeeInfo.setPayee_amount(String.valueOf(amt));
+            params.setPayeeInfo(Arrays.asList(payeeInfo));
+        }
+        // 风控参数
+        String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payeeId, phone, registerTimeStr, txnPurpose);
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setFrms_client_chnl("13");
+        riskItemInfo.setUser_auth_flag("1");
+
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+        String url = "https://accpapi.lianlianpay.com/v1/txn/transfer-morepyee";
+        LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (StringUtils.isEmpty(s)) {
+            throw new CrmebException("内部转账异常");
+        }
+        try {
+            TransferMorepyeeResult result = JSON.parseObject(s, TransferMorepyeeResult.class);
+            if (result == null || !("8888".equals(result.getRet_code()) || "0000".equals(result.getRet_code()) || "8889".equals(result.getRet_code()))) {
+                throw new CrmebException("内部转账异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new CrmebException("内部转账异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 转账到平台自有账户
+     */
+    @Override
+    public TransferMorepyeeResult transferMchOwn(String oidPartner, String priKey, String payerId, String orderNo,
+                                                 Double amt, String txnPurpose, String agreeNo, String ip, String notify_url,
+                                                 String phone, Date registerTime, String frmsWareCategory) {
+        LianLianPayInfoResult lianLianInfo = lianLianPayService.get();
+        TransferMorepyeeParams params = new TransferMorepyeeParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(oidPartner);
+        params.setFunds_flag("N");
+        params.setDirectionalpay_flag("N");
+        params.setContinuously_flag("N");
+
+        params.setNotify_url(lianLianInfo.getHost() + notify_url);
+
+        // 商户订单信息
+        TransferMorepyeeOrderInfo orderInfo = new TransferMorepyeeOrderInfo();
+        orderInfo.setTxn_seqno(orderNo);
+        orderInfo.setTxn_time(timestamp);
+        orderInfo.setTotal_amount(amt);
+        orderInfo.setTxn_purpose(txnPurpose);
+        params.setOrderInfo(orderInfo);
+
+        // 付款方信息
+        TransferMorepyeePayerInfo payerInfo = new TransferMorepyeePayerInfo();
+        payerInfo.setPayer_type("USER");
+        payerInfo.setPayer_id(payerId);
+        payerInfo.setPap_agree_no(LLianPayAccpSignature.getInstance().localEncrypt(agreeNo));
+        params.setPayerInfo(payerInfo);
+
+        // 收款方信息
         TransferMorepyeePayeeInfo payeeInfo = new TransferMorepyeePayeeInfo();
-        payeeInfo.setPayee_type("USER");
-        payeeInfo.setPayee_id(payeeId);
+        payeeInfo.setPayee_type("MERCHANT");
+        payeeInfo.setPayee_id("402403180000017645");
+        payeeInfo.setPayee_accttype("MCHOWN");
         payeeInfo.setPayee_amount(String.valueOf(amt));
         params.setPayeeInfo(Arrays.asList(payeeInfo));
         // 风控参数
         String registerTimeStr = DateTimeUtils.format(registerTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, payeeId, phone, registerTimeStr, txnPurpose);
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frmsWareCategory, "MCHOWN", phone, registerTimeStr, txnPurpose);
         riskItemInfo.setFrms_ip_addr(ip);
         riskItemInfo.setFrms_client_chnl("13");
         riskItemInfo.setUser_auth_flag("1");

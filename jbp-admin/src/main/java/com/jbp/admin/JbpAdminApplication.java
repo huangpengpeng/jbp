@@ -8,13 +8,17 @@ import com.jbp.common.lianlian.params.PapAgreeQueryParams;
 import com.jbp.common.lianlian.result.BindCardH5ApplyResult;
 import com.jbp.common.lianlian.result.LztPapAgreeApplyResult;
 import com.jbp.common.lianlian.result.LztTransferResult;
+import com.jbp.common.lianlian.result.TransferMorepyeeResult;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztPayChannel;
 import com.jbp.common.model.agent.LztTransferMorepyee;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.WeChatMiniAuthorizeVo;
 import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.LianLianPayService;
+import com.jbp.service.service.LztService;
 import com.jbp.service.service.WechatService;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
@@ -51,26 +55,40 @@ public class JbpAdminApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
 
+        LztService lztService = run.getBean(LztService.class);
         DegreePayService degreePayService = run.getBean(DegreePayService.class);
         LztAcctService lztAcctService = run.getBean(LztAcctService.class);
         LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
         LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
-        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli4");
+
+        LztAcct lztAcct = lztAcctService.getByUserId("xingwang15");
         LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
-//        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_11113",
-//                "https://join.jubaopeng.cc");
 
 //        LztPapAgreeApplyResult lztPapAgreeApplyResult = lianLianPayService.papAgreeApply(payChannel.getPartnerId(), payChannel.getPriKey(), lztAcct.getUserId(), null);
 //        System.out.println(JSONObject.toJSONString(lztPapAgreeApplyResult));
 
 
-        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_202371926473158");
-        degreePayService.papAgreeQuery(params, payChannel.getPriKey());
+//        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_111050181327313");
+//        System.out.println(degreePayService.papAgreeQuery(params, payChannel.getPriKey()));
 
-//        LztAcctService lztAcctService = run.getBean(LztAcctService.class);
-//        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
-//        LztSalaryTransferService lztSalaryTransferService = run.getBean(LztSalaryTransferService.class);
-//        lztSalaryTransferService.send(lztAcct, 24L, "60.186.153.50");
+
+//        String orderNo = StringUtils.N_TO_10("YK_");
+//        System.out.println(orderNo);
+//        //  转账到平台自有账户
+//        TransferMorepyeeResult transferMorepyeeResult = lztService.transferMchOwn(payChannel.getPartnerId(), payChannel.getPriKey(), lztAcct.getUserId(), orderNo,
+//                9699.2,
+//                "月扣手续费",
+//                lztAcct.getTransferPapAgreeNo(),
+//                "115.195.90.138", "",
+//                "15306500433", DateTimeUtils.parseDate("2024-04-08 20:27:11"), payChannel.getFrmsWareCategory());
+//        System.out.println(JSONObject.toJSONString(transferMorepyeeResult));
     }
+
+
+
+    // 绑卡
+//        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_11113",
+//                "https://join.jubaopeng.cc");
+
 
 }

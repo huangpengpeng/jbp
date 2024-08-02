@@ -9,6 +9,7 @@ import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.lianlian.params.LztPapAgreeApplyParams;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.*;
@@ -60,6 +61,8 @@ public class LztAcctController {
     @Resource
     private LztTransferService lztTransferService;
     @Resource
+    private LztSalaryTransferService lztSalaryTransferService;
+    @Resource
     private LztWithdrawalService lztWithdrawalService;
     @Resource
     private DegreePayService degreePayService;
@@ -67,8 +70,6 @@ public class LztAcctController {
     private SmsService smsService;
     @Resource
     private LztTransferMorepyeeService lztTransferMorepyeeService;
-    @Resource
-    private LztSalaryTransferService lztSalaryTransferService;
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "来账通新增账户")
     @GetMapping("/add")
@@ -278,6 +279,7 @@ public class LztAcctController {
                 acctBalList.setFlag_dc("CREDIT".equals(acctBalList.getFlag_dc()) ? "入账" : "出账");
                 acctBalList.setTxn_time(DateTimeUtils.format(DateTimeUtils.parseDate(acctBalList.getTxn_time(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
                 if (StringUtils.isNotEmpty(acctBalList.getJno_acct()) && "连连".equals(lztAcct.getPayChannelType())) {
+
                     AcctSerialDetailResult acctSerialDetailResult = lztService.acctSerialDetail(payInfo.getOidPartner(), payInfo.getPriKey(), acctBalList.getUserId(),
                             LianLianPayConfig.UserType.getCode(lztAcct.getUserType()), acctBalList.getJno_acct());
                     acctBalList.setDetail(acctSerialDetailResult);
@@ -285,6 +287,7 @@ public class LztAcctController {
                     if (StringUtils.equals("内部代发", acctBalList.getTxn_type())) {
                         acctBalList.setTxn_type("转账");
                         LztTransferMorepyee lztTransferMorepyee = lztTransferMorepyeeService.getByTxnSeqno(acctBalList.getJno_cli());
+
                         if(lztTransferMorepyee != null){
                             acctBalList.setFeeAmount(lztTransferMorepyee.getFeeAmount());
                         }else{
@@ -294,12 +297,20 @@ public class LztAcctController {
                     if (StringUtils.equals("外部代发", acctBalList.getTxn_type()) && acctBalList.getFeeAmount() == null) {
                         acctBalList.setTxn_type("代付");
                         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(acctBalList.getJno_cli());
+                        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.getByTxnSeqno(acctBalList.getJno_cli());
                         if (lztTransfer != null) {
                             acctBalList.setFeeAmount(lztTransfer.getFeeAmount());
                             AcctSerialDetailResult detail = acctBalList.getDetail();
                             detail.setOther_acct_name(lztTransfer.getBankAcctName());
                             detail.setOther_acct(lztTransfer.getBankAcctNo());
-                        }else{
+                        }
+                        if(lztSalaryTransfer != null){
+                            acctBalList.setFeeAmount(lztSalaryTransfer.getFeeAmount());
+                            AcctSerialDetailResult detail = acctBalList.getDetail();
+                            detail.setOther_acct_name(lztSalaryTransfer.getBankAcctName());
+                            detail.setOther_acct(lztSalaryTransfer.getBankAcctNo());
+                        }
+                        if(lztSalaryTransfer == null && lztTransfer == null){
                             acctBalList.setFeeAmount(BigDecimal.ZERO.setScale(2));
                         }
                     }
@@ -309,7 +320,9 @@ public class LztAcctController {
                             acctBalList.setFeeAmount(lztWithdrawal.getFeeAmount());
                         }
                     }
-
+                    if(acctBalList.getJno_cli().startsWith("YK_")){
+                        acctBalList.setTxn_type("代扣手续费");
+                    }
                 }
             }
         }

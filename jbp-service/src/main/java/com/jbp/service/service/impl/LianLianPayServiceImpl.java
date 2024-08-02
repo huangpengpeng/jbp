@@ -414,8 +414,8 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         if (papSignInfo == null) {
             papSignInfo = new PapSignInfo();
         }
-        papSignInfo.setSign_start_time("20240719");
-        papSignInfo.setSign_invalid_time("20250718");
+        papSignInfo.setSign_start_time("20240801");
+        papSignInfo.setSign_invalid_time("20240807");
         papSignInfo.setAgreement_type("WITH_HOLD");
         String timestamp = LLianPayDateUtils.getTimestamp();
         LztPapAgreeApplyParams params = new LztPapAgreeApplyParams(timestamp, oidPartner, user_id, papSignInfo);

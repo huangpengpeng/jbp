@@ -1,6 +1,5 @@
 package com.jbp.service.service;
 
-import com.jbp.common.lianlian.params.FindPasswordVerifyParams;
 import com.jbp.common.lianlian.result.*;
 
 import java.math.BigDecimal;
@@ -54,8 +53,19 @@ public interface LztService {
      * 来账通内部代发申请
      */
     TransferMorepyeeResult transferMorepyee(String oidPartner, String priKey, String payerId, String orderNo,
-                                            Double amt, String txnPurpose, String pwd, String randomKey,
+                                            Double amt, Double feeAmt,  String txnPurpose, String pwd, String randomKey,
                                             String payeeId, String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory);
+
+
+    /**
+     * 转账到平台自有账户
+     */
+    TransferMorepyeeResult transferMchOwn(String oidPartner, String priKey, String payerId, String orderNo,
+                                          Double amt, String txnPurpose, String agreeNo,
+                                          String ip, String notify_url, String phone, Date registerTime, String frmsWareCategory);
+
+
+
     /**
      * 来账通内部代发结果查询
      */

@@ -405,9 +405,13 @@ public class DegreePayServiceImpl implements DegreePayService {
         TransferMorepyeeResult result = new TransferMorepyeeResult();
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
         if (lztAcct.getPayChannelType().equals("连连")) {
-            amt = BigDecimal.valueOf(amt).add(fee).doubleValue();
+            if(lztAcct.getMerId().intValue() == 14 && "企业用户".equals(lztAcct.getUserType())){
+
+            }else{
+                amt = BigDecimal.valueOf(amt).add(fee).doubleValue();
+            }
             result = lztService.transferMorepyee(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(),
-                    lztAcct.getUserId(), orderNo, amt.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notify_url, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
+                    lztAcct.getUserId(), orderNo, amt.doubleValue(), fee.doubleValue(), txnPurpose, pwd, randomKey, payeeId, ip, notify_url, lztAcct.getPhone(), lztAcct.getGmtCreated(), lztPayChannel.getFrmsWareCategory());
         }
         if (lztAcct.getPayChannelType().equals("易宝")) {
             LianLianPayInfoResult payInfo = lianLianPayService.get();
