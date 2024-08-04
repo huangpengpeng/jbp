@@ -404,8 +404,9 @@ public class DegreePayServiceImpl implements DegreePayService {
     public TransferMorepyeeResult transferMorepyee(LztAcct lztAcct, String orderNo, Double amt, BigDecimal fee, String txnPurpose, String pwd, String randomKey, String payeeId, String ip, String notify_url) {
         TransferMorepyeeResult result = new TransferMorepyeeResult();
         LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        LztAcct payee = lztAcctService.getByUserId(payeeId);
         if (lztAcct.getPayChannelType().equals("连连")) {
-            if(lztAcct.getMerId().intValue() == 14 && "企业用户".equals(lztAcct.getUserType())){
+            if(lztAcct.getMerId().intValue() == 14 && "企业用户".equals(payee.getUserType())){
 
             }else{
                 amt = BigDecimal.valueOf(amt).add(fee).doubleValue();

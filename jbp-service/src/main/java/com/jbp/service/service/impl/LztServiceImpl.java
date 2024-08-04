@@ -281,6 +281,13 @@ public class LztServiceImpl implements LztService {
         orderInfo.setTxn_seqno(orderNo);
         orderInfo.setTxn_time(timestamp);
         orderInfo.setTotal_amount(amt);
+        LztAcct lztAcct = lztAcctService.getByUserId(payeeId);
+        if(lztAcct.getMerId().intValue() == 14 && "企业用户".equals(lztAcct.getUserType())){
+            if(feeAmt != null && ArithmeticUtils.gt(BigDecimal.valueOf(feeAmt), BigDecimal.ZERO)){
+                BigDecimal totalAmount = BigDecimal.valueOf(amt).add(BigDecimal.valueOf(feeAmt));
+                orderInfo.setTotal_amount(totalAmount.doubleValue());
+            }
+        }
         orderInfo.setTxn_purpose(txnPurpose);
         params.setOrderInfo(orderInfo);
 
@@ -293,7 +300,7 @@ public class LztServiceImpl implements LztService {
         params.setPayerInfo(payerInfo);
 
         // 收款方信息
-        LztAcct lztAcct = lztAcctService.getByUserId(payeeId);
+
         if(lztAcct.getMerId().intValue() == 14 && "企业用户".equals(lztAcct.getUserType())){
             List<TransferMorepyeePayeeInfo> list = Lists.newArrayList();
             TransferMorepyeePayeeInfo payeeInfo = new TransferMorepyeePayeeInfo();
