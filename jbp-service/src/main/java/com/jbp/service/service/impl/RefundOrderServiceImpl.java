@@ -125,6 +125,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private Environment environment;
     @Autowired
     private RelationScoreService relationScoreService;
+    @Autowired
+    private FundClearingRecordService fundClearingRecordService;
 
     /**
      * 商户端退款订单分页列表
@@ -1496,6 +1498,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)|| order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
                 redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());
             }
+        }
+        //运营中心更新已退款
+        List<FundClearingRecord> list = fundClearingRecordService.list(new QueryWrapper<FundClearingRecord>().lambda().eq(FundClearingRecord::getExternalNo, order.getOutTradeNo()));
+        if (CollUtil.isNotEmpty(list)) {
+            fundClearingRecordService.refund(order.getOutTradeNo());
         }
         return execute;
     }
