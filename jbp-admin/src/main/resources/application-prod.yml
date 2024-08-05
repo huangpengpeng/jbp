@@ -64,7 +64,7 @@ mybatis-plus:
 #swagger 配置
 swagger:
   basic:
-    enable: true #是否开启界面
+    enable: false #是否开启界面
     check: false #是否打开验证
     username: crmeb #访问swagger的账号
     password: crmeb.com #访问swagger的密码
