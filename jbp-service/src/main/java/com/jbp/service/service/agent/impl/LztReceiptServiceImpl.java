@@ -42,6 +42,8 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
     private LztTransferMorepyeeService lztTransferMorepyeeService;
     @Resource
     private DegreePayService degreePayService;
+    @Resource
+    private LztSalaryTransferService lztSalaryTransferService;
 
     @Override
     public List<LztReceipt> getList(Integer merId, String tradeTxnSeqno, String memo) {
@@ -70,6 +72,11 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(tradeTxnSeqno);
         if (lztTransfer != null) {
             payChannelType = lztTransfer.getPayChannelType();
+        }
+        // 外部转账记录
+        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.getByTxnSeqno(tradeTxnSeqno);
+        if (lztSalaryTransfer != null) {
+            payChannelType = lztSalaryTransfer.getPayChannelType();
         }
 
         LztReceipt lztReceipt = new LztReceipt();
@@ -112,6 +119,12 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
             lztTransfer.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
             lztTransferService.updateById(lztTransfer);
         }
+        if (lztSalaryTransfer != null) {
+            lztSalaryTransfer.setReceiptStatus(1);
+            lztSalaryTransfer.setReceiptToken(lztReceipt.getToken());
+            lztSalaryTransfer.setReceiptAccpTxno(lztReceipt.getReceiptAccpTxno());
+            lztSalaryTransferService.updateById(lztSalaryTransfer);
+        }
         return lztReceipt;
     }
 
@@ -139,6 +152,17 @@ public class LztReceiptServiceImpl extends ServiceImpl<LztReceiptDao, LztReceipt
         }
         if (lztTransferMorepyee != null) {
             result.setReceipt_sum_file(lztTransferMorepyee.getReceiptZip());
+        }
+        // 批量代付
+        LztSalaryTransfer lztSalaryTransfer = lztSalaryTransferService.getByTxnSeqno(tradeTxnSeqno);
+        if(lztSalaryTransfer != null && StringUtils.isEmpty(lztSalaryTransfer.getReceiptZip())){
+            LztAcct lztAcct = lztAcctService.getByUserId(lztSalaryTransfer.getPayerId());
+            result = degreePayService.receiptDownload(lztAcct, lztSalaryTransfer.getReceiptAccpTxno(), lztSalaryTransfer.getTxnSeqno(), lztSalaryTransfer.getReceiptToken(), "PAY", DateTimeUtils.format(lztSalaryTransfer.getCreateTime(), DateTimeUtils.DEFAULT_DATE_FORMAT_PATTERN));
+            lztSalaryTransfer.setReceiptZip(result.getReceipt_sum_file());
+            lztSalaryTransferService.updateById(lztSalaryTransfer);
+        }
+        if (lztSalaryTransfer != null) {
+            result.setReceipt_sum_file(lztSalaryTransfer.getReceiptZip());
         }
         // 外部转账记录
         LztTransfer lztTransfer = lztTransferService.getByTxnSeqno(tradeTxnSeqno);
