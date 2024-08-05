@@ -37,9 +37,11 @@
                c.account,
                c.nickname,
                c.comm_amt,
-               c.price
+               c.price,
+               ro.refund_time
         FROM eb_fund_clearing_record AS c
-                 LEFT JOIN eb_order AS o ON c.external_no = o.order_no
+                 LEFT JOIN eb_order AS o ON c.external_no = o.plat_order_no
+                 LEFT JOIN eb_refund_order AS ro ON ro.order_no = o.order_no
     </sql>
     <select id="pageList" resultMap="FundClearingRecord">
         <include refid="selectFundClearingRecordVo"/>

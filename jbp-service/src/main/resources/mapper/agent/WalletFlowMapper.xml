@@ -24,10 +24,13 @@
             and f.action =#{action}
         </if>
         <if test="nickname !='' and nickname!= null ">
-            and   us.nickname =#{nickname}
+            and   us.nickname like CONCAT('%',#{nickname},'%')
         </if>
         <if test="startTime !='' and startTime!= null and endTime !='' and endTime!= null ">
             and f.gmt_Created between #{startTime} and #{endTime}
+        </if>
+        <if test="operate !='' and operate!= null ">
+            and f.operate =#{operate}
         </if>
         order by f.id desc
     </select>

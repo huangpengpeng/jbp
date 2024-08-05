@@ -20,7 +20,6 @@ public class WalletRequest implements Serializable {
     @ApiModelProperty("钱包类型")
     private Integer type;
 
-
     @ApiModelProperty(value = "创建时间区间")
     private String dateLimit;
 
@@ -35,5 +34,8 @@ public class WalletRequest implements Serializable {
 
     @ApiModelProperty("用户昵称")
     private String nickname;
+
+    @ApiModelProperty("操作")
+    private String operate;
 
 }

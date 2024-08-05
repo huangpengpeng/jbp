@@ -129,4 +129,8 @@ public class FundClearingRecord extends BaseModel {
     @ApiModelProperty("下单时间")
     @TableField(exist = false)
     private String payTime;
+
+    @ApiModelProperty(value = "退款时间")
+    @TableField(exist = false)
+    private Date refundTime;
 }

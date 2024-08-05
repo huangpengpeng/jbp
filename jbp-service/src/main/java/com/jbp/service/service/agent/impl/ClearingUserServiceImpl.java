@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -227,7 +228,18 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         lqw.eq(uid != null, ClearingUser::getUid, uid);
         lqw.eq(StringUtils.isNotEmpty(account), ClearingUser::getAccountNo, account);
         lqw.orderByDesc(ClearingUser::getId);
-        return CommonPage.copyPageInfo(page, list(lqw));
+        List<ClearingUser> list = list(lqw);
+        if (CollectionUtils.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
+        }
+        List<Integer> uidList = list.stream().map(ClearingUser::getUid).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uidList);
+        list.forEach(e -> {
+            User user = uidMapList.get(e.getUid());
+            e.setNickname(user != null ? user.getNickname() : "");
+        });
+
+        return CommonPage.copyPageInfo(page, list);
     }
 
     private void createMonthGuanLiUser(Long clearingId, ClearingFinal clearingFinal, Date startTime, Date endTime, Map<Integer, ClearingUser> perMap) {

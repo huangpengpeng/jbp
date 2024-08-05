@@ -27,7 +27,6 @@ public class WhiteUser extends BaseModel {
     @TableField("orders_sn")
     private String ordersSn;
 
-
     @ApiModelProperty("用户账户")
     @TableField(exist = false)
     private String account;
@@ -35,4 +34,16 @@ public class WhiteUser extends BaseModel {
     @ApiModelProperty("白名单名称")
     @TableField(exist = false)
     private String whiteName;
+
+    @ApiModelProperty("等级名称")
+    @TableField(exist = false)
+    private String CapaName;
+
+    @ApiModelProperty("星级名称")
+    @TableField(exist = false)
+    private String CapaXsName;
+
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
 }
