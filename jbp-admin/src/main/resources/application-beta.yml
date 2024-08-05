@@ -122,7 +122,7 @@ mybatis-plus:
 #swagger 配置
 swagger:
   basic:
-    enable: true #是否开启
+    enable: false #是否开启
     check: false #是否打开验证
     username: root
     password: 123456

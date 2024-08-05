@@ -39,7 +39,7 @@ import static com.google.common.collect.Lists.newArrayList;
 public class SwaggerConfig {
 
     //是否开启swagger，正式环境一般是需要关闭的，可根据springboot的多环境配置进行设置
-    Boolean swaggerEnabled = true;
+    Boolean swaggerEnabled = false;
 
     @Value("${server.port}")
     private String port;
