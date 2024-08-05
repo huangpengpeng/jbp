@@ -24,6 +24,7 @@ import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.dao.agent.UserCapaXsDao;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaXsService;
 import com.jbp.service.service.agent.UserCapaXsService;
@@ -64,9 +65,10 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
     public AsyncUtils asyncUtils;
     @Resource
     private UserInvitationService userInvitationService;
-
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private TeamUserService teamUserService;
 
     @Override
     public UserCapaXs getByUser(Integer uid) {
@@ -148,8 +150,11 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
-        Map<Integer, User> userMap = userService.getUidMapList(list.stream().map(UserCapaXs::getUid).collect(Collectors.toList()));
+        List<Integer> uidList = list.stream().map(UserCapaXs::getUid).collect(Collectors.toList());
+        Map<Integer, User> userMap = userService.getUidMapList(uidList);
         Map<Long, CapaXs> capaXsMap = capaXsService.getCapaXsMap();
+        Map<Integer, TeamUser> uidMapList = teamUserService.getUidMapList(uidList);
+
         list.forEach(e -> {
             User user = userMap.get(e.getUid());
             e.setPhone(user!= null ? user.getPhone() : "");
@@ -158,6 +163,8 @@ public class UserCapaXsServiceImpl extends ServiceImpl<UserCapaXsDao, UserCapaXs
             CapaXs capaXs = capaXsMap.get(e.getCapaId());
             e.setCapaName(capaXs.getName());
             e.setCapaUrl(capaXs.getIconUrl());
+            TeamUser teamUser = uidMapList.get(e.getUid());
+            e.setTeamName(teamUser != null ? teamUser.getName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

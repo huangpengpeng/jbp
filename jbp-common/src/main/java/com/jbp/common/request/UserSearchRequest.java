@@ -75,4 +75,7 @@ public class UserSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "用户id")
     private Integer uid;
+
+    @ApiModelProperty(value = "注册时间")
+    private String regDateLimit;
 }

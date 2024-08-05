@@ -1,8 +1,12 @@
 package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.article.ArticleCategory;
+import com.jbp.common.request.ArticleCategoryFrontRequest;
+import com.jbp.common.request.ArticleCategoryListRequest;
 import com.jbp.common.request.ArticleCategoryRequest;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleCategoryResponse;
 
 import java.util.List;
@@ -24,7 +28,7 @@ public interface ArticleCategoryService extends IService<ArticleCategory> {
     /**
      * 获取文章分类列表
      */
-    List<ArticleCategoryResponse> getAdminList();
+    PageInfo<ArticleCategoryResponse> getAdminList(ArticleCategoryListRequest request, PageParamRequest pageParamRequest);
 
     /**
      * 文章新增
@@ -59,5 +63,13 @@ public interface ArticleCategoryService extends IService<ArticleCategory> {
     /**
      * 获取移动端文章分类列表
      */
-    List<ArticleCategoryResponse> getFrontList();
+    List<ArticleCategoryResponse> getFrontList(ArticleCategoryFrontRequest request);
+
+    /**
+     * 获取文章分类详情
+     * @param id 分类ID
+     * @return ArticleCategory
+     */
+    ArticleCategory detail(Integer id);
+
 }

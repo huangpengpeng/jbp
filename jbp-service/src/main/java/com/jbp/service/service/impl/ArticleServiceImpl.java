@@ -13,18 +13,25 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.LimitTemp;
 import com.jbp.common.model.article.Article;
+import com.jbp.common.model.article.ArticleCategory;
+import com.jbp.common.model.article.ArticlePlate;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.ArticleFrontRequest;
 import com.jbp.common.request.ArticleRequest;
 import com.jbp.common.request.ArticleSearchRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleInfoResponse;
 import com.jbp.common.response.ArticleResponse;
+import com.jbp.common.utils.CrmebDateUtil;
+import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.service.dao.ArticleDao;
-import com.jbp.service.service.ArticleService;
-import com.jbp.service.service.SystemAttachmentService;
-import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.*;
 
+import com.jbp.service.service.agent.LimitTempService;
+import com.jbp.service.service.agent.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -55,31 +63,43 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
 
     @Resource
     private ArticleDao dao;
-
+    @Autowired
+    private LimitTempService limitTempService;
+    @Autowired
+    private ArticlePlateService articlePlateService;
     @Autowired
     private SystemConfigService systemConfigService;
-
     @Autowired
     private SystemAttachmentService systemAttachmentService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private MessageService messageService;
+    @Autowired
+    private ArticleCategoryService articleCategoryService;
 
     /**
      * 列表
      *
-     * @param cid              文章分类id
+     * @param request          前端文章请求对象
      * @param pageParamRequest 分页类参数
      * @return PageInfo<Article>
      */
     @Override
-    public PageInfo<ArticleResponse> getList(Integer cid, PageParamRequest pageParamRequest) {
-        Page<Article> articlePage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-
-        LambdaQueryWrapper<Article> lqw = Wrappers.lambdaQuery();
-        if (ObjectUtil.isNotNull(cid) && cid > 0) {
-            lqw.eq(Article::getCid, cid);
+    public PageInfo<ArticleResponse> getList(ArticleFrontRequest request, PageParamRequest pageParamRequest) {
+        User user = userService.getInfo();
+        if (user == null) {
+            throw new CrmebException("请先登录!");
         }
+        List<Long> tempIdList = messageService.getTempIds(user.getId());
+        Page<Article> articlePage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<Article> lqw = Wrappers.lambdaQuery();
+        lqw.eq(!ObjectUtil.isNull(request.getCid()) && request.getCid() > 0, Article::getCid, request.getCid());
+        lqw.eq(!ObjectUtil.isNull(request.getPlateId()) && request.getPlateId() > 0, Article::getPlateId, request.getPlateId());
+        lqw.in(Article::getLimitTempId, tempIdList);
         lqw.eq(Article::getStatus, true);
         lqw.eq(Article::getIsDel, false);
-        lqw.orderByDesc(Article::getSort, Article::getId).orderByDesc(Article::getVisit).orderByDesc(Article::getCreateTime);
+        lqw.orderByDesc(Article::getSort, Article::getId);
         List<Article> articleList = dao.selectList(lqw);
         if (CollUtil.isEmpty(articleList)) {
             return CommonPage.copyPageInfo(articlePage, CollUtil.newArrayList());
@@ -89,6 +109,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
             BeanUtils.copyProperties(e, articleResponse);
             return articleResponse;
         }).collect(Collectors.toList());
+
+        if (!ObjectUtil.isNull(request.getCount()) && (ObjectUtil.isNull(request.getIfLimit()) || request.getIfLimit()) && pageParamRequest.getLimit() > request.getCount() && !ObjectUtil.isNull(request.getCid())) {
+            responseList = responseList.stream().limit(request.getCount()).collect(Collectors.toList());
+            return CommonPage.copyPageInfo(articlePage, responseList);
+        }
         return CommonPage.copyPageInfo(articlePage, responseList);
     }
 
@@ -107,12 +132,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
         if (ObjectUtil.isNotNull(request.getCid())) {
             lqw.eq(Article::getCid, request.getCid());
         }
+        if (ObjectUtil.isNotNull(request.getPlateId())) {
+            lqw.eq(Article::getPlateId, request.getPlateId());
+        }
+        if (ObjectUtil.isNotNull(request.getLimitTempId())) {
+            lqw.eq(Article::getLimitTempId, request.getLimitTempId());
+        }
+        if (ObjectUtil.isNotNull(request.getStatus())) {
+            lqw.eq(Article::getStatus,true);
+        }
         if (StrUtil.isNotBlank(request.getTitle())) {
             String title = URLUtil.decode(request.getTitle());
             lqw.like(Article::getTitle, title);
         }
         if (StrUtil.isNotBlank(request.getAuthor())) {
             lqw.eq(Article::getAuthor, URLUtil.decode(request.getAuthor()));
+        }
+        if (StrUtil.isNotEmpty(request.getDateLimit())) {
+            DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(request.getDateLimit());
+            lqw.between(Article::getCreateTime, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime());
         }
         lqw.eq(Article::getIsDel, false);
         lqw.orderByDesc(Article::getSort).orderByDesc(Article::getId);
@@ -122,9 +160,27 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
         if (CollUtil.isEmpty(articleList)) {
             return CommonPage.copyPageInfo(articlePage, responseList);
         }
+        //权益模板
+        List<LimitTemp> limitTempList = limitTempService.list();
+        Map<Long, LimitTemp> tempMap = limitTempList.stream().collect(Collectors.toMap(LimitTemp::getId, e -> e));
+        //文章分类
+        List<ArticleCategory> articleCategoryList = articleCategoryService.list();
+        Map<Integer, ArticleCategory> categoryMap = articleCategoryList.stream().collect(Collectors.toMap(ArticleCategory::getId, e -> e));
+        //文章板块
+        List<Long> plateIdList = articleList.stream().map(Article::getPlateId).collect(Collectors.toList());
+        Map<Long, ArticlePlate> plateIdMapList = articlePlateService.getPlateIdMapList(plateIdList);
         for (Article article : articleList) {
             ArticleResponse response = new ArticleResponse();
             BeanUtils.copyProperties(article, response);
+            //获取文章板块名称
+            ArticlePlate articlePlate = plateIdMapList.get(article.getPlateId());
+            response.setPlateName(articlePlate != null ? articlePlate.getName() : "");
+            //获取文章分类名称
+            ArticleCategory articleCategory = categoryMap.get(article.getCid());
+            response.setCName(articleCategory != null ? articleCategory.getName() : "");
+            //获取权益模板名称
+            LimitTemp limitTemp = tempMap.get(article.getLimitTempId());
+            response.setLimitTempName(limitTemp != null ? limitTemp.getName() : "");
             responseList.add(response);
         }
         return CommonPage.copyPageInfo(articlePage, responseList);
@@ -143,11 +199,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
             throw new CrmebException("文章不存在");
         }
         if (!article.getStatus()) {
-            throw new CrmebException("文章不存在");
+            throw new CrmebException("文章未开启");
         }
         ArticleInfoResponse articleResponse = new ArticleInfoResponse();
         BeanUtils.copyProperties(article, articleResponse);
-        if (addArticleVisit(id)) {
+        if (!addArticleVisit(id)) {
             logger.error("增加文章阅读次数失败，文章id = {}", id);
         }
         return articleResponse;
@@ -227,7 +283,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
         String cdnUrl = systemAttachmentService.getCdnUrl();
         article.setCover(systemAttachmentService.clearPrefix(article.getCover(), cdnUrl));
         article.setContent(systemAttachmentService.clearPrefix(article.getContent(), cdnUrl));
-        article.setVisit(0L);
+        article.setStatus(true);
         return save(article);
     }
 

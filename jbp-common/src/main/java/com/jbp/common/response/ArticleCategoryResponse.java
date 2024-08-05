@@ -43,4 +43,10 @@ public class ArticleCategoryResponse implements Serializable {
     @ApiModelProperty(value = "状态，0-关闭，1-开启")
     private Boolean status;
 
+    @ApiModelProperty(value = "板块名称")
+    private String plateName;
+
+    @ApiModelProperty(value = "板块id")
+    private Long plateId;
+
 }

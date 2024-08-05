@@ -119,4 +119,7 @@ public class PlatformOrderPageResponse implements Serializable {
 
     @ApiModelProperty(value = "订单商品扩展信息")
     private String productExtInfo;
+
+    @ApiModelProperty(value = "退款时间")
+    private Date refundTime;
 }

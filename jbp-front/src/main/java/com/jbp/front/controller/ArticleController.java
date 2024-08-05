@@ -2,6 +2,8 @@ package com.jbp.front.controller;
 
 import com.jbp.common.model.article.Article;
 import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.ArticleCategoryFrontRequest;
+import com.jbp.common.request.ArticleFrontRequest;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.ArticleCategoryResponse;
 import com.jbp.common.response.ArticleInfoResponse;
@@ -48,15 +50,15 @@ public class ArticleController {
 
     @ApiOperation(value = "文章分类列表")
     @RequestMapping(value = "/category/list", method = RequestMethod.GET)
-    public CommonResult<List<ArticleCategoryResponse>> getCategoryList() {
-        return CommonResult.success(articleCategoryService.getFrontList());
+    public CommonResult<List<ArticleCategoryResponse>> getCategoryList(ArticleCategoryFrontRequest request) {
+        return CommonResult.success(articleCategoryService.getFrontList(request));
     }
 
     @ApiOperation(value = "文章分页列表")
-    @RequestMapping(value = "/list/{cid}", method = RequestMethod.GET)
-    public CommonResult<CommonPage<ArticleResponse>> getList(@PathVariable(name = "cid") Integer cid,
-                                                             @Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(articleService.getList(cid, pageParamRequest)));
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public CommonResult<CommonPage<ArticleResponse>> getList(ArticleFrontRequest request,
+                                                           @Validated PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(articleService.getList(request, pageParamRequest)));
     }
 
     @ApiOperation(value = "热门列表")

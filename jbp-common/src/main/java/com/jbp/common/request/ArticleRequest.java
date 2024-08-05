@@ -74,4 +74,16 @@ public class ArticleRequest implements Serializable {
     @ApiModelProperty(value = "排序")
     @Range(min = 0, max = 9999, message = "排序范围为0~9999")
     private Integer sort;
+
+    @ApiModelProperty(value = "浏览次数")
+    @NotNull(message = "浏览次数不能为空！")
+    private Long visit;
+
+    @ApiModelProperty(value = "权益模板")
+    @NotNull(message = "权益模板不能为空！")
+    private Long limitTempId;
+
+    @ApiModelProperty(value = "文章板块id")
+    @NotNull(message = "文章板块不能为空！")
+    private Long plateId;
 }

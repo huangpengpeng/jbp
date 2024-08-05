@@ -54,5 +54,6 @@ public class ArticleCategory implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
-
+    @ApiModelProperty(value = "板块id")
+    private Long plateId;
 }

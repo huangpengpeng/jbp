@@ -4,6 +4,7 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.WalletWithdraw;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.WalletWithdrawCancelRequest;
 import com.jbp.common.request.agent.WalletWithdrawPageRequest;
 import com.jbp.common.request.agent.WalletWithdrawRequest;
 import com.jbp.common.result.CommonResult;
@@ -47,7 +48,7 @@ public class WalletWithdrawController {
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:cancel')")
     @PostMapping("/cancel")
     @ApiOperation("钱包提现批量取消")
-    public CommonResult cancel(@RequestBody List<WalletWithdrawRequest> requests) {
+    public CommonResult cancel(@RequestBody WalletWithdrawCancelRequest requests) {
         walletWithdrawService.cancel(requests);
         return CommonResult.success();
     }

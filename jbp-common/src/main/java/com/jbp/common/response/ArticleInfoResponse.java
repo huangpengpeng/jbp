@@ -67,4 +67,10 @@ public class ArticleInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
+    @ApiModelProperty(value = "权益模板")
+    private Long limitTempId;
+
+    @ApiModelProperty(value = "文章板块id")
+    private Long plateId;
 }

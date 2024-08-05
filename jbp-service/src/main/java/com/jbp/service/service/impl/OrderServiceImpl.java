@@ -123,6 +123,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private ProductDayRecordService productDayRecordService;
     @Autowired
     private ProductAttrValueService productAttrValueService;
+    @Autowired
+    private RefundOrderService refundOrderService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -658,11 +660,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         Map<String, OrderExt> orderNoMapList = orderExtService.getOrderNoMapList(orderNoList);
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNoList);
         Map<String, List<MerchantOrder>> merchantOrderMap = FunctionUtil.valueMap(merchantOrderList, MerchantOrder::getOrderNo);
-
         Map<Integer, Merchant> finalMerchantMap = merchantMap;
         List<PlatformOrderPageResponse> pageResponses = orderList.stream().map(e -> {
             PlatformOrderPageResponse pageResponse = new PlatformOrderPageResponse();
             BeanUtils.copyProperties(e, pageResponse);
+            if (e.getRefundStatus() == 3) {
+                List<RefundOrder> refundOrderList = refundOrderService.list(new QueryWrapper<RefundOrder>().lambda().eq(RefundOrder::getOrderNo, e.getOrderNo()));
+                pageResponse.setRefundTime(refundOrderList.isEmpty() ? null : refundOrderList.get(0).getRefundTime());
+            }
             MerchantOrder merchantOrder = merchantOrderMap.get(e.getOrderNo()).get(0);
             pageResponse.setShippingType(merchantOrder.getShippingType());
             pageResponse.setUserRemark(merchantOrder.getUserRemark());

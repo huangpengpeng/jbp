@@ -315,6 +315,10 @@ public class ExportServiceImpl implements ExportService {
                 User user = userMap.get(order.getPayUid());
                 vo.setPayAccount(user != null ? user.getAccount() : "");
             }
+            if (order.getRefundStatus() == 3) {
+                List<RefundOrder> refundOrderList = refundOrderService.list(new QueryWrapper<RefundOrder>().lambda().eq(RefundOrder::getOrderNo, order.getOrderNo()));
+                vo.setRefundTime(refundOrderList.isEmpty() ? null : refundOrderList.get(0).getRefundTime());
+            }
             vo.setPayPrice(order.getPayPrice().subtract(order.getPayPostage()));
             vo.setPayPostage(order.getPayPostage());
             vo.setCouponPrice(order.getCouponPrice());
@@ -403,6 +407,8 @@ public class ExportServiceImpl implements ExportService {
 
         for (RefundOrder refundOrder : refundOrderList) {
             RefundOrderExcel vo = new RefundOrderExcel();
+            Order byOrderNo = orderService.getByOrderNo(refundOrder.getOrderNo());
+            vo.setPayTime(byOrderNo == null ? null : byOrderNo.getPayTime());
             vo.setRefundOrderNo(refundOrder.getRefundOrderNo());
             vo.setOrderNo(orderService.getPlatOrderNo(refundOrder.getOrderNo()));
             vo.setUid(refundOrder.getUid());

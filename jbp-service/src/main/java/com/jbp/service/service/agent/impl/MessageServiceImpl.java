@@ -56,6 +56,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
     @Autowired
     private SystemAttachmentService systemAttachmentService;
 
+    /**
+     *获取消息列表
+     */
     @Override
     public PageInfo<Message> pageList(String title, Boolean status, Boolean isPop, Boolean isTop, PageParamRequest pageParamRequest) {
         Page<Message> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -69,6 +72,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         return CommonPage.copyPageInfo(page, list);
     }
 
+    /**
+     * 后台消息新增
+     *
+     * @param request 消息新增请求对象
+     * @return Boolean
+     */
     @Override
     public Boolean add(MessageAddRequest request) {
 
@@ -83,6 +92,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         return  save(message);
     }
 
+    /**
+     * 后台消息修改
+     *
+     * @param request 消息修改请求对象
+     * @return Boolean
+     */
     @Override
     public Boolean edit(MessageUpdateRequest request) {
         Message message = getById(request.getId());
@@ -97,6 +112,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         return updateById(message);
     }
 
+    /**
+     * 获取用户满足条件的权益模板
+     *
+     * @param uid 用户id
+     * @return List<Long> 权益模板id集合
+     */
     @Override
     public List<Long> getTempIds(Integer uid) {
         Integer pId = null, rId = null;
@@ -119,6 +140,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         return tempIds;
     }
 
+    /**
+     * 首页弹窗
+     *
+     * @return Message
+     */
     @Override
     public Message homePopup() {
         User user = userService.getInfo();
@@ -137,6 +163,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         return message;
     }
 
+    /**
+     * 获取用户未读消息数量
+     *
+     * @return Integer
+     */
     @Override
     public Integer unreadCount() {
         User user = userService.getInfo();
@@ -162,6 +193,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, Message> impleme
         return idList.size();
     }
 
+    /**
+     * 用户消息列表
+     *
+     * @param uid 用户id
+     * @param pageParamRequest 分页参数
+     * @return PageInfo<Message>
+     */
     @Override
     public PageInfo<Message> getList(Integer uid,PageParamRequest pageParamRequest) {
         List<Long> tempIds = getTempIds(uid);

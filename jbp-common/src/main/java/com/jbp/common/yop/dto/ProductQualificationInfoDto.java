@@ -11,10 +11,10 @@ public class ProductQualificationInfoDto implements Serializable {
 
     public ProductQualificationInfoDto() {
         this.internetType = Lists.newArrayList("MOBILE");
-        this.terminalType = "WECHANT_APPLET";
-        this.terminalName = "FNY新零售";
+        this.terminalType = "H5";
+        this.terminalName = "https://front.jbp.kkyp.vip/static/html/pc.html";
 //        this.terminalName = "响灿健康";
-        this.terminalTestAccount = "15871898210";
+        this.terminalTestAccount = "ZH367623";
         this.terminalTestPassword = "123456";
     }
 

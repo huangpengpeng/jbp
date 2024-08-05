@@ -19,7 +19,7 @@ public class YopDemo {
 
 
     public static void registerQuery(YopService yopService) {
-        RegisterQueryResult result = yopService.registerQuery("LZT_RS_109673520641391");
+        RegisterQueryResult result = yopService.registerQuery("LZT_RS_88843459131965");
         System.out.println(JSONObject.toJSONString(result));
     }
 
@@ -31,11 +31,11 @@ public class YopDemo {
         System.out.println(JSONObject.toJSONString(withdrawResult));
     }
 
-    private static void transfer(YopService yopService) {
+    public static void transfer(YopService yopService) {
         String transferNo = StringUtils.N_TO_10("LZT_NDF_");
         // 10090316790  5元最早账户
         // 10089625822
-        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10089625822", "10090338239", "1", null);
+        AccountTransferOrderResult transferResult = yopService.transferB2bOrder(transferNo, "10090466492", "10090413808", "1", null);
         System.out.println(JSONObject.toJSONString(transferResult));
     }
 
@@ -50,29 +50,29 @@ public class YopDemo {
 //        RegisterQueryResult result = yopService.registerQuery("LZT_RS_157329444997738");
 //        System.out.println(JSONObject.toJSONString(result));
     }
-    private static void merRegister(YopService yopService) {
+    public static void merRegister(YopService yopService) {
         RegisterParams params = new RegisterParams();
         params.setRequestNo(StringUtils.N_TO_10("LZT_RS_"));
         params.setBusinessRole("PLATFORM_MERCHANT");// 平台商户
 
         // 商户资质信息
-        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/24/merchant-1719231297716-1af1fe28-4952-426a-9962-71ff9d1f5829-jPAMRTfGQeCKhUKhaOhW.jpg\", \"signName\":\"四川福能源生物科技有限公司浙江分公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91330127MACW9AYK4B\", \"shortName\":\"福能源浙江分公司\" }";
+        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329053156-65ab6ab6-ad6a-498a-abd0-df08049d2f25-qDloQVozqINYVawSmmBM.jpg\", \"signName\":\"上海吾善科技有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91310120MA1HWW3EXH\", \"shortName\":\"上海吾善科技有限公司\" }";
         params.setMerchantSubjectInfo(merchantSubjectInfo);
 
         // 法人信息
-        String merchantCorporationInfo = "{ \"legalName\":\"黄冰欢\", \"legalLicenceType\":\"ID_CARD\", \"legalLicenceNo\":\"350802198205191019\", \"legalLicenceFrontUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/24/merchant-1719231330228-c613ee52-28f8-421e-965c-7aca454dd136-IJNtYoNEvIXTlODoArJQ.jpg\", \"legalLicenceBackUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/06/24/merchant-1719231355078-ffc02232-7cbc-46ae-b63b-a1b3afca4006-siniPDLMLqfrhaqfwjQF.jpg\" }";
+        String merchantCorporationInfo = "{ \"legalName\":\"杨卫红\", \"legalLicenceType\":\"ID_CARD\", \"legalLicenceNo\":\"610303197110071629\", \"legalLicenceFrontUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329135903-4c7b5fde-aec6-455a-9396-69dcaf608bfd-alXfUsKrjGUOuVWMeMGH.jpg\", \"legalLicenceBackUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329160273-7bc97f44-fa42-4ce5-815a-72df20797dcf-eewflZsCOvdPNnGOBMkj.jpg\" }";
         params.setMerchantCorporationInfo(merchantCorporationInfo);
 
         // 联系人信息
-        String merchantContactInfo="{ \"contactName\":\"麻晴露\", \"contactMobile\":\"15868875872\", \"contactEmail\":\"maqinglu@zjfny.com.cn\", \"contactLicenceNo\":\"33032619931023322X\" ,\"adminEmail\":\"maqinglu@zjfny.com.cn\",\"adminMobile\":\"15868875872\" }";
+        String merchantContactInfo="{ \"contactName\":\"宋鑫\", \"contactMobile\":\"13811065970\", \"contactEmail\":\"20840414@qq.com\", \"contactLicenceNo\":\"210124197704250612\" ,\"adminEmail\":\"20840414@qq.com\",\"adminMobile\":\"13811065970\" }";
         params.setMerchantContactInfo(merchantContactInfo);
 
         // 地址信息
-        String businessAddressInfo = "{ \"province\":\"330000\", \"city\":\"330100\", \"district\":\"330106\", \"address\":\"天目山路178号5楼506室\" }";
+        String businessAddressInfo = "{ \"province\":\"310000\", \"city\":\"310100\", \"district\":\"310120\", \"address\":\"海坤路1号1幢\" }";
         params.setBusinessAddressInfo(businessAddressInfo);
 
         // 结算账户信息  招商银行股份有限公司广州机场路支行
-        String settlementAccountInfo = "{ \"settlementDirection\":\"BANKCARD\", \"bankCode\":\"NBYH\", \"bankAccountType\":\"ENTERPRISE_ACCOUNT\", \"bankCardNo\":\"71280122000119057\" }";
+        String settlementAccountInfo = "{ \"settlementDirection\":\"BANKCARD\", \"bankCode\":\"ABC\", \"bankAccountType\":\"ENTERPRISE_ACCOUNT\", \"bankCardNo\":\"03769000040035541\" }";
         params.setSettlementAccountInfo(settlementAccountInfo);
 
         // 通知地址

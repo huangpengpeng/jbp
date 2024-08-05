@@ -48,4 +48,8 @@ public class ArticleCategoryRequest implements Serializable {
     @Range(min = 0, max = 9999, message = "排序范围为0~9999")
     private Integer sort;
 
+    @ApiModelProperty(value = "文章板块id", required = true)
+    @NotNull(message = "文章板块不能为空")
+    private Long plateId;
+
 }

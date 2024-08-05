@@ -3,6 +3,7 @@ package com.jbp.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.article.Article;
+import com.jbp.common.request.ArticleFrontRequest;
 import com.jbp.common.request.ArticleRequest;
 import com.jbp.common.request.ArticleSearchRequest;
 import com.jbp.common.request.PageParamRequest;
@@ -28,11 +29,11 @@ public interface ArticleService extends IService<Article> {
     /**
      * 文章列表
      *
-     * @param cid              文章分类id
+     * @param request          前端文章请求对象
      * @param pageParamRequest 分页类参数
      * @return PageInfo<Article>
      */
-    PageInfo<ArticleResponse> getList(Integer cid, PageParamRequest pageParamRequest);
+    PageInfo<ArticleResponse> getList(ArticleFrontRequest request, PageParamRequest pageParamRequest);
 
     /**
      * 获取文章列表
