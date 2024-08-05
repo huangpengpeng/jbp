@@ -132,19 +132,8 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
             oneFun.setCommName("直推");
             oneFun.setCommAmt(oneFee);
             list.add(oneFun);
-            // 分给直推的培育人
-            UserInvitation oneUserInvitation = invitationService.getByUser(oneId);
-            if (oneUserInvitation != null && oneUserInvitation.getMId() != null) {
-                UserCapa userCapa = userCapaService.getByUser(oneId);
-                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0) {
-                    BigDecimal threeFee = totalPv.multiply(rule.getThreeRatio());
-                    FundClearing threeFund = new FundClearing();
-                    threeFund.setUid(oneUserInvitation.getMId());
-                    threeFund.setCommName("培育");
-                    threeFund.setCommAmt(threeFee);
-                    list.add(threeFund);
-                }
-            }
+
+
             // 找下一个分钱人
             uid = oneId;
             Integer twoId = null;
@@ -168,6 +157,30 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 twoFund.setCommName("间推");
                 twoFund.setCommAmt(twoFee);
                 list.add(twoFund);
+            }
+
+            // 分给直推的培育人
+            uid = order.getUid();
+            Integer threeId = null;
+            do {
+                UserInvitation oneUserInvitation = invitationService.getByUser(uid);
+                if (oneUserInvitation == null || oneUserInvitation.getPId() == null) {
+                    break;
+                }
+                UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getPId());
+                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0 && oneUserInvitation.getMId() != null) {
+                    threeId = oneUserInvitation.getMId();
+                    break;
+                }
+                uid = oneUserInvitation.getPId();
+            } while (true);
+            if (threeId != null) {
+                BigDecimal threeFee = totalPv.multiply(rule.getThreeRatio());
+                FundClearing threeFund = new FundClearing();
+                threeFund.setUid(threeId);
+                threeFund.setCommName("培育");
+                threeFund.setCommAmt(threeFee);
+                list.add(threeFund);
             }
         }
 
@@ -201,7 +214,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 description = description + "培育获奖:" + totalAmt;
             }
             fundClearingService.create(uid, order.getOrderNo(), ProductCommEnum.报单佣金.getName(),
-                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getNickname()+"|"+orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
+                    totalAmt.setScale(2, BigDecimal.ROUND_DOWN), null, orderUser.getNickname() + "|" + orderUser.getAccount() + "下单,获得" + ProductCommEnum.报单佣金.getName() + "【" + description + "】", "");
         });
     }
 
