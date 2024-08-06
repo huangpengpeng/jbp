@@ -168,8 +168,9 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                     break;
                 }
                 UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getPId());
-                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0 && oneUserInvitation.getMId() != null) {
-                    threeId = oneUserInvitation.getMId();
+                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0 ) {
+                    UserInvitation p = invitationService.getByUser(oneUserInvitation.getPId());
+                    threeId = p.getMId();
                     break;
                 }
                 uid = oneUserInvitation.getPId();

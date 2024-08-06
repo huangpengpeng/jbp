@@ -79,10 +79,10 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public PageInfo<WalletFlowExtResponse> pageList(Integer uid, Integer type, String dateLimit, String externalNo, String action, String teamId, String nickname,PageParamRequest pageParamRequest) {
+    public PageInfo<WalletFlowExtResponse> pageList(Integer uid, Integer type, String dateLimit, String externalNo, String action, String teamId, String nickname, String operate, PageParamRequest pageParamRequest) {
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletFlowExtResponse> list = dao.getList(uid,type,dateLimitUtilVo.getStartTime(),dateLimitUtilVo.getEndTime(),externalNo,action,teamId,nickname);
+        List<WalletFlowExtResponse> list = dao.getList(uid, type, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), externalNo, action, teamId, nickname, operate);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);
         }
@@ -136,7 +136,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
     }
 
     @Override
-    public List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo,String action,String teamId) {
+    public List<WalletFlowVo> excel(Integer uid, Integer type, String dateLimit, String externalNo, String action, String teamId, String operate) {
         Long id = 0L;
         List<WalletFlowVo> result = Lists.newArrayList();
         do {
@@ -144,7 +144,8 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                     .eq(!ObjectUtil.isNull(uid), WalletFlow::getUid, uid)
                     .eq(!ObjectUtil.isNull(type), WalletFlow::getWalletType, type)
                     .eq(StringUtils.isNotEmpty(externalNo), WalletFlow::getExternalNo, externalNo)
-                    .eq(StringUtils.isNotEmpty(action), WalletFlow::getAction, action);
+                    .eq(StringUtils.isNotEmpty(action), WalletFlow::getAction, action)
+                    .eq(StringUtils.isNotEmpty(operate), WalletFlow::getOperate, operate);
 
                 getRequestTimeWhere(walletLambdaQueryWrapper, dateLimit);
             if(com.jbp.common.utils.StringUtils.isNotBlank(teamId)) {

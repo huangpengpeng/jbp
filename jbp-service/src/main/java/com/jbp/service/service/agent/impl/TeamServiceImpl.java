@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,11 +10,13 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Team;
+import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.TeamDao;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.TeamUserService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationFlowService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -31,6 +36,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
     private UserInvitationFlowService userInvitationFlowService;
     @Resource
     private TeamUserService teamUserService;
+    @Resource
+    private UserService userService;
 
     /**
      * 获取最近的一个团队
@@ -93,11 +100,26 @@ public class TeamServiceImpl extends ServiceImpl<TeamDao, Team> implements TeamS
     }
 
     @Override
-    public PageInfo<Team> pageList(String name, PageParamRequest pageParamRequest) {
-        LambdaQueryWrapper<Team> lambdaQueryWrapper = new LambdaQueryWrapper<Team>()
-                .eq(StringUtils.isNotEmpty(name), Team::getName, name);
+    public PageInfo<Team> pageList(String name, Integer uid, String nickname, PageParamRequest pageParamRequest) {
         Page<Team> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        return CommonPage.copyPageInfo(page, list(lambdaQueryWrapper));
+        LambdaQueryWrapper<Team> lambdaQueryWrapper = new LambdaQueryWrapper<Team>()
+                .eq(StringUtils.isNotEmpty(name), Team::getName, name)
+                .eq(ObjectUtil.isNotNull(uid), Team::getLeaderId, uid);
+        if (StringUtils.isNotEmpty(nickname)) {
+            lambdaQueryWrapper.apply("leader_id in (select id from eb_user where nickname like {0})", "%" + nickname + "%");
+        }
+        List<Team> list = list(lambdaQueryWrapper);
+        if (CollUtil.isEmpty(list)) {
+            return CommonPage.copyPageInfo(page, CollUtil.newArrayList());
+        }
+        List<Integer> uidList = list.stream().map(Team::getLeaderId).collect(Collectors.toList());
+        Map<Integer, User> uidMapList = userService.getUidMapList(uidList);
+        list.forEach(e->{
+            User user = uidMapList.get(e.getLeaderId());
+            e.setAccount(user != null ? user.getAccount() : "");
+            e.setNickname(user != null ? user.getNickname() : "");
+        });
+        return CommonPage.copyPageInfo(page,list );
     }
 
     @Override

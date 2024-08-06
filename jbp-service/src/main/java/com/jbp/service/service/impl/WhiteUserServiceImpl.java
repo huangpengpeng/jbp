@@ -9,6 +9,9 @@ import com.google.common.collect.Maps;
 import com.jbp.common.dto.UserWhiteDto;
 import com.jbp.common.excel.WhiteUserExcel;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaXs;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.White;
 import com.jbp.common.model.user.WhiteUser;
@@ -17,10 +20,9 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.WhiteUserRequest;
 import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.WhiteUserDao;
-import com.jbp.service.service.UploadService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.WhiteService;
-import com.jbp.service.service.WhiteUserService;
+import com.jbp.service.service.*;
+import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaXsService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +48,12 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
     private TransactionTemplate transactionTemplate;
     @Autowired
     private UploadService uploadService;
+    @Autowired
+    private UserCapaService userCapaService;
+    @Autowired
+    private UserCapaXsService userCapaXsService;
+    @Autowired
+    private TeamUserService teamUserService;
 
     @Override
     public PageInfo<WhiteUser> pageList(Integer uid, Long whiteId, PageParamRequest pageParamRequest) {
@@ -60,11 +68,24 @@ public class WhiteUserServiceImpl extends ServiceImpl<WhiteUserDao, WhiteUser> i
         }
         List<Integer> uIdList = list().stream().map(WhiteUser::getUid).collect(Collectors.toList());
         Map<Integer, User> uidMapList = userService.getUidMapList(uIdList);
+        //等级
+        Map<Integer, UserCapa> capaMapList = userCapaService.getUidMap(uIdList);
+        Map<Integer, UserCapaXs> capaXsMapList = userCapaXsService.getUidMap(uIdList);
+        //团队
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         whites.forEach(e -> {
             User user = uidMapList.get(e.getUid());
             e.setAccount(user != null ? user.getAccount() : "");
             White white = whiteService.getById(e.getWhiteId());
             e.setWhiteName(white != null ? white.getName() : "");
+            //等级
+            UserCapa uUserCapa = capaMapList.get(e.getUid());
+            e.setCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
+            UserCapaXs uUserCapaXs = capaXsMapList.get(e.getUid());
+            e.setCapaXsName(uUserCapaXs!=null?uUserCapaXs.getCapaName():"");
+            //团队
+            TeamUser teamUser = teamUserMapList.get(e.getUid());
+            e.setTeamName(teamUser != null ? teamUser.getName() : "");
         });
         return CommonPage.copyPageInfo(page, whites);
     }

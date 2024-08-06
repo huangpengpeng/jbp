@@ -47,8 +47,6 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
     private OrdersFundSummaryDao ordersFundSummaryDao;
     @Resource
     private UploadService uploadService;
-    @Resource
-    private OssService ossService;
 
 
     @Override
@@ -75,6 +73,7 @@ public class OrdersFundSummaryServiceImpl extends ServiceImpl<OrdersFundSummaryD
             vo.setName(response.getName());
             vo.setCommAmt(response.getCommAmt());
             vo.setPayPrice(response.getPayPrice());
+            vo.setPayTime(response.getPayTime());
             result.add(vo);
         }
         FileResultVo fileResultVo = uploadService.excelLocalUpload(result, OrdersFundSummaryExcel.class);

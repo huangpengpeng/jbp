@@ -1,14 +1,13 @@
 package com.jbp.common.excel;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.annotation.TableField;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -32,6 +31,9 @@ public class OrdersFundSummaryExcel implements Serializable {
 
     @ExcelProperty(value = "总PV", index = 5)
     private BigDecimal pv;
+
+    @ExcelProperty(value = "付款时间", index = 6)
+    private Date payTime;
 
 
 }

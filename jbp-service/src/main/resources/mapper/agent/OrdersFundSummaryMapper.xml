@@ -4,7 +4,8 @@
 
     <select id="getList" resultType="com.jbp.common.response.OrdersFundSummaryExtResponse">
 
-        select f.*,t.name from eb_orders_fund_summary f
+        select f.*,t.name,o.pay_time
+        from eb_orders_fund_summary f
         left join eb_order o on o.plat_order_no  = f.orders_sn
 				left join eb_team_user  u on u.uid = o.uid
 				left join eb_team t on t.id = u.tid
@@ -19,7 +20,7 @@
             and   o.pay_time >= #{startPayTime}
         </if>
         <if test="endPayTime !='' and endPayTime!= null ">
-            <![CDATA[AND pay_time <= #{endPayTime}]]>
+            <![CDATA[AND pay_time <= DATE_ADD(#{endPayTime},INTERVAL 1 DAY)]]>
         </if>
 
         order by f.id desc

@@ -35,4 +35,5 @@ public interface FundClearingRecordService extends IService<FundClearingRecord> 
 
     PageInfo<FundClearingRecord> detail(Integer uid,String day, PageParamRequest pageParamRequest);
 
+    String export(FundClearingRecordRequest request);
 }

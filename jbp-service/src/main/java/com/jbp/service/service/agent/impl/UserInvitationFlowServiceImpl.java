@@ -134,12 +134,13 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
         //等级
         Map<Integer, UserCapa> capaMapList = userCapaService.getUidMap(uIdList);
         Map<Integer, UserCapaXs> capaXsMapList = userCapaXsService.getUidMap(uIdList);
-
+        //团队
+        Map<Integer, TeamUser> teamUserMapList = teamUserService.getUidMapList(uIdList);
         list.forEach(e -> {
             User uUser = userMap.get(e.getUId());
             e.setUAccount(uUser != null ? uUser.getAccount() : "");
             e.setUNickName(uUser != null ? uUser.getNickname() : "");
-            //等级、】
+            //等级
             UserCapa uUserCapa = capaMapList.get(e.getUId());
             e.setUCapaName(uUserCapa != null ? uUserCapa.getCapaName() : "");
             UserCapaXs uUserCapaXs = capaXsMapList.get(e.getUId());
@@ -152,6 +153,9 @@ public class UserInvitationFlowServiceImpl extends ServiceImpl<UserInvitationFlo
             e.setPCapaName(pUserCapa != null ? pUserCapa.getCapaName() : "");
             UserCapaXs pUserCapaXs = capaXsMapList.get(e.getPId());
             e.setPCapaXsName(pUserCapaXs!=null?pUserCapaXs.getCapaName():"");
+            //团队
+            TeamUser teamUser = teamUserMapList.get(e.getUId());
+            e.setTeamName(teamUser != null ? teamUser.getName() : "");
         });
         return CommonPage.copyPageInfo(page, list);
     }

@@ -1,7 +1,6 @@
 package com.jbp.admin.controller.agent;
 
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -44,7 +43,8 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(), request.getTeamId(),request.getNickname(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(walletFlowService.pageList(uid, request.getType(), request.getDateLimit(), request.getExternalNo(), request.getAction(),
+                request.getTeamId(), request.getNickname(), request.getOperate(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:user:wallet:flow:excel')")
@@ -63,6 +63,6 @@ public class WalletFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(),request.getTeamId()));
+        return CommonResult.success(walletFlowService.excel(uid, request.getType(), request.getDateLimit(), request.getExternalNo(),request.getAction(),request.getTeamId(),request.getOperate()));
     }
 }

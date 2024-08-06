@@ -1,7 +1,12 @@
 package com.jbp.front;
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.service.service.YopService;
+import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
+import com.jbp.service.product.comm.BaoDanCommHandler;
+import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.OrderService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +18,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 程序主入口
@@ -40,9 +48,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        YopDemo.merRegister(run.getBean(YopService.class));
-
-//        YopDemo.registerQuery(run.getBean(YopService.class));
-
+//        BaoDanCommHandler baoDanCommHandler = run.getBean(BaoDanCommHandler.class);
+//        OrderService orderService = run.getBean(OrderService.class);
+//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+//
+//        Order order = orderService.getByOrderNo("PT340172285144112555196");
+//        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+//        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
+//        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
     }
 }

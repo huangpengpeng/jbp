@@ -81,4 +81,31 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
         }
         return list.stream().map(ProductMaterials::getBarCode).collect(Collectors.toSet()).stream().collect(Collectors.toList());
     }
+
+    @Override
+    public Boolean edit(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode, String supplyName, Long id) {
+        if (ObjectUtil.isNull(id)) {
+            throw new CrmebException("id不能为空");
+        }
+        LambdaQueryWrapper<ProductMaterials> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(ProductMaterials::getMerId, merId);
+        lqw.eq(ProductMaterials::getBarCode, barCode);
+        lqw.eq(ProductMaterials::getMaterialsCode, materialsCode);
+        lqw.ne(ProductMaterials::getId, id);
+        if (!list(lqw).isEmpty()) {
+            throw new CrmebException("已存在");
+        }
+        ProductMaterials productMaterials = getById(id);
+        if (productMaterials == null) {
+            throw new CrmebException("该物料不存在");
+        }
+        productMaterials.setMerId(merId);
+        productMaterials.setBarCode(barCode);
+        productMaterials.setMerName(materialsName);
+        productMaterials.setMaterialsQuantity(materialsQuantity);
+        productMaterials.setMaterialsPrice(materialsPrice);
+        productMaterials.setMaterialsCode(materialsCode);
+        productMaterials.setSupplyName(supplyName);
+        return updateById(productMaterials);
+    }
 }
