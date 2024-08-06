@@ -26,9 +26,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-wz9o75s8venhi29r65o.mysql.rds.aliyuncs.com:3306/jbp_pay?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: kk_account
-    password: kk_account2018
+    url: jdbc:mysql://120.26.102.41:3306/jbp_pay?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: jbp_pay
+    password: 12345Aa#
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
