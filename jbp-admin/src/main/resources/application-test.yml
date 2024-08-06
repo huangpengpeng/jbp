@@ -51,9 +51,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-wz9o75s8venhi29r65o.mysql.rds.aliyuncs.com:3306/jbpmain?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true
-    username: kk_account
-    password: kk_account2018
+    url: jdbc:mysql://120.26.102.41:3306/oageless?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true
+    username: oageless
+    password: 12345Aa#
 
   # quartz
   quartz:
