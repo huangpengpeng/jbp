@@ -11,6 +11,7 @@ import com.jbp.common.request.agent.TeamRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.TeamService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.print.DocFlavor;
 import java.util.List;
 
 @RestController
@@ -34,7 +34,15 @@ public class TeamController {
     @GetMapping("/page")
     @ApiOperation("列表分页查询")
     public CommonResult<CommonPage<Team>> getList(TeamPageRequest request, PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(teamService.pageList(request.getName(), pageParamRequest)));
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (ObjectUtil.isNull(user)) {
+                return CommonResult.failed("账户信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(CommonPage.restPage(teamService.pageList(request.getName(),uid,request.getNickname(), pageParamRequest)));
     }
 
     @PreAuthorize("hasAuthority('agent:team:add')")

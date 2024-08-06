@@ -49,4 +49,11 @@ public class FundClearingRecordController {
     public CommonResult<CommonPage<FundClearingRecordResponse>> getTotal(FundClearingRecordTotalRequest request, PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(fundClearingRecordService.total(request, pageParamRequest)));
     }
+
+    @PreAuthorize("hasAuthority('agent:fund:clearing:record:export')")
+    @GetMapping("/export")
+    @ApiOperation("佣金发放记录列表导出excel")
+    public CommonResult<String> export(FundClearingRecordRequest request) {
+        return CommonResult.success(fundClearingRecordService.export(request));
+    }
 }

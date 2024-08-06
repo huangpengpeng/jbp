@@ -10,6 +10,7 @@ import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.ProductMaterialsAddRequest;
+import com.jbp.common.request.agent.ProductMaterialsEditRequest;
 import com.jbp.common.request.agent.ProductMaterialsRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.SecurityUtil;
@@ -75,6 +76,23 @@ public class ProductMaterialsController {
     @ApiOperation("删除")
     public CommonResult delete(Integer id) {
         productMaterialsService.removeById(id);
+        return CommonResult.success();
+    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.UPDATE, description = "物料编辑")
+    @PreAuthorize("hasAuthority('agent:product:materials:edit')")
+    @PostMapping("/edit")
+    @ApiOperation("编辑")
+    public CommonResult edit(@RequestBody @Validated ProductMaterialsEditRequest request) {
+        SystemAdmin user = SecurityUtil.getLoginUserVo().getUser();
+        Boolean ifPlatformAdd = user.getMerId() == 0;
+        Merchant merchant;
+        if (!ifPlatformAdd) {
+            merchant = merchantService.getByIdException(user.getMerId());
+        } else {
+            merchant = merchantService.getByIdException(Integer.valueOf(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID)));
+        }
+        productMaterialsService.edit(merchant.getId(), request.getBarCode(), request.getMaterialsName(), request.getMaterialsQuantity(), request.getMaterialsPrice(), request.getMaterialsCode(), request.getSupplyName(),request.getId());
         return CommonResult.success();
     }
 }

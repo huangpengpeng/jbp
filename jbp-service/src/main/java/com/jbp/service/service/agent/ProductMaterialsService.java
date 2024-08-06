@@ -18,4 +18,6 @@ public interface ProductMaterialsService extends IService<ProductMaterials> {
     List<ProductMaterials> getByBarCode(Integer merId, String barCode);
 
     List<String> getBarCodeList4Supply(String supplyName);
+
+    Boolean edit(Integer merId, String barCode, String materialsName, Integer materialsQuantity, BigDecimal materialsPrice, String materialsCode, String supplyName, Long id);
 }

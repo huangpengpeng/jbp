@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.model.agent.Team;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.vo.MyRecord;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public interface TeamService extends IService<Team> {
 
     void save(Integer leaderId, String name);
 
-     PageInfo<Team> pageList(String name, PageParamRequest pageParamRequest);
+     PageInfo<Team> pageList(String name, Integer id, String nickname, PageParamRequest pageParamRequest);
 
     List<Team> getByNameList(String name);
 }

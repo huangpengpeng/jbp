@@ -17,4 +17,10 @@ public class TeamPageRequest implements Serializable {
     @ApiModelProperty("团队名称")
     private String name;
 
+    @ApiModelProperty("团队领导账号")
+    private String account;
+
+    @ApiModelProperty("团队领导昵称")
+    private String nickname;
+
 }

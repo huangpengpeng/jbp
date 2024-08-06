@@ -27,15 +27,26 @@ import java.io.Serializable;
 public class Team implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @ApiModelProperty(value = "记录id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
     @ApiModelProperty("团队名称")
     @TableField("name")
     private String name;
+
     @ApiModelProperty("团队领导用户ID")
     @TableField(value = "leader_id", updateStrategy = FieldStrategy.IGNORED)
     private Integer leaderId;
+
+    @ApiModelProperty("团队领导用户账号")
+    @TableField(exist = false)
+    private String account;
+
+    @ApiModelProperty("团队领导用户昵称")
+    @TableField(exist = false)
+    private String nickname;
 
     public Team(String name, Integer leaderId) {
         this.name = name;

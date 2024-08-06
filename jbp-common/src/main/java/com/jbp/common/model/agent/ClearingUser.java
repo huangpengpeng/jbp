@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -51,4 +52,8 @@ public class ClearingUser extends BaseModel {
     @ApiModelProperty("得奖规则")
     @TableField("rule")
     private String rule;
+
+    @ApiModelProperty("账户昵称")
+    @TableField(exist = false)
+    private String nickname;
 }
