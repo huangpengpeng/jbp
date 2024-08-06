@@ -265,4 +265,12 @@ public class YopDemo {
         BankAccountOpenResult result = yopService.bankAccountOpen(params);
         System.out.println(JSONObject.toJSONString(result));
     }
+
+
+    public static void selfSettle(YopService yopService) {
+        String s = StringUtils.N_TO_10("S_");
+        System.out.println(s);
+        SelfSettleResult all = yopService.selfSettle("10090418105", s, "ALL");
+        System.out.println(JSONObject.toJSONString(all));
+    }
 }

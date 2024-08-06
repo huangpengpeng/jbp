@@ -7,6 +7,7 @@ import com.jbp.service.product.comm.BaoDanCommHandler;
 import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.YopService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -56,5 +57,9 @@ import java.util.List;
 //        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
 //        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
 //        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
+
+
+//        YopDemo.selfSettle(run.getBean(YopService.class));
+
     }
 }
