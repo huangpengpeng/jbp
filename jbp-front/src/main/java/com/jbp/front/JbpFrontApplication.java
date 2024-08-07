@@ -53,7 +53,7 @@ import java.util.List;
 //        OrderService orderService = run.getBean(OrderService.class);
 //        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //
-//        Order order = orderService.getByOrderNo("PT340172285144112555196");
+//        Order order = orderService.getByOrderNo("PT579172302318142854490");
 //        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
 //        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
 //        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
