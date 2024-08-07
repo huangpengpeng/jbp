@@ -177,11 +177,13 @@ public class LztAcctApplyServiceImpl extends ServiceImpl<LztAcctApplyDao, LztAcc
             List<LztQueryAcctInfo> list = result.getList();
             if (CollectionUtils.isNotEmpty(list)) {
                 list = list.stream().filter(s -> !("CANCEL".equals(s.getAcct_stat()) || "FAIL".equals(s.getAcct_stat()))).collect(Collectors.toList());
-                LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
-                lztAcctApply.setStatus(acctState.getCode());
-                if (lztAcctApply.getPayChannelType().equals("易宝")) {
-                    lztAcct.setBankAccount(list.get(0).getBank_acct_no());
-                    lztAcctService.updateById(lztAcct);
+                if (CollectionUtils.isNotEmpty(list)) {
+                    LianLianPayConfig.AcctState acctState = LianLianPayConfig.AcctState.valueOf(list.get(0).getAcct_stat());
+                    lztAcctApply.setStatus(acctState.getCode());
+                    if (lztAcctApply.getPayChannelType().equals("易宝")) {
+                        lztAcct.setBankAccount(list.get(0).getBank_acct_no());
+                        lztAcctService.updateById(lztAcct);
+                    }
                 }
             }
             lztAcctApply.setRetMsg(result.getRet_msg());
