@@ -28,7 +28,7 @@ public class ProductRefController {
     @GetMapping("/list")
     @ApiOperation("商品关联套组列表")
     public CommonResult<List<ProductRef>> list(ProductRefSearchRequest request){
-       return CommonResult.success(productRefService.getList(request.getProductId()));
+       return CommonResult.success(productRefService.getList(request.getRefProductId()));
     }
 
 

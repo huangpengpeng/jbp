@@ -9,5 +9,5 @@ import java.util.List;
 public interface ProductRefService extends IService<ProductRef> {
     Boolean add(ProductRefRequest request);
 
-    List<ProductRef> getList(Integer productId);
+    List<ProductRef> getList(Integer refProductId);
 }
