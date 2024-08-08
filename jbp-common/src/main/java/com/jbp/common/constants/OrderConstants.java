@@ -37,6 +37,14 @@ public class OrderConstants {
     /** 共享仓操作订单号前缀 */
     public static final String C_GXC_ORDER_PREFIX = "CGXC";
 
+    /** 发货单号 */
+    public static final String ORDER_PREFIX_SHIP = "FH";
+
+    /** 订货单号 */
+    public static final String ORDER_PREFIX_DING = "DH";
+
+
+
     /** 订单状态-待支付 */
     public static final Integer ORDER_STATUS_WAIT_PAY = 0;
     /** 订单状态-待发货 */
@@ -74,6 +82,10 @@ public class OrderConstants {
     public static final Integer ORDER_TYPE_VIDEO = 1;
     /** 订单类型-秒杀订单 */
     public static final Integer ORDER_TYPE_SECKILL = 2;
+    /** 订单类型-发货单 */
+    public static final Integer ORDER_TYPE_SHIP = 3;
+    /** 订单类型-定单 */
+    public static final Integer ORDER_TYPE_DORDER = 4;
 
     /** 订单配送方式-快递 */
     public static final Integer ORDER_SHIPPING_TYPE_EXPRESS = 1;
@@ -106,6 +118,11 @@ public class OrderConstants {
     public static final String PLACE_ORDER_TYPE_VIDEO = "video";
     /** 订单下单类型-秒杀 */
     public static final String PLACE_ORDER_TYPE_SECKILL = "seckill";
+
+    /** 订单下单类型-秒杀 */
+    public static final String PLACE_ORDER_TYPE_SHIP = "ship";
+    /** 订单下单类型-秒杀 */
+    public static final String PLACE_ORDER_TYPE_DORDER = "dorder";
 
 
     /** 商户端订单查询状态-所有 */

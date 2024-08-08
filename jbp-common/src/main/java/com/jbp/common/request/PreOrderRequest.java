@@ -31,9 +31,9 @@ import java.util.List;
 @ApiModel(value = "PreOrderRequest对象", description = "预下单请求对象")
 public class PreOrderRequest {
 
-    @ApiModelProperty(value = "预下单类型（“shoppingCart”：购物车下单，“buyNow”：立即购买，”again“： 再次购买，”video“: 视频号商品下单，”seckill“： 秒杀下单）", required = true)
+    @ApiModelProperty(value = "预下单类型（“shoppingCart”：购物车下单，“buyNow”：立即购买，”again“： 再次购买，”video“: 视频号商品下单，”seckill“： 秒杀下单，”ship“： 订货下单，”dorder“： 发货下单）", required = true)
     @NotBlank(message = "预下单类型不能为空")
-    @StringContains(limitValues = {"shoppingCart", "buyNow", "again", "video", "seckill"}, message = "未知的预下单类型")
+    @StringContains(limitValues = {"shoppingCart", "buyNow", "again", "video", "seckill","ship","dorder"}, message = "未知的预下单类型")
     private String preOrderType;
 
     @ApiModelProperty(value = "下单详情列表", required = true)

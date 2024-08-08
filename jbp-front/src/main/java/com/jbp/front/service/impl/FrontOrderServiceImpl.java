@@ -174,8 +174,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private ProductExtConfigService productExtConfigService;
 
-
-
+    @Autowired
+    private ProductRepertoryService productRepertoryService;
     /**
      * 订单预下单V1.3
      *
@@ -258,6 +258,18 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         }
         // 计算优惠券
         preOrderSetCouponPrice(preOrderInfoVo, orderInfoList, payUser);
+
+
+
+        //发货付款金额
+        if (StringUtils.equals(request.getPreOrderType(), "ship")) {
+            preOrderInfoVo.setProTotalFee(BigDecimal.ZERO);
+            preOrderInfoVo.setCouponFee(BigDecimal.ZERO);
+            preOrderInfoVo.setWalletDeductionFee(BigDecimal.ZERO);
+            //订货付款金额
+        } else if (StringUtils.equals(request.getPreOrderType(), "dorder")) {
+            preOrderInfoVo.setFreightFee(BigDecimal.ZERO);
+        }
 
         preOrderInfoVo.setPayFee(preOrderInfoVo.getProTotalFee().add(preOrderInfoVo.getFreightFee()).subtract(preOrderInfoVo.getCouponFee()).subtract(preOrderInfoVo.getWalletDeductionFee()));
         String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);
@@ -1030,6 +1042,13 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         // 平台订单
         Order order = new Order();
         String orderNo = CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_PLATFORM);
+        if(orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SHIP)){
+            orderNo = CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_SHIP);
+        }
+        if(orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_DORDER)){
+            orderNo = CrmebUtil.getOrderNo(OrderConstants.ORDER_PREFIX_DING);
+        }
+
         order.setOrderNo(orderNo);
         order.setMerId(0);
         order.setUid(orderInfoVo.getUid());
@@ -1060,7 +1079,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         // 订单扩展信息
         OrderExt orderExt = orderInfoVo.getOrderExt();
         orderExt.setOrderNo(order.getOrderNo());
-        if (StringUtils.isNotEmpty(orderRequest.getContent())){
+        if (StringUtils.isNotEmpty(orderRequest.getContent())) {
             orderExt.setOrderGoodsInfo(orderRequest.getContent());
         }
         // 商户订单
@@ -2321,6 +2340,17 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 merchantOrderVoList.add(seckillService.validatePreOrderSeckill(request.getOrderDetails().get(0)));
                 preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_SECKILL);
                 break;
+            case OrderConstants.PLACE_ORDER_TYPE_SHIP:
+                // 发货单
+                merchantOrderVoList.add(validatePreShipOrderNormal(request.getOrderDetails().get(0)));
+                preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_SHIP);
+                break;
+            case OrderConstants.PLACE_ORDER_TYPE_DORDER:
+                // 定单
+                merchantOrderVoList.add(validatePreOrderNormal(request.getOrderDetails().get(0)));
+                preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_DORDER);
+                break;
+
         }
         preOrderInfoVo.setMerchantOrderVoList(merchantOrderVoList);
 
@@ -2420,6 +2450,24 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         logger.info("预下单检查调用:结果preOrderInfoVo:{}", JSON.toJSONString(preOrderInfoVo));
         return preOrderInfoVo;
     }
+
+
+
+    /**
+     * 发货单下单校验
+     *
+     * @param detailRequest 商品参数
+     */
+    private PreMerchantOrderVo validatePreShipOrderNormal(PreOrderDetailRequest detailRequest) {
+
+        ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory ::getUId,userService.getUserId()).eq(ProductRepertory::getProductId,detailRequest.getProductId()));
+        if (detailRequest.getProductNum() > productRepertory.getCount()) {
+            throw new CrmebException("库存数量不足");
+        }
+        return validatePreOrderNormal(detailRequest);
+    }
+
+
 
     /**
      * 普通商品下单校验
@@ -2758,7 +2806,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 }
             }
             payPrice = payPrice.subtract(deductionPrice);
-            priceResponse.setPayFee(payPrice.add(priceResponse.getFreightFee()));
+
+            if(orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SHIP)) {
+                priceResponse.setPayFee(priceResponse.getFreightFee());
+            }else{
+                priceResponse.setPayFee(payPrice.add(priceResponse.getFreightFee()));
+            }
             priceResponse.setDeductionPrice(deductionPrice);
             priceResponse.setIsUseIntegral(true);
             priceResponse.setIntegralDeductionSwitch(true);

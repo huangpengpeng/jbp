@@ -88,7 +88,7 @@ public class PreOrderInfoVo {
     @ApiModelProperty(value = "用户是否使用积分抵扣")
     private Boolean isUseIntegral;
 
-    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单")
+    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单,2-秒杀订单 ,3-发货单,4-定货")
     private Integer type = 0;
 
     @ApiModelProperty(value = "钱包积分抵扣")
