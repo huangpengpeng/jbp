@@ -16,6 +16,7 @@ import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantBalanceRecord;
 import com.jbp.common.model.order.*;
+import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.model.record.BrowseRecord;
 import com.jbp.common.model.record.UserVisitRecord;
 import com.jbp.common.model.system.SystemNotification;
@@ -133,7 +134,8 @@ public class AsyncServiceImpl implements AsyncService {
     private OrderSuccessMsgService orderSuccessMsgService;
     @Autowired
     private RedisTemplate redisTemplate;
-
+    @Autowired
+    private ProductRepertoryService productRepertoryService;
 
     /**
      * 商品详情统计
@@ -247,6 +249,16 @@ public class AsyncServiceImpl implements AsyncService {
             }
             orderExtService.updateById(orderExt);
         }
+
+        //增加库存
+        if(order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)){
+            //productRepertoryService.add();
+
+        }
+
+
+
+
         // 异步拆单
         orderPaySuccessSplit2(order);
     }

@@ -21,7 +21,7 @@ public class ProductRepertoryFlow extends BaseModel {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "用户id")
-    private Integer userId;
+    private Integer uId;
 
     @ApiModelProperty(value = "商品id")
     private Integer productId;
