@@ -1224,6 +1224,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 MyRecord skuRecord = skuRecordList.get(0);
                 seckillService.subStock(skuRecord);
             }
+            //发货单扣减库存
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_SHIP)) {
+              for(OrderDetail orderDetail :orderDetailList ) {
+                  productRepertoryService.reduce(orderDetail.getProductId(),orderDetail.getPayNum(),orderDetail.getUid(),"发货",orderDetail.getOrderNo(),"发货");
+              }
+            }
+
+
             orderService.save(order);
             orderExtService.save(orderExt);
             merchantOrderService.saveBatch(merchantOrderList);
@@ -2118,6 +2126,14 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 if (attrValue.getStock() < info.getPayNum()) {
                     throw new CrmebException("购买的商品库存不足");
                 }
+
+                if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SHIP)) {
+                    ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory ::getUId,userService.getUserId()).eq(ProductRepertory::getProductId,info.getProductId()));
+                    if (info.getPayNum() > productRepertory.getCount()) {
+                        throw new CrmebException("用户库存数量不足");
+                    }
+                }
+
                 MyRecord record = new MyRecord();
                 record.set("productId", info.getProductId());
                 record.set("num", info.getPayNum());

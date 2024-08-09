@@ -261,7 +261,7 @@ public class AsyncServiceImpl implements AsyncService {
                     continue;
                 }
                 for (ProductRef productRef : productRefServiceList) {
-                    productRepertoryService.saveToUpdate(productRef.getProductId(), productRef.getCount() * orderDetail.getPayNum(), orderDetail.getUid(), "订货", order.getOrderNo(), "订货");
+                    productRepertoryService.increase(productRef.getProductId(), productRef.getCount() * orderDetail.getPayNum(), orderDetail.getUid(), "订货", order.getOrderNo(), "订货");
                 }
             }
 

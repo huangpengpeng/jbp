@@ -41,9 +41,28 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
         return productRepertory;
     }
 
+    @Override
+    public Boolean reduce(Integer productId, Integer count, Integer uId, String description, String orderSn, String type) {
+        ProductRepertory productRepertory = dao.selectOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, productId).eq(ProductRepertory::getUId, uId));
+
+        if(productRepertory.getCount() - count < 0 ){
+            throw new CrmebException("库存不足，无法扣减");
+        }
+
+       productRepertory.setCount(productRepertory.getCount() - count);
+        boolean ifSuccess = updateById(productRepertory);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
+
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type);
+
+        return ifSuccess;
+    }
+
 
     @Override
-    public Boolean saveToUpdate(Integer productId, Integer count, Integer uId, String description, String orderSn, String type) {
+    public Boolean increase(Integer productId, Integer count, Integer uId, String description, String orderSn, String type) {
 
         ProductRepertory productRepertory = dao.selectOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, productId).eq(ProductRepertory::getUId, uId));
         if (productRepertory == null) {

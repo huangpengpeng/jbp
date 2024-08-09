@@ -9,12 +9,10 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.config.CrmebConfig;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.kqbill.result.KqPayQueryResult;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.bill.MerchantBill;
 import com.jbp.common.model.merchant.Merchant;
@@ -22,20 +20,18 @@ import com.jbp.common.model.merchant.MerchantBalanceRecord;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.product.ProductRepertoryFlow;
 import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.system.SystemNotification;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBrokerageRecord;
 import com.jbp.common.model.user.UserIntegralRecord;
 import com.jbp.common.model.user.UserToken;
-import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebDateUtil;
 import com.jbp.common.utils.RedisUtil;
 import com.jbp.common.vo.MyRecord;
 import com.jbp.service.service.*;
-
 import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.agent.PlatformWalletService;
 import com.jbp.service.service.agent.WalletService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -128,6 +124,10 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     private PayCallbackService payCallbackService;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private ProductRepertoryService productRepertoryService;
+    @Autowired
+    private ProductRepertoryFlowService productRepertoryFlowService;
 
 
     /**
@@ -204,6 +204,14 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             }
             // 退抵扣
             walletService.refundDeduction(order.getUid(), order.getOrderNo(), "订单取消回退");
+
+            //退库存
+            List<ProductRepertoryFlow> productRepertoryFlows = productRepertoryFlowService.list(new QueryWrapper<ProductRepertoryFlow>().lambda().eq(ProductRepertoryFlow::getOrderSn, orderNo));
+            for (ProductRepertoryFlow productRepertoryFlow : productRepertoryFlows) {
+                productRepertoryService.increase(productRepertoryFlow.getProductId(), productRepertoryFlow.getCount(), order.getUid(), "取消订单", orderNo, "取消订单");
+            }
+
+
             Boolean rollbackStock = rollbackStock(order);
             if (!rollbackStock) {
                 e.setRollbackOnly();
@@ -216,10 +224,11 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     /**
      * 用户积分记录——订单取消
-     * @param uid 用户ID
+     *
+     * @param uid         用户ID
      * @param useIntegral 使用的积分
-     * @param integral 用户当前积分
-     * @param orderNo 订单号
+     * @param integral    用户当前积分
+     * @param orderNo     订单号
      * @return 用户积分记录
      */
     private UserIntegralRecord initOrderCancelIntegralRecord(Integer uid, Integer useIntegral, Integer integral, String orderNo) {
@@ -515,6 +524,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     /**
      * 获取退款平台优惠券ID
+     *
      * @param platOrderNo 主订单号/平台订单号
      * @return 0-平台优惠券不满足退款，>0 - 平台优惠券ID
      */
@@ -539,6 +549,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     /**
      * 获取退款商户优惠券ID
+     *
      * @param orderNo 订单号
      * @return 0-商户优惠券不满足退款，>0 - 商户优惠券ID
      */
@@ -582,7 +593,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
      * 退款回滚库存
      *
      * @param refundOrderInfo 退款单详情
-     * @param orderType 订单类型
+     * @param orderType       订单类型
      */
     private void refundRollbackStock(RefundOrderInfo refundOrderInfo, Integer orderType) {
         if (orderType.equals(OrderConstants.ORDER_TYPE_SECKILL)) {
@@ -667,8 +678,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             try {
 
 
-
-
                 boolean result = orderAutoCancel(String.valueOf(data));
                 if (!result) {
                     redisUtil.lPush(redisKey, data);
@@ -687,7 +696,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
      */
     private Boolean orderAutoCancel(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
-        String  platOrderNo = StringUtils.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() :order.getPlatOrderNo();
+        String platOrderNo = StringUtils.isEmpty(order.getPlatOrderNo()) ? order.getOrderNo() : order.getPlatOrderNo();
         payCallbackService.payResultSync(order.getPayChannel(), platOrderNo);
 
         Order lastOrder = orderService.getByOrderNo(orderNo);
@@ -879,7 +888,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         List<Order> orderList = orderService.findCanCompleteOrder(autoCompleteDay);
         if (CollUtil.isEmpty(orderList)) {
             logger.info("OrderTaskServiceImpl.autoComplete | size:0");
-            return ;
+            return;
         }
         List<String> orderNoList = orderList.stream().map(Order::getOrderNo).collect(Collectors.toList());
         Boolean execute = transactionTemplate.execute(e -> {
@@ -897,7 +906,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     /**
      * 订单积分冻结处理
-     * @param orderNo 订单编号
+     *
+     * @param orderNo   订单编号
      * @param freezeDay 积分冻结天数
      */
     private void orderIntegralFreezingOperation(String orderNo, Integer freezeDay) {
@@ -954,7 +964,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     /**
      * 订单佣金分账冻结处理
-     * @param orderNo 订单编号
+     *
+     * @param orderNo   订单编号
      * @param freezeDay 积分冻结天数
      */
     private void orderBrokerageShareFreezingOperation(String orderNo, Integer freezeDay) {
@@ -1024,7 +1035,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     /**
      * 订单商户分账冻结处理
-     * @param orderNo 订单编号
+     *
+     * @param orderNo   订单编号
      * @param freezeDay 积分冻结天数
      */
     private void orderMerchantShareFreezingOperation(String orderNo, Integer freezeDay) {
@@ -1082,7 +1094,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_WECHAT_PUBLIC) && notification.getIsWechat().equals(1)) {
             userToken = userTokenService.getTokenByUserId(user.getId(), UserConstants.USER_TOKEN_TYPE_WECHAT);
             if (ObjectUtil.isNull(userToken)) {
-                return ;
+                return;
             }
             /**
              * {{first.DATA}}
@@ -1104,7 +1116,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             // 小程序发送订阅消息
             userToken = userTokenService.getTokenByUserId(user.getId(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
             if (ObjectUtil.isNull(userToken)) {
-                return ;
+                return;
             }
             List<OrderDetail> orderInvoiceDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
             List<String> productNameList = orderInvoiceDetailList.stream().map(OrderDetail::getProductName).collect(Collectors.toList());
@@ -1113,7 +1125,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
             // 组装数据
             if (StrUtil.isBlank(storeNameAndCarNumString)) {
-                return ;
+                return;
             }
             if (storeNameAndCarNumString.length() > 20) {
                 storeNameAndCarNumString = storeNameAndCarNumString.substring(0, 15) + "***";

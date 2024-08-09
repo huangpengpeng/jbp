@@ -15,13 +15,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.kqbill.result.KqRefundResult;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.FundClearing;
+import com.jbp.common.model.agent.FundClearingRecord;
+import com.jbp.common.model.agent.WalletConfig;
+import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantAddress;
 import com.jbp.common.model.order.*;
 import com.jbp.common.model.product.ProductDeduction;
+import com.jbp.common.model.product.ProductRef;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
 import com.jbp.common.page.CommonPage;
@@ -34,13 +37,9 @@ import com.jbp.common.vo.WxRefundVo;
 import com.jbp.service.dao.RefundOrderDao;
 import com.jbp.service.product.comm.ProductCommChain;
 import com.jbp.service.product.profit.ProductProfitChain;
-import com.jbp.service.product.profit.ProductProfitHandler;
 import com.jbp.service.service.*;
-
 import com.jbp.service.service.agent.*;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -128,10 +127,18 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     @Autowired
     private FundClearingRecordService fundClearingRecordService;
 
+    @Autowired
+    private ProductRepertoryFlowService productRepertoryFlowService;
+    @Autowired
+    private ProductRepertoryService productRepertoryService;
+    @Autowired
+    private ProductRefService productRefService;
+
+
     /**
      * 商户端退款订单分页列表
      *
-     * @param request          查询参数
+     * @param request 查询参数
      * @return PageInfo
      */
     @Override
@@ -206,7 +213,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         }
 
         String name = environment.getProperty("fundClearing.refundBack");
-        if(!BooleanUtil.toBoolean(name)) {
+        if (!BooleanUtil.toBoolean(name)) {
             if (order.getStatus().equals(OrderConstants.ORDER_STATUS_COMPLETE)) {
                 throw new CrmebException("已完成订单无法申请退款");
             }
@@ -257,7 +264,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             refundOrderInfo.setRefundUseIntegral(orderDetail.getUseIntegral());
             refundOrderInfo.setRefundGainIntegral(orderDetail.getGainIntegral());
             refundOrderInfo.setRefundFreightFee(orderDetail.getFreightFee());
-            refundOrderInfo.getRefundWalletList().forEach(w->{
+            refundOrderInfo.getRefundWalletList().forEach(w -> {
                 w.setRefundFee(w.getDeductionFee());
             });
         } else {
@@ -280,7 +287,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             if (orderDetail.getPlatCouponPrice().compareTo(BigDecimal.ZERO) > 0) {
                 refundOrderInfo.setRefundPlatCouponPrice(orderDetail.getPlatCouponPrice().multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
-            if(CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
+            if (CollectionUtils.isNotEmpty(refundOrderInfo.getRefundWalletList())) {
                 BigDecimal refundWalletFee = BigDecimal.ZERO;
                 for (ProductDeduction deduction : refundOrderInfo.getRefundWalletList()) {
                     if (deduction.getDeductionFee() != null && ArithmeticUtils.gt(deduction.getDeductionFee(), BigDecimal.ZERO)) {
@@ -304,7 +311,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         orderDetail.setApplyRefundNum(orderDetail.getApplyRefundNum() + request.getNum());
         Boolean execute = transactionTemplate.execute(e -> {
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 e.setRollbackOnly();
                 log.error("当前操作人数过多");
             }
@@ -386,7 +393,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             // 设置订单退款状态
             settingOrderStatus(order);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             return Boolean.TRUE;
@@ -607,10 +614,11 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 微信退款
-     * @param order 订单
+     *
+     * @param order         订单
      * @param refundOrderNo 退款单号
-     * @param refundPrice 退款金额
-     * @param totalPrice 订单支付总金额
+     * @param refundPrice   退款金额
+     * @param totalPrice    订单支付总金额
      */
     private void wxRefund(Order order, String refundOrderNo, BigDecimal refundPrice, BigDecimal totalPrice) {
         String appId = "";
@@ -659,7 +667,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     /**
      * 设置订单状态
      *
-     * @param order       订单
+     * @param order 订单
      */
     private void settingOrderStatus(Order order) {
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
@@ -701,6 +709,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 退款订单列表
+     *
      * @param request 搜索参数
      * @return List
      */
@@ -722,6 +731,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 退款订单详情（移动端）
+     *
      * @param refundOrderNo 退款订单号
      * @return RefundOrderInfoResponse
      */
@@ -734,6 +744,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 商户端退款单详情响应对象
+     *
      * @param refundOrderNo 退款单号
      * @return 退款单详情
      */
@@ -835,6 +846,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 平台端退款订单分页列表
+     *
      * @param request 查询参数
      * @return PageInfo
      */
@@ -881,9 +893,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             response.setRefundTime(order.getRefundTime());
             response.setUserNickName(userMap.get(order.getUid()).getNickname());
             Merchant merchant = merchantMap.get(order.getMerId());
-            if(merchant != null){
+            if (merchant != null) {
                 response.setMerName(merchant.getName());
-            }else{
+            } else {
                 response.setMerName("平台");
             }
             return response;
@@ -893,6 +905,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 获取平台端退款订单各状态数量
+     *
      * @param dateLimit 时间参数
      * @return RefundOrderCountItemResponse
      */
@@ -903,6 +916,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 平台备注退款单
+     *
      * @param request 备注参数
      * @return Boolean
      */
@@ -915,6 +929,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 平台端退款订单详情
+     *
      * @param refundOrderNo 退款单号
      * @return 退款单详情
      */
@@ -963,8 +978,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 获取某一天的所有数据
+     *
      * @param merId 商户id，0为所有商户
-     * @param date 日期：年-月-日
+     * @param date  日期：年-月-日
      * @return List
      */
     @Override
@@ -980,6 +996,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 获取某一月的所有数据
+     *
      * @param merId 商户id，0为所有商户
      * @param month 日期：年-月
      * @return List
@@ -997,6 +1014,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 根据日期获取退款订单数量
+     *
      * @param date 日期
      * @return Integer
      */
@@ -1011,6 +1029,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 根据日期获取退款订单金额
+     *
      * @param date 日期
      * @return Integer
      */
@@ -1040,6 +1059,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 获取退款单详情
+     *
      * @param refundOrderNo 退款单号
      */
     @Override
@@ -1052,6 +1072,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 待退款订单数量
+     *
      * @return Integer
      */
     @Override
@@ -1067,8 +1088,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 撤销退款单
+     *
      * @param refundOrderNo 退款单号
-     * todo 缺少退款单日志，缺少订单状态更新
+     *                      todo 缺少退款单日志，缺少订单状态更新
      */
     @Override
     public Boolean revoke(String refundOrderNo) {
@@ -1085,6 +1107,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 退款单审核
+     *
      * @param request 审核参数
      * @return 审核结果
      */
@@ -1097,7 +1120,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         }
 
         String name = environment.getProperty("fundClearing.refundBack");
-        if(BooleanUtil.toBoolean(name)) {
+        if (BooleanUtil.toBoolean(name)) {
             List<FundClearing> fundClearingList = fundClearingService.getByExternalNo(refundOrder.getOrderNo(), FundClearing.contributeStatus());
             if (!fundClearingList.isEmpty()) {
                 throw new CrmebException("还有佣金未追回，无法退款");
@@ -1122,7 +1145,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 // 设置订单退款状态
                 settingOrderStatus(order);
                 boolean b = orderService.updateById(order);
-                if(!b){
+                if (!b) {
                     throw new RuntimeException("当前操作人数过多");
                 }
                 return Boolean.TRUE;
@@ -1138,7 +1161,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             refundOrder.setReceiverPhone(merchantAddress.getReceiverPhone());
             refundOrder.setReceiverAddressDetail(merchantAddress.getDetail());
             refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_RETURN_GOODS);
-            Boolean execute =  transactionTemplate.execute(e -> {
+            Boolean execute = transactionTemplate.execute(e -> {
                 updateById(refundOrder);
                 refundOrderStatusService.add(refundOrder.getRefundOrderNo(), RefundOrderConstants.REFUND_ORDER_LOG_AUDIT, "售后单商家审核通过");
                 productCommChain.orderRefundIntercept(order);
@@ -1151,6 +1174,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 退款单收到退货
+     *
      * @param refundOrderNo 退款单号
      */
     @Override
@@ -1158,13 +1182,13 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(refundOrderNo);
         if (refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REJECT)
-            || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUNDING)
-            || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND)
-            || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REVOKE)) {
+                || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUNDING)
+                || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND)
+                || refundOrder.getRefundStatus().equals(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REVOKE)) {
             throw new CrmebException("退款单状态异常");
         }
         Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
-        if(!ifPlatformAdd){
+        if (!ifPlatformAdd) {
             if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
                 throw new CrmebException("无法操作非自己商户的订单");
             }
@@ -1176,6 +1200,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 平台强制退款
+     *
      * @param refundOrderNo 退款单号
      */
     @Override
@@ -1183,7 +1208,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(refundOrderNo);
         Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
-        if(!ifPlatformAdd){
+        if (!ifPlatformAdd) {
             if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
                 throw new CrmebException("无法操作非自己商户的订单");
             }
@@ -1198,15 +1223,16 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 退款单-商家拒绝收货退款
+     *
      * @param request 拒绝收货请求对象
-     * todo 后续逻辑、退款状态可能有变动
+     *                todo 后续逻辑、退款状态可能有变动
      */
     @Override
     public Boolean receivingReject(RejectReceivingRequest request) {
         SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
         RefundOrder refundOrder = getInfoException(request.getRefundOrderNo());
         Boolean ifPlatformAdd = systemAdmin.getMerId() == 0;// 是否平台新增商品
-        if(!ifPlatformAdd){
+        if (!ifPlatformAdd) {
             if (!refundOrder.getMerId().equals(systemAdmin.getMerId())) {
                 throw new CrmebException("无法操作非自己商户的订单");
             }
@@ -1227,7 +1253,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
             // 设置订单退款状态
             settingOrderStatus(order);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             return Boolean.TRUE;
@@ -1258,6 +1284,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
     /**
      * 退款
+     *
      * @param refundOrder 退款单
      */
     public Boolean refundPrice(RefundOrder refundOrder, Order order) {
@@ -1453,7 +1480,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                     platformWalletService.transferToUser(order.getPayUid(), walletConfig.getType(), refundPrice, WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
                 }
             }
-            if(CollUtil.isNotEmpty(refundOrder.getRefundWalletList())) {
+            if (CollUtil.isNotEmpty(refundOrder.getRefundWalletList())) {
                 refundOrder.getRefundWalletList().forEach(w -> {
                     if (w.getRefundFee() != null && ArithmeticUtils.gt(w.getRefundFee(), BigDecimal.ZERO)) {
                         platformWalletService.transferToUser(order.getPayUid(), w.getWalletType(), w.getRefundFee(), WalletFlow.OperateEnum.退款.toString(), refundOrder.getRefundOrderNo(), refundOrder.getRefundReason());
@@ -1486,16 +1513,42 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
 
             productCommChain.orderRefundIntercept(order);
 
+            List<ProductRef> productRefList = productRefService.getList(refundOrderInfo.getProductId());
+
+            //退库存 发货单
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_SHIP)) {
+                if (!productRefList.isEmpty()) {
+                    for (ProductRef productRef : productRefList) {
+                        productRepertoryService.increase(productRef.getProductId(), productRef.getCount() * refundOrderInfo.getApplyRefundNum(), order.getUid(), "退款", order.getPlatOrderNo(), "退款");
+                    }
+                } else {
+                    productRepertoryService.increase(refundOrderInfo.getProductId(), refundOrderInfo.getApplyRefundNum(), order.getUid(), "退款", order.getPlatOrderNo(), "退款");
+                }
+            }
+
+            //退库存 订货单
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+                if (!productRefList.isEmpty()) {
+                    for (ProductRef productRef : productRefList) {
+                        productRepertoryService.reduce(productRef.getProductId(), productRef.getCount() * refundOrderInfo.getApplyRefundNum(), order.getUid(), "退款", order.getPlatOrderNo(), "退款");
+                    }
+                } else {
+                    productRepertoryService.reduce(refundOrderInfo.getProductId(), refundOrderInfo.getApplyRefundNum(), order.getUid(), "退款", order.getPlatOrderNo(), "退款");
+                }
+
+            }
+
+
             settingOrderStatus(order);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             return Boolean.TRUE;
         });
         if (execute) {
             // 积分、佣金、优惠券等放入后置task中处理
-            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN)|| order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
+            if (order.getPayType().equals(PayConstants.PAY_TYPE_YUE) || order.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || order.getPayType().equals(PayConstants.PAY_TYPE_LIANLIAN) || order.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
                 redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, refundOrder.getRefundOrderNo());
             }
         }
