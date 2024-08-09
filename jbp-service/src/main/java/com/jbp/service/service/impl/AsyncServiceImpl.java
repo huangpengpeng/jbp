@@ -16,7 +16,7 @@ import com.jbp.common.model.coupon.CouponUser;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantBalanceRecord;
 import com.jbp.common.model.order.*;
-import com.jbp.common.model.product.ProductRepertory;
+import com.jbp.common.model.product.ProductRef;
 import com.jbp.common.model.record.BrowseRecord;
 import com.jbp.common.model.record.UserVisitRecord;
 import com.jbp.common.model.system.SystemNotification;
@@ -24,10 +24,10 @@ import com.jbp.common.model.system.SystemUserLevel;
 import com.jbp.common.model.user.*;
 import com.jbp.common.utils.CrmebUtil;
 import com.jbp.common.utils.RedisUtil;
-import com.jbp.common.utils.StringUtils;
 import com.jbp.service.product.profit.ProductProfitChain;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.OrderSuccessMsgService;
+import com.jbp.service.service.agent.ProductRefService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -136,6 +136,8 @@ public class AsyncServiceImpl implements AsyncService {
     private RedisTemplate redisTemplate;
     @Autowired
     private ProductRepertoryService productRepertoryService;
+    @Autowired
+    private ProductRefService productRefService;
 
     /**
      * 商品详情统计
@@ -251,12 +253,19 @@ public class AsyncServiceImpl implements AsyncService {
         }
 
         //增加库存
-        if(order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)){
-            //productRepertoryService.add();
+        if (order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+            List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
+            for (OrderDetail orderDetail : orderDetailList) {
+                List<ProductRef> productRefServiceList = productRefService.getList(orderDetail.getProductId());
+                if (productRefServiceList.isEmpty()) {
+                    continue;
+                }
+                for (ProductRef productRef : productRefServiceList) {
+                    productRepertoryService.saveToUpdate(productRef.getProductId(), productRef.getCount() * orderDetail.getPayNum(), orderDetail.getUid(), "订货", order.getOrderNo(), "订货");
+                }
+            }
 
         }
-
-
 
 
         // 异步拆单
@@ -657,6 +666,7 @@ public class AsyncServiceImpl implements AsyncService {
 
     /**
      * 订单支付成功后冻结处理
+     *
      * @param orderNoList 订单编号列表
      */
     @Async
@@ -687,6 +697,7 @@ public class AsyncServiceImpl implements AsyncService {
 
     /**
      * 订单完成后冻结处理
+     *
      * @param orderNoList 订单编号列表
      */
     @Async
@@ -721,8 +732,9 @@ public class AsyncServiceImpl implements AsyncService {
 
     /**
      * 订单积分冻结处理
+     *
      * @param orderNoList 订单编号列表
-     * @param freezeDay 积分冻结天数
+     * @param freezeDay   积分冻结天数
      */
     private void orderIntegralFreezingOperation(List<String> orderNoList, Integer freezeDay) {
         Order order = orderService.getByOrderNo(orderNoList.get(0));
@@ -798,6 +810,7 @@ public class AsyncServiceImpl implements AsyncService {
 
     /**
      * 订单佣金分账冻结处理
+     *
      * @param orderNoList 订单编号列表
      */
     private void orderBrokerageShareFreezingOperation(List<String> orderNoList, Integer freezeDay) {
@@ -871,6 +884,7 @@ public class AsyncServiceImpl implements AsyncService {
 
     /**
      * 订单商户分账冻结处理
+     *
      * @param orderNoList 订单编号列表
      */
     private void orderMerchantShareFreezingOperation(List<String> orderNoList, Integer freezeDay) {
