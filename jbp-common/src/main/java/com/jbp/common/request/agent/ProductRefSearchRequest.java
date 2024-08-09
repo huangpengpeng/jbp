@@ -14,6 +14,6 @@ import java.io.Serializable;
 @ApiModel(value = "ProductRefSearchRequest对象", description = "商品关联套组查询请求对象")
 public class ProductRefSearchRequest implements Serializable {
 
-    @ApiModelProperty("商品ID")
-    private Integer productId;
+    @ApiModelProperty("套组id")
+    private Integer refProductId;
 }

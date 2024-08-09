@@ -37,7 +37,7 @@ public class ProductRefServiceImpl extends ServiceImpl<ProductRefDao, ProductRef
             });
         }
         // 删除当前商品原有的套组
-        remove(new QueryWrapper<ProductRef>().lambda().eq(ProductRef::getProductId, request.getProductId()));
+        remove(new QueryWrapper<ProductRef>().lambda().eq(ProductRef::getProductId, request.getRefProductId()));
         if (CollUtil.isNotEmpty(refAddList)){
             saveBatch(refAddList);
         }
@@ -48,7 +48,7 @@ public class ProductRefServiceImpl extends ServiceImpl<ProductRefDao, ProductRef
     }
 
     @Override
-    public List<ProductRef> getList(Integer productId) {
-        return list(new QueryWrapper<ProductRef>().lambda().eq(ProductRef::getProductId, productId));
+    public List<ProductRef> getList(Integer refProductId) {
+        return list(new QueryWrapper<ProductRef>().lambda().eq(ProductRef::getRefProductId, refProductId));
     }
 }

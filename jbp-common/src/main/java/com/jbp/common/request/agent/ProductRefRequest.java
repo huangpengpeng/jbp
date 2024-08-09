@@ -16,9 +16,9 @@ import java.util.List;
 @ApiModel(value = "ProductRefAddRequest对象", description = "商品关联套组增加请求对象")
 public class ProductRefRequest  implements Serializable {
 
-    @NotNull(message = "商品ID不能为空")
-    @ApiModelProperty("商品ID")
-    private Integer productId;
+    @NotNull(message = "套组ID不能为空")
+    @ApiModelProperty("套组ID")
+    private Integer refProductId;
 
     @ApiModelProperty("商品关联套组信息")
     private List<ProductRefAddRequest> productRefInfoList;
