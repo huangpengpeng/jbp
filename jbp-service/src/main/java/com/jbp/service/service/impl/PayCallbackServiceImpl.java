@@ -99,7 +99,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
     public String wechatPayCallback(String xmlInfo) {
         StringBuffer sb = new StringBuffer();
         sb.append("<xml>");
-        if(StrUtil.isBlank(xmlInfo)){
+        if (StrUtil.isBlank(xmlInfo)) {
             sb.append("<return_code><![CDATA[FAIL]]></return_code>");
             sb.append("<return_msg><![CDATA[xmlInfo is blank]]></return_msg>");
             sb.append("</xml>");
@@ -107,7 +107,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             return sb.toString();
         }
 
-        try{
+        try {
             HashMap<String, Object> map = WxPayUtil.processResponseXml(xmlInfo);
             // 通信是否成功
             String returnCode = (String) map.get("return_code");
@@ -174,9 +174,15 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 Boolean execute = transactionTemplate.execute(e -> {
                     order.setPaid(true);
                     order.setPayTime(CrmebDateUtil.nowDateTime());
-                    order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+
+                    if (order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+                        order.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
+                    } else {
+                        order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                    }
+
                     boolean b = orderService.updateById(order);
-                    if(!b){
+                    if (!b) {
                         throw new RuntimeException("当前操作人数过多");
                     }
                     wechatPayInfoService.updateById(wechatPayInfo);
@@ -195,11 +201,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             // 充值订单处理
             if (PayConstants.PAY_SERVICE_TYPE_RECHARGE.equals(attachVo.getType())) {
                 RechargeOrder rechargeOrder = rechargeOrderService.getByOutTradeNo(callbackVo.getOutTradeNo());
-                if(ObjectUtil.isNull(rechargeOrder)){
+                if (ObjectUtil.isNull(rechargeOrder)) {
                     logger.error("充值订单后置处理，没有找到对应订单，支付服务方订单号：{}", callbackVo.getOutTradeNo());
                     throw new CrmebException("没有找到充值订单信息");
                 }
-                if(rechargeOrder.getPaid()){
+                if (rechargeOrder.getPaid()) {
                     sb.append("<return_code><![CDATA[SUCCESS]]></return_code>");
                     sb.append("<return_msg><![CDATA[OK]]></return_msg>");
                     sb.append("</xml>");
@@ -214,7 +220,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             }
             sb.append("<return_code><![CDATA[SUCCESS]]></return_code>");
             sb.append("<return_msg><![CDATA[OK]]></return_msg>");
-        }catch (Exception e){
+        } catch (Exception e) {
             sb.append("<return_code><![CDATA[FAIL]]></return_code>");
             sb.append("<return_msg><![CDATA[").append(e.getMessage()).append("]]></return_msg>");
             logger.error("wechat pay error : 业务异常==》" + e.getMessage());
@@ -284,11 +290,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 String orderType = split[1];
                 if (PayConstants.PAY_SERVICE_TYPE_RECHARGE.equals(orderType)) {// 充值订单
                     RechargeOrder rechargeOrder = rechargeOrderService.getByOutTradeNo(outTradeNo);
-                    if(ObjectUtil.isNull(rechargeOrder)){
+                    if (ObjectUtil.isNull(rechargeOrder)) {
                         logger.error("ali pay error : 充值订单后置处理，没有找到对应订单，支付服务方订单号：{}", outTradeNo);
                         return "fail";
                     }
-                    if(rechargeOrder.getPaid()){
+                    if (rechargeOrder.getPaid()) {
                         return "success";
                     }
                     // 支付成功处理
@@ -334,9 +340,14 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     Boolean execute = transactionTemplate.execute(e -> {
                         order.setPaid(true);
                         order.setPayTime(CrmebDateUtil.nowDateTime());
-                        order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+
+                        if (order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+                            order.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
+                        } else {
+                            order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                        }
                         boolean b = orderService.updateById(order);
-                        if(!b){
+                        if (!b) {
                             throw new RuntimeException("当前操作人数过多");
                         }
                         return Boolean.TRUE;
@@ -361,6 +372,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
     /**
      * 保存支付宝回调信息
+     *
      * @param params
      */
     private void saveAliPayCallbackInfo(Map<String, String> params) {
@@ -388,13 +400,14 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
     /**
      * 将request中的参数转换成Map
+     *
      * @param request
      * @return
      */
     private Map<String, String> convertRequestParamsToMap(HttpServletRequest request) {
         Map<String, String> retMap = new HashMap<String, String>();
         Map requestParams = request.getParameterMap();
-        for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+        for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
             String[] values = (String[]) requestParams.get(name);
             String valueStr = "";
@@ -411,6 +424,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
     /**
      * 微信退款回调
+     *
      * @param xmlInfo 微信回调json
      * @return MyRecord
      */
@@ -481,9 +495,13 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         update.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
                         update.setPayType("lianlian");
                         update.setPayTime(CrmebDateUtil.nowDateTime());
-                        update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                        if (update.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+                            update.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
+                        } else {
+                            update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                        }
                         boolean b1 = orderService.updateById(update);
-                        if(!b1){
+                        if (!b1) {
                             throw new RuntimeException("当前操作人数过多");
                         }
                         return Boolean.TRUE;
@@ -559,7 +577,12 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     update.setPayMethod(KqPayConfig.PayMethod.getName(kqPayQueryResult.getPayType()).getName());
                     update.setPayType("kq");
                     update.setPayTime(CrmebDateUtil.nowDateTime());
-                    update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+
+                    if (update.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+                        update.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
+                    } else {
+                        update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                    }
                     boolean b1 = orderService.updateById(update);
                     if (!b1) {
                         throw new RuntimeException("当前操作人数过多");
@@ -632,7 +655,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         update.setPayMethod(payWayEnum.name());
                     }
                     update.setPayTime(DateTimeUtils.parseDate(tradeOrderQueryResult.getPaySuccessDate()));
-                    update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                    if (update.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
+                        update.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
+                    } else {
+                        update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+                    }
                     boolean b1 = orderService.updateById(update);
                     if (!b1) {
                         throw new RuntimeException("当前操作人数过多");
@@ -691,6 +718,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
     /**
      * 支付订单回调通知
+     *
      * @return MyRecord
      */
     private MyRecord refundNotify(String xmlInfo, MyRecord notifyRecord) {
@@ -698,7 +726,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
         refundRecord.set("status", "fail");
         StringBuilder sb = new StringBuilder();
         sb.append("<xml>");
-        if(StrUtil.isBlank(xmlInfo)){
+        if (StrUtil.isBlank(xmlInfo)) {
             sb.append("<return_code><![CDATA[FAIL]]></return_code>");
             sb.append("<return_msg><![CDATA[xmlInfo is blank]]></return_msg>");
             sb.append("</xml>");
@@ -785,6 +813,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
     }
 
     private static final List<String> list = new ArrayList<>();
+
     static {
         list.add("total_fee");
         list.add("cash_fee");
@@ -818,6 +847,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
     /**
      * 仅仅为微信解析密文使用
+     *
      * @param source 待解析密文
      * @return 结果
      */

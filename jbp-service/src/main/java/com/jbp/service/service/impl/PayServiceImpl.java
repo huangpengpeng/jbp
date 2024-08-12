@@ -1009,7 +1009,14 @@ public class PayServiceImpl implements PayService {
             order.setPayTime(DateUtil.date());
             order.setPayMethod("积分支付");
             order.setPayType("wallet");
-            order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+
+            if(order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)){
+                order.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
+            }else{
+                order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
+            }
+
+
             order.setOutTradeNo(order.getOrderNo());
             boolean b = orderService.updateById(order);
             if(!b){
