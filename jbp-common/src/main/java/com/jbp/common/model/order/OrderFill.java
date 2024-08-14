@@ -23,9 +23,6 @@ public class OrderFill extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "ID")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
 
     @ApiModelProperty(value = "订单号")
     private String orderNo;
