@@ -1,7 +1,12 @@
 package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.product.ProductRepertoryFlow;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.ProductRepertoryFlowDao;
 import com.jbp.service.service.ProductRepertoryFlowService;
 import org.slf4j.Logger;
@@ -10,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -24,7 +30,7 @@ public class ProductRepertoryFlowServiceImpl extends ServiceImpl<ProductRepertor
     @Override
     public void  add(Integer uId, Integer productId, Integer count, String description, String orderSn, Date time, String type) {
         ProductRepertoryFlow productRepertoryFlow = new ProductRepertoryFlow();
-        productRepertoryFlow.setUId(uId);
+        productRepertoryFlow.setUid(uId);
         productRepertoryFlow.setProductId(productId);
         productRepertoryFlow.setCount(count);
         productRepertoryFlow.setDescription(description);
@@ -33,6 +39,13 @@ public class ProductRepertoryFlowServiceImpl extends ServiceImpl<ProductRepertor
         productRepertoryFlow.setType(type);
 
         save(productRepertoryFlow);
+    }
+
+    @Override
+    public PageInfo<ProductRepertoryFlow> getList(Integer uid, String nickname, PageParamRequest pageParamRequest) {
+        Page<ProductRepertoryFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ProductRepertoryFlow> list = dao.getList(uid, nickname);
+        return CommonPage.copyPageInfo(page, list);
     }
 }
 

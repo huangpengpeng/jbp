@@ -3,11 +3,13 @@ package com.jbp.admin.controller.agent;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.CapaOrder;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
@@ -19,6 +21,7 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SystemAttachmentService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.CapaOrderService;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserInvitationJumpService;
 import io.swagger.annotations.Api;
@@ -43,6 +46,8 @@ public class CapaController {
     private CapaService capaService;
     @Resource
     private SystemAttachmentService systemAttachmentService;
+    @Resource
+    private CapaOrderService capaOrderService;
 
 
     @PreAuthorize("hasAuthority('capa:list')")
@@ -91,7 +96,18 @@ public class CapaController {
         capa.setIconUrl(systemAttachmentService.clearPrefix(capaRequest.getIconUrl(), cdnUrl));
         capa.setRiseImgUrl(systemAttachmentService.clearPrefix(capaRequest.getRiseImgUrl(), cdnUrl));
         capa.setShareImgUrl(systemAttachmentService.clearPrefix(capaRequest.getShareImgUrl(), cdnUrl));
+        CapaOrder capaOrder = capaOrderService.getByCapaId(capaRequest.getId());
+        if (capaOrder!=null){
+            capaOrder.setIfSupply(capaRequest.getIfSupply());
+            capaOrder.setOrderRule(capaRequest.getOrderRule());
+            capaOrder.setIfCompany(capaRequest.getIfCompany());
+            if (capaRequest.getIfCompany()){
+                capaOrder.setOrderAmount(capaRequest.getOrderAmount());
+                capaOrder.setRepAmount(capaRequest.getRepAmount());
+            }
+        }
         capaService.updateById(capa);
+        capaOrderService.updateById(capaOrder);
         return CommonResult.success();
     }
 

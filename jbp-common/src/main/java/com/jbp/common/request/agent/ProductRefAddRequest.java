@@ -16,8 +16,6 @@ import java.math.BigDecimal;
 @ApiModel(value = "ProductRefAddRequest对象", description = "商品关联套组增加请求对象")
 public class ProductRefAddRequest implements Serializable {
 
-
-
     @ApiModelProperty(value = "数量")
     @NotNull(message = "商品数量不能为空")
     private Integer count;
@@ -28,5 +26,5 @@ public class ProductRefAddRequest implements Serializable {
 
     @ApiModelProperty(value = "关联套组")
     @NotNull(message = "关联套组礼包不能为空")
-    private Integer refProductId;
+    private Integer productId;
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.ProductRepertoryFlowDao">
+    <select id="getList" resultType="com.jbp.common.model.product.ProductRepertoryFlow">
+        select *,p.name as product_name,v.bar_code,u.nickname,u.account,t.name as team_name
+        from eb_product_repertory_flow f
+        left join eb_product p on f.product_id = p.id
+        left join eb_product_attr_value v on f.product_id = v.product_id
+        left join eb_user u on f.uid = u.id
+        left join eb_team_user tu on f.uid = tu.uid
+        left join eb_team t on tu.tid = t.id
+        <where>
+            <if test="uid !=null and uid!=''">
+                and r.uid=#{uid}
+            </if>
+            <if test="nickname !=null and nickname!=''">
+                and u.nickname like CONCAT('%',#{nickname},'%')
+            </if>
+        </where>
+        order by f.id desc
+
+    </select>
+
+</mapper>

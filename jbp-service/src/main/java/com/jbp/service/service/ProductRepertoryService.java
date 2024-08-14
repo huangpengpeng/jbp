@@ -1,7 +1,15 @@
 package com.jbp.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.product.ProductRepertory;
+import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ProductRepertorySearchRequest;
+import com.jbp.common.vo.MyRecord;
+import org.apache.poi.ss.formula.functions.T;
+
+import java.util.List;
+
 
 public interface ProductRepertoryService extends IService<ProductRepertory> {
 
@@ -12,4 +20,11 @@ public interface ProductRepertoryService extends IService<ProductRepertory> {
 
     public Boolean reduce(Integer productId,Integer count,Integer uId,String description ,String orderSn,String type);
 
+    PageInfo<ProductRepertory> getList(Integer uid, String nickname, String productNameOrCode, PageParamRequest pageParamRequest);
+
+    Boolean allot(Integer fUid, Integer tUid, Integer productId, Integer count);
+
+    String export(Integer uid, String nickname, String productNameOrCode);
+
+    List<ProductRepertory> getUserRepertory(Integer uid, Integer productId);
 }
