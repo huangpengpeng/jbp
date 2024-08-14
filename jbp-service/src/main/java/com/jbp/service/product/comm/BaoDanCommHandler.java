@@ -13,6 +13,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -23,6 +24,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -48,9 +50,9 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
     @Resource
     private UserInvitationService invitationService;
     @Resource
-    private ProductCommConfigService productCommConfigService;
-    @Resource
     private FundClearingService fundClearingService;
+    @Resource
+    private Environment environment;
 
     @Override
     public Integer getType() {
@@ -89,6 +91,8 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
 
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
+        String zhcxIndex = environment.getProperty("zhcx.index");
+        Boolean index = StringUtils.isNotEmpty(zhcxIndex);
         // 增加对碰积分业绩
         List<FundClearing> list = Lists.newArrayList();
         // 订单总PV
@@ -106,9 +110,11 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 continue;
             }
             Rule rule = getRule(productComm);
+            BigDecimal peiYuAmt = BigDecimal.ZERO;
             // 最近的满足等级的用户获得直推
             Integer uid = order.getUid();
             Integer oneId = null;
+            Boolean onePeiYu = false;
             do {
                 Integer pid = invitationService.getPid(uid);
                 if (pid == null) {
@@ -116,6 +122,9 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 }
                 UserCapa userCapa = userCapaService.getByUser(pid);
                 if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getOneCapaId()) >= 0) {
+                    if(NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0 ){
+                        onePeiYu = true;
+                    }
                     oneId = pid;
                     break;
                 }
@@ -131,12 +140,16 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
             oneFun.setUid(oneId);
             oneFun.setCommName("直推");
             oneFun.setCommAmt(oneFee);
+            if(onePeiYu){
+                peiYuAmt = oneFee.multiply(BigDecimal.valueOf(0.1));
+            }
             list.add(oneFun);
 
 
             // 找下一个分钱人
             uid = oneId;
             Integer twoId = null;
+            Boolean twoPeiYu = false;
             do {
                 Integer pid = invitationService.getPid(uid);
                 if (pid == null) {
@@ -144,6 +157,9 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 }
                 UserCapa userCapa = userCapaService.getByUser(pid);
                 if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getTwoCapaId()) >= 0) {
+                    if(NumberUtils.compare(userCapa.getCapaId(), rule.getThreeCapaId()) >= 0 ){
+                        twoPeiYu = true;
+                    }
                     twoId = pid;
                     break;
                 }
@@ -156,6 +172,9 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 twoFund.setUid(twoId);
                 twoFund.setCommName("间推");
                 twoFund.setCommAmt(twoFee);
+                if(twoPeiYu){
+                    peiYuAmt = twoFee.multiply(BigDecimal.valueOf(0.1));
+                }
                 list.add(twoFund);
             }
 
@@ -181,9 +200,14 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 threeFund.setUid(threeId);
                 threeFund.setCommName("培育");
                 threeFund.setCommAmt(threeFee);
+                if(index){
+                    threeFund.setCommAmt(peiYuAmt);
+                }
                 list.add(threeFund);
             }
         }
+
+
 
         // 相同用户相同佣金类型合并发放
         if (CollectionUtils.isEmpty(list)) {

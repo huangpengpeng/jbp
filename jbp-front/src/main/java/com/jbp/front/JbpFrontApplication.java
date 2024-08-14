@@ -1,13 +1,19 @@
 package com.jbp.front;
 
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.request.agent.ScoreDownloadRequest;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.product.comm.BaoDanCommHandler;
 import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.YopService;
+import com.jbp.service.service.agent.InvitationScoreService;
+import org.apache.commons.collections4.MapUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +28,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 程序主入口
@@ -48,18 +55,5 @@ import java.util.List;
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-//        BaoDanCommHandler baoDanCommHandler = run.getBean(BaoDanCommHandler.class);
-//        OrderService orderService = run.getBean(OrderService.class);
-//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
-//
-//        Order order = orderService.getByOrderNo("PT579172302318142854490");
-//        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
-//        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
-//        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
-
-
-//        YopDemo.selfSettle(run.getBean(YopService.class));
-
     }
 }

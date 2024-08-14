@@ -183,6 +183,8 @@ zhcx:
   zd: CX000000
   org: CX111111
   two: 1
+  index: 1
+
 
 
 host: https://adm.zhonghe88188.com
