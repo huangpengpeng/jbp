@@ -51,7 +51,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://120.26.102.41:3306/oageless?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true
+    url: jdbc:mysql://120.26.102.41:3306/oageless?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     username: oageless
     password: 12345Aa#
 
@@ -187,7 +187,7 @@ zhcx:
 
 
 
-host: https://adm.zhonghe88188.com
+host: https://admin.jbp.kkyp.vip
 
 
 
