@@ -1,7 +1,6 @@
 package com.jbp.common.model.order;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -10,7 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.util.Date;
 
 
@@ -22,10 +20,6 @@ import java.util.Date;
 public class OrderFill extends BaseModel {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "ID")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
 
     @ApiModelProperty(value = "订单号")
     private String orderNo;
@@ -47,5 +41,21 @@ public class OrderFill extends BaseModel {
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
+    @ApiModelProperty(value = "下单人账号")
+    @TableField(exist = false)
+    private String oAccount;
+
+    @ApiModelProperty(value = "下单人昵称")
+    @TableField(exist = false)
+    private String oNickname;
+
+    @ApiModelProperty(value = "供货人账号")
+    @TableField(exist = false)
+    private String sAccount;
+
+    @ApiModelProperty(value = "供货人账号")
+    @TableField(exist = false)
+    private String sNickname;
 
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.OrderFillDao">
+
+    <select id="getList" resultType="com.jbp.common.model.order.OrderFill">
+        select *,ou.account as oAccount,ou.nickname as oNickname,fu.nickname as sNickname,fu.account as sAccount
+        from eb_order_fill f
+            left join eb_order o on f.order_no = o.order_no
+            left join eb_user ou on ou.id = o.uid
+            left join eb_user fu on fu.id = f.uid
+        <where>
+            <if test="uid !=null and uid!=''">
+                and ou.uid=#{uid}
+            </if>
+            <if test="oNickname !=null and oNickname!=''">
+                and ou.oNickname=#{oNickname}
+            </if>
+            <if test="orderNo !=null and orderNo!=''">
+                and f.orderNo=#{orderNo}
+            </if>
+        </where>
+        order by f.id desc
+
+
+    </select>
+</mapper>

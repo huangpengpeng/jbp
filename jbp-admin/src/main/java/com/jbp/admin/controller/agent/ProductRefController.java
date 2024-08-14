@@ -24,17 +24,16 @@ public class ProductRefController {
     @Autowired
     private ProductRefService productRefService;
 
-    @PreAuthorize("hasAuthority('agent:platform:product:ref:page')")
+//    @PreAuthorize("hasAuthority('agent:platform:product:ref:page')")
     @GetMapping("/list")
     @ApiOperation("商品关联套组列表")
     public CommonResult<List<ProductRef>> list(ProductRefSearchRequest request){
        return CommonResult.success(productRefService.getList(request.getRefProductId()));
     }
 
-
-    @PreAuthorize("hasAuthority('agent:platform:product:ref:add')")
+//    @PreAuthorize("hasAuthority('agent:platform:product:ref:add')")
     @PostMapping("/add")
-    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "商品配套编辑")
+//    @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "商品配套编辑")
     @ApiOperation("商品关联套组增加")
     public CommonResult<Boolean> add(@RequestBody @Validated ProductRefRequest request){
         return CommonResult.success(productRefService.add(request));

@@ -1,5 +1,6 @@
 package com.jbp.common.model.product;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -8,7 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
 
 
 @Data
@@ -21,13 +21,33 @@ public class ProductRepertory extends BaseModel {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "用户id")
-    private Integer uId;
+    private Integer uid;
 
     @ApiModelProperty(value = "商品id")
     private Integer productId;
 
     @ApiModelProperty(value = "数量")
     private Integer count;
+
+    @ApiModelProperty(value = "商品名称")
+    @TableField(exist = false)
+    private String productName;
+
+    @ApiModelProperty(value = "商品编码")
+    @TableField(exist = false)
+    private String barCode;
+
+    @ApiModelProperty(value = "用户账号")
+    @TableField(exist = false)
+    private String account;
+
+    @ApiModelProperty(value = "用户昵称")
+    @TableField(exist = false)
+    private String nickname;
+
+    @ApiModelProperty(value = "团队名称")
+    @TableField(exist = false)
+    private String teamName;
 
 
 

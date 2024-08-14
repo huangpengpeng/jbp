@@ -29,6 +29,7 @@ public class ProductRefServiceImpl extends ServiceImpl<ProductRefDao, ProductRef
             request.getProductRefInfoList().forEach(e -> {
                 ProductRef ref = new ProductRef();
                 BeanUtils.copyProperties(e, ref);
+                ref.setRefProductId(request.getRefProductId());
                 if (ObjectUtil.isNull(ref.getId())) {
                     refAddList.add(ref);
                 }else {
@@ -37,7 +38,7 @@ public class ProductRefServiceImpl extends ServiceImpl<ProductRefDao, ProductRef
             });
         }
         // 删除当前商品原有的套组
-        remove(new QueryWrapper<ProductRef>().lambda().eq(ProductRef::getProductId, request.getRefProductId()));
+        remove(new QueryWrapper<ProductRef>().lambda().eq(ProductRef::getRefProductId, request.getRefProductId()));
         if (CollUtil.isNotEmpty(refAddList)){
             saveBatch(refAddList);
         }
