@@ -10,6 +10,7 @@ import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.user.User;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.FunctionUtil;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
@@ -20,6 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -45,7 +47,7 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
     @Resource
     private UserInvitationService invitationService;
     @Resource
-    private ProductCommConfigService productCommConfigService;
+    private Environment environment;
     @Resource
     private FundClearingService fundClearingService;
     @Override
@@ -86,6 +88,9 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
     @Override
     public void orderSuccessCalculateAmt(Order order, List<OrderDetail> orderDetails, LinkedList<CommCalculateResult> resultList) {
 
+        String zhcxIndex = environment.getProperty("zhcx.index");
+        Boolean index = StringUtils.isNotEmpty(zhcxIndex);
+
         // 增加对碰积分业绩
         List<FundClearing> list = Lists.newArrayList();
         // 订单总PV
@@ -118,30 +123,73 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
                 }
                 uid = pid;
             } while (true);
+
             // 没有上级就不用继续分钱了
             if (oneId == null) {
-                continue;
-            }
-            BigDecimal oneFee = totalPv.multiply(rule.getOneRatio());
-            FundClearing oneFun = new FundClearing();
-            oneFun.setUid(oneId);
-            oneFun.setCommName("直推");
-            oneFun.setCommAmt(oneFee);
-            list.add(oneFun);
-
-            // 分给直推的培育人
-            UserInvitation oneUserInvitation = invitationService.getByUser(oneId);
-            if (oneUserInvitation != null && oneUserInvitation.getMId() != null) {
-                UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getMId());
-                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getTwoCapaId()) >= 0) {
-                    BigDecimal threeFee = totalPv.multiply(rule.getTwoRatio());
-                    FundClearing threeFund = new FundClearing();
-                    threeFund.setUid(oneUserInvitation.getMId());
-                    threeFund.setCommName("培育");
-                    threeFund.setCommAmt(threeFee);
-                    list.add(threeFund);
+                BigDecimal oneFee = totalPv.multiply(rule.getOneRatio());
+                FundClearing oneFun = new FundClearing();
+                oneFun.setUid(oneId);
+                oneFun.setCommName("直推");
+                oneFun.setCommAmt(oneFee);
+                list.add(oneFun);
+                if(!index){
+                    // 分给直推的培育人
+                    UserInvitation oneUserInvitation = invitationService.getByUser(oneId);
+                    if (oneUserInvitation != null && oneUserInvitation.getMId() != null) {
+                        UserCapa userCapa = userCapaService.getByUser(oneUserInvitation.getMId());
+                        if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getTwoCapaId()) >= 0) {
+                            BigDecimal threeFee = totalPv.multiply(rule.getTwoRatio());
+                            FundClearing threeFund = new FundClearing();
+                            threeFund.setUid(oneUserInvitation.getMId());
+                            threeFund.setCommName("培育");
+                            threeFund.setCommAmt(threeFee);
+                            list.add(threeFund);
+                        }
+                    }
                 }
             }
+
+
+            if(index){
+                Integer twoId = null;
+                UserCapa userCapa = userCapaService.getByUser(order.getUid());
+                if (userCapa != null && NumberUtils.compare(userCapa.getCapaId(), rule.getOneCapaId()) >= 0) {
+                    twoId = userCapa.getUid();
+                }
+                if(twoId == null){
+                    uid = order.getUid();
+                    do {
+                        Integer pid = invitationService.getPid(uid);
+                        if (pid == null) {
+                            break;
+                        }
+                        UserCapa userCapa2 = userCapaService.getByUser(pid);
+                        if (userCapa2 != null && NumberUtils.compare(userCapa2.getCapaId(), rule.getOneCapaId()) >= 0) {
+                            twoId = pid;
+                            break;
+                        }
+                        uid = pid;
+                    } while (true);
+                }
+
+                if(twoId != null){
+                    UserInvitation oneUserInvitation = invitationService.getByUser(twoId);
+                    if (oneUserInvitation != null && oneUserInvitation.getMId() != null) {
+                        UserCapa userCapa3 = userCapaService.getByUser(oneUserInvitation.getMId());
+                        if (userCapa3 != null && NumberUtils.compare(userCapa3.getCapaId(), rule.getTwoCapaId()) >= 0) {
+                            BigDecimal threeFee = totalPv.multiply(rule.getTwoRatio());
+                            FundClearing threeFund = new FundClearing();
+                            threeFund.setUid(oneUserInvitation.getMId());
+                            threeFund.setCommName("培育");
+                            threeFund.setCommAmt(threeFee);
+                            list.add(threeFund);
+                        }
+                    }
+                }
+            }
+
+
+
 
         }
 
