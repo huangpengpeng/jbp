@@ -172,7 +172,7 @@ public class BaoDanCommHandler extends AbstractProductCommHandler {
                 twoFund.setUid(twoId);
                 twoFund.setCommName("间推");
                 twoFund.setCommAmt(twoFee);
-                if(twoPeiYu){
+                if(!onePeiYu && twoPeiYu){
                     peiYuAmt = twoFee.multiply(BigDecimal.valueOf(0.1));
                 }
                 list.add(twoFund);

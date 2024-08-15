@@ -55,5 +55,17 @@ import java.util.Map;
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//        BaoDanCommHandler baoDanCommHandler = run.getBean(BaoDanCommHandler.class);
+//        OrderService orderService = run.getBean(OrderService.class);
+//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+//
+//        Order order = orderService.getByOrderNo("PT381172363248562221850");
+//        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
+//        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
+//        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
+
+
+
     }
 }
