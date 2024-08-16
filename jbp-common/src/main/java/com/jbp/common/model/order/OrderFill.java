@@ -34,7 +34,7 @@ public class OrderFill extends BaseModel {
     private String status;
 
     @ApiModelProperty(value = "补单用户")
-    private Integer uId;
+    private Integer uid;
 
     @ApiModelProperty(value = "拒补时间")
     private Date noFillTime;

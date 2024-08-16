@@ -164,6 +164,9 @@ public class Product implements Serializable {
     @ApiModelProperty(value = "不允许加入购物车")
     private Boolean unAddCard;
 
+    @ApiModelProperty(value = "供货规则")
+    private String supplyRule;
+
     @ApiModelProperty(value = "商品详情")
     @TableField(exist = false)
     private String content;

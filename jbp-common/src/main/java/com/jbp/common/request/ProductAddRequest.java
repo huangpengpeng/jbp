@@ -136,4 +136,7 @@ public class ProductAddRequest implements Serializable {
     @ApiModelProperty(value = "不允许加入购物车")
     private Boolean unAddCard;
 
+    @ApiModelProperty(value = "供货规则")
+    private String supplyRule;
+
 }

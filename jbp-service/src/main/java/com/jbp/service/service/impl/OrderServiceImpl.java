@@ -54,6 +54,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -125,6 +126,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private ProductAttrValueService productAttrValueService;
     @Autowired
     private RefundOrderService refundOrderService;
+    @Autowired
+    private OrderFillService orderFillService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -661,6 +664,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         List<MerchantOrder> merchantOrderList = merchantOrderService.getByOrderNo(orderNoList);
         Map<String, List<MerchantOrder>> merchantOrderMap = FunctionUtil.valueMap(merchantOrderList, MerchantOrder::getOrderNo);
         Map<Integer, Merchant> finalMerchantMap = merchantMap;
+        //补单信息
+        Map<String, OrderFill> orderFillMap = orderFillService.getOrderNoMapList(orderNoList,"已补单");
         List<PlatformOrderPageResponse> pageResponses = orderList.stream().map(e -> {
             PlatformOrderPageResponse pageResponse = new PlatformOrderPageResponse();
             BeanUtils.copyProperties(e, pageResponse);
@@ -675,6 +680,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             if(StringUtils.isNotEmpty(pageResponse.getPlatOrderNo())){
                 pageResponse.setOrderNo(pageResponse.getPlatOrderNo());
             }
+            OrderFill orderFill = orderFillMap.get(e.getOrderNo());
+            pageResponse.setSupplyAccount(orderFill != null ? orderFill.getSAccount() : "");
+            pageResponse.setSupplyNickname(orderFill != null ? orderFill.getSNickname() : "");
             User user = userMap.get(e.getUid());
             if (user != null) {
                 pageResponse.setUid(user.getId());
