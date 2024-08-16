@@ -12,7 +12,7 @@ public interface OrderFillService extends IService<OrderFill> {
     OrderFill add(String orderNo,Integer uId);
 
 
-    OrderFill saveOrder(String orderNo);
+    void saveOrder(String orderNo);
 
     PageInfo<OrderFill> getList(Integer uid, String oNickname, String orderNo, PageParamRequest pageParamRequest);
 }
