@@ -1,7 +1,9 @@
 package com.jbp.common.model.product;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,6 +50,12 @@ public class ProductRepertory extends BaseModel {
     @ApiModelProperty(value = "团队名称")
     @TableField(exist = false)
     private String teamName;
+
+    @Version
+    @TableField(value = "version", fill = FieldFill.INSERT)
+    private Integer version = 1;
+
+
 
 
 

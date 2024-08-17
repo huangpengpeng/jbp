@@ -15,4 +15,9 @@ public interface OrderFillService extends IService<OrderFill> {
     void saveOrder(String orderNo);
 
     PageInfo<OrderFill> getList(Integer uid, String oNickname, String orderNo, PageParamRequest pageParamRequest);
+
+
+    void expired(OrderFill orderFill);
+
+    void fill(OrderFill orderFill);
 }
