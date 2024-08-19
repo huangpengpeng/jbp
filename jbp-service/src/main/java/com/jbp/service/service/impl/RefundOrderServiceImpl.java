@@ -133,6 +133,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private ProductRepertoryService productRepertoryService;
     @Autowired
     private ProductRefService productRefService;
+    @Autowired
+    private OrderFillService orderFillService;
 
 
     /**
@@ -876,10 +878,15 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         Map<Integer, Merchant> merchantMap = merchantService.getMerIdMapByIdList(merIdList);
         List<Integer> uidList = refundOrderList.stream().map(RefundOrder::getUid).distinct().collect(Collectors.toList());
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
-
+        List<String> orderNoList = refundOrderList.stream().map(RefundOrder::getOrderNo).collect(Collectors.toList());
+        //补单信息
+        Map<String, OrderFill> orderFillMap = orderFillService.getOrderNoMapList(orderNoList,"已补单");
 
         List<PlatformRefundOrderPageResponse> responseList = refundOrderList.stream().map(order -> {
             PlatformRefundOrderPageResponse response = new PlatformRefundOrderPageResponse();
+            OrderFill orderFill = orderFillMap.get(order.getOrderNo());
+            response.setSupplyAccount(orderFill != null ? orderFill.getSAccount() : "");
+            response.setSupplyNickname(orderFill != null ? orderFill.getSNickname() : "");
             Order byOrderNo = orderService.getByOrderNo(order.getOrderNo());
             response.setPayTime(byOrderNo == null ? null : byOrderNo.getPayTime());
             response.setRefundOrderNo(order.getRefundOrderNo());

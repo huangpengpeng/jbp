@@ -2,21 +2,18 @@ package com.jbp.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.excel.ProductRepertoryExcel;
-import com.jbp.common.excel.ProductStatementExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.agent.ProductRepertorySearchRequest;
 import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.ProductRepertoryDao;
 import com.jbp.service.service.*;
@@ -76,7 +73,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type);
+        productRepertoryFlowService.add(uId, productId, -count, description, orderSn, new Date(), type);
 
         return ifSuccess;
     }
@@ -123,14 +120,11 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
     }
 
     @Override
-    public List<ProductRepertory> getUserRepertory(Integer uid, Integer productId) {
+    public List<ProductRepertory> getUserRepertory(Integer uid) {
         if (ObjectUtil.isNull(uid)){
             throw new CrmebException("用户账号不能为空");
         }
-        LambdaQueryWrapper<ProductRepertory> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(ProductRepertory::getUid, uid);
-        lqw.eq(ObjectUtil.isNotNull(uid), ProductRepertory::getProductId, productId);
-        return dao.selectList(lqw);
+        return dao.getList(uid, "", "");
     }
 
 

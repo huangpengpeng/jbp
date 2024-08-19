@@ -40,6 +40,6 @@ public class ProductRepertoryFlowController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(CommonPage.restPage(productRepertoryFlowService.getList(uid,request.getNickname(),pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(productRepertoryFlowService.getList(uid,request.getNickname(),request.getProductId(),pageParamRequest)));
     }
 }

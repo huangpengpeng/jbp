@@ -12,5 +12,5 @@ public interface ProductRepertoryFlowService extends IService<ProductRepertoryFl
 
     void add(Integer uId, Integer productId, Integer count, String description, String orderSn, Date time,String type);
 
-    PageInfo<ProductRepertoryFlow> getList(Integer uid, String nickname, PageParamRequest pageParamRequest);
+    PageInfo<ProductRepertoryFlow> getList(Integer uid, String nickname, Integer productId, PageParamRequest pageParamRequest);
 }

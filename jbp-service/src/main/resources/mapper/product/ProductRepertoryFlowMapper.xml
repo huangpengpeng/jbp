@@ -10,15 +10,17 @@
         left join eb_team_user tu on f.uid = tu.uid
         left join eb_team t on tu.tid = t.id
         <where>
+            <if test="productId !=null and productId!=''">
+                and f.product_id=#{productId}
+            </if>
             <if test="uid !=null and uid!=''">
-                and r.uid=#{uid}
+                and f.uid=#{uid}
             </if>
             <if test="nickname !=null and nickname!=''">
                 and u.nickname like CONCAT('%',#{nickname},'%')
             </if>
         </where>
         order by f.id desc
-
     </select>
 
 </mapper>

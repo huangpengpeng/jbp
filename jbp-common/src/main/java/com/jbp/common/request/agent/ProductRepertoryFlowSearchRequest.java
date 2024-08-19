@@ -19,4 +19,7 @@ public class ProductRepertoryFlowSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "昵称")
     private String nickname;
+
+    @ApiModelProperty(value = "商品id")
+    private Integer productId;
 }

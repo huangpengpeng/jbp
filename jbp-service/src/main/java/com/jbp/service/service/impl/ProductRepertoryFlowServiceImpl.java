@@ -42,9 +42,9 @@ public class ProductRepertoryFlowServiceImpl extends ServiceImpl<ProductRepertor
     }
 
     @Override
-    public PageInfo<ProductRepertoryFlow> getList(Integer uid, String nickname, PageParamRequest pageParamRequest) {
+    public PageInfo<ProductRepertoryFlow> getList(Integer uid, String nickname, Integer productId, PageParamRequest pageParamRequest) {
         Page<ProductRepertoryFlow> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<ProductRepertoryFlow> list = dao.getList(uid, nickname);
+        List<ProductRepertoryFlow> list = dao.getList(uid, nickname,productId);
         return CommonPage.copyPageInfo(page, list);
     }
 }

@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface ProductRepertoryFlowDao extends BaseMapper<ProductRepertoryFlow> {
 
-    List<ProductRepertoryFlow> getList(@Param("uid") Integer uid, @Param("nickname")String nickname);
+    List<ProductRepertoryFlow> getList(@Param("uid") Integer uid, @Param("nickname")String nickname, @Param("productId")Integer productId);
 }

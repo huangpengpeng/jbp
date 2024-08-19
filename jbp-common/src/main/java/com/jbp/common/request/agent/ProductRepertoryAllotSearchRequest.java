@@ -17,6 +17,4 @@ public class ProductRepertoryAllotSearchRequest implements Serializable {
     @ApiModelProperty(value = "账号")
     private String account;
 
-    @ApiModelProperty(value = "商品id")
-    private Integer productId;
 }

@@ -32,7 +32,7 @@ public class ProductRepertoryController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('agent:platform:product:repertory:page')")
+//    @PreAuthorize("hasAuthority('agent:platform:product:repertory:page')")
     @GetMapping("/list")
     @ApiOperation("库存管理分页列表")
     public CommonResult<CommonPage<ProductRepertory>> page(ProductRepertorySearchRequest request, PageParamRequest pageParamRequest){
@@ -47,7 +47,7 @@ public class ProductRepertoryController {
         return CommonResult.success(CommonPage.restPage(productRepertoryService.getList(uid,request.getNickname(),request.getProductNameOrCode(),pageParamRequest)));
     }
 
-    @PreAuthorize("hasAuthority('agent:platform:product:repertory:allot')")
+//    @PreAuthorize("hasAuthority('agent:platform:product:repertory:allot')")
     @PostMapping("/allot")
     @ApiOperation("调拨库存")
     public CommonResult<Boolean> allot(@RequestBody ProductRepertoryAllotRequest request){
@@ -81,10 +81,10 @@ public class ProductRepertoryController {
             }
             uid = user.getId();
         }
-        return CommonResult.success(productRepertoryService.getUserRepertory(uid,request.getProductId()));
+        return CommonResult.success(productRepertoryService.getUserRepertory(uid));
     }
 
-    @PreAuthorize("hasAuthority('agent:platform:product:repertory:export')")
+//    @PreAuthorize("hasAuthority('agent:platform:product:repertory:export')")
     @ApiOperation(value = "导出库存管理列表Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
     public CommonResult<String> exportProductStatement(ProductRepertorySearchRequest request) {

@@ -10,13 +10,13 @@
             left join eb_user fu on fu.id = f.uid
         <where>
             <if test="uid !=null and uid!=''">
-                and ou.uid=#{uid}
+                and o.uid=#{uid}
             </if>
             <if test="oNickname !=null and oNickname!=''">
-                and ou.oNickname=#{oNickname}
+                and ou.nickname=#{oNickname}
             </if>
             <if test="orderNo !=null and orderNo!=''">
-                and f.orderNo=#{orderNo}
+                and f.order_No=#{orderNo}
             </if>
         </where>
         order by f.id desc
