@@ -204,7 +204,6 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             orderFill.setSNickname(user != null ? user.getNickname() : "");
             orderFillMap.put(orderFill.getOrderNo(), orderFill);
         }
-
         return orderFillMap;
     }
 }
