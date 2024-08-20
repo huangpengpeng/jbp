@@ -150,6 +150,6 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     public UserOfflineSubsidy getByArea(String province, String city, String area, String status, String teamName) {
         return getOne(new QueryWrapper<UserOfflineSubsidy>().lambda()
                 .eq(UserOfflineSubsidy::getProvince, province).eq(UserOfflineSubsidy::getCity, city)
-                .eq(UserOfflineSubsidy::getArea, area).eq(UserOfflineSubsidy::getStatus, status));
+                .eq(UserOfflineSubsidy::getArea, area).eq(UserOfflineSubsidy::getStatus, status).eq(UserOfflineSubsidy::getTeamName, teamName));
     }
 }
