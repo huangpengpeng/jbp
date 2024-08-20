@@ -2128,7 +2128,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 }
 
                 if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SHIP)) {
-                    ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory ::getUId,userService.getUserId()).eq(ProductRepertory::getProductId,info.getProductId()));
+                    ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory ::getUid,userService.getUserId()).eq(ProductRepertory::getProductId,info.getProductId()));
                     if (info.getPayNum() > productRepertory.getCount()) {
                         throw new CrmebException("用户库存数量不足");
                     }
@@ -2476,7 +2476,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     private PreMerchantOrderVo validatePreShipOrderNormal(PreOrderDetailRequest detailRequest) {
 
-        ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory ::getUId,userService.getUserId()).eq(ProductRepertory::getProductId,detailRequest.getProductId()));
+        ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory ::getUid,userService.getUserId()).eq(ProductRepertory::getProductId,detailRequest.getProductId()));
         if (detailRequest.getProductNum() > productRepertory.getCount()) {
             throw new CrmebException("库存数量不足");
         }
