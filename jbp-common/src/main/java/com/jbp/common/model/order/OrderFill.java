@@ -1,7 +1,9 @@
 package com.jbp.common.model.order;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,7 +22,6 @@ import java.util.Date;
 public class OrderFill extends BaseModel {
 
     private static final long serialVersionUID = 1L;
-
     @ApiModelProperty(value = "订单号")
     private String orderNo;
 
@@ -57,5 +58,9 @@ public class OrderFill extends BaseModel {
     @ApiModelProperty(value = "供货人账号")
     @TableField(exist = false)
     private String sNickname;
+
+    @Version
+    @TableField(value = "version", fill = FieldFill.INSERT)
+    private Integer version = 1;
 
 }

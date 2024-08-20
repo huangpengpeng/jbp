@@ -139,6 +139,11 @@ public class AsyncServiceImpl implements AsyncService {
     @Autowired
     private ProductRefService productRefService;
 
+    @Autowired
+    private OrderFillService orderFillService;
+
+
+
     /**
      * 商品详情统计
      *
@@ -305,6 +310,11 @@ public class AsyncServiceImpl implements AsyncService {
             return;
         }
         orderSuccessMsgService.add(order.getOrderNo());
+
+        //增加补单订单
+        orderFillService.saveOrder(order.getOrderNo());
+
+
         // 发送用户升级
         redisUtil.lPush(TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY, order.getUid());
         // 释放锁

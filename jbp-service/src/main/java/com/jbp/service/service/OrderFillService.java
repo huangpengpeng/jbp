@@ -11,7 +11,19 @@ import java.util.Map;
 
 public interface OrderFillService extends IService<OrderFill> {
 
+
+
+    OrderFill add(String orderNo,Integer uId);
+
+
+    void saveOrder(String orderNo);
+
     PageInfo<OrderFill> getList(Integer uid, String oNickname, String orderNo, PageParamRequest pageParamRequest);
 
     Map<String, OrderFill> getOrderNoMapList(List<String> orderNoList, String status);
+
+
+    void expired(OrderFill orderFill);
+
+    void fill(OrderFill orderFill);
 }
