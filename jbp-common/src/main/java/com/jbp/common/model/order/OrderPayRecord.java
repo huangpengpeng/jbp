@@ -19,19 +19,19 @@ import java.math.BigDecimal;
 @ApiModel(value = "OrderPayRecord对象", description = "订单支付记录")
 public class OrderPayRecord extends BaseModel {
 
-    @ApiModelProperty(value = "类型 商城订单  收款码")
+    @ApiModelProperty(value = "类型 商品码  收款码")
     private String type;
 
     @ApiModelProperty(value = "订单号")
     private String orderNo;
 
-    @ApiModelProperty(value = "支付方法")
+    @ApiModelProperty(value = "支付方法 微信  支付宝 快捷")
     private String payMethod;
 
-    @ApiModelProperty(value = "支付方式:weixin,alipay,yue, wallet, lianlian, confirmPay, quickPay")
+    @ApiModelProperty(value = "支付方式: 微信  支付宝 快捷")
     private String payType;
 
-    @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付宝，alipayApp-支付宝App, wallet, lianlian")
+    @ApiModelProperty(value = "支付渠道: 连连  易宝 快钱")
     private String payChannel;
 
     @ApiModelProperty(value = "商户名称")
@@ -51,7 +51,7 @@ public class OrderPayRecord extends BaseModel {
 
 
     public static enum StatusEnum {
-        商城订单, 收款码
+        商品码, 收款码
 
     }
 }
