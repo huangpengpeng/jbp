@@ -14,6 +14,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
+import com.jbp.common.enums.OrderFillType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.FundClearing;
@@ -880,7 +881,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         Map<Integer, User> userMap = userService.getUidMapList(uidList);
         List<String> orderNoList = refundOrderList.stream().map(RefundOrder::getOrderNo).collect(Collectors.toList());
         //补单信息
-        Map<String, OrderFill> orderFillMap = orderFillService.getOrderNoMapList(orderNoList,"已补单");
+        Map<String, OrderFill> orderFillMap = orderFillService.getOrderNoMapList(orderNoList, OrderFillType.已补单.getName());
 
         List<PlatformRefundOrderPageResponse> responseList = refundOrderList.stream().map(order -> {
             PlatformRefundOrderPageResponse response = new PlatformRefundOrderPageResponse();

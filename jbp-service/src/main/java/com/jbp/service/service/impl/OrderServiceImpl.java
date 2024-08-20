@@ -17,6 +17,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jbp.common.constants.*;
+import com.jbp.common.enums.OrderFillType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.Capa;
@@ -665,7 +666,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         Map<String, List<MerchantOrder>> merchantOrderMap = FunctionUtil.valueMap(merchantOrderList, MerchantOrder::getOrderNo);
         Map<Integer, Merchant> finalMerchantMap = merchantMap;
         //补单信息
-        Map<String, OrderFill> orderFillMap = orderFillService.getOrderNoMapList(orderNoList,"已补单");
+        Map<String, OrderFill> orderFillMap = orderFillService.getOrderNoMapList(orderNoList, OrderFillType.已补单.getName());
         List<PlatformOrderPageResponse> pageResponses = orderList.stream().map(e -> {
             PlatformOrderPageResponse pageResponse = new PlatformOrderPageResponse();
             BeanUtils.copyProperties(e, pageResponse);

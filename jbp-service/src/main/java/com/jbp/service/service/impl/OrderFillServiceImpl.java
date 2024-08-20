@@ -66,6 +66,8 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
     private OrderDetailService orderDetailService;
     @Resource
     private ProductRepertoryService productRepertoryService;
+    @Resource
+    private UserService userService;
 
     @Override
     public OrderFill add(String orderNo, Integer uId) {
@@ -112,8 +114,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
 
 
     }
-    @Resource
-    private UserService userService;
+
 
     @Override
     public PageInfo<OrderFill> getList(Integer uid, String oNickname, String orderNo, PageParamRequest pageParamRequest) {
