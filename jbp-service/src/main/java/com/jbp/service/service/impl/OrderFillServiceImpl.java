@@ -75,7 +75,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         orderFill.setExpiredTime(DateTimeUtils.addHours(new Date(), 72));
         orderFill.setOrderNo(orderNo);
         orderFill.setStatus(OrderFillType.待补单.getName());
-        orderFill.setUId(uId);
+        orderFill.setUid(uId);
         save(orderFill);
         return orderFill;
     }
@@ -138,7 +138,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             return;
         }
         //获取补单权限的用户
-        UserInvitation userInvitation = userInvitationService.getByUser(orderFill.getUId());
+        UserInvitation userInvitation = userInvitationService.getByUser(orderFill.getUid());
 
         do {
             if (userInvitation == null) {
@@ -167,7 +167,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
 
         Boolean ifFill = false;
         for (OrderDetail orderDetail : orderDetailList) {
-            ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUId()));
+            ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
             if (productRepertory.getCount() - orderDetail.getPayNum() < 0) {
                 ifFill = true;
             }
@@ -178,7 +178,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         }
 
         for (OrderDetail orderDetail : orderDetailList) {
-            productRepertoryService.reduce(orderDetail.getProductId(), orderDetail.getPayNum(), orderFill.getUId(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
+            productRepertoryService.reduce(orderDetail.getProductId(), orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
         }
         orderFill.setStatus(OrderFillType.已补单.getName());
         orderFill.setFillTime(new Date());
