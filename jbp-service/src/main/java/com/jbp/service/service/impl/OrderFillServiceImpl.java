@@ -20,7 +20,6 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.OrderFillDao;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderFillService;
