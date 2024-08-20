@@ -125,7 +125,7 @@ public class LingShouCommHandler extends AbstractProductCommHandler {
             } while (true);
 
             // 没有上级就不用继续分钱了
-            if (oneId == null) {
+            if (oneId != null) {
                 BigDecimal oneFee = totalPv.multiply(rule.getOneRatio());
                 FundClearing oneFun = new FundClearing();
                 oneFun.setUid(oneId);

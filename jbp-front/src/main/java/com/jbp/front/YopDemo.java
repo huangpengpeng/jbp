@@ -19,7 +19,7 @@ public class YopDemo {
 
 
     public static void registerQuery(YopService yopService) {
-        RegisterQueryResult result = yopService.registerQuery("LZT_RS_88843459131965");
+        RegisterQueryResult result = yopService.registerQuery("LZT_RS_208930512546893");
         System.out.println(JSONObject.toJSONString(result));
     }
 
@@ -56,7 +56,7 @@ public class YopDemo {
         params.setBusinessRole("PLATFORM_MERCHANT");// 平台商户
 
         // 商户资质信息
-        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329053156-65ab6ab6-ad6a-498a-abd0-df08049d2f25-qDloQVozqINYVawSmmBM.jpg\", \"signName\":\"上海吾善科技有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91310120MA1HWW3EXH\", \"shortName\":\"上海吾善科技有限公司\" }";
+        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329053156-65ab6ab6-ad6a-498a-abd0-df08049d2f25-qDloQVozqINYVawSmmBM.jpg\", \"signName\":\"上海吾善科技有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91310120MA1HWW3EXH\", \"shortName\":\"上海吾善科技有限公司\",  \"openAccountLicenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/08/19/merchant-1724065182842-506049b5-de1d-47ef-8b26-7d3a13263ce2-kgJVMFXLGiUEdBHpdhHJ.jpg\"}";
         params.setMerchantSubjectInfo(merchantSubjectInfo);
 
         // 法人信息

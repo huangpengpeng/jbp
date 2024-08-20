@@ -9,6 +9,7 @@ import com.jbp.common.request.agent.ScoreDownloadRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.product.comm.BaoDanCommHandler;
 import com.jbp.service.product.comm.CommCalculateResult;
+import com.jbp.service.product.comm.LingShouCommHandler;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.YopService;
@@ -56,16 +57,18 @@ import java.util.Map;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        BaoDanCommHandler baoDanCommHandler = run.getBean(BaoDanCommHandler.class);
-//        OrderService orderService = run.getBean(OrderService.class);
-//        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
+        LingShouCommHandler lingShouCommHandler = run.getBean(LingShouCommHandler.class);
+        OrderService orderService = run.getBean(OrderService.class);
+        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
 //
-//        Order order = orderService.getByOrderNo("PT381172363248562221850");
+//        Order order = orderService.getByOrderNo("PT393172370525944978690");
 //        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
 //        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
-//        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
+//        lingShouCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
 
+//        YopDemo.merRegister(run.getBean(YopService.class));
 
+        YopDemo.registerQuery(run.getBean(YopService.class));
 
     }
 }
