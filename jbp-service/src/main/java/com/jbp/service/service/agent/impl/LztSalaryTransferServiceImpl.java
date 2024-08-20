@@ -230,14 +230,8 @@ public class LztSalaryTransferServiceImpl extends ServiceImpl<LztSalaryTransferD
 
     public static void main(String[] args) {
 
-        String  str = "6230 2001 5961 1990";
-        String trim = StringUtils.trim(str);
-        String replace = StringUtils.replace(trim, " ", "");
-        System.out.println(replace);
 
-
-
-//        System.out.println(getBankName("6224121237299350"));
+        System.out.println(getBankName("6226822016603242196"));
     }
 
     public static String getBankName(String bankCode) {

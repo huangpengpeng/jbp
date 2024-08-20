@@ -61,15 +61,15 @@ public class JbpAdminApplication {
         LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
         LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
 
-        LztAcct lztAcct = lztAcctService.getByUserId("xingwang15");
+        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
         LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
 
 //        LztPapAgreeApplyResult lztPapAgreeApplyResult = lianLianPayService.papAgreeApply(payChannel.getPartnerId(), payChannel.getPriKey(), lztAcct.getUserId(), null);
 //        System.out.println(JSONObject.toJSONString(lztPapAgreeApplyResult));
 
 
-//        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_111050181327313");
-//        System.out.println(degreePayService.papAgreeQuery(params, payChannel.getPriKey()));
+        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_66730567871417");
+        System.out.println(degreePayService.papAgreeQuery(params, payChannel.getPriKey()));
 
 
 //        String orderNo = StringUtils.N_TO_10("YK_");
