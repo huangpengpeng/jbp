@@ -249,7 +249,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 throw new CrmebException("月度管理补贴规则为空请联系管理员");
             }
             Long capaId = ruleMap.values().stream().collect(Collectors.toList()).get(0).getCapaId();
-            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().last( "where capa_id in (18,19)"));
+            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().last( "where capa_id in (18,19,20,21)"));
             if (CollectionUtils.isEmpty(userCapaList)) {
                 return;
             }
