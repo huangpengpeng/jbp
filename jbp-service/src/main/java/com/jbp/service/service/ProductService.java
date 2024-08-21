@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.product.Product;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.ProductRuleEditRequest;
 import com.jbp.common.request.merchant.MerchantProductSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.vo.MyRecord;
@@ -485,4 +486,5 @@ public interface ProductService extends IService<Product> {
 
     Boolean copy(Integer productId);
 
+    Boolean editRule(ProductRuleEditRequest request);
 }

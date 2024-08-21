@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -28,13 +29,14 @@ public class CapaOrder extends BaseModel {
     @ApiModelProperty(value = "是否向公司订货")
     private Boolean ifCompany;
 
-    @ApiModelProperty(value = "订货规则")
-    private String orderRule;
-
     @ApiModelProperty(value = "订货金额")
     private BigDecimal orderAmount;
 
     @ApiModelProperty(value = "补货金额")
     private BigDecimal repAmount;
+
+    @ApiModelProperty(value = "等级名称")
+    @TableField(exist = false)
+    private String capaName;
 
 }

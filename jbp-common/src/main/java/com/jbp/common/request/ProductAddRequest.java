@@ -3,6 +3,7 @@ package com.jbp.common.request;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.jbp.common.model.product.ProductDeduction;
 import com.jbp.common.mybatis.ProductDeductionListHandler;
+import com.jbp.common.request.agent.ProductRefAddRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -138,5 +139,8 @@ public class ProductAddRequest implements Serializable {
 
     @ApiModelProperty(value = "供货规则")
     private String supplyRule;
+
+    @ApiModelProperty("商品关联套组信息")
+    private List<ProductRefAddRequest> productRefInfoList;
 
 }

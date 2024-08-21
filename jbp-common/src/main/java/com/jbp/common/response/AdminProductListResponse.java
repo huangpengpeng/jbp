@@ -94,4 +94,11 @@ public class AdminProductListResponse implements Serializable {
 
     @ApiModelProperty(value = "商品条码")
     private List<String> barCode;
+
+    @ApiModelProperty(value = "供货规则")
+    private String supplyRule;
+
+    @ApiModelProperty(value = "供货规则")
+    private String freightAssume;
+
 }

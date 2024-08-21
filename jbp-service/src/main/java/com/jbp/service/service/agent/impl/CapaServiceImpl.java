@@ -8,10 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.Capa;
-import com.jbp.common.model.agent.CapaXs;
-import com.jbp.common.model.agent.ProductProfit;
-import com.jbp.common.model.agent.RiseCondition;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.RiseConditionRequest;
@@ -19,10 +16,10 @@ import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.condition.ConditionChain;
 import com.jbp.service.dao.agent.CapaDao;
 import com.jbp.service.service.SystemAttachmentService;
+import com.jbp.service.service.agent.CapaOrderService;
 import com.jbp.service.service.agent.CapaService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +38,8 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
     private ConditionChain conditionChain;
     @Resource
     private TransactionTemplate transactionTemplate;
+    @Resource
+    private CapaOrderService capaOrderService;
 
     @Override
     public PageInfo<Capa> page(PageParamRequest pageParamRequest) {
@@ -65,6 +64,11 @@ public class CapaServiceImpl extends ServiceImpl<CapaDao, Capa> implements CapaS
                     throw new CrmebException("请设置下个等级比本等级较大");
                 }
             }
+            CapaOrder capaOrder = new CapaOrder();
+            capaOrder.setCapaId(capa.getId());
+            capaOrder.setIfCompany(false);
+            capaOrder.setIfSupply(false);
+            capaOrderService.save(capaOrder);
             return Boolean.TRUE;
         });
         return capa;

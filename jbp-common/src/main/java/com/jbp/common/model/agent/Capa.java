@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -76,27 +75,6 @@ public class Capa extends BaseModel {
     @ApiModelProperty("升级条件")
     @TableField(typeHandler = RiseConditionListHandler.class, updateStrategy = FieldStrategy.IGNORED)
     private List<RiseCondition> conditionList;
-
-    @ApiModelProperty(value = "是否有供货权")
-    @TableField(exist = false)
-    private Boolean ifSupply;
-
-    @ApiModelProperty(value = "是否向公司订货")
-    @TableField(exist = false)
-    private Boolean ifCompany;
-
-    @ApiModelProperty(value = "订货规则")
-    @TableField(exist = false)
-    private String orderRule;
-
-    @ApiModelProperty(value = "订货金额")
-    @TableField(exist = false)
-    private BigDecimal orderAmount;
-
-    @ApiModelProperty(value = "补货金额")
-    @TableField(exist = false)
-    private BigDecimal repAmount;
-
 
 
     public Map<String, Boolean> initParser() {

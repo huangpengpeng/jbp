@@ -54,4 +54,7 @@ public class ProductSearchRequest implements Serializable {
 
     @ApiModelProperty(value = "商品id")
     private Integer id;
+
+    @ApiModelProperty(value = "是否是套组")
+    private Boolean ifRef;
 }

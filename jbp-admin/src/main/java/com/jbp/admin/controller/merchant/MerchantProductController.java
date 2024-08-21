@@ -4,12 +4,15 @@ import cn.hutool.json.JSONException;
 
 import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.enums.MethodType;
+import com.jbp.common.model.product.Product;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.ProductRuleEditRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ProductService;
 
+import com.jbp.service.service.agent.ProductRefService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -46,6 +49,8 @@ public class MerchantProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ProductRefService productRefService;
 
     @PreAuthorize("hasAuthority('merchant:product:page:list')")
     @ApiOperation(value = "商品分页列表") //配合swagger使用
@@ -214,6 +219,22 @@ public class MerchantProductController {
     public CommonResult<CommonPage<ProductActivityResponse>> getActivitySearchPage(
             @Validated ProductActivitySearchRequest request, @Validated PageParamRequest pageRequest) {
         return CommonResult.success(CommonPage.restPage(productService.getActivitySearchPageByMerchant(request, pageRequest)));
+    }
+
+    @ApiOperation(value = "获取非套组商品")
+    @RequestMapping(value = "/noRef", method = RequestMethod.GET)
+    public CommonResult<List<Product>> noRefList() {
+        return CommonResult.success(productRefService.getNoRef());
+    }
+
+    @PreAuthorize("hasAuthority('merchant:product:rule')")
+    @ApiOperation(value = "编辑商品供货规则")
+    @RequestMapping(value = "/rule", method = RequestMethod.POST)
+    public CommonResult<String> rule(@RequestBody @Validated ProductRuleEditRequest request) {
+        if (productService.editRule(request)) {
+            return CommonResult.success();
+        }
+        return CommonResult.failed();
     }
 }
 

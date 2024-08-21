@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 /**
  * 市场等级
@@ -43,21 +42,6 @@ public class CapaRequest {
     @ApiModelProperty("计算表达式")
     private String parser;
 
-
-    @ApiModelProperty(value = "是否有供货权")
-    private Boolean ifSupply;
-
-    @ApiModelProperty(value = "是否向公司订货")
-    private Boolean ifCompany;
-
-    @ApiModelProperty(value = "订货规则")
-    private String orderRule;
-
-    @ApiModelProperty(value = "订货金额")
-    private BigDecimal orderAmount;
-
-    @ApiModelProperty(value = "补货金额")
-    private BigDecimal repAmount;
 
 
 }

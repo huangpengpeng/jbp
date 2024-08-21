@@ -1,6 +1,7 @@
 package com.jbp.service.service.agent;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jbp.common.model.product.Product;
 import com.jbp.common.model.product.ProductRef;
 import com.jbp.common.request.agent.ProductRefRequest;
 
@@ -10,4 +11,7 @@ public interface ProductRefService extends IService<ProductRef> {
     Boolean add(ProductRefRequest request);
 
     List<ProductRef> getList(Integer refProductId);
+
+    List<Product> getNoRef();
+
 }

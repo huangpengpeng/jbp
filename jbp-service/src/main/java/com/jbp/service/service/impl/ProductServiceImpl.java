@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -36,6 +37,8 @@ import com.jbp.common.model.product.*;
 import com.jbp.common.model.seckill.SeckillActivity;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.ProductRefRequest;
+import com.jbp.common.request.agent.ProductRuleEditRequest;
 import com.jbp.common.request.merchant.MerchantProductSearchRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.response.productTag.ProductTagsForSearchResponse;
@@ -153,6 +156,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
     private ProductAttrService productAttrService;
     @Resource
     private ProductCommService productCommService;
+    @Autowired
+    private ProductRefService productRefService;
+
 
     /**
      * 获取产品列表Admin
@@ -166,11 +172,20 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         //带 Product 类的多条件查询
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
+        //判断是否是礼包列表
+        if (ObjectUtil.isNotNull(request.getIfRef())) {
+            List<ProductRef> list = productRefService.list();
+            if (CollectionUtils.isEmpty(list)){
+                list = Lists.newArrayList();
+            }
+            List<Integer> refProductIdList = list.stream().map(ProductRef::getRefProductId).collect(Collectors.toList());
+            lqw.in(Product::getId, refProductIdList);
+        }
         //商品id搜索
         if (request.getId() != null){
             lqw.eq(Product::getId, request.getId());
         }
-       Merchant merchant = merchantService.getById(admin.getMerId());
+        Merchant merchant = merchantService.getById(admin.getMerId());
         if (admin.getMerId() == 0) {
             merchant = merchantService.getById(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_PLAT_DEFAULT_MER_ID));
         }
@@ -351,6 +366,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
                     couponList.add(spc);
                 }
                 productCouponService.saveBatch(couponList);
+            }
+            if (CollUtil.isNotEmpty(request.getProductRefInfoList())) {
+                ProductRefRequest refRequest = new ProductRefRequest();
+                refRequest.setRefProductId(product.getId());
+                refRequest.setProductRefInfoList(request.getProductRefInfoList());
+                productRefService.add(refRequest);
             }
             return Boolean.TRUE;
         });
@@ -1514,6 +1535,23 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
             return Boolean.TRUE;
         });
         return execute;
+    }
+
+    /**
+     * 编辑商品供货规则
+     *
+     * @param request 商品id和供货规则参数
+     * @return Boolean
+     */
+    @Override
+    public Boolean editRule(ProductRuleEditRequest request) {
+        Product product = getById(request.getId());
+        if (product == null) {
+            throw new CrmebException("该商品不存在！");
+        }
+        product.setSupplyRule(request.getSupplyRule());
+        product.setFreightAssume(request.getFreightAssume());
+        return updateById(product);
     }
 
     /**
