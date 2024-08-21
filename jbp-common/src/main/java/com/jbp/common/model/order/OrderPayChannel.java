@@ -3,6 +3,7 @@ package com.jbp.common.model.order;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -18,11 +19,10 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName(value = "eb_order_pay_channel", autoResultMap = true)
 @ApiModel(value = "OrderPayChannel对象", description = "支付渠道")
-public class OrderPayChannel implements Serializable {
+public class OrderPayChannel extends BaseModel {
 
-    @ApiModelProperty(value = "主键ID")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    @ApiModelProperty(value = "商户编号")
+    private Integer merId;
 
     @ApiModelProperty(value = "支付渠道 连连, 易宝")
     private String payChannel;
@@ -53,6 +53,9 @@ public class OrderPayChannel implements Serializable {
 
     @ApiModelProperty(value = "其他支付信息")
     private String otherInfo;
+
+    @ApiModelProperty(value = "状态")
+    private String status;
 
     @ApiModelProperty(value = "权重")
     private int weight;

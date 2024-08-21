@@ -54,7 +54,9 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
+    }
 
+    private static void demo(ConfigurableApplicationContext run) {
         LztService lztService = run.getBean(LztService.class);
         DegreePayService degreePayService = run.getBean(DegreePayService.class);
         LztAcctService lztAcctService = run.getBean(LztAcctService.class);
@@ -63,14 +65,21 @@ public class JbpAdminApplication {
 
         LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
         LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
+    }
+
+
+    // 绑卡
+//        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_11113",
+//                "https://join.jubaopeng.cc");
+
 
 //        LztPapAgreeApplyResult lztPapAgreeApplyResult = lianLianPayService.papAgreeApply(payChannel.getPartnerId(), payChannel.getPriKey(), lztAcct.getUserId(), null);
 //        System.out.println(JSONObject.toJSONString(lztPapAgreeApplyResult));
 
 
-        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_66730567871417");
-        System.out.println(degreePayService.papAgreeQuery(params, payChannel.getPriKey()));
-
+//        PapAgreeQueryParams params  = new PapAgreeQueryParams(LLianPayDateUtils.getTimestamp(), payChannel.getPartnerId(), lztAcct.getUserId(), "LZT_PA_66730567871417");
+//        System.out.println(degreePayService.papAgreeQuery(params, payChannel.getPriKey()));
+//
 
 //        String orderNo = StringUtils.N_TO_10("YK_");
 //        System.out.println(orderNo);
@@ -82,13 +91,4 @@ public class JbpAdminApplication {
 //                "115.195.90.138", "",
 //                "15306500433", DateTimeUtils.parseDate("2024-04-08 20:27:11"), payChannel.getFrmsWareCategory());
 //        System.out.println(JSONObject.toJSONString(transferMorepyeeResult));
-    }
-
-
-
-    // 绑卡
-//        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("jiangming", "INNERUSER", "CHANGE_BIND_CARD", "LZT_M_20240716_11113",
-//                "https://join.jubaopeng.cc");
-
-
 }

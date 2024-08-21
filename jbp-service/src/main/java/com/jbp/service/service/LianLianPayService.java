@@ -3,6 +3,7 @@ package com.jbp.service.service;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
+import com.jbp.common.model.order.OrderPayChannel;
 
 import java.math.BigDecimal;
 
@@ -39,6 +40,28 @@ public interface LianLianPayService {
      * https://accpgw.lianlianpay.com/v1/txn/pap-agree-apply
      */
     LztPapAgreeApplyResult  papAgreeApply(String oidPartner, String priKey,  String user_id, PapSignInfo papSignInfo);
+
+    /**
+     * 统一支付创单
+     * 	https://accpapi.lianlianpay.com/v1/txn/tradecreate
+     */
+    TradeCreateResult tradeCreate(OrderPayChannel payChannel,String payNo, BigDecimal total_amount,
+                                  BigDecimal fee_amount, String notify_url, String  return_url, String remark);
+
+
+    /**
+     * 微信扫码支付
+     * https://accpapi.lianlianpay.com/v1/txn/payment-gw
+     */
+    PaymentGwResult wechatScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, String client_ip);
+
+    /**
+     * 支付宝扫码
+     */
+    PaymentGwResult aliScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, String client_ip);
+
+
+
 
 
 

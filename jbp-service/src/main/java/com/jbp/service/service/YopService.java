@@ -162,6 +162,8 @@ public interface YopService {
     AccountReceiptResult accountReceiptGet(String merchantNo, String orderNo, String requestNo, String tradeType, String orderData);
 
 
-
+    /**
+     * 微信支付
+     */
 
 }

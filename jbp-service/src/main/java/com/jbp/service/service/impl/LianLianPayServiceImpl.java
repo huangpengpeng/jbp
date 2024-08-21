@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
@@ -9,7 +10,9 @@ import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.merchant.MerchantPayInfo;
+import com.jbp.common.model.order.OrderPayChannel;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.MerchantService;
 import com.jbp.service.service.SystemConfigService;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -425,6 +429,117 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         LLianPayClient lLianPayClient = new LLianPayClient(priKey, lianLianInfo.getPubKey());
         String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         LztPapAgreeApplyResult result = JSON.parseObject(s, LztPapAgreeApplyResult.class);
+        return result;
+    }
+
+    @Override
+    public TradeCreateResult tradeCreate(OrderPayChannel payChannel, String payNo, BigDecimal total_amount,
+                                         BigDecimal fee_amount, String notify_url, String  return_url, String remark) {
+        TradeCreateParams params = new TradeCreateParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(payChannel.getParentMerchantNo());
+        params.setTxn_type("GENERAL_CONSUME");
+        params.setUser_type("ANONYMOUS");
+        params.setNotify_url(notify_url);
+        params.setReturn_url(return_url);
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setTxn_seqno(payNo);
+        orderInfo.setTxn_time(timestamp);
+        orderInfo.setTotal_amount(total_amount);
+        orderInfo.setFee_amount(fee_amount);
+        params.setOrderInfo(orderInfo);
+
+        PayeeInfo payeeInfo = new PayeeInfo();
+        payeeInfo.setPayee_id(payChannel.getMerchantNo());
+        payeeInfo.setPayee_type("USER");
+        payeeInfo.setPayee_accttype("USEROWN");
+        payeeInfo.setPayee_amount(total_amount);
+        payeeInfo.setPayee_memo(remark);
+
+        List<PayeeInfo> list = new ArrayList<>();
+        list.add(payeeInfo);
+        params.setPayeeInfo(list);
+
+        String url = "https://accpapi.lianlianpay.com/v1/txn/tradecreate";
+        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        TradeCreateResult result = JSON.parseObject(resultJsonStr, TradeCreateResult.class);
+        if (!result.validate()) {
+            throw new RuntimeException("统一创单失败");
+        }
+        return result;
+    }
+
+    @Override
+    public PaymentGwResult wechatScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, String client_ip) {
+        PaymentGwParams params = new PaymentGwParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(payChannel.getParentMerchantNo());
+        params.setTxn_seqno(payNo);
+        params.setTotal_amount(total_amount);
+        RiskItemInfo risk_item = new RiskItemInfo("2007", "", "",
+                timestamp, "扫码");
+        risk_item.setFrms_ip_addr(client_ip);
+        params.setRisk_item(risk_item);
+        params.setClient_ip(client_ip);
+
+        PayerInfo payerInfo = new PayerInfo();
+        payerInfo.setPayer_type("USER");
+        payerInfo.setPayer_id(StringUtils.N_TO_10("SCAN_"));
+        params.setPayerInfo(payerInfo);
+
+        List<PayMethods> payMethods  = Lists.newArrayList();
+        PayMethods payMethod = new PayMethods();
+        payMethod.setMethod("WECHAT_NATIVE");
+        payMethod.setAmount(total_amount);
+        payMethods.add(payMethod);
+        params.setPayMethods(payMethods);
+
+        String url = "https://accpapi.lianlianpay.com/v1/txn/payment-gw";
+        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        PaymentGwResult result = JSON.parseObject(resultJsonStr, PaymentGwResult.class);
+        if (!result.validate()) {
+            throw new RuntimeException("网关支付微信扫码下单失败");
+        }
+        return result;
+    }
+
+    @Override
+    public PaymentGwResult aliScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, String client_ip) {
+        PaymentGwParams params = new PaymentGwParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(payChannel.getParentMerchantNo());
+        params.setTxn_seqno(payNo);
+        params.setTotal_amount(total_amount);
+        RiskItemInfo risk_item = new RiskItemInfo("2007", "", "",
+                timestamp, "扫码");
+        risk_item.setFrms_ip_addr(client_ip);
+        params.setRisk_item(risk_item);
+        params.setClient_ip(client_ip);
+
+        PayerInfo payerInfo = new PayerInfo();
+        payerInfo.setPayer_type("USER");
+        payerInfo.setPayer_id(StringUtils.N_TO_10("SCAN_"));
+        params.setPayerInfo(payerInfo);
+
+        List<PayMethods> payMethods  = Lists.newArrayList();
+        PayMethods payMethod = new PayMethods();
+        payMethod.setMethod("ALIPAY_NATIVE");
+        payMethod.setAmount(total_amount);
+        payMethods.add(payMethod);
+        params.setPayMethods(payMethods);
+
+        String url = "https://accpapi.lianlianpay.com/v1/txn/payment-gw";
+        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        PaymentGwResult result = JSON.parseObject(resultJsonStr, PaymentGwResult.class);
+        if (!result.validate()) {
+            throw new RuntimeException("网关支付支付宝扫码下单失败");
+        }
         return result;
     }
 }
