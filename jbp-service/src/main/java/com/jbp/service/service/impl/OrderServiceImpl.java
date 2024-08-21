@@ -588,7 +588,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         if(StringUtils.isNotEmpty(request.getSupplyName())){
             orderNoList = orderDetailService.getOrderNoList4SupplyName(request.getSupplyName());
         }
-        Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<Order> lqw = Wrappers.lambdaQuery();
         lqw.select(Order::getMerId,Order::getPayTime, Order::getOrderNo, Order::getPlatOrderNo, Order::getPlatform, Order::getUid, Order::getPayUid, Order::getPayPrice, Order::getPayType, Order::getPaid, Order::getStatus,
                 Order::getRefundStatus, Order::getIsUserDel, Order::getIsMerchantDel, Order::getCancelStatus, Order::getLevel, Order::getType, Order::getCreateTime);
@@ -643,6 +642,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         getMerchantStatusWhere(lqw, request.getStatus());
 
         lqw.orderByDesc(Order::getId);
+        Page<Order> startPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<Order> orderList = dao.selectList(lqw);
         if (CollUtil.isEmpty(orderList)) {
             return CommonPage.copyPageInfo(startPage, CollUtil.newArrayList());
