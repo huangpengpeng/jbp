@@ -15,6 +15,7 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.vo.FileResultVo;
+import com.jbp.common.vo.ProductRepertoryVo;
 import com.jbp.service.dao.ProductRepertoryDao;
 import com.jbp.service.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,6 +127,23 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("用户账号不能为空");
         }
         return dao.getList(uid, "", "");
+    }
+
+    @Override
+    public List<ProductRepertoryVo> getProductList(Integer uid) {
+        List<ProductRepertoryVo> list =new ArrayList<>();
+        List<ProductRepertory> productRepertoryList = dao.selectList(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid,uid));
+
+        for(ProductRepertory productRepertory :productRepertoryList ){
+            ProductRepertoryVo productRepertoryVo =new ProductRepertoryVo();
+            Product product =  productService.getById(productRepertory.getProductId());
+            productRepertoryVo.setName(product.getName());
+            productRepertoryVo.setCount(productRepertory.getCount());
+            productRepertoryVo.setPicUrl(product.getImage());
+            list.add(productRepertoryVo);
+        }
+
+        return list;
     }
 
 
