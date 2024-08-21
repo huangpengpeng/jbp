@@ -19,7 +19,7 @@ public class YopDemo {
 
 
     public static void registerQuery(YopService yopService) {
-        RegisterQueryResult result = yopService.registerQuery("LZT_RS_208930512546893");
+        RegisterQueryResult result = yopService.registerQuery("LZT_RS_213931972571809");
         System.out.println(JSONObject.toJSONString(result));
     }
 
