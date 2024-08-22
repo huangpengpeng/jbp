@@ -165,9 +165,9 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
         if (clearingFinal == null ) {
             throw new CrmebException("结算状态不是待结算不允许生成名单1");
         }
-//        if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
-//            throw new CrmebException("结算状态不是待结算不允许生成名单2");
-//        }
+        if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
+            throw new CrmebException("结算状态不是待结算不允许生成名单2");
+        }
         // 获取上一次的名单
         ClearingFinal lastOne = clearingFinalService.getLastOne(clearingId, clearingFinal.getCommType());
         Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
@@ -249,7 +249,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 throw new CrmebException("月度管理补贴规则为空请联系管理员");
             }
             Long capaId = ruleMap.values().stream().collect(Collectors.toList()).get(0).getCapaId();
-            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().last("where capa_id in (18,19,20)"));
+            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, capaId));
             if (CollectionUtils.isEmpty(userCapaList)) {
                 return;
             }
