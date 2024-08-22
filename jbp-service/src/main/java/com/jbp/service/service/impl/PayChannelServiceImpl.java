@@ -16,7 +16,8 @@ public class PayChannelServiceImpl extends ServiceImpl<OrderPayChannelDao, Order
     @Override
     public OrderPayChannel getServer(Integer merId, String payMethod) {
         LambdaQueryWrapper<OrderPayChannel> q = new LambdaQueryWrapper<>();
-        q.eq(OrderPayChannel::getMerId, merId).ne(OrderPayChannel::getPayMethod, payMethod).orderByAsc(OrderPayChannel::getWeight).last(" limit 1");
+        q.eq(OrderPayChannel::getMerId, merId).ne(OrderPayChannel::getPayMethod, payMethod).eq(OrderPayChannel::getStatus, "开启")
+                .orderByAsc(OrderPayChannel::getWeight).last(" limit 1");
         OrderPayChannel one = getOne(q);
         if(one == null){
             throw new RuntimeException("支付渠道不支持");

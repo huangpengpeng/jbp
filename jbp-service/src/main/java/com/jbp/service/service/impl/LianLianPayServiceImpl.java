@@ -472,7 +472,9 @@ public class LianLianPayServiceImpl implements LianLianPayService {
     }
 
     @Override
-    public PaymentGwResult wechatScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, String client_ip) {
+    public PaymentGwResult wechatScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, BigDecimal fee_amount, String notify_url, String  return_url, String remark, String client_ip) {
+        tradeCreate(payChannel, payNo, total_amount, fee_amount, notify_url, return_url, remark);
+
         PaymentGwParams params = new PaymentGwParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -508,7 +510,8 @@ public class LianLianPayServiceImpl implements LianLianPayService {
     }
 
     @Override
-    public PaymentGwResult aliScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, String client_ip) {
+    public PaymentGwResult aliScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, BigDecimal fee_amount, String notify_url, String  return_url, String remark, String client_ip) {
+        tradeCreate(payChannel, payNo, total_amount, fee_amount, notify_url, return_url, remark);
         PaymentGwParams params = new PaymentGwParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);

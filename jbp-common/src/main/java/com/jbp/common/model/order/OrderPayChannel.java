@@ -10,6 +10,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -56,6 +57,10 @@ public class OrderPayChannel extends BaseModel {
 
     @ApiModelProperty(value = "状态")
     private String status;
+
+
+    @ApiModelProperty(value = "费率")
+    private BigDecimal feeScale;
 
     @ApiModelProperty(value = "权重")
     private int weight;

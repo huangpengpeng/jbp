@@ -45,5 +45,5 @@ public class OrderPayRefundRecord extends BaseModel {
     private Date refundTime;
 
     @ApiModelProperty(value = "退款备注")
-    private Date remark;
+    private String remark;
 }
