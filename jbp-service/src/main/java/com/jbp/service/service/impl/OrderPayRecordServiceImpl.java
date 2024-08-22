@@ -6,15 +6,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.lianlian.result.PaymentGwResult;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
+import com.jbp.common.lianlian.result.RefundQueryResult;
+import com.jbp.common.lianlian.result.RefundResult;
 import com.jbp.common.model.order.OrderPayChannel;
 import com.jbp.common.model.order.OrderPayRecord;
+import com.jbp.common.model.order.OrderPayRefundRecord;
+import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.OrderPayRecordDao;
-import com.jbp.service.service.LianLianPayService;
-import com.jbp.service.service.OrderPayChannelService;
-import com.jbp.service.service.OrderPayRecordService;
-import com.jbp.service.service.YopService;
+import com.jbp.service.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,8 @@ public class OrderPayRecordServiceImpl extends ServiceImpl<OrderPayRecordDao, Or
     private OrderPayChannelService payChannelService;
     @Resource
     private LianLianPayService lianLianPayService;
+    @Resource
+    private OrderPayRefundRecordService orderPayRefundRecordService;
     @Resource
     private YopService yopService;
 
@@ -99,5 +102,69 @@ public class OrderPayRecordServiceImpl extends ServiceImpl<OrderPayRecordDao, Or
     @Override
     public List<OrderPayRecord> getWaitPayByOrderNo(String orderNo) {
         return list(new QueryWrapper<OrderPayRecord>().lambda().eq(OrderPayRecord::getOrderNo, orderNo));
+    }
+
+    @Override
+    public OrderPayRecord getByPayNo(String payNo) {
+        return getOne(new QueryWrapper<OrderPayRecord>().lambda().eq(OrderPayRecord::getPayNo, payNo));
+    }
+
+    @Override
+    public void refund(String payNo, BigDecimal refundAmt, String remark) {
+        OrderPayRecord record = getByPayNo(payNo);
+        if (record == null) {
+            throw new RuntimeException("支付订单不存在");
+        }
+        if (!record.getStatus().equals("已付款")) {
+            throw new RuntimeException("支付订单未支付成功不允许退款");
+        }
+        BigDecimal totalRefundAmt = refundAmt.add(record.getRefundPrice());
+        if (ArithmeticUtils.gt(totalRefundAmt, record.getPayPrice())) {
+            BigDecimal subtract = record.getPayPrice().subtract(record.getRefundPrice());
+            throw new RuntimeException("退款总金额超出支付金额，可退金额:" + subtract);
+        }
+        String payRefundNo = StringUtils.N_TO_10("REFUND_");
+        OrderPayRefundRecord refundRecord = new OrderPayRefundRecord(record.getOrderPayChannelId(), record.getId(),
+                payRefundNo, refundAmt, remark);
+        orderPayRefundRecordService.save(refundRecord);
+
+        OrderPayChannel payChannel = payChannelService.getById(record.getOrderPayChannelId());
+        String notify_url = payChannel.getNotifyUrl() + "/" + payRefundNo;
+        if (payChannel.getPayChannel().equals("连连")) {
+            String refundTime = DateTimeUtils.format(refundRecord.getRefundTime(),
+                    DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN);
+            RefundResult refund = lianLianPayService.refund(payChannel, payRefundNo, refundAmt.toString(), payNo, notify_url, refundTime);
+            refundRecord.setOrderResultInfo(JSONObject.toJSONString(refund));
+        }
+        orderPayRefundRecordService.updateById(refundRecord);
+        record.setRefundPrice(record.getRefundPrice().add(refundAmt));
+        updateById(record);
+    }
+
+    @Override
+    public void refundCallBack(String refundNo) {
+        OrderPayRefundRecord refundRecord = orderPayRefundRecordService.getOne(new QueryWrapper<OrderPayRefundRecord>().lambda().eq(OrderPayRefundRecord::getPayRefundNo, refundNo));
+        if (refundRecord == null) {
+            return;
+        }
+        OrderPayChannel payChannel = payChannelService.getById(refundRecord.getOrderPayChannelId());
+        OrderPayRecord record = getById(refundRecord.getOrderPayRecordId());
+        if (refundRecord.getStatus().equals("退款中")) {
+            String refundTime = DateTimeUtils.format(refundRecord.getRefundTime(),
+                    DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN);
+            RefundQueryResult refundQueryResult = lianLianPayService.refundQuery(payChannel, refundNo, refundTime);
+            if (refundQueryResult != null) {
+                refundRecord.setQueryResultInfo(JSONObject.toJSONString(refundQueryResult));
+                if ("2".equals(refundQueryResult.getSta_refund())) {
+                    refundRecord.setStatus("已退款");
+                }
+                if ("3".equals(refundQueryResult.getSta_refund())) {
+                    refundRecord.setStatus("退款失败");
+                    record.setRefundPrice(record.getRefundPrice().subtract(refundRecord.getRefundPrice()));
+                    updateById(record);
+                }
+            }
+        }
+        orderPayRefundRecordService.updateById(refundRecord);
     }
 }

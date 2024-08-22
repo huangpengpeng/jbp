@@ -545,4 +545,59 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         }
         return result;
     }
+
+    @Override
+    public RefundResult refund(OrderPayChannel payChannel, String refundNo, String amt, String payNo, String notifyUrl, String timestamp) {
+        RefundParams params = new RefundParams();
+        params.setSign_type("RSA");
+        params.setOid_partner(payChannel.getParentMerchantNo());
+        params.setNo_refund(refundNo);
+        params.setDt_refund(timestamp);
+        params.setMoney_refund(amt);
+        params.setNo_order(payNo);
+        params.setNotify_url(notifyUrl);
+
+        // 生产签名
+        params.setSign(LLianPayAccpSignature.getInstance().sign(payChannel.getPriKey(), JSON.toJSONString(params)));
+        // 退款URL
+        String url = "https://traderapi.lianlianpay.com/refund.htm";
+        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用支付退款异常" + payNo);
+        }
+        try {
+            RefundResult result = JSON.parseObject(s, RefundResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用支付退款异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用支付退款异常:" + s);
+        }
+    }
+
+    @Override
+    public RefundQueryResult refundQuery(OrderPayChannel payChannel, String refundNo, String timestamp) {
+        RefundQueryParams params = new RefundQueryParams();
+        params.setOid_partner(payChannel.getParentMerchantNo());
+        params.setSign_type("RSA");
+        params.setNo_refund(refundNo);
+        params.setDt_refund(timestamp);
+        // 生成签名
+        params.setSign(LLianPayAccpSignature.getInstance().sign(payChannel.getPriKey(), JSON.toJSONString(params)));
+        // 退款订单查询URL
+        String url = "https://queryapi.lianlianpay.com/refundquery.htm";
+        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用支付退款查询异常" + refundNo);
+        }
+        try {
+            return JSON.parseObject(s, RefundQueryResult.class);
+        } catch (Exception e) {
+            throw new RuntimeException("调用支付退款查询异常:" + s);
+        }
+    }
 }

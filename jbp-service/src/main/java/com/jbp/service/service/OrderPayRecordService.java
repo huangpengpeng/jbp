@@ -16,4 +16,11 @@ public interface OrderPayRecordService extends IService<OrderPayRecord> {
 
     List<OrderPayRecord> getWaitPayByOrderNo(String orderNo);
 
+    OrderPayRecord getByPayNo(String payNo);
+
+    void refund(String payNo, BigDecimal refundAmt, String remark);
+
+    void refundCallBack(String refundNo);
+
+
 }

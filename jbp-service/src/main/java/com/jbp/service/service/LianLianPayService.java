@@ -1,9 +1,11 @@
 package com.jbp.service.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.order.OrderPayChannel;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -61,7 +63,15 @@ public interface LianLianPayService {
     PaymentGwResult aliScanPay(OrderPayChannel payChannel, String payNo, BigDecimal total_amount, BigDecimal fee_amount, String notify_url, String  return_url, String remark, String client_ip);
 
 
+    /**
+     * 退款
+     */
+    RefundResult refund(OrderPayChannel payChannel, String refundNo, String amt, String payNo, String notifyUrl, String timestamp);
 
+    /**
+     * 退款查询
+     */
+    RefundQueryResult refundQuery(OrderPayChannel payChannel, String refundNo, String timestamp);
 
 
 

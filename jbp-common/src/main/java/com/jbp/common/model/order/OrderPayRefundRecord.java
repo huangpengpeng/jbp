@@ -2,6 +2,7 @@ package com.jbp.common.model.order;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.utils.DateTimeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -19,6 +20,17 @@ import java.util.Date;
 @TableName(value = "eb_order_pay_refund_record", autoResultMap = true)
 @ApiModel(value = "OrderPayRefundRecord对象", description = "订单支付退款记录")
 public class OrderPayRefundRecord extends BaseModel {
+
+    public OrderPayRefundRecord(Long orderPayChannelId, Long orderPayRecordId, String payRefundNo, BigDecimal refundPrice, String remark) {
+        this.orderPayChannelId = orderPayChannelId;
+        this.orderPayRecordId = orderPayRecordId;
+        this.payRefundNo = payRefundNo;
+        this.status = "退款中";
+        this.refundPrice = refundPrice;
+        this.createTime = DateTimeUtils.getNow();
+        this.refundTime = createTime;
+        this.remark = remark;
+    }
 
     @ApiModelProperty(value = "支付渠道ID")
     private Long orderPayChannelId;
@@ -46,4 +58,10 @@ public class OrderPayRefundRecord extends BaseModel {
 
     @ApiModelProperty(value = "退款备注")
     private String remark;
+
+    @ApiModelProperty(value = "下单结果")
+    private String orderResultInfo;
+
+    @ApiModelProperty(value = "查询结果")
+    private String queryResultInfo;
 }
