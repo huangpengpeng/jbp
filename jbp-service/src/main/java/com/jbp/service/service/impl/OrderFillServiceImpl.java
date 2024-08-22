@@ -1,8 +1,8 @@
 package com.jbp.service.service.impl;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -10,6 +10,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.enums.OrderFillType;
 import com.jbp.common.model.agent.CapaOrder;
+import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.order.Order;
@@ -21,15 +22,12 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.OrderFillDao;
-import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderFillService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.ProductRepertoryService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaOrderService;
+import com.jbp.service.service.agent.FundClearingService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationService;
 import lombok.extern.slf4j.Slf4j;
-import com.jbp.service.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,6 +35,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +66,8 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
     private ProductRepertoryService productRepertoryService;
     @Resource
     private UserService userService;
+    @Resource
+    private FundClearingService fundClearingService;
 
     @Override
     public OrderFill add(String orderNo, Integer uId) {
@@ -183,6 +184,16 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         orderFill.setStatus(OrderFillType.已补单.getName());
         orderFill.setFillTime(new Date());
         dao.updateById(orderFill);
+
+
+        //货款给补单人
+        List<FundClearing> fundClearingList = fundClearingService.list(new QueryWrapper<FundClearing>().lambda().eq(FundClearing::getExternalNo, orderFill.getOrderNo()));
+        BigDecimal clearingFee = BigDecimal.ZERO;
+        for (FundClearing fundClearing : fundClearingList) {
+            clearingFee = clearingFee.add(fundClearing.getCommAmt());
+        }
+        fundClearingService.create(orderFill.getUid(), orderFill.getOrderNo(), "货款", clearingFee,
+                null, orderFill.getOrderNo() + "下单获得货款", "");
     }
 
 
@@ -193,7 +204,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         lqw.eq(OrderFill::getStatus, status);
         List<OrderFill> list = list(lqw);
         Map<String, OrderFill> orderFillMap = new HashMap<>();
-        if (CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return orderFillMap;
         }
         List<Integer> uidList = list.stream().map(OrderFill::getUid).collect(Collectors.toList());
