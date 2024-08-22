@@ -55,7 +55,7 @@ public class ProductRepertoryController {
     @RequestMapping(value = "/updateRepertory", method = RequestMethod.POST)
     public CommonResult<Boolean> updateRepertory(@RequestBody @Validated ProductRepertoryRequest request) {
 
-
+        productRepertoryService.allot(request.getPhone(),request.getProductId(),request.getCount());
         return CommonResult.success();
     }
 

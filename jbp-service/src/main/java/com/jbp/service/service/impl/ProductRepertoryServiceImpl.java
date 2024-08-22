@@ -65,11 +65,11 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
     public Boolean reduce(Integer productId, Integer count, Integer uId, String description, String orderSn, String type) {
         ProductRepertory productRepertory = dao.selectOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, productId).eq(ProductRepertory::getUid, uId));
 
-        if(productRepertory.getCount() - count < 0 ){
+        if (productRepertory.getCount() - count < 0) {
             throw new CrmebException("库存不足，无法扣减");
         }
 
-       productRepertory.setCount(productRepertory.getCount() - count);
+        productRepertory.setCount(productRepertory.getCount() - count);
         boolean ifSuccess = updateById(productRepertory);
         if (BooleanUtils.isNotTrue(ifSuccess)) {
             throw new CrmebException("当前操作人数过多");
@@ -98,9 +98,9 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
         }
         User fUser = userService.getById(fUid);
         User tUser = userService.getById(tUid);
-        String description = fUser.getNickname()+"调拨给"+tUser.getNickname();
-        reduce(productId,count,fUid,description,"","供货");
-        increase(productId,count,tUid,description,"","订货");
+        String description = fUser.getNickname() + "调拨给" + tUser.getNickname();
+        reduce(productId, count, fUid, description, "", "供货");
+        increase(productId, count, tUid, description, "", "订货");
         return true;
     }
 
@@ -111,7 +111,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("未查询到库存管理数据！");
         }
         List<ProductRepertoryExcel> result = new LinkedList<>();
-        list.forEach(e->{
+        list.forEach(e -> {
             ProductRepertoryExcel vo = new ProductRepertoryExcel();
             BeanUtils.copyProperties(e, vo);
             result.add(vo);
@@ -123,7 +123,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
 
     @Override
     public List<ProductRepertory> getUserRepertory(Integer uid) {
-        if (ObjectUtil.isNull(uid)){
+        if (ObjectUtil.isNull(uid)) {
             throw new CrmebException("用户账号不能为空");
         }
         return dao.getList(uid, "", "");
@@ -131,12 +131,12 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
 
     @Override
     public List<ProductRepertoryVo> getProductList(Integer uid) {
-        List<ProductRepertoryVo> list =new ArrayList<>();
-        List<ProductRepertory> productRepertoryList = dao.selectList(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid,uid));
+        List<ProductRepertoryVo> list = new ArrayList<>();
+        List<ProductRepertory> productRepertoryList = dao.selectList(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, uid));
 
-        for(ProductRepertory productRepertory :productRepertoryList ){
-            ProductRepertoryVo productRepertoryVo =new ProductRepertoryVo();
-            Product product =  productService.getById(productRepertory.getProductId());
+        for (ProductRepertory productRepertory : productRepertoryList) {
+            ProductRepertoryVo productRepertoryVo = new ProductRepertoryVo();
+            Product product = productService.getById(productRepertory.getProductId());
             productRepertoryVo.setName(product.getName());
             productRepertoryVo.setCount(productRepertory.getCount());
             productRepertoryVo.setPicUrl(product.getImage());
@@ -144,6 +144,14 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
         }
 
         return list;
+    }
+
+    @Override
+    public void allot(String phone, Integer productId, Integer count) {
+        List<User> users = userService.getByPhone(phone);
+
+        reduce(productId,  count, userService.getUserId(), "调拨给"+users.get(0).getAccount(),"", "调拨");
+        increase( productId,  count,users.get(0).getId(), userService.getAccount() +"调拨接收", "", "调拨");
     }
 
 

@@ -29,4 +29,7 @@ public interface ProductRepertoryService extends IService<ProductRepertory> {
 
     List<ProductRepertoryVo>  getProductList(Integer uid);
 
+
+    void allot(String phone,Integer productId,Integer count);
+
 }
