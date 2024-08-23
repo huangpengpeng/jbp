@@ -2,6 +2,8 @@ package com.jbp.service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserScore;
 import com.jbp.common.request.UserScoreRequest;
@@ -10,6 +12,7 @@ import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserScoreFlowService;
 import com.jbp.service.service.UserScoreService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 @Service
@@ -34,6 +38,8 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
 
     @Autowired
     private SystemConfigService systemConfigService;
+    @Autowired
+    private UserCapaService userCapaService;
 
 
     @Override
@@ -77,11 +83,26 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
     public void updateUserCapa(UserScoreRequest request) {
 
 
-        //赠送用户等级账号
-        User user = userService.registerNoBandPater(request.getPhone(), request.getPhone(), "上级赠送", request.getCapaId());
+        List<User> phoneList = userService.getByPhone(request.getPhone());
+        if (phoneList.size() > 1) {
+            throw new CrmebException("手机号重复");
+        }
 
-        //绑定关系
-        userInvitationService.band(user.getId(), userService.getUserId(), false, true, false);
+        if (phoneList.isEmpty()) {
+            //赠送用户等级账号
+            User user = userService.registerNoBandPater(request.getPhone(), request.getPhone(), "上级赠送", request.getCapaId());
+            //绑定关系
+            userInvitationService.band(user.getId(), userService.getUserId(), false, true, false);
+        }
+
+        if(!phoneList.isEmpty()){
+          UserCapa userCapa  =  userCapaService.getByUser(phoneList.get(0).getId());
+          if(userCapa==null || userCapa.getCapaId() < request.getCapaId()){
+              userCapaService.saveOrUpdateCapa(phoneList.get(0).getId(),request.getCapaId(),"赠送","上级赠送");
+          }else{
+              throw new CrmebException("赠送级别低于当前等级，无法操作");
+          }
+        }
 
         //合伙人分数
         String reducePartnerMark = systemConfigService.getValueByKey("reduce_partner_mark");
