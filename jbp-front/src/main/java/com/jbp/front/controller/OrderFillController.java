@@ -55,7 +55,7 @@ public class OrderFillController {
                 ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, userService.getUserId()).eq(ProductRepertory::getProductId, detail.getProductId()));
                 OrderFillVo orderFillVo = new OrderFillVo();
                 orderFillVo.setCount(detail.getPayNum());
-                orderFillVo.setGoodsCount(productRepertory.getCount());
+                orderFillVo.setGoodsCount(productRepertory == null ?0 : productRepertory.getCount());
                 orderFillVo.setName(detail.getProductName());
                 orderFillVo.setPicUrl(detail.getImage());
                 orderFillVos.add(orderFillVo);
