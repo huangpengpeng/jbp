@@ -3,9 +3,11 @@ package com.jbp.front.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserScore;
+import com.jbp.common.model.user.UserScoreFlow;
 import com.jbp.common.request.PasswordRequest;
 import com.jbp.common.request.UserScoreRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.service.service.UserScoreFlowService;
 import com.jbp.service.service.UserScoreService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.UserInvitationService;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @Slf4j
@@ -32,6 +36,8 @@ public class UserScoreController {
     private UserService userService;
     @Autowired
     private UserInvitationService userInvitationService;
+    @Autowired
+    private UserScoreFlowService userScoreFlowService;
 
     @ApiOperation(value = "获取当前分数")
     @RequestMapping(value = "/getUserScore", method = RequestMethod.GET)
@@ -53,6 +59,14 @@ public class UserScoreController {
 
 
 
+    @ApiOperation(value = "获取分数明细")
+    @RequestMapping(value = "/getUserScoreFlow", method = RequestMethod.GET)
+    public CommonResult<List<UserScoreFlow>> getUserScoreFlow() {
+
+        List<UserScoreFlow> userScoreFlows = userScoreFlowService.list(new QueryWrapper<UserScoreFlow>().lambda().eq(UserScoreFlow::getUid, userService.getUserId()));
+
+        return CommonResult.success(userScoreFlows);
+    }
 
 
 }

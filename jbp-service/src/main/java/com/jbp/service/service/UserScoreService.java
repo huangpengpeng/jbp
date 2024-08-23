@@ -10,7 +10,7 @@ public interface UserScoreService extends IService<UserScore> {
 
     void increase(Integer uid, Integer score,String desc);
 
-    void reduce(Integer uid, Integer score,String desc);
+    void reduce(Integer uid, Integer score,String desc,String remark);
 
 
     void updateUserCapa(UserScoreRequest request);

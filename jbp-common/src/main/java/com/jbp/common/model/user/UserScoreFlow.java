@@ -36,4 +36,8 @@ public class UserScoreFlow extends BaseModel {
     @ApiModelProperty(value = "描述")
     private String desc;
 
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+
 }

@@ -18,7 +18,7 @@ public class UserScoreFlowServiceImpl extends ServiceImpl<UserScoreFlowDao, User
 
 
     @Override
-    public void add(Integer uid, Integer score, String type, String desc) {
+    public void add(Integer uid, Integer score, String type, String desc,String remark) {
 
         UserScoreFlow userScoreFlow = new UserScoreFlow();
         userScoreFlow.setUid(uid);
@@ -26,6 +26,7 @@ public class UserScoreFlowServiceImpl extends ServiceImpl<UserScoreFlowDao, User
         userScoreFlow.setScore(score);
         userScoreFlow.setCreateTime(new Date());
         userScoreFlow.setDesc(desc);
+        userScoreFlow.setRemark(remark);
         dao.insert(userScoreFlow);
     }
 }

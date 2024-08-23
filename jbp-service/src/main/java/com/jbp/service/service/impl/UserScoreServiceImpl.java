@@ -3,6 +3,7 @@ package com.jbp.service.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserScore;
@@ -12,6 +13,7 @@ import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserScoreFlowService;
 import com.jbp.service.service.UserScoreService;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,9 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
     private SystemConfigService systemConfigService;
     @Autowired
     private UserCapaService userCapaService;
+    @Autowired
+    private CapaService capaService;
+
 
 
     @Override
@@ -57,12 +62,12 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         userScore.setScore(userScore.getScore() + score);
         dao.updateById(userScore);
 
-        userScoreFlowService.add(uid, score, "增加", desc);
+        userScoreFlowService.add(uid, score, "增加", desc,"升级");
 
     }
 
     @Override
-    public void reduce(Integer uid, Integer score, String desc) {
+    public void reduce(Integer uid, Integer score, String desc,String remark) {
         UserScore userScore = dao.selectOne(new QueryWrapper<UserScore>().lambda().eq(UserScore::getUid, uid));
         if (userScore == null) {
             throw new RuntimeException("用户无分数，无法扣减");
@@ -75,7 +80,7 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         userScore.setScore(userScore.getScore() - score);
         dao.updateById(userScore);
 
-        userScoreFlowService.add(uid, score, "减少", desc);
+        userScoreFlowService.add(uid, score, "减少", desc,remark);
 
     }
 
@@ -116,7 +121,8 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         }
 
         if (score > 0) {
-            reduce(userService.getUserId(), score, "赠送等级");
+           Capa capa =  capaService.getById(request.getCapaId());
+            reduce(userService.getUserId(), score, "赠送"+capa.getName(),request.getPhone());
         }
     }
 
