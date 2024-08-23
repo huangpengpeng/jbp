@@ -25,7 +25,7 @@ public class UserScoreFlowServiceImpl extends ServiceImpl<UserScoreFlowDao, User
         userScoreFlow.setType(type);
         userScoreFlow.setScore(score);
         userScoreFlow.setCreateTime(new Date());
-        userScoreFlow.setDesc(desc);
+        userScoreFlow.setDescription(desc);
         userScoreFlow.setRemark(remark);
         dao.insert(userScoreFlow);
     }

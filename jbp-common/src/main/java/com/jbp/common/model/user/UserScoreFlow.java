@@ -34,7 +34,7 @@ public class UserScoreFlow extends BaseModel {
     private Date createTime;
 
     @ApiModelProperty(value = "描述")
-    private String desc;
+    private String description;
 
     @ApiModelProperty(value = "备注")
     private String remark;
