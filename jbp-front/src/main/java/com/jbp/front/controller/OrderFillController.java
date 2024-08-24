@@ -59,8 +59,8 @@ public class OrderFillController {
                 orderFillVo.setName(detail.getProductName());
                 orderFillVo.setPicUrl(detail.getImage());
                 orderFillVo.setProductId(detail.getProductId());
+                orderFillVo.setAttrValueId(detail.getAttrValueId());
                 orderFillVos.add(orderFillVo);
-
             }
         }
 

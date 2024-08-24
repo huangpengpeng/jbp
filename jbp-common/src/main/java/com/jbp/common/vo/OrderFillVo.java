@@ -28,4 +28,9 @@ public class OrderFillVo {
     @ApiModelProperty("库存")
     private Integer goodsCount;
 
+
+    @ApiModelProperty("规格id")
+    private Integer attrValueId;
+
+
 }
