@@ -12,6 +12,11 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "OrderFillVo对象", description = "补单Vo")
 public class OrderFillVo {
 
+
+
+    @ApiModelProperty("商品id")
+    private Integer productId;
+
     @ApiModelProperty("商品名称")
     private String name;
     @ApiModelProperty("商品图片")

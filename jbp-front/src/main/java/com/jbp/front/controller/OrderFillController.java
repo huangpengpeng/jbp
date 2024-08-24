@@ -58,6 +58,7 @@ public class OrderFillController {
                 orderFillVo.setGoodsCount(productRepertory == null ?0 : productRepertory.getCount());
                 orderFillVo.setName(detail.getProductName());
                 orderFillVo.setPicUrl(detail.getImage());
+                orderFillVo.setProductId(detail.getProductId());
                 orderFillVos.add(orderFillVo);
 
             }
