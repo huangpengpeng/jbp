@@ -1104,10 +1104,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                     break;
                 }
             }
-            if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP)) {
+            if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_PICK_UP) ) {
                 merchantOrder.setUserAddress(merchantOrderVo.getMerName());
                 merchantOrder.setVerifyCode(String.valueOf(CrmebUtil.randomCount(1111111111, 999999999)));
-            } else {
+            } else if(merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS) ) {
                 merchantOrder.setRealName(userAddress.getRealName());
                 merchantOrder.setUserPhone(userAddress.getPhone());
                 String userAddressStr = userAddress.getProvince() + userAddress.getCity() + userAddress.getDistrict() + userAddress.getStreet() + userAddress.getDetail();
@@ -2358,12 +2358,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                 break;
             case OrderConstants.PLACE_ORDER_TYPE_SHIP:
                 // 发货单
-                merchantOrderVoList.add(validatePreShipOrderNormal(request.getOrderDetails().get(0)));
+                merchantOrderVoList = validatePreOrderd(request, payUser);
                 preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_SHIP);
                 break;
             case OrderConstants.PLACE_ORDER_TYPE_DORDER:
                 // 定单
-                merchantOrderVoList.add(validatePreOrderNormal(request.getOrderDetails().get(0)));
+                merchantOrderVoList = validatePreOrderd(request, payUser);
                 preOrderInfoVo.setType(OrderConstants.ORDER_TYPE_DORDER);
                 break;
 
@@ -2608,6 +2608,25 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         });
         return merchantOrderVoList;
     }
+
+
+
+    /**
+     * 订货 发货预下单校验
+     *
+     * @param request 请求参数
+     * @param user    用户
+     * @return List<PreMerchantOrderVo>
+     */
+    private List<PreMerchantOrderVo> validatePreOrderd(PreOrderRequest request, User user) {
+        List<PreMerchantOrderVo> merchantOrderVoList = CollUtil.newArrayList();
+        request.getOrderDetails().forEach(e -> {
+            PreMerchantOrderVo merchantOrderVo = validatePreOrderNormal(e);
+            merchantOrderVoList.add(merchantOrderVo);
+        });
+        return merchantOrderVoList;
+    }
+
 
     private ComputedOrderPriceResponse computedPrice_V1_3(OrderComputedPriceRequest request, PreOrderInfoVo orderInfoVo, User user) {
         String integralDeductionSwitch = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_DEDUCTION_SWITCH);

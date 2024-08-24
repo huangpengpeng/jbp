@@ -249,7 +249,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
             lqw.lt(Order::getRefundStatus, OrderConstants.ORDER_REFUND_STATUS_REFUND);
             lqw.eq(Order::getIsUserDel, false);
             lqw.eq(Order::getIsMerchantDel, false);
-            lqw.in(Order::getType, OrderConstants.ORDER_TYPE_NORMAL, OrderConstants.ORDER_TYPE_SECKILL);
+            lqw.in(Order::getType, OrderConstants.ORDER_TYPE_NORMAL, OrderConstants.ORDER_TYPE_SECKILL, OrderConstants.ORDER_TYPE_DORDER,OrderConstants.ORDER_TYPE_SHIP);
             lqw.eq(Order::getIsDel, false);
             lqw.orderByDesc(Order::getId);
             List<Order> orderList = dao.selectList(lqw);

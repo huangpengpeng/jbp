@@ -35,9 +35,9 @@ public class OrderMerchantRequest {
     @NotNull(message = "订单商户优惠券编号不能为空")
     private Integer userCouponId;
 
-    @ApiModelProperty(value = "快递类型: 1-快递配送，2-到店自提", required = true)
+    @ApiModelProperty(value = "快递类型: 1-快递配送，2-到店自提 3-订货不需要快递", required = true)
     @NotNull(message = "快递类型不能为空")
-    @Range(min = 1, max = 2, message = "未知的快递类型")
+    @Range(min = 1, max = 3, message = "未知的快递类型")
     private Integer shippingType;
 
     @ApiModelProperty(value = "备注")
