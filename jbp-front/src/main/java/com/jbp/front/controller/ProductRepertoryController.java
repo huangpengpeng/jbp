@@ -53,9 +53,9 @@ public class ProductRepertoryController {
 
     @ApiOperation(value = "调拨库存")
     @RequestMapping(value = "/updateRepertory", method = RequestMethod.POST)
-    public CommonResult<Boolean> updateRepertory(@RequestBody @Validated ProductRepertoryRequest request) {
+    public CommonResult<Boolean> updateRepertory(@RequestBody @Validated List<ProductRepertoryRequest> request) {
 
-        productRepertoryService.allot(request.getPhone(),request.getProductId(),request.getCount());
+        productRepertoryService.allot(request);
         return CommonResult.success();
     }
 

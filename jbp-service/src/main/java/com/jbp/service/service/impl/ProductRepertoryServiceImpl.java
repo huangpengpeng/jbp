@@ -14,6 +14,7 @@ import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.ProductRepertoryRequest;
 import com.jbp.common.vo.FileResultVo;
 import com.jbp.common.vo.ProductRepertoryVo;
 import com.jbp.service.dao.ProductRepertoryDao;
@@ -147,11 +148,16 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
     }
 
     @Override
-    public void allot(String phone, Integer productId, Integer count) {
-        List<User> users = userService.getByPhone(phone);
+    public void allot(List<ProductRepertoryRequest> request) {
 
-        reduce(productId,  count, userService.getUserId(), "调拨给"+users.get(0).getAccount(),"", "调拨");
-        increase( productId,  count,users.get(0).getId(), userService.getAccount() +"调拨接收", "", "调拨");
+        for (ProductRepertoryRequest productRepertoryRequest : request) {
+            List<User> users = userService.getByPhone(productRepertoryRequest.getPhone());
+            if(users.isEmpty()){
+                throw new CrmebException("用户手机号不存在");
+            }
+            reduce(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), userService.getUserId(), "调拨给" + users.get(0).getAccount(), "", "调拨");
+            increase(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), users.get(0).getId(), userService.getAccount() + "调拨接收", "", "调拨");
+        }
     }
 
 
