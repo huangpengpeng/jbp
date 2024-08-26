@@ -1969,6 +1969,14 @@ public class PayServiceImpl implements PayService {
                     WechatAlipayPayParams.CHANNEL.ALIPAY.name(), "", "", order.getIp());
             result.setGateway_url(wechatAlipayPay.getPrePayTn());
         }
+        if ("ybweixin".equals(order.getPayType())) {
+          String appId =  systemConfigService.getValueByKey("wechat_appid");
+            UserToken tokenByUser = userTokenService.getTokenByUserId(order.getUid(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
+            WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
+                    yopNotifyUrl, "", yopReturnUrl, WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(),
+                    WechatAlipayPayParams.CHANNEL.WECHAT.name(), appId, tokenByUser == null ? "" : tokenByUser.getToken(), order.getIp());
+            result.setGateway_url(wechatAlipayPay.getPrePayTn());
+        }
         boolean b = orderService.updateById(order);
         if (!b) {
             throw new RuntimeException("当前操作人数过多");
