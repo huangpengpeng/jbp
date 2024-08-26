@@ -3,10 +3,13 @@ package com.jbp.front.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.model.agent.CapaOrder;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.user.User;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaOrderService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserInvitationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Slf4j
@@ -28,13 +34,15 @@ public class CapaOrderController {
     private UserCapaService userCapaService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserInvitationService userInvitationService;
 
     @ApiOperation(value = "获取当前用户等级订单信息")
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     public CommonResult<CapaOrder> getList() {
         Integer uid = userService.getUserId();
         if (ObjectUtil.isNull(uid)) {
-        return CommonResult.failed("获取当前用户信息失败！");
+            return CommonResult.failed("获取当前用户信息失败！");
         }
         UserCapa userCapa = userCapaService.getByUser(uid);
         if (ObjectUtil.isNull(userCapa)) {
@@ -42,5 +50,41 @@ public class CapaOrderController {
         }
         CapaOrder capaOrder = capaOrderService.getCapaOrderByUser(userCapa.getCapaId().intValue());
         return CommonResult.success(capaOrder);
+    }
+
+
+    @ApiOperation(value = "获取当前用户等级订单信息")
+    @RequestMapping(value = "/pSupplyUser", method = RequestMethod.GET)
+    public CommonResult<Map<String, String>> pSupplyUser() {
+        Integer uid = userService.getUserId();
+        if (ObjectUtil.isNull(uid)) {
+            return CommonResult.failed("获取当前用户信息失败！");
+        }
+        UserCapa userCapa = userCapaService.getByUser(uid);
+        if (ObjectUtil.isNull(userCapa)) {
+            return CommonResult.failed("当前用户没有等级！");
+        }
+        Map<String, String> map = new HashMap<>();
+
+        Integer pId = userInvitationService.getPid(uid);
+
+        do {
+            UserCapa pCapa = userCapaService.getByUser(pId);
+            CapaOrder capaOrder = capaOrderService.getCapaOrderByUser(userCapa.getCapaId().intValue());
+            if (pCapa.getCapaId() > userCapa.getCapaId() && capaOrder.getIfSupply()) {
+                User user = userService.getById(pId);
+                map.put("nickname", user.getNickname());
+                map.put("account", user.getAccount());
+                map.put("phone", user.getPhone());
+                break;
+            }
+            pId = userInvitationService.getPid(pId);
+            if (pId == null) {
+                break;
+            }
+
+        } while (true);
+
+        return CommonResult.success(map);
     }
 }
