@@ -14,4 +14,6 @@ public interface CapaOrderService extends IService<CapaOrder> {
     PageInfo<CapaOrder> getList(PageParamRequest pageParamRequest);
 
     Boolean edit(CapaOrderRequest capaRequest);
+
+    CapaOrder getCapaOrderByUser(Integer capaId);
 }

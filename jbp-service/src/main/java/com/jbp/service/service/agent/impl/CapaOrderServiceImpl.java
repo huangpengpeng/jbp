@@ -63,4 +63,13 @@ public class CapaOrderServiceImpl extends ServiceImpl<CapaOrderDao, CapaOrder> i
         BeanUtils.copyProperties(request, capaOrder);
         return updateById(capaOrder);
     }
+
+    @Override
+    public CapaOrder getCapaOrderByUser(Integer capaId) {
+        CapaOrder capaOrder = getOne(new QueryWrapper<CapaOrder>().lambda().eq(CapaOrder::getCapaId, capaId));
+        if (capaOrder == null) {
+            throw new CrmebException("该等级未设置订货管理信息！");
+        }
+        return capaOrder;
+    }
 }
