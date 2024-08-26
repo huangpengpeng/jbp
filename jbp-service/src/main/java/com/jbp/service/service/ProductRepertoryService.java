@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.ProductRepertoryRequest;
 import com.jbp.common.vo.ProductRepertoryVo;
 
 import java.util.List;
@@ -30,6 +31,6 @@ public interface ProductRepertoryService extends IService<ProductRepertory> {
     List<ProductRepertoryVo>  getProductList(Integer uid);
 
 
-    void allot(String phone,Integer productId,Integer count);
+    void allot(List<ProductRepertoryRequest> request);
 
 }
