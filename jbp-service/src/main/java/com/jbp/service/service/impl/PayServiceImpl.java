@@ -1972,7 +1972,7 @@ public class PayServiceImpl implements PayService {
         }
         if ("ybweixin".equals(order.getPayType())) {
             WechatAlipayTutelagePayResult wechatAlipayPay = yopPayService.wechatAlipayTutelagePay(yopMerchantNo, order.getOrderNo(), order.getPayPrice().toString(), productName,
-                    yopNotifyUrl, "",  WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(),
+                    yopNotifyUrl, "",  WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(), WechatAlipayPayParams.CHANNEL.WECHAT.name(),
                     order.getIp(), "");
             result.setGateway_url(wechatAlipayPay.getPrePayTn());
         }
