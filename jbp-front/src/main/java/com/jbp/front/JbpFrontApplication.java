@@ -3,6 +3,7 @@ package com.jbp.front;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.front.controller.UserVisaController;
 import com.jbp.service.product.comm.BaoDanCommHandler;
 import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.service.OrderDetailService;
@@ -56,5 +57,9 @@ import java.util.List;
 //        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
 //        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
 //        baoDanCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
+
+
+//        UserVisaController userVisaController = run.getBean(UserVisaController.class);
+//        userVisaController.skin();
     }
 }

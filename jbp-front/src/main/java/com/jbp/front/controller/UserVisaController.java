@@ -591,4 +591,36 @@ public class UserVisaController {
 
 
 
+
+
+
+
+
+    @ApiOperation(value = "悦人悦己-皮肤检测", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @RequestMapping(value = "/skin", method = {
+            RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResult skin() {
+
+
+        JSONObject data = new JSONObject();
+        data.put("username", "useryryj");
+        data.put("userpsw", "5fd490c08933");
+        data.put("mobile", "13850686330");
+
+
+        String body = JSON.toJSONString(data);
+        HttpRequest request = HttpRequest.post("https://fxftdev.114.fm/api/product/getUserReport");
+        request.contentType("application/json");
+        request.charset("utf-8");
+        String response = request.body(body).send().bodyText();
+
+
+
+
+
+        return CommonResult.success();
+    }
+
+
 }
