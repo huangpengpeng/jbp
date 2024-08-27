@@ -66,9 +66,9 @@ import java.util.Map;
 //        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
 //        lingShouCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
 
-//        YopDemo.merRegister(run.getBean(YopService.class));
+        YopDemo.merRegister(run.getBean(YopService.class));
 
-        YopDemo.registerQuery(run.getBean(YopService.class));
+//        YopDemo.registerQuery(run.getBean(YopService.class));
 
     }
 }
