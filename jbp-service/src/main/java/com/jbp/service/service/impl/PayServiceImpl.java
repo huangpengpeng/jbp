@@ -49,6 +49,7 @@ import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
 import com.jbp.common.yop.params.WechatAlipayPayParams;
 import com.jbp.common.yop.result.WechatAliPayPayResult;
+import com.jbp.common.yop.result.WechatAlipayTutelagePayResult;
 import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;
 
@@ -1970,11 +1971,9 @@ public class PayServiceImpl implements PayService {
             result.setGateway_url(wechatAlipayPay.getPrePayTn());
         }
         if ("ybweixin".equals(order.getPayType())) {
-          String appId =  systemConfigService.getValueByKey("wechat_appid");
-            UserToken tokenByUser = userTokenService.getTokenByUserId(order.getUid(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
-            WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
-                    yopNotifyUrl, "", yopReturnUrl, WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(),
-                    WechatAlipayPayParams.CHANNEL.WECHAT.name(), appId, tokenByUser == null ? "" : tokenByUser.getToken(), order.getIp());
+            WechatAlipayTutelagePayResult wechatAlipayPay = yopPayService.wechatAlipayTutelagePay(yopMerchantNo, order.getOrderNo(), order.getPayPrice().toString(), productName,
+                    yopNotifyUrl, "",  WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(),
+                    order.getIp(), "");
             result.setGateway_url(wechatAlipayPay.getPrePayTn());
         }
         boolean b = orderService.updateById(order);
