@@ -196,4 +196,6 @@ public interface YopService {
      * 自助结算  /rest/v1.0/settle/self-settle/apply
      */
     SelfSettleResult selfSettle(String merchantNo, String settleRequestNo, String operatePeriod);
+
+
 }
