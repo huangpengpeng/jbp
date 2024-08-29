@@ -45,6 +45,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import jodd.http.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
@@ -620,7 +621,7 @@ public class UserVisaController {
         String response = request.body(body).send().bodyText();
         log.info(response);
         JSONObject result = JSON.parseObject(response);
-        if (!result.get("code").equals(1) || result.get("data") == null) {
+        if (!result.get("code").equals(1) || result.getJSONArray("data").isEmpty()) {
             return CommonResult.success(false);
         }
         UserSkin userSkin = new UserSkin();
