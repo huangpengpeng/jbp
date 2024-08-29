@@ -611,8 +611,7 @@ public class UserVisaController {
         JSONObject data = new JSONObject();
         data.put("username", "useryryj");
         data.put("userpsw", "5fd490c08933");
-        data.put("mobile", "13850686330");
-//        data.put("mobile", user.getPhone());
+        data.put("mobile", user.getPhone());
 
         String body = JSON.toJSONString(data);
         HttpRequest request = HttpRequest.post("https://fxftdev.114.fm/api/product/getUserReport");
