@@ -87,4 +87,15 @@ public class CapaOrderController {
 
         return CommonResult.success(map);
     }
+
+    @ApiOperation(value = "获取订货和补货金额门槛")
+    @RequestMapping(value = "/getAmount", method = RequestMethod.GET)
+    public CommonResult<CapaOrder> getAmount(Integer capaId) {
+        Integer uid = userService.getUserId();
+        if (ObjectUtil.isNull(uid)) {
+            return CommonResult.failed("获取当前用户信息失败！");
+        }
+        CapaOrder capaOrder = capaOrderService.getCapaOrderByUser(capaId);
+        return CommonResult.success(capaOrder);
+    }
 }

@@ -21,4 +21,7 @@ public class CapaOrderRequest {
 
     @ApiModelProperty(value = "补货金额")
     private BigDecimal repAmount;
+
+    @ApiModelProperty(value = "升级图片是否展示")
+    private Boolean ifShow;
 }
