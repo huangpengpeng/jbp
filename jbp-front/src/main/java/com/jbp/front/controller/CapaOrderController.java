@@ -37,7 +37,7 @@ public class CapaOrderController {
     @Autowired
     private UserInvitationService userInvitationService;
 
-    @ApiOperation(value = "获取当前用户等级订单信息")
+    @ApiOperation(value = "获取当前用户等级订货信息")
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     public CommonResult<CapaOrder> getList() {
         Integer uid = userService.getUserId();

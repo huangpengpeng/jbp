@@ -18,6 +18,8 @@ import com.fasc.open.api.v5_1.res.signtask.SignTaskActorGetUrlRes;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ChannelIdentity;
+import com.jbp.common.model.user.User;
+import com.jbp.common.model.user.UserSkin;
 import com.jbp.common.model.user.UserVisa;
 import com.jbp.common.model.user.UserVisaOrder;
 import com.jbp.common.request.UserViseRequest;
@@ -26,10 +28,7 @@ import com.jbp.common.request.YzhSignRequest;
 import com.jbp.common.response.UserVisaResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.UserService;
-import com.jbp.service.service.UserVisaOrderService;
-import com.jbp.service.service.UserVisaService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.util.StringUtils;
 import com.yunzhanghu.sdk.apiusersign.ApiUserSignServiceClient;
@@ -80,6 +79,8 @@ public class UserVisaController {
     private SystemConfigService systemConfigService;
     @Autowired
     private Environment environment;
+    @Autowired
+    private UserSkinService userSkinService;
 
 
     @ApiOperation(value = "增加用户签署法大大", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -600,27 +601,32 @@ public class UserVisaController {
     @ResponseBody
     @RequestMapping(value = "/skin", method = {
             RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResult skin() {
+    public CommonResult<Boolean> skin() {
 
-
+        User user = userService.getInfo();
+        if (user == null) {
+            return CommonResult.failed("获取当前用户信息失败！");
+        }
         JSONObject data = new JSONObject();
         data.put("username", "useryryj");
         data.put("userpsw", "5fd490c08933");
         data.put("mobile", "13850686330");
-
+//        data.put("mobile", user.getPhone());
 
         String body = JSON.toJSONString(data);
         HttpRequest request = HttpRequest.post("https://fxftdev.114.fm/api/product/getUserReport");
         request.contentType("application/json");
         request.charset("utf-8");
         String response = request.body(body).send().bodyText();
-
-
-
-
-
-        return CommonResult.success();
+        log.info(response);
+        JSONObject result = JSON.parseObject(response);
+        if (!result.get("code").equals(1) || result.get("data") == null) {
+            return CommonResult.success(false);
+        }
+        UserSkin userSkin = new UserSkin();
+        userSkin.setUid(user.getId());
+        userSkin.setSkinInfo(result.get("data").toString());
+        userSkinService.save(userSkin);
+        return CommonResult.success(true);
     }
-
-
 }
