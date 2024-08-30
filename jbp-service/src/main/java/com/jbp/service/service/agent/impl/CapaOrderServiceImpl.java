@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.excel.util.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -71,5 +72,19 @@ public class CapaOrderServiceImpl extends ServiceImpl<CapaOrderDao, CapaOrder> i
             throw new CrmebException("该等级未设置订货管理信息！");
         }
         return capaOrder;
+    }
+
+    @Override
+    public List<CapaOrder> getList() {
+        List<CapaOrder> list = list();
+        if (CollectionUtils.isEmpty(list)) {
+            return CollUtil.newArrayList();
+        }
+        Map<Long, Capa> capaMap = capaService.getCapaMap();
+        list.forEach(e->{
+            Capa capa = capaMap.get(e.getCapaId());
+            e.setCapaName(capa != null ? capa.getName() : "");
+        });
+        return list;
     }
 }

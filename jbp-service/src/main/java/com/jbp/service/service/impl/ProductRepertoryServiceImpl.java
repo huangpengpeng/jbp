@@ -76,7 +76,25 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, -count, description, orderSn, new Date(), type);
+        productRepertoryFlowService.add(uId, productId, -count, description, orderSn, new Date(), type, productRepertory.getCount());
+
+        return ifSuccess;
+    }
+
+    @Override
+    public Boolean increase(Integer productId, Integer count, Integer uId, String description, String orderSn, String type) {
+
+        ProductRepertory productRepertory = dao.selectOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, productId).eq(ProductRepertory::getUid, uId));
+        if (productRepertory == null) {
+            productRepertory = add(productId, 0, uId);
+        }
+        productRepertory.setCount(productRepertory.getCount() + count);
+        boolean ifSuccess = updateById(productRepertory);
+        if (BooleanUtils.isNotTrue(ifSuccess)) {
+            throw new CrmebException("当前操作人数过多");
+        }
+
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount());
 
         return ifSuccess;
     }
@@ -152,7 +170,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
 
         for (ProductRepertoryRequest productRepertoryRequest : request) {
             List<User> users = userService.getByPhone(productRepertoryRequest.getPhone());
-            if(users.isEmpty()){
+            if (users.isEmpty()) {
                 throw new CrmebException("用户手机号不存在");
             }
             reduce(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), userService.getUserId(), "调拨给" + users.get(0).getAccount(), "", "调拨");
@@ -160,23 +178,5 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
         }
     }
 
-
-    @Override
-    public Boolean increase(Integer productId, Integer count, Integer uId, String description, String orderSn, String type) {
-
-        ProductRepertory productRepertory = dao.selectOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, productId).eq(ProductRepertory::getUid, uId));
-        if (productRepertory == null) {
-            productRepertory = add(productId, 0, uId);
-        }
-        productRepertory.setCount(productRepertory.getCount() + count);
-        boolean ifSuccess = updateById(productRepertory);
-        if (BooleanUtils.isNotTrue(ifSuccess)) {
-            throw new CrmebException("当前操作人数过多");
-        }
-
-        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type);
-
-        return ifSuccess;
-    }
 }
 

@@ -6,6 +6,8 @@ import com.jbp.common.model.agent.CapaOrder;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaOrderRequest;
 
+import java.util.List;
+
 
 public interface CapaOrderService extends IService<CapaOrder> {
 
@@ -16,4 +18,7 @@ public interface CapaOrderService extends IService<CapaOrder> {
     Boolean edit(CapaOrderRequest capaRequest);
 
     CapaOrder getCapaOrderByUser(Integer capaId);
+
+    List<CapaOrder> getList();
+
 }

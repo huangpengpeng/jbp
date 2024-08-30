@@ -38,6 +38,9 @@ public class CapaOrder extends BaseModel {
     @ApiModelProperty(value = "升级图片是否展示")
     private Boolean ifShow;
 
+    @ApiModelProperty(value = "分值")
+    private Integer score;
+
     @ApiModelProperty(value = "等级名称")
     @TableField(exist = false)
     private String capaName;

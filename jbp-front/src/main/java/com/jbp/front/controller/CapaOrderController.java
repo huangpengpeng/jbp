@@ -3,7 +3,6 @@ package com.jbp.front.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.jbp.common.model.agent.CapaOrder;
 import com.jbp.common.model.agent.UserCapa;
-import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.user.User;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -91,11 +91,25 @@ public class CapaOrderController {
     @ApiOperation(value = "获取订货和补货金额门槛")
     @RequestMapping(value = "/getAmount", method = RequestMethod.GET)
     public CommonResult<CapaOrder> getAmount(Integer capaId) {
-        Integer uid = userService.getUserId();
-        if (ObjectUtil.isNull(uid)) {
-            return CommonResult.failed("获取当前用户信息失败！");
+        if (ObjectUtil.isNull(capaId)) {
+            Integer uid = userService.getUserId();
+            if (ObjectUtil.isNull(uid)) {
+                return CommonResult.failed("获取当前用户信息失败！");
+            }
+            UserCapa userCapa = userCapaService.getByUser(uid);
+            if (ObjectUtil.isNull(userCapa)) {
+                return CommonResult.failed("当前用户没有等级！");
+            }
+            capaId = userCapa.getCapaId().intValue();
         }
         CapaOrder capaOrder = capaOrderService.getCapaOrderByUser(capaId);
         return CommonResult.success(capaOrder);
+    }
+
+    @ApiOperation(value = "获取当前等级赠送分数")
+    @RequestMapping(value = "/getList", method = RequestMethod.GET)
+    public CommonResult<List<CapaOrder>> getAllList() {
+        List<CapaOrder> list = capaOrderService.getList();
+        return CommonResult.success(list);
     }
 }

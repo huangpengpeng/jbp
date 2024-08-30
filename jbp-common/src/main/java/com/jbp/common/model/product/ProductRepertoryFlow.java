@@ -42,6 +42,9 @@ public class ProductRepertoryFlow extends BaseModel {
     @ApiModelProperty(value = "类型（发货，供货，订货）")
     private String type;
 
+    @ApiModelProperty(value = "剩余库存")
+    private Integer surplusCount;
+
     @ApiModelProperty(value = "商品名称")
     @TableField(exist = false)
     private String productName;
