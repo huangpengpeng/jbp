@@ -1,5 +1,7 @@
 package com.jbp.common.lianlian.result;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,5 +25,10 @@ public class LztQueryAcctInfoResult {
      * 返回结果信息
      */
     private List<LztQueryAcctInfo> list;
+
+
+    private String drawBankAcctNo;
+
+    private String drawBankName;
 
 }

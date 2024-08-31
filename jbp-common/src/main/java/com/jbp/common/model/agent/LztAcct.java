@@ -138,4 +138,12 @@ public class LztAcct extends BaseModel {
     @ApiModelProperty(value = "是否可以代付")
     @TableField(exist = false)
     private Boolean ifPayment;
+
+    @ApiModelProperty(value = "提现卡号")
+    @TableField(exist = false)
+    private String drawBankAcctNo;
+
+    @ApiModelProperty(value = "提现银行")
+    @TableField(exist = false)
+    private String drawBankName;
 }

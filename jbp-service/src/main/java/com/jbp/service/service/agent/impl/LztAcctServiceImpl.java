@@ -101,7 +101,10 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                     }
                     lztAcct.setBankAcctInfoList(list);
                 }
+                lztAcct.setDrawBankName(bankAcctInfoResult.getDrawBankName());
+                lztAcct.setDrawBankAcctNo(bankAcctInfoResult.getDrawBankAcctNo());
             }
+
         }
 
         List<AcctInfo> acctinfoList = acctInfoResult.getAcctinfo_list();

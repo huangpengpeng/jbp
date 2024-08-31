@@ -2,6 +2,7 @@ package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.exception.CrmebException;
@@ -17,6 +18,7 @@ import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.yop.constants.YopEnums;
 import com.jbp.common.yop.dto.AccountBalanceInfoDto;
+import com.jbp.common.yop.dto.BankCardAccountDto;
 import com.jbp.common.yop.dto.FundBillFlowDto;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.DegreePayService;
@@ -27,6 +29,7 @@ import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +38,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DegreePayServiceImpl implements DegreePayService {
@@ -49,6 +53,7 @@ public class DegreePayServiceImpl implements DegreePayService {
     private LztAcctService lztAcctService;
     @Resource
     private LianLianPayService lianLianPayService;
+
 
     @Override
     public UserInfoResult queryUserInfo(LztPayChannel lztPayChannel, LztAcctOpen lztAcctOpen) {
@@ -122,14 +127,23 @@ public class DegreePayServiceImpl implements DegreePayService {
         LztQueryAcctInfoResult result = new LztQueryAcctInfoResult();
         if (lztAcctApply.getPayChannelType().equals("连连")) {
             result = lztService.queryBankAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcctApply.getUserId());
+            if (result == null) {
+                result = new LztQueryAcctInfoResult();
+            }
+            QueryLinkedAcctResult linkedAcctResult = lztService.queryLinkedAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcctApply.getUserId());
+            if (linkedAcctResult != null && CollectionUtils.isNotEmpty(linkedAcctResult.getLinked_acctlist())) {
+                LinkedAcctList linkedAcctList = linkedAcctResult.getLinked_acctlist().get(0);
+                result.setDrawBankName(linkedAcctList.getLinked_brbankname());
+                result.setDrawBankAcctNo(linkedAcctList.getLinked_acctno());
+            }
         }
         if (lztAcctApply.getPayChannelType().equals("易宝")) {
             if (StringUtils.isNotEmpty(lztAcct.getBankAccount())) {
-                String   bankCode = lztAcctApply.getOpenBank();
-                if("HXBXB_GATHER".equals(bankCode)){
+                String bankCode = lztAcctApply.getOpenBank();
+                if ("HXBXB_GATHER".equals(bankCode)) {
                     bankCode = "HXBXB";
                 }
-                if("SUNINGBANK_MULTICHANNEL".equals(bankCode)){
+                if ("SUNINGBANK_MULTICHANNEL".equals(bankCode)) {
                     bankCode = "SUNINGBANK";
                 }
                 BankAccountBalanceQueryResult yopResult = yopService.bankAccountBalanceQuery(lztAcctApply.getUserId(), bankCode,
@@ -153,6 +167,17 @@ public class DegreePayServiceImpl implements DegreePayService {
                 }
             }
         }
+        if (lztAcctApply.getPayChannelType().equals("易宝")) {
+            WithdrawCardQueryResult cardResult = yopService.withdrawCardQuery(lztAcct.getUserId());
+            if (cardResult != null && CollectionUtils.isNotEmpty(cardResult.getBankCardAccountList())) {
+                BankCardAccountDto bankCardAccount = cardResult.getBankCardAccountList().get(0);
+                Map<String, Object> map = SqlRunner.db().selectOne("select * from yop_bank_code where code='" + bankCardAccount.getBankCode() + "' limit 1 ");
+                result.setDrawBankName(MapUtils.getString(map, "name", ""));
+                result.setDrawBankAcctNo(bankCardAccount.getAccountNo());
+            }
+
+        }
+
         return result;
     }
 

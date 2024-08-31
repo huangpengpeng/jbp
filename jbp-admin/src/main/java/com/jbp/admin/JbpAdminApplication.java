@@ -5,10 +5,7 @@ import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration
 import com.jbp.common.captcha.util.RandomUtils;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.lianlian.params.PapAgreeQueryParams;
-import com.jbp.common.lianlian.result.BindCardH5ApplyResult;
-import com.jbp.common.lianlian.result.LztPapAgreeApplyResult;
-import com.jbp.common.lianlian.result.LztTransferResult;
-import com.jbp.common.lianlian.result.TransferMorepyeeResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.model.agent.LztAcct;
 import com.jbp.common.model.agent.LztPayChannel;
@@ -16,10 +13,8 @@ import com.jbp.common.model.agent.LztTransferMorepyee;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.vo.WeChatMiniAuthorizeVo;
-import com.jbp.service.service.DegreePayService;
-import com.jbp.service.service.LianLianPayService;
-import com.jbp.service.service.LztService;
-import com.jbp.service.service.WechatService;
+import com.jbp.common.yop.result.WithdrawCardQueryResult;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.LztAcctService;
 import com.jbp.service.service.agent.LztPayChannelService;
 import com.jbp.service.service.agent.LztSalaryTransferService;
@@ -54,6 +49,7 @@ public class JbpAdminApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
+//        demo(run);
     }
 
     private static void demo(ConfigurableApplicationContext run) {
@@ -63,8 +59,12 @@ public class JbpAdminApplication {
         LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
         LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
 
-        LztAcct lztAcct = lztAcctService.getByUserId("ruicirenli");
+        LztAcct lztAcct = lztAcctService.getByUserId("10089625822");
         LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
+
+        LztAcct details = lztAcctService.details("gz0002");
+
+        System.out.println(JSONObject.toJSONString(details));
     }
 
 
