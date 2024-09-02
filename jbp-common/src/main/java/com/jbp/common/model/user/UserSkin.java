@@ -22,4 +22,8 @@ public class UserSkin extends BaseModel {
 
     @ApiModelProperty(value = "皮肤检测信息")
     private String skinInfo;
+
+    @ApiModelProperty(value = "皮肤检测报告序列号")
+    private String recordListNo;
+
 }

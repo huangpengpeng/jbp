@@ -18,7 +18,5 @@ public interface CapaOrderService extends IService<CapaOrder> {
     Boolean edit(CapaOrderRequest capaRequest);
 
     CapaOrder getCapaOrderByUser(Integer capaId);
-
-    List<CapaOrder> getList();
-
+    List<CapaOrder> getList(Integer uid);
 }
