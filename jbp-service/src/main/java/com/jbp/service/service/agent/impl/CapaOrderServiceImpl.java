@@ -11,20 +11,24 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.CapaOrder;
+import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.CapaOrderRequest;
 import com.jbp.service.dao.agent.CapaOrderDao;
 import com.jbp.service.service.agent.CapaOrderService;
 import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.UserCapaService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
@@ -32,6 +36,9 @@ public class CapaOrderServiceImpl extends ServiceImpl<CapaOrderDao, CapaOrder> i
 
     @Resource
     private CapaService capaService;
+    @Resource
+    private UserCapaService userCapaService;
+
     @Override
     public CapaOrder getByCapaId(Integer capaId) {
         return getOne(new QueryWrapper<CapaOrder>().lambda().eq(CapaOrder::getCapaId, capaId));
@@ -75,16 +82,25 @@ public class CapaOrderServiceImpl extends ServiceImpl<CapaOrderDao, CapaOrder> i
     }
 
     @Override
-    public List<CapaOrder> getList() {
-        List<CapaOrder> list = list();
+    public List<CapaOrder> getList(Integer uid) {
+        UserCapa userCapa = userCapaService.getByUser(uid);
+        if (userCapa == null) {
+            return CollUtil.newArrayList();
+        }
+        //只展示合伙人和事业合伙人的订货管理配置信息
+        List<Integer> ids = new ArrayList<>();
+        ids.add(3);
+        ids.add(4);
+        List<CapaOrder> list = list(new QueryWrapper<CapaOrder>().lambda().in(CapaOrder::getCapaId, ids));
         if (CollectionUtils.isEmpty(list)) {
             return CollUtil.newArrayList();
         }
+        List<CapaOrder> fList = list.stream().filter(e -> e.getCapaId() <= userCapa.getCapaId()).collect(Collectors.toList());
         Map<Long, Capa> capaMap = capaService.getCapaMap();
-        list.forEach(e->{
+        fList.forEach(e->{
             Capa capa = capaMap.get(e.getCapaId());
             e.setCapaName(capa != null ? capa.getName() : "");
         });
-        return list;
+        return fList;
     }
 }

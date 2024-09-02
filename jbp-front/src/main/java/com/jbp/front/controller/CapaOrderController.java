@@ -109,7 +109,11 @@ public class CapaOrderController {
     @ApiOperation(value = "获取当前等级赠送分数")
     @RequestMapping(value = "/getList", method = RequestMethod.GET)
     public CommonResult<List<CapaOrder>> getAllList() {
-        List<CapaOrder> list = capaOrderService.getList();
+        Integer uid = userService.getUserId();
+        if (ObjectUtil.isNull(uid)) {
+            return CommonResult.failed("获取当前用户信息失败！");
+        }
+        List<CapaOrder> list = capaOrderService.getList(uid);
         return CommonResult.success(list);
     }
 }

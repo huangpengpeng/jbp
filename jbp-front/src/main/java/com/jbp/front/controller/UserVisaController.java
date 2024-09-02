@@ -623,9 +623,18 @@ public class UserVisaController {
         if (!result.get("code").equals(1) || result.getJSONArray("data").isEmpty()) {
             return CommonResult.success(false);
         }
+        JSONObject skin = result.getJSONArray("data").getJSONObject(0);
+        String record0 = skin.getJSONArray("record_list").get(0).toString();
+        String record1 = skin.getJSONArray("record_list").get(1).toString();
+        String recordListNo = record0 + record1;
+        UserSkin userSkinOne = userSkinService.getOne(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getRecordListNo, recordListNo));
+        if (userSkinOne != null) {
+            return CommonResult.success(true);
+        }
         UserSkin userSkin = new UserSkin();
         userSkin.setUid(user.getId());
         userSkin.setSkinInfo(result.get("data").toString());
+        userSkin.setRecordListNo(recordListNo);
         userSkinService.save(userSkin);
         return CommonResult.success(true);
     }
