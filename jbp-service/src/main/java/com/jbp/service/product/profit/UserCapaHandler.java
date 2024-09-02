@@ -90,6 +90,9 @@ public class UserCapaHandler implements ProductProfitHandler {
         if (CollectionUtils.isEmpty(productProfitList)) {
             return;
         }
+        if(order.getPlatform().equals("订货")){
+            return;
+        }
         // 获取执行等级
         Long capaId = -1L;
         ProductProfit exceProductProfit = null;

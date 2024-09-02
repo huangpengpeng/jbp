@@ -314,9 +314,10 @@ public class AsyncServiceImpl implements AsyncService {
         //增加补单订单
         orderFillService.saveOrder(order.getOrderNo());
 
-
-        // 发送用户升级
-        redisUtil.lPush(TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY, order.getUid());
+        if(!order.getPlatform().equals("订货")){
+            // 发送用户升级
+            redisUtil.lPush(TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY, order.getUid());
+        }
         // 释放锁
         redisTemplate.delete("orderPaySuccessSplit" + order.getOrderNo());
     }
