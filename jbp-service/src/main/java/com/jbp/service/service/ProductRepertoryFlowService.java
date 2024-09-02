@@ -10,7 +10,7 @@ import java.util.Date;
 public interface ProductRepertoryFlowService extends IService<ProductRepertoryFlow> {
 
 
-    void add(Integer uId, Integer productId, Integer count, String description, String orderSn, Date time,String type, Integer surplusCount);
+    void add(Integer uId, Integer productId, Integer count, String description, String orderSn, Date time,String type, Integer surplusCount, String kind);
 
     PageInfo<ProductRepertoryFlow> getList(Integer uid, String nickname, Integer productId, PageParamRequest pageParamRequest);
 }

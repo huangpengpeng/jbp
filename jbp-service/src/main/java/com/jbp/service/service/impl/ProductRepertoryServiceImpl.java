@@ -81,7 +81,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount());
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount(), "减少");
 
         return ifSuccess;
     }
@@ -99,7 +99,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount());
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount(), "增加");
 
         return ifSuccess;
     }
@@ -178,8 +178,11 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
     public void allot(List<ProductRepertoryRequest> request) {
 
         for (ProductRepertoryRequest productRepertoryRequest : request) {
+            if (productRepertoryRequest.getCount() == 0) {
+                continue;
+            }
             User users = userService.getByAccount(productRepertoryRequest.getPhone());
-            if (users  == null) {
+            if (users == null) {
                 throw new CrmebException("用户手机号不存在");
             }
             reduce(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), userService.getUserId(), "调拨给" + users.getAccount(), "", "调拨");

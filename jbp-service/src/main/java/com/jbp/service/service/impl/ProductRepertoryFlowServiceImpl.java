@@ -28,7 +28,7 @@ public class ProductRepertoryFlowServiceImpl extends ServiceImpl<ProductRepertor
 
 
     @Override
-    public void  add(Integer uId, Integer productId, Integer count, String description, String orderSn, Date time, String type, Integer surplusCount) {
+    public void  add(Integer uId, Integer productId, Integer count, String description, String orderSn, Date time, String type, Integer surplusCount, String kind){
         ProductRepertoryFlow productRepertoryFlow = new ProductRepertoryFlow();
         productRepertoryFlow.setUid(uId);
         productRepertoryFlow.setProductId(productId);
@@ -38,6 +38,7 @@ public class ProductRepertoryFlowServiceImpl extends ServiceImpl<ProductRepertor
         productRepertoryFlow.setTime(time);
         productRepertoryFlow.setType(type);
         productRepertoryFlow.setSurplusCount(surplusCount);
+        productRepertoryFlow.setKind(kind);
 
         save(productRepertoryFlow);
     }
