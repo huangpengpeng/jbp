@@ -46,7 +46,7 @@ public class ProductRepertoryController {
     @ApiOperation(value = "获取当前库存详情")
     @RequestMapping(value = "/updateUserCapa", method = RequestMethod.GET)
     public CommonResult<List<ProductRepertoryFlow>> password(Integer productId) {
-        List<ProductRepertoryFlow> productRepertoryFlows = productRepertoryFlowService.list(new QueryWrapper<ProductRepertoryFlow>().lambda().eq(ProductRepertoryFlow::getProductId, productId));
+        List<ProductRepertoryFlow> productRepertoryFlows = productRepertoryFlowService.list(new QueryWrapper<ProductRepertoryFlow>().lambda().eq(ProductRepertoryFlow::getProductId, productId).eq(ProductRepertoryFlow::getUid,userService.getUserId()));
         return CommonResult.success(productRepertoryFlows);
     }
 
