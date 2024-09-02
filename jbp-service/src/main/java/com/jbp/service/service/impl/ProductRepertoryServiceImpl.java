@@ -7,9 +7,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.excel.ProductRepertoryExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.product.Product;
+import com.jbp.common.model.product.ProductAttr;
+import com.jbp.common.model.product.ProductAttrValue;
 import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -51,6 +54,8 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
     private UserService userService;
     @Resource
     private UploadService uploadService;
+    @Resource
+    private ProductAttrValueService productAttrValueService;
 
     @Override
     public ProductRepertory add(Integer productId, Integer count, Integer uId) {
@@ -156,10 +161,13 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
         for (ProductRepertory productRepertory : productRepertoryList) {
             ProductRepertoryVo productRepertoryVo = new ProductRepertoryVo();
             Product product = productService.getById(productRepertory.getProductId());
+            List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(product.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+
             productRepertoryVo.setName(product.getName());
             productRepertoryVo.setCount(productRepertory.getCount());
             productRepertoryVo.setPicUrl(product.getImage());
             productRepertoryVo.setId(product.getId());
+            productRepertoryVo.setSpecificationId(attrValueList.get(0).getId());
             list.add(productRepertoryVo);
         }
 
