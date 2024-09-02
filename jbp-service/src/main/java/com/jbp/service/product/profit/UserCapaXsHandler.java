@@ -91,6 +91,12 @@ public class UserCapaXsHandler implements ProductProfitHandler {
         if (CollectionUtils.isEmpty(productProfitList)) {
             return;
         }
+
+        if(order.getPlatform().equals("订货")){
+            return;
+        }
+
+
         // 获取执行等级
         Long capaXsId = -1L;
         ProductProfit exceProductProfit = null;
