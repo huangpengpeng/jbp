@@ -81,7 +81,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, -count, description, orderSn, new Date(), type, productRepertory.getCount());
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount());
 
         return ifSuccess;
     }
