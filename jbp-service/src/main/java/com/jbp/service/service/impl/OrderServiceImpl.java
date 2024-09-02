@@ -20,10 +20,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.enums.OrderFillType;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.admin.SystemAdmin;
-import com.jbp.common.model.agent.Capa;
-import com.jbp.common.model.agent.ProductMaterials;
-import com.jbp.common.model.agent.Team;
-import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.model.express.Express;
 import com.jbp.common.model.merchant.Merchant;
 import com.jbp.common.model.order.*;
@@ -43,6 +40,7 @@ import com.jbp.service.dao.OrderInvoiceDao;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.ProductMaterialsService;
+import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +127,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private RefundOrderService refundOrderService;
     @Autowired
     private OrderFillService orderFillService;
+    @Autowired
+    private UserInvitationService userInvitationService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -237,8 +237,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                 lqw.eq(Order::getPayUid, userId);
                 lqw.ne(Order::getUid, userId);
             } else {
-                lqw.eq(Order::getUid, userId);
+                //客户订单
+                if(request.getIfCient() != null && request.getIfCient()){
+                    List<Integer> listPid = userInvitationService.getNextPidList(userId);
+                    lqw.in(Order::getUid, listPid);
+                }else {
+                    lqw.eq(Order::getUid, userId);
+                }
             }
+
+
+
             if (request.getStatus() >= 0) {
                 if (request.getStatus() == 1) {
                     lqw.in(Order::getStatus, OrderConstants.ORDER_STATUS_WAIT_SHIPPING, OrderConstants.ORDER_STATUS_PART_SHIPPING);
