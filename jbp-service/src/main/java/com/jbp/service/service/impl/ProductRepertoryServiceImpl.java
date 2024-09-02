@@ -178,12 +178,12 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
     public void allot(List<ProductRepertoryRequest> request) {
 
         for (ProductRepertoryRequest productRepertoryRequest : request) {
-            List<User> users = userService.getByPhone(productRepertoryRequest.getPhone());
-            if (users.isEmpty()) {
+            User users = userService.getByAccount(productRepertoryRequest.getPhone());
+            if (users  == null) {
                 throw new CrmebException("用户手机号不存在");
             }
-            reduce(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), userService.getUserId(), "调拨给" + users.get(0).getAccount(), "", "调拨");
-            increase(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), users.get(0).getId(), userService.getAccount() + "调拨接收", "", "调拨");
+            reduce(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), userService.getUserId(), "调拨给" + users.getAccount(), "", "调拨");
+            increase(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), users.getId(), userService.getAccount() + "调拨接收", "", "调拨");
         }
     }
 
