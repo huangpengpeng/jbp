@@ -39,5 +39,6 @@ public class OrderFrontListRequest extends PageParamRequest implements Serializa
     @ApiModelProperty(value = "是否代购订单")
     private Boolean agent;
 
-
+    @ApiModelProperty(value = "是否客户订单")
+    private Boolean ifCient;
 }
