@@ -20,4 +20,8 @@ public class ProductRepertoryVo {
     @ApiModelProperty("商品数量")
     private Integer count;
 
+
+    @ApiModelProperty("商品id")
+    private Integer id;
+
 }

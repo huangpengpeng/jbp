@@ -159,6 +159,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             productRepertoryVo.setName(product.getName());
             productRepertoryVo.setCount(productRepertory.getCount());
             productRepertoryVo.setPicUrl(product.getImage());
+            productRepertoryVo.setId(product.getId());
             list.add(productRepertoryVo);
         }
 
