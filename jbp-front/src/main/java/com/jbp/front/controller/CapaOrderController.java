@@ -68,6 +68,10 @@ public class CapaOrderController {
 
         Integer pId = userInvitationService.getPid(uid);
 
+        if(pId == null){
+            return CommonResult.success();
+        }
+
         do {
             UserCapa pCapa = userCapaService.getByUser(pId);
             CapaOrder capaOrder = capaOrderService.getCapaOrderByUser(userCapa.getCapaId().intValue());
