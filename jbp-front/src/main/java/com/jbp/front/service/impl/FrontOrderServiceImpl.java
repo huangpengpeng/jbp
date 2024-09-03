@@ -180,6 +180,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Autowired
     private UserSkinService userSkinService;
 
+    @Autowired
+    private UserInvitationService userInvitationService;
+
     /**
      * 订单预下单V1.3
      *
@@ -1585,7 +1588,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public OrderFrontDetailResponse frontDetail(String orderNo) {
         User currentUser = userService.getInfo();
         Order order = orderService.getByOrderNo(orderNo);
-        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId()))) {
+        Integer pid =  userInvitationService.getPid(order.getUid());
+        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId()) &&  !pid.equals(currentUser.getId()))) {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
