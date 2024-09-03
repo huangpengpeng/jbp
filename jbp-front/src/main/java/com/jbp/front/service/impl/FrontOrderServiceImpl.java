@@ -1577,7 +1577,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         User currentUser = userService.getInfo();
         Order order = orderService.getByOrderNo(orderNo);
         Integer pid =  userInvitationService.getPid(order.getUid());
-        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId())) || !pid.equals(currentUser.getId())) {
+        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId()) &&  !pid.equals(currentUser.getId()))) {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
