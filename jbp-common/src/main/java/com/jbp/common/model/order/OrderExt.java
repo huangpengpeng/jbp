@@ -67,4 +67,7 @@ public class OrderExt extends BaseModel {
 
     @ApiModelProperty(value = "订单商品扩展信息")
     private String orderGoodsInfo;
+
+    @ApiModelProperty(value = "序列号")
+    private String number;
 }

@@ -34,6 +34,7 @@ import com.jbp.common.model.seckill.SeckillProduct;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserAddress;
 import com.jbp.common.model.user.UserIntegralRecord;
+import com.jbp.common.model.user.UserSkin;
 import com.jbp.common.model.wechat.video.PayComponentProduct;
 import com.jbp.common.model.wechat.video.PayComponentProductSku;
 import com.jbp.common.page.CommonPage;
@@ -176,6 +177,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     @Autowired
     private ProductRepertoryService productRepertoryService;
+    @Autowired
+    private UserSkinService userSkinService;
 
     /**
      * 订单预下单V1.3
@@ -976,6 +979,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         if (!exists) {
             throw new CrmebException("预下单订单不存在");
         }
+        if (StringUtils.isNotEmpty(orderRequest.getNumber())) {
+            UserSkin userSkin = userSkinService.getByNo(orderRequest.getNumber());
+            if (ObjectUtil.isNull(userSkin)) {
+                throw new CrmebException("该序列号不存在！");
+            }
+        }
         String orderVoString = redisUtil.get(key).toString();
         PreOrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, PreOrderInfoVo.class);
         if (orderInfoVo.getType().equals(OrderConstants.ORDER_TYPE_SECKILL)) {
@@ -1083,6 +1092,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         orderExt.setOrderNo(order.getOrderNo());
         if (StringUtils.isNotEmpty(orderRequest.getContent())) {
             orderExt.setOrderGoodsInfo(orderRequest.getContent());
+        }
+        if (StringUtils.isNotEmpty(orderRequest.getNumber())) {
+            orderExt.setNumber(orderRequest.getNumber());
         }
         // 商户订单
         List<Integer> couponIdList = CollUtil.newArrayList();
