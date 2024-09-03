@@ -44,11 +44,11 @@ public class UserCapaUpdateInvitationEventListener implements ApplicationListene
         //分公司
         String riseFilialeMark = systemConfigService.getValueByKey("rise_filiale_mark");
         Integer score = 0;
-        if (userCapa.getCapaId() == 2) {
+        if (userCapa.getCapaId() == 3) {
             score =  risePartnerMark == null? 0: Integer.valueOf(risePartnerMark);
-        } else if (userCapa.getCapaId() == 3) {
-            score = riseCauseMark == null? 0:  Integer.valueOf(riseCauseMark);
         } else if (userCapa.getCapaId() == 4) {
+            score = riseCauseMark == null? 0:  Integer.valueOf(riseCauseMark);
+        } else if (userCapa.getCapaId() == 5) {
             score = riseFilialeMark == null? 0: Integer.valueOf(riseFilialeMark);
         }
         if(score > 0 ) {
