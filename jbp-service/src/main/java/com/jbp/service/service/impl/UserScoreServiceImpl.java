@@ -114,9 +114,9 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         //事业合伙人
         String reduceCauseMark = systemConfigService.getValueByKey("reduce_cause_mark");
         Integer score = 0;
-        if (request.getCapaId() == 2) {
+        if (request.getCapaId() == 3) {
             score = reducePartnerMark == null ? 0 : Integer.valueOf(reducePartnerMark);
-        } else if (request.getCapaId() == 3) {
+        } else if (request.getCapaId() == 4) {
             score = reduceCauseMark == null ? 0 : Integer.valueOf(reduceCauseMark);
         }
 
