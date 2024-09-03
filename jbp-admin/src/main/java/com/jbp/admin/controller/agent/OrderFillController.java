@@ -28,7 +28,7 @@ public class OrderFillController {
     @Autowired
     private UserService userService;
 
-//    @PreAuthorize("hasAuthority('agent:order:fill:page')")
+    @PreAuthorize("hasAuthority('agent:order:fill:page')")
     @GetMapping("/page")
     @ApiOperation("订单补单列表")
     public CommonResult<CommonPage<OrderFill>> page(OrderFillSearchRequest request, PageParamRequest pageParamRequest) {
