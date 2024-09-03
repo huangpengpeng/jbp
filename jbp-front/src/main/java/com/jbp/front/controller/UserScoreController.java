@@ -63,7 +63,7 @@ public class UserScoreController {
     @RequestMapping(value = "/getUserScoreFlow", method = RequestMethod.GET)
     public CommonResult<List<UserScoreFlow>> getUserScoreFlow() {
 
-        List<UserScoreFlow> userScoreFlows = userScoreFlowService.list(new QueryWrapper<UserScoreFlow>().lambda().eq(UserScoreFlow::getUid, userService.getUserId()));
+        List<UserScoreFlow> userScoreFlows = userScoreFlowService.list(new QueryWrapper<UserScoreFlow>().lambda().eq(UserScoreFlow::getUid, userService.getUserId()).orderByDesc(UserScoreFlow::getCreateTime));
 
         return CommonResult.success(userScoreFlows);
     }

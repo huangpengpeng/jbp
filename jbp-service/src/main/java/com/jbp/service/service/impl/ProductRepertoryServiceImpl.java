@@ -81,7 +81,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount());
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount(), "减少");
 
         return ifSuccess;
     }
@@ -99,7 +99,7 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
             throw new CrmebException("当前操作人数过多");
         }
 
-        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount());
+        productRepertoryFlowService.add(uId, productId, count, description, orderSn, new Date(), type, productRepertory.getCount(), "增加");
 
         return ifSuccess;
     }
@@ -176,14 +176,17 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
 
     @Override
     public void allot(List<ProductRepertoryRequest> request) {
-
+        User user = userService.getInfo();
         for (ProductRepertoryRequest productRepertoryRequest : request) {
+            if (productRepertoryRequest.getCount() == 0) {
+                continue;
+            }
             User users = userService.getByAccount(productRepertoryRequest.getPhone());
-            if (users  == null) {
+            if (users == null) {
                 throw new CrmebException("用户手机号不存在");
             }
             reduce(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), userService.getUserId(), "调拨给" + users.getAccount(), "", "调拨");
-            increase(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), users.getId(), userService.getAccount() + "调拨接收", "", "调拨");
+            increase(productRepertoryRequest.getProductId(), productRepertoryRequest.getCount(), users.getId(), user.getAccount() + "调拨接收", "", "调拨");
         }
     }
 

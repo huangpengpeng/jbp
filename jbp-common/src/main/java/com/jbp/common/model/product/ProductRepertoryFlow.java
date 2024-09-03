@@ -39,11 +39,14 @@ public class ProductRepertoryFlow extends BaseModel {
     @ApiModelProperty(value = "时间")
     private Date time;
 
-    @ApiModelProperty(value = "类型（发货，供货，订货）")
+    @ApiModelProperty(value = "类型（发货，供货，订货,调拨，取消订单）")
     private String type;
 
     @ApiModelProperty(value = "剩余库存")
     private Integer surplusCount;
+
+    @ApiModelProperty(value = "库存变动方向")
+    private String kind;
 
     @ApiModelProperty(value = "商品名称")
     @TableField(exist = false)
