@@ -689,10 +689,8 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
                 }
 
 
-List<String> extUser =new ArrayList<>();
-                extUser.add("1099855245305012");
-
-
+                List<String> extUser =new ArrayList<>();
+                extUser.add("1027477816459045");
 
 
                 BigDecimal salse = orderService.getGoodsPrice(goodsRepetitionIdQua,user.getId(), month+"-01 00:00:00");
