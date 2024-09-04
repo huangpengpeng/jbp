@@ -93,6 +93,23 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
             throw new CrmebException("手机号重复");
         }
 
+        //合伙人分数
+        String reducePartnerMark = systemConfigService.getValueByKey("reduce_partner_mark");
+        //事业合伙人
+        String reduceCauseMark = systemConfigService.getValueByKey("reduce_cause_mark");
+        Integer score = 0;
+        if (request.getCapaId() == 3) {
+            score = reducePartnerMark == null ? 0 : Integer.valueOf(reducePartnerMark);
+        } else if (request.getCapaId() == 4) {
+            score = reduceCauseMark == null ? 0 : Integer.valueOf(reduceCauseMark);
+        }
+
+        if (score > 0) {
+            Capa capa =  capaService.getById(request.getCapaId());
+            reduce(userService.getUserId(), score, "赠送"+capa.getName(),request.getPhone());
+        }
+
+
         if (phoneList.isEmpty()) {
             //赠送用户等级账号
             User user = userService.registerNoBandPater(request.getPhone(), request.getPhone(), "上级赠送", request.getCapaId());
@@ -109,21 +126,7 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
           }
         }
 
-        //合伙人分数
-        String reducePartnerMark = systemConfigService.getValueByKey("reduce_partner_mark");
-        //事业合伙人
-        String reduceCauseMark = systemConfigService.getValueByKey("reduce_cause_mark");
-        Integer score = 0;
-        if (request.getCapaId() == 3) {
-            score = reducePartnerMark == null ? 0 : Integer.valueOf(reducePartnerMark);
-        } else if (request.getCapaId() == 4) {
-            score = reduceCauseMark == null ? 0 : Integer.valueOf(reduceCauseMark);
-        }
 
-        if (score > 0) {
-           Capa capa =  capaService.getById(request.getCapaId());
-            reduce(userService.getUserId(), score, "赠送"+capa.getName(),request.getPhone());
-        }
     }
 
 
