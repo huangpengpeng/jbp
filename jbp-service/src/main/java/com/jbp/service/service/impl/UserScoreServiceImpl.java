@@ -89,9 +89,13 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
 
 
         List<User> phoneList = userService.getByPhone(request.getPhone());
+        if(phoneList.isEmpty()){
+            throw new CrmebException("手机号不存在");
+        }
         if (phoneList.size() > 1) {
             throw new CrmebException("手机号重复");
         }
+
 
         //合伙人分数
         String reducePartnerMark = systemConfigService.getValueByKey("reduce_partner_mark");
