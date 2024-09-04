@@ -1,10 +1,12 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
+import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserScore;
 import com.jbp.common.request.UserScoreRequest;
@@ -15,6 +17,7 @@ import com.jbp.service.service.UserScoreService;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
+import com.jbp.service.service.agent.UserCapaSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +47,8 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
     private UserCapaService userCapaService;
     @Autowired
     private CapaService capaService;
-
+    @Autowired
+    private UserCapaSnapshotService userCapaSnapshotService;
 
 
     @Override
@@ -57,17 +61,17 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
             userScore.setScore(score);
             userScore.setUid(uid);
             dao.insert(userScore);
+        }else {
+            userScore.setScore(userScore.getScore() + score);
+            dao.updateById(userScore);
         }
 
-        userScore.setScore(userScore.getScore() + score);
-        dao.updateById(userScore);
-
-        userScoreFlowService.add(uid, score, "增加", desc,"升级");
+        userScoreFlowService.add(uid, score, "增加", desc, "升级");
 
     }
 
     @Override
-    public void reduce(Integer uid, Integer score, String desc,String remark) {
+    public void reduce(Integer uid, Integer score, String desc, String remark) {
         UserScore userScore = dao.selectOne(new QueryWrapper<UserScore>().lambda().eq(UserScore::getUid, uid));
         if (userScore == null) {
             throw new RuntimeException("用户无分数，无法扣减");
@@ -80,7 +84,7 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         userScore.setScore(userScore.getScore() - score);
         dao.updateById(userScore);
 
-        userScoreFlowService.add(uid, score, "减少", desc,remark);
+        userScoreFlowService.add(uid, score, "减少", desc, remark);
 
     }
 
@@ -89,7 +93,7 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
 
 
         List<User> phoneList = userService.getByPhone(request.getPhone());
-        if(phoneList.isEmpty()){
+        if (phoneList.isEmpty()) {
             throw new CrmebException("手机号不存在");
         }
         if (phoneList.size() > 1) {
@@ -109,8 +113,8 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         }
 
         if (score > 0) {
-            Capa capa =  capaService.getById(request.getCapaId());
-            reduce(userService.getUserId(), score, "赠送"+capa.getName(),request.getPhone());
+            Capa capa = capaService.getById(request.getCapaId());
+            reduce(userService.getUserId(), score, "赠送" + capa.getName(), request.getPhone());
         }
 
 
@@ -121,13 +125,29 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
             userInvitationService.band(user.getId(), userService.getUserId(), false, true, false);
         }
 
-        if(!phoneList.isEmpty()){
-          UserCapa userCapa  =  userCapaService.getByUser(phoneList.get(0).getId());
-          if(userCapa==null || userCapa.getCapaId() < request.getCapaId()){
-              userCapaService.saveOrUpdateCapa(phoneList.get(0).getId(),request.getCapaId(),"赠送","上级赠送");
-          }else{
-              throw new CrmebException("赠送级别低于当前等级，无法操作");
-          }
+        if (!phoneList.isEmpty()) {
+            UserCapa userCapa = userCapaService.getByUser(phoneList.get(0).getId());
+            if (userCapa == null || userCapa.getCapaId() < request.getCapaId()) {
+                UserCapa userCapa2 = userCapaService.getByUser(phoneList.get(0).getId());
+
+                String type = "";
+                if (userCapa2 == null) {
+                    userCapa2 = UserCapa.builder().uid(phoneList.get(0).getId()).capaId(request.getCapaId()).build();
+                    type = UserCapaSnapshot.Constants.升级.toString();
+                } else {
+                    type = NumberUtil.compare(userCapa2.getCapaId(), request.getCapaId()) > 0 ? UserCapaSnapshot.Constants.降级.toString()
+                            : UserCapaSnapshot.Constants.升级.toString();
+                    userCapa2.setCapaId(request.getCapaId());
+                }
+                userCapaService.saveOrUpdate(userCapa2);
+                // 记录快照
+                UserCapaSnapshot snapshot = UserCapaSnapshot.builder().uid(phoneList.get(0).getId()).capaId(request.getCapaId()).type(type).remark("赠送")
+                        .description("上级赠送").build();
+                userCapaSnapshotService.save(snapshot);
+
+            } else {
+                throw new CrmebException("赠送级别低于当前等级，无法操作");
+            }
         }
 
 
