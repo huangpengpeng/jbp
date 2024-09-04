@@ -28,7 +28,7 @@ public class ProductRepertoryFlowController {
     @Autowired
     private ProductRepertoryFlowService productRepertoryFlowService;
 
-//    @PreAuthorize("hasAuthority('agent:platform:product:repertory:flow:page')")
+    @PreAuthorize("hasAuthority('agent:platform:product:repertory:flow:page')")
     @GetMapping("/list")
     @ApiOperation("库存明细分页列表")
     public CommonResult<CommonPage<ProductRepertoryFlow>> page(ProductRepertoryFlowSearchRequest request, PageParamRequest pageParamRequest){
