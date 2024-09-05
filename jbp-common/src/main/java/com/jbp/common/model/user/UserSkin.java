@@ -1,5 +1,6 @@
 package com.jbp.common.model.user;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -12,10 +13,10 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("eb_user_skin")
-@ApiModel(value="UserSkin对象", description="用户皮肤检测记录表")
+@ApiModel(value = "UserSkin对象", description = "用户皮肤检测记录表")
 public class UserSkin extends BaseModel {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "用户uid")
     private Integer uid;
@@ -25,5 +26,18 @@ public class UserSkin extends BaseModel {
 
     @ApiModelProperty(value = "皮肤检测报告序列号")
     private String recordListNo;
+
+    @ApiModelProperty(value = "用户账号")
+    @TableField(exist = false)
+    private String account;
+
+    @ApiModelProperty(value = "用户手机号")
+    @TableField(exist = false)
+    private String phone;
+
+    @ApiModelProperty(value = "用户昵称")
+    @TableField(exist = false)
+    private String nickname;
+
 
 }
