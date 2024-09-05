@@ -1,6 +1,7 @@
 package com.jbp.front.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jbp.common.enums.OrderFillType;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderFill;
@@ -52,7 +53,7 @@ public class OrderFillController {
     @RequestMapping(value = "/getFill", method = RequestMethod.GET)
     public CommonResult<List<OrderFillVo>> getFill() {
 
-        List<OrderFill> orderFillList = orderFillService.list(new QueryWrapper<OrderFill>().lambda().eq(OrderFill::getUid, userService.getUserId()));
+        List<OrderFill> orderFillList = orderFillService.list(new QueryWrapper<OrderFill>().lambda().eq(OrderFill::getUid, userService.getUserId()).eq(OrderFill::getStatus, OrderFillType.待补单.getName()));
 
         List<OrderFillVo> orderFillVos = new ArrayList<>();
 
