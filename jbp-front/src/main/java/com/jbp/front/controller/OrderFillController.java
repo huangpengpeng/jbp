@@ -2,6 +2,7 @@ package com.jbp.front.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.enums.OrderFillType;
+import com.jbp.common.enums.SupplyRuleEnum;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderFill;
@@ -64,11 +65,13 @@ public class OrderFillController {
             List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 
             for (OrderDetail detail : orderDetailList) {
-
-
                 List<ProductRef> refs = productRefService.getList(detail.getProductId());
 
                 if (refs.isEmpty()) {
+                    Product product = productService.getById(detail.getProductId());
+                    if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
+                        continue;
+                    }
                     ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, userService.getUserId()).eq(ProductRepertory::getProductId, detail.getProductId()));
                     OrderFillVo orderFillVo = new OrderFillVo();
                     orderFillVo.setCount(detail.getPayNum());
@@ -81,6 +84,10 @@ public class OrderFillController {
                 } else {
                     for (ProductRef ref : refs) {
                         Product product = productService.getById(ref.getProductId());
+                        if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
+                            continue;
+                        }
+
                         List<ProductAttrValue> productAttrValueList = productAttrValueService.list(new QueryWrapper<ProductAttrValue>().lambda().eq(ProductAttrValue::getProductId, ref.getProductId()));
                         ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, userService.getUserId()).eq(ProductRepertory::getProductId, ref.getProductId()));
                         OrderFillVo orderFillVo = new OrderFillVo();
