@@ -9,6 +9,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.enums.OrderFillType;
+import com.jbp.common.enums.SupplyRuleEnum;
 import com.jbp.common.model.agent.CapaOrder;
 import com.jbp.common.model.agent.FundClearing;
 import com.jbp.common.model.agent.UserCapa;
@@ -174,7 +175,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             if (refs.isEmpty()) {
                 ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
                 Product product = productService.getById(orderDetail.getProductId());
-                if (product.getSupplyRule().equals("公司补货")) {
+                if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("price", orderDetail.getPrice().multiply(new BigDecimal(orderDetail.getPayNum())));
                     mapList.add(map);
@@ -187,7 +188,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
                 for (ProductRef ref : refs) {
                     ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, ref.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
                     Product product = productService.getById(ref.getProductId());
-                    if (product.getSupplyRule().equals("公司补货")) {
+                    if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                         Map<String, Object> map = new HashMap<>();
                         map.put("price", ref.getPrice().multiply(new BigDecimal(ref.getCount())).multiply(new BigDecimal(orderDetail.getPayNum())));
                         mapList.add(map);
@@ -215,7 +216,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             List<ProductRef> refs = productRefService.getList(orderDetail.getProductId());
             if (refs.isEmpty()) {
                 Product product = productService.getById(orderDetail.getProductId());
-                if (product.getSupplyRule().equals("公司补货")) {
+                if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                     continue;
                 }
                 productRepertoryService.reduce(orderDetail.getProductId(), orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
@@ -223,7 +224,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             } else {
                 for (ProductRef ref : refs) {
                     Product product = productService.getById(ref.getProductId());
-                    if (product.getSupplyRule().equals("公司补货")) {
+                    if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                         continue;
                     }
                     productRepertoryService.reduce(ref.getProductId(), ref.getCount()*orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
