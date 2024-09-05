@@ -1,34 +1,46 @@
 package com.jbp.service.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.jbp.common.excel.UserScoreExcel;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserCapaSnapshot;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserScore;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.UserScoreRequest;
+import com.jbp.common.request.agent.UserScoreEditRequest;
+import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.UserScoreDao;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.UserScoreFlowService;
-import com.jbp.service.service.UserScoreService;
-import com.jbp.service.service.UserService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaSnapshotService;
 import com.jbp.service.service.agent.UserInvitationService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 
 
 @Service
+@Slf4j
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> implements UserScoreService {
 
@@ -40,7 +52,6 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
     private UserService userService;
     @Autowired
     private UserInvitationService userInvitationService;
-
     @Autowired
     private SystemConfigService systemConfigService;
     @Autowired
@@ -49,10 +60,12 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
     private CapaService capaService;
     @Autowired
     private UserCapaSnapshotService userCapaSnapshotService;
+    @Autowired
+    private UploadService uploadService;
 
 
     @Override
-    public void increase(Integer uid, Integer score, String desc) {
+    public void increase(Integer uid, Integer score, String desc, String remark) {
 
         UserScore userScore = dao.selectOne(new QueryWrapper<UserScore>().lambda().eq(UserScore::getUid, uid));
 
@@ -61,12 +74,12 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
             userScore.setScore(score);
             userScore.setUid(uid);
             dao.insert(userScore);
-        }else {
+        } else {
             userScore.setScore(userScore.getScore() + score);
             dao.updateById(userScore);
         }
 
-        userScoreFlowService.add(uid, score, "增加", desc, "升级");
+        userScoreFlowService.add(uid, score, "增加", desc, remark, userScore.getScore());
 
     }
 
@@ -84,7 +97,7 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         userScore.setScore(userScore.getScore() - score);
         dao.updateById(userScore);
 
-        userScoreFlowService.add(uid, score, "减少", desc, remark);
+        userScoreFlowService.add(uid, score, "减少", desc, remark, userScore.getScore());
 
     }
 
@@ -114,7 +127,8 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
 
         if (score > 0) {
             Capa capa = capaService.getById(request.getCapaId());
-            reduce(userService.getUserId(), score, "赠送" + capa.getName(), request.getPhone());
+            User user = userService.getInfo();
+            reduce(user.getId(), score, "赠送" + capa.getName(), user.getNickname() + "/" + request.getPhone() + "/" + user.getAccount());
         }
 
 
@@ -151,6 +165,47 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
         }
 
 
+    }
+
+    @Override
+    public PageInfo<UserScore> getList(Integer uid, String nickname, String phone, PageParamRequest pageParamRequest) {
+        Page<UserScore> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<UserScore> list = dao.getList(uid, nickname, phone);
+        return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public Boolean edit(UserScoreEditRequest request) {
+        if (ObjectUtil.isNull(request.getId()) || ObjectUtil.isNull(request.getScore()) || StrUtil.isEmpty(request.getType())) {
+            throw new CrmebException("参数不全！");
+        }
+        UserScore userScore = getById(request.getId());
+        if (userScore == null) {
+            throw new CrmebException("id不存在！");
+        }
+        if (request.getType().equals("增加")) {
+            increase(userScore.getUid(), request.getScore(), "人工修改", request.getRemark());
+        } else {
+            reduce(userScore.getUid(), request.getScore(), "人工修改", request.getRemark());
+        }
+        return true;
+    }
+
+    @Override
+    public String export(Integer uid, String nickname, String phone) {
+        List<UserScore> list = dao.getList(uid, nickname, phone);
+        if (CollUtil.isEmpty(list)) {
+            throw new CrmebException("未查询到用户分数管理数据！");
+        }
+        List<UserScoreExcel> result = new LinkedList<>();
+        list.forEach(e -> {
+            UserScoreExcel vo = new UserScoreExcel();
+            BeanUtils.copyProperties(e, vo);
+            result.add(vo);
+        });
+        FileResultVo fileResultVo = uploadService.excelLocalUpload(result, UserScoreExcel.class);
+        log.info("导出用户分数管理下载地址:" + fileResultVo.getUrl());
+        return fileResultVo.getUrl();
     }
 
 

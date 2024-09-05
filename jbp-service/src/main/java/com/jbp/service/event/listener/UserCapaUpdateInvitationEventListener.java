@@ -52,7 +52,7 @@ public class UserCapaUpdateInvitationEventListener implements ApplicationListene
             score = riseFilialeMark == null? 0: Integer.valueOf(riseFilialeMark);
         }
         if(score > 0 ) {
-            userScoreService.increase(userCapa.getUid(), score, "升级");
+            userScoreService.increase(userCapa.getUid(), score, "升级", "下单升级");
         }
 
     }
