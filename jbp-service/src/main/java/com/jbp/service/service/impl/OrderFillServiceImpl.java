@@ -16,6 +16,8 @@ import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderFill;
+import com.jbp.common.model.product.Product;
+import com.jbp.common.model.product.ProductRef;
 import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
@@ -23,10 +25,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.OrderFillDao;
 import com.jbp.service.service.*;
-import com.jbp.service.service.agent.CapaOrderService;
-import com.jbp.service.service.agent.FundClearingService;
-import com.jbp.service.service.agent.UserCapaService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -68,6 +64,10 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
     private UserService userService;
     @Resource
     private FundClearingService fundClearingService;
+    @Resource
+    private ProductService productService;
+    @Resource
+    private ProductRefService productRefService;
 
     @Override
     public OrderFill add(String orderNo, Integer uId) {
@@ -164,13 +164,45 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
     @Override
     public void fill(OrderFill orderFill) {
 
+        List<Map<String, Object>> mapList = new ArrayList<>();
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orderFill.getOrderNo());
 
         Boolean ifFill = false;
         for (OrderDetail orderDetail : orderDetailList) {
-            ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
-            if (productRepertory.getCount() - orderDetail.getPayNum() < 0) {
-                ifFill = true;
+
+            List<ProductRef> refs = productRefService.getList(orderDetail.getProductId());
+            if (refs.isEmpty()) {
+                ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
+                Product product = productService.getById(orderDetail.getProductId());
+                if (product.getSupplyRule().equals("公司补货")) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("price", orderDetail.getPrice().multiply(new BigDecimal(orderDetail.getPayNum())));
+                    mapList.add(map);
+                    continue;
+                }
+                if (productRepertory.getCount() - orderDetail.getPayNum() < 0) {
+                    ifFill = true;
+                }
+            } else {
+                for (ProductRef ref : refs) {
+                    ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, ref.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
+                    Product product = productService.getById(ref.getProductId());
+                    if (product.getSupplyRule().equals("公司补货")) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("price", ref.getPrice().multiply(new BigDecimal(ref.getCount())).multiply(new BigDecimal(orderDetail.getPayNum())));
+                        mapList.add(map);
+                        continue;
+                    }
+                    if (productRepertory.getCount() - (orderDetail.getPayNum() * ref.getCount()) < 0) {
+                        ifFill = true;
+                    } else {
+                        ifFill = false;
+                        break;
+                    }
+                }
+            }
+            if(!ifFill){
+                break;
             }
         }
         //库存不足，无法补单
@@ -179,7 +211,27 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         }
 
         for (OrderDetail orderDetail : orderDetailList) {
-            productRepertoryService.reduce(orderDetail.getProductId(), orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
+
+            List<ProductRef> refs = productRefService.getList(orderDetail.getProductId());
+            if (refs.isEmpty()) {
+                Product product = productService.getById(orderDetail.getProductId());
+                if (product.getSupplyRule().equals("公司补货")) {
+                    continue;
+                }
+                productRepertoryService.reduce(orderDetail.getProductId(), orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
+
+            } else {
+                for (ProductRef ref : refs) {
+                    Product product = productService.getById(ref.getProductId());
+                    if (product.getSupplyRule().equals("公司补货")) {
+                        continue;
+                    }
+                    productRepertoryService.reduce(ref.getProductId(), ref.getCount()*orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
+
+                }
+            }
+
+
         }
         orderFill.setStatus(OrderFillType.已补单.getName());
         orderFill.setFillTime(new Date());
@@ -192,7 +244,18 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         for (FundClearing fundClearing : fundClearingList) {
             clearingFee = clearingFee.add(fundClearing.getCommAmt());
         }
-        fundClearingService.create(orderFill.getUid(), orderFill.getOrderNo(), "货款", clearingFee,
+
+        Order order = orderService.getByOrderNo(orderFill.getOrderNo());
+
+
+        //计算公司补货金额
+        BigDecimal price = BigDecimal.ZERO;
+        for (Map<String, Object> map : mapList) {
+            price = price.add(new BigDecimal(map.get("price").toString()));
+        }
+
+
+        fundClearingService.create(orderFill.getUid(), orderFill.getOrderNo(), "货款", order.getPayPrice().subtract(clearingFee).subtract(price),
                 null, orderFill.getOrderNo() + "下单获得货款", "");
     }
 
