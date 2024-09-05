@@ -4,10 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.OrderFill;
+import com.jbp.common.model.product.Product;
+import com.jbp.common.model.product.ProductAttrValue;
+import com.jbp.common.model.product.ProductRef;
 import com.jbp.common.model.product.ProductRepertory;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.vo.OrderFillVo;
 import com.jbp.service.service.*;
+import com.jbp.service.service.agent.ProductRefService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +40,13 @@ public class OrderFillController {
     private OrderService orderService;
     @Autowired
     private OrderDetailService orderDetailService;
+    @Autowired
+    private ProductRefService productRefService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
+
 
     @ApiOperation(value = "获取当前待补单")
     @RequestMapping(value = "/getFill", method = RequestMethod.GET)
@@ -52,15 +63,36 @@ public class OrderFillController {
             List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(order.getOrderNo());
 
             for (OrderDetail detail : orderDetailList) {
-                ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, userService.getUserId()).eq(ProductRepertory::getProductId, detail.getProductId()));
-                OrderFillVo orderFillVo = new OrderFillVo();
-                orderFillVo.setCount(detail.getPayNum());
-                orderFillVo.setGoodsCount(productRepertory == null ?0 : productRepertory.getCount());
-                orderFillVo.setName(detail.getProductName());
-                orderFillVo.setPicUrl(detail.getImage());
-                orderFillVo.setProductId(detail.getProductId());
-                orderFillVo.setAttrValueId(detail.getAttrValueId());
-                orderFillVos.add(orderFillVo);
+
+
+                List<ProductRef> refs = productRefService.getList(detail.getProductId());
+
+                if (refs.isEmpty()) {
+                    ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, userService.getUserId()).eq(ProductRepertory::getProductId, detail.getProductId()));
+                    OrderFillVo orderFillVo = new OrderFillVo();
+                    orderFillVo.setCount(detail.getPayNum());
+                    orderFillVo.setGoodsCount(productRepertory == null ? 0 : productRepertory.getCount());
+                    orderFillVo.setName(detail.getProductName());
+                    orderFillVo.setPicUrl(detail.getImage());
+                    orderFillVo.setProductId(detail.getProductId());
+                    orderFillVo.setAttrValueId(detail.getAttrValueId());
+                    orderFillVos.add(orderFillVo);
+                } else {
+                    for (ProductRef ref : refs) {
+                        Product product = productService.getById(ref.getProductId());
+                        List<ProductAttrValue> productAttrValueList = productAttrValueService.list(new QueryWrapper<ProductAttrValue>().lambda().eq(ProductAttrValue::getProductId, ref.getProductId()));
+                        ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getUid, userService.getUserId()).eq(ProductRepertory::getProductId, ref.getProductId()));
+                        OrderFillVo orderFillVo = new OrderFillVo();
+                        orderFillVo.setCount(detail.getPayNum() * ref.getCount());
+                        orderFillVo.setGoodsCount(productRepertory == null ? 0 : productRepertory.getCount());
+                        orderFillVo.setName(product.getName());
+                        orderFillVo.setPicUrl(product.getImage());
+                        orderFillVo.setProductId(product.getId());
+                        orderFillVo.setAttrValueId(productAttrValueList.get(0).getId());
+                        orderFillVos.add(orderFillVo);
+                    }
+                }
+
             }
         }
 
