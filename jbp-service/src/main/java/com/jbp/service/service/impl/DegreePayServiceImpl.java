@@ -127,15 +127,6 @@ public class DegreePayServiceImpl implements DegreePayService {
         LztQueryAcctInfoResult result = new LztQueryAcctInfoResult();
         if (lztAcctApply.getPayChannelType().equals("连连")) {
             result = lztService.queryBankAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcctApply.getUserId());
-            if (result == null) {
-                result = new LztQueryAcctInfoResult();
-            }
-            QueryLinkedAcctResult linkedAcctResult = lztService.queryLinkedAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcctApply.getUserId());
-            if (linkedAcctResult != null && CollectionUtils.isNotEmpty(linkedAcctResult.getLinked_acctlist())) {
-                LinkedAcctList linkedAcctList = linkedAcctResult.getLinked_acctlist().get(0);
-                result.setDrawBankName(linkedAcctList.getLinked_brbankname());
-                result.setDrawBankAcctNo(linkedAcctList.getLinked_acctno());
-            }
         }
         if (lztAcctApply.getPayChannelType().equals("易宝")) {
             if (StringUtils.isNotEmpty(lztAcct.getBankAccount())) {
@@ -167,7 +158,22 @@ public class DegreePayServiceImpl implements DegreePayService {
                 }
             }
         }
-        if (lztAcctApply.getPayChannelType().equals("易宝")) {
+        return result;
+    }
+
+    @Override
+    public LztQueryAcctInfoResult queryDrawBank(LztAcct lztAcct) {
+        LztPayChannel lztPayChannel = lztPayChannelService.getById(lztAcct.getPayChannelId());
+        LztQueryAcctInfoResult result = new LztQueryAcctInfoResult();
+        if (lztAcct.getPayChannelType().equals("连连")) {
+            QueryLinkedAcctResult linkedAcctResult = lztService.queryLinkedAcct(lztPayChannel.getPartnerId(), lztPayChannel.getPriKey(), lztAcct.getUserId());
+            if (linkedAcctResult != null && CollectionUtils.isNotEmpty(linkedAcctResult.getLinked_acctlist())) {
+                LinkedAcctList linkedAcctList = linkedAcctResult.getLinked_acctlist().get(0);
+                result.setDrawBankName(linkedAcctList.getLinked_brbankname());
+                result.setDrawBankAcctNo(linkedAcctList.getLinked_acctno());
+            }
+        }
+        if (lztAcct.getPayChannelType().equals("易宝")) {
             WithdrawCardQueryResult cardResult = yopService.withdrawCardQuery(lztAcct.getUserId());
             if (cardResult != null && CollectionUtils.isNotEmpty(cardResult.getBankCardAccountList())) {
                 BankCardAccountDto bankCardAccount = cardResult.getBankCardAccountList().get(0);
@@ -175,12 +181,9 @@ public class DegreePayServiceImpl implements DegreePayService {
                 result.setDrawBankName(MapUtils.getString(map, "name", ""));
                 result.setDrawBankAcctNo(bankCardAccount.getAccountNo());
             }
-
         }
-
         return result;
     }
-
 
     private String getYopTime(String dateString){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");

@@ -9,7 +9,6 @@ import com.jbp.common.annotation.LogControllerAnnotation;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.enums.MethodType;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.params.LztPapAgreeApplyParams;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.*;
@@ -29,7 +28,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -221,14 +219,14 @@ public class LztAcctController {
             SystemAdmin systemAdmin = SecurityUtil.getLoginUserVo().getUser();
             Integer merId = systemAdmin.getMerId();
             QueryWrapper<LztAcct> query = new QueryWrapper<>();
-            query.lambda().eq(merId > 0, LztAcct::getMerId, merId);
+            query.lambda().eq(merId > 0, LztAcct::getMerId, merId).ne(LztAcct::getIfDel, 1);
             return CommonResult.success(lztAcctService.list(query));
         } else {
             LztAcct lztAcct = lztAcctService.getByUserId(orgUserId);
             if (StringUtils.isEmpty(lztAcct.getTransferUserList())) {
                 Integer merId = lztAcct.getMerId();
                 QueryWrapper<LztAcct> query = new QueryWrapper<>();
-                query.lambda().eq(merId > 0, LztAcct::getMerId, merId).eq(LztAcct::getPayChannelType, lztAcct.getPayChannelType())
+                query.lambda().eq(merId > 0, LztAcct::getMerId, merId).eq(LztAcct::getPayChannelType, lztAcct.getPayChannelType()).ne(LztAcct::getIfDel, 1)
                         .eq(lztAcct.getIfTransferUser() != null && !lztAcct.getIfTransferUser(), LztAcct::getUserType, "企业用户");
                 return CommonResult.success(lztAcctService.list(query));
             } else {
@@ -508,9 +506,22 @@ public class LztAcctController {
         return CommonResult.success(feeAmount);
     }
 
-//    public static void main(String[] args) {
-//        JSONArray array = new JSONArray();
-//        array.add("d0002");
-//        System.out.println(array.toJSONString());
-//    }
+
+    @LogControllerAnnotation(intoDB = true, methodType = MethodType.DELETE, description = "来账通删除账户")
+    @PreAuthorize("hasAuthority('agent:lzt:acct:del')")
+    @GetMapping("/del")
+    @ApiOperation("删除账户")
+    public CommonResult del(String userId) {
+        // 查询账户
+        LztAcct lztAcct = lztAcctService.getByUserId(userId);
+        if(lztAcct == null){
+            throw new RuntimeException("账户不存在");
+        }
+        if(!"个人用户".equals(lztAcct.getUserType())){
+            throw new RuntimeException("只允许删除个人账户");
+        }
+        lztAcct.setIfDel(1);
+        lztAcctService.updateById(lztAcct);
+        return CommonResult.success();
+    }
 }

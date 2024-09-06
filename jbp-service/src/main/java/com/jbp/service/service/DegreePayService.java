@@ -19,6 +19,8 @@ public interface DegreePayService {
 
     LztQueryAcctInfoResult queryBankAcct(LztAcctApply lztAcctApply);
 
+    LztQueryAcctInfoResult queryDrawBank(LztAcct lztAcct);
+
     AcctSerialResult queryAcctSerial(LztAcct lztAcct, String startTime, String entTime, Integer pageNo, Integer limit);
 
     /**

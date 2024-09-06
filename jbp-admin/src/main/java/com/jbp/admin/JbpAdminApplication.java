@@ -59,10 +59,10 @@ public class JbpAdminApplication {
         LianLianPayService lianLianPayService = run.getBean(LianLianPayService.class);
         LztPayChannelService lztPayChannelService = run.getBean(LztPayChannelService.class);
 
-        LztAcct lztAcct = lztAcctService.getByUserId("10089625822");
+        LztAcct lztAcct = lztAcctService.getByUserId("yezhaoshun01");
         LztPayChannel payChannel = lztPayChannelService.getByMer(lztAcct.getMerId(), lztAcct.getPayChannelType());
 
-        LztAcct details = lztAcctService.details("gz0002");
+        LztAcct details = lztAcctService.details("yezhaoshun01");
 
         System.out.println(JSONObject.toJSONString(details));
     }

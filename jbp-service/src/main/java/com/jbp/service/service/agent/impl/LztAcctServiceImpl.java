@@ -101,8 +101,6 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                     }
                     lztAcct.setBankAcctInfoList(list);
                 }
-                lztAcct.setDrawBankName(bankAcctInfoResult.getDrawBankName());
-                lztAcct.setDrawBankAcctNo(bankAcctInfoResult.getDrawBankAcctNo());
             }
 
         }
@@ -115,6 +113,9 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             }
             lztAcct.setAcctInfoList(acctinfoList);
         }
+        LztQueryAcctInfoResult drawBank = degreePayService.queryDrawBank(lztAcct);
+        lztAcct.setDrawBankName(drawBank.getDrawBankName());
+        lztAcct.setDrawBankAcctNo(drawBank.getDrawBankAcctNo());
         return lztAcct;
     }
 
@@ -130,6 +131,7 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
                 .eq(StringUtils.isNotEmpty(username), LztAcct::getUsername, username)
                 .eq(StringUtils.isNotEmpty(userType), LztAcct::getUserType, userType)
                 .eq(merId != null && merId > 0, LztAcct::getMerId, merId)
+                .ne(LztAcct::getIfDel, 1)
                 .orderByDesc(LztAcct::getId);
 
         Page<LztAcct> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -152,6 +154,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             }
             //查询用户用户信息
             LztAcct bankAcctInfo = details(s.getUserId());
+            s.setDrawBankName(bankAcctInfo.getDrawBankName());
+            s.setDrawBankAcctNo(bankAcctInfo.getDrawBankAcctNo());
             s.setAcctInfoList(bankAcctInfo.getAcctInfoList());
             s.setBankAcctInfoList(bankAcctInfo.getBankAcctInfoList());
             BigDecimal amtBalcur = BigDecimal.ZERO, amtBalaval = BigDecimal.ZERO, amtBankBalaval = BigDecimal.ZERO, amtBalfrz = BigDecimal.ZERO, amtUnClearing = BigDecimal.ZERO;

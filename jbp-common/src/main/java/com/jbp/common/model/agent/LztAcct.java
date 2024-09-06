@@ -34,6 +34,7 @@ public class LztAcct extends BaseModel {
         this.bankAccount = bankAccount;
         this.ifOpenBankAcct = false;
         this.ifTransferUser = true;
+        this.ifDel = 0;
 
     }
 
@@ -90,6 +91,9 @@ public class LztAcct extends BaseModel {
 
     @ApiModelProperty(value = "提现协议号")
     private String withPapAgreeNo;
+
+    @ApiModelProperty(value = "是否删除 1 删除")
+    private int ifDel;
 
     @ApiModelProperty(value = "银行开户地址")
     @TableField(exist = false)
