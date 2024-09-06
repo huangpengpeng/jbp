@@ -17,4 +17,16 @@
         and g.activity_score_id = #{activityId}
         ) as a
     </select>
+
+    <select id="getList" resultType="com.jbp.common.model.agent.ActivityScoreGoods">
+        select *,p.name as product_name,p.image,p.price,p.stock
+        from eb_activity_score_goods g
+        left join eb_product p on p.id=g.activity_score_goods_id
+        <where>
+            <if test="activityScoreId!= null and activityScoreId !=''">
+                and g.activity_score_id = #{activityScoreId}
+            </if>
+        </where>
+        order by g.id desc
+    </select>
 </mapper>
