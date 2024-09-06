@@ -39,6 +39,14 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
         if (activityScore == null) {
             throw new RuntimeException("活动不存在");
         }
+
+
+        ActivityScoreClearing activityScoreUser = getOne(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId).last(" limit 1"));
+
+        if (activityScoreUser != null) {
+            throw new RuntimeException("活动已经结算，无法再次操作");
+        }
+
         List<ActivityScoreGoods> activityScoreGoodsList = activityScoreGoodsService.list(new QueryWrapper<ActivityScoreGoods>().lambda().eq(ActivityScoreGoods::getActivityScoreId, activityId));
         List<Integer> productIds = activityScoreGoodsList.stream().map(ActivityScoreGoods::getActivityScoreGoodsId).collect(Collectors.toList());
 
@@ -54,7 +62,7 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
             activityScore.getRule();
 
 
-            ActivityScoreClearing activityScoreClearing =new ActivityScoreClearing();
+            ActivityScoreClearing activityScoreClearing = new ActivityScoreClearing();
             activityScoreClearing.setActivityScoreId(activityId);
 //            activityScoreClearing.setCardCount(score);
 //            activityScoreClearing.setScore(score);
