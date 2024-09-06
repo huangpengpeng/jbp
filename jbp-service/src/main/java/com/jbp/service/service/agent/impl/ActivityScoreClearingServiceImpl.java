@@ -1,5 +1,7 @@
 package com.jbp.service.service.agent.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.agent.ActivityScore;
@@ -52,20 +54,26 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
 
         List<UserInvitation> userInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().groupBy(UserInvitation::getPId));
         for (UserInvitation userInvitation : userInvitationList) {
-
+            ActivityScoreClearing activityScoreClearing = new ActivityScoreClearing();
             List<Integer> uids = userInvitationService.getNextPidList(userInvitation.getPId());
             //获取分值
             Integer score = activityScoreGoodsService.getProductNumber(productIds, uids, DateTimeUtils.format(activityScore.getStartTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
                     DateTimeUtils.format(activityScore.getEndTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN), activityId);
 
+            //计算分值能获得什么奖励
+            JSONArray jsonArray = JSONArray.parseArray( activityScore.getRule());
+            for(int i=0;i< jsonArray.size();i++){
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                if(score >= jsonObject.getInteger("score")){
+                       activityScoreClearing.setCardCount(jsonObject.getInteger("number"));
+                       activityScoreClearing.setScore(jsonObject.getInteger("bonuspoints"));
+                }
+            }
 
-            activityScore.getRule();
-
-
-            ActivityScoreClearing activityScoreClearing = new ActivityScoreClearing();
+            if(activityScoreClearing.getCardCount() <= 0 && activityScoreClearing.getScore() <= 0 ){
+                continue;
+            }
             activityScoreClearing.setActivityScoreId(activityId);
-//            activityScoreClearing.setCardCount(score);
-//            activityScoreClearing.setScore(score);
             activityScoreClearing.setUid(userInvitation.getPId());
             activityScoreClearing.setStatus("待结算");
             save(activityScoreClearing);

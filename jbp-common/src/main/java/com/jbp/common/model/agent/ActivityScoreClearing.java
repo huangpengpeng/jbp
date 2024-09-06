@@ -43,7 +43,7 @@ public class ActivityScoreClearing extends BaseModel {
 
     @ApiModelProperty("年卡")
     @TableField("card_count")
-    private String cardCount;
+    private Integer cardCount;
 
 
 }
