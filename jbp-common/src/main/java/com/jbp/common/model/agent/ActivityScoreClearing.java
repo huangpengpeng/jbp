@@ -27,7 +27,7 @@ public class ActivityScoreClearing extends BaseModel {
 
     @ApiModelProperty("用户id")
     @TableField("uId")
-    private String name;
+    private Integer uid;
 
     @ApiModelProperty("状态")
     @TableField("status")
