@@ -13,6 +13,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.ActivityScoreClearingDao;
 import com.jbp.service.service.agent.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreClearingDao, ActivityScoreClearing> implements ActivityScoreClearingService {
@@ -59,10 +61,12 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
         List<Integer> productIds = activityScoreGoodsList.stream().map(ActivityScoreGoods::getActivityScoreGoodsId).collect(Collectors.toList());
 
         List<UserInvitation> userInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().groupBy(UserInvitation::getPId));
+      int j=0;
         for (UserInvitation userInvitation : userInvitationList) {
-
+            j++;
+            log.info("总数:{},当前条数:{}", userInvitationList.size(), j);
             UserCapa capa = userCapaService.getByUser(userInvitation.getPId());
-            if (capa.getCapaId() < activityScore.getCapaId()) {
+            if (capa == null || capa.getCapaId() < activityScore.getCapaId()) {
                 continue;
             }
 
