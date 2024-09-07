@@ -4,16 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jbp.common.model.agent.ActivityScore;
-import com.jbp.common.model.agent.ActivityScoreClearing;
-import com.jbp.common.model.agent.ActivityScoreGoods;
-import com.jbp.common.model.agent.UserInvitation;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.ActivityScoreClearingDao;
-import com.jbp.service.service.agent.ActivityScoreClearingService;
-import com.jbp.service.service.agent.ActivityScoreGoodsService;
-import com.jbp.service.service.agent.ActivityScoreService;
-import com.jbp.service.service.agent.UserInvitationService;
+import com.jbp.service.service.agent.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -33,6 +27,8 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
     private ActivityScoreGoodsService activityScoreGoodsService;
     @Autowired
     private UserInvitationService userInvitationService;
+    @Autowired
+    private UserCapaService userCapaService;
 
 
     @Override
@@ -54,6 +50,13 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
 
         List<UserInvitation> userInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().groupBy(UserInvitation::getPId));
         for (UserInvitation userInvitation : userInvitationList) {
+
+            UserCapa capa = userCapaService.getByUser(userInvitation.getPId());
+            if (capa.getCapaId() < activityScore.getCapaId()) {
+                continue;
+            }
+
+
             ActivityScoreClearing activityScoreClearing = new ActivityScoreClearing();
             List<Integer> uids = userInvitationService.getNextPidList(userInvitation.getPId());
             //获取分值
@@ -61,16 +64,16 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
                     DateTimeUtils.format(activityScore.getEndTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN), activityId);
 
             //计算分值能获得什么奖励
-            JSONArray jsonArray = JSONArray.parseArray( activityScore.getRule());
-            for(int i=0;i< jsonArray.size();i++){
+            JSONArray jsonArray = JSONArray.parseArray(activityScore.getRule());
+            for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if(score >= jsonObject.getInteger("score")){
-                       activityScoreClearing.setCardCount(jsonObject.getInteger("number"));
-                       activityScoreClearing.setScore(jsonObject.getInteger("bonuspoints"));
+                if (score >= jsonObject.getInteger("score")) {
+                    activityScoreClearing.setCardCount(jsonObject.getInteger("number"));
+                    activityScoreClearing.setScore(jsonObject.getInteger("bonuspoints"));
                 }
             }
 
-            if(activityScoreClearing.getCardCount() <= 0 && activityScoreClearing.getScore() <= 0 ){
+            if (activityScoreClearing.getCardCount() <= 0 && activityScoreClearing.getScore() <= 0) {
                 continue;
             }
             activityScoreClearing.setActivityScoreId(activityId);
