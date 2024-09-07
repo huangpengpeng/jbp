@@ -13,6 +13,7 @@ import com.jbp.service.product.comm.LingShouCommHandler;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderService;
 import com.jbp.service.service.YopService;
+import com.jbp.service.service.agent.ActivityScoreClearingService;
 import com.jbp.service.service.agent.InvitationScoreService;
 import org.apache.commons.collections4.MapUtils;
 import org.mybatis.spring.annotation.MapperScan;
@@ -70,5 +71,8 @@ import java.util.Map;
 
 //        YopDemo.registerQuery(run.getBean(YopService.class));
 
+
+        ActivityScoreClearingService activityScoreClearingService =  run.getBean(ActivityScoreClearingService.class);
+        activityScoreClearingService.clearingUser(8);
     }
 }
