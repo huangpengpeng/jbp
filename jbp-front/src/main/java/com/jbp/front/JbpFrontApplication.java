@@ -72,7 +72,6 @@ import java.util.Map;
 //        YopDemo.registerQuery(run.getBean(YopService.class));
 
 
-        ActivityScoreClearingService activityScoreClearingService =  run.getBean(ActivityScoreClearingService.class);
-        activityScoreClearingService.clearingUser(8);
+
     }
 }

@@ -11,7 +11,17 @@
         left join eb_order_detail d on o.order_no = d.order_no
         left join eb_activity_score_goods g on g.activity_score_goods_id = d.product_id
 
-        where o.paid = 1 and o.is_del = 0 and o.refund_status = 0 and d.product_id in (#{productId}) and o.uid in (#{uid})
+        where o.paid = 1 and o.is_del = 0 and o.refund_status = 0 and d.product_id in
+        <foreach close=")" collection="productId" item="prId" open="(" separator=",">
+            #{prId}
+        </foreach>
+
+         and o.uid in
+        <foreach close=")" collection="uid" item="userid" open="(" separator=",">
+            #{userid}
+        </foreach>
+
+
          and o.pay_time >= #{startTime}
         and o.pay_time <![CDATA[ <= #{endTime} ]]>
         and g.activity_score_id = #{activityId}
