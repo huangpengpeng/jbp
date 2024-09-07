@@ -15,4 +15,6 @@ public interface ActivityScoreService extends IService<ActivityScore> {
     Integer add(ActivityScoreAddRequest request);
 
     Boolean edit(ActivityScoreEditRequest request);
+
+    List<ActivityScore> tree();
 }

@@ -49,4 +49,16 @@ public class ActivityScoreClearing extends BaseModel {
     @TableField("clear_time")
     private Date clearTime;
 
+    @ApiModelProperty("用户账号")
+    @TableField(exist = false)
+    private String account;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
+
+    @ApiModelProperty("活动名称")
+    @TableField(exist = false)
+    private String activityName;
+
 }

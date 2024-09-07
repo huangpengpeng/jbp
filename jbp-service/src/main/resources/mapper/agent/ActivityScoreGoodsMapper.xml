@@ -6,7 +6,7 @@
 
 
 
-      select sum(counts) from(
+      select ifnull(sum(counts),0) from(
         select d.product_id,g.goods_count *d.pay_num  as counts from eb_order o
         left join eb_order_detail d on o.order_no = d.order_no
         left join eb_activity_score_goods g on g.activity_score_goods_id = d.product_id

@@ -19,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("api/admin/agent/activity/score")
@@ -74,5 +76,12 @@ public class ActivityScoreController {
         activityScoreService.removeById(id);
         activityScoreGoodsService.remove(new QueryWrapper<ActivityScoreGoods>().lambda().eq(ActivityScoreGoods::getActivityScoreId, id));
         return CommonResult.success(true);
+    }
+
+    @ApiOperation(value = "待结算积分活动下拉选")
+    @GetMapping(value = "/tree")
+    public CommonResult<List<ActivityScore>> tree() {
+        List<ActivityScore> result = activityScoreService.tree();
+        return CommonResult.success(result);
     }
 }

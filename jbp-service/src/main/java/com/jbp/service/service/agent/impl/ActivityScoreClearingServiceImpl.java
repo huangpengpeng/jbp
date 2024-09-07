@@ -4,7 +4,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.*;
+import com.jbp.common.page.CommonPage;
+import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.ActivityScoreClearingDao;
 import com.jbp.service.service.agent.*;
@@ -16,13 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreClearingDao, ActivityScoreClearing> implements ActivityScoreClearingService {
 
+    @Autowired
+    private ActivityScoreClearingDao dao;
     @Autowired
     private ActivityScoreService activityScoreService;
     @Autowired
@@ -62,6 +68,8 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
 
 
             ActivityScoreClearing activityScoreClearing = new ActivityScoreClearing();
+            activityScoreClearing.setCardCount(0);
+            activityScoreClearing.setScore(0);
             List<Integer> uids = userInvitationService.getNextPidList(userInvitation.getPId());
             //获取分值
             Integer score = activityScoreGoodsService.getProductNumber(productIds, uids, DateTimeUtils.format(activityScore.getStartTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
@@ -105,11 +113,29 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
            activityScoreClearing.setClearTime(new Date());
            updateById(activityScoreClearing);
 
-
-
        }
 
+    }
 
 
+    @Override
+    public PageInfo<ActivityScoreClearing> getList(PageParamRequest pageParamRequest) {
+        Page<ActivityScoreClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<ActivityScoreClearing> list = dao.getList();
+        return CommonPage.copyPageInfo(page, list);
+    }
+
+    @Override
+    public Boolean del(Integer activityId) {
+        ActivityScore activityScore = activityScoreService.getById(activityId);
+        if (activityScore == null) {
+            throw new RuntimeException("活动不存在");
+        }
+        ActivityScoreClearing activityScoreUser = getOne(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId).eq(ActivityScoreClearing::getStatus,"已结算").last(" limit 1"));
+        if (activityScoreUser != null) {
+            throw new RuntimeException("活动已结算，无法删除！");
+        }
+        return remove(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId));
     }
 }
+
