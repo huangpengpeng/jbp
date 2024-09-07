@@ -35,7 +35,7 @@ public class ActivityScoreGoods extends BaseModel {
 
     @ApiModelProperty("活动商品分数")
     @TableField("goods_count")
-    private Integer goodsCount;
+    private BigDecimal goodsCount;
 
     @ApiModelProperty("商品图")
     @TableField(exist = false)

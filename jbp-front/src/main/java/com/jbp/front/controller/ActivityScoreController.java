@@ -80,9 +80,7 @@ public class ActivityScoreController {
     @ApiOperation(value = "用户活动列表")
     @RequestMapping(value = "/getList", method = RequestMethod.GET)
     public CommonResult<List<ActivityScore>> getList() {
-
         List<ActivityScore> list = activityScoreService.list(new QueryWrapper<ActivityScore>().lambda().eq(ActivityScore::getStatus, "开启"));
-
         return CommonResult.success(list);
     }
 

@@ -1,5 +1,6 @@
 package com.jbp.service.service.agent.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -51,14 +52,14 @@ public class ActivityScoreGoodsServiceImpl extends ServiceImpl<ActivityScoreGood
             throw new CrmebException("活动商品不能为空");
         }
         List<ActivityScoreGoods> list = list(new QueryWrapper<ActivityScoreGoods>().lambda().eq(ActivityScoreGoods::getActivityScoreId, request.getActivityScoreId()));
+        List<Integer> productIds = CollUtil.newArrayList();
         if (!list.isEmpty()){
-            List<Integer> goodList = list.stream().map(ActivityScoreGoods::getActivityScoreGoodsId).collect(Collectors.toList());
-            List<Integer> productIds = request.getActivityScoreGoodsList().stream().map(ActivityScoreGoodsRequest::getProductId).collect(Collectors.toList());
-            if (goodList.containsAll(productIds)){
-                throw new CrmebException("请勿添加重复商品！");
-            }
+            productIds = list.stream().map(ActivityScoreGoods::getActivityScoreGoodsId).collect(Collectors.toList());
         }
         for (ActivityScoreGoodsRequest activityGood : request.getActivityScoreGoodsList()) {
+            if (productIds.contains(activityGood.getProductId())){
+                continue;
+            }
             ActivityScoreGoods goods = new ActivityScoreGoods();
             goods.setActivityScoreId(request.getActivityScoreId());
             goods.setActivityScoreGoodsId(activityGood.getProductId());

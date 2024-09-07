@@ -58,6 +58,8 @@ public class ActivityScoreServiceImpl extends ServiceImpl<ActivityScoreDao, Acti
             throw new CrmebException("id不存在！");
         }
         BeanUtils.copyProperties(request,activityScore);
+        String cdnUrl = systemAttachmentService.getCdnUrl();
+        activityScore.setMark(systemAttachmentService.clearPrefix(activityScore.getMark(), cdnUrl));
         return updateById(activityScore);
     }
 

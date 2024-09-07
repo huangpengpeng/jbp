@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -23,5 +24,5 @@ public class ActivityScoreGoodsRequest implements Serializable {
 
     @NotNull(message = "分值不能为空")
     @ApiModelProperty("分值")
-    private Integer goodsCount;
+    private BigDecimal goodsCount;
 }
