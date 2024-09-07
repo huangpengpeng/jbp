@@ -9,4 +9,5 @@ import com.jbp.common.request.PageParamRequest;
 public interface ActivityScoreClearingService extends IService<ActivityScoreClearing> {
 
     void clearingUser(Integer activityId);
+    void verifyUser(Integer activityId);
 }

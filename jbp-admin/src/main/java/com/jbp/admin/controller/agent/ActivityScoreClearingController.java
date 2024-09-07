@@ -33,10 +33,6 @@ public class ActivityScoreClearingController {
     public CommonResult<String> page( Integer activityId) {
 
         activityScoreClearingService.clearingUser(activityId);
-
-
-
-
         return CommonResult.success();
     }
 
@@ -44,6 +40,14 @@ public class ActivityScoreClearingController {
 
 
 
+    @PreAuthorize("hasAuthority('activity:score:verify')")
+    @ApiOperation(value = "积分活动确认")
+    @GetMapping(value = "/verify")
+    public CommonResult<String> verify(Integer activityId) {
+
+        activityScoreClearingService.verifyUser(activityId);
+        return CommonResult.success();
+    }
 
 
 

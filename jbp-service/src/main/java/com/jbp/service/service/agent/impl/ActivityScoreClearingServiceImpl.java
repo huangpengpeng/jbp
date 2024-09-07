@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +31,8 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
     private UserInvitationService userInvitationService;
     @Autowired
     private UserCapaService userCapaService;
+    @Autowired
+    private WalletService walletService;
 
 
     @Override
@@ -82,5 +86,30 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
             save(activityScoreClearing);
 
         }
+    }
+
+    @Override
+    public void verifyUser(Integer activityId) {
+        ActivityScore activityScore = activityScoreService.getById(activityId);
+       List<ActivityScoreClearing> activityScoreClearings =  list(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId,activityId));
+       if(!activityScoreClearings.get(0).getStatus().equals("待结算")){
+            throw new RuntimeException("活动已经结算，无法再次操作");
+       }
+
+       for(ActivityScoreClearing activityScoreClearing :activityScoreClearings ){
+
+           if(activityScoreClearing.getScore() > 0 ){
+               walletService.increase(activityScoreClearing.getUid(),3,new BigDecimal(activityScoreClearing.getScore()),WalletFlow.OperateEnum.奖励.name(),"",activityScore.getName()+"获得");
+           }
+           activityScoreClearing.setStatus("已结算");
+           activityScoreClearing.setClearTime(new Date());
+           updateById(activityScoreClearing);
+
+
+
+       }
+
+
+
     }
 }

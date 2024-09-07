@@ -45,5 +45,8 @@ public class ActivityScoreClearing extends BaseModel {
     @TableField("card_count")
     private Integer cardCount;
 
+    @ApiModelProperty("结算时间")
+    @TableField("clear_time")
+    private Date clearTime;
 
 }
