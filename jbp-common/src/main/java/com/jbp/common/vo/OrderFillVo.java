@@ -32,5 +32,8 @@ public class OrderFillVo {
     @ApiModelProperty("规格id")
     private Integer attrValueId;
 
+    @ApiModelProperty("订单号")
+    private String orderNo;
+
 
 }
