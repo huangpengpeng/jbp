@@ -80,6 +80,7 @@ public class OrderFillController {
                     orderFillVo.setPicUrl(detail.getImage());
                     orderFillVo.setProductId(detail.getProductId());
                     orderFillVo.setAttrValueId(detail.getAttrValueId());
+                    orderFillVo.setOrderNo(orderFill.getOrderNo());
                     orderFillVos.add(orderFillVo);
                 } else {
                     for (ProductRef ref : refs) {
@@ -97,6 +98,7 @@ public class OrderFillController {
                         orderFillVo.setPicUrl(product.getImage());
                         orderFillVo.setProductId(product.getId());
                         orderFillVo.setAttrValueId(productAttrValueList.get(0).getId());
+                        orderFillVo.setOrderNo(orderFill.getOrderNo());
                         orderFillVos.add(orderFillVo);
                     }
                 }
