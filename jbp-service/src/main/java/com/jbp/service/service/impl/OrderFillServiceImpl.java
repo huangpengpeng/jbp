@@ -168,16 +168,11 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
         List<Map<String, Object>> mapList = new ArrayList<>();
         List<OrderDetail> orderDetailList = orderDetailService.getByOrderNo(orderFill.getOrderNo());
 
-        Boolean ifFill = false;
         for (OrderDetail orderDetail : orderDetailList) {
 
             List<ProductRef> refs = productRefService.getList(orderDetail.getProductId());
             if (refs.isEmpty()) {
                 ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
-                if (productRepertory == null) {
-                    ifFill = true;
-                    break;
-                }
                 Product product = productService.getById(orderDetail.getProductId());
                 if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                     Map<String, Object> map = new HashMap<>();
@@ -185,18 +180,12 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
                     mapList.add(map);
                     continue;
                 }
-                if (productRepertory.getCount() - orderDetail.getPayNum() < 0) {
-                    ifFill = true;
+                if (productRepertory == null || productRepertory.getCount() - orderDetail.getPayNum() < 0) {
+                    return;
                 }
             } else {
                 for (ProductRef ref : refs) {
                     ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, ref.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
-
-                    if (productRepertory == null) {
-                        ifFill = true;
-                        break;
-                    }
-
                     Product product = productService.getById(ref.getProductId());
                     if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                         Map<String, Object> map = new HashMap<>();
@@ -204,22 +193,13 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
                         mapList.add(map);
                         continue;
                     }
-                    if (productRepertory.getCount() - (orderDetail.getPayNum() * ref.getCount()) < 0) {
-                        ifFill = true;
-                        break;
-                    } else {
-                        ifFill = false;
 
+                    if (productRepertory == null || productRepertory.getCount() - (orderDetail.getPayNum() * ref.getCount()) < 0) {
+                        return;
                     }
                 }
             }
-            if (ifFill) {
-                break;
-            }
-        }
-        //库存不足，无法补单
-        if (ifFill) {
-            return;
+
         }
 
         for (OrderDetail orderDetail : orderDetailList) {
