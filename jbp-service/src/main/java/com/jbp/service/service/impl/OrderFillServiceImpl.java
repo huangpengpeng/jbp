@@ -174,6 +174,10 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             List<ProductRef> refs = productRefService.getList(orderDetail.getProductId());
             if (refs.isEmpty()) {
                 ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, orderDetail.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
+                if (productRepertory == null) {
+                    ifFill = true;
+                    break;
+                }
                 Product product = productService.getById(orderDetail.getProductId());
                 if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                     Map<String, Object> map = new HashMap<>();
@@ -187,6 +191,12 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
             } else {
                 for (ProductRef ref : refs) {
                     ProductRepertory productRepertory = productRepertoryService.getOne(new QueryWrapper<ProductRepertory>().lambda().eq(ProductRepertory::getProductId, ref.getProductId()).eq(ProductRepertory::getUid, orderFill.getUid()));
+
+                    if (productRepertory == null) {
+                        ifFill = true;
+                        break;
+                    }
+
                     Product product = productService.getById(ref.getProductId());
                     if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                         Map<String, Object> map = new HashMap<>();
@@ -203,7 +213,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
                     }
                 }
             }
-            if(ifFill){
+            if (ifFill) {
                 break;
             }
         }
@@ -228,7 +238,7 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
                     if (product.getSupplyRule().equals(SupplyRuleEnum.公司.getName())) {
                         continue;
                     }
-                    productRepertoryService.reduce(ref.getProductId(), ref.getCount()*orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
+                    productRepertoryService.reduce(ref.getProductId(), ref.getCount() * orderDetail.getPayNum(), orderFill.getUid(), orderFill.getOrderNo() + "补单", orderFill.getOrderNo(), "补单");
 
                 }
             }

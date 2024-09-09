@@ -69,7 +69,7 @@ import java.util.List;
 
 //        OrderFillService orderFillService = run.getBean(OrderFillService.class);
 //        //补单
-//        List<OrderFill> fillList = orderFillService.list(new QueryWrapper<OrderFill>().lambda().ge(OrderFill::getExpiredTime, new Date()).eq(OrderFill::getStatus, OrderFillType.待补单.getName()).eq(OrderFill::getOrderNo,"PT750172585104461095783"));
+//        List<OrderFill> fillList = orderFillService.list(new QueryWrapper<OrderFill>().lambda().ge(OrderFill::getExpiredTime, new Date()).eq(OrderFill::getStatus, OrderFillType.待补单.getName()));
 //        for (OrderFill orderFill : fillList) {
 //            orderFillService.fill(orderFill);
 //        }
