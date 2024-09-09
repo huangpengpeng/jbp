@@ -169,7 +169,7 @@ public class UserCapaServiceImpl extends ServiceImpl<UserCapaDao, UserCapa> impl
         Map<Integer, TeamUser> uidMapList = teamUserService.getUidMapList(uidList);
         list.forEach(e -> {
             User user = userMap.get(e.getUid());
-            e.setAccount(userMap.get(e.getUid()).getAccount());
+            e.setAccount(user!= null ? user.getAccount() : "");
             e.setPhone(user!= null ? user.getPhone() : "");
             e.setNickName(user!= null ? user.getNickname() : "");
             Capa capa = capaMap.get(e.getCapaId());
