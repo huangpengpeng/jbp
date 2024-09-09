@@ -1,12 +1,16 @@
 package com.jbp.front;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.enums.OrderFillType;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
+import com.jbp.common.model.order.OrderFill;
 import com.jbp.front.controller.UserVisaController;
 import com.jbp.service.product.comm.BaoDanCommHandler;
 import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.service.OrderDetailService;
+import com.jbp.service.service.OrderFillService;
 import com.jbp.service.service.OrderService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +24,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -61,5 +66,14 @@ import java.util.List;
 
 //        UserVisaController userVisaController = run.getBean(UserVisaController.class);
 //        userVisaController.skin();
+
+//        OrderFillService orderFillService = run.getBean(OrderFillService.class);
+//        //补单
+//        List<OrderFill> fillList = orderFillService.list(new QueryWrapper<OrderFill>().lambda().ge(OrderFill::getExpiredTime, new Date()).eq(OrderFill::getStatus, OrderFillType.待补单.getName()).eq(OrderFill::getOrderNo,"PT750172585104461095783"));
+//        for (OrderFill orderFill : fillList) {
+//            orderFillService.fill(orderFill);
+//        }
+
+
     }
 }

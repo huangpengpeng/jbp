@@ -196,13 +196,14 @@ public class OrderFillServiceImpl extends ServiceImpl<OrderFillDao, OrderFill> i
                     }
                     if (productRepertory.getCount() - (orderDetail.getPayNum() * ref.getCount()) < 0) {
                         ifFill = true;
+                        break;
                     } else {
                         ifFill = false;
-                        break;
+
                     }
                 }
             }
-            if(!ifFill){
+            if(ifFill){
                 break;
             }
         }
