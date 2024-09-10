@@ -627,7 +627,7 @@ public class UserVisaController {
         String record0 = skin.getJSONArray("record_list").get(0).toString();
         String record1 = skin.getJSONArray("record_list").get(1).toString();
         String recordListNo = record0 + record1;
-        UserSkin userSkinOne = userSkinService.getOne(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getRecordListNo, recordListNo));
+        UserSkin userSkinOne = userSkinService.getOne(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getRecordListNo, recordListNo).eq(UserSkin::getUid, user.getId()));
         if (userSkinOne != null) {
             return CommonResult.success(true);
         }

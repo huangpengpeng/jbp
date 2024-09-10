@@ -34,7 +34,7 @@ public class UserSkinController {
         if (ObjectUtil.isNull(uid)){
             return CommonResult.failed("用户未登录!");
         }
-        List<UserSkin> list = userSkinService.list(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getUid,uid ));
+        List<UserSkin> list = userSkinService.list(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getUid,uid ).orderByDesc(UserSkin::getId));
         return CommonResult.success(list);
     }
 }
