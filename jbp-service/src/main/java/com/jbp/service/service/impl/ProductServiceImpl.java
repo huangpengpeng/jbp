@@ -1197,7 +1197,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         lqw.select(Product::getId, Product::getMerId, Product::getImage, Product::getName, Product::getSliderImage,
                 Product::getOtPrice, Product::getStock, Product::getSales, Product::getPrice, Product::getIntro,
                 Product::getFicti, Product::getBrowse, Product::getUnitName, Product::getGuaranteeIds, Product::getBrandId,
-                Product::getCategoryId ,Product :: getUnAddCard);
+                Product::getCategoryId ,Product :: getUnAddCard,Product::getIsNumber);
         lqw.eq(Product::getId, id);
         getForSaleWhere(lqw);
         Product product = dao.selectOne(lqw);
