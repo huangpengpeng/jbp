@@ -2478,8 +2478,10 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             Collectors.summingInt(PreOrderDetailRequest::getProductNum)
                     ));
 
-            limitTempService.validBuy(preOrderInfoVo.getUid(), capaId, capaXsId, whiteIdList,
-                    teamIdList.stream().map(t -> Long.valueOf(t)).collect(Collectors.toList()), pId, rId, productList, productNumMap);
+            if(!request.getPreOrderType().equals("ship")) {
+                limitTempService.validBuy(preOrderInfoVo.getUid(), capaId, capaXsId, whiteIdList,
+                        teamIdList.stream().map(t -> Long.valueOf(t)).collect(Collectors.toList()), pId, rId, productList, productNumMap);
+            }
         }
         logger.info("预下单检查调用:结果preOrderInfoVo:{}", JSON.toJSONString(preOrderInfoVo));
         return preOrderInfoVo;
