@@ -27,7 +27,7 @@ public class ActivityScoreClearing extends BaseModel {
 
     @ApiModelProperty("用户id")
     @TableField("uId")
-    private String name;
+    private Integer uid;
 
     @ApiModelProperty("状态")
     @TableField("status")
@@ -43,7 +43,22 @@ public class ActivityScoreClearing extends BaseModel {
 
     @ApiModelProperty("年卡")
     @TableField("card_count")
-    private String cardCount;
+    private Integer cardCount;
 
+    @ApiModelProperty("结算时间")
+    @TableField("clear_time")
+    private Date clearTime;
+
+    @ApiModelProperty("用户账号")
+    @TableField(exist = false)
+    private String account;
+
+    @ApiModelProperty("用户昵称")
+    @TableField(exist = false)
+    private String nickname;
+
+    @ApiModelProperty("活动名称")
+    @TableField(exist = false)
+    private String activityName;
 
 }

@@ -3,6 +3,7 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -112,6 +113,19 @@ public class UserInvitationServiceImpl extends ServiceImpl<UserInvitationDao, Us
         wrapper.in(UserInvitation::getPId, uid);
         return list(wrapper);
     }
+
+
+    @Override
+    public List<Integer> getNextPidList(Integer uid){
+
+        LambdaQueryWrapper<UserInvitation> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(UserInvitation::getUId);
+        wrapper.eq(UserInvitation::getPId, uid);
+        List<UserInvitation>  userInvitations =  dao.selectList(wrapper);
+
+        return userInvitations.stream().map(UserInvitation::getUId).collect(Collectors.toList());
+    }
+
 
     @Override
     public LinkedList<List<UserInvitation>> getLevelList(Integer uid, int level) {

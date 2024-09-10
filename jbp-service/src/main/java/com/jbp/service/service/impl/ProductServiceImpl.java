@@ -2125,6 +2125,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         List<ProductActivityResponse> responseList = dao.getActivitySearchPage(map);
         responseList.forEach(response -> {
             List<ProductAttrValue> attrValueList = productAttrValueService.getListByProductIdAndType(response.getId(), ProductConstants.PRODUCT_TYPE_NORMAL);
+            response.setScore(1);
             response.setAttrValue(attrValueList);
         });
         return CommonPage.copyPageInfo(page, responseList);

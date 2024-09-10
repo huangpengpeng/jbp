@@ -25,7 +25,7 @@ public interface UserInvitationService extends IService<UserInvitation> {
      */
     List<UserInvitation> getNextList2(Integer uid);
 
-
+     List<Integer> getNextPidList(Integer uid);
     List<UserInvitation> getNextOrMidList(Integer uid);
 
 

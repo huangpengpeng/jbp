@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.math.BigDecimal;
 
 /**
  * 积分活动
@@ -35,5 +35,21 @@ public class ActivityScoreGoods extends BaseModel {
 
     @ApiModelProperty("活动商品分数")
     @TableField("goods_count")
-    private Integer goodsCount;
+    private BigDecimal goodsCount;
+
+    @ApiModelProperty("商品图")
+    @TableField(exist = false)
+    private String image;
+
+    @ApiModelProperty("商品名称")
+    @TableField(exist = false)
+    private String productName;
+
+    @ApiModelProperty("商品价格")
+    @TableField(exist = false)
+    private BigDecimal price;
+
+    @ApiModelProperty("商品库存")
+    @TableField(exist = false)
+    private Integer stock;
 }
