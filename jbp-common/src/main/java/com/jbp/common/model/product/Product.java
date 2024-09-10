@@ -167,8 +167,11 @@ public class Product implements Serializable {
     @ApiModelProperty(value = "供货规则")
     private String supplyRule;
 
-    @ApiModelProperty(value = "供货规则")
+    @ApiModelProperty(value = "运费承担方")
     private String freightAssume;
+
+    @ApiModelProperty(value = "是否设置序列号")
+    private Boolean isNumber;
 
     @ApiModelProperty(value = "商品详情")
     @TableField(exist = false)

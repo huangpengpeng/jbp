@@ -143,4 +143,7 @@ public class ProductAddRequest implements Serializable {
     @ApiModelProperty("商品关联套组信息")
     private List<ProductRefAddRequest> productRefInfoList;
 
+    @ApiModelProperty(value = "是否设置序列号")
+    private Boolean isNumber;
+
 }

@@ -140,4 +140,7 @@ public class OrderExcel implements Serializable {
 
     @ExcelProperty(value = "订单商品扩展信息", index = 41)
     private String productExtInfo;
+
+    @ExcelProperty(value = "序列号", index = 42)
+    private String number;
 }

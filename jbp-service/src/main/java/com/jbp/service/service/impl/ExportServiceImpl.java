@@ -229,6 +229,7 @@ public class ExportServiceImpl implements ExportService {
                             Capa capa = capaMap.get(orderExt.getCapaId());
                             vo.setSuccessCapaName(capa != null ? capa.getName() : "");
                         }
+                        vo.setNumber(orderExt.getNumber());
                         vo.setProductExtInfo(orderExt.getOrderGoodsInfo());
                     }
                     List<ProductDeduction> deductionList = orderDetail.getWalletDeductionList();
@@ -357,6 +358,7 @@ public class ExportServiceImpl implements ExportService {
                     Capa capa = capaMap.get(orderExt.getCapaId());
                     vo.setSuccessCapaName(capa != null ? capa.getName() : "");
                 }
+                vo.setNumber(orderExt.getNumber());
                 vo.setProductExtInfo(orderExt.getOrderGoodsInfo());
             }
             vo.setIfUserVerifyReceive("否");

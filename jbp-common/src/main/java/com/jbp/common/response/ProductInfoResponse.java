@@ -117,4 +117,7 @@ public class ProductInfoResponse implements Serializable {
     @ApiModelProperty(value = "消费抵扣")
     @TableField(typeHandler = ProductDeductionListHandler.class)
     private List<ProductDeduction> deductionList;
+
+    @ApiModelProperty(value = "是否设置序列号")
+    private Boolean isNumber;
 }

@@ -128,4 +128,7 @@ public class PlatformOrderPageResponse implements Serializable {
 
     @ApiModelProperty(value = "供货人账号")
     private String supplyAccount;
+
+    @ApiModelProperty(value = "序列号")
+    private String number;
 }

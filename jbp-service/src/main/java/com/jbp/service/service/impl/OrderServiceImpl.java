@@ -721,6 +721,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
                     pageResponse.setSuccessCapaName(successCapa != null ? successCapa.getName() : "");
                 }
                 pageResponse.setProductExtInfo(orderExt.getOrderGoodsInfo());
+                pageResponse.setNumber(orderExt.getNumber());
             }
             Merchant merchant = finalMerchantMap.get(e.getMerId());
             if (merchant != null) {
