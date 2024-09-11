@@ -206,7 +206,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             walletService.refundDeduction(order.getUid(), order.getOrderNo(), "订单取消回退");
 
             //退库存
-            List<ProductRepertoryFlow> productRepertoryFlows = productRepertoryFlowService.list(new QueryWrapper<ProductRepertoryFlow>().lambda().eq(ProductRepertoryFlow::getOrderSn, orderNo));
+            List<ProductRepertoryFlow> productRepertoryFlows = productRepertoryFlowService.list(new QueryWrapper<ProductRepertoryFlow>().lambda().eq(ProductRepertoryFlow::getOrderSn, orderNo).eq(ProductRepertoryFlow::getType,"发货"));
             for (ProductRepertoryFlow productRepertoryFlow : productRepertoryFlows) {
                 productRepertoryService.increase(productRepertoryFlow.getProductId(), productRepertoryFlow.getCount(), order.getUid(), "取消订单", orderNo, "取消订单");
             }
