@@ -27,6 +27,9 @@ public class UserSkin extends BaseModel {
     @ApiModelProperty(value = "皮肤检测报告序列号")
     private String recordListNo;
 
+    @ApiModelProperty(value = "报告id")
+    private Integer reportId;
+
     @ApiModelProperty(value = "用户账号")
     @TableField(exist = false)
     private String account;
