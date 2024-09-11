@@ -40,7 +40,7 @@ public class LotteryRecord extends BaseModel {
 
     @ApiModelProperty("活动用户")
     @TableField("uid")
-    private Long uid;
+    private Integer uid;
 
     @ApiModelProperty("备注")
     @TableField("remark")

@@ -25,7 +25,7 @@ public class LotteryUser extends BaseModel {
 
     @ApiModelProperty("活动用户")
     @TableField("uid")
-    private Long uid;
+    private Integer uid;
 
     @ApiModelProperty("抽奖活动")
     @TableField("lottery_id")
