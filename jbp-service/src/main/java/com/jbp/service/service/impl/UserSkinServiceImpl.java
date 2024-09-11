@@ -34,8 +34,8 @@ public class UserSkinServiceImpl extends ServiceImpl<UserSkinDao, UserSkin> impl
     private UploadService uploadService;
 
     @Override
-    public UserSkin getByNo(String number,Integer uid) {
-        return getOne(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getRecordListNo, number).eq(UserSkin::getUid,uid));
+    public List<UserSkin> getByNo(String number) {
+        return list(new QueryWrapper<UserSkin>().lambda().eq(UserSkin::getRecordListNo, number));
     }
 
     @Override
