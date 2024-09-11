@@ -6,6 +6,15 @@
         from eb_activity_score_clearing c
         left join eb_activity_score s on s.id=c.activity_score_id
         left join eb_user u on u.id=c.uid
+        <where>
+            <if test="activityScoreName!= null and activityScoreName !=''">
+                and s.name  like CONCAT('%',#{activityScoreName},'%')
+            </if>
+            <if test="uid!= null and uid !=''">
+                and c.uid = #{uid}
+            </if>
+        </where>
         order by c.id desc
     </select>
+
 </mapper>

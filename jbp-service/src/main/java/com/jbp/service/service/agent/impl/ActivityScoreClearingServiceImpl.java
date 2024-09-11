@@ -7,13 +7,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
+import com.jbp.common.request.agent.ActivityScoreClearingEditRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.agent.ActivityScoreClearingDao;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -121,11 +124,21 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
 
     }
 
+    @Override
+    public Boolean edit(ActivityScoreClearingEditRequest request) {
+        ActivityScoreClearing scoreClearing = getById(request.getId());
+        if (scoreClearing == null) {
+            throw new CrmebException("积分活动不存在！");
+        }
+        BeanUtils.copyProperties(request, scoreClearing);
+        return updateById(scoreClearing);
+    }
+
 
     @Override
-    public PageInfo<ActivityScoreClearing> getList(PageParamRequest pageParamRequest) {
+    public PageInfo<ActivityScoreClearing> getList(Integer uid, String activityScoreName, PageParamRequest pageParamRequest) {
         Page<ActivityScoreClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<ActivityScoreClearing> list = dao.getList();
+        List<ActivityScoreClearing> list = dao.getList(uid,activityScoreName);
         return CommonPage.copyPageInfo(page, list);
     }
 
