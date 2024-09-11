@@ -6,10 +6,11 @@ import com.jbp.common.model.user.UserSkin;
 import com.jbp.common.request.PageParamRequest;
 
 import java.util.Date;
+import java.util.List;
 
 public interface UserSkinService extends IService<UserSkin> {
 
-    UserSkin getByNo(String number,Integer uid);
+    List<UserSkin> getByNo(String number);
 
     PageInfo<UserSkin> getList(Integer uid, String nickname, String phone, Date startCreateTime, Date endCreateTime, PageParamRequest pageParamRequest);
 
