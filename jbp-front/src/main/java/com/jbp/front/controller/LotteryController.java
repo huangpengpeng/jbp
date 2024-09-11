@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.dto.RewardContextDTO;
 import com.jbp.common.enums.ReturnCodeEnum;
+import com.jbp.common.model.agent.LotteryPrize;
 import com.jbp.common.model.agent.LotteryUser;
 import com.jbp.common.response.LotteryResponse;
 import com.jbp.common.result.CommonResult;
@@ -58,29 +59,29 @@ public class LotteryController {
     @RequestMapping(value = "/entrance", method = RequestMethod.GET)
     public CommonResult<LotteryResponse> entrance(Long id, HttpServletRequest request) {
 
-
-        String accountIp = null;
-        JSONObject jsonObject = null;
-        try {
-            accountIp = IPUtil.getIpAddress(request);
-            jsonObject = new JSONObject();
-            // 判断当前用户上一次抽奖是否结束
-            checkDrawParams(id, accountIp);
-            // 抽奖
-            RewardContextDTO context = lotteryService.doDraw(accountIp, id);
-            jsonObject.put("id", context.getPrizeId());
-            LotteryPrize lotteryPrize = lotteryPrizeMng.getInfo(context.getPrizeId());
-            // 如果关联了商品执行商品下单操作
-            if (StringUtils.isNotBlank(lotteryPrize.getLotteryGood())) {
-                JSONObject paySecret = new JSONObject();
-                paySecret.put(lotteryPrize.getLotteryGood(), context.getLotteryRecord().getId());
-                jsonObject.put("paySecret", CryptoDesUtils.encrypt(paySecret.toJSONString()));
-                jsonObject.put("goodsId", lotteryPrize.getLotteryGood());
-            }
-        } finally {
-            redisTemplate.delete(LotteryRedisKeyManager.getDrawingRedisKey(accountIp));
-        }
-
+//
+//        String accountIp = null;
+//        JSONObject jsonObject = null;
+//        try {
+//            accountIp = IPUtil.getIpAddress(request);
+//            jsonObject = new JSONObject();
+//            // 判断当前用户上一次抽奖是否结束
+//            checkDrawParams(id, accountIp);
+//            // 抽奖
+//            RewardContextDTO context = lotteryService.doDraw(accountIp, id);
+//            jsonObject.put("id", context.getPrizeId());
+//            LotteryPrize lotteryPrize = lotteryPrizeMng.getInfo(context.getPrizeId());
+//            // 如果关联了商品执行商品下单操作
+//            if (StringUtils.isNotBlank(lotteryPrize.getLotteryGood())) {
+//                JSONObject paySecret = new JSONObject();
+//                paySecret.put(lotteryPrize.getLotteryGood(), context.getLotteryRecord().getId());
+//                jsonObject.put("paySecret", CryptoDesUtils.encrypt(paySecret.toJSONString()));
+//                jsonObject.put("goodsId", lotteryPrize.getLotteryGood());
+//            }
+//        } finally {
+//            redisTemplate.delete(LotteryRedisKeyManager.getDrawingRedisKey(accountIp));
+//        }
+//
 
         return CommonResult.success();
     }

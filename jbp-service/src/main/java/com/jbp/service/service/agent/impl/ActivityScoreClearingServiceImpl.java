@@ -54,17 +54,17 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
         }
 
 
-        ActivityScoreClearing activityScoreUser = getOne(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId).last(" limit 1"));
+        //      ActivityScoreClearing activityScoreUser = getOne(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId).last(" limit 1"));
 
-        if (activityScoreUser != null) {
-            throw new RuntimeException("活动已经结算，无法再次操作");
-        }
+//        if (activityScoreUser != null) {
+//            throw new RuntimeException("活动已经结算，无法再次操作");
+//        }
 
         List<ActivityScoreGoods> activityScoreGoodsList = activityScoreGoodsService.list(new QueryWrapper<ActivityScoreGoods>().lambda().eq(ActivityScoreGoods::getActivityScoreId, activityId));
         List<Integer> productIds = activityScoreGoodsList.stream().map(ActivityScoreGoods::getActivityScoreGoodsId).collect(Collectors.toList());
 
         List<UserInvitation> userInvitationList = userInvitationService.list(new QueryWrapper<UserInvitation>().lambda().groupBy(UserInvitation::getPId));
-      int j=0;
+        int j = 0;
         for (UserInvitation userInvitation : userInvitationList) {
             j++;
             log.info("总数:{},当前条数:{}", userInvitationList.size(), j);
@@ -79,14 +79,14 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
             activityScoreClearing.setScore(0);
             List<Integer> uids = userInvitationService.getNextPidList(userInvitation.getPId());
             //获取分值
-            Integer score = activityScoreGoodsService.getProductNumber(productIds, uids, DateTimeUtils.format(activityScore.getStartTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
+            BigDecimal score = activityScoreGoodsService.getProductNumber(productIds, uids, DateTimeUtils.format(activityScore.getStartTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN),
                     DateTimeUtils.format(activityScore.getEndTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN), activityId);
 
             //计算分值能获得什么奖励
             JSONArray jsonArray = JSONArray.parseArray(activityScore.getRule());
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (score >= jsonObject.getInteger("score")) {
+                if (score.compareTo(jsonObject.getBigDecimal("score")) >= 0) {
                     activityScoreClearing.setCardCount(jsonObject.getInteger("number"));
                     activityScoreClearing.setScore(jsonObject.getInteger("bonuspoints"));
                 }
@@ -106,21 +106,21 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
     @Override
     public void verifyUser(Integer activityId) {
         ActivityScore activityScore = activityScoreService.getById(activityId);
-       List<ActivityScoreClearing> activityScoreClearings =  list(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId,activityId));
-       if(!activityScoreClearings.get(0).getStatus().equals("待结算")){
+        List<ActivityScoreClearing> activityScoreClearings = list(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId));
+        if (!activityScoreClearings.get(0).getStatus().equals("待结算")) {
             throw new RuntimeException("活动已经结算，无法再次操作");
-       }
+        }
 
-       for(ActivityScoreClearing activityScoreClearing :activityScoreClearings ){
+        for (ActivityScoreClearing activityScoreClearing : activityScoreClearings) {
 
-           if(activityScoreClearing.getScore() > 0 ){
-               walletService.increase(activityScoreClearing.getUid(),3,new BigDecimal(activityScoreClearing.getScore()),WalletFlow.OperateEnum.奖励.name(),"",activityScore.getName()+"获得");
-           }
-           activityScoreClearing.setStatus("已结算");
-           activityScoreClearing.setClearTime(new Date());
-           updateById(activityScoreClearing);
+            if (activityScoreClearing.getScore() > 0) {
+                walletService.increase(activityScoreClearing.getUid(), 3, new BigDecimal(activityScoreClearing.getScore()), WalletFlow.OperateEnum.奖励.name(), "", activityScore.getName() + "获得");
+            }
+            activityScoreClearing.setStatus("已结算");
+            activityScoreClearing.setClearTime(new Date());
+            updateById(activityScoreClearing);
 
-       }
+        }
 
     }
 
@@ -138,7 +138,7 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
     @Override
     public PageInfo<ActivityScoreClearing> getList(Integer uid, String activityScoreName, PageParamRequest pageParamRequest) {
         Page<ActivityScoreClearing> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<ActivityScoreClearing> list = dao.getList(uid,activityScoreName);
+        List<ActivityScoreClearing> list = dao.getList(uid, activityScoreName);
         return CommonPage.copyPageInfo(page, list);
     }
 
@@ -148,7 +148,7 @@ public class ActivityScoreClearingServiceImpl extends ServiceImpl<ActivityScoreC
         if (activityScore == null) {
             throw new RuntimeException("活动不存在");
         }
-        ActivityScoreClearing activityScoreUser = getOne(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId).eq(ActivityScoreClearing::getStatus,"已结算").last(" limit 1"));
+        ActivityScoreClearing activityScoreUser = getOne(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getActivityScoreId, activityId).eq(ActivityScoreClearing::getStatus, "已结算").last(" limit 1"));
         if (activityScoreUser != null) {
             throw new RuntimeException("活动已结算，无法删除！");
         }
