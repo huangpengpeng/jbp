@@ -113,6 +113,11 @@ public class UserScoreServiceImpl extends ServiceImpl<UserScoreDao, UserScore> i
             throw new CrmebException("手机号重复");
         }
 
+        Integer pid = userInvitationService.getPid(phoneList.get(0).getId());
+        if (pid == null || pid != userService.getUserId()) {
+            throw new CrmebException("不是直属下级，无法赠送");
+        }
+
 
         //合伙人分数
         String reducePartnerMark = systemConfigService.getValueByKey("reduce_partner_mark");
