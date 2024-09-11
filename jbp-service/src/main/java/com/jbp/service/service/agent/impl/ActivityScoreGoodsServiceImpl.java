@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +80,7 @@ public class ActivityScoreGoodsServiceImpl extends ServiceImpl<ActivityScoreGood
         return updateById(activityScoreGoods);
     }
     @Override
-    public Integer getProductNumber(List<Integer> productId, List<Integer> uid,String startTime,String endTime,Integer activityId) {
+    public BigDecimal getProductNumber(List<Integer> productId, List<Integer> uid, String startTime, String endTime, Integer activityId) {
         return dao.getProductNumber(productId,uid,startTime,endTime,activityId);
     }
 }

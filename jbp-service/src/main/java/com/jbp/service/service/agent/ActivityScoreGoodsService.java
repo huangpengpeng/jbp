@@ -8,12 +8,13 @@ import com.jbp.common.request.agent.ActivityScoreGoodsAddRequest;
 import com.jbp.common.request.agent.ActivityScoreGoodsEditRequest;
 import com.jbp.common.request.agent.ActivityScoreGoodsSearchRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
 public interface ActivityScoreGoodsService extends IService<ActivityScoreGoods> {
 
-    public Integer getProductNumber(List<Integer> productId, List<Integer> uid,String startTime,String endTime,Integer activityId);
+    public BigDecimal getProductNumber(List<Integer> productId, List<Integer> uid, String startTime, String endTime, Integer activityId);
 
     PageInfo<ActivityScoreGoods> getList(ActivityScoreGoodsSearchRequest request, PageParamRequest pageParamRequest);
 
