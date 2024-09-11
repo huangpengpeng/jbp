@@ -983,7 +983,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             throw new CrmebException("预下单订单不存在");
         }
         if (StringUtils.isNotEmpty(orderRequest.getNumber())) {
-            UserSkin userSkin = userSkinService.getByNo(orderRequest.getNumber());
+            UserSkin userSkin = userSkinService.getByNo(orderRequest.getNumber(),userService.getUserId());
             if (ObjectUtil.isNull(userSkin)) {
                 throw new CrmebException("该序列号不存在！");
             }
