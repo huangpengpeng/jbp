@@ -1206,7 +1206,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         Boolean execute = transactionTemplate.execute(e -> {
             Boolean result = true;
             logger.info("开始扣件商品库存:order:{}", JSON.toJSONString(order));
-            if (order.getType().equals(OrderConstants.ORDER_TYPE_NORMAL)) { // 普通商品
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_NORMAL) ||order.getType().equals(OrderConstants.ORDER_TYPE_SHIP)  ||order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) { // 普通商品
                 logger.info("开始扣件商品库存 --> 普通商品:{}", JSON.toJSONString(skuRecordList));
                 // 扣减库存
                 for (MyRecord skuRecord : skuRecordList) {

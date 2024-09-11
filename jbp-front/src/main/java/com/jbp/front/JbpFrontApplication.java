@@ -12,6 +12,8 @@ import com.jbp.service.product.comm.CommCalculateResult;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.OrderFillService;
 import com.jbp.service.service.OrderService;
+import com.jbp.service.service.OrderTaskService;
+import com.jbp.service.service.impl.OrderTaskServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -73,7 +75,6 @@ import java.util.List;
 //        for (OrderFill orderFill : fillList) {
 //            orderFillService.fill(orderFill);
 //        }
-
 
     }
 }
