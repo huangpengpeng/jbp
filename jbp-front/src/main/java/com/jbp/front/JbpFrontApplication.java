@@ -2,6 +2,7 @@ package com.jbp.front;
 
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.service.service.KqPayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 程序主入口
@@ -40,5 +44,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
+        KqPayService kqPayService = run.getBean(KqPayService.class);
+        String cashier = kqPayService.cashier("123456",  "183.158.104.14","test-000001",
+                new BigDecimal("1"), "补差", new Date(), "");
+        System.out.println(cashier);
     }
 }
