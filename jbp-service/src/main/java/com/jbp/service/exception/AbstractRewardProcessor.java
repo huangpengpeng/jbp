@@ -25,12 +25,18 @@ public abstract class AbstractRewardProcessor implements RewardProcessor<RewardC
 
     @Override
     public LotteryRecord doReward(RewardContextDTO context) {
+        beforeProcessor(context);
         processor(context);
         return afterProcessor(context);
     }
 
     protected abstract LotteryRecord afterProcessor(RewardContextDTO context);
 
+
+
+
+    private void beforeProcessor(RewardContextDTO context) {
+    }
 
     /**
      * 发放对应的奖品
