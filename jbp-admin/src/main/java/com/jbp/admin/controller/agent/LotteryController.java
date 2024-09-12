@@ -85,6 +85,19 @@ public class LotteryController {
         return CommonResult.success(true);
     }
 
+//    @PreAuthorize("hasAuthority('agent:lottery:switch')")
+    @ApiOperation(value = "抽奖活动开关")
+    @PostMapping(value = "/switch/{id}")
+    public CommonResult<Boolean> open(@PathVariable(value = "id") Long id) {
+        Lottery lottery = lotteryService.getById(id);
+        if (lottery == null) {
+            throw new CrmebException("抽奖活动不存在！");
+        }
+        lottery.setState(lottery.getState() == 1 ? 2 : 1);
+        lotteryService.updateById(lottery);
+        return CommonResult.success(true);
+    }
+
 
 
 
