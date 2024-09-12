@@ -84,4 +84,11 @@ public class ActivityScoreController {
         List<ActivityScore> result = activityScoreService.tree();
         return CommonResult.success(result);
     }
+
+    @ApiOperation(value = "积分活动删除下拉选")
+    @GetMapping(value = "/del/tree")
+    public CommonResult<List<ActivityScore>> delTree() {
+        List<ActivityScore> result = activityScoreService.delTree();
+        return CommonResult.success(result);
+    }
 }

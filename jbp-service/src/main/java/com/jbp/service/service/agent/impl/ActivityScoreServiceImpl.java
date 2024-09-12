@@ -74,5 +74,15 @@ public class ActivityScoreServiceImpl extends ServiceImpl<ActivityScoreDao, Acti
         return list;
     }
 
+    @Override
+    public List<ActivityScore> delTree() {
+        List<ActivityScoreClearing> clearingList = activityScoreClearingService.list(new QueryWrapper<ActivityScoreClearing>().lambda().eq(ActivityScoreClearing::getStatus, "待结算"));
+        if (clearingList.isEmpty()){
+            return list();
+        }
+        List<Integer> clearingIdList = clearingList.stream().map(ActivityScoreClearing::getActivityScoreId).distinct().collect(Collectors.toList());
+        return list(new QueryWrapper<ActivityScore>().lambda().in(ActivityScore::getId, clearingIdList));
+    }
+
 
 }

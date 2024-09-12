@@ -17,4 +17,7 @@ public interface ActivityScoreService extends IService<ActivityScore> {
     Boolean edit(ActivityScoreEditRequest request);
 
     List<ActivityScore> tree();
+
+    List<ActivityScore> delTree();
+
 }
