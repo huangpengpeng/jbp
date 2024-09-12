@@ -182,6 +182,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
     @Autowired
     private UserInvitationService userInvitationService;
+    @Autowired
+    private CapaOrderService capaOrderService;
 
     /**
      * 订单预下单V1.3
@@ -1206,7 +1208,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         Boolean execute = transactionTemplate.execute(e -> {
             Boolean result = true;
             logger.info("开始扣件商品库存:order:{}", JSON.toJSONString(order));
-            if (order.getType().equals(OrderConstants.ORDER_TYPE_NORMAL) ||order.getType().equals(OrderConstants.ORDER_TYPE_SHIP)  ||order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) { // 普通商品
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_NORMAL) || order.getType().equals(OrderConstants.ORDER_TYPE_SHIP) || order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) { // 普通商品
                 logger.info("开始扣件商品库存 --> 普通商品:{}", JSON.toJSONString(skuRecordList));
                 // 扣减库存
                 for (MyRecord skuRecord : skuRecordList) {
@@ -1588,8 +1590,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public OrderFrontDetailResponse frontDetail(String orderNo) {
         User currentUser = userService.getInfo();
         Order order = orderService.getByOrderNo(orderNo);
-        Integer pid =  userInvitationService.getPid(order.getUid());
-        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId()) &&  !pid.equals(currentUser.getId()))) {
+        Integer pid = userInvitationService.getPid(order.getUid());
+        if (order.getIsUserDel() || order.getIsMerchantDel() || (!order.getPayUid().equals(currentUser.getId()) && !order.getUid().equals(currentUser.getId()) && !pid.equals(currentUser.getId()))) {
             throw new CrmebException("订单不存在");
         }
         OrderFrontDetailResponse response = new OrderFrontDetailResponse();
@@ -2478,7 +2480,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
                             Collectors.summingInt(PreOrderDetailRequest::getProductNum)
                     ));
 
-            if(!request.getPreOrderType().equals("ship")) {
+            if (!request.getPreOrderType().equals("ship")) {
                 limitTempService.validBuy(preOrderInfoVo.getUid(), capaId, capaXsId, whiteIdList,
                         teamIdList.stream().map(t -> Long.valueOf(t)).collect(Collectors.toList()), pId, rId, productList, productNumMap);
             }
@@ -2682,7 +2684,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             merchantOrderVo.setMerId(merchant.getId());
             merchantOrderVo.setMerName(merchant.getName());
             merchantOrderVo.setPayGateway(product.getPayType());
-          //  merchantOrderVo.setCouponFee(merchantOrderVo.getPlatCouponFee().add(merchantOrderVo.getMerCouponFee()));
+            //  merchantOrderVo.setCouponFee(merchantOrderVo.getPlatCouponFee().add(merchantOrderVo.getMerCouponFee()));
             merchantOrderVo.setTakeTheirSwitch(merchant.getIsTakeTheir());
             merchantOrderVo.setIsSelf(merchant.getIsSelf());
 
@@ -2717,7 +2719,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
             }
             detailVo.setProductType(ProductConstants.PRODUCT_TYPE_NORMAL);
             infoList.add(detailVo);
-    });
+        });
         merchantOrderVo.setOrderInfoList(infoList);
 
         return merchantOrderVo;
@@ -2733,6 +2735,26 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     private List<PreMerchantOrderVo> validatePreOrderd(PreOrderRequest request, User user) {
         PreMerchantOrderVo merchantOrderVo = validatePreOrderDf(request);
+
+        //订货验证
+        if (request.getPreOrderType().equals("dorder")) {
+
+            BigDecimal amount = BigDecimal.ZERO;
+            for (PreOrderInfoDetailVo preOrderInfoDetailVo : merchantOrderVo.getOrderInfoList()) {
+                amount = amount.add(preOrderInfoDetailVo.getPayPrice().multiply(new BigDecimal(preOrderInfoDetailVo.getPayNum())));
+            }
+            UserCapa userCapa = userCapaService.getByUser(userService.getUserId());
+            CapaOrder capaOrder =  capaOrderService.getByCapaId(userCapa.getCapaId().intValue());
+
+            if (request.getPlatfrom().equals("补货") && capaOrder.getRepAmount().compareTo(amount) == 1){
+                throw new CrmebException("补货金额不足，无法下单");
+            }
+
+            if (request.getPlatfrom().equals("升级") && capaOrder.getOrderAmount().compareTo(amount) == 1){
+                throw new CrmebException("升级金额不足，无法下单");
+            }
+        }
+
         List<PreMerchantOrderVo> list = new ArrayList<>();
         list.add(merchantOrderVo);
         return list;
