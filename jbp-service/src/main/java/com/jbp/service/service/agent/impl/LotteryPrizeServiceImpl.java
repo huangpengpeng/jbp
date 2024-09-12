@@ -9,9 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 @Service
 public class LotteryPrizeServiceImpl extends ServiceImpl<LotteryPrizeDao, LotteryPrize> implements LotteryPrizeService {
     @Autowired
     private LotteryPrizeDao dao;
+
+    @Override
+    public List<LotteryPrize> getListByLotteryId(Long id) {
+        return dao.getListByLotteryId(id);
+    }
 }

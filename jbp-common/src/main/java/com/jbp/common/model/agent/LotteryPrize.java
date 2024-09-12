@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class LotteryPrize extends BaseModel {
     @TableField("prize_name")
     private String prizeName;
 
-    @ApiModelProperty("奖品类型， -1-谢谢参与、1-普通奖品、2-唯一性奖品")
+    @ApiModelProperty("奖品类型， -1-谢谢参与、1-普通奖品")
     @TableField("prize_type")
     private Integer prizeType;
 
@@ -61,5 +62,16 @@ public class LotteryPrize extends BaseModel {
     @ApiModelProperty("图片")
     @TableField("images")
     private String images;
+
+    @ApiModelProperty("奖项概率")
+    @TableField(exist = false)
+    private BigDecimal percent;
+
+    @ApiModelProperty("默认奖项")
+    @TableField(exist = false)
+    private Integer defaultItem;
+
+
+
 
 }

@@ -53,4 +53,12 @@ public class Lottery extends BaseModel {
     @TableField("create_time")
     private Date createTime;
 
+    @ApiModelProperty("中奖名单是否开启")
+    @TableField("is_winners")
+    private Boolean isWinners;
+
+    @ApiModelProperty("个人中奖记录是否开启")
+    @TableField("is_self_record")
+    private Boolean isSelfRecord;
+
 }
