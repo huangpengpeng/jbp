@@ -9,6 +9,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.LotteryRequest;
 import com.jbp.common.request.agent.LotterySearchRequest;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.utils.LotteryRedisKeyManager;
 import com.jbp.service.service.agent.LotteryItemService;
 import com.jbp.service.service.agent.LotteryPrizeService;
 import com.jbp.service.service.agent.LotteryService;
@@ -16,6 +17,7 @@ import com.jbp.service.service.agent.LotteryUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,8 @@ public class LotteryController {
     private LotteryItemService lotteryItemService;
     @Autowired
     private LotteryUserService lotteryUserService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 //    @PreAuthorize("hasAuthority('agent:lottery:page')")
     @ApiOperation(value = "抽奖活动分页列表")
@@ -59,6 +63,9 @@ public class LotteryController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult<String> add(@RequestBody @Validated LotteryRequest request) {
         if (lotteryService.add(request)) {
+            redisTemplate.delete(LotteryRedisKeyManager.getLotteryItemRedisKey(request.getId()));
+            redisTemplate.delete(LotteryRedisKeyManager.getLotteryPrizeRedisKey(request.getId()));
+
             return CommonResult.success();
         }
         return CommonResult.failed();
@@ -69,6 +76,10 @@ public class LotteryController {
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public CommonResult<String> edit(@RequestBody @Validated LotteryRequest request) {
         if (lotteryService.edit(request)) {
+
+            redisTemplate.delete(LotteryRedisKeyManager.getLotteryItemRedisKey(request.getId()));
+            redisTemplate.delete(LotteryRedisKeyManager.getLotteryPrizeRedisKey(request.getId()));
+
             return CommonResult.success();
         }
         return CommonResult.failed();

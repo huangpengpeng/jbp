@@ -153,11 +153,3 @@ historyOrder:
 internal:
   uid:
   shop: 0
-
-async:
-  executor:
-    thread:
-      core-pool-size: 6
-      max-pool-size: 12
-      queue-capacity: 100000
-      name-prefix: lottery-service-
