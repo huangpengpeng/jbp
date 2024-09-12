@@ -9,5 +9,5 @@ import java.util.List;
 public interface LotteryPrizeService extends IService<LotteryPrize> {
     List<LotteryPrize> getListByLotteryId(Long id);
 
-    List<LotteryPrize> getFrontListByLotteryId(LotteryPrizeFrontRequest request);
+    List<LotteryPrize> getFrontList(Integer prizeType, Long lotteryId);
 }

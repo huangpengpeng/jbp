@@ -1,5 +1,6 @@
 package com.jbp.admin.controller.agent;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/agent/lottery")
@@ -93,8 +96,16 @@ public class LotteryController {
         if (lottery == null) {
             throw new CrmebException("抽奖活动不存在！");
         }
-        lottery.setState(lottery.getState() == 1 ? 2 : 1);
-        lotteryService.updateById(lottery);
+        if (lottery.getState() == 2) {
+            List<Lottery> list = lotteryService.list();
+            list.forEach(e->e.setState(2));
+            lotteryService.updateBatchById(list);
+            lottery.setState(1);
+            lotteryService.updateById(lottery);
+        }else {
+            lottery.setState(2);
+            lotteryService.updateById(lottery);
+        }
         return CommonResult.success(true);
     }
 

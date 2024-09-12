@@ -26,10 +26,10 @@ public class LotteryPrizeServiceImpl extends ServiceImpl<LotteryPrizeDao, Lotter
     }
 
     @Override
-    public List<LotteryPrize> getFrontListByLotteryId(LotteryPrizeFrontRequest request) {
+    public List<LotteryPrize> getFrontList(Integer prizeType, Long lotteryId) {
         LambdaQueryWrapper<LotteryPrize> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(LotteryPrize::getLotteryId,request.getId());
-        lqw.eq(!ObjectUtils.isNull(request.getPrizeType()),LotteryPrize::getPrizeType,request.getPrizeType());
+        lqw.eq(LotteryPrize::getLotteryId,lotteryId);
+        lqw.eq(!ObjectUtils.isNull(prizeType),LotteryPrize::getPrizeType,prizeType);
         return list(lqw);
     }
 }

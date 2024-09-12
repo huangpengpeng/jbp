@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.jbp.common.model.agent.LotteryRecord;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.LotteryRecordEditRequest;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.util.Date;
 import java.util.List;
@@ -15,5 +14,5 @@ public interface LotteryRecordService extends IService<LotteryRecord> {
 
     boolean edit(LotteryRecordEditRequest request);
 
-    List<LotteryRecord> getFrontListByLotteryId(Integer id);
+    List<LotteryRecord> getFrontList(Integer id, Integer uid);
 }

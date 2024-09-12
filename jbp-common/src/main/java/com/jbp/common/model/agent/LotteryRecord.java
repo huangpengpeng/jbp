@@ -46,7 +46,7 @@ public class LotteryRecord extends BaseModel {
     @TableField("remark")
     private String remark;
 
-    @ApiModelProperty("奖品类型， -1-谢谢参与、1-普通奖品")
+    @ApiModelProperty("奖品类型， -1-谢谢参与、2-普通奖品")
     @TableField(exist = false)
     private Integer prizeType;
 

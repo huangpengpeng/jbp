@@ -63,6 +63,7 @@ public class LotteryPrize extends BaseModel {
     @TableField("images")
     private String images;
 
+
     @ApiModelProperty("奖项概率")
     @TableField(exist = false)
     private BigDecimal percent;
@@ -70,6 +71,18 @@ public class LotteryPrize extends BaseModel {
     @ApiModelProperty("默认奖项")
     @TableField(exist = false)
     private Integer defaultItem;
+
+    @ApiModelProperty("奖项id")
+    @TableField(exist = false)
+    private Integer itemId;
+
+    @ApiModelProperty("权重")
+    @TableField(exist = false)
+    private Integer weight;
+
+    @ApiModelProperty("奖品id")
+    @TableField(exist = false)
+    private Integer prizeId;
 
 
 

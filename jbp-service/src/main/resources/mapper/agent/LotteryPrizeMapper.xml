@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.agent.LotteryPrizeDao">
     <select id="getListByLotteryId" resultType="com.jbp.common.model.agent.LotteryPrize">
-        select *,i.percent,i.default_item
+        select *,i.percent,i.default_item,i.weight,i.id as item_id,p.id as prize_id
         from eb_lottery_prize p
         left join eb_lottery_item i on p.id=i.prize_id
         <where>

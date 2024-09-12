@@ -33,8 +33,7 @@ public class LotteryPrizeController {
     @PostMapping(value = "/list")
     public CommonResult<List<LotteryPrize>> list(LotteryPrizeFrontRequest request) {
         Lottery lottery = lotteryService.getOne(new QueryWrapper<Lottery>().lambda().eq(Lottery::getState, 1).orderByDesc(Lottery::getId).last("LIMIT 1"));
-        request.setId(lottery.getId().intValue());
-        List<LotteryPrize> prizeList = lotteryPrizeService.getFrontListByLotteryId(request);
+        List<LotteryPrize> prizeList = lotteryPrizeService.getFrontList(request.getPrizeType(),lottery.getId());
         return CommonResult.success(prizeList);
     }
 

@@ -14,9 +14,6 @@ import java.io.Serializable;
 @ApiModel(value = "LotteryPrizeFrontRequest对象", description = "抽奖商品前端请求对象")
 public class LotteryPrizeFrontRequest implements Serializable {
 
-    @ApiModelProperty("抽奖活动id")
-    private Integer id;
-
     @ApiModelProperty("奖品类型， -1-谢谢参与、2-普通奖品")
     private Integer prizeType;
 }

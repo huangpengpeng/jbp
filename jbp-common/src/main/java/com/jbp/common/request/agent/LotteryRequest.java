@@ -21,10 +21,10 @@ import java.util.List;
 public class LotteryRequest implements Serializable {
 
     @ApiModelProperty("活动id")
-    private Integer lotteryId;
+    private Integer id;
 
     @ApiModelProperty("活动名称")
-//    @NotBlank(message = "活动名称不能为空!")
+    @NotBlank(message = "活动名称不能为空!")
     private String topic;
 
     @ApiModelProperty("开始时间")
@@ -32,10 +32,6 @@ public class LotteryRequest implements Serializable {
 
     @ApiModelProperty("结束时间")
     private Date endTime;
-
-    @ApiModelProperty("活动状态，1-上线，2-下线")
-//    @NotNull(message = "活动状态不能为空!")
-    private Integer state;
 
     @ApiModelProperty("活动描述")
     private String link;

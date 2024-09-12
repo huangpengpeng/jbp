@@ -18,14 +18,19 @@
                 and DATE(r.create_time) BETWEEN #{startTime} AND #{endTime}
             </if>
         </where>
+        order by r.id desc
     </select>
 
-    <select id="getFrontListByLotteryId" resultType="com.jbp.common.model.agent.LotteryRecord">
-        select *
+    <select id="getFrontList" resultType="com.jbp.common.model.agent.LotteryRecord">
+        select *,u.nickname
         from eb_lottery_record r
         left join eb_lottery_item i on i.id=r.item_id
         left join eb_lottery l on l.id=i.lottery_id
+        left join eb_user u on u.id=r.uid
         <where>
+            <if test="id!= null and id !=''">
+                and l.id = #{id}
+            </if>
             <if test="uid!= null and uid !=''">
                 and r.uid = #{uid}
             </if>

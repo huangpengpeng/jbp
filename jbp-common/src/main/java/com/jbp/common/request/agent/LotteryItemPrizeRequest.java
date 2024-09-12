@@ -44,5 +44,11 @@ public class LotteryItemPrizeRequest implements Serializable {
     @ApiModelProperty("默认奖项")
     private Integer defaultItem;
 
+    @ApiModelProperty("权重")
+    private Integer weight;
+
+    @ApiModelProperty("序号")
+    private Integer number;
+
 
 }

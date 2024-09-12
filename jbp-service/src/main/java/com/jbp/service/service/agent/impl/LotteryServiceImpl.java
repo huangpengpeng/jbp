@@ -237,12 +237,12 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
     @Override
     public boolean edit(LotteryRequest request) {
 
-        Lottery lottery = getById(request.getLotteryId());
+        Lottery lottery = getById(request.getId());
         if (lottery == null) {
             throw new CrmebException("抽奖活动不存在!");
         }
         BeanUtils.copyProperties(request, lottery);
-        lottery.setId(request.getLotteryId().longValue());
+        lottery.setId(request.getId().longValue());
         String cdnUrl = systemAttachmentService.getCdnUrl();
         lottery.setImages(systemAttachmentService.clearPrefix(request.getImages(), cdnUrl));
         lottery.setLink(systemAttachmentService.clearPrefix(request.getLink(), cdnUrl));
@@ -250,14 +250,14 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
         List<LotteryItem> itemList = CollUtil.newArrayList();
         request.getItemPrizeList().forEach(e->{
             //抽奖奖品信息
-            LotteryPrize lotteryPrize = new LotteryPrize();
+            LotteryPrize lotteryPrize = lotteryPrizeService.getById(e.getPrizeId());
             BeanUtils.copyProperties(e, lotteryPrize);
-            lotteryPrize.setId(e.getPrizeId().longValue());
+//            lotteryPrizeService.updateById(lotteryPrize);
             prizeList.add(lotteryPrize);
             //抽奖概率信息
-            LotteryItem lotteryItem = new LotteryItem();
+            LotteryItem lotteryItem = lotteryItemService.getById(e.getItemId());
             BeanUtils.copyProperties(e, lotteryItem);
-            lotteryItem.setId(e.getItemId().longValue());
+//            lotteryItemService.updateById(lotteryItem);
             itemList.add(lotteryItem);
         });
         Boolean execute = transactionTemplate.execute(e -> {

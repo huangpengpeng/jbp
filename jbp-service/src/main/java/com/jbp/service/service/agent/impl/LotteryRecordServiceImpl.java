@@ -43,7 +43,20 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
     }
 
     @Override
-    public List<LotteryRecord> getFrontListByLotteryId(Integer id) {
-        return dao.getFrontListByLotteryId(id);
+    public List<LotteryRecord> getFrontList(Integer id, Integer uid) {
+        return dao.getFrontList(id,uid);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

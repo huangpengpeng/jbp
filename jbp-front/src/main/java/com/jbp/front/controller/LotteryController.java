@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.dto.RewardContextDTO;
 import com.jbp.common.enums.ReturnCodeEnum;
+import com.jbp.common.exception.CrmebException;
+import com.jbp.common.model.agent.Lottery;
 import com.jbp.common.model.agent.LotteryPrize;
 import com.jbp.common.model.agent.LotteryUser;
 import com.jbp.common.response.LotteryResponse;
@@ -102,6 +104,13 @@ public class LotteryController {
         if (!result) {
             throw new RuntimeException(ReturnCodeEnum.LOTTER_DRAWING.getMsg());
         }
+    }
+
+    @ApiOperation(value = "抽奖活动详情")
+    @GetMapping(value = "/detail")
+    public CommonResult<Lottery> detail() {
+        Lottery lottery = lotteryService.getOne(new QueryWrapper<Lottery>().lambda().eq(Lottery::getState, 1));
+        return CommonResult.success(lottery);
     }
 
 
