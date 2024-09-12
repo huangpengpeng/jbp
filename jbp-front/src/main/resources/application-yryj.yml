@@ -37,7 +37,7 @@ server:
 
 spring:
   profiles:
-    active: zhcx-front
+    active: yryj-front
   servlet:
     multipart:
       max-file-size: 50MB #设置单个文件大小
