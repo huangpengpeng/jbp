@@ -38,6 +38,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -85,6 +86,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private PingTaiCommHandler pingTaiCommHandler;
     @Resource
     private MonthGuanLiCommHandler monthGuanLiCommHandler;
+    @Resource
+    private Environment environment;
 
 
     @Override
@@ -256,7 +259,9 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             // 支付成功的订单
             Map<Integer, Double> userScoreMap = Maps.newConcurrentMap();
             List<Order> successList = orderService.getSuccessList(startTime, endTime);
-
+            if (environment.getProperty("spring.profiles.active").contains("yryj")) {
+                successList = successList.stream().filter(s -> !s.getOrderNo().startsWith("D")).collect(Collectors.toList());
+            }
             BigDecimal totalScore = BigDecimal.ZERO;
             for (Order order : successList) {
                 BigDecimal score = BigDecimal.ZERO;
