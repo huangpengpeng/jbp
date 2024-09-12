@@ -25,7 +25,6 @@ public abstract class AbstractRewardProcessor implements RewardProcessor<RewardC
 
     @Override
     public LotteryRecord doReward(RewardContextDTO context) {
-        beforeProcessor(context);
         processor(context);
         return afterProcessor(context);
     }
@@ -34,9 +33,6 @@ public abstract class AbstractRewardProcessor implements RewardProcessor<RewardC
 
 
 
-
-    private void beforeProcessor(RewardContextDTO context) {
-    }
 
     /**
      * 发放对应的奖品
@@ -55,6 +51,8 @@ public abstract class AbstractRewardProcessor implements RewardProcessor<RewardC
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.THANK.getValue(), applicationContext.getBean(NoneStockRewardProcessor.class));
-        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.NORMAL.getValue(), applicationContext.getBean(HasStockRewardProcessor.class));
+        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.NORMAL.getValue(), applicationContext.getBean(NoneStockRewardProcessor.class));
+        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.UNIQUE.getValue(), applicationContext.getBean(HasStockRewardProcessor.class));
+
     }
 }

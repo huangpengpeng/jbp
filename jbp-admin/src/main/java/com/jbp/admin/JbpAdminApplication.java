@@ -50,5 +50,9 @@ public class JbpAdminApplication {
 
 //        ClearingUserService clearingUserService =run.getBean(ClearingUserService.class);
 //        clearingUserService.create(7L);
+
+//        ActivityScoreClearingService activityScoreClearingService = run.getBean(ActivityScoreClearingService.class);
+//        activityScoreClearingService.verifyUser();
+
     }
 }

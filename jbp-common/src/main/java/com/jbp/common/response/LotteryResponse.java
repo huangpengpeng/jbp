@@ -37,6 +37,6 @@ public class LotteryResponse implements Serializable {
     private String images;
 
     @ApiModelProperty(value = "奖品id")
-    private Integer id;
+    private Long id;
 
 }

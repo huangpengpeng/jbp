@@ -76,7 +76,7 @@ public class LotteryController {
             RewardContextDTO context = lotteryService.doDraw(accountIp, id);
             jsonObject.put("id", context.getPrizeId());
             LotteryPrize lotteryPrize = lotteryPrizeService.getById(context.getPrizeId());
-            lotteryResponse.setId(lotteryPrize.getPrizeId());
+            lotteryResponse.setId(lotteryPrize.getId());
             lotteryResponse.setImages(lotteryPrize.getImages());
             lotteryResponse.setName(lotteryPrize.getPrizeName());
             return CommonResult.success(lotteryResponse);
