@@ -14,14 +14,14 @@ public class Demo {
         ScoreDownloadRequest request = new ScoreDownloadRequest();
         request.setName("总代");
         request.setCapaIdXsList(Lists.newArrayList(15L));
-        request.setStartTime(DateTimeUtils.parseDate("2024-07-01"));
-        request.setEndTime(DateTimeUtils.parseDate("2024-08-01"));
+        request.setStartTime(DateTimeUtils.parseDate("2024-08-01"));
+        request.setEndTime(DateTimeUtils.parseDate("2024-09-01"));
         service.download(request);
 
         request.setName("总代省代");
         request.setCapaIdXsList(Lists.newArrayList(14L, 15L));
-        request.setStartTime(DateTimeUtils.parseDate("2024-07-01"));
-        request.setEndTime(DateTimeUtils.parseDate("2024-08-01"));
+        request.setStartTime(DateTimeUtils.parseDate("2024-08-01"));
+        request.setEndTime(DateTimeUtils.parseDate("2024-09-01"));
         service.download(request);
     }
 
