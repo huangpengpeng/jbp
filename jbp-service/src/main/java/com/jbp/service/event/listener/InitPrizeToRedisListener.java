@@ -1,5 +1,6 @@
 package com.jbp.service.event.listener;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,13 +52,9 @@ public class InitPrizeToRedisListener implements ApplicationListener<InitPrizeTo
 
         //如果指定的奖品没有了，会生成一个默认的奖项
 //        LotteryItem defaultLotteryItem = lotteryItems.parallelStream().filter(o -> o.getDefaultItem().intValue() == 1).findFirst().orElse(null);
-        ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> lotteryItemMap = new HashMap<>(16);
-        try {
-            lotteryItemMap.put(LotteryRedisKeyManager.getLotteryItemRedisKey(initPrizeToRedisEvent.getLotteryId()), mapper.writeValueAsString(lotteryItems));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+            lotteryItemMap.put(LotteryRedisKeyManager.getLotteryItemRedisKey(initPrizeToRedisEvent.getLotteryId()), lotteryItems);
+
 //        lotteryItemMap.put(RedisKeyManager.getDefaultLotteryItemRedisKey(initPrizeToRedisEvent.getLotteryId()), JsonUtils.renderJson(defaultLotteryItem) );
         redisTemplate.opsForValue().multiSet(lotteryItemMap);
 

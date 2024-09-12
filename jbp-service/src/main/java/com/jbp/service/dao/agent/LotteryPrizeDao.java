@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface LotteryPrizeDao extends BaseMapper<LotteryPrize> {
     List<LotteryPrize> getListByLotteryId(@Param("id") Long id);
+
+    List<LotteryPrize> getFrontList(@Param("prizeType")Integer prizeType, @Param("lotteryId")Long lotteryId);
+
 }

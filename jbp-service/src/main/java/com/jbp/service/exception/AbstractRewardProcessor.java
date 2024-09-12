@@ -54,7 +54,7 @@ public abstract class AbstractRewardProcessor implements RewardProcessor<RewardC
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.THANK.getValue(), (RewardProcessor) applicationContext.getBean(NoneStockRewardProcessor.class));
-        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.NORMAL.getValue(), (RewardProcessor) applicationContext.getBean(HasStockRewardProcessor.class));
+        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.THANK.getValue(), applicationContext.getBean(NoneStockRewardProcessor.class));
+        rewardProcessorMap.put(LotteryConstants.PrizeTypeEnum.NORMAL.getValue(), applicationContext.getBean(HasStockRewardProcessor.class));
     }
 }
