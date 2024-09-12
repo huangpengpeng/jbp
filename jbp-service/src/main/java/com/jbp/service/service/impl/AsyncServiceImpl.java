@@ -263,10 +263,11 @@ public class AsyncServiceImpl implements AsyncService {
             for (OrderDetail orderDetail : orderDetailList) {
                 List<ProductRef> productRefServiceList = productRefService.getList(orderDetail.getProductId());
                 if (productRefServiceList.isEmpty()) {
-                    continue;
-                }
-                for (ProductRef productRef : productRefServiceList) {
-                    productRepertoryService.increase(productRef.getProductId(), productRef.getCount() * orderDetail.getPayNum(), orderDetail.getUid(), "订货", order.getOrderNo(), "订货");
+                    productRepertoryService.increase(orderDetail.getProductId(),  orderDetail.getPayNum(), orderDetail.getUid(), "订货", order.getOrderNo(), "订货");
+                }else {
+                    for (ProductRef productRef : productRefServiceList) {
+                        productRepertoryService.increase(productRef.getProductId(), productRef.getCount() * orderDetail.getPayNum(), orderDetail.getUid(), "订货", order.getOrderNo(), "订货");
+                    }
                 }
             }
 
