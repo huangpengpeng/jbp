@@ -212,6 +212,7 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
             LotteryPrize lotteryPrize = new LotteryPrize();
             BeanUtils.copyProperties(e, lotteryPrize);
             lotteryPrize.setImages(systemAttachmentService.clearPrefix(e.getImages(), cdnUrl));
+            lotteryPrize.setValidStock(e.getTotalStock());
             lotteryPrizeService.save(lotteryPrize);
 
             //抽奖概率信息
