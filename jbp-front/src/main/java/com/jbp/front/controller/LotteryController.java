@@ -63,10 +63,11 @@ public class LotteryController {
     @ApiOperation(value = "抽奖")
     @RequestMapping(value = "/entrance", method = RequestMethod.GET)
     public CommonResult<LotteryResponse> entrance(Long id, HttpServletRequest request) {
-        LotteryResponse lotteryResponse = new LotteryResponse();
+
         String accountIp = null;
         JSONObject jsonObject = null;
         try {
+            LotteryResponse lotteryResponse = new LotteryResponse();
             accountIp = IPUtil.getIpAddress(request);
             jsonObject = new JSONObject();
             // 判断当前用户上一次抽奖是否结束
@@ -78,14 +79,14 @@ public class LotteryController {
             lotteryResponse.setId(lotteryPrize.getPrizeId());
             lotteryResponse.setImages(lotteryPrize.getImages());
             lotteryResponse.setName(lotteryPrize.getPrizeName());
+            return CommonResult.success(lotteryResponse);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         } finally {
             redisTemplate.delete(LotteryRedisKeyManager.getDrawingRedisKey(accountIp));
         }
 
-
-        return CommonResult.success(lotteryResponse);
     }
 
 

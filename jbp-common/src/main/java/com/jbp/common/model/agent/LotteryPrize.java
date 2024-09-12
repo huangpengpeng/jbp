@@ -84,6 +84,10 @@ public class LotteryPrize extends BaseModel {
     @TableField(exist = false)
     private Integer prizeId;
 
+    @ApiModelProperty("序号")
+    @TableField(exist = false)
+    private Integer number;
+
 
 
 

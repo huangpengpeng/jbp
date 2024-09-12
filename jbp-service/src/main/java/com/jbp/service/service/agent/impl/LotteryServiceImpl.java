@@ -130,7 +130,7 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
         if (lotteryItemsObj == null) {
             lotteryItems = lotteryItemService.list(new QueryWrapper<LotteryItem>().lambda().eq(LotteryItem::getLotteryId, lottery.getId()));
         } else {
-            lotteryItems = JSONArray.parseArray(JSONArray.toJSONString(lotteryItemsObj), LotteryItem.class);
+            lotteryItems = JSONArray.parseArray(lotteryItemsObj.toString(), LotteryItem.class);
         }
         //奖项数据未配置
         if (lotteryItems.isEmpty()) {
@@ -203,6 +203,7 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
         String cdnUrl = systemAttachmentService.getCdnUrl();
         lottery.setImages(systemAttachmentService.clearPrefix(request.getImages(), cdnUrl));
         lottery.setLink(systemAttachmentService.clearPrefix(request.getLink(), cdnUrl));
+        lottery.setState(2);
         List<LotteryPrize> prizeList = CollUtil.newArrayList();
         List<LotteryItem> itemList = CollUtil.newArrayList();
         request.getItemPrizeList().forEach(e->{
