@@ -254,12 +254,11 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
             //抽奖奖品信息
             LotteryPrize lotteryPrize = lotteryPrizeService.getById(e.getPrizeId());
             BeanUtils.copyProperties(e, lotteryPrize);
-//            lotteryPrizeService.updateById(lotteryPrize);
+            lotteryPrize.setImages(systemAttachmentService.clearPrefix(e.getImages(), cdnUrl));
             prizeList.add(lotteryPrize);
             //抽奖概率信息
             LotteryItem lotteryItem = lotteryItemService.getById(e.getItemId());
             BeanUtils.copyProperties(e, lotteryItem);
-//            lotteryItemService.updateById(lotteryItem);
             itemList.add(lotteryItem);
         });
         Boolean execute = transactionTemplate.execute(e -> {
