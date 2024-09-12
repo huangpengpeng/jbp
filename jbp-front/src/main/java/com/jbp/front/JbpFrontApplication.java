@@ -1,21 +1,7 @@
 package com.jbp.front;
 
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.beust.jcommander.internal.Lists;
+
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-import com.jbp.common.model.order.Order;
-import com.jbp.common.model.order.OrderDetail;
-import com.jbp.common.request.agent.ScoreDownloadRequest;
-import com.jbp.common.utils.DateTimeUtils;
-import com.jbp.service.product.comm.BaoDanCommHandler;
-import com.jbp.service.product.comm.CommCalculateResult;
-import com.jbp.service.product.comm.LingShouCommHandler;
-import com.jbp.service.service.OrderDetailService;
-import com.jbp.service.service.OrderService;
-import com.jbp.service.service.YopService;
-import com.jbp.service.service.agent.ActivityScoreClearingService;
-import com.jbp.service.service.agent.InvitationScoreService;
-import org.apache.commons.collections4.MapUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,10 +13,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 程序主入口
@@ -57,21 +39,6 @@ import java.util.Map;
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
-
-        LingShouCommHandler lingShouCommHandler = run.getBean(LingShouCommHandler.class);
-        OrderService orderService = run.getBean(OrderService.class);
-        OrderDetailService orderDetailService = run.getBean(OrderDetailService.class);
-//
-//        Order order = orderService.getByOrderNo("PT393172370525944978690");
-//        List<OrderDetail> orderDetails = orderDetailService.getByOrderNo(order.getOrderNo());
-//        LinkedList<CommCalculateResult> resultList = new LinkedList<>();
-//        lingShouCommHandler.orderSuccessCalculateAmt(order, orderDetails, resultList);
-
-//        YopDemo.pay(run.getBean(YopService.class));
-
-//        YopDemo.registerQuery(run.getBean(YopService.class));
-
-
 
     }
 }
