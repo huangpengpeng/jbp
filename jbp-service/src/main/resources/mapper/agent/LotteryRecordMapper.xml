@@ -19,4 +19,16 @@
             </if>
         </where>
     </select>
+
+    <select id="getFrontListByLotteryId" resultType="com.jbp.common.model.agent.LotteryRecord">
+        select *
+        from eb_lottery_record r
+        left join eb_lottery_item i on i.id=r.item_id
+        left join eb_lottery l on l.id=i.lottery_id
+        <where>
+            <if test="uid!= null and uid !=''">
+                and r.uid = #{uid}
+            </if>
+        </where>
+    </select>
 </mapper>

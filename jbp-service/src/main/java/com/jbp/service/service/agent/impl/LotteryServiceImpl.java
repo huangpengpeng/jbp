@@ -226,7 +226,9 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
         Boolean execute = transactionTemplate.execute(e -> {
             save(lottery);
             prizeList.forEach(prize -> prize.setLotteryId(lottery.getId()));
+            lotteryPrizeService.updateBatchById(prizeList);
             itemList.forEach(item -> item.setLotteryId(lottery.getId()));
+            lotteryItemService.updateBatchById(itemList);
             return Boolean.TRUE;
         });
         return Boolean.TRUE.equals(execute);

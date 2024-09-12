@@ -14,4 +14,6 @@ public interface LotteryRecordService extends IService<LotteryRecord> {
     PageInfo<LotteryRecord> pageList(Integer uid, Integer prizeType, Date startTime, Date endTime, PageParamRequest pageParamRequest);
 
     boolean edit(LotteryRecordEditRequest request);
+
+    List<LotteryRecord> getFrontListByLotteryId(Integer id);
 }

@@ -41,4 +41,9 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
         lotteryRecord.setRemark(request.getRemark());
         return updateById(lotteryRecord);
     }
+
+    @Override
+    public List<LotteryRecord> getFrontListByLotteryId(Integer id) {
+        return dao.getFrontListByLotteryId(id);
+    }
 }

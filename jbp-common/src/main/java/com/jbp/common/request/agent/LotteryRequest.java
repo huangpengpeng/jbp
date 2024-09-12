@@ -24,7 +24,7 @@ public class LotteryRequest implements Serializable {
     private Integer lotteryId;
 
     @ApiModelProperty("活动名称")
-    @NotBlank(message = "活动名称不能为空!")
+//    @NotBlank(message = "活动名称不能为空!")
     private String topic;
 
     @ApiModelProperty("开始时间")
@@ -34,7 +34,7 @@ public class LotteryRequest implements Serializable {
     private Date endTime;
 
     @ApiModelProperty("活动状态，1-上线，2-下线")
-    @NotNull(message = "活动状态不能为空!")
+//    @NotNull(message = "活动状态不能为空!")
     private Integer state;
 
     @ApiModelProperty("活动描述")

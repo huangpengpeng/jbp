@@ -1,7 +1,10 @@
 package com.jbp.service.service.agent.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.model.agent.LotteryPrize;
+import com.jbp.common.request.agent.LotteryPrizeFrontRequest;
 import com.jbp.service.dao.agent.LotteryPrizeDao;
 import com.jbp.service.service.agent.LotteryPrizeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +23,13 @@ public class LotteryPrizeServiceImpl extends ServiceImpl<LotteryPrizeDao, Lotter
     @Override
     public List<LotteryPrize> getListByLotteryId(Long id) {
         return dao.getListByLotteryId(id);
+    }
+
+    @Override
+    public List<LotteryPrize> getFrontListByLotteryId(LotteryPrizeFrontRequest request) {
+        LambdaQueryWrapper<LotteryPrize> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(LotteryPrize::getLotteryId,request.getId());
+        lqw.eq(!ObjectUtils.isNull(request.getPrizeType()),LotteryPrize::getPrizeType,request.getPrizeType());
+        return list(lqw);
     }
 }
