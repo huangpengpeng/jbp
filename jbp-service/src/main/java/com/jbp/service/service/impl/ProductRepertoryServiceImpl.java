@@ -190,5 +190,35 @@ public class ProductRepertoryServiceImpl extends ServiceImpl<ProductRepertoryDao
         }
     }
 
+    @Override
+    public Boolean company(Integer uid, Integer productId, Integer count, String description) {
+        Product product = productService.getById(productId);
+        if (ObjectUtil.isNull(product)) {
+            throw new CrmebException("商品不存在！");
+        }
+        if (count < 0) {
+            throw new CrmebException("数量输入有误！");
+        }
+        increase(productId, count, uid, description, "", "公司调拨");
+        return true;
+    }
+
+    @Override
+    public Boolean edit(Integer id, Integer count, String kind, String description) {
+        ProductRepertory productRepertory = getById(id);
+        if (productRepertory == null){
+            throw new CrmebException("库存不存在！");
+        }
+        if (count < 0) {
+            throw new CrmebException("数量输入有误！");
+        }
+        if (kind.equals("增加")) {
+            increase(productRepertory.getProductId(), count, productRepertory.getUid(), description, "", "人工调整");
+        }else {
+            reduce(productRepertory.getProductId(), count, productRepertory.getUid(), description, "", "人工调整");
+        }
+        return true;
+    }
+
 }
 

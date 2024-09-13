@@ -6,9 +6,8 @@ import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.ProductDayRecordRequest;
-import com.jbp.common.request.agent.ProductRepertoryAllotRequest;
-import com.jbp.common.request.agent.ProductRepertoryAllotSearchRequest;
-import com.jbp.common.request.agent.ProductRepertorySearchRequest;
+import com.jbp.common.request.ProductRepertoryRequest;
+import com.jbp.common.request.agent.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.ProductRepertoryService;
 import com.jbp.service.service.UserService;
@@ -70,6 +69,21 @@ public class ProductRepertoryController {
         return CommonResult.success(productRepertoryService.allot(fUid,tUid,request.getProductId(),request.getCount()));
     }
 
+    @PreAuthorize("hasAuthority('agent:platform:product:repertory:company')")
+    @PostMapping("/company")
+    @ApiOperation("公司调拨库存")
+    public CommonResult<Boolean> company(@RequestBody @Validated ProductRepertoryCompanyRequest request){
+        Integer uid = null;
+        if (StringUtils.isNotEmpty(request.getAccount())) {
+            User user = userService.getByAccount(request.getAccount());
+            if (ObjectUtil.isNull(user)) {
+                return CommonResult.failed("调拨账号信息错误");
+            }
+            uid = user.getId();
+        }
+        return CommonResult.success(productRepertoryService.company(uid,request.getProductId(),request.getCount(),request.getDescription()));
+    }
+
     @GetMapping("/user/repertory")
     @ApiOperation("获取用户商品库存")
     public CommonResult<List<ProductRepertory>> getProduct(ProductRepertoryAllotSearchRequest request){
@@ -99,7 +113,12 @@ public class ProductRepertoryController {
         return CommonResult.success(productRepertoryService.export(uid,request.getNickname(),request.getProductNameOrCode()));
     }
 
-
+    @PreAuthorize("hasAuthority('agent:platform:product:repertory:edit')")
+    @PostMapping("/edit")
+    @ApiOperation("库存编辑")
+    public CommonResult<Boolean> edit(@RequestBody @Validated ProductRepertoryEditRequest request){
+        return CommonResult.success(productRepertoryService.edit(request.getId(),request.getCount(),request.getKind(),request.getDescription()));
+    }
 
 
 
