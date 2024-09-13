@@ -63,7 +63,6 @@ public class LotteryPrize extends BaseModel {
     @TableField("images")
     private String images;
 
-
     @ApiModelProperty("奖项概率")
     @TableField(exist = false)
     private BigDecimal percent;
@@ -88,7 +87,9 @@ public class LotteryPrize extends BaseModel {
     @TableField(exist = false)
     private Integer number;
 
-
+    @ApiModelProperty("提示语")
+    @TableField(exist = false)
+    private String tips;
 
 
 }

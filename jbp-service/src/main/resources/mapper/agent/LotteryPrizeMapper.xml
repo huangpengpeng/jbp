@@ -13,7 +13,7 @@
     </select>
 
     <select id="getFrontList" resultType="com.jbp.common.model.agent.LotteryPrize">
-        select *,i.percent,i.default_item,i.weight,i.id as item_id,p.id as prize_id,i.number,p.remark
+        select *,i.percent,i.default_item,i.weight,i.id as item_id,p.id as prize_id,i.number,p.remark as tips
         from eb_lottery_prize p
         left join eb_lottery_item i on p.id=i.prize_id
         <where>
