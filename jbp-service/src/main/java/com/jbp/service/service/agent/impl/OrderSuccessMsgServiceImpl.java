@@ -3,11 +3,15 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.constants.OrderStatusConstants;
 import com.jbp.common.dto.ProductInfoDto;
+import com.jbp.common.model.agent.Lottery;
 import com.jbp.common.model.agent.OrderSuccessMsg;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.order.Materials;
@@ -31,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -61,9 +66,13 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
     private ProductMaterialsService productMaterialsService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private LotteryService lotteryService;
+    @Autowired
+    private LotteryUserService lotteryUserService;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         redisTemplate.delete("TemUserTask.create");
         redisTemplate.delete("WalletGivePlanTask.give");
         redisTemplate.delete("refreshFlowAndTeam");
@@ -73,7 +82,6 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         redisTemplate.delete("UserRelationFlowTask.refresh");
         redisTemplate.delete("UserInvitationFlowTask.refresh");
         redisTemplate.delete("FundClearingTask.send");
-
 
 
     }
@@ -177,6 +185,27 @@ public class OrderSuccessMsgServiceImpl extends ServiceImpl<OrderSuccessMsgDao, 
         if (!b) {
             throw new RuntimeException("执行订单成功消息失败[更新订单详情]:" + msg.getOrdersSn());
         }
+
+
+        //抽奖次数增加
+        Lottery lottery = lotteryService.getOne(new QueryWrapper<Lottery>().lambda().eq(Lottery::getState, 1));
+        if (lottery != null && lottery.getStartTime().compareTo(new Date()) <0  && lottery.getEndTime().compareTo(new Date())>0 ) {
+            if (StringUtils.isNotEmpty(lottery.getRule())) {
+                Integer number = 0;
+                JSONArray jsonArray = JSONArray.parseArray(lottery.getRule());
+                for (Object object : jsonArray) {
+                    JSONObject jsonObject = (JSONObject) object;
+                    if (platOrder.getPayPrice().compareTo(jsonObject.getBigDecimal("score")) >= 0) {
+                        number = jsonObject.getInteger("number");
+                    }
+                }
+                if (number > 0) {
+                    lotteryUserService.increase(platOrder.getUid(), lottery.getId(), number);
+                }
+            }
+        }
+
+
         // 订单日志
         orderList.forEach(o -> orderStatusService.createLog(o.getOrderNo(), OrderStatusConstants.ORDER_STATUS_PAY_SPLIT, StrUtil.format(OrderStatusConstants.ORDER_LOG_MESSAGE_PAY_SPLIT, platOrder.getOrderNo())));
         msg.setExec(true);
