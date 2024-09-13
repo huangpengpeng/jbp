@@ -22,7 +22,7 @@
     </select>
 
     <select id="getFrontList" resultType="com.jbp.common.model.agent.LotteryRecord">
-        select *,u.nickname,p.prize_name
+        select *,u.nickname,p.prize_name,p.remark as tips
         from eb_lottery_record r
         left join eb_lottery_item i on i.id=r.item_id
         left join eb_lottery l on l.id=i.lottery_id

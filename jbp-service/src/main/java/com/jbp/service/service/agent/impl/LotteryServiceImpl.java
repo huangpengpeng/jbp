@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jbp.common.dto.RewardContextDTO;
 import com.jbp.common.enums.ReturnCodeEnum;
@@ -12,11 +13,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.ActivityScoreClearing;
-import com.jbp.common.model.agent.Lottery;
-import com.jbp.common.model.agent.LotteryItem;
-import com.jbp.common.model.agent.LotteryPrize;
-import com.jbp.common.model.agent.LotteryRecord;
+import com.jbp.common.model.agent.*;
 import com.jbp.common.utils.LotteryRedisKeyManager;
 import com.jbp.common.model.agent.LotteryItem;
 import com.jbp.common.model.agent.LotteryPrize;
@@ -24,6 +21,7 @@ import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.LotteryRequest;
 import com.jbp.common.request.agent.LotterySearchRequest;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.agent.LotteryDao;
 import com.jbp.service.event.InitPrizeToRedisEvent;
 import com.jbp.service.exception.AbstractRewardProcessor;
@@ -248,6 +246,9 @@ public class LotteryServiceImpl extends ServiceImpl<LotteryDao, Lottery> impleme
         String cdnUrl = systemAttachmentService.getCdnUrl();
         lottery.setImages(systemAttachmentService.clearPrefix(request.getImages(), cdnUrl));
         lottery.setLink(systemAttachmentService.clearPrefix(request.getLink(), cdnUrl));
+        if (StringUtils.isEmpty(request.getRule())){
+            lottery.setRule("");
+        }
         List<LotteryPrize> prizeList = CollUtil.newArrayList();
         List<LotteryItem> itemList = CollUtil.newArrayList();
         request.getItemPrizeList().forEach(e->{
