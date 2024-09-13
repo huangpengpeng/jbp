@@ -1,6 +1,5 @@
 package com.jbp.admin.controller.agent;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.*;
@@ -40,7 +39,7 @@ public class LotteryController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-//    @PreAuthorize("hasAuthority('agent:lottery:page')")
+    @PreAuthorize("hasAuthority('agent:lottery:page')")
     @ApiOperation(value = "抽奖活动分页列表")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<Lottery>> pageList(LotterySearchRequest request, PageParamRequest pageParamRequest) {
@@ -58,7 +57,7 @@ public class LotteryController {
     }
 
 
-//    @PreAuthorize("hasAuthority('agent:lottery:add')")
+    @PreAuthorize("hasAuthority('agent:lottery:add')")
     @ApiOperation(value = "抽奖活动新增")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult<String> add(@RequestBody @Validated LotteryRequest request) {
@@ -71,7 +70,7 @@ public class LotteryController {
         return CommonResult.failed();
     }
 
-//    @PreAuthorize("hasAuthority('agent:lottery:edit')")
+    @PreAuthorize("hasAuthority('agent:lottery:edit')")
     @ApiOperation(value = "抽奖活动编辑")
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public CommonResult<String> edit(@RequestBody @Validated LotteryRequest request) {
@@ -85,7 +84,7 @@ public class LotteryController {
         return CommonResult.failed();
     }
 
-//    @PreAuthorize("hasAuthority('agent:lottery:delete')")
+    @PreAuthorize("hasAuthority('agent:lottery:delete')")
     @ApiOperation(value = "抽奖活动删除")
     @PostMapping(value = "/delete/{id}")
     public CommonResult<Boolean> delete(@PathVariable(value = "id") Long id) {
@@ -99,7 +98,7 @@ public class LotteryController {
         return CommonResult.success(true);
     }
 
-//    @PreAuthorize("hasAuthority('agent:lottery:switch')")
+    @PreAuthorize("hasAuthority('agent:lottery:switch')")
     @ApiOperation(value = "抽奖活动开关")
     @PostMapping(value = "/switch/{id}")
     public CommonResult<Boolean> open(@PathVariable(value = "id") Long id) {
