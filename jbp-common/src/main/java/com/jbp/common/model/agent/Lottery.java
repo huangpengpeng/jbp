@@ -61,4 +61,8 @@ public class Lottery extends BaseModel {
     @TableField("is_self_record")
     private Boolean isSelfRecord;
 
+    @ApiModelProperty("抽奖规则")
+    @TableField("rule")
+    private String rule;
+
 }

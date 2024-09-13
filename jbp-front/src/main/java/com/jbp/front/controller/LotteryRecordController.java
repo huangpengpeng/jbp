@@ -43,9 +43,9 @@ public class LotteryRecordController {
     }
 
 
-    @ApiOperation(value = "抽奖活动详情")
+    @ApiOperation(value = "用户抽奖活动添加地址")
     @PostMapping(value = "/address")
-    public CommonResult<Boolean> detail(@RequestBody LotteryRecordFrontRequest request) {
+    public CommonResult<Boolean> address(@RequestBody LotteryRecordFrontRequest request) {
         Integer uid = userService.getUserId();
         if (uid == null) {
             throw new CrmebException("请先登录！");

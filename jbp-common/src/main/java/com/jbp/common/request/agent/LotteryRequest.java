@@ -45,6 +45,9 @@ public class LotteryRequest implements Serializable {
     @ApiModelProperty("个人中奖记录是否开启")
     private Boolean isSelfRecord;
 
+    @ApiModelProperty("抽奖规则")
+    private String rule;
+
     @ApiModelProperty("活动项目商品列表")
     private List<LotteryItemPrizeRequest> itemPrizeList;
 

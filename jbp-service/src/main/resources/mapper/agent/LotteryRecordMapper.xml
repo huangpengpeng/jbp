@@ -35,6 +35,7 @@
             <if test="uid!= null and uid !=''">
                 and r.uid = #{uid}
             </if>
+            and p.prize_type = 2
         </where>
         order by r.id desc
     </select>
