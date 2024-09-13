@@ -65,4 +65,8 @@ public class Lottery extends BaseModel {
     @TableField("rule")
     private String rule;
 
+    @ApiModelProperty("活动背景方案-1:金色;2:蓝色")
+    @TableField("option_id")
+    private Integer optionId;
+
 }

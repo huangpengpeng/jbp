@@ -11,7 +11,7 @@
             <if test="uid!= null and uid !=''">
                 and r.uid = #{uid}
             </if>
-            <if test="id!= null and id !=''">
+            <if test="prizeType!= null and prizeType !=''">
                 and p.prize_type = #{prizeType}
             </if>
             <if test="startTime!=null and endTime!=null">

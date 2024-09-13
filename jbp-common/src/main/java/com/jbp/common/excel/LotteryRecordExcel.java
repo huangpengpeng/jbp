@@ -24,10 +24,13 @@ public class LotteryRecordExcel {
     @ExcelProperty(value = "奖品信息", index = 3)
     private String prizeName;
 
-    @ExcelProperty(value = "抽奖时间", index = 4)
+    @ExcelProperty(value = "中奖类型", index = 4)
+    private String prizeType;
+
+    @ExcelProperty(value = "抽奖时间", index = 5)
     private Date createTime;
 
-    @ExcelProperty(value = "备注", index = 5)
+    @ExcelProperty(value = "备注", index = 6)
     private Date remark;
 
 }

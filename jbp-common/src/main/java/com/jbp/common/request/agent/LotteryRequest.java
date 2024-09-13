@@ -36,6 +36,9 @@ public class LotteryRequest implements Serializable {
     @ApiModelProperty("活动描述")
     private String link;
 
+    @ApiModelProperty("活动背景方案-1:金色;2:蓝色")
+    private Integer optionId;
+
     @ApiModelProperty("活动图片")
     private String images;
 

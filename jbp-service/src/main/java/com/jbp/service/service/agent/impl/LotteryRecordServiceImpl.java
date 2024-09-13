@@ -69,6 +69,13 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
         for (LotteryRecord record : list) {
             LotteryRecordExcel vo = new LotteryRecordExcel();
             BeanUtils.copyProperties(record, vo);
+            vo.setPrizeName(record.getPrizeName());
+            if (record.getPrizeType() == 1) {
+                vo.setPrizeType("谢谢参与");
+            }
+            if (record.getPrizeType() == 2) {
+                vo.setPrizeType("普通奖品");
+            }
             result.add(vo);
         }
         FileResultVo fileResultVo = uploadService.excelLocalUpload(result, LotteryRecordExcel.class);
