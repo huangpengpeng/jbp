@@ -26,8 +26,8 @@ public class LotteryItemPrizeRequest implements Serializable {
     @ApiModelProperty("奖品图片")
     private String images;
 
-    @ApiModelProperty("总库存")
-    private  Integer totalStock;
+    @ApiModelProperty("可用库存")
+    private  Integer validStock;
 
     @ApiModelProperty("奖项概率：0-1")
     private BigDecimal percent;
