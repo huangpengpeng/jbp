@@ -49,7 +49,7 @@
             <if test="uid!= null and uid !=''">
                 and r.uid = #{uid}
             </if>
-            and p.prize_type = 2
+            and p.prize_type = 2 or r.prize_name is null
             and r.address is null
         </where>
         order by r.id desc
