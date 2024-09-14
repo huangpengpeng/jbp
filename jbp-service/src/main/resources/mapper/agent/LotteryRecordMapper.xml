@@ -51,6 +51,7 @@
             </if>
             and p.prize_type = 2 or r.prize_name is null
             and r.address is null
+            and l.state = 1
         </where>
         order by r.id desc
         limit 1
