@@ -2,6 +2,7 @@ package com.jbp.front;
 
 
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.service.service.KqPayService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -44,9 +45,7 @@ import java.util.Date;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        KqPayService kqPayService = run.getBean(KqPayService.class);
-//        String cashier = kqPayService.cashier("123456",  "183.158.104.14","fky000001",
-//                new BigDecimal("1"), "补差", new Date(), "");
-//        System.out.println(cashier);
+
+
     }
 }
