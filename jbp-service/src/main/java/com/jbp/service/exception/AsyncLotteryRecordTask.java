@@ -17,7 +17,6 @@ public class AsyncLotteryRecordTask {
     @Autowired
     LotteryRecordService lotteryRecordMapper;
 
-    @Async("lotteryServiceExecutor")
     public LotteryRecord saveLotteryRecord(String accountIp, LotteryItem lotteryItem, String prizeName, Integer userId) {
         log.info(Thread.currentThread().getName() + "---saveLotteryRecord");
         //存储中奖信息

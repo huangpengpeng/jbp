@@ -11,13 +11,14 @@ import com.jbp.service.service.agent.LotteryPrizeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class HasStockRewardProcessor extends AbstractRewardProcessor {
 
-    @Autowired
+    @Resource
     AsyncLotteryRecordTask asyncLotteryRecordTask;
 
     @Autowired
@@ -38,7 +39,9 @@ public class HasStockRewardProcessor extends AbstractRewardProcessor {
         LotteryPrize lotteryPrize = lotteryPrizeMapper.getById(context.getLotteryItem().getPrizeId());
         List<Object> prizes = new ArrayList<>();
         if (lotteryPrize.getValidStock() - 1 < 0) {
-            lotteryPrize = lotteryPrizeMapper.getById(context.getLotteryItem().getDefaultItem().longValue());
+
+            LotteryItem lotteryItem = lotteryItemDao.getOne(new QueryWrapper<LotteryItem>().lambda().orderByDesc(LotteryItem::getPercent).last(" limit 1"));
+            lotteryPrize = lotteryPrizeMapper.getById(lotteryItem.getPrizeId());
             context.setLotteryItem(lotteryItemDao.getOne(new QueryWrapper<LotteryItem>().lambda().eq(LotteryItem::getLotteryId, context.getLottery().getId()).eq(LotteryItem::getPrizeId, lotteryPrize.getId())));
         }
 

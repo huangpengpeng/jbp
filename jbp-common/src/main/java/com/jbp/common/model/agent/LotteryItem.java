@@ -51,5 +51,15 @@ public class LotteryItem extends BaseModel {
     @TableField("default_item")
     private Integer defaultItem;
 
+    @ApiModelProperty("权重")
+    @TableField("weight")
+    private Integer weight;
+
+    @ApiModelProperty("序号")
+    @TableField("number")
+    private Integer number;
+
+
+
 
 }

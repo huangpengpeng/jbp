@@ -7,10 +7,12 @@ import com.jbp.service.service.agent.LotteryRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 
 @Service
 public class NoneStockRewardProcessor extends AbstractRewardProcessor {
+
 
     @Autowired
     LotteryRecordService lotteryRecordMapper;

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.dto.RewardContextDTO;
 import com.jbp.common.enums.ReturnCodeEnum;
+import com.jbp.common.model.agent.Lottery;
 import com.jbp.common.model.agent.LotteryPrize;
 import com.jbp.common.model.agent.LotteryUser;
 import com.jbp.common.response.LotteryResponse;
@@ -11,14 +12,15 @@ import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.IPUtil;
 import com.jbp.common.utils.LotteryRedisKeyManager;
 import com.jbp.service.service.UserService;
+import com.jbp.service.service.agent.LotteryPrizeService;
 import com.jbp.service.service.agent.LotteryService;
 import com.jbp.service.service.agent.LotteryUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,36 +56,37 @@ public class LotteryController {
     private RedisTemplate redisTemplate;
     @Autowired
     private LotteryService lotteryService;
+    @Autowired
+    private LotteryPrizeService lotteryPrizeService;
+
 
     @ApiOperation(value = "抽奖")
     @RequestMapping(value = "/entrance", method = RequestMethod.GET)
     public CommonResult<LotteryResponse> entrance(Long id, HttpServletRequest request) {
 
-//
-//        String accountIp = null;
-//        JSONObject jsonObject = null;
-//        try {
-//            accountIp = IPUtil.getIpAddress(request);
-//            jsonObject = new JSONObject();
-//            // 判断当前用户上一次抽奖是否结束
-//            checkDrawParams(id, accountIp);
-//            // 抽奖
-//            RewardContextDTO context = lotteryService.doDraw(accountIp, id);
-//            jsonObject.put("id", context.getPrizeId());
-//            LotteryPrize lotteryPrize = lotteryPrizeMng.getInfo(context.getPrizeId());
-//            // 如果关联了商品执行商品下单操作
-//            if (StringUtils.isNotBlank(lotteryPrize.getLotteryGood())) {
-//                JSONObject paySecret = new JSONObject();
-//                paySecret.put(lotteryPrize.getLotteryGood(), context.getLotteryRecord().getId());
-//                jsonObject.put("paySecret", CryptoDesUtils.encrypt(paySecret.toJSONString()));
-//                jsonObject.put("goodsId", lotteryPrize.getLotteryGood());
-//            }
-//        } finally {
-//            redisTemplate.delete(LotteryRedisKeyManager.getDrawingRedisKey(accountIp));
-//        }
-//
+        String accountIp = null;
+        JSONObject jsonObject = null;
+        try {
+            LotteryResponse lotteryResponse = new LotteryResponse();
+            accountIp = IPUtil.getIpAddress(request);
+            jsonObject = new JSONObject();
+            // 判断当前用户上一次抽奖是否结束
+            checkDrawParams(id, accountIp);
+            // 抽奖
+            RewardContextDTO context = lotteryService.doDraw(accountIp, id);
+            jsonObject.put("id", context.getPrizeId());
+            LotteryPrize lotteryPrize = lotteryPrizeService.getById(context.getPrizeId());
+            lotteryResponse.setId(lotteryPrize.getId());
+            lotteryResponse.setImages(lotteryPrize.getImages());
+            lotteryResponse.setName(lotteryPrize.getPrizeName());
+            return CommonResult.success(lotteryResponse);
 
-        return CommonResult.success();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            redisTemplate.delete(LotteryRedisKeyManager.getDrawingRedisKey(accountIp));
+        }
+
     }
 
 
@@ -103,6 +106,13 @@ public class LotteryController {
         if (!result) {
             throw new RuntimeException(ReturnCodeEnum.LOTTER_DRAWING.getMsg());
         }
+    }
+
+    @ApiOperation(value = "抽奖活动详情")
+    @GetMapping(value = "/detail")
+    public CommonResult<Lottery> detail() {
+        Lottery lottery = lotteryService.getOne(new QueryWrapper<Lottery>().lambda().eq(Lottery::getState, 1));
+        return CommonResult.success(lottery);
     }
 
 
