@@ -44,9 +44,9 @@ import java.util.Date;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        KqPayService kqPayService = run.getBean(KqPayService.class);
-        String cashier = kqPayService.cashier("123456",  "183.158.104.14","test-000001",
-                new BigDecimal("1"), "补差", new Date(), "");
-        System.out.println(cashier);
+//        KqPayService kqPayService = run.getBean(KqPayService.class);
+//        String cashier = kqPayService.cashier("123456",  "183.158.104.14","fky000001",
+//                new BigDecimal("1"), "补差", new Date(), "");
+//        System.out.println(cashier);
     }
 }
