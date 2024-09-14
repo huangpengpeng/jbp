@@ -180,7 +180,7 @@ jeecg:
       - 40
 
 kq:
-  config: jh.properties
+  config: hdf.properties
 
 internal:
   uid:
