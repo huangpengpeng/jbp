@@ -46,7 +46,35 @@ public class LotteryRecord extends BaseModel {
     @TableField("remark")
     private String remark;
 
-    @ApiModelProperty("地址")
+    @ApiModelProperty(value = "收货人姓名")
+    @TableField("real_name")
+    private String realName;
+
+    @ApiModelProperty(value = "收货人电话")
+    @TableField("user_phone")
+    private String userPhone;
+
+    @ApiModelProperty(value = "收货详细地址")
+    @TableField("user_address")
+    private String userAddress;
+
+    @ApiModelProperty(value = "收货省")
+    @TableField("province")
+    private String province;
+
+    @ApiModelProperty(value = "收货市")
+    @TableField("city")
+    private String city;
+
+    @ApiModelProperty(value = "收货区")
+    @TableField("district")
+    private String district;
+
+    @ApiModelProperty(value = "收货街道")
+    @TableField("street")
+    private String street;
+
+    @ApiModelProperty("详细地址")
     @TableField("address")
     private String address;
 

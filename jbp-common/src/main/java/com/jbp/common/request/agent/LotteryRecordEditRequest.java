@@ -19,6 +19,21 @@ public class LotteryRecordEditRequest implements Serializable {
     @NotNull(message = "id不能为空")
     private Integer id;
 
-    @ApiModelProperty("备注")
-    private String remark;
+    @ApiModelProperty(value = "收货人姓名")
+    private String realName;
+
+    @ApiModelProperty(value = "收货人电话")
+    private String userPhone;
+
+    @ApiModelProperty(value = "收货省")
+    private String province;
+    @ApiModelProperty(value = "收货市")
+    private String city;
+    @ApiModelProperty(value = "收货区")
+    private String district;
+    @ApiModelProperty(value = "收货街道")
+    private String street;
+    @ApiModelProperty("详细地址")
+    private String address;
+
 }

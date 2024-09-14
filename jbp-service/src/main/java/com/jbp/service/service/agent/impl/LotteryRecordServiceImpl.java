@@ -11,10 +11,12 @@ import com.jbp.common.model.agent.LotteryRecord;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.LotteryRecordEditRequest;
+import com.jbp.common.request.agent.LotteryRecordFrontRequest;
 import com.jbp.common.request.agent.LotteryRecordSearchRequest;
 import com.jbp.common.vo.FileResultVo;
 import com.jbp.service.dao.agent.LotteryRecordDao;
 import com.jbp.service.service.UploadService;
+import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.LotteryRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +37,8 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
     private LotteryRecordDao dao;
     @Autowired
     private UploadService uploadService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public PageInfo<LotteryRecord> pageList(Integer uid, Integer prizeType, Date startTime, Date endTime, PageParamRequest pageParamRequest) {
@@ -49,7 +53,16 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
         if (lotteryRecord==null){
             throw new CrmebException("中奖记录不存在");
         }
-        lotteryRecord.setRemark(request.getRemark());
+        lotteryRecord.setRealName(request.getRealName());
+        lotteryRecord.setUserPhone(request.getUserPhone());
+        lotteryRecord.setProvince(request.getProvince());
+        lotteryRecord.setCity(request.getCity());
+        lotteryRecord.setDistrict(request.getDistrict());
+        lotteryRecord.setStreet(request.getStreet());
+        lotteryRecord.setAddress(request.getAddress());
+
+        String userAddressStr = request.getProvince() + request.getCity() + request.getDistrict() + request.getStreet() + request.getAddress();
+        lotteryRecord.setUserAddress(userAddressStr);
         return updateById(lotteryRecord);
     }
 
@@ -69,7 +82,6 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
         for (LotteryRecord record : list) {
             LotteryRecordExcel vo = new LotteryRecordExcel();
             BeanUtils.copyProperties(record, vo);
-            vo.setPrizeName(record.getPrizeName());
             if (record.getPrizeType() == 1) {
                 vo.setPrizeType("谢谢参与");
             }
@@ -82,6 +94,34 @@ public class LotteryRecordServiceImpl extends ServiceImpl<LotteryRecordDao, Lott
         log.info("中奖记录导出下载地址:" + fileResultVo.getUrl());
         return fileResultVo.getUrl();
 
+    }
+
+    @Override
+    public Boolean address(LotteryRecordFrontRequest request) {
+        Integer uid = userService.getUserId();
+        if (uid == null) {
+            throw new CrmebException("请先登录！");
+        }
+        LotteryRecord lotteryRecord = getById(request.getId());
+        if (lotteryRecord==null){
+            throw new CrmebException("中奖记录不存在");
+        }
+        lotteryRecord.setRealName(request.getRealName());
+        lotteryRecord.setUserPhone(request.getUserPhone());
+        lotteryRecord.setProvince(request.getProvince());
+        lotteryRecord.setCity(request.getCity());
+        lotteryRecord.setDistrict(request.getDistrict());
+        lotteryRecord.setStreet(request.getStreet());
+        lotteryRecord.setAddress(request.getAddress());
+
+        String userAddressStr = request.getProvince() + request.getCity() + request.getDistrict() + request.getStreet() + request.getAddress();
+        lotteryRecord.setUserAddress(userAddressStr);
+        return updateById(lotteryRecord);
+    }
+
+    @Override
+    public LotteryRecord noAddress(Integer uid) {
+        return dao.getLast(uid);
     }
 
 

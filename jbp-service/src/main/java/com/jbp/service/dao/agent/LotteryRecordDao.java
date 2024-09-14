@@ -11,4 +11,6 @@ public interface LotteryRecordDao extends BaseMapper<LotteryRecord> {
     List<LotteryRecord> getList(@Param("uid") Integer uid, @Param("prizeType")Integer prizeType, @Param("startTime")Date startTime, @Param("endTime")Date endTime);
 
     List<LotteryRecord> getFrontList(@Param("id")Integer id,@Param("uid")Integer uid);
+
+    LotteryRecord getLast(@Param("uid")Integer uid);
 }
