@@ -52,7 +52,7 @@ public class UserAddressRequest implements Serializable {
     private String province;
 
     @ApiModelProperty(value = "省份ID")
-    @NotNull(message = "省份ID不能为空")
+    @NotNull(message = "所在地区信息不全，点击补充")
     private Integer provinceId;
 
     @ApiModelProperty(value = "收货人所在市")
@@ -60,7 +60,7 @@ public class UserAddressRequest implements Serializable {
     private String city;
 
     @ApiModelProperty(value = "城市id")
-    @NotNull(message = "城市id不能为空")
+    @NotNull(message = "所在地区信息不全，点击补充")
     private Integer cityId;
 
     @ApiModelProperty(value = "收货人所在区/县")
@@ -68,7 +68,7 @@ public class UserAddressRequest implements Serializable {
     private String district;
 
     @ApiModelProperty(value = "区/县id")
-    @NotNull(message = "区/县id不能为空")
+    @NotNull(message = "所在地区信息不全，点击补充")
     private Integer districtId;
 
     @ApiModelProperty(value = "收货人所在街道")
