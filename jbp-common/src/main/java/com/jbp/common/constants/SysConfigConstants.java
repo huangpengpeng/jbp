@@ -260,6 +260,18 @@ public class SysConfigConstants {
      * 开启账号登录
      */
     public static final String MOBILE_ACCOUNT_LOGIN_OPEN = "mobile_account_login_open";
+
+    /**
+     * 默认账号登录开启手机号验证码登录
+     */
+    public static final String DEFAULT_ACCOUNT_PRIORITY = "default_account_priority";
+    /**
+     * 去注册隐藏交易密码、登录密码
+     */
+    public static final String HIDDEN_PASSWORD = "hidden_password";
+
+
+
     /**
      * 开启隐私协议
      */

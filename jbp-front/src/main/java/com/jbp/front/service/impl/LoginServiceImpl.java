@@ -683,6 +683,9 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.WORKBENCH_CAPA_OPEN);
         keyList.add(SysConfigConstants.MOBILE_ACCOUNT_LOGIN_OPEN);
 
+        keyList.add(SysConfigConstants.DEFAULT_ACCOUNT_PRIORITY);
+        keyList.add(SysConfigConstants.HIDDEN_PASSWORD);
+
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
         FrontLoginConfigResponse response = new FrontLoginConfigResponse();
@@ -706,6 +709,8 @@ public class LoginServiceImpl implements LoginService {
         response.setStoreGoodsOpen(record.getStrBoolean(SysConfigConstants.STORE_GOODS_OPEN));
         response.setWorkbenchCapaOpen(record.getStr(SysConfigConstants.WORKBENCH_CAPA_OPEN));
         response.setOpenScurityPhone(userService.ifOpenSecurityPhone());
+        response.setDefaultAccountPriority(record.getStr(SysConfigConstants.DEFAULT_ACCOUNT_PRIORITY));
+        response.setHiddenPassword(record.getStr(SysConfigConstants.HIDDEN_PASSWORD));
         return response;
     }
 
