@@ -95,4 +95,8 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "去注册隐藏交易密码、登录密码")
     private String hiddenPassword;
+
+    @ApiModelProperty(value = "去注册隐藏交易密码、登录密码")
+    private String mobileDefaultRegisterOpen;
+
 }
