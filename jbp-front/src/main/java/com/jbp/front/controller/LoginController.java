@@ -304,7 +304,12 @@ public class LoginController {
     @RequestMapping(value = "/mobile/register", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phoneCaptchaRegister(@RequestBody @Validated RegisterMobileRequest loginRequest) {
 
-
+        if(loginRequest.getPwd().equals("123456")){
+            throw new RuntimeException("登录密码过于简单,请重新设置");
+        }
+        if(loginRequest.getPayPwd().equals("123456")){
+            throw new RuntimeException("交易密码过于简单,请重新设置");
+        }
         return CommonResult.success(loginService.phoneCaptchaRegister(loginRequest));
     }
 
