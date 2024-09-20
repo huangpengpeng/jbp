@@ -686,6 +686,7 @@ public class LoginServiceImpl implements LoginService {
         keyList.add(SysConfigConstants.DEFAULT_ACCOUNT_PRIORITY);
         keyList.add(SysConfigConstants.HIDDEN_PASSWORD);
         keyList.add(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN);
+        keyList.add(SysConfigConstants.GRAPHIC_VERIFICATION);
 
 
         MyRecord record = systemConfigService.getValuesByKeyList(keyList);
@@ -713,6 +714,7 @@ public class LoginServiceImpl implements LoginService {
         response.setDefaultAccountPriority(record.getStr(SysConfigConstants.DEFAULT_ACCOUNT_PRIORITY));
         response.setHiddenPassword(record.getStr(SysConfigConstants.HIDDEN_PASSWORD));
         response.setMobileDefaultRegisterOpen(record.getStr(SysConfigConstants.CONFIG_KEY_MOBILE_DEFAULT_REGISTER_OPEN));
+        response.setGraphicVerification(record.getStr(SysConfigConstants.GRAPHIC_VERIFICATION));
 
         return response;
     }

@@ -96,7 +96,10 @@ public class FrontLoginConfigResponse implements Serializable {
     @ApiModelProperty(value = "去注册隐藏交易密码、登录密码")
     private String hiddenPassword;
 
-    @ApiModelProperty(value = "去注册隐藏交易密码、登录密码")
+    @ApiModelProperty(value = "手机号验证码登录默认注册")
     private String mobileDefaultRegisterOpen;
+
+    @ApiModelProperty(value = "账号密码登录图形验证")
+    private String graphicVerification;
 
 }

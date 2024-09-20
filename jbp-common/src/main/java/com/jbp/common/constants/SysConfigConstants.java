@@ -290,6 +290,11 @@ public class SysConfigConstants {
     public static final String H5_DEFAULT_AVATAR = "h5_default_avatar";
     public static final String TOURIST_LOGIN_OPEN = "tourist_login_open";
 
+    /**
+     * 账号密码登录图形验证
+     */
+    public static final String GRAPHIC_VERIFICATION = "graphic_verification";
+
 
     /**
      *  验证码是否使用身份证后6位

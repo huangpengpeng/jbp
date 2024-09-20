@@ -303,18 +303,38 @@ public class LoginController {
     @ApiOperation(value = "手机号验证码注册")
     @RequestMapping(value = "/mobile/register", method = RequestMethod.POST)
     public CommonResult<LoginResponse> phoneCaptchaRegister(@RequestBody @Validated RegisterMobileRequest loginRequest) {
+        // 校验密码是否是6个连续的数字
+        String regex1 = "^(012345|123456|234567|345678|456789|567890|654321|543210|432109|321098|210987|109876)$";
+        // 校验密码是否是6个相同的数字
+        String regex2 = "^(\\d)\\1{5}$";
 
-        if(loginRequest.getPwd().equals("123456")){
+        if (loginRequest.getPwd().matches(regex1)) {
             throw new RuntimeException("登录密码过于简单,请重新设置");
         }
-        if(loginRequest.getPayPwd().equals("123456")){
+        if (loginRequest.getPwd().matches(regex2)) {
+            throw new RuntimeException("登录密码过于简单,请重新设置");
+        }
+        if (loginRequest.getPayPwd().matches(regex1)) {
+            throw new RuntimeException("交易密码过于简单,请重新设置");
+        }
+        if (loginRequest.getPayPwd().matches(regex2)) {
             throw new RuntimeException("交易密码过于简单,请重新设置");
         }
         return CommonResult.success(loginService.phoneCaptchaRegister(loginRequest));
     }
 
 
-
+    @EncryptIgnore
+    @ApiOperation(value = "校验交易密码")
+    @RequestMapping(value = "/verify/pwt", method = RequestMethod.POST)
+    public CommonResult<Boolean> verifyPwt() {
+        User user = userService.getInfo();
+        if (user == null) {
+            throw new CrmebException("未登录！");
+        }
+        String payPwd = CrmebUtil.encryptPassword("123456");
+        return CommonResult.success(!user.getPayPwd().equals(payPwd));
+    }
 }
 
 

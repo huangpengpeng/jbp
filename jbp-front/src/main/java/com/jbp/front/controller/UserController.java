@@ -12,6 +12,7 @@ import com.jbp.common.model.agent.*;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.*;
+import com.jbp.common.request.agent.PasswordResetRequest;
 import com.jbp.common.response.*;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.CrmebUtil;
@@ -90,6 +91,17 @@ public class UserController {
     @ApiOperation(value = "登录密码修改")
     @RequestMapping(value = "/register/reset", method = RequestMethod.POST)
     public CommonResult<Boolean> password(@RequestBody @Validated PasswordRequest request) {
+        // 校验密码是否是6个连续的数字
+        String regex1 = "^(012345|123456|234567|345678|456789|567890|654321|543210|432109|321098|210987|109876)$";
+        // 校验密码是否是6个相同的数字
+        String regex2 = "^(\\d)\\1{5}$";
+
+        if (request.getPassword().matches(regex1)) {
+            throw new RuntimeException("登录密码过于简单,请重新设置");
+        }
+        if (request.getPassword().matches(regex2)) {
+            throw new RuntimeException("登录密码过于简单,请重新设置");
+        }
         return CommonResult.success(userService.password(request));
     }
 
@@ -637,6 +649,41 @@ public class UserController {
         return CommonResult.success(userRiseIndexResponse);
     }
 
+    @ApiOperation(value = "登录密码和交易密码修改")
+    @RequestMapping(value = "/pwd/reset", method = RequestMethod.POST)
+    public CommonResult<Boolean> passwordRest(@RequestBody @Validated PasswordResetRequest request) {
+
+        User user = userService.getInfo();
+        if (!user.getPhone().equals(request.getPhone())) {
+            throw new CrmebException("手机号错误，需填写当前登录账号的手机号!");
+        }
+        //检测验证码
+        userService.checkValidateCode(user.getPhone(), request.getValidateCode());
+        // 校验密码是否是6个连续的数字
+        String regex1 = "^(012345|123456|234567|345678|456789|567890|654321|543210|432109|321098|210987|109876)$";
+        // 校验密码是否是6个相同的数字
+        String regex2 = "^(\\d)\\1{5}$";
+
+        if (!StringUtils.isEmpty(request.getPwd())){
+            if (request.getPwd().matches(regex1)) {
+                throw new RuntimeException("登录密码过于简单,请重新设置");
+            }
+            if (request.getPwd().matches(regex2)) {
+                throw new RuntimeException("登录密码过于简单,请重新设置");
+            }
+            user.setPwd(CrmebUtil.encryptPassword(request.getPwd()));
+        }
+        if (!StringUtils.isEmpty(request.getPayPwd())) {
+            if (request.getPayPwd().matches(regex1)) {
+                throw new RuntimeException("交易密码过于简单,请重新设置");
+            }
+            if (request.getPayPwd().matches(regex2)) {
+                throw new RuntimeException("交易密码过于简单,请重新设置");
+            }
+            user.setPayPwd(CrmebUtil.encryptPassword(request.getPayPwd()));
+        }
+        return CommonResult.success(userService.updateById(user));
+    }
 
 }
 

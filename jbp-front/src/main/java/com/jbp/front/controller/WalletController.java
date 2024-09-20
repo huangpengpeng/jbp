@@ -94,6 +94,17 @@ public class WalletController {
     @GetMapping("/trade/password")
     @ApiOperation("设置交易密码")
     public CommonResult tradePassword(WalletTradePasswordRequest request) {
+        // 校验密码是否是6个连续的数字
+        String regex1 = "^(012345|123456|234567|345678|456789|567890|654321|543210|432109|321098|210987|109876)$";
+        // 校验密码是否是6个相同的数字
+        String regex2 = "^(\\d)\\1{5}$";
+
+        if (request.getTradePassword().matches(regex1)) {
+            throw new RuntimeException("交易密码过于简单,请重新设置");
+        }
+        if (request.getTradePassword().matches(regex2)) {
+            throw new RuntimeException("交易密码过于简单,请重新设置");
+        }
         userService.tradePassword(request.getCode(), request.getTradePassword());
         return CommonResult.success();
     }
