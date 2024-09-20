@@ -180,7 +180,7 @@ public class CrmebUtil {
      * @param args String[] 字符串数组
      */
     public static void main(String[] args) throws Exception {
-//       System.out.println(encryptPassword("123456"));
+       System.out.println(encryptPassword("123456"));
         System.out.println(decryptPassowrd("0ngdPxVkYyu7WNvMaHACcA==", "18929560630"));
         System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
         System.out.println(decryptPassowrd("kS2IqUkx0vI=", "18444010100"));
@@ -197,8 +197,14 @@ public class CrmebUtil {
         System.out.println(decryptPassowrd("QCZZE8uL31Qa5a+CwTEbVQ==", "18610098429"));
 
         System.out.println(decryptPassowrd("Kmj+e6EVJrvwblLkvhnqng==", "18011526148"));
-        System.out.println(decryptPassowrd("YQtDjCVGSiE=", "18928707599"));
+
         System.out.println(decryptPassowrd("y5W4Zk8f7Tw=", "19011203013"));
+        System.out.println(decryptPassowrd("1IihZ/9ZsQxk89KgJM/3OQ==", "15871898210"));
+        System.out.println(decryptPassowrd("/oW4gfb8iFnISdOCUuAK3A==", "18667117111"));
+
+        System.out.println(decryptPassowrd("YQtDjCVGSiE=", "18928707599"));
+
+
 
 
 
