@@ -368,6 +368,7 @@ public class UserController {
         UserInviteResponse userInviteResponse = new UserInviteResponse();
         BeanUtils.copyProperties(user, userInviteResponse);
         userInviteResponse.setPhone(CrmebUtil.maskMobile(userInviteResponse.getPhone()));
+        userInviteResponse.setAccount(CrmebUtil.maskMobile(userInviteResponse.getAccount()));
         return CommonResult.success(userInviteResponse);
     }
 

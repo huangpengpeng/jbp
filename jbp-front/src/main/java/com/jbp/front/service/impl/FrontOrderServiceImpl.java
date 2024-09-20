@@ -173,7 +173,8 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private LogisticService logisticService;
     @Autowired
     private ProductExtConfigService productExtConfigService;
-
+    @Autowired
+    private OrderInvoiceService orderInvoiceService;
 
 
     /**
@@ -1962,6 +1963,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public LogisticsResultVo getLogisticsInfo(Integer invoiceId) {
+
+        OrderInvoice orderInvoice = orderInvoiceService.getById(invoiceId);
+        Order order = orderService.getByOrderNo(orderInvoice.getOrderNo());
+        if(orderInvoice.getUid() != userService.getUserId() && order.getPayUid() !=  userService.getUserId()){
+            throw new CrmebException("无权限查看");
+        }
         return orderService.getLogisticsInfo(invoiceId);
     }
 
@@ -1985,8 +1992,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Override
     public OrderInvoiceFrontResponse getInvoiceList(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
-        List<OrderInvoiceResponse> invoiceList = orderService.getInvoiceList(orderNo);
         OrderInvoiceFrontResponse response = new OrderInvoiceFrontResponse();
+        if(order.getUid() != userService.getUserId() && order.getPayUid() != userService.getUserId()){
+            return response;
+        }
+        List<OrderInvoiceResponse> invoiceList = orderService.getInvoiceList(orderNo);
         response.setInvoiceList(invoiceList);
         if (CollUtil.isEmpty(invoiceList)) {
             response.setNum(1);
