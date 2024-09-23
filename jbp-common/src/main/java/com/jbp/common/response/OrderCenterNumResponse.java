@@ -47,4 +47,7 @@ public class OrderCenterNumResponse implements Serializable {
     @ApiModelProperty(value = "退款中数量")
     private Integer refundCount;
 
+    @ApiModelProperty(value = "已完成数量")
+    private Integer completedCount;
+
 }

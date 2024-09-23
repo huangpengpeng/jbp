@@ -2019,6 +2019,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         response.setAwaitShippedCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_WAIT_SHIPPING, userId));
         response.setReceiptCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_WAIT_RECEIPT, userId));
         response.setVerificationCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_AWAIT_VERIFICATION, userId));
+        response.setCompletedCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_COMPLETE, userId));
         response.setAwaitReplyCount(orderDetailService.getAwaitReplyCount(userId));
         response.setRefundCount(refundOrderService.getRefundingCount(userId));
         return response;
