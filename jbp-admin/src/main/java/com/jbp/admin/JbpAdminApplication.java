@@ -52,6 +52,7 @@ public class JbpAdminApplication {
 
 
         KqPayService kqPayService = run.getBean(KqPayService.class);
+        System.out.println("PT985172706701730859627");
         KqPayQueryResult result = kqPayService.queryPayResult("PT985172706701730859627");
         System.out.println(JSONObject.toJSONString(result));
 
