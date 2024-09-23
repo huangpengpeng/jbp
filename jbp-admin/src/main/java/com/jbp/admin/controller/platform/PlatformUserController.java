@@ -124,6 +124,11 @@ public class PlatformUserController {
     @PostMapping("/register/phone")
     @ApiOperation("用户注册")
     public CommonResult<User> registerPhone(@Validated @RequestBody RegisterPhoneRequest request) {
+
+        if(request.getPwd().equals("123456")){
+            throw new RuntimeException("登录密码过于简单,请重新设置");
+        }
+
         User users = userService.getByAccount(request.getAccount());
         if (ObjectUtil.isNotEmpty(users)){
             throw new CrmebException("账号已存在");

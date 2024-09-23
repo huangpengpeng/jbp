@@ -35,8 +35,25 @@
             <if test="uid!= null and uid !=''">
                 and r.uid = #{uid}
             </if>
-            and p.prize_type = 2
         </where>
         order by r.id desc
+    </select>
+
+    <select id="getLast" resultType="com.jbp.common.model.agent.LotteryRecord">
+        select *
+        from eb_lottery_record r
+                 left join eb_lottery_item i on i.id=r.item_id
+                 left join eb_lottery l on l.id=i.lottery_id
+                 left join eb_lottery_prize p on p.id=i.prize_id
+        <where>
+            <if test="uid!= null and uid !=''">
+                and r.uid = #{uid}
+            </if>
+            and p.prize_type = 2
+            and r.address is null
+            and l.state = 1
+        </where>
+        order by r.id desc
+        limit 1
     </select>
 </mapper>

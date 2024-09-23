@@ -260,6 +260,18 @@ public class SysConfigConstants {
      * 开启账号登录
      */
     public static final String MOBILE_ACCOUNT_LOGIN_OPEN = "mobile_account_login_open";
+
+    /**
+     * 默认账号登录开启手机号验证码登录
+     */
+    public static final String DEFAULT_ACCOUNT_PRIORITY = "default_account_priority";
+    /**
+     * 去注册隐藏交易密码、登录密码
+     */
+    public static final String HIDDEN_PASSWORD = "hidden_password";
+
+
+
     /**
      * 开启隐私协议
      */
@@ -277,6 +289,11 @@ public class SysConfigConstants {
     public static final String MOBILE_TOP_LOGO = "mobile_top_logo";
     public static final String H5_DEFAULT_AVATAR = "h5_default_avatar";
     public static final String TOURIST_LOGIN_OPEN = "tourist_login_open";
+
+    /**
+     * 账号密码登录图形验证
+     */
+    public static final String GRAPHIC_VERIFICATION = "graphic_verification";
 
 
     /**

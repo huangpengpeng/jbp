@@ -1,0 +1,204 @@
+# CRMEB 相关配置
+crmeb:
+  version: CRMEB-JAVACORE-MER-DFYHZ-v1.4_beta # 当前代码版本为企业版本 授权给巅峰云（杭州）网络科技有限公司
+  domain: #配合swagger使用 # 待部署域名
+  wechat-api-url:  #请求微信接口中专服务器
+  asyncConfig: false #是否同步config表数据到redis
+  imagePath: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/ # 服务器图片路径配置 斜杠结尾
+  retailStoreBrokerageRatio: 30 #佣金返佣比例和上限
+  activityStyleCachedTime: 10 #活动边框缓存周期 秒为单位，生产环境适当5-10分钟即可
+  activityStyleProductLimit: 100 # 活动边框指定商品上线
+  productTagCacheMinutes: 10 # 商品标签缓存分钟数
+  orderCancelTime: 30 # 订单支付取消时间，单位分钟
+  ignored: #安全路径白名单
+      - swagger-ui/
+      - swagger-resources/**
+      - /**/v2/api-docs
+      - /**/*.html
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.map
+      - /favicon.ico
+      - /actuator/**
+      - /druid/**
+      - api/admin/platform/pagediy/info
+      - /jmreport/**
+      - /jushuitan/**
+# 配置端口
+server:
+  port: 8181
+  servlet:
+    context-path: /         # 访问path
+  tomcat:
+    uri-encoding: UTF-8     # 默认编码格式
+    max-threads: 1000       # 最大线程数量 默认200
+    min-spare-threads: 30   # 初始化启动线程数量
+spring:
+  profiles:
+    active: ctk-admin
+  servlet:
+    multipart:
+      max-file-size: 50MB #设置单个文件大小
+      max-request-size: 50MB #设置单次请求文件的总大小
+  application:
+    name: jbp-admin #这个很重要，这在以后的服务与服务之间相互调用一般都是根据这个name
+  jackson:
+    locale: zh_CN
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  #  数据库配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://wkp2.cqrfkonij3bk.ap-southeast-1.rds.amazonaws.com:3306/ctk?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: smbs8888#
+  # quartz
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: quartzScheduler
+            #            instanceName: clusteredScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: false
+            clusterCheckinInterval: 10000
+            useProperties: false
+          #            dataSource: crmeb_java_beta
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    #数据库方式
+    job-store-type: JDBC
+  # 捕获404异常
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  redis:
+    host: 127.0.0.1 #地址
+    port: 6379 #端口
+    password: 
+    timeout: 30000 # 连接超时时间（毫秒）
+    database: 5  #默认数据库
+    jedis:
+      pool:
+        max-active: 200 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+        time-between-eviction-runs: -1 #逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
+debug: true
+logging:
+  level:
+    io.swagger.*: error
+    com.zbjk.crmeb: INFO
+    org.springframework.boot.autoconfigure: ERROR
+    org.springframework.web: INFO
+  config: classpath:logback-spring.xml
+  file:
+    path: ./crmeb_log
+# mybatis 配置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*/*Mapper.xml #xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）
+  typeAliasesPackage: com.jbp.**.model
+  # 配置slq打印日志
+  configuration:
+    cache-enabled: false #禁用二级缓存
+    local-cache-scope: session #一级缓存指定为statement级别
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  global-config:
+    enable-sql-runner: true
+    db-config:
+#      logic-delete-field: isDel  #全局逻辑删除字段值 3.3.0开始支持，详情看下面。
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+#swagger 配置
+swagger:
+  basic:
+    enable: false #是否开启
+    check: false #是否打开验证
+    username: root
+    password: 123456
+# wx-java-tools 第三方框架仅仅用到了微信小程序直播功能 是用小程序直播时必须配置
+wx:
+  miniapp:
+    configs:
+      - appid: wx6eb1c319ea4c845c #微信小程序的appid
+        secret: b74d9d5fe953f32f4a8461246dbdc2eb #微信小程序的Secret
+        token: CrmebJava #微信小程序消息服务器配置的token
+        aesKey:  #微信小程序消息服务器配置的EncodingAESKey
+        msgDataFormat: JSON
+
+    config-storage:
+       type: redistemplate
+rsa:
+  encrypt:
+    open: true # 是否开启加密 true  or  false
+    showLog: true # 是否打印加解密log true  or  false
+    key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo8jKuU2/N4zvyDVdvlLwUoPTW672DtbGV7Tvek1dlmaaxV4IiA2ZNIfpXfzD3ERzN9/MQii80YkmOkpDlAAPIAOHikMhhfbMqsy13tL/z9pQO5Icu6X2VfdHUdKDEOUTnD/lA0tRwu80dw/+VOkvzg7I3qDcT6gsRs9J92SN+KydMeulqk/AjZomP9/ISgz2i8gLi62jCswbCsvqg9kx7FMq4p/fHTqCXvDPt6ebEQbFh0FP2TmD/f7XISUeplD45u19yheYfPt1UvjePKZrbuHWTmB7YfNSdBv9rCREllxc/nQ6o4LB2alW7ZoGWc3PjlH1MwpTe0Q3Iopi6nT20QIDAQAB
+    openMerchantLogin: false
+minidao:
+  base-package: org.jeecg.modules.jmreport.*
+jeecg:
+  # local|minio|alioss
+  uploadType: local
+  # local
+  path:
+    #文件路径
+    upload: /Users/stivepeim/Documents/ZBKJ/CODEMANGER/BIZ-CODE/JavaMer/V1.4/
+  #大屏报表参数设置
+  jmreport:
+    #多租户模式，默认值为空(created:按照创建人隔离、tenant:按照租户隔离)
+    saasMode:
+    # 平台上线安全配置
+    firewall:
+      # 数据源安全 (开启后，不允许使用平台数据源、SQL解析加签并且不允许查询数据库)
+      dataSourceSafe: false
+      # 低代码开发模式（dev:开发模式，prod:发布模式—关闭在线报表设计功能，分配角色admin、lowdeveloper可放开限制）
+      lowCodeMode: dev
+    # 展示列数
+    col: 100
+    # 展示行数
+    row: 200
+    pageSize:
+      - 10
+      - 20
+      - 30
+      - 40
+# 聚水潭店铺配置
+
+jushuitan:
+  appKey: 60fe53c33c1b4fbbb243f6990e852132
+  appSecret: cad5739f959c4cbc94be68b493d9e194
+  url: https://ctk.fnyss.cc/api/front/jushuitan/auth/callApi
+
+fundClearing:
+  name: 市场推广费,市场服务费,教育培训费,产品分享积分,品牌推广积分,佣金,店务补贴,培训基金,销售提成,重复消费积分,推荐奖励,见点奖,平级奖励,级差奖
+  refundBack: true
+
+historyOrder:
+  name: wkp42271043176625
+
+teamAmtSelf:
+  ifopen: true
+  filterList: 1000036,1000052,1000075
+
+host: https://ctkadmin.fnyss.cc
+
+
+
+
+
+
+
+
+

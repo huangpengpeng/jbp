@@ -14,6 +14,24 @@ import java.io.Serializable;
 @ApiModel(value = "LotteryRecordEditRequest对象", description = "中奖记录编辑对象")
 public class LotteryRecordFrontRequest implements Serializable {
 
-    @ApiModelProperty("地址")
+    @ApiModelProperty("id")
+    private Integer id;
+
+    @ApiModelProperty(value = "收货人姓名")
+    private String realName;
+
+    @ApiModelProperty(value = "收货人电话")
+    private String userPhone;
+
+
+    @ApiModelProperty(value = "收货省")
+    private String province;
+    @ApiModelProperty(value = "收货市")
+    private String city;
+    @ApiModelProperty(value = "收货区")
+    private String district;
+    @ApiModelProperty(value = "收货街道")
+    private String street;
+    @ApiModelProperty("详细地址")
     private String address;
 }

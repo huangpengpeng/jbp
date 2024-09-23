@@ -3,12 +3,8 @@ package com.jbp.front.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Lottery;
-import com.jbp.common.model.agent.LotteryItem;
-import com.jbp.common.model.agent.LotteryPrize;
 import com.jbp.common.model.agent.LotteryRecord;
-import com.jbp.common.request.agent.LotteryPrizeFrontRequest;
 import com.jbp.common.request.agent.LotteryRecordFrontRequest;
-import com.jbp.common.request.agent.LotteryRequest;
 import com.jbp.common.result.CommonResult;
 import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.LotteryRecordService;
@@ -46,13 +42,17 @@ public class LotteryRecordController {
     @ApiOperation(value = "用户抽奖活动添加地址")
     @PostMapping(value = "/address")
     public CommonResult<Boolean> address(@RequestBody LotteryRecordFrontRequest request) {
+        return CommonResult.success(lotteryRecordService.address(request));
+    }
+
+    @ApiOperation(value = "用户未填写中奖记录地址")
+    @GetMapping(value = "/noAddress")
+    public CommonResult<LotteryRecord> noAddress() {
         Integer uid = userService.getUserId();
         if (uid == null) {
             throw new CrmebException("请先登录！");
         }
-        LotteryRecord lotteryRecord = lotteryRecordService.getOne(new QueryWrapper<LotteryRecord>().lambda().eq(LotteryRecord::getUid, uid).orderByDesc(LotteryRecord::getId).last("LIMIT 1"));
-        lotteryRecord.setAddress(request.getAddress());
-        return CommonResult.success(lotteryRecord.updateById());
+        return CommonResult.success(lotteryRecordService.noAddress(uid));
     }
 
 }

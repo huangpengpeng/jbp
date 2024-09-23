@@ -40,7 +40,7 @@ public class HasStockRewardProcessor extends AbstractRewardProcessor {
         List<Object> prizes = new ArrayList<>();
         if (lotteryPrize.getValidStock() - 1 < 0) {
 
-            LotteryItem lotteryItem = lotteryItemDao.getOne(new QueryWrapper<LotteryItem>().lambda().orderByDesc(LotteryItem::getPercent).last(" limit 1"));
+            LotteryItem lotteryItem = lotteryItemDao.getOne(new QueryWrapper<LotteryItem>().lambda().eq(LotteryItem::getLotteryId,lotteryPrize.getLotteryId()).orderByDesc(LotteryItem::getPercent).last(" limit 1"));
             lotteryPrize = lotteryPrizeMapper.getById(lotteryItem.getPrizeId());
             context.setLotteryItem(lotteryItemDao.getOne(new QueryWrapper<LotteryItem>().lambda().eq(LotteryItem::getLotteryId, context.getLottery().getId()).eq(LotteryItem::getPrizeId, lotteryPrize.getId())));
         }

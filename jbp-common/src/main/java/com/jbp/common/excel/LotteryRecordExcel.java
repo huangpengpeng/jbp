@@ -30,7 +30,25 @@ public class LotteryRecordExcel {
     @ExcelProperty(value = "抽奖时间", index = 5)
     private Date createTime;
 
-    @ExcelProperty(value = "备注", index = 6)
-    private Date remark;
+    @ExcelProperty(value = "收货人姓名", index = 6)
+    private String realName;
+
+    @ExcelProperty(value = "收货人电话", index = 7)
+    private String userPhone;
+
+    @ExcelProperty(value = "收货省", index = 8)
+    private String province;
+
+    @ExcelProperty(value = "收货市", index = 9)
+    private String city;
+
+    @ExcelProperty(value = "收货区", index = 10)
+    private String district;
+
+    @ExcelProperty(value = "收货街道", index = 11)
+    private String street;
+
+    @ExcelProperty(value = "详细地址", index = 12)
+    private String address;
 
 }

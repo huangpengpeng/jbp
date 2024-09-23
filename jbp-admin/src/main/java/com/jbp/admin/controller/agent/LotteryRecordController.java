@@ -5,7 +5,6 @@ import com.jbp.common.model.agent.LotteryRecord;
 import com.jbp.common.model.user.User;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
-import com.jbp.common.request.RefundOrderSearchRequest;
 import com.jbp.common.request.agent.LotteryRecordEditRequest;
 import com.jbp.common.request.agent.LotteryRecordSearchRequest;
 import com.jbp.common.result.CommonResult;
@@ -29,7 +28,7 @@ public class LotteryRecordController {
     @Autowired
     private UserService userService;
 
-//    @PreAuthorize("hasAuthority('agent:lottery:record:page')")
+    @PreAuthorize("hasAuthority('agent:lottery:record:page')")
     @ApiOperation(value = "中奖记录分页列表")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<LotteryRecord>> pageList(LotteryRecordSearchRequest request, PageParamRequest pageParamRequest) {
@@ -45,7 +44,7 @@ public class LotteryRecordController {
     }
 
 
-//    @PreAuthorize("hasAuthority('agent:lottery:record:remark')")
+    @PreAuthorize("hasAuthority('agent:lottery:record:remark')")
     @ApiOperation(value = "中奖记录添加备注")
     @PostMapping(value = "/remark")
     public CommonResult<String> remark(@RequestBody @Validated LotteryRecordEditRequest request) {
@@ -55,7 +54,7 @@ public class LotteryRecordController {
         return CommonResult.failed();
     }
 
-//    @PreAuthorize("hasAuthority('agent:lottery:record:excel')")
+    @PreAuthorize("hasAuthority('agent:lottery:record:excel')")
     @ApiOperation(value = "导出中奖记录列表Excel")
     @RequestMapping(value = "/excel", method = RequestMethod.GET)
     public CommonResult<String> exportRefund(@Validated LotteryRecordSearchRequest request) {
