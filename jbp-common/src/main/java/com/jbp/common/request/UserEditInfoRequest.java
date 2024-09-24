@@ -38,8 +38,6 @@ public class UserEditInfoRequest implements Serializable {
     private String nickname;
 
     @ApiModelProperty(value = "用户头像")
-    @NotBlank(message = "请上传用户头像")
-    @Length(max = 255, message = "用户头像不能超过255个字符")
     private String avatar;
 
     @ApiModelProperty(value = "生日")
