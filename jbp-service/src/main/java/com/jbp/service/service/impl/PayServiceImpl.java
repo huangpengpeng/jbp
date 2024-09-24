@@ -238,6 +238,7 @@ public class PayServiceImpl implements PayService {
             response.setYopWechatPay(false);
             response.setYopQuickPay(false);
             response.setYopAliPayStatus(false);
+            response.setLianlianQuickPay(false);
         }
         return response;
     }
