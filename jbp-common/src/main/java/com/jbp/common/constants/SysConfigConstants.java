@@ -219,6 +219,7 @@ public class SysConfigConstants {
     public static final String CONFIG_YOP_WALLET_PAY_STATUS = "yop_wechatPay";
     public static final String CONFIG_YOP_ALI_PAY_STATUS = "yop_aliPay";
     public static final String CONFIG_YOP_QUICK_PAY_STATUS = "yop_quickPay";
+    public static final String CONFIG_LIANLIANQUICK_PAY_STATUS = "lianlian_quickPay";
 
     /**
      * 积分支付开启密码

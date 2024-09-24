@@ -198,6 +198,7 @@ public class PayServiceImpl implements PayService {
         String yopWechatPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_WALLET_PAY_STATUS);
         String yopAliPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_ALI_PAY_STATUS);
         String yopQuickPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_QUICK_PAY_STATUS);
+        String lianlianQuickPa = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIANQUICK_PAY_STATUS);
 
         PayConfigResponse response = new PayConfigResponse();
         response.setYuePayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus));
@@ -210,6 +211,8 @@ public class PayServiceImpl implements PayService {
         response.setYopWechatPay(StringUtils.isNotEmpty(yopWechatPay) && StringUtils.equals("1", yopWechatPay));
         response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
         response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
+
+        response.setLianlianQuickPay(StringUtils.isNotEmpty(lianlianQuickPa) && StringUtils.equals("1", lianlianQuickPa));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
