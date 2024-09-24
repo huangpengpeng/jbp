@@ -192,4 +192,10 @@ public interface YopService {
      */
     RefundQueryResult refundQuery(String merchantNo, String orderId, String refundOrderId);
 
+    /**
+     * 自助结算  /rest/v1.0/settle/self-settle/apply
+     */
+    SelfSettleResult selfSettle(String merchantNo, String settleRequestNo, String operatePeriod);
+
+
 }

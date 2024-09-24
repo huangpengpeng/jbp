@@ -465,6 +465,20 @@ public class YopServiceImpl implements YopService {
         return send("/rest/v1.0/trade/refund/query", "GET", params, RefundQueryResult.class);
     }
 
+    @Override
+    public SelfSettleResult selfSettle(String merchantNo, String settleRequestNo, String operatePeriod) {
+        SelfSettleParams params = new SelfSettleParams();
+        params.setParentMerchantNo("10089066338");
+        params.setMerchantNo(merchantNo);
+        params.setSettleRequestNo(settleRequestNo);
+        params.setOperatePeriod(operatePeriod);
+        String valueByKey = systemConfigService.getValueByKey("yopParentMerchantNo");
+        if(StringUtils.isNotEmpty(valueByKey)) {
+            params.setParentMerchantNo(valueByKey);
+        }
+        return send("/rest/v1.0/settle/self-settle/apply", "POST", params, SelfSettleResult.class);
+    }
+
     public <T> T send3(String url, String method, BaseYopRequest parameters, Class<T> responseClass) {
         //生成易宝请求
         YopRequest request = new YopRequest(url, method);

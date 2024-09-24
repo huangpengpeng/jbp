@@ -15,6 +15,27 @@ import java.util.List;
 @Data
 @EqualsAndHashCode
 public class QueryPaymentResult {
+
+    public QueryPaymentResult(String ret_code, String ret_msg, String oid_partner, String txn_type, String accounting_date,
+                              String finish_time, String accp_txno, String chnl_txno, String txn_status,
+                              QueryPaymentOrderInfo orderInfo, List<QueryPaymentPayerInfo> payerInfo, List<QueryPaymentPayeeInfo> payeeInfo) {
+        this.ret_code = ret_code;
+        this.ret_msg = ret_msg;
+        this.oid_partner = oid_partner;
+        this.txn_type = txn_type;
+        this.accounting_date = accounting_date;
+        this.finish_time = finish_time;
+        this.accp_txno = accp_txno;
+        this.chnl_txno = chnl_txno;
+        this.txn_status = txn_status;
+        this.orderInfo = orderInfo;
+        this.payerInfo = payerInfo;
+        this.payeeInfo = payeeInfo;
+    }
+
+    public QueryPaymentResult() {
+    }
+
     private String ret_code;
     private String ret_msg;
     private String oid_partner;

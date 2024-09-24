@@ -48,22 +48,15 @@ public class UserOfflineSubsidyImpl extends ServiceImpl<UserOfflineSubsidyDao, U
     public PageInfo<UserOfflineSubsidy> pageList(Integer uid, Integer provinceId, Integer cityId, Integer areaId, Integer teamId, PageParamRequest pageParamRequest) {
         LambdaQueryWrapper<UserOfflineSubsidy> lqw = new LambdaQueryWrapper<UserOfflineSubsidy>()
                 .eq(!ObjectUtil.isNull(uid), UserOfflineSubsidy::getUid, uid)
-                .orderByDesc(UserOfflineSubsidy::getId);
-        if (provinceId != null) {
-            lqw.eq(UserOfflineSubsidy::getProvince, cityRegionService.getByRegionId(provinceId).getRegionName());
-        }
-        if (cityId != null) {
-            lqw.eq(UserOfflineSubsidy::getCity, cityRegionService.getByRegionId(cityId).getRegionName());
-        }
-        if (areaId != null) {
-            lqw.eq(UserOfflineSubsidy::getArea, cityRegionService.getByRegionId(areaId).getRegionName());
-        }
+                .eq(!ObjectUtil.isNull(provinceId), UserOfflineSubsidy::getProvinceId, provinceId)
+                .eq(!ObjectUtil.isNull(cityId), UserOfflineSubsidy::getCityId, cityId)
+                .eq(!ObjectUtil.isNull(areaId), UserOfflineSubsidy::getAreaId, areaId);
         if (teamId != null) {
             Team team = teamService.getOne(new QueryWrapper<Team>().eq("id", teamId));
-            lqw.eq(UserOfflineSubsidy::getTeamName, team.getName());
+            lqw.eq(!ObjectUtil.isNull(team), UserOfflineSubsidy::getTeamName, team.getName());
         }
-        lqw.orderByDesc(UserOfflineSubsidy::getUid);
-        Page<UserRegion> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        lqw.orderByDesc(UserOfflineSubsidy::getId);
+        Page<UserOfflineSubsidy> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<UserOfflineSubsidy> list = list(lqw);
         if (CollectionUtils.isEmpty(list)) {
             return CommonPage.copyPageInfo(page, list);

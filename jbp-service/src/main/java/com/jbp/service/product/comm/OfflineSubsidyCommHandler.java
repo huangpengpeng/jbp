@@ -3,7 +3,10 @@ package com.jbp.service.product.comm;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.agent.*;
+import com.jbp.common.model.agent.ProductComm;
+import com.jbp.common.model.agent.TeamUser;
+import com.jbp.common.model.agent.UserOfflineSubsidy;
+import com.jbp.common.model.agent.UserRegion;
 import com.jbp.common.model.order.MerchantOrder;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.model.order.OrderDetail;
@@ -13,7 +16,9 @@ import com.jbp.service.service.MerchantOrderService;
 import com.jbp.service.service.OrderDetailService;
 import com.jbp.service.service.TeamUserService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.agent.*;
+import com.jbp.service.service.agent.FundClearingService;
+import com.jbp.service.service.agent.ProductCommService;
+import com.jbp.service.service.agent.UserOfflineSubsidyService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,13 +45,9 @@ public class OfflineSubsidyCommHandler extends AbstractProductCommHandler {
     @Resource
     private UserService userService;
     @Resource
-    private UserCapaService userCapaService;
-    @Resource
     private FundClearingService fundClearingService;
     @Resource
     private ProductCommService productCommService;
-    @Resource
-    private ProductCommConfigService productCommConfigService;
     @Resource
     private TeamUserService teamUserService;
 

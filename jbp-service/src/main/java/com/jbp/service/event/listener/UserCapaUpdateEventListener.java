@@ -83,7 +83,11 @@ public class UserCapaUpdateEventListener implements ApplicationListener<UserCapa
         userInvitationService.band(userCapa.getUid(), zdUser.getId(), false, true, true);
         // 5.保存转挂
         UserInvitation newUserInvitation = userInvitationService.getByUser(userCapa.getUid());
-        newUserInvitation.setMId(userInvitation.getMId());
+        if (userInvitation.getMId() != null) {
+            newUserInvitation.setMId(userInvitation.getMId());
+        } else {
+            newUserInvitation.setMId(orgPid);
+        }
         userInvitationService.updateById(newUserInvitation);
         // 6.新增跳转
         invitationJumpService.add(userCapa.getUid(), zdUser.getId(), orgPid);

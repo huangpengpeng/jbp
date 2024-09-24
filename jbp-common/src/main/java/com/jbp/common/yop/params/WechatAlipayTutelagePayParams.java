@@ -21,7 +21,7 @@ public class WechatAlipayTutelagePayParams extends BaseYopRequest {
         this.notifyUrl = notifyUrl;
         this.payWay = payWay;
         this.channel = channel;
-        this.scene = "OFFLINE";
+        this.scene = "ONLINE";
         this.userIp = userIp;
         this.token = token;
     }

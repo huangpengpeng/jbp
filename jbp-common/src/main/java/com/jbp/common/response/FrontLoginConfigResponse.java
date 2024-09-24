@@ -89,4 +89,17 @@ public class FrontLoginConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "开启安全手机号")
     private Boolean openScurityPhone ;
+
+    @ApiModelProperty(value = "默认账号登录开启手机号验证码登录")
+    private String defaultAccountPriority;
+
+    @ApiModelProperty(value = "去注册隐藏交易密码、登录密码")
+    private String hiddenPassword;
+
+    @ApiModelProperty(value = "手机号验证码登录默认注册")
+    private String mobileDefaultRegisterOpen;
+
+    @ApiModelProperty(value = "账号密码登录图形验证")
+    private String graphicVerification;
+
 }

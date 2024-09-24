@@ -24,4 +24,7 @@ public class LianLianPayInfoResult implements Serializable {
     private String lzt_priKey;
     private String lzt_oid_partner;
 
+    // 连连产品名称
+    private String productName;
+
 }

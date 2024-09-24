@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbp.service.dao.agent.LotteryRecordDao">
+    <select id="getList" resultType="com.jbp.common.model.agent.LotteryRecord">
+        select *,p.prize_type,u.account,u.nickname
+        from eb_lottery_record r
+        left join eb_lottery_item i on i.id=r.item_id
+        left join eb_lottery_prize p on p.id=i.prize_id
+        left join eb_user u on u.id=r.uid
+        <where>
+            <if test="uid!= null and uid !=''">
+                and r.uid = #{uid}
+            </if>
+            <if test="prizeType!= null and prizeType !=''">
+                and p.prize_type = #{prizeType}
+            </if>
+            <if test="startTime!=null and endTime!=null">
+                and DATE(r.create_time) BETWEEN #{startTime} AND #{endTime}
+            </if>
+        </where>
+        order by r.id desc
+    </select>
+
+    <select id="getFrontList" resultType="com.jbp.common.model.agent.LotteryRecord">
+        select *,u.nickname,p.prize_name,p.remark as tips
+        from eb_lottery_record r
+        left join eb_lottery_item i on i.id=r.item_id
+        left join eb_lottery l on l.id=i.lottery_id
+        left join eb_lottery_prize p on p.id=i.prize_id
+        left join eb_user u on u.id=r.uid
+        <where>
+            <if test="id!= null and id !=''">
+                and l.id = #{id}
+            </if>
+            <if test="uid!= null and uid !=''">
+                and r.uid = #{uid}
+            </if>
+        </where>
+        order by r.id desc
+    </select>
+
+    <select id="getLast" resultType="com.jbp.common.model.agent.LotteryRecord">
+        select *
+        from eb_lottery_record r
+                 left join eb_lottery_item i on i.id=r.item_id
+                 left join eb_lottery l on l.id=i.lottery_id
+                 left join eb_lottery_prize p on p.id=i.prize_id
+        <where>
+            <if test="uid!= null and uid !=''">
+                and r.uid = #{uid}
+            </if>
+            and p.prize_type = 2
+            and r.address is null
+            and l.state = 1
+        </where>
+        order by r.id desc
+        limit 1
+    </select>
+</mapper>

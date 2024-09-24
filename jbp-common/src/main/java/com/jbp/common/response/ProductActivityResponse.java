@@ -79,4 +79,7 @@ public class ProductActivityResponse {
 
     @ApiModelProperty(value = "单位名")
     private String unitName;
+
+    @ApiModelProperty(value = "分值")
+    private Integer score;
 }

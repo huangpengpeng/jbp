@@ -165,7 +165,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     @Override
     public Boolean create(Long clearingId) {
         ClearingFinal clearingFinal = clearingFinalService.getById(clearingId);
-        if (clearingFinal == null ) {
+        if (clearingFinal == null) {
             throw new CrmebException("结算状态不是待结算不允许生成名单1");
         }
         if (!clearingFinal.getStatus().equals(ClearingFinal.Constants.待结算.name())) {
@@ -409,7 +409,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     clearingUserList.add(newUser);
                 });
             }
-            if(CollectionUtils.isNotEmpty(clearingUserList)){
+            if (CollectionUtils.isNotEmpty(clearingUserList)) {
                 clearingUserDao.insertBatch(clearingUserList);
             }
         }
@@ -600,7 +600,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             }
         }
         // 保存数据
-        if(!insetBatchList.isEmpty()){
+        if (!insetBatchList.isEmpty()) {
             List<List<ClearingUser>> partition = Lists.partition(insetBatchList, 2000);
             for (List<ClearingUser> clearingUsers : partition) {
                 clearingUserDao.insertBatch(clearingUsers);

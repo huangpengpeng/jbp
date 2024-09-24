@@ -174,12 +174,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     private LogisticService logisticService;
     @Autowired
     private ProductExtConfigService productExtConfigService;
-
     @Autowired
     private ProductRepertoryService productRepertoryService;
     @Autowired
     private UserSkinService userSkinService;
-
+    @Autowired
+    private OrderInvoiceService orderInvoiceService;
     @Autowired
     private UserInvitationService userInvitationService;
     @Autowired
@@ -2009,6 +2009,12 @@ public class FrontOrderServiceImpl implements FrontOrderService {
      */
     @Override
     public LogisticsResultVo getLogisticsInfo(Integer invoiceId) {
+
+        OrderInvoice orderInvoice = orderInvoiceService.getById(invoiceId);
+        Order order = orderService.getByOrderNo(orderInvoice.getOrderNo());
+        if(orderInvoice.getUid() != userService.getUserId() && order.getPayUid() !=  userService.getUserId()){
+            throw new CrmebException("无权限查看");
+        }
         return orderService.getLogisticsInfo(invoiceId);
     }
 
@@ -2032,8 +2038,11 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     @Override
     public OrderInvoiceFrontResponse getInvoiceList(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
-        List<OrderInvoiceResponse> invoiceList = orderService.getInvoiceList(orderNo);
         OrderInvoiceFrontResponse response = new OrderInvoiceFrontResponse();
+        if(order.getUid() != userService.getUserId() && order.getPayUid() != userService.getUserId()){
+            return response;
+        }
+        List<OrderInvoiceResponse> invoiceList = orderService.getInvoiceList(orderNo);
         response.setInvoiceList(invoiceList);
         if (CollUtil.isEmpty(invoiceList)) {
             response.setNum(1);
@@ -2056,6 +2065,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
         response.setAwaitShippedCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_WAIT_SHIPPING, userId));
         response.setReceiptCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_WAIT_RECEIPT, userId));
         response.setVerificationCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_AWAIT_VERIFICATION, userId));
+        response.setCompletedCount(orderService.getCountByStatusAndUid(OrderConstants.ORDER_STATUS_COMPLETE, userId));
         response.setAwaitReplyCount(orderDetailService.getAwaitReplyCount(userId));
         response.setRefundCount(refundOrderService.getRefundingCount(userId));
         return response;

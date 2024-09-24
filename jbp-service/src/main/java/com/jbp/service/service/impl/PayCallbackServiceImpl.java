@@ -484,6 +484,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
                     return "Success";
                 }
+
                 if (LianLianPayConfig.TxnStatus.交易成功.getCode().equals(txnStatus)) {
                     Boolean execute = transactionTemplate.execute(e -> {
                         Boolean b = orderService.updatePaid(orderNo);

@@ -24,7 +24,7 @@ public class OrderPayChannel implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "支付渠道 lianlian, yop, kq")
+    @ApiModelProperty(value = "支付渠道 连连, 易宝, 快钱")
     private String payChannel;
 
     @ApiModelProperty(value = "商户名称")

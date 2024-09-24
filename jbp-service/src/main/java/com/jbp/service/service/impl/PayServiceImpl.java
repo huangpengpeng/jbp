@@ -22,8 +22,7 @@ import com.jbp.common.constants.*;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.lianlian.result.CashierPayCreateResult;
-import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.alipay.AliPayInfo;
 import com.jbp.common.model.bill.Bill;
@@ -49,6 +48,7 @@ import com.jbp.common.vo.wxvedioshop.ShopOrderAddResultVo;
 import com.jbp.common.vo.wxvedioshop.order.*;
 import com.jbp.common.yop.params.WechatAlipayPayParams;
 import com.jbp.common.yop.result.WechatAliPayPayResult;
+import com.jbp.common.yop.result.WechatAlipayTutelagePayResult;
 import com.jbp.service.product.comm.*;
 import com.jbp.service.service.*;
 
@@ -1948,13 +1948,41 @@ public class PayServiceImpl implements PayService {
     private CashierPayCreateResult lianLianCashierPay(Order order) {
         User user = userService.getById(order.getPayUid());
         List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
-        CashierPayCreateResult cashier = lianLianPayService.cashier(user.getAccount(), user.getPhone(), order.getOrderNo(), order.getPayPrice(),details.get(0).getProductName(), order.getIp());
-        // 更新商户订单号
-        order.setOutTradeNo(cashier.getAccp_txno());
-        boolean b = orderService.updateById(order);
-        if(!b){
-            throw new RuntimeException("当前操作人数过多");
+        LianLianPayInfoResult payInfoResult = lianLianPayService.get();
+        CashierPayCreateResult cashier = new CashierPayCreateResult();
+        if (StringUtils.equals("惠支付", payInfoResult.getProductName())) {
+            if (StringUtils.equals("weixin", order.getPayType())) {
+                WechatPayCreateBillResult result = lianLianPayService.wechatPayCreateBill(user.getAccount(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice().toString(),
+                        order.getIp(), "Y");
+                cashier = new CashierPayCreateResult(result.getRet_code(), result.getRet_msg(), payInfoResult.getOid_partner(),
+                        user.getAccount(), Double.valueOf(result.getMoney_order()),
+                        result.getNo_order(), result.getOid_paybill(), result.getGateway_url(), result.getPayload());
+            }
+            if (StringUtils.equals("alipay", order.getPayType())) {
+
+                AlipayPayCreateBillResult result = lianLianPayService.alipayCreateBill(user.getAccount(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice().toString(),
+                        order.getIp());
+                cashier = new CashierPayCreateResult(result.getRet_code(), result.getRet_msg(), payInfoResult.getOid_partner(),
+                        user.getAccount(), Double.valueOf(result.getMoney_order()),
+                        result.getNo_order(), result.getOid_paybill(), result.getGateway_url(), result.getPayload());
+            }
+            if (StringUtils.equals("quickPay", order.getPayType())) {
+                PayCreateBillResult result = lianLianPayService.payCreateBill(user.getAccount(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice().toString(),
+                        order.getIp());
+                cashier = new CashierPayCreateResult(result.getRet_code(), result.getRet_msg(), payInfoResult.getOid_partner(),
+                        user.getAccount(), Double.valueOf(result.getMoney_order()),
+                        result.getNo_order(), result.getOid_paybill(), result.getGateway_url(), null);
+            }
+        } else {
+            cashier = lianLianPayService.cashier(user.getAccount(), user.getPhone(), order.getOrderNo(), order.getPayPrice(), details.get(0).getProductName(), order.getIp());
+            // 更新商户订单号
+            order.setOutTradeNo(cashier.getAccp_txno());
+            boolean b = orderService.updateById(order);
+            if (!b) {
+                throw new RuntimeException("当前操作人数过多");
+            }
         }
+
         order = orderService.getById(order.getId());
         return cashier;
     }
@@ -1974,6 +2002,12 @@ public class PayServiceImpl implements PayService {
             WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
                     yopNotifyUrl, "", yopReturnUrl, WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),
                     WechatAlipayPayParams.CHANNEL.ALIPAY.name(), "", "", order.getIp());
+            result.setGateway_url(wechatAlipayPay.getPrePayTn());
+        }
+        if ("ybweixin".equals(order.getPayType())) {
+            WechatAlipayTutelagePayResult wechatAlipayPay = yopPayService.wechatAlipayTutelagePay(yopMerchantNo, order.getOrderNo(), order.getPayPrice().toString(), productName,
+                    yopNotifyUrl, "",  WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(), WechatAlipayPayParams.CHANNEL.WECHAT.name(),
+                    order.getIp(), "");
             result.setGateway_url(wechatAlipayPay.getPrePayTn());
         }
         boolean b = orderService.updateById(order);

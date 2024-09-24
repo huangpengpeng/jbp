@@ -12,14 +12,23 @@ import com.jbp.common.yop.params.RegisterParams;
 import com.jbp.common.yop.params.WechatAlipayPayParams;
 import com.jbp.common.yop.result.*;
 import com.jbp.service.service.YopService;
+import com.jbp.service.service.impl.YopServiceImpl;
 
 import java.util.List;
 
 public class YopDemo {
 
+    public static void pay(YopService yopService) {
+
+        String orderId = StringUtils.N_TO_10("TEST_");
+
+        WechatAlipayTutelagePayResult r = yopService.wechatAlipayTutelagePay("10090608904", orderId, "0.1", "测试商品", "https://plat.jubaopeng.cc", "https://plat.jubaopeng.cc", "MINI_PROGRAM", "WECHAT", "115.220.220.122", "测试");
+        System.out.println(JSONObject.toJSONString(r));
+    }
+
 
     public static void registerQuery(YopService yopService) {
-        RegisterQueryResult result = yopService.registerQuery("LZT_RS_88843459131965");
+        RegisterQueryResult result = yopService.registerQuery("LZT_RS_171539063818562");
         System.out.println(JSONObject.toJSONString(result));
     }
 
@@ -50,13 +59,14 @@ public class YopDemo {
 //        RegisterQueryResult result = yopService.registerQuery("LZT_RS_157329444997738");
 //        System.out.println(JSONObject.toJSONString(result));
     }
+
     public static void merRegister(YopService yopService) {
         RegisterParams params = new RegisterParams();
         params.setRequestNo(StringUtils.N_TO_10("LZT_RS_"));
         params.setBusinessRole("PLATFORM_MERCHANT");// 平台商户
 
         // 商户资质信息
-        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329053156-65ab6ab6-ad6a-498a-abd0-df08049d2f25-qDloQVozqINYVawSmmBM.jpg\", \"signName\":\"上海吾善科技有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91310120MA1HWW3EXH\", \"shortName\":\"上海吾善科技有限公司\" }";
+        String merchantSubjectInfo = "{ \"licenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/07/30/merchant-1722329053156-65ab6ab6-ad6a-498a-abd0-df08049d2f25-qDloQVozqINYVawSmmBM.jpg\", \"signName\":\"上海吾善科技有限公司\", \"signType\":\"ENTERPRISE\", \"licenceNo\":\"91310120MA1HWW3EXH\", \"shortName\":\"上海吾善科技有限公司\",  \"openAccountLicenceUrl\":\"http://staticres.yeepay.com/jcptb-merchant-netinjt05/2024/08/19/merchant-1724065182842-506049b5-de1d-47ef-8b26-7d3a13263ce2-kgJVMFXLGiUEdBHpdhHJ.jpg\"}";
         params.setMerchantSubjectInfo(merchantSubjectInfo);
 
         // 法人信息
@@ -64,7 +74,7 @@ public class YopDemo {
         params.setMerchantCorporationInfo(merchantCorporationInfo);
 
         // 联系人信息
-        String merchantContactInfo="{ \"contactName\":\"宋鑫\", \"contactMobile\":\"13811065970\", \"contactEmail\":\"20840414@qq.com\", \"contactLicenceNo\":\"210124197704250612\" ,\"adminEmail\":\"20840414@qq.com\",\"adminMobile\":\"13811065970\" }";
+        String merchantContactInfo = "{ \"contactName\":\"宋鑫\", \"contactMobile\":\"13811065970\", \"contactEmail\":\"20840414@qq.com\", \"contactLicenceNo\":\"210124197704250612\" ,\"adminEmail\":\"20840414@qq.com\",\"adminMobile\":\"13811065970\" }";
         params.setMerchantContactInfo(merchantContactInfo);
 
         // 地址信息
@@ -99,7 +109,7 @@ public class YopDemo {
         params.setMerchantCorporationInfo(merchantCorporationInfo);
 
         // 联系人信息
-        String merchantContactInfo="{ \"contactName\":\"吴健平\", \"contactMobile\":\"13850686330\", \"contactEmail\":\"105809899@qq.com\", \"contactLicenceNo\":\"350802198205025010\" ,\"adminEmail\":\"105809899@qq.com\",\"adminMobile\":\"13850686330\" }";
+        String merchantContactInfo = "{ \"contactName\":\"吴健平\", \"contactMobile\":\"13850686330\", \"contactEmail\":\"105809899@qq.com\", \"contactLicenceNo\":\"350802198205025010\" ,\"adminEmail\":\"105809899@qq.com\",\"adminMobile\":\"13850686330\" }";
         params.setMerchantContactInfo(merchantContactInfo);
 
         // 地址信息
@@ -121,15 +131,15 @@ public class YopDemo {
     }
 
 
-    public static void quickPay(YopService yopService){
+    public static void quickPay(YopService yopService) {
         String orderId = StringUtils.N_TO_10("YB_");
-        String s = yopService.quickPay("10090436581",  "10000", orderId, "0.1", "测试商品", "http://fky.natapp1.cc/yop", "", "http://fky.natapp1.cc/yop");
+        String s = yopService.quickPay("10090436581", "10000", orderId, "0.1", "测试商品", "http://fky.natapp1.cc/yop", "", "http://fky.natapp1.cc/yop");
         System.out.println(s);
     }
 
-    public static void wechatAliPay(YopService yopService){
+    public static void wechatAliPay(YopService yopService) {
         String orderId = StringUtils.N_TO_10("YB_");
-        WechatAliPayPayResult result =yopService.wechatAlipayPay("10090436581", "10000",  orderId, "0.1", "测试商品",
+        WechatAliPayPayResult result = yopService.wechatAlipayPay("10090436581", "10000", orderId, "0.1", "测试商品",
                 "http://fky.natapp1.cc/yop", "", "http://fky.natapp1.cc/yop", WechatAlipayPayParams.PAYWAY.USER_SCAN.name(),
                 WechatAlipayPayParams.CHANNEL.ALIPAY.name(), "", "", "115.220.223.185");
         System.out.println(result);
@@ -172,7 +182,7 @@ public class YopDemo {
         params.setNotifyUrl("https://applet.dys.ink/yop/ew");
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
-        if(params.getOpenAccountType().equals("ENTERPRISE")){
+        if (params.getOpenAccountType().equals("ENTERPRISE")) {
             dto.setBindCardType("PUBLIC_CARD");
             dto.setBindCardNo("42050164680800001338");
             dto.setBindBankCode("CCB"); //招商银行股份有限公司深圳南海支行
@@ -228,7 +238,7 @@ public class YopDemo {
         params.setNotifyUrl("https://applet.dys.ink/yop/ew");
 
         SnMultiChannelOpenAccountDTO dto = new SnMultiChannelOpenAccountDTO();
-        if(params.getOpenAccountType().equals("ENTERPRISE")){
+        if (params.getOpenAccountType().equals("ENTERPRISE")) {
             dto.setBindCardType("PUBLIC_CARD");
             dto.setBindCardNo("42050164680800001329");
             dto.setBindBankCode("CCB"); //招商银行股份有限公司深圳南海支行
@@ -264,5 +274,13 @@ public class YopDemo {
 
         BankAccountOpenResult result = yopService.bankAccountOpen(params);
         System.out.println(JSONObject.toJSONString(result));
+    }
+
+
+    public static void selfSettle(YopService yopService) {
+        String s = StringUtils.N_TO_10("S_");
+        System.out.println(s);
+        SelfSettleResult all = yopService.selfSettle("10090418105", s, "ALL");
+        System.out.println(JSONObject.toJSONString(all));
     }
 }

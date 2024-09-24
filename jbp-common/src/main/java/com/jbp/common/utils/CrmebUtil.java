@@ -180,7 +180,7 @@ public class CrmebUtil {
      * @param args String[] 字符串数组
      */
     public static void main(String[] args) throws Exception {
-//       System.out.println(encryptPassword("123456"));
+       System.out.println(encryptPassword("123456"));
         System.out.println(decryptPassowrd("0ngdPxVkYyu7WNvMaHACcA==", "18929560630"));
         System.out.println(decryptPassowrd("EtcZy0MJ4b0E6BQ/geHLLg==", "18216024339"));
         System.out.println(decryptPassowrd("kS2IqUkx0vI=", "18444010100"));
@@ -188,6 +188,34 @@ public class CrmebUtil {
         System.out.println(decryptPassowrd("wpyZM4Otjm4=", "13823668660"));
 
         System.out.println(decryptPassowrd("8FOo2uLVucE=", "19011203013"));
+
+        System.out.println(decryptPassowrd("zaNERkBxHEHOV40CvMyWRQ==", "13159403413"));
+        System.out.println(decryptPassowrd("JTbvuAGT/YQayWbmiAPK+A==", "18820412252"));
+        System.out.println(decryptPassowrd("jsaJW8EGRiZvROGFdaOozg==", "15618417068"));
+        System.out.println(decryptPassowrd("etGjdFesMjvHyP9LAzXt0g==", "19979384655"));
+
+        System.out.println(decryptPassowrd("QCZZE8uL31Qa5a+CwTEbVQ==", "18610098429"));
+
+        System.out.println(decryptPassowrd("Kmj+e6EVJrvwblLkvhnqng==", "18011526148"));
+
+        System.out.println(decryptPassowrd("y5W4Zk8f7Tw=", "19011203013"));
+        System.out.println(decryptPassowrd("1IihZ/9ZsQxk89KgJM/3OQ==", "15871898210"));
+        System.out.println(decryptPassowrd("/oW4gfb8iFnISdOCUuAK3A==", "18667117111"));
+
+        System.out.println(decryptPassowrd("YQtDjCVGSiE=", "18928707599"));
+        System.out.println("孟超健康: " + decryptPassowrd("OGyveTCMZMMPDVzj8LbU4A==", "18506051809"));
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

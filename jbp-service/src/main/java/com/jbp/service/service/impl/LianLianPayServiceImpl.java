@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.lianlian.client.LLianPayClient;
+import com.jbp.common.lianlian.client.LLianPayYtSignature;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
@@ -46,6 +47,8 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String lzt_oid_partner = systemConfigService.getValueByKey("lianlian_lzt_oid_partner");
         String lzt_pri_key = systemConfigService.getValueByKey("lianlian_lzt_pri_key");
 
+        String productName = systemConfigService.getValueByKey("lianlian_product_name");
+
         LianLianPayInfoResult result = new LianLianPayInfoResult();
         result.setPubKey(pubKey);
         result.setPriKey(priKey);
@@ -62,6 +65,9 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         // 来账通产品信息
         result.setLzt_priKey(lzt_pri_key);
         result.setLzt_oid_partner(lzt_oid_partner);
+
+        // 产品名称
+        result.setProductName(productName);
         return result;
     }
 
@@ -73,19 +79,61 @@ public class LianLianPayServiceImpl implements LianLianPayService {
 
     @Override
     public QueryPaymentResult queryPayResult(String orderNo) {
+        QueryPaymentResult queryPaymentResult = new QueryPaymentResult();
         LianLianPayInfoResult lianLianInfo = get();
-        QueryPaymentParams params = new QueryPaymentParams();
-        params.setTimestamp(LLianPayDateUtils.getTimestamp());
-        params.setOid_partner(lianLianInfo.getOid_partner());
-        params.setTxn_seqno(orderNo);
-        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
-        // 测试环境URL
-        String url = "https://accpapi.lianlianpay.com/v1/txn/query-payment";
-        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        QueryPaymentResult queryPaymentResult = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
+        if (StringUtils.equals("惠支付", lianLianInfo.getProductName())) {
+            OrderQueryParams params = new OrderQueryParams();
+            String timestamp = LLianPayDateUtils.getTimestamp();
+            params.setOid_partner(lianLianInfo.getOid_partner());
+            params.setSign_type("RSA");
+            params.setNo_order(orderNo);
+            params.setDt_order(timestamp);
+            params.setQuery_version("1.0");
+            // 生成签名
+            params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+            String url = "https://queryapi.lianlianpay.com/orderquery.htm";
+            LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+            String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+            if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+                throw new RuntimeException("调用支付查询异常" + orderNo);
+            }
+            try {
+                OrderQueryResult result = JSON.parseObject(s, OrderQueryResult.class);
+                if (result == null || !"0000".equals(result.getRet_code())) {
+                    throw new RuntimeException("调用支付查询异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+                }
+                QueryPaymentOrderInfo orderInfo = new QueryPaymentOrderInfo();
+                orderInfo.setTxn_seqno(result.getNo_order());
+                orderInfo.setTotal_amount(Double.valueOf(result.getMoney_order()));
+                String status = "";
+                if ("SUCCESS".equals(result.getResult_pay())) {
+                    status = "TRADE_SUCCESS";
+                }
+                if ("WAITING".equals(result.getResult_pay()) || "PROCESSING".equals(result.getResult_pay())) {
+                    status = "TRADE_WAIT_PAY";
+                }
+                if ("REFUND".equals(result.getResult_pay()) || "FAILURE".equals(result.getResult_pay())) {
+                    status = "TRADE_CLOSE";
+                }
+                queryPaymentResult = new QueryPaymentResult(result.getRet_code(), result.getRet_msg(),
+                        lianLianInfo.getOid_partner(), "", result.getDt_order(),
+                        result.getDt_order(), result.getOid_paybill(), result.getOid_paybill(), status,
+                        orderInfo, null, null);
+            } catch (Exception e) {
+                throw new RuntimeException("调用支付查询异常:" + s);
+            }
+        } else {
+            QueryPaymentParams params = new QueryPaymentParams();
+            params.setTimestamp(LLianPayDateUtils.getTimestamp());
+            params.setOid_partner(lianLianInfo.getOid_partner());
+            params.setTxn_seqno(orderNo);
+            LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+            String url = "https://accpapi.lianlianpay.com/v1/txn/query-payment";
+            String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+            queryPaymentResult = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
+        }
         return queryPaymentResult;
     }
-
 
     @Override
     public CashierPayCreateResult cashier(String account, String phone, String payCode, BigDecimal amount, String goodsName, String ip) {
@@ -99,18 +147,18 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setTxn_type("GENERAL_CONSUME");
         params.setUser_id(account);
         params.setUser_type("ANONYMOUS");
-        params.setNotify_url(lianLianInfo.getHost()+lianLianInfo.getNotify_url()+payCode);
+        params.setNotify_url(lianLianInfo.getHost() + lianLianInfo.getNotify_url() + payCode);
         if (payCode.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
-            params.setReturn_url(lianLianInfo.getReturn_url2()+payCode);
-        }else{
-            params.setReturn_url(lianLianInfo.getReturn_url()+payCode);
+            params.setReturn_url(lianLianInfo.getReturn_url2() + payCode);
+        } else {
+            params.setReturn_url(lianLianInfo.getReturn_url() + payCode);
         }
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
         // 测试风控参数
         String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         String frms_ware_category = "4009";
-        if(StringUtils.isNotEmpty(lianLianInfo.getFrms_ware_category())){
+        if (StringUtils.isNotEmpty(lianLianInfo.getFrms_ware_category())) {
             frms_ware_category = lianLianInfo.getFrms_ware_category();
         }
         RiskItemInfo riskItemInfo = new RiskItemInfo(frms_ware_category, account, phone, registerTime, goodsName);
@@ -229,6 +277,200 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         return result;
     }
 
+
+    /**
+     * 惠支付银行卡
+     */
+    @Override
+    public PayCreateBillResult payCreateBill(String userId, String goodsName, String payCode, String amt, String ip) {
+        LianLianPayInfoResult lianLianInfo = get();
+        PayCreateBillParams params = new PayCreateBillParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setApi_version("1.0");
+        params.setSign_type("RSA");
+        params.setTime_stamp(timestamp);
+        params.setOid_partner(lianLianInfo.getOid_partner());
+
+        params.setUser_id(userId);
+        params.setBusi_partner("109001");
+        params.setNo_order(payCode);
+        params.setDt_order(timestamp);
+        params.setName_goods(goodsName);
+        params.setMoney_order(amt);
+        params.setNotify_url(lianLianInfo.getNotify_url() + payCode);
+        params.setUrl_return(lianLianInfo.getReturn_url() + payCode);
+
+        Map<String, Object> map = SqlRunner.db().selectOne(("SELECT * FROM `certificaterealname` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `certificaterealname`)-(SELECT MIN(id) FROM `certificaterealname`)) + (SELECT MIN(id) FROM `certificaterealname`))) ORDER BY id LIMIT 1 "));
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4005", userId, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setFlag_pay_product("0");
+        params.setFlag_chnl("3");
+        params.setShow_head("hide");
+        params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+        // 收银台支付创单URL
+        String url = "https://payserverapi.lianlianpay.com/v1/paycreatebill";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用支付异常" + payCode);
+        }
+        try {
+            PayCreateBillResult result = JSON.parseObject(s, PayCreateBillResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用支付异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            result.setPayMerchantNo(params.getOid_partner());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用支付异常:" + s);
+        }
+    }
+
+    /**
+     * 惠支付微信
+     */
+    @Override
+    public WechatPayCreateBillResult wechatPayCreateBill(String userId, String goodsName, String payCode, String amt, String ip, String flagWxH5) {
+        LianLianPayInfoResult lianLianInfo = get();
+        WechatPayCreateBillParams params = new WechatPayCreateBillParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setApi_version("1.0");
+        params.setSign_type("RSA");
+        params.setTime_stamp(timestamp);
+        params.setOid_partner(lianLianInfo.getOid_partner());
+
+        params.setUser_id(userId);
+        params.setBusi_partner("109001");
+        params.setNo_order(payCode);
+        params.setDt_order(timestamp);
+        params.setName_goods(goodsName);
+        params.setMoney_order(amt);
+        params.setNotify_url(lianLianInfo.getNotify_url() + payCode);
+        params.setUrl_return(lianLianInfo.getReturn_url() + payCode);
+
+        Map<String, Object> map = SqlRunner.db().selectOne(("SELECT * FROM `certificaterealname` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `certificaterealname`)-(SELECT MIN(id) FROM `certificaterealname`)) + (SELECT MIN(id) FROM `certificaterealname`))) ORDER BY id LIMIT 1 "));
+
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4005", userId, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setFlag_pay_product("20");
+        params.setFlag_chnl("3");
+        params.setShow_head("hide");
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(flagWxH5)) {
+            params.setFlag_wx_h5(flagWxH5);
+            params.setReq_domain(lianLianInfo.getReq_domain());
+        }
+
+        params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+        // 收银台支付创单URL
+        String url = "https://payserverapi.lianlianpay.com/v1/paycreatebill";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用微信支付异常" + payCode);
+        }
+        try {
+            WechatPayCreateBillResult result = JSON.parseObject(s, WechatPayCreateBillResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用微信支付异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            result.setPayMerchantNo(params.getOid_partner());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用微信支付异常:" + s);
+        }
+    }
+
+    /**
+     * 惠支付支付宝
+     */
+    @Override
+    public AlipayPayCreateBillResult alipayCreateBill(String userId, String goodsName, String payCode, String amt, String ip) {
+        LianLianPayInfoResult lianLianInfo = get();
+        AlipayPayCreateBillParams params = new AlipayPayCreateBillParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setSign_type("RSA");
+        params.setOid_partner(lianLianInfo.getOid_partner());
+        params.setUser_id(userId);
+        params.setBusi_partner("109001");
+        params.setNo_order(payCode);
+        params.setDt_order(timestamp);
+        params.setName_goods(goodsName);
+        params.setMoney_order(amt);
+        params.setNotify_url(lianLianInfo.getNotify_url() + payCode);
+
+        Map<String, Object> map = SqlRunner.db().selectOne(("SELECT * FROM `certificaterealname` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `certificaterealname`)-(SELECT MIN(id) FROM `certificaterealname`)) + (SELECT MIN(id) FROM `certificaterealname`))) ORDER BY id LIMIT 1 "));
+
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4005", userId, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setPay_type("L");
+        params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("oid_partner", params.getOid_partner());
+        // 使用连连公钥对请求参数进行加密
+        jsonObject.put("pay_load", LLianPayYtSignature.getInstance().encryptGeneratePayload(JSON.toJSONString(params), lianLianInfo.getPubKey()));
+
+        // 收银台支付创单URL
+        String url = "https://mpayapi.lianlianpay.com/v1/bankcardprepay";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, jsonObject.toJSONString());
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用支付宝扫码异常" + payCode);
+        }
+        try {
+            AlipayPayCreateBillResult result = JSON.parseObject(s, AlipayPayCreateBillResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用支付宝扫码异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            result.setPayMerchantNo(params.getOid_partner());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用支付宝扫码异常:" + s);
+        }
+    }
+
+
     @Override
     public MorePayeeRefundResult refund(String account, String payCode, String refundNo, BigDecimal refundAmt) {
         LianLianPayInfoResult lianLianInfo = get();
@@ -237,72 +479,93 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         if (queryPaymentResult == null || !"TRADE_SUCCESS".equals(queryPaymentResult.getTxn_status())) {
             throw new RuntimeException("订单未支付成功不允许退款:" + payCode);
         }
-
-        QueryPaymentOrderInfo orderInfo = queryPaymentResult.getOrderInfo();
-        List<QueryPaymentPayeeInfo> payeeInfo = queryPaymentResult.getPayeeInfo();
-        List<QueryPaymentPayerInfo> payerInfo = queryPaymentResult.getPayerInfo();
-
-        MorePayeeRefundParams params = new MorePayeeRefundParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
-        params.setTimestamp(timestamp);
-        params.setOid_partner(lianLianInfo.getOid_partner());
-        // 原交易付款方user_id
-        params.setUser_id(account);
 
-        // 原商户订单信息
-        OriginalOrderInfo originalOrderInfo = new OriginalOrderInfo();
-        // 原支付交易商户系统唯一交易流水号
-        originalOrderInfo.setTxn_seqno(payCode);
-        // 订单总金额
-        originalOrderInfo.setTotal_amount(orderInfo.getTotal_amount());
-        params.setOriginalOrderInfo(originalOrderInfo);
+        MorePayeeRefundResult morePayeeRefundResult = new MorePayeeRefundResult();
+        if (StringUtils.equals("惠支付", lianLianInfo.getProductName())) {
 
-        // 退款订单信息
-        RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
-        // 退款订单号。标识一次退款请求，商户系统需要保证唯一
-        refundOrderInfo.setRefund_seqno(refundNo);
-        refundOrderInfo.setRefund_time(timestamp);
-        // 退款总金额。本次需要退款的金额，不允许超过对应原收款方的收款金额
-        refundOrderInfo.setRefund_amount(refundAmt.doubleValue());
-        params.setRefundOrderInfo(refundOrderInfo);
+            RefundParams params = new RefundParams();
+            params.setSign_type("RSA");
+            params.setOid_partner(lianLianInfo.getOid_partner());
+            params.setNo_refund(refundNo);
+            params.setDt_refund(timestamp);
+            params.setMoney_refund(refundAmt.toString());
+            params.setNo_order(payCode);
 
-        // 原收款方退款信息
-        PyeeRefundInfo pyeeRefundInfo = new PyeeRefundInfo();
-        // 原收款方id，本次退款需要处理的原交易收款方id
-        pyeeRefundInfo.setPayee_id(payeeInfo.get(0).getPayee_id());
-        /*
-        原收款方类型。
-        用户：USER
-        平台商户：MERCHANT
-         */
-        pyeeRefundInfo.setPayee_type(payeeInfo.get(0).getPayee_type());
-        /*
-        原收款方账户类型。
-        用户账户：USEROWN
-        平台商户自有资金账户：MCHOWN
-        平台商户担保账户：MCHASSURE
-        平台商户优惠券账户：MCHCOUPON
-        平台商户手续费账户：MCHFEE
-         */
-        pyeeRefundInfo.setPayee_accttype("MERCHANT".equals(pyeeRefundInfo.getPayee_type()) ? "MCHOWN" : "USEROWN");
-        // 退款金额。本次需要退款的金额，不允许超过对应原收款方的收款金额。
-        pyeeRefundInfo.setPayee_refund_amount(refundAmt.doubleValue());
-        // 垫资标识。当原收款方金额不足时，是否由平台垫资的标识，默认:N
-        pyeeRefundInfo.setIs_advance_pay("N");
-        params.setPyeeRefundInfos(Arrays.asList(new PyeeRefundInfo[]{pyeeRefundInfo}));
+            params.setNotify_url(lianLianInfo.getNotify_url() + refundNo);
 
-        // 原付款方式退款规则信息
-        RefundMethod refundMethod = new RefundMethod();
-        // 付款方式
-        refundMethod.setMethod(payerInfo.get(0).getMethod());
-        // 退款金额
-        refundMethod.setAmount(refundAmt.doubleValue());
-        params.setRefundMethods(Arrays.asList(new RefundMethod[]{refundMethod}));
+            // 生产签名
+            params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+            // 退款URL
+            String url = "https://traderapi.lianlianpay.com/refund.htm";
+            LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+            String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+            if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+                throw new RuntimeException("调用支付退款异常" + refundNo);
+            }
+            try {
+                RefundResult result = JSON.parseObject(s, RefundResult.class);
+                if (result == null || !"0000".equals(result.getRet_code())) {
+                    throw new RuntimeException("调用支付退款异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+                }
+                morePayeeRefundResult = new MorePayeeRefundResult(result.getRet_code(), result.getRet_msg(),
+                        lianLianInfo.getOid_partner(), "", result.getNo_refund(), Double.valueOf(result.getMoney_refund()), result.getOid_refundno());
+            } catch (Exception e) {
+                throw new RuntimeException("调用支付退款异常:" + s);
+            }
+        } else {
+            QueryPaymentOrderInfo orderInfo = queryPaymentResult.getOrderInfo();
+            List<QueryPaymentPayeeInfo> payeeInfo = queryPaymentResult.getPayeeInfo();
+            List<QueryPaymentPayerInfo> payerInfo = queryPaymentResult.getPayerInfo();
 
-        String url = "https://accpapi.lianlianpay.com/v1/txn/more-payee-refund";
-        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
-        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        MorePayeeRefundResult morePayeeRefundResult = JSON.parseObject(resultJsonStr, MorePayeeRefundResult.class);
+            MorePayeeRefundParams params = new MorePayeeRefundParams();
+            params.setTimestamp(timestamp);
+            params.setOid_partner(lianLianInfo.getOid_partner());
+            // 原交易付款方user_id
+            params.setUser_id(account);
+
+            // 原商户订单信息
+            OriginalOrderInfo originalOrderInfo = new OriginalOrderInfo();
+            // 原支付交易商户系统唯一交易流水号
+            originalOrderInfo.setTxn_seqno(payCode);
+            // 订单总金额
+            originalOrderInfo.setTotal_amount(orderInfo.getTotal_amount());
+            params.setOriginalOrderInfo(originalOrderInfo);
+
+            // 退款订单信息
+            RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
+            // 退款订单号。标识一次退款请求，商户系统需要保证唯一
+            refundOrderInfo.setRefund_seqno(refundNo);
+            refundOrderInfo.setRefund_time(timestamp);
+            // 退款总金额。本次需要退款的金额，不允许超过对应原收款方的收款金额
+            refundOrderInfo.setRefund_amount(refundAmt.doubleValue());
+            params.setRefundOrderInfo(refundOrderInfo);
+
+            // 原收款方退款信息
+            PyeeRefundInfo pyeeRefundInfo = new PyeeRefundInfo();
+            // 原收款方id，本次退款需要处理的原交易收款方id
+            pyeeRefundInfo.setPayee_id(payeeInfo.get(0).getPayee_id());
+            pyeeRefundInfo.setPayee_type(payeeInfo.get(0).getPayee_type());
+            pyeeRefundInfo.setPayee_accttype("MERCHANT".equals(pyeeRefundInfo.getPayee_type()) ? "MCHOWN" : "USEROWN");
+            // 退款金额。本次需要退款的金额，不允许超过对应原收款方的收款金额。
+            pyeeRefundInfo.setPayee_refund_amount(refundAmt.doubleValue());
+            // 垫资标识。当原收款方金额不足时，是否由平台垫资的标识，默认:N
+            pyeeRefundInfo.setIs_advance_pay("N");
+            params.setPyeeRefundInfos(Arrays.asList(new PyeeRefundInfo[]{pyeeRefundInfo}));
+
+            // 原付款方式退款规则信息
+            RefundMethod refundMethod = new RefundMethod();
+            // 付款方式
+            refundMethod.setMethod(payerInfo.get(0).getMethod());
+            // 退款金额
+            refundMethod.setAmount(refundAmt.doubleValue());
+            params.setRefundMethods(Arrays.asList(new RefundMethod[]{refundMethod}));
+
+            String url = "https://accpapi.lianlianpay.com/v1/txn/more-payee-refund";
+            LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+            String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+            morePayeeRefundResult = JSON.parseObject(resultJsonStr, MorePayeeRefundResult.class);
+        }
         return morePayeeRefundResult;
     }
 
