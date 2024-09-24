@@ -212,7 +212,7 @@ public class PayServiceImpl implements PayService {
         response.setYopQuickPay(StringUtils.isNotEmpty(yopQuickPay) && StringUtils.equals("1", yopQuickPay));
         response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
 
-        response.setLianlianQuickPay(StringUtils.isNotEmpty(lianlianQuickPa) && StringUtils.equals("1", lianlianQuickPa));
+        response.setLianlianQuickPay(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianQuickPa));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
