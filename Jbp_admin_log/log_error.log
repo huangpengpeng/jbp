@@ -25,3 +25,121 @@ Caused by: java.lang.InterruptedException: null
 	at com.alibaba.druid.pool.DruidDataSource.takeLast(DruidDataSource.java:2111)
 	at com.alibaba.druid.pool.DruidDataSource.getConnectionInternal(DruidDataSource.java:1620)
 	... 15 common frames omitted
+2024-09-23 14:59:13.273 [Druid-ConnectionPool-Create-1703353597] ERROR com.alibaba.druid.pool.DruidDataSource - create connection holder error
+com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 1,039 milliseconds ago. The last packet sent successfully to the server was 2,064 milliseconds ago.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:174)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64)
+	at com.mysql.cj.jdbc.ConnectionImpl.isReadOnly(ConnectionImpl.java:1414)
+	at com.mysql.cj.jdbc.ConnectionImpl.isReadOnly(ConnectionImpl.java:1399)
+	at com.alibaba.druid.filter.FilterChainImpl.connection_isReadOnly(FilterChainImpl.java:463)
+	at com.alibaba.druid.filter.FilterAdapter.connection_isReadOnly(FilterAdapter.java:894)
+	at com.alibaba.druid.filter.FilterChainImpl.connection_isReadOnly(FilterChainImpl.java:459)
+	at com.alibaba.druid.filter.FilterAdapter.connection_isReadOnly(FilterAdapter.java:894)
+	at com.alibaba.druid.filter.FilterChainImpl.connection_isReadOnly(FilterChainImpl.java:459)
+	at com.alibaba.druid.proxy.jdbc.ConnectionProxyImpl.isReadOnly(ConnectionProxyImpl.java:291)
+	at com.alibaba.druid.pool.DruidConnectionHolder.<init>(DruidConnectionHolder.java:137)
+	at com.alibaba.druid.pool.DruidConnectionHolder.<init>(DruidConnectionHolder.java:77)
+	at com.alibaba.druid.pool.DruidDataSource.put(DruidDataSource.java:2412)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:2757)
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 1,039 milliseconds ago. The last packet sent successfully to the server was 2,064 milliseconds ago.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:61)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:105)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:151)
+	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:167)
+	at com.mysql.cj.protocol.a.NativeProtocol.clearInputStream(NativeProtocol.java:807)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendCommand(NativeProtocol.java:622)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendCommand(NativeProtocol.java:128)
+	at com.mysql.cj.NativeSession.sendCommand(NativeSession.java:311)
+	at com.mysql.cj.NativeSession.queryServerVariable(NativeSession.java:1008)
+	at com.mysql.cj.jdbc.ConnectionImpl.isReadOnly(ConnectionImpl.java:1406)
+	... 11 common frames omitted
+Caused by: java.io.IOException: Socket is closed
+	at com.mysql.cj.protocol.AbstractSocketConnection.getMysqlInput(AbstractSocketConnection.java:72)
+	at com.mysql.cj.protocol.a.NativeProtocol.clearInputStream(NativeProtocol.java:803)
+	... 16 common frames omitted
+2024-09-23 14:59:55.424 [main] ERROR org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'lztPayChannelController': Lookup method resolution failed; nested exception is java.lang.IllegalStateException: Failed to introspect Class [com.jbp.admin.controller.agent.LztPayChannelController] from ClassLoader [sun.misc.Launcher$AppClassLoader@18b4aac2]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:289)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineConstructorsFromBeanPostProcessors(AbstractAutowireCapableBeanFactory.java:1286)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1201)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:557)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:517)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:323)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:882)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:878)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:550)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:747)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:397)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:315)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1215)
+	at com.jbp.admin.JbpAdminApplication.main(JbpAdminApplication.java:48)
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [com.jbp.admin.controller.agent.LztPayChannelController] from ClassLoader [sun.misc.Launcher$AppClassLoader@18b4aac2]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:481)
+	at org.springframework.util.ReflectionUtils.doWithLocalMethods(ReflectionUtils.java:321)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:267)
+	... 18 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: com/jbp/common/model/agent/LztPayChannel
+	at java.lang.Class.getDeclaredMethods0(Native Method)
+	at java.lang.Class.privateGetDeclaredMethods(Class.java:2701)
+	at java.lang.Class.getDeclaredMethods(Class.java:1975)
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:463)
+	... 20 common frames omitted
+Caused by: java.lang.ClassNotFoundException: com.jbp.common.model.agent.LztPayChannel
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:418)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:355)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:351)
+	... 24 common frames omitted
+2024-09-23 15:17:27.210 [Druid-ConnectionPool-Create-187903706] ERROR com.alibaba.druid.pool.DruidDataSource - create connection holder error
+com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 1,107 milliseconds ago. The last packet sent successfully to the server was 2,154 milliseconds ago.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:174)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64)
+	at com.mysql.cj.jdbc.ConnectionImpl.isReadOnly(ConnectionImpl.java:1414)
+	at com.mysql.cj.jdbc.ConnectionImpl.isReadOnly(ConnectionImpl.java:1399)
+	at com.alibaba.druid.filter.FilterChainImpl.connection_isReadOnly(FilterChainImpl.java:463)
+	at com.alibaba.druid.filter.FilterAdapter.connection_isReadOnly(FilterAdapter.java:894)
+	at com.alibaba.druid.filter.FilterChainImpl.connection_isReadOnly(FilterChainImpl.java:459)
+	at com.alibaba.druid.filter.FilterAdapter.connection_isReadOnly(FilterAdapter.java:894)
+	at com.alibaba.druid.filter.FilterChainImpl.connection_isReadOnly(FilterChainImpl.java:459)
+	at com.alibaba.druid.proxy.jdbc.ConnectionProxyImpl.isReadOnly(ConnectionProxyImpl.java:291)
+	at com.alibaba.druid.pool.DruidConnectionHolder.<init>(DruidConnectionHolder.java:137)
+	at com.alibaba.druid.pool.DruidConnectionHolder.<init>(DruidConnectionHolder.java:77)
+	at com.alibaba.druid.pool.DruidDataSource.put(DruidDataSource.java:2412)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:2757)
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 1,107 milliseconds ago. The last packet sent successfully to the server was 2,154 milliseconds ago.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:61)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:105)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:151)
+	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:167)
+	at com.mysql.cj.protocol.a.NativeProtocol.clearInputStream(NativeProtocol.java:807)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendCommand(NativeProtocol.java:622)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendCommand(NativeProtocol.java:128)
+	at com.mysql.cj.NativeSession.sendCommand(NativeSession.java:311)
+	at com.mysql.cj.NativeSession.queryServerVariable(NativeSession.java:1008)
+	at com.mysql.cj.jdbc.ConnectionImpl.isReadOnly(ConnectionImpl.java:1406)
+	... 11 common frames omitted
+Caused by: java.io.IOException: Socket is closed
+	at com.mysql.cj.protocol.AbstractSocketConnection.getMysqlInput(AbstractSocketConnection.java:72)
+	at com.mysql.cj.protocol.a.NativeProtocol.clearInputStream(NativeProtocol.java:803)
+	... 16 common frames omitted

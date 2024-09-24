@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.lianlian.client.LLianPayClient;
+import com.jbp.common.lianlian.client.LLianPayYtSignature;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
@@ -99,18 +100,18 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         params.setTxn_type("GENERAL_CONSUME");
         params.setUser_id(account);
         params.setUser_type("ANONYMOUS");
-        params.setNotify_url(lianLianInfo.getHost()+lianLianInfo.getNotify_url()+payCode);
+        params.setNotify_url(lianLianInfo.getHost() + lianLianInfo.getNotify_url() + payCode);
         if (payCode.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
-            params.setReturn_url(lianLianInfo.getReturn_url2()+payCode);
-        }else{
-            params.setReturn_url(lianLianInfo.getReturn_url()+payCode);
+            params.setReturn_url(lianLianInfo.getReturn_url2() + payCode);
+        } else {
+            params.setReturn_url(lianLianInfo.getReturn_url() + payCode);
         }
         // 交易发起渠道设置
         params.setFlag_chnl("H5");
         // 测试风控参数
         String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         String frms_ware_category = "4009";
-        if(StringUtils.isNotEmpty(lianLianInfo.getFrms_ware_category())){
+        if (StringUtils.isNotEmpty(lianLianInfo.getFrms_ware_category())) {
             frms_ware_category = lianLianInfo.getFrms_ware_category();
         }
         RiskItemInfo riskItemInfo = new RiskItemInfo(frms_ware_category, account, phone, registerTime, goodsName);
@@ -228,6 +229,202 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         }
         return result;
     }
+
+
+    /**
+     * 惠支付银行卡
+     */
+    @Override
+    public PayCreateBillResult payCreateBill(String userId, String goodsName, String payCode, String amt,
+                                             String notifyUrl, String returnUrl, String ip) {
+        LianLianPayInfoResult lianLianInfo = get();
+        PayCreateBillParams params = new PayCreateBillParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setApi_version("1.0");
+        params.setSign_type("RSA");
+        params.setTime_stamp(timestamp);
+        params.setOid_partner(lianLianInfo.getOid_partner());
+
+        params.setUser_id(userId);
+        params.setBusi_partner("109001");
+        params.setNo_order(payCode);
+        params.setDt_order(timestamp);
+        params.setName_goods(goodsName);
+        params.setMoney_order(amt);
+        params.setNotify_url(notifyUrl);
+        params.setUrl_return(returnUrl);
+
+        Map<String, Object> map = SqlRunner.db().selectOne(("SELECT * FROM `certificaterealname` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `certificaterealname`)-(SELECT MIN(id) FROM `certificaterealname`)) + (SELECT MIN(id) FROM `certificaterealname`))) ORDER BY id LIMIT 1 "));
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4005", userId, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setFlag_pay_product("0");
+        params.setFlag_chnl("3");
+        params.setShow_head("hide");
+        params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+        // 收银台支付创单URL
+        String url = "https://payserverapi.lianlianpay.com/v1/paycreatebill";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用支付异常" + payCode);
+        }
+        try {
+            PayCreateBillResult result = JSON.parseObject(s, PayCreateBillResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用支付异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            result.setPayMerchantNo(params.getOid_partner());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用支付异常:" + s);
+        }
+    }
+
+    /**
+     * 惠支付微信
+     */
+    @Override
+    public WechatPayCreateBillResult wechatPayCreateBill(String userId, String goodsName, String payCode, String amt,
+                                                         String notifyUrl, String returnUrl, String ip, String flagWxH5) {
+        LianLianPayInfoResult lianLianInfo = get();
+        WechatPayCreateBillParams params = new WechatPayCreateBillParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setApi_version("1.0");
+        params.setSign_type("RSA");
+        params.setTime_stamp(timestamp);
+        params.setOid_partner(lianLianInfo.getOid_partner());
+
+        params.setUser_id(userId);
+        params.setBusi_partner("109001");
+        params.setNo_order(payCode);
+        params.setDt_order(timestamp);
+        params.setName_goods(goodsName);
+        params.setMoney_order(amt);
+        params.setNotify_url(notifyUrl);
+        params.setUrl_return(returnUrl);
+
+        Map<String, Object> map = SqlRunner.db().selectOne(("SELECT * FROM `certificaterealname` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `certificaterealname`)-(SELECT MIN(id) FROM `certificaterealname`)) + (SELECT MIN(id) FROM `certificaterealname`))) ORDER BY id LIMIT 1 "));
+
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4005", userId, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setFlag_pay_product("20");
+        params.setFlag_chnl("3");
+        params.setShow_head("hide");
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(flagWxH5)) {
+            params.setFlag_wx_h5(flagWxH5);
+            params.setReq_domain(lianLianInfo.getReq_domain());
+        }
+
+        params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+        // 收银台支付创单URL
+        String url = "https://payserverapi.lianlianpay.com/v1/paycreatebill";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用微信支付异常" + payCode);
+        }
+        try {
+            WechatPayCreateBillResult result = JSON.parseObject(s, WechatPayCreateBillResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用微信支付异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            result.setPayMerchantNo(params.getOid_partner());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用微信支付异常:" + s);
+        }
+    }
+
+    /**
+     * 惠支付支付宝
+     */
+    @Override
+    public AlipayPayCreateBillResult alipayCreateBill(String userId, String goodsName, String payCode, String amt, String notifyUrl, String ip) {
+        LianLianPayInfoResult lianLianInfo = get();
+        AlipayPayCreateBillParams params = new AlipayPayCreateBillParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setSign_type("RSA");
+        params.setOid_partner(lianLianInfo.getOid_partner());
+        params.setUser_id(userId);
+        params.setBusi_partner("109001");
+        params.setNo_order(payCode);
+        params.setDt_order(timestamp);
+        params.setName_goods(goodsName);
+        params.setMoney_order(amt);
+        params.setNotify_url(notifyUrl);
+
+        Map<String, Object> map = SqlRunner.db().selectOne(("SELECT * FROM `certificaterealname` WHERE id >= (SELECT floor( RAND() * ((SELECT MAX(id) FROM `certificaterealname`)-(SELECT MIN(id) FROM `certificaterealname`)) + (SELECT MIN(id) FROM `certificaterealname`))) ORDER BY id LIMIT 1 "));
+
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        RiskItemInfo riskItemInfo = new RiskItemInfo("4005", userId, MapUtils.getString(map, "phone"), registerTime, goodsName);
+        riskItemInfo.setFrms_client_chnl("16");
+        riskItemInfo.setFrms_ip_addr(ip);
+        riskItemInfo.setUser_auth_flag("1");
+        riskItemInfo.setUser_info_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setUser_info_id_no(MapUtils.getString(map, "cardNo"));
+        riskItemInfo.setUser_info_identify_state("1");
+        riskItemInfo.setUser_info_identify_type("1");
+        riskItemInfo.setUser_info_id_type("0");
+        riskItemInfo.setDelivery_full_name(MapUtils.getString(map, "name"));
+        riskItemInfo.setDelivery_phone(MapUtils.getString(map, "phone"));
+        riskItemInfo.setDelivery_addr_province(MapUtils.getString(map, "province"));
+        riskItemInfo.setDelivery_addr_city(MapUtils.getString(map, "city"));
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        params.setPay_type("L");
+        params.setSign(LLianPayYtSignature.getInstance().sign(lianLianInfo.getPriKey(), JSON.toJSONString(params)));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("oid_partner", params.getOid_partner());
+        // 使用连连公钥对请求参数进行加密
+        jsonObject.put("pay_load", LLianPayYtSignature.getInstance().encryptGeneratePayload(JSON.toJSONString(params), lianLianInfo.getPubKey()));
+
+        // 收银台支付创单URL
+        String url = "https://mpayapi.lianlianpay.com/v1/bankcardprepay";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String s = lLianPayClient.sendRequest(url, jsonObject.toJSONString());
+        if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {
+            throw new RuntimeException("调用支付宝扫码异常" + payCode);
+        }
+        try {
+            AlipayPayCreateBillResult result = JSON.parseObject(s, AlipayPayCreateBillResult.class);
+            if (result == null || !"0000".equals(result.getRet_code())) {
+                throw new RuntimeException("调用支付宝扫码异常：" + result == null ? "请求结果为空" : result.getRet_msg());
+            }
+            result.setPayMerchantNo(params.getOid_partner());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("调用支付宝扫码异常:" + s);
+        }
+    }
+
 
     @Override
     public MorePayeeRefundResult refund(String account, String payCode, String refundNo, BigDecimal refundAmt) {
