@@ -2,9 +2,7 @@ package com.jbp.front.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.jbp.common.constants.Constants;
 import com.jbp.common.constants.SmsConstants;
-import com.jbp.common.constants.SysConfigConstants;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
@@ -22,7 +20,6 @@ import com.jbp.service.condition.ConditionEnum;
 import com.jbp.service.service.SmsService;
 import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.UserService;
-import com.jbp.service.service.WalletConfigService;
 import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -665,7 +662,7 @@ public class UserController {
         // 校验密码是否是6个相同的数字
         String regex2 = "^(\\d)\\1{5}$";
 
-        if (!StringUtils.isEmpty(request.getPwd())){
+        if (!StringUtils.isEmpty(request.getPwd())) {
             if (request.getPwd().matches(regex1)) {
                 throw new RuntimeException("登录密码过于简单,请重新设置");
             }
@@ -684,6 +681,16 @@ public class UserController {
             user.setPayPwd(CrmebUtil.encryptPassword(request.getPayPwd()));
         }
         return CommonResult.success(userService.updateById(user));
+    }
+
+    @GetMapping("/phone")
+    @ApiOperation(value = "获取当前用户手机号")
+    public CommonResult<String> getPhone() {
+        User user = userService.getInfo();
+        if (user == null) {
+            throw new CrmebException("未登录！");
+        }
+        return CommonResult.success(userService.getPhone(user.getAccount()));
     }
 
 }
