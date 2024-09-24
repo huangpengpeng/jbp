@@ -32,6 +32,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -637,6 +638,15 @@ public class UserController {
         return CommonResult.success(userRiseIndexResponse);
     }
 
+    @GetMapping("/phone")
+    @ApiOperation(value = "获取当前用户手机号")
+    public CommonResult<String> getPhone() {
+        User user = userService.getInfo();
+        if (user == null) {
+            throw new CrmebException("未登录！");
+        }
+        return CommonResult.success(userService.getPhone(user.getAccount()));
+    }
 
 }
 
