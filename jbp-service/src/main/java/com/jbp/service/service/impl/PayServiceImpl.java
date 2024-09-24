@@ -1970,7 +1970,7 @@ public class PayServiceImpl implements PayService {
                         user.getAccount(), Double.valueOf(result.getMoney_order()),
                         result.getNo_order(), result.getOid_paybill(), result.getGateway_url(), result.getPayload());
             }
-            if (StringUtils.equals("lianlianquickPay", order.getPayType())) {
+            if (StringUtils.equals("lianlianQuickPay", order.getPayType())) {
                 PayCreateBillResult result = lianLianPayService.payCreateBill(user.getAccount(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice().toString(),
                         order.getIp());
                 cashier = new CashierPayCreateResult(result.getRet_code(), result.getRet_msg(), payInfoResult.getOid_partner(),
