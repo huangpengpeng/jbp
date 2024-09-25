@@ -32,9 +32,9 @@ public class OrderPayRequest {
     @NotBlank(message = "订单编号不能为空")
     private String orderNo;
 
-    @ApiModelProperty(value = "支付方式: weixin, alipay,yue, wallet, lianlian, kq ,quickPay,ybalipay,ybweixin,lianlianQuickPay", required = true)
+    @ApiModelProperty(value = "支付方式: weixin, alipay,yue, wallet, lianlian, kq ,quickPay,ybalipay,ybweixin,lianlianQuickPay,lianlianWeixin,lianlianAlipay", required = true)
     @NotBlank(message = "支付方式不能为空")
-    @StringContains(limitValues = {"weixin","alipay","yue", "wallet", "lianlian","kq","quickPay","ybalipay","ybweixin","lianlianQuickPay"}, message = "未知的支付方式")
+    @StringContains(limitValues = {"weixin","alipay","yue", "wallet", "lianlian","kq","quickPay","ybalipay","ybweixin","lianlianQuickPay","lianlianWeixin","lianlianAlipay"}, message = "未知的支付方式")
     private String payType;
 
     @ApiModelProperty(value = "支付渠道：public-公众号,mini-小程序，h5-网页支付,yue-余额，wechatIos-微信Ios，wechatAndroid-微信Android,alipay-支付包，alipayApp-支付宝App, video=视频号, native=微信native支付， alipayPc=支付宝PC支付, confirmPay-人工 ,kq-快钱 ,yop-易宝", required = true)

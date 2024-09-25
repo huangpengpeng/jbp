@@ -1955,14 +1955,14 @@ public class PayServiceImpl implements PayService {
         LianLianPayInfoResult payInfoResult = lianLianPayService.get();
         CashierPayCreateResult cashier = new CashierPayCreateResult();
         if (StringUtils.equals("惠支付", payInfoResult.getProductName())) {
-            if (StringUtils.equals("weixin", order.getPayType())) {
+            if (StringUtils.equals("lianlianWeixin", order.getPayType())) {
                 WechatPayCreateBillResult result = lianLianPayService.wechatPayCreateBill(user.getAccount(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice().toString(),
                         order.getIp(), "Y");
                 cashier = new CashierPayCreateResult(result.getRet_code(), result.getRet_msg(), payInfoResult.getOid_partner(),
                         user.getAccount(), Double.valueOf(result.getMoney_order()),
                         result.getNo_order(), result.getOid_paybill(), result.getGateway_url(), result.getPayload());
             }
-            if (StringUtils.equals("alipay", order.getPayType())) {
+            if (StringUtils.equals("lianlianAlipay", order.getPayType())) {
 
                 AlipayPayCreateBillResult result = lianLianPayService.alipayCreateBill(user.getAccount(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice().toString(),
                         order.getIp());
