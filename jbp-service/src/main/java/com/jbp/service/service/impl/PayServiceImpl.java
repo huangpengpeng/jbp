@@ -200,6 +200,9 @@ public class PayServiceImpl implements PayService {
         String yopQuickPay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YOP_QUICK_PAY_STATUS);
         String lianlianQuickPa = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIANQUICK_PAY_STATUS);
 
+        String lianlianWeixin = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIANWEIXIN_PAY_STATUS);
+        String lianlianAlipay = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_LIANLIANALIPAY_PAY_STATUS);
+
         PayConfigResponse response = new PayConfigResponse();
         response.setYuePayStatus(Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus));
         response.setPayWechatOpen(Constants.CONFIG_FORM_SWITCH_OPEN.equals(payWxOpen));
@@ -213,6 +216,9 @@ public class PayServiceImpl implements PayService {
         response.setYopAliPayStatus(StringUtils.isNotEmpty(yopAliPay) && StringUtils.equals("1", yopAliPay));
 
         response.setLianlianQuickPay(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianQuickPa));
+
+        response.setLianlianWeixin(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianWeixin));
+        response.setLianlianAlipay(Constants.CONFIG_FORM_SWITCH_OPEN.equals(lianlianAlipay));
 
         response.setWalletPayOpenPassword(Constants.CONFIG_FORM_SWITCH_OPEN.equals(walletPayOpenPassword));
         if (Constants.CONFIG_FORM_SWITCH_OPEN.equals(yuePayStatus)) {
@@ -239,6 +245,8 @@ public class PayServiceImpl implements PayService {
             response.setYopQuickPay(false);
             response.setYopAliPayStatus(false);
             response.setLianlianQuickPay(false);
+            response.setLianlianWeixin(false);
+            response.setLianlianWeixin(false);
         }
         return response;
     }
@@ -266,7 +274,7 @@ public class PayServiceImpl implements PayService {
         }
         if (order.getStatus() > OrderConstants.ORDER_STATUS_WAIT_PAY) {
             throw new CrmebException("订单状态异常");
-    }
+        }
         User user = userService.getInfo();
 
         if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WALLET) || orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
@@ -333,7 +341,7 @@ public class PayServiceImpl implements PayService {
         // 快钱支付
         if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_KQ)) {
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             String result = kqCashierPay(order);
@@ -446,7 +454,7 @@ public class PayServiceImpl implements PayService {
             logger.info("订单支付 微信下单");
             WxPayJsResultVo vo = wechatPayment(order);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             response.setStatus(true);
@@ -459,7 +467,7 @@ public class PayServiceImpl implements PayService {
             String result = aliPayment(order);
             order.setOutTradeNo(order.getOrderNo());
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             response.setStatus(true);
@@ -473,7 +481,6 @@ public class PayServiceImpl implements PayService {
         logger.info("订单支付 END response:{}", JSON.toJSONString(response));
         return response;
     }
-
 
 
     /**
@@ -523,7 +530,7 @@ public class PayServiceImpl implements PayService {
             Boolean walletPay = gxcWalletPay(order);
             response.setStatus(walletPay);
 
-            if(walletPay){
+            if (walletPay) {
 
                 order.setStatus("已支付");
                 order.setPayTime(new Date());
@@ -542,7 +549,6 @@ public class PayServiceImpl implements PayService {
         logger.info("订单支付 END response:{}", JSON.toJSONString(response));
         return response;
     }
-
 
 
     /**
@@ -581,7 +587,7 @@ public class PayServiceImpl implements PayService {
         wechatPayInfo.setTradeStateDesc(myRecord.getStr("trade_state_desc"));
         Boolean updatePaid = transactionTemplate.execute(e -> {
             Boolean b = orderService.updatePaid(orderNo);
-            if(!b){
+            if (!b) {
                 e.setRollbackOnly();
             }
             wechatPayInfoService.updateById(wechatPayInfo);
@@ -808,7 +814,7 @@ public class PayServiceImpl implements PayService {
             // 拆单后，一个主订单只会对应一个商户订单
             MerchantOrder merchantOrder = merchantOrderService.getOneByOrderNo(order.getOrderNo());
             // 排除核销订单，核销订单在具体核销步骤再打印小票
-            if(merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS)){
+            if (merchantOrder.getShippingType().equals(OrderConstants.ORDER_SHIPPING_TYPE_EXPRESS)) {
                 merchantOrderListForPrint.add(merchantOrder);
             }
             if (order.getGainIntegral() > 0) {
@@ -991,7 +997,7 @@ public class PayServiceImpl implements PayService {
             order.setPayTime(DateUtil.date());
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             return true;
@@ -1003,7 +1009,7 @@ public class PayServiceImpl implements PayService {
         return true;
     }
 
-     @Override
+    @Override
     public Boolean walletPay(Order order) {
         // 用户余额扣除
         Boolean execute = transactionTemplate.execute(e -> {
@@ -1014,16 +1020,16 @@ public class PayServiceImpl implements PayService {
             order.setPayMethod("积分支付");
             order.setPayType("wallet");
 
-            if(order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)){
+            if (order.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
                 order.setStatus(OrderConstants.ORDER_STATUS_COMPLETE);
-            }else{
+            } else {
                 order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             }
 
 
             order.setOutTradeNo(order.getOrderNo());
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             Wallet wallet = walletService.getCanPayByUser(order.getPayUid());
@@ -1056,7 +1062,7 @@ public class PayServiceImpl implements PayService {
             order.setStatus("已支付");
             order.setPayTime(DateUtil.date());
             boolean b = tankOrdersService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             Wallet wallet = walletService.getCanPayByUser(order.getUserId().intValue());
@@ -1096,7 +1102,7 @@ public class PayServiceImpl implements PayService {
             order.setPayType("confirmPay");
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             return update;
@@ -1169,7 +1175,7 @@ public class PayServiceImpl implements PayService {
         return transactionTemplate.execute(e -> {
             // 订单
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             merchantOrderService.updateById(merchantOrder);
@@ -1295,7 +1301,7 @@ public class PayServiceImpl implements PayService {
         return transactionTemplate.execute(e -> {
             // 订单
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             merchantOrderService.updateBatchById(merchantOrderList);
@@ -1405,7 +1411,7 @@ public class PayServiceImpl implements PayService {
         if (count == 0L) {
             return CollUtil.newArrayList();
         }
-        if(merchantOrder.getUid() == null){
+        if (merchantOrder.getUid() == null) {
             return CollUtil.newArrayList();
         }
         // 查找订单所属人信息
@@ -1946,6 +1952,7 @@ public class PayServiceImpl implements PayService {
 
     /**
      * 连连支付
+     *
      * @param order
      * @return
      */
@@ -2000,7 +2007,7 @@ public class PayServiceImpl implements PayService {
         String productName = details.get(0).getProductName();
         if ("quickPay".equals(order.getPayType())) {
             String gateWay = yopPayService.quickPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName, yopNotifyUrl, "", yopReturnUrl);
-            result.setGateway_url(gateWay.replace("cash.yeepay.com","cashsec.yeepay.com"));
+            result.setGateway_url(gateWay.replace("cash.yeepay.com", "cashsec.yeepay.com"));
         }
         if ("ybalipay".equals(order.getPayType())) {
             WechatAliPayPayResult wechatAlipayPay = yopPayService.wechatAlipayPay(yopMerchantNo, order.getPayUid().toString(), order.getOrderNo(), order.getPayPrice().toString(), productName,
@@ -2010,7 +2017,7 @@ public class PayServiceImpl implements PayService {
         }
         if ("ybweixin".equals(order.getPayType())) {
             WechatAlipayTutelagePayResult wechatAlipayPay = yopPayService.wechatAlipayTutelagePay(yopMerchantNo, order.getOrderNo(), order.getPayPrice().toString(), productName,
-                    yopNotifyUrl, "",  WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(), WechatAlipayPayParams.CHANNEL.WECHAT.name(),
+                    yopNotifyUrl, "", WechatAlipayPayParams.PAYWAY.MINI_PROGRAM.name(), WechatAlipayPayParams.CHANNEL.WECHAT.name(),
                     order.getIp(), "");
             result.setGateway_url(wechatAlipayPay.getPrePayTn());
         }
@@ -2049,7 +2056,7 @@ public class PayServiceImpl implements PayService {
             order.setPayTime(DateUtil.date());
             order.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
             boolean b = orderService.updateById(order);
-            if(!b){
+            if (!b) {
                 throw new RuntimeException("当前操作人数过多");
             }
             // 这里只扣除金额，账单记录在task中处理

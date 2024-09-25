@@ -69,4 +69,8 @@ public class PayConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "连连快捷")
     private Boolean lianlianQuickPay;
+    @ApiModelProperty(value = "连连微信")
+    private Boolean lianlianWeixin;
+    @ApiModelProperty(value = "连连支付宝")
+    private Boolean lianlianAlipay;
 }
