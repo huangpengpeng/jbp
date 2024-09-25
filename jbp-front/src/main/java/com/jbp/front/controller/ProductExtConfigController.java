@@ -42,7 +42,7 @@ public class ProductExtConfigController {
 
 
     @ApiOperation(value = "商品分页列表前置信息")
-    @RequestMapping(value = "/list/before", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<List<ProductExtConfig>> getListBefore(Integer productId) {
         List<ProductExtConfig> list = productExtConfigService.list(new QueryWrapper<ProductExtConfig>().lambda().eq(ProductExtConfig::getProductId, productId));
         return CommonResult.success(list);
