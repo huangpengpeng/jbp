@@ -30,6 +30,7 @@ import com.jbp.service.service.agent.OrderSuccessMsgService;
 import com.jbp.service.service.agent.ProductRefService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
@@ -315,7 +316,7 @@ public class AsyncServiceImpl implements AsyncService {
         //增加补单订单
         orderFillService.saveOrder(order.getOrderNo());
 
-        if(!order.getPlatform().equals("订货")){
+        if(!StringUtils.isEmpty(order.getPlatform()) && !order.getPlatform().equals("订货")){
             // 发送用户升级
             redisUtil.lPush(TaskConstants.TASK_ORDER_SUCCESS_USER_RISE_KEY, order.getUid());
         }
