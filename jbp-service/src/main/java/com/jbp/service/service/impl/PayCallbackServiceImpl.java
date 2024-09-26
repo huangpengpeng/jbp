@@ -493,7 +493,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                             return Boolean.FALSE;
                         }
                         Order update = orderService.getByOrderNo(orderNo);
-                        update.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
+                       // update.setPayMethod(LianLianPayConfig.PayMethod.getName(queryPaymentResult.getPayerInfo().get(0).getMethod()).getName());
                         update.setPayType("lianlian");
                         update.setPayTime(CrmebDateUtil.nowDateTime());
                         if (update.getType().equals(OrderConstants.ORDER_TYPE_DORDER)) {
