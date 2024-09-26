@@ -172,14 +172,18 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product>
         SystemAdmin admin = SecurityUtil.getLoginUserVo().getUser();
         //带 Product 类的多条件查询
         LambdaQueryWrapper<Product> lqw = new LambdaQueryWrapper<>();
+        //查出礼包的商品
+        List<ProductRef> list = productRefService.list();
+        if (CollectionUtils.isEmpty(list)){
+            list = Lists.newArrayList();
+        }
+        List<Integer> refProductIdList = list.stream().map(ProductRef::getRefProductId).collect(Collectors.toList());
         //判断是否是礼包列表
         if (ObjectUtil.isNotNull(request.getIfRef())) {
-            List<ProductRef> list = productRefService.list();
-            if (CollectionUtils.isEmpty(list)){
-                list = Lists.newArrayList();
-            }
-            List<Integer> refProductIdList = list.stream().map(ProductRef::getRefProductId).collect(Collectors.toList());
             lqw.in(Product::getId, refProductIdList);
+        }else{
+            //商品列表过滤掉礼包
+            lqw.notIn(Product::getId, refProductIdList);
         }
         //商品id搜索
         if (request.getId() != null){
