@@ -35,4 +35,5 @@ public class CashierPayCreateResult {
     private String accp_txno;
     private String gateway_url;
     private String payload;
+    private String token;
 }

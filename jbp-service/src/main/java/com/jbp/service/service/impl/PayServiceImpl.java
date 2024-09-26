@@ -1968,6 +1968,7 @@ public class PayServiceImpl implements PayService {
                 cashier = new CashierPayCreateResult(result.getRet_code(), result.getRet_msg(), payInfoResult.getOid_partner(),
                         user.getAccount(), Double.valueOf(result.getMoney_order()),
                         result.getNo_order(), result.getOid_paybill(), result.getGateway_url(), result.getPayload());
+                cashier.setToken(result.getToken());
             }
             if (StringUtils.equals("lianlianAlipay", order.getPayType())) {
 
