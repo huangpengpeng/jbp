@@ -1989,12 +1989,12 @@ public class PayServiceImpl implements PayService {
             cashier = lianLianPayService.cashier(user.getAccount(), user.getPhone(), order.getOrderNo(), order.getPayPrice(), details.get(0).getProductName(), order.getIp());
             // 更新商户订单号
             order.setOutTradeNo(cashier.getAccp_txno());
-            boolean b = orderService.updateById(order);
-            if (!b) {
-                throw new RuntimeException("当前操作人数过多");
-            }
-        }
 
+        }
+        boolean b = orderService.updateById(order);
+        if (!b) {
+            throw new RuntimeException("当前操作人数过多");
+        }
         order = orderService.getById(order.getId());
         return cashier;
     }

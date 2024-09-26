@@ -21,6 +21,7 @@ import com.jbp.service.service.agent.OrdersRefundMsgService;
 import com.jbp.service.service.agent.ProductProfitConfigService;
 import com.jbp.service.service.agent.ProductProfitService;
 import com.jbp.service.service.agent.UserCapaXsService;
+import com.jbp.service.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -92,7 +93,7 @@ public class UserCapaXsHandler implements ProductProfitHandler {
             return;
         }
 
-        if(order.getPlatform().equals("订货")){
+        if(!StringUtils.isEmpty(order.getPlatform()) && order.getPlatform().equals("订货")){
             return;
         }
 
