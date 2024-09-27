@@ -61,4 +61,8 @@ public class ActivityScoreClearing extends BaseModel {
     @TableField(exist = false)
     private String activityName;
 
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
 }
