@@ -1966,9 +1966,9 @@ public class FrontOrderServiceImpl implements FrontOrderService {
 
         OrderInvoice orderInvoice = orderInvoiceService.getById(invoiceId);
         Order order = orderService.getByOrderNo(orderInvoice.getOrderNo());
-        if(orderInvoice.getUid() != userService.getUserId() && order.getPayUid() !=  userService.getUserId()){
-            throw new CrmebException("无权限查看");
-        }
+//        if(!Objects.equals(orderInvoice.getUid(), userService.getUserId()) && !Objects.equals(order.getPayUid(), userService.getUserId())){
+//            throw new CrmebException("无权限查看");
+//        }
         return orderService.getLogisticsInfo(invoiceId);
     }
 
@@ -1993,7 +1993,7 @@ public class FrontOrderServiceImpl implements FrontOrderService {
     public OrderInvoiceFrontResponse getInvoiceList(String orderNo) {
         Order order = orderService.getByOrderNo(orderNo);
         OrderInvoiceFrontResponse response = new OrderInvoiceFrontResponse();
-        if(order.getUid() != userService.getUserId() && order.getPayUid() != userService.getUserId()){
+        if(!Objects.equals(order.getUid(), userService.getUserId()) && !Objects.equals(order.getPayUid(), userService.getUserId())){
             return response;
         }
         List<OrderInvoiceResponse> invoiceList = orderService.getInvoiceList(orderNo);
