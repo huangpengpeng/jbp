@@ -9,6 +9,7 @@ import com.jbp.common.jdpay.util.JdPayApiUtil;
 import com.jbp.common.jdpay.util.SignUtil;
 import com.jbp.common.jdpay.vo.*;
 import com.jbp.common.kqbill.utils.PropertiesLoader;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /*************************************************
@@ -40,7 +44,6 @@ public class JdPay {
     private String respJson;
 
 
-
     @PostConstruct
     public void init() {
         logger.info("正在初始化京东支付核心类.......");
@@ -51,11 +54,15 @@ public class JdPay {
         }
         propertiesLoader = new PropertiesLoader("classpath:" + property);
         String merchantNo = propertiesLoader.getProperty("jd.pay.merchantNo");
+        String merchantNo2 = propertiesLoader.getProperty("jd.pay.divisionSub.merchantNo1");
+        String merchantNo3 = propertiesLoader.getProperty("jd.pay.divisionSub.merchantNo2");
         String signKey = propertiesLoader.getProperty("jd.pay.signKey");
         String priCertPwd = propertiesLoader.getProperty("jd.pay.priCertPwd");
         String priCert = propertiesLoader.getProperty("jd.pay.priCert");
         String pubCert = propertiesLoader.getProperty("jd.pay.pubCert");
         String apiDomain = propertiesLoader.getProperty("jd.pay.apiDomain");
+        String notifyUrl = propertiesLoader.getProperty("jd.pay.notifyUrl");
+        String returnUrl = propertiesLoader.getProperty("jd.pay.returnUrl");
         // 加载商户私钥证书
         byte[] privateCert = FileUtil.readFile(priCert);
         // 加载商户公钥证书
@@ -68,7 +75,7 @@ public class JdPay {
             throw new RuntimeException("读取京东支付商户公钥证书为空");
         }
         // 初始化京东支付配置对象
-        JdPayConfig myConfig = new JdPayDefaultConfig(merchantNo, signKey, privateCert, priCertPwd, publicCert, apiDomain);
+        JdPayConfig myConfig = new JdPayDefaultConfig(merchantNo, merchantNo2, merchantNo3, signKey, privateCert, priCertPwd, publicCert, apiDomain, notifyUrl, returnUrl);
         this.jdPayConfig = myConfig;
         this.jdPayHttpClientProxy = new JdPayHttpClientProxy(jdPayConfig, new JdPayHttpClient());
     }
@@ -93,6 +100,9 @@ public class JdPay {
      * @throws Exception
      */
     public JdPayAggregateCreateOrderResponse aggregateCreateOrder(JdPayAggregateCreateOrderRequest request) throws Exception {
+        request.setNotifyUrl(jdPayConfig.getNotifyUrl() + "/" + request.getOutTradeNo());
+        request.setPageBackUrl(jdPayConfig.getReturnUrl() + "/" + request.getOutTradeNo());
+        request.setDivisionAccount(GsonUtil.toJson(getJdPayDivisionAccount(request.getOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
         return this.baseExecute(JdPayConstant.AGGREGATE_CREATE_ORDER_URL, request, JdPayAggregateCreateOrderResponse.class);
     }
     /**
@@ -128,6 +138,7 @@ public class JdPay {
      * @throws Exception
      */
     public JdPayRefundResponse refund(JdPayRefundRequest request) throws Exception {
+        request.setDivisionAccountRefund(GsonUtil.toJson(getJdPayDivisionAccountRefund(request.getOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
         return this.baseExecute(JdPayConstant.REFUND_URL, request, JdPayRefundResponse.class);
     }
 
@@ -216,5 +227,49 @@ public class JdPay {
      */
     public JdPayAgreementSignApplyResponse agreementSignApply(JdPayAgreementSignApplyRequest request) throws Exception{
         return this.baseExecute(JdPayConstant.AGREEMENT_SIGN_APPLY_URL, request, JdPayAgreementSignApplyResponse.class);
+    }
+
+    public  JdPayDivisionAccount getJdPayDivisionAccount(String payCode, BigDecimal amt) {
+        BigDecimal oneAmt = amt.multiply(BigDecimal.valueOf(0.2));
+        JdPayDivisionAccount divisionAccount = new JdPayDivisionAccount();
+        List<JdPayDivisionAccountTradeInfo> divisionAccountTradeInfoList = new ArrayList<JdPayDivisionAccountTradeInfo>();
+        JdPayDivisionAccountTradeInfo divisionAccountTradeInfoOne = new JdPayDivisionAccountTradeInfo();
+        divisionAccountTradeInfoOne.setMerchantNo(jdPayConfig.getMerchantNo());
+        divisionAccountTradeInfoOne.setOutTradeNo(payCode + "_1");
+        divisionAccountTradeInfoOne.setTradeAmount(oneAmt.stripTrailingZeros().toPlainString());
+        divisionAccountTradeInfoList.add(divisionAccountTradeInfoOne);
+
+        JdPayDivisionAccountTradeInfo divisionAccountTradeInfoTwo = new JdPayDivisionAccountTradeInfo();
+        divisionAccountTradeInfoTwo.setMerchantNo(jdPayConfig.getMerchantNo2());
+        divisionAccountTradeInfoTwo.setOutTradeNo(payCode + "_2");
+        BigDecimal twoAmt = amt.subtract(oneAmt);
+        divisionAccountTradeInfoTwo.setTradeAmount(twoAmt.stripTrailingZeros().toPlainString());
+        divisionAccountTradeInfoList.add(divisionAccountTradeInfoTwo);
+        divisionAccount.setDivisionAccountTradeInfoList(divisionAccountTradeInfoList);
+        divisionAccount.setVersion( "V2" );
+        return divisionAccount;
+    }
+
+    public  JdPayDivisionAccountRefund getJdPayDivisionAccountRefund(String payCode, BigDecimal refundAmt) {
+        JdPayDivisionAccountRefund divisionAccountRefund = new JdPayDivisionAccountRefund();
+        String now = DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        BigDecimal oneAmt = refundAmt.multiply(BigDecimal.valueOf(0.2));
+        List<JdPayDivisionAccountRefundInfo> divisionAccountRefundInfoList = new ArrayList<JdPayDivisionAccountRefundInfo>();
+        JdPayDivisionAccountRefundInfo divisionAccountRefundInfoOne = new JdPayDivisionAccountRefundInfo();
+        divisionAccountRefundInfoOne.setMerchantNo("134592065004");
+        divisionAccountRefundInfoOne.setOutTradeNo("R_" + payCode + "_" + now + "_1");
+        divisionAccountRefundInfoOne.setTradeAmount(oneAmt.stripTrailingZeros().toPlainString());
+        divisionAccountRefundInfoOne.setOriginalOutTradeNo(payCode + "_1");
+        divisionAccountRefundInfoList.add(divisionAccountRefundInfoOne);
+
+        JdPayDivisionAccountRefundInfo divisionAccountRefundInfoTwo = new JdPayDivisionAccountRefundInfo();
+        BigDecimal twoAmt = refundAmt.subtract(oneAmt);
+        divisionAccountRefundInfoTwo.setMerchantNo("134592065006");
+        divisionAccountRefundInfoTwo.setOutTradeNo("R_" + payCode + "_" + now + "_2");
+        divisionAccountRefundInfoTwo.setTradeAmount(twoAmt.stripTrailingZeros().toPlainString());
+        divisionAccountRefundInfoTwo.setOriginalOutTradeNo(payCode + "_2");
+        divisionAccountRefundInfoList.add(divisionAccountRefundInfoTwo);
+        divisionAccountRefund.setDivisionAccountRefundInfoList(divisionAccountRefundInfoList);
+        return divisionAccountRefund;
     }
 }

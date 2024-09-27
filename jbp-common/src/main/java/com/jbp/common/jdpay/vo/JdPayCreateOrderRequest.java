@@ -29,6 +29,11 @@ public class JdPayCreateOrderRequest implements Serializable {
      * 交易类型
      */
     private String tradeType;
+
+    /**
+     * 交易场景
+     */
+    private String sceneType;
     /**
      * 交易描述
      */
@@ -106,6 +111,7 @@ public class JdPayCreateOrderRequest implements Serializable {
                 + ", \"tradeExpiryTime\":\"" + tradeExpiryTime + "\""
                 + ", \"tradeSubject\":\"" + tradeSubject + "\""
                 + ", \"tradeType\":\"" + tradeType + "\""
+                + ", \"sceneType\":\"" + sceneType + "\""
                 + ", \"tradeRemark\":\"" + tradeRemark + "\""
                 + ", \"clientType\":\"" + clientType + "\""
                 + ", \"currency\":\"" + currency + "\""
@@ -285,4 +291,11 @@ public class JdPayCreateOrderRequest implements Serializable {
         this.templateNo = templateNo;
     }
 
+    public String getSceneType() {
+        return sceneType;
+    }
+
+    public void setSceneType(String sceneType) {
+        this.sceneType = sceneType;
+    }
 }

@@ -60,5 +60,8 @@ public class OrderPayResultResponse {
     @ApiModelProperty(value = "易宝返回")
     private CashierPayCreateResult yopConfig;
 
+    @ApiModelProperty(value = "京东返回")
+    private CashierPayCreateResult jdConfig;
+
 
 }
