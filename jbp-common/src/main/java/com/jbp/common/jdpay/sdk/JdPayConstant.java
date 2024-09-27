@@ -7,8 +7,8 @@ public class JdPayConstant {
     /**
      * 京东支付统一收单 url
      **/
-//    public static final String CREATE_ORDER_URL = "/api/createOrder"; // 生产
-    public static final String CREATE_ORDER_URL = "/api/createOrderYf"; // 预发
+    public static final String CREATE_ORDER_URL = "/api/createOrder"; // 生产
+//    public static final String CREATE_ORDER_URL = "/api/createOrderYf"; // 预发
 
     /**
      * 三方聚合统一收单 url

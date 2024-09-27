@@ -29,6 +29,14 @@ public abstract class JdPayConfig {
      */
     public abstract String getMerchantNo();
 
+    public abstract String getMerchantNo2();
+
+    public abstract String getMerchantNo3();
+
+    public abstract String getNotifyUrl();
+
+    public abstract String getReturnUrl();
+
     /**
      * 获取signKey
      *

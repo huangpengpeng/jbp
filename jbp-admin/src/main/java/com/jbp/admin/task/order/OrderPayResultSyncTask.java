@@ -1,6 +1,7 @@
 package com.jbp.admin.task.order;
 
 import com.jbp.common.constants.PayConstants;
+import com.jbp.common.jdpay.vo.JdPayQueryOrderResponse;
 import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.order.Order;
@@ -35,6 +36,8 @@ public class OrderPayResultSyncTask {
     @Resource
     private YopService yopService;
     @Resource
+    private JdPayService jdPayService;
+    @Resource
     private SystemConfigService systemConfigService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrderPayResultSyncTask.class);
@@ -60,6 +63,11 @@ public class OrderPayResultSyncTask {
                     TradeOrderQueryResult tradeOrderQueryResult = yopService.queryPayResult(yopMerchantNo, order.getOrderNo());
                     if (tradeOrderQueryResult.ifSuccess()) {
                         payCallbackService.yopPayCallback(tradeOrderQueryResult);
+                    }
+                }else if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_JD)) {
+                    JdPayQueryOrderResponse jdPayQueryOrderResponse = jdPayService.queryOrder(order.getOrderNo());
+                    if (jdPayQueryOrderResponse.ifSuccess()) {
+                        payCallbackService.jdPayCallback(jdPayQueryOrderResponse);
                     }
                 }
             }

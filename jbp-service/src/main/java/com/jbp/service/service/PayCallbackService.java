@@ -1,5 +1,6 @@
 package com.jbp.service.service;
 
+import com.jbp.common.jdpay.vo.JdPayQueryOrderResponse;
 import com.jbp.common.kqbill.result.KqPayQueryResult;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.order.Order;
@@ -44,6 +45,8 @@ public interface PayCallbackService {
     String  kqPayCallback(KqPayQueryResult kqPayQueryResult);
 
     String  yopPayCallback(TradeOrderQueryResult tradeOrderQueryResult);
+
+    String jdPayCallback(JdPayQueryOrderResponse jdPayQueryOrderResponse);
 
     void payResultSync(String payChannel, String orderNo);
 

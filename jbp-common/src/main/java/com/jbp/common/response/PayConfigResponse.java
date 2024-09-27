@@ -66,4 +66,13 @@ public class PayConfigResponse implements Serializable {
 
     @ApiModelProperty(value = "易宝微信")
     private Boolean yopWechatPay;
+
+    @ApiModelProperty(value = "京东支付")
+    private Boolean jdStatus;
+
+    @ApiModelProperty(value = "京东支付宝")
+    private Boolean jdAliPayStatus;
+
+    @ApiModelProperty(value = "京东快捷")
+    private Boolean jdQuickPay;
 }

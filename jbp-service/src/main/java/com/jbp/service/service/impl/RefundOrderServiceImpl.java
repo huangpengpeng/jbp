@@ -15,6 +15,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.jdpay.vo.JdPayRefundResponse;
 import com.jbp.common.kqbill.result.KqRefundResult;
 import com.jbp.common.model.admin.SystemAdmin;
 import com.jbp.common.model.agent.*;
@@ -127,6 +128,8 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
     private RelationScoreService relationScoreService;
     @Autowired
     private FundClearingRecordService fundClearingRecordService;
+    @Autowired
+    private JdPayService jdPayService;
 
     /**
      * 商户端退款订单分页列表
@@ -1410,12 +1413,21 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 throw new CrmebException("易宝退款失败！" + e.getMessage());
             }
         }
-        if (order.getPayType().equals(PayConstants.PAY_TYPE_KQ) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+        if (order.getPayChannel().equals(PayConstants.PAY_TYPE_KQ) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
             try {
                 kqPayService.refund(order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice, new Date());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new CrmebException("快钱退款失败！" + e.getMessage());
+            }
+        }
+
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_JD) && refundPrice.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                jdPayService.refund(order.getPlatOrderNo(), refundOrder.getRefundOrderNo(), refundPrice, order.getCreateTime());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CrmebException("连连退款失败！" + e.getMessage());
             }
         }
 
@@ -1470,6 +1482,9 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
             if (order.getPayType().equals(PayConstants.PAY_CHANNEL_YOP_QUICK)) {
+                refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
+            }
+            if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_JD)) {
                 refundOrder.setRefundStatus(OrderConstants.MERCHANT_REFUND_ORDER_STATUS_REFUND);
             }
 

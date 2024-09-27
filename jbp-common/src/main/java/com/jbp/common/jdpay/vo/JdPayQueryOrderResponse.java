@@ -192,4 +192,14 @@ public class JdPayQueryOrderResponse extends BaseResponse {
                 + "}"
                 ;
     }
+
+    public boolean ifSuccess() {
+        if (this == null) {
+            return false;
+        }
+        if ("FINI".equals(this.tradeStatus)) {
+            return true;
+        }
+        return false;
+    }
 }

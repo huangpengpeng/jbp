@@ -101,4 +101,14 @@ public class JdPayRefundResponse extends BaseResponse {
                 + super.toString()
                 ;
     }
+
+    public boolean ifSuccess() {
+        if (this == null) {
+            return false;
+        }
+        if (!"CLOS".equals(this.tradeStatus)) {
+            return true;
+        }
+        return false;
+    }
 }

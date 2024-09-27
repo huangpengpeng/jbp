@@ -21,10 +21,20 @@ public class JdPayAggregateCreateOrderResponse extends BaseResponse {
      * 跳转收银台链接
      */
     private String webUrl;
+
+    private String qrCode;
     /**
      * 唤起通道参数
      */
     private String payInfo;
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
 
     public String getMerchantNo() {
         return merchantNo;

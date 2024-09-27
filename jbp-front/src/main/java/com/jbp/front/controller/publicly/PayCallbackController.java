@@ -5,14 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.annotation.CustomResponseAnnotation;
 import com.jbp.common.constants.LianLianPayConfig;
 import com.jbp.common.encryptapi.EncryptIgnore;
+import com.jbp.common.jdpay.sdk.JdPay;
+import com.jbp.common.jdpay.vo.JdPayQueryOrderResponse;
 import com.jbp.common.lianlian.result.QueryPaymentResult;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.common.yop.result.TradeOrderQueryResult;
-import com.jbp.service.service.LianLianPayService;
-import com.jbp.service.service.PayCallbackService;
-import com.jbp.service.service.SystemConfigService;
-import com.jbp.service.service.YopService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,6 +64,8 @@ public class PayCallbackController {
     private YopService yopService;
     @Resource
     private SystemConfigService systemConfigService;
+    @Resource
+    private JdPayService jdPayService;
 
     @ApiOperation(value = "微信支付回调")
     @RequestMapping(value = "/wechat", method = RequestMethod.POST)
@@ -140,7 +141,15 @@ public class PayCallbackController {
         return "error";
     }
 
-
+    @ApiOperation(value = "连连支付回调")
+    @RequestMapping(value = "/jd/{txnSeqno}")
+    public String jd(@PathVariable("txnSeqno") String txnSeqno, HttpServletRequest request) {
+        JdPayQueryOrderResponse jdPayQueryOrderResponse = jdPayService.queryOrder(txnSeqno);
+        if(jdPayQueryOrderResponse == null){
+            return "ERROR";
+        }
+        return callbackService.jdPayCallback(jdPayQueryOrderResponse);
+    }
 
     @ApiOperation(value = "来账通回调")
     @RequestMapping(value = "/lianlian/lzt/{txnSeqno}")

@@ -62,6 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -89,6 +90,8 @@ public class PayServiceImpl implements PayService {
 
     private static final Logger logger = LoggerFactory.getLogger(PayServiceImpl.class);
 
+    @Resource
+    private Environment environment;
     @Autowired
     private SystemConfigService systemConfigService;
     @Autowired
@@ -181,6 +184,8 @@ public class PayServiceImpl implements PayService {
     private FundClearingService fundClearingService;
     @Resource
     private TeamUserService teamUserService;
+    @Resource
+    private JdPayService jdPayService;
 
 
     /**
@@ -222,6 +227,22 @@ public class PayServiceImpl implements PayService {
             Wallet wallet = walletService.getCanPayByUser(user.getId());
             response.setWalletBalance(wallet == null ? BigDecimal.ZERO : wallet.getBalance());
         }
+        String jdStatus = environment.getProperty("jdpay.status");
+        if(StringUtils.isNotEmpty(jdStatus) && StringUtils.equals("1", jdStatus )){
+            response.setJdStatus(true);
+            response.setYopWechatPay(false);
+            response.setYopQuickPay(false);
+            response.setYopAliPayStatus(false);
+        }
+        String jdAliPay = environment.getProperty("jdpay.alipay");
+        if(StringUtils.isNotEmpty(jdAliPay) && StringUtils.equals("1", jdAliPay )){
+            response.setJdAliPayStatus(true);
+        }
+        String quickPay = environment.getProperty("jdpay.quickPay");
+        if(StringUtils.isNotEmpty(quickPay) && StringUtils.equals("1", quickPay )){
+            response.setJdQuickPay(true);
+        }
+
         // 在线支付 ,充值支付
         if (payGateway != null && 0 == payGateway) {
             response.setWalletStatus(false);
@@ -236,6 +257,9 @@ public class PayServiceImpl implements PayService {
             response.setYopWechatPay(false);
             response.setYopQuickPay(false);
             response.setYopAliPayStatus(false);
+            response.setJdAliPayStatus(false);
+            response.setJdQuickPay(false);
+            response.setJdStatus(false);
         }
         return response;
     }
@@ -345,6 +369,14 @@ public class PayServiceImpl implements PayService {
             response.setStatus("0000".equals(result.getRet_code()));
             response.setYopConfig(result);
             logger.info("易宝支付 response : {}", JSON.toJSONString(response));
+            return response;
+        }
+        // 京东支付
+        if (order.getPayChannel().equals(PayConstants.PAY_CHANNEL_JD)) {
+            CashierPayCreateResult result = jdPay(order);
+            response.setStatus("0000".equals(result.getRet_code()));
+            response.setJdConfig(result);
+            logger.info("京东支付 response : {}", JSON.toJSONString(response));
             return response;
         }
         // 微信视频号下单 需要额外调用支付参数
@@ -2038,6 +2070,29 @@ public class PayServiceImpl implements PayService {
         if (!execute) throw new CrmebException("余额支付订单失败");
         asyncService.orderPaySuccessSplit(order.getOrderNo());
         return true;
+    }
+
+    private CashierPayCreateResult jdPay(Order order) {
+        CashierPayCreateResult result = new CashierPayCreateResult();
+        List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
+
+        if ("jdQuickPay".equals(order.getPayType())) {
+            String gateway_url= jdPayService.jdPay(order.getUid().toString(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice(),
+                    order.getIp(), order.getCreateTime()).getWebUrl();
+            result.setGateway_url(gateway_url);
+        }
+        if ("jdAlipay".equals(order.getPayType())) {
+            String gateway_url= jdPayService.aliPay(order.getUid().toString(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice(),
+                    order.getIp(), order.getCreateTime()).getQrCode();
+            result.setGateway_url(gateway_url);
+        }
+
+        boolean b = orderService.updateById(order);
+        if (!b) {
+            throw new RuntimeException("当前操作人数过多");
+        }
+        order = orderService.getById(order.getId());
+        return result;
     }
 
     /**
