@@ -187,7 +187,6 @@ public class CrmebUtil {
 
         System.out.println(decryptPassowrd("wpyZM4Otjm4=", "13823668660"));
 
-        System.out.println(decryptPassowrd("8FOo2uLVucE=", "19011203013"));
 
         System.out.println(decryptPassowrd("zaNERkBxHEHOV40CvMyWRQ==", "13159403413"));
         System.out.println(decryptPassowrd("JTbvuAGT/YQayWbmiAPK+A==", "18820412252"));

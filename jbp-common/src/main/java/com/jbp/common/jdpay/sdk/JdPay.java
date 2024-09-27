@@ -230,22 +230,14 @@ public class JdPay {
     }
 
     public  JdPayDivisionAccount getJdPayDivisionAccount(String payCode, BigDecimal amt) {
-        BigDecimal oneAmt = amt.multiply(BigDecimal.valueOf(0.2));
+        BigDecimal oneAmt = amt.multiply(BigDecimal.valueOf(1));
         JdPayDivisionAccount divisionAccount = new JdPayDivisionAccount();
         List<JdPayDivisionAccountTradeInfo> divisionAccountTradeInfoList = new ArrayList<JdPayDivisionAccountTradeInfo>();
         JdPayDivisionAccountTradeInfo divisionAccountTradeInfoOne = new JdPayDivisionAccountTradeInfo();
-        divisionAccountTradeInfoOne.setMerchantNo(jdPayConfig.getMerchantNo());
+        divisionAccountTradeInfoOne.setMerchantNo(jdPayConfig.getMerchantNo2());
         divisionAccountTradeInfoOne.setOutTradeNo(payCode + "_1");
         divisionAccountTradeInfoOne.setTradeAmount(oneAmt.stripTrailingZeros().toPlainString());
         divisionAccountTradeInfoList.add(divisionAccountTradeInfoOne);
-
-        JdPayDivisionAccountTradeInfo divisionAccountTradeInfoTwo = new JdPayDivisionAccountTradeInfo();
-        divisionAccountTradeInfoTwo.setMerchantNo(jdPayConfig.getMerchantNo2());
-        divisionAccountTradeInfoTwo.setOutTradeNo(payCode + "_2");
-        BigDecimal twoAmt = amt.subtract(oneAmt);
-        divisionAccountTradeInfoTwo.setTradeAmount(twoAmt.stripTrailingZeros().toPlainString());
-        divisionAccountTradeInfoList.add(divisionAccountTradeInfoTwo);
-        divisionAccount.setDivisionAccountTradeInfoList(divisionAccountTradeInfoList);
         divisionAccount.setVersion( "V2" );
         return divisionAccount;
     }
@@ -253,23 +245,14 @@ public class JdPay {
     public  JdPayDivisionAccountRefund getJdPayDivisionAccountRefund(String payCode, BigDecimal refundAmt) {
         JdPayDivisionAccountRefund divisionAccountRefund = new JdPayDivisionAccountRefund();
         String now = DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
-        BigDecimal oneAmt = refundAmt.multiply(BigDecimal.valueOf(0.2));
+        BigDecimal oneAmt = refundAmt.multiply(BigDecimal.valueOf(1));
         List<JdPayDivisionAccountRefundInfo> divisionAccountRefundInfoList = new ArrayList<JdPayDivisionAccountRefundInfo>();
         JdPayDivisionAccountRefundInfo divisionAccountRefundInfoOne = new JdPayDivisionAccountRefundInfo();
-        divisionAccountRefundInfoOne.setMerchantNo("134592065004");
+        divisionAccountRefundInfoOne.setMerchantNo(jdPayConfig.getMerchantNo2());
         divisionAccountRefundInfoOne.setOutTradeNo("R_" + payCode + "_" + now + "_1");
         divisionAccountRefundInfoOne.setTradeAmount(oneAmt.stripTrailingZeros().toPlainString());
         divisionAccountRefundInfoOne.setOriginalOutTradeNo(payCode + "_1");
         divisionAccountRefundInfoList.add(divisionAccountRefundInfoOne);
-
-        JdPayDivisionAccountRefundInfo divisionAccountRefundInfoTwo = new JdPayDivisionAccountRefundInfo();
-        BigDecimal twoAmt = refundAmt.subtract(oneAmt);
-        divisionAccountRefundInfoTwo.setMerchantNo("134592065006");
-        divisionAccountRefundInfoTwo.setOutTradeNo("R_" + payCode + "_" + now + "_2");
-        divisionAccountRefundInfoTwo.setTradeAmount(twoAmt.stripTrailingZeros().toPlainString());
-        divisionAccountRefundInfoTwo.setOriginalOutTradeNo(payCode + "_2");
-        divisionAccountRefundInfoList.add(divisionAccountRefundInfoTwo);
-        divisionAccountRefund.setDivisionAccountRefundInfoList(divisionAccountRefundInfoList);
         return divisionAccountRefund;
     }
 }
