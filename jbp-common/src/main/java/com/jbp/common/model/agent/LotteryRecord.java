@@ -94,5 +94,9 @@ public class LotteryRecord extends BaseModel {
     @TableField(exist = false)
     private String tips;
 
+    @ApiModelProperty("团队名称")
+    @TableField(exist = false)
+    private String teamName;
+
 
 }

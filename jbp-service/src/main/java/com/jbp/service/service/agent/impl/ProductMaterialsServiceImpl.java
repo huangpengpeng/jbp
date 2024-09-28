@@ -2,18 +2,23 @@ package com.jbp.service.service.agent.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.jbp.common.constants.ProductConstants;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.ProductMaterials;
 import com.jbp.common.model.merchant.Merchant;
+import com.jbp.common.model.product.Product;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.service.dao.agent.ProductMaterialsDao;
 import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.ProductAttrValueService;
+import com.jbp.service.service.ProductService;
 import com.jbp.service.service.agent.ProductMaterialsService;
 import com.jbp.service.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +33,8 @@ import java.util.stream.Collectors;
 public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao, ProductMaterials> implements ProductMaterialsService {
     @Resource
     private MerchantService merchantService;
+    @Resource
+    private ProductService productService;
 
     @Override
     public PageInfo<ProductMaterials> pageList(Integer merId, String materialsName, String barCode, String supplyName, PageParamRequest pageParamRequest) {
@@ -44,7 +51,12 @@ public class ProductMaterialsServiceImpl extends ServiceImpl<ProductMaterialsDao
         }
         list.forEach(e -> {
             Merchant merchant = merchantService.getById(e.getMerId());
+                    Product product = productService.getOne(new QueryWrapper<Product>().lambda().eq(Product::getIsShow, true)
+                            .eq(Product::getIsRecycle, false).eq(Product::getIsDel, false).in(Product::getAuditStatus, ProductConstants.AUDIT_STATUS_SUCCESS, ProductConstants.AUDIT_STATUS_EXEMPTION)
+                            .apply("id in (select product_id from eb_product_attr_value where bar_code = {0})", e.getBarCode()).last("limit 1"));
             e.setMerName(merchant != null ? merchant.getName() : "");
+            e.setProductName(product != null ? product.getName() : "");
+            e.setProductPrice(product != null ? product.getPrice() : new BigDecimal(0));
         });
         return CommonPage.copyPageInfo(page, list);
     }

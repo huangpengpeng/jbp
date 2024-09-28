@@ -2,10 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jbp.service.dao.agent.ActivityScoreClearingDao">
     <select id="getList" resultType="com.jbp.common.model.agent.ActivityScoreClearing">
-        select *,s.name as activity_name,u.account,u.nickname
+        select *,s.name as activity_name,u.account,u.nickname,t.name as team_name
         from eb_activity_score_clearing c
         left join eb_activity_score s on s.id=c.activity_score_id
         left join eb_user u on u.id=c.uid
+        left join eb_team_user tu on tu.uid=c.uid
+        left join eb_team t on t.id=tu.tid
         <where>
             <if test="activityScoreName!= null and activityScoreName !=''">
                 and s.name  like CONCAT('%',#{activityScoreName},'%')
