@@ -44,7 +44,7 @@ public class UserAddressRequest implements Serializable {
 
     @ApiModelProperty(value = "收货人电话")
     @NotBlank(message = "收货人电话不能为空")
-    @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
+  //  @Pattern(regexp = RegularConstants.PHONE_TWO, message = "请输入正确的手机号")
     private String phone;
 
     @ApiModelProperty(value = "收货人所在省")
