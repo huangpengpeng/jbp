@@ -116,7 +116,7 @@ public class JdPay {
      */
     public JdPayAggregateCreateOrderResponse aggregateCreateOrder(JdPayAggregateCreateOrderRequest request) throws Exception {
         request.setNotifyUrl(jdPayConfig.getNotifyUrl() + "/" + request.getOutTradeNo());
-        request.setPageBackUrl(jdPayConfig.getReturnUrl() + "=" + request.getOutTradeNo()+"&status=1");
+        request.setPageBackUrl(jdPayConfig.getReturnUrl());
         request.setDivisionAccount(GsonUtil.toJson(getJdPayDivisionAccount(request.getOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
         return this.baseExecute(JdPayConstant.AGGREGATE_CREATE_ORDER_URL, request, JdPayAggregateCreateOrderResponse.class);
     }
