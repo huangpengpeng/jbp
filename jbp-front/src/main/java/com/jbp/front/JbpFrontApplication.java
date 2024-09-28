@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
 import com.jbp.common.jdpay.sdk.JdPay;
 import com.jbp.common.jdpay.vo.JdPayAggregateCreateOrderResponse;
+import com.jbp.common.jdpay.vo.JdPayRefundResponse;
 import com.jbp.common.jdpay.vo.JdPaySendCommissionResponse;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
@@ -66,6 +67,10 @@ import java.util.Date;
 
         // T_24514749833186
 //        JdPaySendCommissionResponse response = jdPayService.sendCommission("T_24514749833186", BigDecimal.valueOf(0.2));
+//        System.out.println(JSONObject.toJSONString(response));
+
+
+//        JdPayRefundResponse response = jdPayService.refund("PT567172754186400293699", "RPT567172754186400293699", BigDecimal.valueOf(299), DateTimeUtils.parseDate("2024-09-29 00:44:07"));
 //        System.out.println(JSONObject.toJSONString(response));
     }
 }

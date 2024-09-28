@@ -734,7 +734,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     return "SUCCESS";
                 }
                 Boolean execute = transactionTemplate.execute(e -> {
-                    rechargeOrder.setPayTime(DateTimeUtils.parseDate(jdPayQueryOrderResponse.getFinishDate()));
+                    try {
+                        rechargeOrder.setPayTime(DateTimeUtils.parseDate(jdPayQueryOrderResponse.getFinishDate(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                    } catch (ParseException ex) {
+                        throw new RuntimeException(ex);
+                    };
                     rechargeOrderService.paySuccessAfter(rechargeOrder);
                     return true;
                 });

@@ -154,7 +154,7 @@ public class JdPay {
      * @throws Exception
      */
     public JdPayRefundResponse refund(JdPayRefundRequest request) throws Exception {
-        request.setDivisionAccountRefund(GsonUtil.toJson(getJdPayDivisionAccountRefund(request.getOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
+        request.setDivisionAccountRefund(GsonUtil.toJson(getJdPayDivisionAccountRefund(request.getOriginalOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
         return this.baseExecute(JdPayConstant.REFUND_URL, request, JdPayRefundResponse.class);
     }
 
