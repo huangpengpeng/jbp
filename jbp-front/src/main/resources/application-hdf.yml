@@ -145,6 +145,12 @@ rsa:
 kq:
   config: hdf.properties
 
+jdpay:
+  config: fny1.properties
+  status: 1
+  alipay: 1
+  quickPay: 1
+
 historyOrder:
   ifOpenOrder: true
   name: hdfmall
