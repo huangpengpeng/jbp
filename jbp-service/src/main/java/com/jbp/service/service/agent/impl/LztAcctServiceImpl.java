@@ -23,6 +23,7 @@ import com.jbp.service.dao.agent.LztAcctDao;
 import com.jbp.service.dao.agent.LztPermsFilterDao;
 import com.jbp.service.service.DegreePayService;
 import com.jbp.service.service.MerchantService;
+import com.jbp.service.service.SystemConfigService;
 import com.jbp.service.service.agent.LztAcctApplyService;
 import com.jbp.service.service.agent.LztAcctOpenService;
 import com.jbp.service.service.agent.LztAcctService;
@@ -56,6 +57,8 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
     private LztAcctOpenService lztAcctOpenService;
     @Resource
     private LztPermsFilterDao lztPermsFilterDao;
+    @Resource
+    private SystemConfigService systemConfigService;
 
 
     @Override
@@ -121,8 +124,14 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
 
     @Override
     public PageInfo<LztAcct> pageList(Integer merId, String userId, String username, String userType, PageParamRequest pageParamRequest) {
-
-         List<LztPermsFilter> lztPermsFilters = lztPermsFilterDao.selectList(new QueryWrapper<LztPermsFilter>());
+        BigDecimal xwAmt;
+         String wx = systemConfigService.getValueByKey("xw");
+         if(StringUtils.isNotEmpty(wx)){
+             xwAmt = new BigDecimal(wx);
+         } else {
+             xwAmt = BigDecimal.ZERO;
+         }
+        List<LztPermsFilter> lztPermsFilters = lztPermsFilterDao.selectList(new QueryWrapper<LztPermsFilter>());
          Map<String, List<LztPermsFilter>> lztPermsListMap = FunctionUtil.valueMap(lztPermsFilters, LztPermsFilter::getUserId);
 
 
@@ -184,6 +193,15 @@ public class LztAcctServiceImpl extends ServiceImpl<LztAcctDao, LztAcct> impleme
             s.setAmtUnClearing(amtUnClearing);
             s.setIfTransfer(true);
             s.setIfPayment(true);
+
+            if(s.getUserId().equals("xingwang15")){
+                 s.setAmtBalcur(amtBalcur.subtract(xwAmt));
+                s.setAmtBankBalaval(amtBankBalaval.subtract(xwAmt));
+            }
+            if(s.getUserId().equals("ruicirenli")){
+                s.setAmtBalcur(amtBalcur.add(xwAmt));
+                s.setAmtBalaval(amtBalaval.add(xwAmt));
+            }
             if(lztPermsListMap != null){
                 List<LztPermsFilter> lztPermsFiltersList = lztPermsListMap.get(s.getUserId());
                 if(CollectionUtils.isNotEmpty(lztPermsFiltersList)){

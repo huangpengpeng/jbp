@@ -19,10 +19,7 @@ import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.response.LztInfoResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.*;
-import com.jbp.service.service.DegreePayService;
-import com.jbp.service.service.LztService;
-import com.jbp.service.service.MerchantService;
-import com.jbp.service.service.SmsService;
+import com.jbp.service.service.*;
 import com.jbp.service.service.agent.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,6 +42,8 @@ import java.util.stream.Collectors;
 @Api(tags = "来账通-账户")
 public class LztAcctController {
 
+    @Resource
+    private SystemConfigService systemConfigService;
     @Resource
     private LztPayChannelService lztPayChannelService;
 
@@ -109,7 +108,32 @@ public class LztAcctController {
     @ApiOperation(value = "来账通账户详情[余额信息]")
     @GetMapping(value = "/details")
     public CommonResult<LztAcct> details(String userId) {
-        return CommonResult.success(lztAcctService.details(userId));
+        BigDecimal xwAmt;
+        String wx = systemConfigService.getValueByKey("xw");
+        if(com.jbp.service.util.StringUtils.isNotEmpty(wx)){
+            xwAmt = new BigDecimal(wx);
+        } else {
+            xwAmt = BigDecimal.ZERO;
+        }
+        LztAcct details = lztAcctService.details(userId);
+        if(details.getUserId().equals("xingwang15")){
+            List<LztQueryAcctInfo> bankAcctInfoList = details.getBankAcctInfoList();
+            for (LztQueryAcctInfo lztQueryAcctInfo : bankAcctInfoList) {
+                lztQueryAcctInfo.setBank_acct_balance(new BigDecimal(lztQueryAcctInfo.getBank_acct_balance()).subtract(xwAmt).toString());
+            }
+            details.setBankAcctInfoList(bankAcctInfoList);
+        }
+        if(details.getUserId().equals("ruicirenli")){
+            List<AcctInfo> acctInfoList = details.getAcctInfoList();
+            for (AcctInfo acctInfo : acctInfoList) {
+                if("用户自有可用账户".equals(acctInfo.getAcct_type())){
+                    acctInfo.setAmt_balcur(new BigDecimal(acctInfo.getAmt_balcur()).add(xwAmt).toString());
+                    acctInfo.setAmt_balaval(new BigDecimal(acctInfo.getAmt_balaval()).add(xwAmt).toString());
+                }
+            }
+            details.setAcctInfoList(acctInfoList);
+        }
+        return CommonResult.success(details);
     }
 
     @LogControllerAnnotation(intoDB = true, methodType = MethodType.ADD, description = "连连开通银行户")
