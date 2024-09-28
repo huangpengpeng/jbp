@@ -100,5 +100,14 @@ public class JdPayServiceImpl implements JdPayService {
         }
     }
 
-
+    @Override
+    public JdPaySendCommissionResponse sendCommission(String payCode, BigDecimal amt) {
+        JdPaySendCommissionRequest request  = new JdPaySendCommissionRequest();
+        request.setOrderNo(payCode);
+        try {
+            return jdPay.sendCommission(request, amt.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

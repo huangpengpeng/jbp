@@ -1,8 +1,6 @@
 package com.jbp.common.jdpay.sdk;
 
 
-
-
 import com.jbp.common.jdpay.util.FileUtil;
 import com.jbp.common.jdpay.util.GsonUtil;
 import com.jbp.common.jdpay.util.JdPayApiUtil;
@@ -91,6 +89,23 @@ public class JdPay {
     public JdPayCreateOrderResponse createOrder(JdPayCreateOrderRequest request) throws Exception {
         return this.baseExecute(JdPayConstant.CREATE_ORDER_URL, request, JdPayCreateOrderResponse.class);
     }
+
+    /**
+     * 分发佣金
+     */
+    public JdPaySendCommissionResponse sendCommission(JdPaySendCommissionRequest request, String amt) throws Exception {
+        request.setPlatNo(jdPayConfig.getMerchantNo());
+        request.setMerchantNo(jdPayConfig.getMerchantNo2());
+        JdPayCommissionInfo commissionInfo = new JdPayCommissionInfo();
+        commissionInfo.setCommNo(request.getOrderNo() + "_C_1");
+        commissionInfo.setAmount(amt);
+        commissionInfo.setReceiveMerchantno(jdPayConfig.getMerchantNo3());
+        List<JdPayCommissionInfo> list = new ArrayList<>();
+        list.add(commissionInfo);
+        request.setCommissionInfos(list);
+        return this.baseExecute(JdPayConstant.SEND_COMMISSION_URL, request, JdPaySendCommissionResponse.class);
+    }
+
     /**
      * 作用：三方聚合统一下单
      * 场景：三方聚合
@@ -105,6 +120,7 @@ public class JdPay {
         request.setDivisionAccount(GsonUtil.toJson(getJdPayDivisionAccount(request.getOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
         return this.baseExecute(JdPayConstant.AGGREGATE_CREATE_ORDER_URL, request, JdPayAggregateCreateOrderResponse.class);
     }
+
     /**
      * 作用：订单查询
      * 场景：查询订单信息 -  包括首次支付订单与代扣订单
@@ -179,7 +195,7 @@ public class JdPay {
         return this.baseExecute(JdPayConstant.AGREEMENT_QUERY_URL, request, JdPayAgreementQueryResponse.class);
     }
 
-    public JdPayAgreementSignResponse agreementNewSign(JdPayAgreementSignRequest request) throws Exception{
+    public JdPayAgreementSignResponse agreementNewSign(JdPayAgreementSignRequest request) throws Exception {
         return this.baseExecute(JdPayConstant.AGREEMENT_NEW_SIGN_URL, request, JdPayAgreementSignResponse.class);
     }
 
@@ -221,28 +237,30 @@ public class JdPay {
 
     /**
      * 账户签约
+     *
      * @param request
      * @return
      * @throws Exception
      */
-    public JdPayAgreementSignApplyResponse agreementSignApply(JdPayAgreementSignApplyRequest request) throws Exception{
+    public JdPayAgreementSignApplyResponse agreementSignApply(JdPayAgreementSignApplyRequest request) throws Exception {
         return this.baseExecute(JdPayConstant.AGREEMENT_SIGN_APPLY_URL, request, JdPayAgreementSignApplyResponse.class);
     }
 
-    public  JdPayDivisionAccount getJdPayDivisionAccount(String payCode, BigDecimal amt) {
+    public JdPayDivisionAccount getJdPayDivisionAccount(String payCode, BigDecimal amt) {
         BigDecimal oneAmt = amt.multiply(BigDecimal.valueOf(1));
         JdPayDivisionAccount divisionAccount = new JdPayDivisionAccount();
         List<JdPayDivisionAccountTradeInfo> divisionAccountTradeInfoList = new ArrayList<JdPayDivisionAccountTradeInfo>();
         JdPayDivisionAccountTradeInfo divisionAccountTradeInfoOne = new JdPayDivisionAccountTradeInfo();
         divisionAccountTradeInfoOne.setMerchantNo(jdPayConfig.getMerchantNo2());
-        divisionAccountTradeInfoOne.setOutTradeNo(payCode + "_1");
+        divisionAccountTradeInfoOne.setOutTradeNo(payCode);
         divisionAccountTradeInfoOne.setTradeAmount(oneAmt.stripTrailingZeros().toPlainString());
         divisionAccountTradeInfoList.add(divisionAccountTradeInfoOne);
-        divisionAccount.setVersion( "V2" );
+        divisionAccount.setVersion("V2");
+        divisionAccount.setDivisionAccountTradeInfoList(divisionAccountTradeInfoList);
         return divisionAccount;
     }
 
-    public  JdPayDivisionAccountRefund getJdPayDivisionAccountRefund(String payCode, BigDecimal refundAmt) {
+    public JdPayDivisionAccountRefund getJdPayDivisionAccountRefund(String payCode, BigDecimal refundAmt) {
         JdPayDivisionAccountRefund divisionAccountRefund = new JdPayDivisionAccountRefund();
         String now = DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
         BigDecimal oneAmt = refundAmt.multiply(BigDecimal.valueOf(1));
@@ -251,8 +269,10 @@ public class JdPay {
         divisionAccountRefundInfoOne.setMerchantNo(jdPayConfig.getMerchantNo2());
         divisionAccountRefundInfoOne.setOutTradeNo("R_" + payCode + "_" + now + "_1");
         divisionAccountRefundInfoOne.setTradeAmount(oneAmt.stripTrailingZeros().toPlainString());
-        divisionAccountRefundInfoOne.setOriginalOutTradeNo(payCode + "_1");
+        divisionAccountRefundInfoOne.setOriginalOutTradeNo(payCode);
         divisionAccountRefundInfoList.add(divisionAccountRefundInfoOne);
+        divisionAccountRefund.setVersion("V2");
+        divisionAccountRefund.setDivisionAccountRefundInfoList(divisionAccountRefundInfoList);
         return divisionAccountRefund;
     }
 }

@@ -26,6 +26,7 @@ public class JdPayDemo {
     private JdPayAggregateCreateOrderResponse aggregateResponse;
 
 
+
     /**
      * {"currency":"CNY","originalOutTradeNo":"20240925161841","outTradeNo":"R_20240925161841",
      * "resultCode":"0000","resultDesc":"成功",

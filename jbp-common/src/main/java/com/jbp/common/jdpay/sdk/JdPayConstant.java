@@ -58,6 +58,12 @@ public class JdPayConstant {
     public static final String SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     /**
+     * 账户分佣
+     */
+    public static final String SEND_COMMISSION_URL = "/api/sendCommission";
+
+
+    /**
      * 公共字段常量 start
      **/
     public static final String CCM = "CCM";
