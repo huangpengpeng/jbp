@@ -56,4 +56,12 @@ public class ProductMaterials extends BaseModel {
     @ApiModelProperty("供应商")
     private String supplyName;
 
+    @ApiModelProperty("商品名称")
+    @TableField(exist = false)
+    private String productName;
+
+    @ApiModelProperty("商品价格")
+    @TableField(exist = false)
+    private BigDecimal productPrice;
+
 }
