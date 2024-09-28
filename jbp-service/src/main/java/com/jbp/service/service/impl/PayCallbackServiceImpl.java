@@ -45,6 +45,7 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -704,7 +705,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                         return Boolean.FALSE;
                     }
                     Order update = orderService.getByOrderNo(orderNo);
-                    update.setPayTime(DateTimeUtils.parseDate(jdPayQueryOrderResponse.getFinishDate()));
+                    try {
+                        update.setPayTime(DateTimeUtils.parseDate(jdPayQueryOrderResponse.getFinishDate(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
+                    } catch (ParseException ex) {
+                        throw new RuntimeException(ex);
+                    };
                     update.setStatus(OrderConstants.ORDER_STATUS_WAIT_SHIPPING);
                     boolean b1 = orderService.updateById(update);
                     if (!b1) {

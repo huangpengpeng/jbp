@@ -20,6 +20,13 @@ import java.util.regex.Pattern;
  * @author zoro
  */
 public class DateTimeUtils extends DateUtils {
+    public static void main(String[] args) {
+        try {
+            DateTimeUtils.parseDate("20240929004453", DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     //Mysql支持的时间戳限制
     static long minTime = Timestamp.valueOf("1970-01-01 09:00:00").getTime();
