@@ -30,6 +30,12 @@ public class PayConstants {
     /** 支付方式-快钱 */
     public static final String PAY_TYPE_KQ = "kq";
 
+    /** 支付方式-京东支付宝 */
+    public static final String PAY_TYPE_JD_ZFB= "jdAlipay";
+
+    /** 支付方式-京东支付宝 */
+    public static final String PAY_TYPE_JD_KJ= "jdQuickPay";
+
     /** 支付渠道-公众号 */
     public static final String PAY_CHANNEL_WECHAT_PUBLIC = "public";
     /** 支付渠道-小程序 */

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,6 +23,7 @@ import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.bill.Bill;
 import com.jbp.common.model.order.Order;
+import com.jbp.common.model.order.OrderDetail;
 import com.jbp.common.model.order.RechargeOrder;
 import com.jbp.common.model.user.User;
 import com.jbp.common.model.user.UserBalanceRecord;
@@ -100,6 +102,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
     private KqPayService kqPayService;
     @Autowired
     private TeamUserService teamUserService;
+    @Resource
+    private JdPayService jdPayService;
 
 
     /**
@@ -226,12 +230,36 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         }
         if (request.getPayType().equals(PayConstants.PAY_TYPE_KQ)) {
             TeamUser teamUser = teamUserService.getByUser(user.getId());
-            String cashier = kqPayService.cashier(user.getAccount(),  request.getIp(),rechargeNo,
+            String cashier = kqPayService.cashier(user.getAccount(), request.getIp(), rechargeNo,
                     rechargePrice, "补差", new Date(), teamUser != null ? teamUser.getName() : "");
             response.setStatus(true);
             response.setKqGatewayUrl(cashier);
             response.setPayType(PayConstants.PAY_TYPE_KQ);
         }
+
+        // 京东支付宝
+        if (request.getPayType().equals(PayConstants.PAY_TYPE_JD_ZFB)) {
+            CashierPayCreateResult result = new CashierPayCreateResult();
+            String gateway_url = jdPayService.aliPay(user.getId().toString(), "补差", rechargeNo, rechargePrice,
+                    request.getIp(), new Date()).getQrCode();
+            result.setGateway_url(gateway_url);
+            response.setStatus(true);
+            response.setJdConfig(result);
+            response.setPayType(request.getPayType());
+            logger.info("京东支付支付宝 response : {}", JSON.toJSONString(response));
+        }
+        // 京东快捷
+        if (request.getPayType().equals(PayConstants.PAY_TYPE_JD_KJ)) {
+            CashierPayCreateResult result = new CashierPayCreateResult();
+            String gateway_url = jdPayService.jdPay(user.getId().toString(), "补差", rechargeNo, rechargePrice,
+                    request.getIp(), new Date()).getWebUrl();
+            result.setGateway_url(gateway_url);
+            response.setStatus(true);
+            response.setJdConfig(result);
+            response.setPayType(request.getPayType());
+            logger.info("京东支付快捷 response : {}", JSON.toJSONString(response));
+        }
+
         rechargeOrder.setUid(user.getId());
         rechargeOrder.setOrderNo(rechargeNo);
         rechargeOrder.setPrice(rechargePrice);
@@ -245,6 +273,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         }
         return response;
     }
+
 
     /**
      * 微信支付
@@ -437,11 +466,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         User user = userService.getById(rechargeOrder.getUid());
         BigDecimal addPrice = rechargeOrder.getPrice().add(rechargeOrder.getGivePrice());
         BigDecimal balance = BigDecimal.ZERO;
-        if(rechargeOrder.getType() == 0){
+        if (rechargeOrder.getType() == 0) {
             balance = user.getNowMoney().add(addPrice);
         }
         UserBalanceRecord record = new UserBalanceRecord();
-        if(rechargeOrder.getType() == 0){
+        if (rechargeOrder.getType() == 0) {
             // 余额变动对象
             record.setUid(rechargeOrder.getUid());
             record.setLinkId(rechargeOrder.getOrderNo());
