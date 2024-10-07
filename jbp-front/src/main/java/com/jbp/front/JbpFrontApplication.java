@@ -7,10 +7,12 @@ import com.jbp.common.jdpay.sdk.JdPay;
 import com.jbp.common.jdpay.vo.JdPayAggregateCreateOrderResponse;
 import com.jbp.common.jdpay.vo.JdPayRefundResponse;
 import com.jbp.common.jdpay.vo.JdPaySendCommissionResponse;
+import com.jbp.common.request.agent.ClearingRequest;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
 import com.jbp.service.service.JdPayService;
 import com.jbp.service.service.KqPayService;
+import com.jbp.service.service.agent.ClearingFinalService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -52,25 +54,13 @@ import java.util.Date;
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        JdPayService jdPayService = run.getBean(JdPayService.class);
-
-//        KqPayService kqPayService = run.getBean(KqPayService.class);
-//        kqPayService.refund("PT254172655572736563917", "SH550172655598886821192", BigDecimal.valueOf(130.00), new Date());
-
-//        String orderId = StringUtils.N_TO_10("T_");
-//        System.out.println("###########################################"+ orderId);
-//        JdPayService jdPayService = run.getBean(JdPayService.class);
-//        JdPayAggregateCreateOrderResponse response = jdPayService.aliPay("franky", "测试支付", orderId, BigDecimal.valueOf(1),
-//                "60.177.247.25", DateTimeUtils.getNow());
-//        System.out.println(JSONObject.toJSONString(response));
-
-
-        // T_24514749833186
-//        JdPaySendCommissionResponse response = jdPayService.sendCommission("T_24514749833186", BigDecimal.valueOf(0.2));
-//        System.out.println(JSONObject.toJSONString(response));
-
-
-//        JdPayRefundResponse response = jdPayService.refund("PT567172754186400293699", "RPT567172754186400293699", BigDecimal.valueOf(299), DateTimeUtils.parseDate("2024-09-29 00:44:07"));
-//        System.out.println(JSONObject.toJSONString(response));
+//        ClearingFinalService clearingFinalService = run.getBean(ClearingFinalService.class);
+//        ClearingRequest request = new ClearingRequest();
+//        request.setCommType(25);
+//        request.setCommName("月度管理补贴");
+//        request.setStartTime("20240801");
+//        request.setEndTime("20240901");
+//        request.setIfImportUser(false);
+//        clearingFinalService.syncOneKeyClearing(request);
     }
 }

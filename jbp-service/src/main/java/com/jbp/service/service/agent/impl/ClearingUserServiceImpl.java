@@ -67,6 +67,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     @Resource
     private UserCapaService userCapaService;
     @Resource
+    private UserCapaXsService userCapaXsService;
+    @Resource
     private ProductCommService productCommService;
     @Resource
     private OrderDetailService orderDetailService;
@@ -86,6 +88,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
     private PingTaiCommHandler pingTaiCommHandler;
     @Resource
     private MonthGuanLiCommHandler monthGuanLiCommHandler;
+    @Resource
+    private Environment environment;
 
 
 
@@ -251,8 +255,15 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 throw new CrmebException("月度管理补贴规则为空请联系管理员");
             }
             Long capaId = ruleMap.values().stream().collect(Collectors.toList()).get(0).getCapaId();
-            List<UserCapa> userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, capaId));
-            if (CollectionUtils.isEmpty(userCapaList)) {
+            List<UserCapa> userCapaList = Lists.newArrayList();
+            List<UserCapaXs> userCapaXsList = Lists.newArrayList();
+            boolean sm = environment.getProperty("spring.profiles.active").contains("sm");
+            if (sm) {
+                userCapaXsList = userCapaXsService.list(new LambdaQueryWrapper<UserCapaXs>().ge(UserCapaXs::getCapaId, capaId));
+            } else {
+                userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, capaId));
+            }
+            if (CollectionUtils.isEmpty(userCapaList) && CollectionUtils.isEmpty(userCapaXsList)) {
                 return;
             }
             // 支付成功的订单
@@ -280,10 +291,16 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             }
             // 满足结算等级用户
             Map<Integer, Double> userTeamScoreMap = Maps.newConcurrentMap();
-            List<Integer> uidList = userCapaList.stream().map(UserCapa::getUid).collect(Collectors.toList());
+            List<Integer> uidList = Lists.newArrayList();
+            if (sm) {
+                uidList = userCapaXsList.stream().map(UserCapaXs::getUid).collect(Collectors.toList());
+            } else {
+                uidList = userCapaList.stream().map(UserCapa::getUid).collect(Collectors.toList());
+            }
+            List<Integer> finalUidList = uidList;
             userScoreMap.forEach((uid, score) -> {
                 // 先加给自己
-                if (uidList.contains(uid)) {
+                if (finalUidList.contains(uid)) {
                     Double d = MapUtils.getDouble(userTeamScoreMap, uid, 0.0);
                     userTeamScoreMap.put(uid, BigDecimal.valueOf(d).add(BigDecimal.valueOf(score)).doubleValue());
                 }
@@ -291,7 +308,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                 List<UserUpperDto> allUpper = invitationService.getAllUpper(uid);
                 if (CollectionUtils.isNotEmpty(allUpper)) {
                     for (UserUpperDto upperDto : allUpper) {
-                        if (upperDto.getPId() != null && uidList.contains(upperDto.getPId())) {
+                        if (upperDto.getPId() != null && finalUidList.contains(upperDto.getPId())) {
                             Double d = MapUtils.getDouble(userTeamScoreMap, upperDto.getPId(), 0.0);
                             userTeamScoreMap.put(upperDto.getPId(), BigDecimal.valueOf(d).add(BigDecimal.valueOf(score)).doubleValue());
                         }
