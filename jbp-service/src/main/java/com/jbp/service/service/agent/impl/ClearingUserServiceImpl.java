@@ -278,6 +278,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), monthGuanLiCommHandler.getType());
                     if (productComm != null) {
                         BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
+                        realScore = realScore.multiply(productComm.getScale());
                         score = score.add(realScore);
                     }
                 }
