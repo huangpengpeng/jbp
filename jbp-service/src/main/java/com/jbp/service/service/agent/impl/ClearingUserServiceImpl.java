@@ -293,7 +293,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             // 满足结算等级用户
             Map<Integer, Double> userTeamScoreMap = Maps.newConcurrentMap();
             List<Integer> uidList = Lists.newArrayList();
-            if (sm) {
+            if (sm || yk) {
                 uidList = userCapaXsList.stream().map(UserCapaXs::getUid).collect(Collectors.toList());
             } else {
                 uidList = userCapaList.stream().map(UserCapa::getUid).collect(Collectors.toList());
