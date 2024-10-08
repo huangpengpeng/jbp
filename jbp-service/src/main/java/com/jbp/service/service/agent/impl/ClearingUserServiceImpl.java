@@ -258,7 +258,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             List<UserCapa> userCapaList = Lists.newArrayList();
             List<UserCapaXs> userCapaXsList = Lists.newArrayList();
             boolean sm = environment.getProperty("spring.profiles.active").contains("sm");
-            if (sm) {
+            boolean yk = environment.getProperty("spring.profiles.active").contains("yk");
+            if (sm || yk) {
                 userCapaXsList = userCapaXsService.list(new LambdaQueryWrapper<UserCapaXs>().ge(UserCapaXs::getCapaId, capaId));
             } else {
                 userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, capaId));
