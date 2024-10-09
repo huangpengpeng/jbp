@@ -125,6 +125,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
     private ProductAttrValueService productAttrValueService;
     @Autowired
     private RefundOrderService refundOrderService;
+    @Autowired
+    private RefundOrderInfoService refundOrderInfoService;
 
     @Override
     public String getOrderNo(String orderNo) {
@@ -764,6 +766,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements Or
         }
 
         List<OrderInfoFrontDataResponse> orderInfoList = orderDetailList.stream().map(e -> {
+            RefundOrderInfo refundOrderInfo =   refundOrderInfoService.getOne(new QueryWrapper<RefundOrderInfo>().lambda().eq(RefundOrderInfo :: getOrderDetailId, e.getId()));
+           if(refundOrderInfo!= null) {
+               e.setApplyRefundNum(refundOrderInfo.getApplyRefundNum());
+           }
+
             OrderInfoFrontDataResponse dataResponse = new OrderInfoFrontDataResponse();
             BeanUtils.copyProperties(e, dataResponse);
             return dataResponse;

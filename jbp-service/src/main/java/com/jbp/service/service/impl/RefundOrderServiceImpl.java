@@ -944,7 +944,7 @@ public class RefundOrderServiceImpl extends ServiceImpl<RefundOrderDao, RefundOr
         response.setRefundFirstBrokerageFee(refundOrder.getRefundFirstBrokerageFee());
         response.setRefundSecondBrokerageFee(refundOrder.getRefundSecondBrokerageFee());
         response.setRefundFreightFee(refundOrder.getRefundFreightFee());
-        response.setApplyRefundNum(refundOrder.getTotalNum());
+        response.setApplyRefundNum(refundOrderInfo.getApplyRefundNum());
 
         response.setReturnGoodsType(refundOrder.getReturnGoodsType());
         response.setRefundReasonWap(refundOrder.getRefundReasonWap());
