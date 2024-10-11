@@ -10,9 +10,11 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.jdpay.vo.JdPayToPersonalWalletResponse;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.model.user.UserJd;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawCancelRequest;
@@ -25,7 +27,9 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 import com.jbp.common.vo.WalletWithdrawVo;
 import com.jbp.service.dao.agent.WalletWithdrawDao;
+import com.jbp.service.service.JdPayService;
 import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.UserJdService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.WalletService;
@@ -56,6 +60,10 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private ChannelCardService channelCardService;
     @Resource
     private WalletWithdrawDao walletWithdrawDao;
+    @Resource
+    private JdPayService jdPayService;
+    @Resource
+    private UserJdService userJdService;
 
     @Override
     public PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest) {
@@ -174,6 +182,39 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
             walletWithdraw.setStatus(WalletWithdraw.StatusEnum.已出款.toString());
             walletWithdraw.setRemark(withdrawRequest.getRemark());
             walletWithdraw.setSuccessTime(now);
+            list.add(walletWithdraw);
+            i++;
+        }
+        List<List<WalletWithdraw>> partition = com.google.common.collect.Lists.partition(list, 100);
+        for (List<WalletWithdraw> walletWithdraws : partition) {
+            boolean ifSuccess = updateBatchById(walletWithdraws);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
+        }
+    }
+
+    @Override
+    public void jdSend(List<WalletWithdrawRequest> walletWithdrawList) {
+        if (CollectionUtils.isEmpty(walletWithdrawList)) {
+            throw new CrmebException("提现信息不能为空");
+        }
+        List<WalletWithdraw> list = Lists.newArrayList();
+        Date now = DateTimeUtils.getNow();
+        int i = 1;
+        for (WalletWithdrawRequest withdrawRequest : walletWithdrawList) {
+            if (StringUtils.isEmpty(withdrawRequest.getUniqueNo())) {
+                throw new CrmebException("提现信息单号不能为空，行号:" + i);
+            }
+            WalletWithdraw walletWithdraw = getByUniqueNo(withdrawRequest.getUniqueNo());
+            if (walletWithdraw == null) {
+                throw new CrmebException("提现信息不存在，行号:" + i);
+            }
+            if (!walletWithdraw.getStatus().equals(WalletWithdraw.StatusEnum.待审核.toString())) {
+                throw new CrmebException("提现状态不是待审核，行号:" + i);
+            }
+            walletWithdraw.setStatus(WalletWithdraw.StatusEnum.待出款.toString());
+            walletWithdraw.setRemark(withdrawRequest.getRemark());
             list.add(walletWithdraw);
             i++;
         }

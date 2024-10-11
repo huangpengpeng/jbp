@@ -53,6 +53,16 @@ public class WalletWithdrawController {
         return CommonResult.success();
     }
 
+
+    @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
+    @PostMapping("/jdSend")
+    @ApiOperation("jd钱包提现批量出款")
+    public CommonResult jdSend(@RequestBody List<WalletWithdrawRequest> requests) {
+        walletWithdrawService.send(requests);
+        return CommonResult.success();
+    }
+
+
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:cancel')")
     @PostMapping("/cancel")
     @ApiOperation("钱包提现批量取消")
