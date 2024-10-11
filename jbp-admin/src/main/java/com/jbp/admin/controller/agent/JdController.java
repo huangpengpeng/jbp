@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("api/admin/agent/user/jd")
-@Api(tags = "等级")
+@Api(tags = "京东")
 public class JdController {
 
     @Resource

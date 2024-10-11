@@ -79,7 +79,7 @@
                 <if test="teamId!=null and teamId!=''">
                     and  t.leader_id = #{teamId}
                 </if>
-              and w.channel != "JD"
+                and  ( w.channel is null or w.channel  != "JD")
             </where> ORDER BY w.id DESC
     </select>
     <select id="jdPageList" resultMap="WalletWithdraw">
