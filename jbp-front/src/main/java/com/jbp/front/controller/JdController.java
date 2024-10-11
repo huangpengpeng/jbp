@@ -34,7 +34,7 @@ public class JdController {
         User user = userService.getInfo();
         JdPayOauth2Response response = jdPay.oauth2(code);
         String xid = response.getXid();
-        
+
         return CommonResult.success();
     }
 }

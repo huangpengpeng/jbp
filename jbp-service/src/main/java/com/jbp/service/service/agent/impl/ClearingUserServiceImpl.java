@@ -258,7 +258,8 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             List<UserCapa> userCapaList = Lists.newArrayList();
             List<UserCapaXs> userCapaXsList = Lists.newArrayList();
             boolean sm = environment.getProperty("spring.profiles.active").contains("sm");
-            if (sm) {
+            boolean yk = environment.getProperty("spring.profiles.active").contains("yk");
+            if (sm || yk) {
                 userCapaXsList = userCapaXsService.list(new LambdaQueryWrapper<UserCapaXs>().ge(UserCapaXs::getCapaId, capaId));
             } else {
                 userCapaList = userCapaService.list(new LambdaQueryWrapper<UserCapa>().eq(UserCapa::getCapaId, capaId));
@@ -277,6 +278,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     ProductComm productComm = productCommService.getByProduct(orderDetail.getProductId(), monthGuanLiCommHandler.getType());
                     if (productComm != null) {
                         BigDecimal realScore = orderDetailService.getRealScore(orderDetail);
+                        realScore = realScore.multiply(productComm.getScale());
                         score = score.add(realScore);
                     }
                 }
@@ -292,7 +294,7 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
             // 满足结算等级用户
             Map<Integer, Double> userTeamScoreMap = Maps.newConcurrentMap();
             List<Integer> uidList = Lists.newArrayList();
-            if (sm) {
+            if (sm || yk) {
                 uidList = userCapaXsList.stream().map(UserCapaXs::getUid).collect(Collectors.toList());
             } else {
                 uidList = userCapaList.stream().map(UserCapa::getUid).collect(Collectors.toList());
