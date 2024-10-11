@@ -33,20 +33,16 @@ public class JdPayHttpClientProxy {
         return new String(nonceChars);
     }
 
-    public String execute(String urlSuffix, String request) throws Exception {
+    public String execute(String urlSuffix, String request, String reqNo, String merchantNo) throws Exception {
         long startTimestampMs = System.currentTimeMillis();
         String response;
         String httpResponse = null;
         // 接口名称
         String apiName = urlSuffix.replaceFirst(JdPayConstant.URL_PATH, "");
-        // 唯一请求号
-//        String reqNo = genNonceStr();
-        String reqNo = "1703768114610";
-
         try {
             JdPayApiUtil.logger.info("1.{}接口请求参数:{}", apiName, request);
             // 请求参数加密和签名
-            String httpRequest = JdPayApiUtil.encryptAndSignature(jdPayConfig, reqNo, request);
+            String httpRequest = JdPayApiUtil.encryptAndSignature(jdPayConfig, reqNo, request, merchantNo);
             JdPayApiUtil.logger.info("2.{}远程调用请求参数:{}", apiName, httpRequest);
             httpResponse = jdPayHttpClient.execute(jdPayConfig, urlSuffix, httpRequest);
             JdPayApiUtil.logger.info("3.{}远程调用返回参数:{}", apiName, httpResponse);

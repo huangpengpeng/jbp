@@ -1,6 +1,7 @@
 package com.jbp.common.jdpay.sdk;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.jbp.common.jdpay.util.FileUtil;
 import com.jbp.common.jdpay.util.GsonUtil;
 import com.jbp.common.jdpay.util.JdPayApiUtil;
@@ -9,6 +10,20 @@ import com.jbp.common.jdpay.vo.*;
 import com.jbp.common.kqbill.utils.PropertiesLoader;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -16,10 +31,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.jbp.common.utils.SignatureUtil.RANDOM;
 
 /*************************************************
  *
@@ -29,6 +47,10 @@ import java.util.Map;
 
 @Component
 public class JdPay {
+
+    private static final String APP_KEY="E587420511102134670FC83264105546";
+
+    private static final String APP_SECRET="e5407d44b5c54908bf88f6afbaac9ecd";
 
     @Resource
     private Environment environment;
@@ -97,13 +119,22 @@ public class JdPay {
         request.setPlatNo(jdPayConfig.getMerchantNo());
         request.setMerchantNo(jdPayConfig.getMerchantNo2());
         JdPayCommissionInfo commissionInfo = new JdPayCommissionInfo();
-        commissionInfo.setCommNo(request.getOrderNo() + "_C_1");
+        commissionInfo.setCommNo(StringUtils.N_TO_10("C_"));
         commissionInfo.setAmount(amt);
-        commissionInfo.setReceiveMerchantno(jdPayConfig.getMerchantNo3());
+        commissionInfo.setReceiveMerchantNo(jdPayConfig.getMerchantNo3());
         List<JdPayCommissionInfo> list = new ArrayList<>();
         list.add(commissionInfo);
         request.setCommissionInfos(list);
         return this.baseExecute(JdPayConstant.SEND_COMMISSION_URL, request, JdPaySendCommissionResponse.class);
+    }
+
+    public JdPayToPersonalWalletResponse payToPersonalWallet(JdPayToPersonalWalletRequest request) throws Exception {
+//        request.setMerchantNo(jdPayConfig.getMerchantNo());
+        request.setMerchantNo(jdPayConfig.getMerchantNo3());
+        request.setReqNo(StringUtils.N_TO_10("Q_"));
+        request.setAppKey(APP_KEY);
+        request.setMerchantChannelCode("waichangShanghu");
+        return this.baseExecute(JdPayConstant.PAY_TO_PERSONAL_WALLET, request, JdPayToPersonalWalletResponse.class, request.getReqNo(), request.getMerchantNo());
     }
 
     /**
@@ -229,12 +260,25 @@ public class JdPay {
      * @return 返回对象
      * @throws Exception 异常
      */
-    public <REQ, RES> RES baseExecute(String urlSuffix, REQ request, Class<RES> clazz) throws Exception {
+    public <REQ, RES> RES baseExecute(String urlSuffix, REQ request, Class<RES> clazz, String reqNo, String merchantNo) throws Exception {
         String reqJson = GsonUtil.toJson(request);
-        String respJson = jdPayHttpClientProxy.execute(urlSuffix, reqJson);
+        String respJson = jdPayHttpClientProxy.execute(urlSuffix, reqJson, reqNo, merchantNo);
         return GsonUtil.fromJson(respJson, clazz);
     }
 
+    public <REQ, RES> RES baseExecute(String urlSuffix, REQ request, Class<RES> clazz) throws Exception {
+        String reqJson = GsonUtil.toJson(request);
+        String respJson = jdPayHttpClientProxy.execute(urlSuffix, reqJson, genNonceStr(), "");
+        return GsonUtil.fromJson(respJson, clazz);
+    }
+
+    private static String genNonceStr() {
+        char[] nonceChars = new char[32];
+        for (int index = 0; index < nonceChars.length; ++index) {
+            nonceChars[index] = JdPayConstant.SYMBOLS.charAt(RANDOM.nextInt(JdPayConstant.SYMBOLS.length()));
+        }
+        return new String(nonceChars);
+    }
     /**
      * 账户签约
      *
@@ -244,6 +288,21 @@ public class JdPay {
      */
     public JdPayAgreementSignApplyResponse agreementSignApply(JdPayAgreementSignApplyRequest request) throws Exception {
         return this.baseExecute(JdPayConstant.AGREEMENT_SIGN_APPLY_URL, request, JdPayAgreementSignApplyResponse.class);
+    }
+
+    public JdPayOauth2Response oauth2(String code) {
+        String url = "https://open-oauth.jd.com/oauth2/access_token?app_key=%s&app_secret=%s&grant_type=authorization_code&code=%s";
+        url = String.format(url, APP_KEY, APP_SECRET, code);
+        HttpGet httpGet = new HttpGet(url);
+        HttpClient httpClient = getHttpClientByBasicConnectionManager();
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            HttpEntity httpEntity = httpResponse.getEntity();
+            String string = EntityUtils.toString(httpEntity, JdPayConstant.UTF8);
+            return GsonUtil.fromJson(string, JdPayOauth2Response.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public JdPayDivisionAccount getJdPayDivisionAccount(String payCode, BigDecimal amt) {
@@ -274,5 +333,22 @@ public class JdPay {
         divisionAccountRefund.setVersion("V2");
         divisionAccountRefund.setDivisionAccountRefundInfoList(divisionAccountRefundInfoList);
         return divisionAccountRefund;
+    }
+
+    private static HttpClient getHttpClientByBasicConnectionManager() {
+        HttpClientConnectionManager connManager = new BasicHttpClientConnectionManager(
+                RegistryBuilder.<ConnectionSocketFactory>create()
+                        .register(JdPayConstant.HTTP, PlainConnectionSocketFactory.getSocketFactory())
+                        .register(JdPayConstant.HTTPS, SSLConnectionSocketFactory.getSocketFactory())
+                        .build(),
+                null,
+                null,
+                null
+        );
+        return HttpClientBuilder.create()
+                // 连接池
+                .setConnectionManager(connManager)
+                // 重试策略
+                .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false)).build();
     }
 }

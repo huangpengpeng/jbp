@@ -62,6 +62,10 @@ public class JdPayConstant {
      */
     public static final String SEND_COMMISSION_URL = "/api/sendCommission";
 
+    /**
+     * 打款到用户钱包
+     */
+    public static final String PAY_TO_PERSONAL_WALLET = "/api/payToPersonalWallet";
 
     /**
      * 公共字段常量 start

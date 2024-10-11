@@ -20,4 +20,6 @@ public interface JdPayService {
 
     JdPaySendCommissionResponse sendCommission(String payCode, BigDecimal amt);
 
+    JdPayToPersonalWalletResponse payToPersonalWallet(String merchantTradeNo,  String xid, BigDecimal amt, String merchantTradeDesc);
+
 }

@@ -23,7 +23,7 @@ public class JdPayCommissionInfo implements Serializable {
      * 02
      * 在企业站入驻时配置的佣金账户，佣金账户的二级商户号
      */
-    private String receiveMerchantno;
+    private String receiveMerchantNo;
 
 
     public String getCommNo() {
@@ -50,11 +50,11 @@ public class JdPayCommissionInfo implements Serializable {
         this.amount = amount;
     }
 
-    public String getReceiveMerchantno() {
-        return receiveMerchantno;
+    public String getReceiveMerchantNo() {
+        return receiveMerchantNo;
     }
 
-    public void setReceiveMerchantno(String receiveMerchantno) {
-        this.receiveMerchantno = receiveMerchantno;
+    public void setReceiveMerchantNo(String receiveMerchantNo) {
+        this.receiveMerchantNo = receiveMerchantNo;
     }
 }

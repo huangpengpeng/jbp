@@ -1,11 +1,15 @@
 package com.jbp.common.jdpay.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
+
 
 /**
  * 分佣请求类
  */
+@Data
 public class JdPaySendCommissionResponse extends BaseResponse {
 
     /**

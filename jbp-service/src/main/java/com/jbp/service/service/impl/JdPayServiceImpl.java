@@ -102,10 +102,20 @@ public class JdPayServiceImpl implements JdPayService {
 
     @Override
     public JdPaySendCommissionResponse sendCommission(String payCode, BigDecimal amt) {
-        JdPaySendCommissionRequest request  = new JdPaySendCommissionRequest();
+        JdPaySendCommissionRequest request = new JdPaySendCommissionRequest();
         request.setOrderNo(payCode);
         try {
             return jdPay.sendCommission(request, amt.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public JdPayToPersonalWalletResponse payToPersonalWallet(String merchantTradeNo, String xid, BigDecimal amt, String merchantTradeDesc) {
+        JdPayToPersonalWalletRequest request = new JdPayToPersonalWalletRequest(merchantTradeNo, xid, amt.multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString(), merchantTradeDesc);
+        try {
+            return jdPay.payToPersonalWallet(request);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

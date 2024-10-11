@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jbp.common.jdpay.sdk.JdPayConfig;
 import com.jbp.common.jdpay.sdk.JdPayConstant;
 import com.jbp.common.jdpay.sdk.JdPaySecurity;
+import com.jbp.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +26,12 @@ public class JdPayApiUtil {
     /**
      * 加密和签名
      */
-    public static String encryptAndSignature(JdPayConfig jdPayConfig, String reqNo, String jsonParam) throws IOException {
+    public static String encryptAndSignature(JdPayConfig jdPayConfig, String reqNo, String jsonParam, String merchantNo) throws IOException {
         // 组装公共请求参数
-        Map<String, String> commonParam = fillCommonParam(jdPayConfig.getMerchantNo(), reqNo);
+        if(StringUtils.isEmpty(merchantNo)){
+            merchantNo = jdPayConfig.getMerchantNo();
+        }
+        Map<String, String> commonParam = fillCommonParam(merchantNo, reqNo);
         // 加密
         byte[] dataBytes = jsonParam.getBytes(JdPayConstant.UTF8);
         JdPaySecurity se = new JdPaySecurity();
