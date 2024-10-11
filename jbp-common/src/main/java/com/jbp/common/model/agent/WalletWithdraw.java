@@ -88,6 +88,10 @@ public class WalletWithdraw extends VersionModel {
     @TableField("remark")
     private String remark;
 
+    @ApiModelProperty("渠道")
+    @TableField("channel")
+    private String channel;
+
     @ApiModelProperty("银行卡名称")
     @TableField(exist = false)
     private String bankName;

@@ -3,7 +3,6 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
@@ -59,22 +58,22 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private WalletWithdrawDao walletWithdrawDao;
 
     @Override
-    public PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, String teamId,PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletWithdrawVo> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletWithdrawVo> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName,teamId);
+        List<WalletWithdrawVo> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName, nickName, teamId);
         return CommonPage.copyPageInfo(page, walletWithdrawsList);
     }
 
     @Override
-    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName, String teamId) {
+    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit, String nickName, String teamId) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName,nickName,teamId);
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName, nickName, teamId);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
@@ -100,12 +99,12 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         head.put("bankName", "银行卡名称");
         head.put("bankCode", "银行卡号");
         head.put("realName", "真实姓名");
-        head.put("nickName","用户昵称");
-        head.put("idCardNo","身份证");
-        head.put("phone","手机号");
-        head.put("teamName","团队");
+        head.put("nickName", "用户昵称");
+        head.put("idCardNo", "身份证");
+        head.put("phone", "手机号");
+        head.put("teamName", "团队");
         JSONArray array = new JSONArray();
-        head.forEach((k,v)->{
+        head.forEach((k, v) -> {
             JSONObject json = new JSONObject();
             json.put("k", k);
             json.put("v", v);
@@ -128,7 +127,12 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         String commissionScale = systemConfigService.getValueByKey("wallet_withdraw_commission");
         BigDecimal scale = StringUtils.isEmpty(commissionScale) ? BigDecimal.ZERO : new BigDecimal(commissionScale);
         BigDecimal commission = amt.multiply(scale).setScale(2, BigDecimal.ROUND_DOWN);
+
+        String ifOpenJdtx = systemConfigService.getValueByKey("if_open_jdtx");
         WalletWithdraw walletWithdraw = new WalletWithdraw(uid, account, walletType, walletName, amt.subtract(commission), commission, postscript);
+        if (ifOpenJdtx.equals("'true'")) {
+            walletWithdraw.setChannel("JD");
+        }
         save(walletWithdraw);
         walletService.reduce(uid, walletType, amt, WalletFlow.OperateEnum.提现.name(), walletWithdraw.getUniqueNo(), postscript);
         return walletWithdraw;
