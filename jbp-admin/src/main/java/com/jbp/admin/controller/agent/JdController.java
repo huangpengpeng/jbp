@@ -34,7 +34,7 @@ public class JdController {
     @ApiOperation(value = "用户京东账号")
     @GetMapping(value = "/page")
     public CommonResult<CommonPage<UserJdResponse>> page(@ModelAttribute PageParamRequest pageParamRequest, UserJdRequest userJdRequest) {
-        return CommonResult.success(CommonPage.restPage(userJdService.getUserJdList(userJdRequest.getAccount(), userJdRequest.getName(), pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(userJdService.getUserJdList(userJdRequest.getAccount(), userJdRequest.getNickname(), pageParamRequest)));
     }
 
 }

@@ -17,5 +17,5 @@ public class UserJdRequest implements Serializable {
     @ApiModelProperty("用户账号")
     private String account;
     @ApiModelProperty("用户名称")
-    private String name;
+    private String nickname;
 }
