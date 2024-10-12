@@ -6,11 +6,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.google.common.collect.Lists;
 import com.jbp.common.constants.*;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.agent.Capa;
+import com.jbp.common.model.agent.MsgCode;
 import com.jbp.common.model.agent.UserCapa;
 import com.jbp.common.model.agent.UserInvitation;
 import com.jbp.common.model.coupon.Coupon;
@@ -32,6 +34,7 @@ import com.jbp.common.vo.WeChatOauthToken;
 import com.jbp.front.service.LoginService;
 import com.jbp.service.service.*;
 import com.jbp.service.service.agent.CapaService;
+import com.jbp.service.service.agent.MsgCodeService;
 import com.jbp.service.service.agent.UserCapaService;
 import com.jbp.service.service.agent.UserInvitationService;
 import org.apache.commons.lang3.BooleanUtils;
@@ -45,6 +48,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -99,6 +103,8 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private WhiteUserService whiteUserService;
 
+    @Autowired
+    private MsgCodeService msgCodeService;
 
 
     /**
@@ -124,15 +130,21 @@ public class LoginServiceImpl implements LoginService {
         if (StringUtils.isNotEmpty(value) && "0".equals(value)) {
             return;
         }
-        Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
-        if (ObjectUtil.isNull(validateCode)) {
+        MsgCode msgCode = msgCodeService.getOne(new QueryWrapper<MsgCode>().lambda().eq(MsgCode::getPhone, phone).eq(MsgCode::getStatus, "未使用").ge(MsgCode::getExpiredTime, new Date()).last(" order by gmt_created desc limit 1"));
+
+        if (msgCode == null) {
             throw new CrmebException("验证码已过期");
         }
-        if (!validateCode.toString().equals(code)) {
+        if (!msgCode.getMsg().equals(code)) {
             throw new CrmebException("验证码错误");
         }
-        //删除验证码
-        redisUtil.delete(SmsConstants.SMS_VALIDATE_PHONE + phone);
+
+        List<MsgCode> msgCodes = msgCodeService.list(new QueryWrapper<MsgCode>().lambda().eq(MsgCode::getPhone, phone).eq(MsgCode::getStatus, "未使用"));
+
+        for (MsgCode msgCode1 : msgCodes) {
+            msgCode1.setStatus("已使用");
+            msgCodeService.updateById(msgCode1);
+        }
     }
 
     private void checkValidateCodeNoDel(String phone, String code) {
@@ -140,13 +152,15 @@ public class LoginServiceImpl implements LoginService {
         if (StringUtils.isNotEmpty(value) && "0".equals(value)) {
             return;
         }
-        Object validateCode = redisUtil.get(SmsConstants.SMS_VALIDATE_PHONE + phone);
-        if (ObjectUtil.isNull(validateCode)) {
+        MsgCode msgCode = msgCodeService.getOne(new QueryWrapper<MsgCode>().lambda().eq(MsgCode::getPhone, phone).eq(MsgCode::getStatus, "未使用").ge(MsgCode::getExpiredTime, new Date()).last(" order by gmt_created desc limit 1"));
+        if (msgCode == null) {
             throw new CrmebException("验证码已过期");
         }
-        if (!validateCode.toString().equals(code)) {
+        if (!msgCode.getMsg().equals(code)) {
             throw new CrmebException("验证码错误");
         }
+//        msgCode.setStatus("已使用");
+//        msgCodeService.updateById(msgCode);
     }
 
     /**
@@ -189,10 +203,10 @@ public class LoginServiceImpl implements LoginService {
             throw new CrmebException("当前手机号存在多个账号, 请选择账号在进行登录");
         }
 
-        UserCapa userCapa  = userCapaService.getByUser(userList.get(0).getId());
-        UserInvitation userInvitation =  userInvitationService.getByUser(userList.get(0).getId());
-        if (spreadPid != null && spreadPid > 0  && userInvitation == null) {
-            String ifOpen =  systemConfigService.getValueByKey("ifOpen");
+        UserCapa userCapa = userCapaService.getByUser(userList.get(0).getId());
+        UserInvitation userInvitation = userInvitationService.getByUser(userList.get(0).getId());
+        if (spreadPid != null && spreadPid > 0 && userInvitation == null) {
+            String ifOpen = systemConfigService.getValueByKey("ifOpen");
             String capaId = systemConfigService.getValueByKey("capaId");
             //邀请配置 配置关闭时默认强绑定
             userInvitationService.band(userList.get(0).getId(), spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).intValue() <= userCapa.getCapaId().intValue(), false);
@@ -203,7 +217,7 @@ public class LoginServiceImpl implements LoginService {
         User user = userService.getByAccount(loginRequest.getAccount());
 
         //元气小站配置写死
-        if(loginRequest.getIfvitality()) {
+        if (loginRequest.getIfvitality()) {
             White white = whiteService.getByName("元气小站");
             if (white != null) {
                 WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), white.getId());
@@ -272,7 +286,7 @@ public class LoginServiceImpl implements LoginService {
         }
         //查询用户信息
         User user = userService.getByAccount(loginRequest.getAccount().toUpperCase());
-        if(userService.isUnique4Phone() && user == null){
+        if (userService.isUnique4Phone() && user == null) {
             List<User> userList = userService.getByPhone(loginRequest.getAccount());
             user = userList.isEmpty() ? null : userList.get(0);
         }
@@ -288,9 +302,9 @@ public class LoginServiceImpl implements LoginService {
         Integer spreadPid = Optional.ofNullable(loginRequest.getSpreadPid()).orElse(0);
 
 
-        UserInvitation userInvitation =  userInvitationService.getByUser(user.getId());
-        if (spreadPid != null && spreadPid > 0  && userInvitation == null) {
-            UserCapa userCapa  = userCapaService.getByUser(user.getId());
+        UserInvitation userInvitation = userInvitationService.getByUser(user.getId());
+        if (spreadPid != null && spreadPid > 0 && userInvitation == null) {
+            UserCapa userCapa = userCapaService.getByUser(user.getId());
             String ifOpen = systemConfigService.getValueByKey("ifOpen");
             String capaId = systemConfigService.getValueByKey("capaId");
             //邀请配置 配置关闭时默认强绑定
@@ -298,7 +312,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         //元气小站配置写死
-        if(loginRequest.getIfvitality()) {
+        if (loginRequest.getIfvitality()) {
             White white = whiteService.getByName("元气小站");
             if (white != null) {
                 WhiteUser whiteUser = whiteUserService.getByUser(user.getId(), white.getId());
@@ -320,10 +334,10 @@ public class LoginServiceImpl implements LoginService {
         if (!user.getPhone().equals(phone)) {
             throw new CrmebException("与绑定手机号不符合");
         }
-        checkValidateCode(phone ,captcha);
-        LambdaUpdateWrapper<User> luw=new LambdaUpdateWrapper<User>()
-                .eq(User::getId,user.getId())
-                .set(User::getPwd,CrmebUtil.encryptPassword(password));
+        checkValidateCode(phone, captcha);
+        LambdaUpdateWrapper<User> luw = new LambdaUpdateWrapper<User>()
+                .eq(User::getId, user.getId())
+                .set(User::getPwd, CrmebUtil.encryptPassword(password));
         userService.update(luw);
 
     }
@@ -332,7 +346,7 @@ public class LoginServiceImpl implements LoginService {
     public LoginResponse phoneCaptchaRegister(RegisterMobileRequest loginRequest) {
 
         List<User> userList = userService.getByPhone(loginRequest.getPhone());
-        if(!userList.isEmpty()){
+        if (!userList.isEmpty()) {
             throw new CrmebException("手机号已存在");
         }
 
@@ -520,9 +534,9 @@ public class LoginServiceImpl implements LoginService {
                 userService.save(finalUser);
                 if (spreadPid > 0) {
 
-                    String ifOpen =  systemConfigService.getValueByKey("ifOpen");
-                    String capaId =  systemConfigService.getValueByKey("capaId");
-                   userInvitationService.band(finalUser.getId(), spreadPid, false, ifOpen.equals("2")?true:Long.valueOf(capaId).equals(capaService.getMinCapa().getId()), false);
+                    String ifOpen = systemConfigService.getValueByKey("ifOpen");
+                    String capaId = systemConfigService.getValueByKey("capaId");
+                    userInvitationService.band(finalUser.getId(), spreadPid, false, ifOpen.equals("2") ? true : Long.valueOf(capaId).equals(capaService.getMinCapa().getId()), false);
 
                 }
 
@@ -535,7 +549,6 @@ public class LoginServiceImpl implements LoginService {
                     bindSpread(finalUser, spreadPid);
                 }
             }
-
 
 
             userTokenService.bind(registerThirdUserRequest.getOpenId(), userTokenType, finalUser.getId());
