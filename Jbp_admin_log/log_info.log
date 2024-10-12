@@ -2129,3 +2129,512 @@
 2024-09-23 16:01:59.992 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
 2024-09-23 16:02:00.343 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
 2024-09-23 16:02:00.388 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2024-10-12 14:32:29.047 [main] INFO  com.jbp.admin.JbpAdminApplication - Starting JbpAdminApplication on 192.168.0.56 with PID 87084 (/Users/franky/work/jbp/jbp-admin/target/classes started by kaycm in /Users/franky/work/jbp)
+2024-10-12 14:32:29.049 [main] INFO  com.jbp.admin.JbpAdminApplication - The following profiles are active: sm
+2024-10-12 14:32:33.139 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2024-10-12 14:32:33.143 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2024-10-12 14:32:33.225 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 47ms. Found 0 Redis repository interfaces.
+2024-10-12 14:32:33.396 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  ******************* init miniDao config [ begin ] *********************** 
+2024-10-12 14:32:33.396 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  ------ minidao.base-package ------- org.jeecg.modules.jmreport.*
+2024-10-12 14:32:33.397 [main] INFO  o.j.minidao.auto.MinidaoAutoConfiguration -  *******************  init miniDao config  [ end ] *********************** 
+2024-10-12 14:32:33.545 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDataSourceDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbFieldDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDbParamDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDictDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportDictItemDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportLinkDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportMapDao }
+2024-10-12 14:32:33.546 [main] INFO  o.j.minidao.factory.MiniDaoClassPathMapperScanner - register minidao name is { org.jeecg.modules.jmreport.desreport.dao.JimuReportShareDao }
+2024-10-12 14:32:34.109 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#9' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.112 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportShareDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.113 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#8' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.113 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportMapDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.114 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#7' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.114 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportLinkDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.115 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#6' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.116 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDictItemDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.116 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#5' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.117 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDictDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.118 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#4' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.118 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbParamDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.119 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#3' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.119 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbFieldDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.120 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#2' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.120 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDbDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.121 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc#1' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.121 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDataSourceDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.122 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#28f154cc' of type [org.jeecgframework.minidao.aop.MiniDaoHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.122 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'jimuReportDao' of type [org.jeecgframework.minidao.factory.MiniDaoBeanFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.396 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.406 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.411 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@334540a0' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.412 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.424 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2024-10-12 14:32:34.981 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8181 (http)
+2024-10-12 14:32:34.994 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8181"]
+2024-10-12 14:32:34.995 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-10-12 14:32:34.995 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.33]
+2024-10-12 14:32:35.684 [main] INFO  org.apache.jasper.servlet.TldScanner - At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2024-10-12 14:32:35.705 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-10-12 14:32:35.705 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 6553 ms
+2024-10-12 14:32:41.528 [main] INFO  o.j.m.jmreport.config.init.JimuReportConfiguration -  Init JimuReport Config [ Token Interceptor & Resource Locations ] 
+2024-10-12 14:32:43.691 [main] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2024-10-12 14:32:55.856 [main] INFO  c.y.y.s.c.provider.file.YopFileSdkConfigProvider - 加载默认配置文件config/yop_sdk_config_default.json
+2024-10-12 14:32:56.766 [main] INFO  com.jbp.common.jdpay.sdk.JdPay - 正在初始化京东支付核心类.......
+2024-10-12 14:32:56.776 [main] INFO  com.jbp.common.jdpay.sdk.JdPay - 未启动京东支付初始化退出.......
+2024-10-12 14:33:04.982 [main] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
+2024-10-12 14:33:05.000 [main] INFO  org.quartz.simpl.SimpleThreadPool - Job execution threads will use class loader of thread: main
+2024-10-12 14:33:05.024 [main] INFO  org.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2024-10-12 14:33:05.041 [main] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v.2.3.2 created.
+2024-10-12 14:33:05.053 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Using db table-based data access locking (synchronization).
+2024-10-12 14:33:05.057 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - JobStoreCMT initialized.
+2024-10-12 14:33:05.058 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2024-10-12 14:33:05.058 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2024-10-12 14:33:05.058 [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.3.2
+2024-10-12 14:33:05.059 [main] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@2005d3e0
+2024-10-12 14:33:46.094 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoint(s) beneath base path '/actuator'
+2024-10-12 14:33:46.410 [main] INFO  o.j.modules.jmreport.config.JmReportExecutorConfig -  Init JimuReport Config [ 线程池 ] 
+2024-10-12 14:33:46.553 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2024-10-12 14:33:46.599 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-10-12 14:33:46.602 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'taskExecutor'
+2024-10-12 14:33:46.825 [main] INFO  o.s.security.web.DefaultSecurityFilterChain - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@51e513b7, org.springframework.security.web.context.SecurityContextPersistenceFilter@8c6a7db, org.springframework.security.web.header.HeaderWriterFilter@4058b398, org.springframework.web.filter.CorsFilter@4e68aede, org.springframework.web.filter.CorsFilter@4e68aede, org.springframework.web.filter.CorsFilter@4e68aede, org.springframework.security.web.authentication.logout.LogoutFilter@17563b82, com.jbp.admin.filter.JwtAuthenticationTokenFilter@2f025e9e, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@40afa4f1, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4159c66d, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@87affb5, org.springframework.security.web.session.SessionManagementFilter@1fb947f6, org.springframework.security.web.access.ExceptionTranslationFilter@15c4b89b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@3310bb28]
+2024-10-12 14:33:47.269 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService
+2024-10-12 14:33:47.270 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'jmReportTaskExecutor'
+2024-10-12 14:33:48.032 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2024-10-12 14:33:48.051 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Found 4 custom documentation plugin(s)
+2024-10-12 14:33:48.051 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Skipping initializing disabled plugin bean swagger v2.0
+2024-10-12 14:33:48.051 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Skipping initializing disabled plugin bean swagger v2.0
+2024-10-12 14:33:48.051 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Skipping initializing disabled plugin bean swagger v2.0
+2024-10-12 14:33:48.051 [main] INFO  s.d.s.web.plugins.DocumentationPluginsBootstrapper - Skipping initializing disabled plugin bean swagger v2.0
+2024-10-12 14:33:48.051 [main] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
+2024-10-12 14:33:48.442 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Freed 0 triggers from 'acquired' / 'blocked' state.
+2024-10-12 14:33:49.551 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Recovering 0 jobs that were in-progress at the time of the last shut-down.
+2024-10-12 14:33:49.552 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Recovery complete.
+2024-10-12 14:33:49.646 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Removed 0 'complete' triggers.
+2024-10-12 14:33:50.885 [main] INFO  o.s.scheduling.quartz.LocalDataSourceJobStore - Removed 0 stale fired job entries.
+2024-10-12 14:33:51.086 [main] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2024-10-12 14:33:51.111 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8181"]
+2024-10-12 14:33:51.281 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8181 (http) with context path ''
+2024-10-12 14:33:51.288 [main] INFO  com.jbp.admin.JbpAdminApplication - Started JbpAdminApplication in 83.678 seconds (JVM running for 84.775)
+2024-10-12 14:33:51.851 [RMI TCP Connection(8)-192.168.0.56] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-10-12 14:33:51.852 [RMI TCP Connection(8)-192.168.0.56] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-10-12 14:33:51.876 [RMI TCP Connection(8)-192.168.0.56] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 23 ms
+2024-10-12 14:33:55.585 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:1
+2024-10-12 14:33:58.420 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:2
+2024-10-12 14:34:01.586 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:3
+2024-10-12 14:34:03.907 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-10-12 14:34:03.914 [task-executor-1] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Sat Oct 12 14:34:03 CST 2024
+2024-10-12 14:34:03.929 [task-executor-1] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-10-12 14:34:03.929 [task-executor-1] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：21毫秒
+2024-10-12 14:34:04.808 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:4
+2024-10-12 14:34:05.467 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:5
+2024-10-12 14:34:08.703 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:6
+2024-10-12 14:34:09.723 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:7
+2024-10-12 14:34:11.156 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:8
+2024-10-12 14:34:12.810 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:9
+2024-10-12 14:34:15.456 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:10
+2024-10-12 14:34:17.205 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:11
+2024-10-12 14:34:19.152 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:12
+2024-10-12 14:34:21.760 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:13
+2024-10-12 14:34:23.654 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:14
+2024-10-12 14:34:25.487 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:15
+2024-10-12 14:34:27.017 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:16
+2024-10-12 14:34:28.450 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:17
+2024-10-12 14:34:29.177 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:18
+2024-10-12 14:34:30.717 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:19
+2024-10-12 14:34:31.125 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:20
+2024-10-12 14:34:31.842 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:21
+2024-10-12 14:34:33.841 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:22
+2024-10-12 14:34:34.812 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:23
+2024-10-12 14:34:36.038 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:24
+2024-10-12 14:34:36.898 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:25
+2024-10-12 14:34:40.364 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:26
+2024-10-12 14:34:41.465 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:27
+2024-10-12 14:34:42.687 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:28
+2024-10-12 14:34:43.310 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:29
+2024-10-12 14:34:43.896 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:30
+2024-10-12 14:34:45.238 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:31
+2024-10-12 14:34:45.239 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:32
+2024-10-12 14:34:46.585 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:33
+2024-10-12 14:34:48.419 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:34
+2024-10-12 14:34:49.144 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:35
+2024-10-12 14:34:50.466 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:36
+2024-10-12 14:34:51.705 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:37
+2024-10-12 14:34:52.421 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:38
+2024-10-12 14:34:58.143 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:39
+2024-10-12 14:34:58.660 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:40
+2024-10-12 14:34:59.384 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:41
+2024-10-12 14:34:59.384 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:42
+2024-10-12 14:34:59.861 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:43
+2024-10-12 14:35:00.598 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:44
+2024-10-12 14:35:01.370 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:45
+2024-10-12 14:35:01.978 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:46
+2024-10-12 14:35:01.978 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:47
+2024-10-12 14:35:03.801 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:48
+2024-10-12 14:35:04.764 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-10-12 14:35:04.766 [task-executor-2] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Sat Oct 12 14:35:04 CST 2024
+2024-10-12 14:35:04.768 [task-executor-2] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-10-12 14:35:04.768 [task-executor-2] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：4毫秒
+2024-10-12 14:35:04.896 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:49
+2024-10-12 14:35:07.380 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:50
+2024-10-12 14:35:09.086 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:51
+2024-10-12 14:35:09.086 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:52
+2024-10-12 14:35:09.086 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:53
+2024-10-12 14:35:09.734 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:54
+2024-10-12 14:35:10.446 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:55
+2024-10-12 14:35:12.175 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:56
+2024-10-12 14:35:14.251 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:57
+2024-10-12 14:35:15.259 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:58
+2024-10-12 14:35:15.976 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:59
+2024-10-12 14:35:16.590 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:60
+2024-10-12 14:35:17.106 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:61
+2024-10-12 14:35:18.035 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:62
+2024-10-12 14:35:18.638 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:63
+2024-10-12 14:35:20.690 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:64
+2024-10-12 14:35:23.487 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:65
+2024-10-12 14:35:26.024 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:66
+2024-10-12 14:35:27.112 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:67
+2024-10-12 14:35:27.751 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:68
+2024-10-12 14:35:28.671 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:69
+2024-10-12 14:35:29.809 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:70
+2024-10-12 14:35:31.026 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:71
+2024-10-12 14:35:31.561 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:72
+2024-10-12 14:35:34.643 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:73
+2024-10-12 14:35:35.227 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:74
+2024-10-12 14:35:35.841 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:75
+2024-10-12 14:35:38.613 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:76
+2024-10-12 14:35:40.155 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:77
+2024-10-12 14:35:41.377 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:78
+2024-10-12 14:35:42.091 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:79
+2024-10-12 14:35:42.701 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:80
+2024-10-12 14:35:43.931 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:81
+2024-10-12 14:35:45.898 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:82
+2024-10-12 14:35:45.899 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:83
+2024-10-12 14:35:46.902 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:84
+2024-10-12 14:35:48.145 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:85
+2024-10-12 14:35:50.289 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:86
+2024-10-12 14:35:50.893 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:87
+2024-10-12 14:35:51.491 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:88
+2024-10-12 14:35:52.121 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:89
+2024-10-12 14:35:53.773 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:90
+2024-10-12 14:35:53.775 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:91
+2024-10-12 14:35:55.624 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:92
+2024-10-12 14:35:56.218 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:93
+2024-10-12 14:35:56.942 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:94
+2024-10-12 14:35:57.549 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:95
+2024-10-12 14:35:58.176 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:96
+2024-10-12 14:35:58.880 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:97
+2024-10-12 14:35:59.802 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:98
+2024-10-12 14:36:00.729 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:99
+2024-10-12 14:36:01.440 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:100
+2024-10-12 14:36:02.778 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:101
+2024-10-12 14:36:03.597 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:102
+2024-10-12 14:36:04.205 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:103
+2024-10-12 14:36:04.819 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:104
+2024-10-12 14:36:04.819 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:105
+2024-10-12 14:36:05.434 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:106
+2024-10-12 14:36:06.151 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:107
+2024-10-12 14:36:06.699 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:108
+2024-10-12 14:36:08.503 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:109
+2024-10-12 14:36:08.503 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:110
+2024-10-12 14:36:09.960 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:111
+2024-10-12 14:36:10.656 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:112
+2024-10-12 14:36:11.271 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:113
+2024-10-12 14:36:11.885 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:114
+2024-10-12 14:36:12.499 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:115
+2024-10-12 14:36:13.171 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:116
+2024-10-12 14:36:13.830 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:117
+2024-10-12 14:36:14.550 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:118
+2024-10-12 14:36:14.550 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:119
+2024-10-12 14:36:15.267 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:120
+2024-10-12 14:36:15.267 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:121
+2024-10-12 14:36:16.927 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:122
+2024-10-12 14:36:16.928 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:123
+2024-10-12 14:36:18.390 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:124
+2024-10-12 14:36:19.678 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:125
+2024-10-12 14:36:20.281 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:126
+2024-10-12 14:36:23.265 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:127
+2024-10-12 14:36:24.566 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:128
+2024-10-12 14:36:24.568 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:129
+2024-10-12 14:36:26.657 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:130
+2024-10-12 14:36:27.244 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:131
+2024-10-12 14:36:27.819 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:132
+2024-10-12 14:36:29.598 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:133
+2024-10-12 14:36:31.077 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:134
+2024-10-12 14:36:32.795 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:135
+2024-10-12 14:36:32.795 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:136
+2024-10-12 14:36:33.465 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:137
+2024-10-12 14:36:34.004 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:138
+2024-10-12 14:36:34.617 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:139
+2024-10-12 14:36:35.774 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:140
+2024-10-12 14:36:36.755 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:141
+2024-10-12 14:36:36.756 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:142
+2024-10-12 14:36:36.756 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:143
+2024-10-12 14:36:36.756 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:144
+2024-10-12 14:36:37.342 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:145
+2024-10-12 14:36:37.342 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:146
+2024-10-12 14:36:37.342 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:147
+2024-10-12 14:36:38.003 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:148
+2024-10-12 14:36:39.678 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:149
+2024-10-12 14:36:40.767 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:150
+2024-10-12 14:36:40.768 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:151
+2024-10-12 14:36:40.768 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:152
+2024-10-12 14:36:41.451 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:153
+2024-10-12 14:36:41.452 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:154
+2024-10-12 14:36:42.302 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:155
+2024-10-12 14:36:42.923 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:156
+2024-10-12 14:36:44.038 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:157
+2024-10-12 14:36:45.061 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:158
+2024-10-12 14:36:45.882 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:159
+2024-10-12 14:36:46.496 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:160
+2024-10-12 14:36:47.146 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:161
+2024-10-12 14:36:47.991 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:162
+2024-10-12 14:36:47.991 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:163
+2024-10-12 14:36:47.991 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:164
+2024-10-12 14:36:48.975 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:165
+2024-10-12 14:36:50.052 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:166
+2024-10-12 14:36:52.692 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:167
+2024-10-12 14:36:52.693 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:168
+2024-10-12 14:36:53.253 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:169
+2024-10-12 14:36:53.784 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:170
+2024-10-12 14:36:55.929 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:171
+2024-10-12 14:36:58.139 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:172
+2024-10-12 14:36:59.097 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:173
+2024-10-12 14:36:59.098 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:174
+2024-10-12 14:37:01.164 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:175
+2024-10-12 14:37:02.273 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-10-12 14:37:02.274 [task-executor-3] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Sat Oct 12 14:37:02 CST 2024
+2024-10-12 14:37:02.275 [task-executor-3] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-10-12 14:37:02.275 [task-executor-3] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：3毫秒
+2024-10-12 14:37:02.737 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:176
+2024-10-12 14:37:02.858 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:177
+2024-10-12 14:37:04.988 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:178
+2024-10-12 14:37:06.057 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:179
+2024-10-12 14:37:06.057 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:180
+2024-10-12 14:37:06.870 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:181
+2024-10-12 14:37:08.204 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:182
+2024-10-12 14:37:09.124 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:183
+2024-10-12 14:37:10.667 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:184
+2024-10-12 14:37:10.667 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:185
+2024-10-12 14:37:12.503 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:186
+2024-10-12 14:37:13.838 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:187
+2024-10-12 14:37:14.451 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:188
+2024-10-12 14:37:15.861 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:189
+2024-10-12 14:37:16.496 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:190
+2024-10-12 14:37:17.800 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:191
+2024-10-12 14:37:17.801 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:192
+2024-10-12 14:37:18.783 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:193
+2024-10-12 14:37:19.981 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:194
+2024-10-12 14:37:20.703 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:195
+2024-10-12 14:37:21.259 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:196
+2024-10-12 14:37:21.822 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:197
+2024-10-12 14:37:21.822 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:198
+2024-10-12 14:37:22.436 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:199
+2024-10-12 14:37:22.952 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:200
+2024-10-12 14:37:23.565 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:201
+2024-10-12 14:37:24.277 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:202
+2024-10-12 14:37:25.199 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:203
+2024-10-12 14:37:26.406 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:204
+2024-10-12 14:37:28.137 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:205
+2024-10-12 14:37:28.706 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:206
+2024-10-12 14:37:29.370 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:207
+2024-10-12 14:37:30.546 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:208
+2024-10-12 14:37:30.547 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:209
+2024-10-12 14:37:30.547 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:210
+2024-10-12 14:37:31.379 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:211
+2024-10-12 14:37:32.358 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:212
+2024-10-12 14:37:32.890 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:213
+2024-10-12 14:37:33.503 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:214
+2024-10-12 14:37:34.110 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:215
+2024-10-12 14:37:34.111 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:216
+2024-10-12 14:37:34.824 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:217
+2024-10-12 14:37:35.849 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:218
+2024-10-12 14:37:35.849 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:219
+2024-10-12 14:37:36.466 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:220
+2024-10-12 14:37:37.153 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:221
+2024-10-12 14:37:38.316 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:222
+2024-10-12 14:37:38.922 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:223
+2024-10-12 14:37:38.922 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:224
+2024-10-12 14:37:39.775 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:225
+2024-10-12 14:37:40.776 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:226
+2024-10-12 14:37:41.334 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:227
+2024-10-12 14:37:41.994 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:228
+2024-10-12 14:37:41.994 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:229
+2024-10-12 14:37:43.029 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:230
+2024-10-12 14:37:43.633 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:231
+2024-10-12 14:37:44.247 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:232
+2024-10-12 14:37:44.862 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:233
+2024-10-12 14:37:46.318 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:234
+2024-10-12 14:37:46.319 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:235
+2024-10-12 14:37:47.120 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:236
+2024-10-12 14:37:47.922 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:237
+2024-10-12 14:37:47.923 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:238
+2024-10-12 14:37:48.443 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:239
+2024-10-12 14:37:49.252 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:240
+2024-10-12 14:37:49.252 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:241
+2024-10-12 14:37:50.164 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:242
+2024-10-12 14:37:51.305 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:243
+2024-10-12 14:37:51.942 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:244
+2024-10-12 14:37:53.104 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:245
+2024-10-12 14:37:53.669 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:246
+2024-10-12 14:37:54.180 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:247
+2024-10-12 14:37:54.180 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:248
+2024-10-12 14:37:54.999 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:249
+2024-10-12 14:37:56.435 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:250
+2024-10-12 14:37:57.089 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:251
+2024-10-12 14:37:58.031 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:252
+2024-10-12 14:37:58.795 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:253
+2024-10-12 14:37:58.796 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:254
+2024-10-12 14:37:58.796 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:255
+2024-10-12 14:37:58.796 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:256
+2024-10-12 14:37:58.796 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:257
+2024-10-12 14:38:00.005 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:258
+2024-10-12 14:38:00.006 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:259
+2024-10-12 14:38:00.006 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:260
+2024-10-12 14:38:00.006 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:261
+2024-10-12 14:38:00.978 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:262
+2024-10-12 14:38:01.585 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:263
+2024-10-12 14:38:02.376 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：11
+2024-10-12 14:38:02.377 [task-executor-4] INFO  com.jbp.admin.task.order.OrderRefundTask - ---OrderRefundTask task------produce Data with fixed rate task: Execution Time - Sat Oct 12 14:38:02 CST 2024
+2024-10-12 14:38:02.380 [task-executor-4] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderRefund | size:0
+2024-10-12 14:38:02.380 [task-executor-4] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：11  总共耗时：3毫秒
+2024-10-12 14:38:03.406 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:264
+2024-10-12 14:38:04.432 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:265
+2024-10-12 14:38:05.063 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:266
+2024-10-12 14:38:06.456 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:267
+2024-10-12 14:38:06.456 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:268
+2024-10-12 14:38:07.540 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:269
+2024-10-12 14:38:08.219 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:270
+2024-10-12 14:38:08.848 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:271
+2024-10-12 14:38:09.494 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:272
+2024-10-12 14:38:10.089 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:273
+2024-10-12 14:38:10.848 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:274
+2024-10-12 14:38:11.398 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:275
+2024-10-12 14:38:12.036 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:276
+2024-10-12 14:38:12.478 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:277
+2024-10-12 14:38:13.065 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:278
+2024-10-12 14:38:13.676 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:279
+2024-10-12 14:38:14.406 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:280
+2024-10-12 14:38:15.143 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:281
+2024-10-12 14:38:16.773 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:282
+2024-10-12 14:38:17.963 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:283
+2024-10-12 14:38:19.228 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:284
+2024-10-12 14:38:20.446 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:285
+2024-10-12 14:38:20.446 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:286
+2024-10-12 14:38:21.476 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:287
+2024-10-12 14:38:21.997 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:288
+2024-10-12 14:38:22.702 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:289
+2024-10-12 14:38:22.702 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:290
+2024-10-12 14:38:24.206 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:291
+2024-10-12 14:38:24.733 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:292
+2024-10-12 14:38:25.762 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:293
+2024-10-12 14:38:26.375 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:294
+2024-10-12 14:38:26.375 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:295
+2024-10-12 14:38:27.473 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:296
+2024-10-12 14:38:28.727 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:297
+2024-10-12 14:38:29.444 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:298
+2024-10-12 14:38:30.174 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:299
+2024-10-12 14:38:30.174 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:300
+2024-10-12 14:38:30.864 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:301
+2024-10-12 14:38:31.536 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:302
+2024-10-12 14:38:32.173 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:303
+2024-10-12 14:38:32.720 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:304
+2024-10-12 14:38:33.310 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:305
+2024-10-12 14:38:34.043 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:306
+2024-10-12 14:38:35.065 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:307
+2024-10-12 14:38:35.601 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:308
+2024-10-12 14:38:38.928 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:309
+2024-10-12 14:38:38.978 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:310
+2024-10-12 14:38:39.556 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:311
+2024-10-12 14:38:39.557 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:312
+2024-10-12 14:38:39.599 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:313
+2024-10-12 14:38:39.599 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:314
+2024-10-12 14:38:40.259 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:315
+2024-10-12 14:38:40.728 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:316
+2024-10-12 14:38:41.194 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:317
+2024-10-12 14:38:41.921 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:318
+2024-10-12 14:38:41.921 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:319
+2024-10-12 14:38:42.512 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:320
+2024-10-12 14:38:43.143 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:321
+2024-10-12 14:38:43.144 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:322
+2024-10-12 14:38:44.079 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:323
+2024-10-12 14:38:44.954 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:324
+2024-10-12 14:38:44.955 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:325
+2024-10-12 14:38:45.629 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:326
+2024-10-12 14:38:48.096 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:327
+2024-10-12 14:38:48.556 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:328
+2024-10-12 14:38:48.556 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:329
+2024-10-12 14:38:49.104 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:330
+2024-10-12 14:38:49.662 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:331
+2024-10-12 14:38:50.408 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:332
+2024-10-12 14:38:51.426 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:333
+2024-10-12 14:38:51.426 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:334
+2024-10-12 14:38:52.138 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:335
+2024-10-12 14:38:52.753 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:336
+2024-10-12 14:38:53.434 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:337
+2024-10-12 14:38:53.434 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:338
+2024-10-12 14:38:53.982 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:339
+2024-10-12 14:38:54.597 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:340
+2024-10-12 14:38:56.134 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:341
+2024-10-12 14:38:56.540 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:342
+2024-10-12 14:38:57.186 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:343
+2024-10-12 14:38:57.552 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:344
+2024-10-12 14:38:57.552 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:345
+2024-10-12 14:38:58.287 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:346
+2024-10-12 14:38:58.287 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:347
+2024-10-12 14:38:58.287 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:348
+2024-10-12 14:38:58.288 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:349
+2024-10-12 14:38:59.002 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:350
+2024-10-12 14:38:59.546 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:351
+2024-10-12 14:39:00.255 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:352
+2024-10-12 14:39:01.011 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:353
+2024-10-12 14:39:01.793 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:354
+2024-10-12 14:39:01.951 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务准备执行，任务ID：10
+2024-10-12 14:39:01.955 [task-executor-5] INFO  com.jbp.admin.task.order.OrderReceiptTask - ---OrderReceiptTask task------produce Data with fixed rate task: Execution Time - Sat Oct 12 14:39:01 CST 2024
+2024-10-12 14:39:01.961 [task-executor-5] INFO  com.jbp.service.service.impl.OrderTaskServiceImpl - OrderTaskServiceImpl.orderReceiving | size:0
+2024-10-12 14:39:01.961 [task-executor-5] INFO  com.jbp.admin.quartz.SysJobListener - 任务执行完毕，任务ID：10  总共耗时：11毫秒
+2024-10-12 14:39:02.774 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:355
+2024-10-12 14:39:04.526 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:356
+2024-10-12 14:39:04.526 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:357
+2024-10-12 14:39:05.421 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:358
+2024-10-12 14:39:06.281 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:359
+2024-10-12 14:39:07.316 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:360
+2024-10-12 14:39:08.176 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:361
+2024-10-12 14:39:09.079 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:362
+2024-10-12 14:39:09.547 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:363
+2024-10-12 14:39:09.956 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:364
+2024-10-12 14:39:09.956 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:365
+2024-10-12 14:39:09.956 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:366
+2024-10-12 14:39:09.956 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:367
+2024-10-12 14:39:10.471 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:368
+2024-10-12 14:39:10.471 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:369
+2024-10-12 14:39:10.471 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:370
+2024-10-12 14:39:10.921 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:371
+2024-10-12 14:39:11.495 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:372
+2024-10-12 14:39:12.105 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:373
+2024-10-12 14:39:12.823 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:374
+2024-10-12 14:39:12.872 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:375
+2024-10-12 14:39:13.650 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:376
+2024-10-12 14:39:14.256 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:377
+2024-10-12 14:39:15.082 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:378
+2024-10-12 14:39:17.757 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:379
+2024-10-12 14:39:18.484 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:380
+2024-10-12 14:39:19.281 [main] INFO  c.j.s.s.agent.impl.InvitationScoreServiceImpl - 总数:760,当前条数:381
+2024-10-12 14:39:20.216 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-10-12 14:39:20.661 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'jmReportTaskExecutor'
+2024-10-12 14:39:20.719 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'taskExecutor'
+2024-10-12 14:39:20.782 [SpringContextShutdownHook] INFO  o.s.scheduling.quartz.SchedulerFactoryBean - Shutting down Quartz Scheduler
+2024-10-12 14:39:20.784 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2024-10-12 14:39:20.785 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2024-10-12 14:39:20.794 [SpringContextShutdownHook] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2024-10-12 14:39:21.230 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2024-10-12 14:39:21.287 [SpringContextShutdownHook] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
