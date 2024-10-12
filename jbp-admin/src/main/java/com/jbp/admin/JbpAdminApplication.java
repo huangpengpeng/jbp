@@ -50,6 +50,11 @@ public class JbpAdminApplication {
         ConfigurableApplicationContext run = SpringApplication.run(JbpAdminApplication.class, args);
         System.out.println("ok");
 //        demo(run);
+
+        BindCardH5ApplyResult bindCardH5ApplyResult = run.getBean(LianLianPayService.class).bindCardH5Apply("wangbaoxuan", "INNERUSER", "BIND_CARD", StringUtils.N_TO_10("C_"),
+                "https://plat.jubaopeng.cc");
+        System.out.println(JSONObject.toJSONString(bindCardH5ApplyResult));
+
     }
 
     private static void demo(ConfigurableApplicationContext run) {

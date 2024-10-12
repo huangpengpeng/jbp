@@ -179,6 +179,13 @@ public interface LztService {
      * 资金流水详情
      */
     AcctSerialDetailResult acctSerialDetail(String oidPartner, String priKey, String user_id, String user_type, String jno_acct);
+
+
+    /**
+     * 解绑银行卡 https://accpapi.lianlianpay.com/v1/acctmgr/unlinkedacct-ind-apply
+     */
+
+
 }
 
 

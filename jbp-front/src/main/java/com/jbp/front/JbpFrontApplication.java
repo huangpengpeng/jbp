@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.beust.jcommander.internal.Lists;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.lianlian.result.BindCardH5ApplyResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.utils.StringUtils;
@@ -12,8 +13,10 @@ import com.jbp.common.yop.dto.ProductQualificationInfoDto;
 import com.jbp.common.yop.dto.SnMultiChannelOpenAccountDTO;
 import com.jbp.common.yop.params.*;
 import com.jbp.common.yop.result.*;
+import com.jbp.service.service.LianLianPayService;
 import com.jbp.service.service.YopService;
 import com.jbp.service.service.agent.LztAcctService;
+import com.jbp.service.service.impl.LianLianPayServiceImpl;
 import com.jbp.service.service.impl.YopServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -53,6 +56,7 @@ public class JbpFrontApplication {
         System.out.println("ok");
 
         YopService yopService = run.getBean(YopService.class);
+
 
 
 //        AccountReceiptResult yopResult = yopService.accountReceiptGet("10090476232", null, "LZT_DW_101587422746215", "WITHDRAW", "2024-07-10");

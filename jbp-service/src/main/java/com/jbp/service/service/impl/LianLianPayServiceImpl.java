@@ -385,7 +385,7 @@ public class LianLianPayServiceImpl implements LianLianPayService {
     @Override
     public BindCardH5ApplyResult bindCardH5Apply(String user_id, String user_type, String bind_cardtype, String txn_seqno,
                                                  String notify_url) {
-        Merchant merchant = merchantService.getById(4);
+        Merchant merchant = merchantService.getById(14);
         MerchantPayInfo payInfo = merchant.getPayInfo();
 
         BindCardH5ApplyParams params = new BindCardH5ApplyParams();
