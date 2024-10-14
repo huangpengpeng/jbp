@@ -1,7 +1,11 @@
 package com.jbp.common.model.pay;
 
+import com.alipay.api.domain.OrderInfoDTO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.VersionModel;
+import com.jbp.common.mybatis.FundClearingItemListHandler;
+import com.jbp.common.mybatis.PayOrderInfoListHandler;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -9,6 +13,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -57,7 +62,8 @@ public class PayUnifiedOrder extends VersionModel {
     private String billNo;
 
     @ApiModelProperty(value = "订单信息透传字段")
-    private String orderInfo;
+    @TableField(value = "orderInfo", typeHandler = PayOrderInfoListHandler.class)
+    private List<OrderInfoDTO> orderInfo;
 
     @ApiModelProperty(value = "透传扩展字段")
     private String ext;

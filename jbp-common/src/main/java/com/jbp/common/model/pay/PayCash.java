@@ -1,7 +1,10 @@
 package com.jbp.common.model.pay;
 
+import com.alipay.api.domain.OrderInfoDTO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
+import com.jbp.common.mybatis.PayOrderInfoListHandler;
 import com.jbp.common.utils.CrmebUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +13,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -35,7 +39,8 @@ public class PayCash extends BaseModel {
     private BigDecimal payAmt;
 
     @ApiModelProperty(value = "订单信息透传字段")
-    private String orderInfo;
+    @TableField(value = "orderInfo", typeHandler = PayOrderInfoListHandler.class)
+    private List<OrderInfoDTO> orderInfo;
 
     @ApiModelProperty(value = "透传扩展字段")
     private String ext;

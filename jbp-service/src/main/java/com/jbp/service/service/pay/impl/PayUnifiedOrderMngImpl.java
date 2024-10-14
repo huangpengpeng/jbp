@@ -35,6 +35,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     private PayCashMng payCashMng;
     @Resource
     private PayUserSubMerchantMng payUserSubMerchantMng;
+
     @Override
     public PayUnifiedOrder create(String token, String method) {
         PayCash payCash = payCashMng.getByToken(token);
@@ -70,10 +71,14 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 .notifyUrl(payCash.getNotifyUrl()).returnUrl(payCash.getReturnUrl())
                 .build();
         save(order);
-
         // todo 调用三方支付
 
         return order;
+    }
+
+    @Override
+    public PayUnifiedOrder success(String txnSeqno) {
+        return null;
     }
 
     @Override

@@ -9,6 +9,9 @@ public interface PayUnifiedOrderMng extends IService<PayUnifiedOrder> {
 
 
      PayUnifiedOrder create(String token, String method);
+
+     PayUnifiedOrder success(String txnSeqno);
+
      PayUnifiedOrder getByTxnSeqno(Long payUserId, String txnSeqno);
 
 }
