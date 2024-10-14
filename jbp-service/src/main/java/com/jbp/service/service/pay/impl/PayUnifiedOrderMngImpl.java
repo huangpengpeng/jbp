@@ -67,7 +67,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 .merchantName(subMerchant.getMerchantName()).merchantNo(subMerchant.getMerchantNo())
                 .payUserAccountName(subMerchant.getPayUserAccountName()).payUserAccountNo(subMerchant.getPayUserAccountNo())
                 .payMethod(method).txnSeqno(payCash.getTxnSeqno()).orderInfo(payCash.getOrderInfo()).ext(payCash.getExt())
-                .payAmt(payCash.getPayAmt()).refundAmt(BigDecimal.ZERO).status("PENDING").createTime(payCash.getCreateTime())
+                .payAmt(payCash.getPayAmt()).refundAmt(BigDecimal.ZERO).status("PROCESSING").createTime(payCash.getCreateTime())
                 .notifyUrl(payCash.getNotifyUrl()).returnUrl(payCash.getReturnUrl())
                 .build();
         save(order);

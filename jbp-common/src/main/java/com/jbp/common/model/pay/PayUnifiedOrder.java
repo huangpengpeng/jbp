@@ -74,7 +74,7 @@ public class PayUnifiedOrder extends VersionModel {
     @ApiModelProperty(value = "退款金额")
     private BigDecimal refundAmt;
 
-    @ApiModelProperty(value = "支付状态  SUCCESS CLOSE FAIL PENDING ")
+    @ApiModelProperty(value = "支付状态  SUCCESS CLOSE FAIL PROCESSING ")
     private String status;
 
     @ApiModelProperty(value = "付款时间")
