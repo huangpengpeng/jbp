@@ -1,5 +1,6 @@
 package com.jbp.common.model.agent;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
@@ -10,6 +11,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -27,4 +30,13 @@ public class MsgCode extends BaseModel {
     @ApiModelProperty("消息")
     @TableField("msg")
     private String msg;
+
+    @ApiModelProperty("状态")
+    @TableField("status")
+    private String status;
+
+    @ApiModelProperty("过期时间")
+    @TableField("expired_time")
+    private Date expiredTime;
+
 }

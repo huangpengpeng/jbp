@@ -30,10 +30,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -194,8 +192,12 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
         if (!aBoolean) {
             throw new CrmebException("发送短信失败，请联系后台管理员");
         }
+
+        Calendar nowTime = Calendar.getInstance();
+        nowTime.add(Calendar.MINUTE, Integer.valueOf(codeExpireStr));
         // 保存数据库
-        msgCodeService.save(new MsgCode(phone, code.toString()));
+        MsgCode msgCode =   new MsgCode(phone, code.toString(), "未使用", nowTime.getTime());
+        msgCodeService.save(msgCode);
         // 将验证码存入redis
         redisUtil.set(SmsConstants.SMS_VALIDATE_PHONE + phone, code, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
         redisUtil.set(SmsConstants.SMS_VALIDATE_PHONE_NUM + phone, 1, 60L);
