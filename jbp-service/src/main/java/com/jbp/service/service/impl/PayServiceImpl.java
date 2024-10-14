@@ -2075,15 +2075,17 @@ public class PayServiceImpl implements PayService {
     private CashierPayCreateResult jdPay(Order order) {
         CashierPayCreateResult result = new CashierPayCreateResult();
         List<OrderDetail> details = orderDetailService.getByOrderNo(order.getOrderNo());
+        User user = userService.getById(order.getPayUid());
+        TeamUser teamUser = teamUserService.getByUser(user.getId());
 
         if ("jdQuickPay".equals(order.getPayType())) {
             String gateway_url= jdPayService.jdPay(order.getUid().toString(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice(),
-                    order.getIp(), order.getCreateTime()).getWebUrl();
+                    order.getIp(), order.getCreateTime(), teamUser != null ? teamUser.getName() : "").getWebUrl();
             result.setGateway_url(gateway_url);
         }
         if ("jdAlipay".equals(order.getPayType())) {
             String gateway_url= jdPayService.aliPay(order.getUid().toString(), details.get(0).getProductName(), order.getOrderNo(), order.getPayPrice(),
-                    order.getIp(), order.getCreateTime()).getQrCode();
+                    order.getIp(), order.getCreateTime(), teamUser != null ? teamUser.getName() : "").getQrCode();
             result.setGateway_url(gateway_url);
         }
 

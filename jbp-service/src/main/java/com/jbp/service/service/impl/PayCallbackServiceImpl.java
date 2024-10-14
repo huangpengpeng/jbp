@@ -755,8 +755,6 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 }
             }
         }
-        jd
-
         redisTemplate.delete("PaySuccessCall" + orderNo);
         return "SUCCESS";
     }

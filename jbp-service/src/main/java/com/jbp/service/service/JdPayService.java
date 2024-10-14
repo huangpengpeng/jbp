@@ -9,10 +9,10 @@ public interface JdPayService {
 
 
     JdPayAggregateCreateOrderResponse jdPay(String userId, String goodsName, String payCode, BigDecimal amt,
-                                            String ip, Date createTime);
+                                            String ip, Date createTime, String teamName);
 
     JdPayAggregateCreateOrderResponse aliPay(String userId, String goodsName, String payCode, BigDecimal amt,
-                                             String ip, Date createTime);
+                                             String ip, Date createTime, String teamName);
 
     JdPayQueryOrderResponse queryOrder(String payCode);
 

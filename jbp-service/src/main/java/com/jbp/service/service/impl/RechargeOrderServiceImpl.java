@@ -240,8 +240,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         // 京东支付宝
         if (request.getPayType().equals(PayConstants.PAY_TYPE_JD_ZFB)) {
             CashierPayCreateResult result = new CashierPayCreateResult();
+            TeamUser teamUser = teamUserService.getByUser(user.getId());
             String gateway_url = jdPayService.aliPay(user.getId().toString(), "补差", rechargeNo, rechargePrice,
-                    request.getIp(), new Date()).getQrCode();
+                    request.getIp(), new Date(), teamUser != null ? teamUser.getName() : "").getQrCode();
             result.setGateway_url(gateway_url);
             response.setStatus(true);
             response.setJdConfig(result);
@@ -250,9 +251,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderDao, Rech
         }
         // 京东快捷
         if (request.getPayType().equals(PayConstants.PAY_TYPE_JD_KJ)) {
+            TeamUser teamUser = teamUserService.getByUser(user.getId());
             CashierPayCreateResult result = new CashierPayCreateResult();
             String gateway_url = jdPayService.jdPay(user.getId().toString(), "补差", rechargeNo, rechargePrice,
-                    request.getIp(), new Date()).getWebUrl();
+                    request.getIp(), new Date(), teamUser != null ? teamUser.getName() : "").getWebUrl();
             result.setGateway_url(gateway_url);
             response.setStatus(true);
             response.setJdConfig(result);

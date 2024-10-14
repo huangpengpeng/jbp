@@ -21,7 +21,7 @@ public class JdPayServiceImpl implements JdPayService {
 
     @Override
     public JdPayAggregateCreateOrderResponse jdPay(String userId, String goodsName, String payCode, BigDecimal amt,
-                                                   String ip, Date createTime) {
+                                                   String ip, Date createTime, String teamName) {
         JdPayAggregateCreateOrderRequest request = new JdPayAggregateCreateOrderRequest();
         request.setOutTradeNo(payCode);
         request.setTradeType("AGGRE");
@@ -29,7 +29,7 @@ public class JdPayServiceImpl implements JdPayService {
         request.setCreateDate(DateTimeUtils.format(createTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         request.setTradeExpiryTime("6000");
         request.setTradeSubject(goodsName);
-        request.setTradeRemark(goodsName);
+        request.setTradeRemark(teamName);
         request.setCurrency("CNY");
         request.setUserIp(ip);
         request.setBizTp("");
@@ -37,6 +37,7 @@ public class JdPayServiceImpl implements JdPayService {
         request.setGoodsInfo(goodsName);
         request.setUserId(userId);
         request.setRiskInfo("");
+
         request.setSceneType(SceneTypeEnum.ONLINE_APP.getCode());
 
         try {
@@ -49,7 +50,7 @@ public class JdPayServiceImpl implements JdPayService {
 
     @Override
     public JdPayAggregateCreateOrderResponse aliPay(String userId, String goodsName, String payCode, BigDecimal amt,
-                                                    String ip, Date createTime) {
+                                                    String ip, Date createTime, String teamName) {
         JdPayAggregateCreateOrderRequest request = new JdPayAggregateCreateOrderRequest();
         request.setOutTradeNo(payCode);
         request.setTradeType("AGGRE_QR");
@@ -57,7 +58,7 @@ public class JdPayServiceImpl implements JdPayService {
         request.setCreateDate(DateTimeUtils.format(createTime, DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2));
         request.setTradeExpiryTime("6000");
         request.setTradeSubject(goodsName);
-        request.setTradeRemark(goodsName);
+        request.setTradeRemark(teamName);
         request.setCurrency("CNY");
         request.setUserIp(ip);
         request.setBizTp("");
