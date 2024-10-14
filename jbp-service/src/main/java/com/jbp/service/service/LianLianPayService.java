@@ -45,4 +45,7 @@ public interface LianLianPayService {
 
     WithdrawalResult withdrawal(String drawNo, BigDecimal amt, String postscript, String password, String random_key);
 
+
+    CashierPayCreateResult shouyingtai(String account, String phone, String payCode, BigDecimal amount, String goodsName, String ip);
+
 }

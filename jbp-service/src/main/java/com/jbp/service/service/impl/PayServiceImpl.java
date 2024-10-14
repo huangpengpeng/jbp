@@ -22,8 +22,11 @@ import com.jbp.common.constants.*;
 import com.jbp.common.dto.ProductInfoDto;
 import com.jbp.common.dto.UserUpperDto;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.lianlian.client.LLianPayClient;
+import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.result.LianLianPayInfoResult;
+import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.model.agent.*;
 import com.jbp.common.model.alipay.AliPayInfo;
 import com.jbp.common.model.bill.Bill;
@@ -1126,6 +1129,13 @@ public class PayServiceImpl implements PayService {
         if (!execute) throw new CrmebException("人工确认支付订单失败");
         asyncService.orderPaySuccessSplit(order.getOrderNo());
         return true;
+    }
+
+    @Override
+    public CashierPayCreateResult checkstand(OrderPayRequest orderPayRequest) {
+
+        return  lianLianPayService.shouyingtai("123321","15870064801", "", new BigDecimal(1),"测试商品", "127.0.0.1");
+
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.jbp.service.service;
 
+import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.model.order.Order;
 import com.jbp.common.request.OrderPayRequest;
 import com.jbp.common.response.CashierInfoResponse;
@@ -76,4 +77,12 @@ public interface PayService {
     Boolean walletPay(Order order);
 
     Boolean confirmPay(Order order);
+
+
+    /**
+     * 订单支付
+     * @param orderPayRequest 订单支付参数
+     * @return OrderPayResultResponse
+     */
+    CashierPayCreateResult checkstand(OrderPayRequest orderPayRequest);
 }

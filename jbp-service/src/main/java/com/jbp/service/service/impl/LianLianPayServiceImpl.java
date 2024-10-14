@@ -1,8 +1,10 @@
 package com.jbp.service.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.google.gson.JsonArray;
 import com.jbp.common.constants.OrderConstants;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.client.LLianPayYtSignature;
@@ -629,5 +631,80 @@ public class LianLianPayServiceImpl implements LianLianPayService {
         String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         WithdrawalResult drawalResult = JSON.parseObject(resultJsonStr, WithdrawalResult.class);
         return drawalResult;
+    }
+
+    @Override
+    public CashierPayCreateResult shouyingtai(String account, String phone, String payCode, BigDecimal amount, String goodsName, String ip) {
+        LianLianPayInfoResult lianLianInfo = get();
+
+        CashierPayCreateParams params = new CashierPayCreateParams();
+        String timestamp = LLianPayDateUtils.getTimestamp();
+        params.setTimestamp(timestamp);
+        params.setOid_partner(lianLianInfo.getOid_partner());
+        // 普通消费
+        params.setTxn_type("GENERAL_CONSUME");
+        params.setUser_id("123213");
+        params.setUser_type("ANONYMOUS");
+        params.setNotify_url(lianLianInfo.getHost() + lianLianInfo.getNotify_url() );
+        params.setTotalAmount("1");
+        params.setTxnSeqno("12313273498274A");
+
+        params.setReturn_url(lianLianInfo.getReturn_url());
+        params.setClientIp("127.0.0.1");
+        // 交易发起渠道设置
+        params.setFlag_chnl("H5");
+        // 测试风控参数
+        String registerTime = DateTimeUtils.format(DateTimeUtils.addMonths(new Date(), -3), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN2);
+        String frms_ware_category = "4009";
+        if (StringUtils.isNotEmpty(lianLianInfo.getFrms_ware_category())) {
+            frms_ware_category = lianLianInfo.getFrms_ware_category();
+        }
+        RiskItemInfo riskItemInfo = new RiskItemInfo(frms_ware_category, "13123123", "15870064801", registerTime, "测试商品");
+        riskItemInfo.setFrms_ip_addr("127.0.0.1");
+        riskItemInfo.setFrms_client_chnl("H5");
+        riskItemInfo.setUser_auth_flag("1");
+        params.setRisk_item(JSONObject.toJSONString(riskItemInfo));
+
+        JSONObject extendJson = new JSONObject();
+        extendJson.put("req_domain", lianLianInfo.getReq_domain());
+        params.setExtend(extendJson);
+
+        // 设置商户订单信息
+        CashierPayCreateOrderInfo orderInfo = new CashierPayCreateOrderInfo();
+        orderInfo.setTxn_seqno("99999999999999999999");
+        orderInfo.setTxn_time(timestamp);
+        orderInfo.setTotal_amount(Double.valueOf(1));
+        orderInfo.setGoods_name("测试商品");
+        params.setOrderInfo(orderInfo);
+
+        // 设置付款方信息
+        CashierPayCreatePayerInfo payerInfo = new CashierPayCreatePayerInfo();
+        payerInfo.setPayer_id("123213");
+        payerInfo.setPayer_type("USER");
+        params.setPayerInfo(payerInfo);
+
+        // 收款方
+        CashierPayCreatePayeeInfo payeeInfo = new CashierPayCreatePayeeInfo();
+        payeeInfo.setPayee_id(lianLianInfo.getPayee_no()); // 不允许改变
+        payeeInfo.setPayee_type("USER");
+        payeeInfo.setPayee_accttype("USEROWN");
+        payeeInfo.setPayee_amount(amount.toString());
+        params.setPayeeInfo(new CashierPayCreatePayeeInfo[]{payeeInfo});
+
+        JSONArray jsonArray =new JSONArray();
+        JSONObject jsonObject =new JSONObject();
+        jsonObject.put("method","WECHAT_WXA");
+        jsonObject.put("amount","1");
+        jsonArray.add(jsonObject);
+        params.setPayMethods(jsonArray);
+
+        String url = "https://accpapi.lianlianpay.com/v1/txn/payment-gw";
+        LLianPayClient lLianPayClient = new LLianPayClient(lianLianInfo.getPriKey(), lianLianInfo.getPubKey());
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        CashierPayCreateResult result = JSON.parseObject(resultJsonStr, CashierPayCreateResult.class);
+        if (result == null || !"0000".equals(result.getRet_code())) {
+            throw new RuntimeException("请求三方交易失败:" + JSONObject.toJSONString(result));
+        }
+        return result;
     }
 }

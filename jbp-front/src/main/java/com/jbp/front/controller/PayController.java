@@ -1,5 +1,6 @@
 package com.jbp.front.controller;
 
+import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.request.OrderPayRequest;
 import com.jbp.common.response.CashierInfoResponse;
 import com.jbp.common.response.OrderPayResultResponse;
@@ -64,4 +65,13 @@ public class PayController {
     public CommonResult<CashierInfoResponse> getCashierIno(@PathVariable(value = "orderNo") String orderNo) {
         return CommonResult.success(payService.getCashierIno(orderNo));
     }
+
+
+
+    @ApiOperation(value = "支付")
+    @RequestMapping(value = "/checkstand", method = RequestMethod.POST)
+    public CommonResult<CashierPayCreateResult> checkstand(@RequestBody @Validated OrderPayRequest orderPayRequest) {
+        return CommonResult.success(payService.checkstand(orderPayRequest));
+    }
+
 }

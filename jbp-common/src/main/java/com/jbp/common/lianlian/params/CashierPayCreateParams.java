@@ -1,5 +1,6 @@
 package com.jbp.common.lianlian.params;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,4 +70,11 @@ public class CashierPayCreateParams {
     private CashierPayCreateStyle style;
     // 付款方信息
     private CashierPayCreatePayerInfo payerInfo;
+
+
+    private JSONArray payMethods;
+    private String clientIp;
+    private String totalAmount;
+    private String txnSeqno;
+
 }
