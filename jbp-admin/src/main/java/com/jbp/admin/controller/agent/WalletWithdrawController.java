@@ -37,6 +37,14 @@ public class WalletWithdrawController {
         return CommonResult.success(CommonPage.restPage(walletWithdrawService.pageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(), request.getRealName(),request.getNickName(), request.getTeamId(),pageParamRequest)));
     }
 
+    @PreAuthorize("hasAuthority('agent:wallet:withdraw:page')")
+    @GetMapping("/jdPage")
+    @ApiOperation("钱包提现列表")
+    public CommonResult<CommonPage<WalletWithdrawVo>> getJdList(WalletWithdrawPageRequest request, PageParamRequest pageParamRequest) {
+        return CommonResult.success(CommonPage.restPage(walletWithdrawService.jdPageList(request.getAccount(), request.getWalletName(), request.getStatus(), request.getDateLimit(), request.getRealName(),request.getNickName(), request.getTeamId(),pageParamRequest)));
+    }
+
+
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
     @PostMapping("/send")
     @ApiOperation("钱包提现批量出款")
@@ -44,6 +52,16 @@ public class WalletWithdrawController {
         walletWithdrawService.send(requests);
         return CommonResult.success();
     }
+
+
+    @PreAuthorize("hasAuthority('agent:wallet:withdraw:send')")
+    @PostMapping("/jdSend")
+    @ApiOperation("jd钱包提现批量出款")
+    public CommonResult jdSend(@RequestBody List<WalletWithdrawRequest> requests) {
+        walletWithdrawService.send(requests);
+        return CommonResult.success();
+    }
+
 
     @PreAuthorize("hasAuthority('agent:wallet:withdraw:cancel')")
     @PostMapping("/cancel")

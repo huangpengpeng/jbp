@@ -3,7 +3,6 @@ package com.jbp.service.service.agent.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
@@ -11,9 +10,11 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jbp.common.exception.CrmebException;
+import com.jbp.common.jdpay.vo.JdPayToPersonalWalletResponse;
 import com.jbp.common.model.agent.Wallet;
 import com.jbp.common.model.agent.WalletFlow;
 import com.jbp.common.model.agent.WalletWithdraw;
+import com.jbp.common.model.user.UserJd;
 import com.jbp.common.page.CommonPage;
 import com.jbp.common.request.PageParamRequest;
 import com.jbp.common.request.agent.WalletWithdrawCancelRequest;
@@ -26,7 +27,9 @@ import com.jbp.common.vo.DateLimitUtilVo;
 import com.jbp.common.vo.WalletWithdrawExcelInfoVo;
 import com.jbp.common.vo.WalletWithdrawVo;
 import com.jbp.service.dao.agent.WalletWithdrawDao;
+import com.jbp.service.service.JdPayService;
 import com.jbp.service.service.SystemConfigService;
+import com.jbp.service.service.UserJdService;
 import com.jbp.service.service.agent.ChannelCardService;
 import com.jbp.service.service.agent.ChannelIdentityService;
 import com.jbp.service.service.agent.WalletService;
@@ -57,24 +60,37 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
     private ChannelCardService channelCardService;
     @Resource
     private WalletWithdrawDao walletWithdrawDao;
+    @Resource
+    private JdPayService jdPayService;
+    @Resource
+    private UserJdService userJdService;
 
     @Override
-    public PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName,String nickName, String teamId,PageParamRequest pageParamRequest) {
+    public PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Page<WalletWithdrawVo> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        List<WalletWithdrawVo> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName,nickName,teamId);
+        List<WalletWithdrawVo> walletWithdrawsList = walletWithdrawDao.pageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName, nickName, teamId);
         return CommonPage.copyPageInfo(page, walletWithdrawsList);
     }
 
     @Override
-    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName, String teamId) {
+    public PageInfo<WalletWithdrawVo> jdPageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest) {
+        String channelName = systemConfigService.getValueByKey("pay_channel_name");
+        DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
+        Page<WalletWithdrawVo> page = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        List<WalletWithdrawVo> walletWithdrawsList = walletWithdrawDao.jdPageList(account, walletName, status, dateLimitUtilVo.getEndTime(), dateLimitUtilVo.getStartTime(), realName, channelName, nickName, teamId);
+        return CommonPage.copyPageInfo(page, walletWithdrawsList);
+    }
+
+    @Override
+    public WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit, String nickName, String teamId) {
         String channelName = systemConfigService.getValueByKey("pay_channel_name");
         DateLimitUtilVo dateLimitUtilVo = CrmebDateUtil.getDateLimit(dateLimit);
         Integer id = 0;
         List<WalletWithdrawVo> voList = CollUtil.newArrayList();
         do {
-            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName,nickName,teamId);
+            List<WalletWithdrawVo> fundClearingVos = walletWithdrawDao.excel(id, account, walletName, status, realName, dateLimitUtilVo.getStartTime(), dateLimitUtilVo.getEndTime(), channelName, nickName, teamId);
             if (CollectionUtils.isEmpty(fundClearingVos)) {
                 break;
             }
@@ -100,12 +116,12 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         head.put("bankName", "银行卡名称");
         head.put("bankCode", "银行卡号");
         head.put("realName", "真实姓名");
-        head.put("nickName","用户昵称");
-        head.put("idCardNo","身份证");
-        head.put("phone","手机号");
-        head.put("teamName","团队");
+        head.put("nickName", "用户昵称");
+        head.put("idCardNo", "身份证");
+        head.put("phone", "手机号");
+        head.put("teamName", "团队");
         JSONArray array = new JSONArray();
-        head.forEach((k,v)->{
+        head.forEach((k, v) -> {
             JSONObject json = new JSONObject();
             json.put("k", k);
             json.put("v", v);
@@ -128,7 +144,12 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         String commissionScale = systemConfigService.getValueByKey("wallet_withdraw_commission");
         BigDecimal scale = StringUtils.isEmpty(commissionScale) ? BigDecimal.ZERO : new BigDecimal(commissionScale);
         BigDecimal commission = amt.multiply(scale).setScale(2, BigDecimal.ROUND_DOWN);
+
+        String ifOpenJdtx = systemConfigService.getValueByKey("if_open_jdtx");
         WalletWithdraw walletWithdraw = new WalletWithdraw(uid, account, walletType, walletName, amt.subtract(commission), commission, postscript);
+        if (ifOpenJdtx.equals("'true'")) {
+            walletWithdraw.setChannel("JD");
+        }
         save(walletWithdraw);
         walletService.reduce(uid, walletType, amt, WalletFlow.OperateEnum.提现.name(), walletWithdraw.getUniqueNo(), postscript);
         return walletWithdraw;
@@ -161,6 +182,39 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
             walletWithdraw.setStatus(WalletWithdraw.StatusEnum.已出款.toString());
             walletWithdraw.setRemark(withdrawRequest.getRemark());
             walletWithdraw.setSuccessTime(now);
+            list.add(walletWithdraw);
+            i++;
+        }
+        List<List<WalletWithdraw>> partition = com.google.common.collect.Lists.partition(list, 100);
+        for (List<WalletWithdraw> walletWithdraws : partition) {
+            boolean ifSuccess = updateBatchById(walletWithdraws);
+            if (BooleanUtils.isNotTrue(ifSuccess)) {
+                throw new CrmebException("当前操作人数过多");
+            }
+        }
+    }
+
+    @Override
+    public void jdSend(List<WalletWithdrawRequest> walletWithdrawList) {
+        if (CollectionUtils.isEmpty(walletWithdrawList)) {
+            throw new CrmebException("提现信息不能为空");
+        }
+        List<WalletWithdraw> list = Lists.newArrayList();
+        Date now = DateTimeUtils.getNow();
+        int i = 1;
+        for (WalletWithdrawRequest withdrawRequest : walletWithdrawList) {
+            if (StringUtils.isEmpty(withdrawRequest.getUniqueNo())) {
+                throw new CrmebException("提现信息单号不能为空，行号:" + i);
+            }
+            WalletWithdraw walletWithdraw = getByUniqueNo(withdrawRequest.getUniqueNo());
+            if (walletWithdraw == null) {
+                throw new CrmebException("提现信息不存在，行号:" + i);
+            }
+            if (!walletWithdraw.getStatus().equals(WalletWithdraw.StatusEnum.待审核.toString())) {
+                throw new CrmebException("提现状态不是待审核，行号:" + i);
+            }
+            walletWithdraw.setStatus(WalletWithdraw.StatusEnum.待出款.toString());
+            walletWithdraw.setRemark(withdrawRequest.getRemark());
             list.add(walletWithdraw);
             i++;
         }

@@ -79,8 +79,35 @@
                 <if test="teamId!=null and teamId!=''">
                     and  t.leader_id = #{teamId}
                 </if>
-
+                and  ( w.channel is null or w.channel  != "JD")
             </where> ORDER BY w.id DESC
+    </select>
+    <select id="jdPageList" resultMap="WalletWithdraw">
+        <include refid="selectwalletWithdraw"/>
+        <where>
+            <if test="account!=null and account!=''">
+                and w.account=#{account}
+            </if>
+            <if test="walletName!=null and walletName!=''">
+                and w.wallet_name=#{walletName}
+            </if>
+            <if test="status!=null and status!=''">
+                and w.status=#{status}
+            </if>
+            <if test="endTime!=null and startTime!=null">
+                and  w.create_time  BETWEEN #{startTime} AND #{endTime}
+            </if>
+            <if test="realName!=null and realName!=''">
+                and asentity.real_name=#{realName}
+            </if>
+            <if test="nickName!=null and nickName!=''">
+                and u.nickname=#{nickName}
+            </if>
+            <if test="teamId!=null and teamId!=''">
+                and  t.leader_id = #{teamId}
+            </if>
+            and w.channel = "JD"
+        </where> ORDER BY w.id DESC
     </select>
 <!-- List<WalletWithdrawVo> excel(@Param("id") Integer id,@Param("account") String account,@Param("walletName") String walletName,@Param("status") String status,
                                  @Param("realName") String realName, @Param("startTime") String startTime,@Param("endTime") String endTime,@Param("channelName") String channelName);

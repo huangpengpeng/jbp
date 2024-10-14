@@ -39,7 +39,7 @@ public class WalletWithdraw extends VersionModel {
     }
 
     public static enum StatusEnum {
-        待出款, 已出款, 已取消
+        待出款, 已出款, 已取消,打款中,打款失败,打款成功,待审核
     }
 
     @ApiModelProperty("用户ID")
@@ -87,6 +87,10 @@ public class WalletWithdraw extends VersionModel {
     @ApiModelProperty("备注")
     @TableField("remark")
     private String remark;
+
+    @ApiModelProperty("渠道")
+    @TableField("channel")
+    private String channel;
 
     @ApiModelProperty("银行卡名称")
     @TableField(exist = false)

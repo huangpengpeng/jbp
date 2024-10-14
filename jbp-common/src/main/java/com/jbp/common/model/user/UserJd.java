@@ -23,7 +23,7 @@ public class UserJd extends BaseModel {
     private Integer uid;
 
     @ApiModelProperty(value = "京东账号")
-    private Integer xid;
+    private String xid;
 
 
 

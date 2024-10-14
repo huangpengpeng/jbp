@@ -197,7 +197,7 @@ public class WalletFlowServiceImpl extends ServiceImpl<WalletFlowDao, WalletFlow
                 }
             }
             User receiveUser = uidMapList.get(uid);
-            walletFlow.setPostscript("转账" + "【对手账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
+            walletFlow.setPostscript("转账" + "【对方账户:" + receiveUser.getAccount() + " | 昵称:" + receiveUser.getNickname() + "】");
 
             updateList.add(walletFlow);
             i++;

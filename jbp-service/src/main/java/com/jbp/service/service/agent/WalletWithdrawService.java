@@ -21,9 +21,16 @@ public interface WalletWithdrawService extends IService<WalletWithdraw> {
 
     void send(List<WalletWithdrawRequest> walletWithdrawList);
 
+    void jdSend(List<WalletWithdrawRequest> walletWithdrawList);
+
+
     void cancel(WalletWithdrawCancelRequest request);
 
     PageInfo<WalletWithdrawVo> pageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest);
+
+    PageInfo<WalletWithdrawVo> jdPageList(String account, String walletName, String status, String dateLimit, String realName, String nickName, String teamId, PageParamRequest pageParamRequest);
+
+
 
     WalletWithdrawExcelInfoVo excel(String account, String walletName, String status, String realName, String dateLimit,String nickName, String teamId);
 }
