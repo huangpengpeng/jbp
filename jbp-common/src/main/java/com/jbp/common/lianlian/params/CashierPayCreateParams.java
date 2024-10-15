@@ -1,13 +1,15 @@
 package com.jbp.common.lianlian.params;
 
 import com.alibaba.fastjson.JSONObject;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * 账户+收银台 请求参数
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 public class CashierPayCreateParams {
     /**

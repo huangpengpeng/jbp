@@ -1,5 +1,6 @@
 package com.jbp.service.service.pay;
 
+import com.jbp.common.request.pay.PayQueryRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
 import com.jbp.common.response.pay.PayRefundQueryResponse;
@@ -9,7 +10,7 @@ public interface PayAggregationMng {
 
     PayCreateResponse create();
 
-    PayQueryResponse query();
+    PayQueryResponse query(PayQueryRequest request);
 
     PayRefundResponse refund();
 

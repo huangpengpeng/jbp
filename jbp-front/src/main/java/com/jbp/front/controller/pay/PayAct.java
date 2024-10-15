@@ -5,6 +5,7 @@ import com.jbp.common.model.pay.PayCash;
 import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.request.merchant.MerchantSettledApplyRequest;
 import com.jbp.common.request.pay.PayCashRequest;
+import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
@@ -59,12 +60,11 @@ public class PayAct {
         return CommonResult.success(payCashMng.getPayMethod(token));
     }
 
-
     @ApiOperation(value = "支付下单")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public CommonResult<String> create(String token, String method) {
-        PayUnifiedOrder order = payUnifiedOrderMng.create(token, method);
-        return CommonResult.success();
+    public CommonResult<PayCreateResponse> create(String token, String method) {
+        PayCreateResponse result = payUnifiedOrderMng.create(token, method);
+        return CommonResult.success(result);
     }
 
     @ApiOperation(value = "支付查询")
@@ -74,10 +74,11 @@ public class PayAct {
     }
 
     @ApiOperation(value = "支付回调")
-    @RequestMapping(value = "/callBack", method = RequestMethod.POST)
+    @RequestMapping(value = "/call", method = RequestMethod.POST)
     public CommonResult<String> callBack(String token, String method) {
         return CommonResult.success();
     }
+
 
     @ApiOperation(value = "支付退款")
     @RequestMapping(value = "/refund", method = RequestMethod.POST)
@@ -90,6 +91,7 @@ public class PayAct {
     public CommonResult<String> refundQuery(String token, String method) {
         return CommonResult.success();
     }
+
 
     private void validSign(String appKey, String timeStr, String method, String sign) {
         if (StringUtils.isAnyBlank(appKey, timeStr, method, sign)) {

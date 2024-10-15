@@ -2,13 +2,14 @@ package com.jbp.service.service.pay;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jbp.common.model.pay.PayUnifiedOrder;
+import com.jbp.common.response.pay.PayCreateResponse;
 
 import java.util.List;
 
 public interface PayUnifiedOrderMng extends IService<PayUnifiedOrder> {
 
 
-     PayUnifiedOrder create(String token, String method);
+     PayCreateResponse create(String token, String method);
 
      PayUnifiedOrder success(String txnSeqno);
 

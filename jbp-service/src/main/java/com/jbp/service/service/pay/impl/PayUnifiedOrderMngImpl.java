@@ -8,13 +8,11 @@ import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.model.pay.PayUser;
 import com.jbp.common.model.pay.PayUserSubMerchant;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
+import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.dao.pay.PayUnifiedOrderDao;
-import com.jbp.service.service.pay.PayCashMng;
-import com.jbp.service.service.pay.PayUnifiedOrderMng;
-import com.jbp.service.service.pay.PayUserMng;
-import com.jbp.service.service.pay.PayUserSubMerchantMng;
+import com.jbp.service.service.pay.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -35,9 +33,11 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     private PayCashMng payCashMng;
     @Resource
     private PayUserSubMerchantMng payUserSubMerchantMng;
+    @Resource
+    private PayAggregationMng payAggregationMng;
 
     @Override
-    public PayUnifiedOrder create(String token, String method) {
+    public PayCreateResponse create(String token, String method) {
         PayCash payCash = payCashMng.getByToken(token);
         if (payCash == null || payCash.getExpireTime().before(DateTimeUtils.getNow())) {
             throw new CrmebException("收银台已过期");
@@ -72,8 +72,8 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 .build();
         save(order);
         // todo 调用三方支付
-
-        return order;
+        PayCreateResponse payCreateResponse = payAggregationMng.create();
+        return payCreateResponse;
     }
 
     @Override
