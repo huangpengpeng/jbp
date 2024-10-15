@@ -55,7 +55,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-wz9197fue8001h95k4o.mysql.rds.aliyuncs.com:6330/zs?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true
+    url: jdbc:mysql://rm-wz9197fue8001h95k4o.mysql.rds.aliyuncs.com:3306/zs?characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true
     username: bfb_2023_bfb
     password: Lt#VCArsD%h8
   redis:
