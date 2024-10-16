@@ -38,7 +38,7 @@ public class PaySubMerchantAct {
     }
 
     @ApiOperation(value = "保存或者更新")
-    @RequestMapping(value = "/saveOrUpdate", method = RequestMethod.GET)
+    @RequestMapping(value = "/saveOrUpdate", method = RequestMethod.POST)
     @ResponseBody
     public CommonResult<PaySubMerchant> saveOrUpdate(PaySubMerchant info) {
         paySubMerchantMng.saveOrUpdate(info);
