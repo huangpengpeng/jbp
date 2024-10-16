@@ -21,6 +21,9 @@ public class PayUnifiedRefundOrder extends VersionModel {
     @ApiModelProperty(value = "后台商户ID")
     private Integer merId;
 
+    @ApiModelProperty(value = "用户编号")
+    private String userNo;
+
     @ApiModelProperty(value = "渠道名称")
     private String channelName;
 
@@ -42,23 +45,14 @@ public class PayUnifiedRefundOrder extends VersionModel {
     @ApiModelProperty(value = "支付方法")
     private String payMethod;
 
-    @ApiModelProperty(value = "支付单号")
-    private String paySeqno;
+    @ApiModelProperty(value = "退款单号")
+    private String payRefundNo;
 
-    @ApiModelProperty(value = "业务单号")
+    @ApiModelProperty(value = "支付单号")
     private String txnSeqno;
 
     @ApiModelProperty(value = "三方渠道单号")
     private String payChannelSeqno;
-
-    @ApiModelProperty(value = "订单信息透传字段")
-    private String orderInfo;
-
-    @ApiModelProperty(value = "透传扩展字段")
-    private String ext;
-
-    @ApiModelProperty(value = "支付金额")
-    private BigDecimal payAmt;
 
     @ApiModelProperty(value = "退款金额")
     private BigDecimal refundAmt;

@@ -8,6 +8,7 @@ import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.client.LLianPayYtSignature;
 import com.jbp.common.lianlian.params.*;
 import com.jbp.common.lianlian.result.*;
+import com.jbp.common.lianlian.result.CashierPayCreateResult;
 import com.jbp.common.lianlian.security.LLianPayAccpSignature;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
 import com.jbp.common.utils.DateTimeUtils;

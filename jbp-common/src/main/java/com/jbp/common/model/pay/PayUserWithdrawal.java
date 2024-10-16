@@ -18,6 +18,9 @@ import java.util.Date;
 @ApiModel(value = "PayUserWithdrawal对象", description = "支付收款账户提现")
 public class PayUserWithdrawal extends BaseModel {
 
+    @ApiModelProperty(value = "支付用户ID")
+    private Long payUserId;
+
     @ApiModelProperty(value = "后台商户ID")
     private Integer merId;
 

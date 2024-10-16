@@ -41,7 +41,7 @@ public class PayUserAccount extends BaseModel {
     @ApiModelProperty(value = "可用金额")
     private BigDecimal balavalAmt;
 
-    @ApiModelProperty(value = "状态")
+    @ApiModelProperty(value = "状态 正常 禁用")
     private String status;
 
     @ApiModelProperty(value = "是否虚拟账户【未在三方开户，走线下打款提现】")

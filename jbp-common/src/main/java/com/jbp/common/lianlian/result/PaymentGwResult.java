@@ -1,4 +1,4 @@
-package com.jbp.common.lianlian.params;
+package com.jbp.common.lianlian.result;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode
-public class CashierPayCreateResult {
+public class PaymentGwResult {
     private String ret_code;
     private String ret_msg;
     private String oid_partner;
@@ -17,4 +17,7 @@ public class CashierPayCreateResult {
     private String txn_seqno;
     private String accp_txno;
     private String gateway_url;
+    private String token;
+    private String payload;
+
 }

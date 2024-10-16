@@ -18,8 +18,6 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "PayCompanyInfo对象", description = "付款公司资料信息")
 public class PayCompanyInfo extends BaseModel {
 
-
-
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "公司名称")

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.BaseModel;
 import com.jbp.common.mybatis.PayOrderInfoListHandler;
-import com.jbp.common.utils.CrmebUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -14,7 +13,6 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -22,12 +20,15 @@ import java.util.UUID;
 @Builder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value = "Pay_cash", autoResultMap = true)
-@ApiModel(value = "PayCash对象", description = "支付收银台")
-public class PayCash extends BaseModel {
+@TableName(value = "pay_cashier", autoResultMap = true)
+@ApiModel(value = "PayCashier对象", description = "支付收银台")
+public class PayCashier extends BaseModel {
 
     @ApiModelProperty(value = "收银台token")
     private String token;
+
+    @ApiModelProperty(value = "用户编号")
+    private String userNo;
 
     @ApiModelProperty(value = "应用key")
     private String appKey;

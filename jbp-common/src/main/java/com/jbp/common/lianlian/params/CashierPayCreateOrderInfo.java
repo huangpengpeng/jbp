@@ -1,11 +1,22 @@
 package com.jbp.common.lianlian.params;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode
+@NoArgsConstructor
 public class CashierPayCreateOrderInfo {
+
+    public CashierPayCreateOrderInfo(String txn_seqno, String txn_time, Double total_amount, String goods_name) {
+        this.txn_seqno = txn_seqno;
+        this.txn_time = txn_time;
+        this.total_amount = total_amount;
+        this.goods_name = goods_name;
+    }
+
     /**
      * 商户系统唯一交易流水号。由商户自定义。
      */

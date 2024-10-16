@@ -1,10 +1,12 @@
 package com.jbp.common.lianlian.params;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @Data
+@Builder
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentGwParams {
 
     private String timestamp;

@@ -3,7 +3,7 @@ package com.jbp.service.service.pay.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.pay.PayCash;
+import com.jbp.common.model.pay.PayCashier;
 import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.model.pay.PayUser;
 import com.jbp.common.model.pay.PayUserSubMerchant;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -30,7 +29,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     @Resource
     private PayUserMng payUserMng;
     @Resource
-    private PayCashMng payCashMng;
+    private PayCashierMng payCashierMng;
     @Resource
     private PayUserSubMerchantMng payUserSubMerchantMng;
     @Resource
@@ -38,13 +37,13 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
 
     @Override
     public PayCreateResponse create(String token, String method) {
-        PayCash payCash = payCashMng.getByToken(token);
-        if (payCash == null || payCash.getExpireTime().before(DateTimeUtils.getNow())) {
+        PayCashier payCashier = payCashierMng.getByToken(token);
+        if (payCashier == null || payCashier.getExpireTime().before(DateTimeUtils.getNow())) {
             throw new CrmebException("收银台已过期");
         }
         // 查询订单
-        PayUser payUser = payUserMng.getByAppKey(payCash.getAppKey());
-        PayUnifiedOrder order = getByTxnSeqno(payUser.getId(), payCash.getTxnSeqno());
+        PayUser payUser = payUserMng.getByAppKey(payCashier.getAppKey());
+        PayUnifiedOrder order = getByTxnSeqno(payUser.getId(), payCashier.getTxnSeqno());
         if (order != null) {
             if (order.getTxnSeqno().equals("SUCCESS")) {
                 throw new CrmebException("订单已成功");
@@ -52,7 +51,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
             if (order.getTxnSeqno().equals("FAIL")) {
                 throw new CrmebException("订单已失败");
             }
-            if (ArithmeticUtils.equals(order.getPayAmt(), payCash.getPayAmt())) {
+            if (ArithmeticUtils.equals(order.getPayAmt(), payCashier.getPayAmt())) {
                 throw new CrmebException("单号重复");
             }
             // 订单关闭创建新的订单
@@ -66,9 +65,9 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 .channelName(subMerchant.getChannelName()).channelCode(subMerchant.getChannelCode())
                 .merchantName(subMerchant.getMerchantName()).merchantNo(subMerchant.getMerchantNo())
                 .payUserAccountName(subMerchant.getPayUserAccountName()).payUserAccountNo(subMerchant.getPayUserAccountNo())
-                .payMethod(method).txnSeqno(payCash.getTxnSeqno()).orderInfo(payCash.getOrderInfo()).ext(payCash.getExt())
-                .payAmt(payCash.getPayAmt()).refundAmt(BigDecimal.ZERO).status("PROCESSING").createTime(payCash.getCreateTime())
-                .notifyUrl(payCash.getNotifyUrl()).returnUrl(payCash.getReturnUrl())
+                .payMethod(method).txnSeqno(payCashier.getTxnSeqno()).orderInfo(payCashier.getOrderInfo()).ext(payCashier.getExt())
+                .payAmt(payCashier.getPayAmt()).refundAmt(BigDecimal.ZERO).status("PROCESSING").createTime(payCashier.getCreateTime())
+                .notifyUrl(payCashier.getNotifyUrl()).returnUrl(payCashier.getReturnUrl())
                 .build();
         save(order);
         // todo 调用三方支付

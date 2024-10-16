@@ -1,15 +1,13 @@
 package com.jbp.front.controller.pay;
 
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.pay.PayCash;
-import com.jbp.common.model.pay.PayUnifiedOrder;
-import com.jbp.common.request.merchant.MerchantSettledApplyRequest;
+import com.jbp.common.model.pay.PayCashier;
 import com.jbp.common.request.pay.PayCashRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
-import com.jbp.service.service.pay.PayCashMng;
+import com.jbp.service.service.pay.PayCashierMng;
 import com.jbp.service.service.pay.PayUnifiedOrderMng;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,12 +32,12 @@ import java.util.Map;
 public class PayAct {
 
     @Resource
-    private PayCashMng payCashMng;
+    private PayCashierMng payCashierMng;
     @Resource
     private PayUnifiedOrderMng payUnifiedOrderMng;
 
     @ApiOperation(value = "唤起收银台[不需要登录]")
-    @RequestMapping(value = "/cash", method = RequestMethod.POST)
+    @RequestMapping(value = "/cashier", method = RequestMethod.POST)
     public CommonResult<String> cash(@RequestBody @Validated PayCashRequest request ) {
         validSign(request.getAppKey(), request.getTimeStr(), request.getMethod(), request.getSign());
         Date createTime = DateTimeUtils.parseDate(request.getCreateTime());
@@ -48,7 +45,7 @@ public class PayAct {
         if (expireTime.before(createTime)) {
             throw new CrmebException("过期时间不能大于创单时间");
         }
-        PayCash save = payCashMng.save(request.getAppKey(), request.getTxnSeqno(), request.getPayAmt(),
+        PayCashier save = payCashierMng.save(request.getAppKey(), request.getTxnSeqno(), request.getPayAmt(),
                 request.getOrderInfo(), request.getExt(), DateTimeUtils.parseDate(request.getCreateTime()),
                 DateTimeUtils.parseDate(request.getExpireTime()));
         return CommonResult.success(save.getToken());
@@ -57,7 +54,7 @@ public class PayAct {
     @ApiOperation(value = "获取支付方法")
     @RequestMapping(value = "/methodGet", method = RequestMethod.GET)
     public CommonResult<List<String>> methodGet(String token) {
-        return CommonResult.success(payCashMng.getPayMethod(token));
+        return CommonResult.success(payCashierMng.getPayMethod(token));
     }
 
     @ApiOperation(value = "支付下单")

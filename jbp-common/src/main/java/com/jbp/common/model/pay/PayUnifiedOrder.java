@@ -28,6 +28,9 @@ public class PayUnifiedOrder extends VersionModel {
     @ApiModelProperty(value = "后台商户ID")
     private Integer merId;
 
+    @ApiModelProperty(value = "用户编号")
+    private String userNo;
+
     @ApiModelProperty(value = "支付用户ID")
     private Long payUserId;
 
