@@ -33,7 +33,7 @@ public class LedgerReportFilter implements Filter {
             return;
         }
         String requestURI = httpServletRequest.getRequestURI();
-        if (requestURI.contains("/publicly") || requestURI.contains("/druid")) {
+        if (requestURI.contains("/publicly") || requestURI.contains("/druid") ) {
             chain.doFilter(request, response);
             return;
         }

@@ -98,6 +98,7 @@ public class WebConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/api/front/cbec/editScore")
 				.excludePathPatterns("/api/front/cbec/syncOrder")
 				.excludePathPatterns("/api/publicly/**")
+				.excludePathPatterns("/api/publicly/pay/**")
 				//
 				.excludePathPatterns("/api/front/login/account/List")
 				.excludePathPatterns("/api/front/user/visa/userVisaCallback")

@@ -2,6 +2,7 @@ package com.jbp.common.request.pay;
 
 import com.alipay.api.domain.OrderInfoDTO;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.jbp.common.dto.PayOrderInfoDto;
 import com.jbp.common.mybatis.PayOrderInfoListHandler;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,23 +32,29 @@ public class PayCashRequest implements Serializable {
     @NotEmpty(message = "交易单号不能为空")
     private String txnSeqno;
 
+    @NotEmpty(message = "用户编号")
+    private String userNo;
+
     @NotNull(message = "交易金额不能为空")
     private BigDecimal payAmt;
 
-    private List<OrderInfoDTO> orderInfo;
+    private List<PayOrderInfoDto> orderInfo;
 
     private String ext;
 
-    @NotNull(message = "创单时间不能为空 yyyy-MM-dd hh:mm:ss")
+    @NotEmpty(message = "创单时间不能为空 yyyy-MM-dd hh:mm:ss")
     private String createTime;
 
-    @NotNull(message = "交易过期不能为空 yyyy-MM-dd hh:mm:ss")
+    @NotEmpty(message = "交易过期不能为空 yyyy-MM-dd hh:mm:ss")
     private String expireTime;
 
-    @NotNull(message = "交易通知地址不能为空")
+    @NotEmpty(message = "交易通知地址不能为空")
     private String notifyUrl;
 
-    @NotNull(message = "支付成功跳转地址不能为空")
+    @NotEmpty(message = "支付成功跳转地址不能为空")
     private String returnUrl;
+
+    @NotEmpty(message = "客户ip地址不能为空")
+    private String ip;
 
 }

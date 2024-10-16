@@ -1,6 +1,7 @@
 package com.jbp.common.dto;
 
 import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="PayOrderInfoDto对象", description="付款订单信息")

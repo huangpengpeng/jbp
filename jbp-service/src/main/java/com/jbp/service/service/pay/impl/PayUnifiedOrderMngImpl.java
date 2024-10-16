@@ -3,10 +3,7 @@ package com.jbp.service.service.pay.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jbp.common.exception.CrmebException;
-import com.jbp.common.model.pay.PayCashier;
-import com.jbp.common.model.pay.PayUnifiedOrder;
-import com.jbp.common.model.pay.PayUser;
-import com.jbp.common.model.pay.PayUserSubMerchant;
+import com.jbp.common.model.pay.*;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.utils.ArithmeticUtils;
@@ -34,6 +31,8 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     private PayUserSubMerchantMng payUserSubMerchantMng;
     @Resource
     private PayAggregationMng payAggregationMng;
+    @Resource
+    private PayChannelMng payChannelMng;
 
     @Override
     public PayCreateResponse create(String token, String method) {
@@ -61,17 +60,17 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         // 随机支付渠道
         PayUserSubMerchant subMerchant = payUserSubMerchantMng.get(payUser.getId(), method);
         // 保存支付订单
-        order = PayUnifiedOrder.builder().merId(payUser.getMerId()).payUserId(payUser.getId())
+        order = PayUnifiedOrder.builder().merId(payUser.getMerId()).payUserId(payUser.getId()).userNo(payCashier.getUserNo())
                 .channelName(subMerchant.getChannelName()).channelCode(subMerchant.getChannelCode())
                 .merchantName(subMerchant.getMerchantName()).merchantNo(subMerchant.getMerchantNo())
                 .payUserAccountName(subMerchant.getPayUserAccountName()).payUserAccountNo(subMerchant.getPayUserAccountNo())
                 .payMethod(method).txnSeqno(payCashier.getTxnSeqno()).orderInfo(payCashier.getOrderInfo()).ext(payCashier.getExt())
                 .payAmt(payCashier.getPayAmt()).refundAmt(BigDecimal.ZERO).status("PROCESSING").createTime(payCashier.getCreateTime())
-                .notifyUrl(payCashier.getNotifyUrl()).returnUrl(payCashier.getReturnUrl())
+                .notifyUrl(payCashier.getNotifyUrl()).returnUrl(payCashier.getReturnUrl()).ip(payCashier.getIp())
                 .build();
         save(order);
-        // todo 调用三方支付
-        PayCreateResponse payCreateResponse = payAggregationMng.create();
+        PayChannel payChannel = payChannelMng.getByCode(subMerchant.getChannelCode());
+        PayCreateResponse payCreateResponse = payAggregationMng.create(payUser, payChannel, subMerchant, order);
         return payCreateResponse;
     }
 

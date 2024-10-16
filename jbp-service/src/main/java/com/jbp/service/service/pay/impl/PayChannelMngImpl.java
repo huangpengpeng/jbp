@@ -28,4 +28,9 @@ public class PayChannelMngImpl extends ServiceImpl<PayChannelDao, PayChannel> im
                 .orderByAsc(PayChannel::getId);
         return CommonPage.copyPageInfo(page, list(q));
     }
+
+    @Override
+    public PayChannel getByCode(String code) {
+        return getOne(new LambdaQueryWrapper<PayChannel>().eq(PayChannel::getCode, code));
+    }
 }

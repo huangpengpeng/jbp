@@ -24,6 +24,7 @@ crmeb:
     - /druid/**
     - api/front/pagediy/info
     - api/publicly/**
+    - api/publicly/pay/**
 
 # 配置端口
 server:

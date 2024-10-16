@@ -3,6 +3,7 @@ package com.jbp.common.model.pay;
 import com.alipay.api.domain.OrderInfoDTO;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.jbp.common.dto.PayOrderInfoDto;
 import com.jbp.common.model.BaseModel;
 import com.jbp.common.mybatis.PayOrderInfoListHandler;
 import io.swagger.annotations.ApiModel;
@@ -41,7 +42,7 @@ public class PayCashier extends BaseModel {
 
     @ApiModelProperty(value = "订单信息透传字段")
     @TableField(value = "orderInfo", typeHandler = PayOrderInfoListHandler.class)
-    private List<OrderInfoDTO> orderInfo;
+    private List<PayOrderInfoDto> orderInfo;
 
     @ApiModelProperty(value = "透传扩展字段")
     private String ext;
@@ -57,4 +58,7 @@ public class PayCashier extends BaseModel {
 
     @ApiModelProperty(value = "跳转地址")
     private String returnUrl;
+
+    @ApiModelProperty(value = "客户端ip")
+    private String ip;
 }

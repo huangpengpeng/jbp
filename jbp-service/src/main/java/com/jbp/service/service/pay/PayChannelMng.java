@@ -8,4 +8,6 @@ import com.jbp.common.request.PageParamRequest;
 
 public interface PayChannelMng extends IService<PayChannel> {
     PageInfo<PayChannel> page(PageParamRequest pageParamRequest, String name);
+
+    PayChannel getByCode(String code);
 }

@@ -1,6 +1,5 @@
 package com.jbp.service.service.pay.impl;
 
-import com.alipay.api.domain.OrderInfoDTO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
@@ -9,8 +8,10 @@ import com.jbp.common.model.pay.PayCashier;
 import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.model.pay.PayUser;
 import com.jbp.common.model.pay.PayUserSubMerchant;
+import com.jbp.common.request.pay.PayCashRequest;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.CrmebUtil;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.FunctionUtil;
 import com.jbp.service.dao.pay.PayCashierDao;
 import com.jbp.service.service.pay.PayCashierMng;
@@ -24,8 +25,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -41,16 +40,16 @@ public class PayCashierMngImpl extends ServiceImpl<PayCashierDao, PayCashier> im
     private PayUserSubMerchantMng payUserSubMerchantMng;
 
     @Override
-    public PayCashier save(String appKey, String txnSeqno, BigDecimal payAmt, List<OrderInfoDTO> orderInfo, String ext, Date createTime, Date expireTime) {
+    public PayCashier save(PayCashRequest request) {
         // 检查订单是否存在
-        PayCashier payCashier = getByTxnSeqno(appKey, txnSeqno);
+        PayCashier payCashier = getByTxnSeqno(request.getAppKey(), request.getTxnSeqno());
         if (payCashier != null) {
-            if (ArithmeticUtils.equals(payCashier.getPayAmt(), payAmt)) {
+            if (!ArithmeticUtils.equals(payCashier.getPayAmt(), request.getPayAmt())) {
                 throw new CrmebException("单号重复1");
             }
             // 检查订单是否成功 或者关闭
             PayUser payUser = payUserMng.getByAppKey(payCashier.getAppKey());
-            PayUnifiedOrder order = payUnifiedOrderMng.getByTxnSeqno(payUser.getId(), txnSeqno);
+            PayUnifiedOrder order = payUnifiedOrderMng.getByTxnSeqno(payUser.getId(), request.getTxnSeqno());
             if (order != null) {
                 if (order.getTxnSeqno().equals("SUCCESS")) {
                     throw new CrmebException("订单已成功");
@@ -58,19 +57,29 @@ public class PayCashierMngImpl extends ServiceImpl<PayCashierDao, PayCashier> im
                 if (order.getTxnSeqno().equals("FAIL")) {
                     throw new CrmebException("订单已失败");
                 }
-                if (ArithmeticUtils.equals(order.getPayAmt(), payAmt)) {
+                if (ArithmeticUtils.equals(order.getPayAmt(), request.getPayAmt())) {
                     throw new CrmebException("单号重复2");
                 }
             }
-            payCashier.setOrderInfo(orderInfo);
-            payCashier.setExt(ext);
-            payCashier.setCreateTime(createTime);
-            payCashier.setExpireTime(expireTime);
+            payCashier.setOrderInfo(request.getOrderInfo());
+            payCashier.setExt(request.getExt());
+            payCashier.setCreateTime(DateTimeUtils.parseDate(request.getCreateTime()));
+            payCashier.setExpireTime(DateTimeUtils.parseDate(request.getExpireTime()));
+            payCashier.setUserNo(request.getUserNo());
+            payCashier.setNotifyUrl(request.getNotifyUrl());
+            payCashier.setReturnUrl(request.getReturnUrl());
+            payCashier.setIp(request.getIp());
             updateById(payCashier);
             return payCashier;
         }
         String uuid = CrmebUtil.getUuid();
-        payCashier = PayCashier.builder().token(uuid).appKey(appKey).txnSeqno(txnSeqno).payAmt(payAmt).orderInfo(orderInfo).ext(ext).createTime(createTime).expireTime(expireTime).build();
+        payCashier = PayCashier.builder().token(uuid).appKey(request.getAppKey()).userNo(request.getUserNo()).txnSeqno(request.getTxnSeqno())
+                .payAmt(request.getPayAmt()).orderInfo(request.getOrderInfo()).ext(request.getExt())
+                .createTime(DateTimeUtils.parseDate(request.getCreateTime()))
+                .expireTime(DateTimeUtils.parseDate(request.getExpireTime()))
+                .notifyUrl(request.getNotifyUrl()).returnUrl(request.getReturnUrl())
+                .ip(request.getIp())
+                .build();
         save(payCashier);
         return payCashier;
     }
