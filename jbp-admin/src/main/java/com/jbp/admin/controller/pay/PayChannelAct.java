@@ -30,7 +30,7 @@ public class PayChannelAct {
     }
 
     @ApiOperation(value = "保存或者更新")
-    @RequestMapping(value = "/saveOrUpdate", method = RequestMethod.GET)
+    @RequestMapping(value = "/saveOrUpdate", method = RequestMethod.POST)
     @ResponseBody
     public CommonResult<PayChannel> saveOrUpdate(PayChannel info) {
         payChannelMng.saveOrUpdate(info);
