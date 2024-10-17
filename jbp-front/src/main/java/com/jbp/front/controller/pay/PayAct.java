@@ -55,7 +55,7 @@ public class PayAct {
         map.put("method", request.getMethod());
         String tagSign = SignUtil.getSignToUpperCase("2e556e8f433dc3b9971aa21fa32458b8", map);
         request.setSign(tagSign);
-        request.setTxnSeqno("PAY_20241016144910");
+        request.setTxnSeqno("PAY_20241016144966");
         request.setPayAmt(BigDecimal.valueOf(0.1));
         List<PayOrderInfoDto> orderInfo = Lists.newArrayList();
         PayOrderInfoDto dto = new PayOrderInfoDto("商品名称", 1, BigDecimal.valueOf(0.1));
@@ -63,13 +63,14 @@ public class PayAct {
         request.setOrderInfo(orderInfo);
         request.setCreateTime("2024-10-16 14:54:55");
         request.setExpireTime("2024-10-19 14:54:55");
-        request.setNotifyUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144910");
-        request.setReturnUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144910");
-        request.setUserNo("123");
+        request.setNotifyUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144966");
+        request.setReturnUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144966");
+        request.setUserNo("12113");
         request.setIp("127.0.0.1");
         System.out.println(JSONObject.toJSONString(request));
 
     }
+
 
     @ApiOperation(value = "唤起收银台[不需要登录]")
     @RequestMapping(value = "/cashier", method = RequestMethod.POST)

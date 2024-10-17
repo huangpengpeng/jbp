@@ -58,8 +58,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 throw new CrmebException("单号重复");
             }
             // 订单关闭创建新的订单
-            order.setStatus("FAIL");
-            updateById(order);
+             removeById(order);
         }
         // 随机支付渠道
         PayUserSubMerchant subMerchant = payUserSubMerchantMng.get(payUser.getId(), method);
