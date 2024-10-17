@@ -30,4 +30,9 @@ public class PaySubMerchantMngImpl extends ServiceImpl<PaySubMerchantDao, PaySub
                 .orderByAsc(PaySubMerchant::getId);
         return CommonPage.copyPageInfo(page, list(q));
     }
+
+    @Override
+    public PaySubMerchant getByMerchantNo(String merchantNo) {
+        return getOne(new LambdaQueryWrapper<PaySubMerchant>().eq(PaySubMerchant::getMerchantNo, merchantNo));
+    }
 }

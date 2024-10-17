@@ -1,15 +1,29 @@
 package com.jbp.common.response.pay;
 
 import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="PayQueryResponse对象", description="支付订单查询结果")
 public class PayQueryResponse {
+
+    public PayQueryResponse(String appKey, String method, String txnSeqno, String platformTxno,
+                            String orderAmt, String txnTime) {
+        this.appKey = appKey;
+        this.method = method;
+        this.txnSeqno = txnSeqno;
+        this.platformTxno = platformTxno;
+        this.orderAmt = orderAmt;
+        this.txnTime = txnTime;
+    }
 
     private String appKey; // 应用appKey
 

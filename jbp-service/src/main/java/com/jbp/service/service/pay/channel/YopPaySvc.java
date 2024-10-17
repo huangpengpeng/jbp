@@ -1,7 +1,13 @@
 package com.jbp.service.service.pay.channel;
 
+import com.jbp.common.lianlian.result.TradeCreateResult;
 import com.jbp.common.model.pay.PayChannel;
 import com.jbp.common.model.pay.PaySubMerchant;
+import com.jbp.common.model.pay.PayUnifiedOrder;
+import com.jbp.common.model.pay.PayUser;
+import com.jbp.common.response.pay.PayCreateResponse;
+import com.jbp.common.response.pay.PayQueryResponse;
+import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.yop.BaseYopRequest;
 import com.jbp.common.yop.BaseYopResponse;
@@ -31,65 +37,99 @@ public class YopPaySvc {
     @Resource
     private YopClient yopClient;
 
-    public TradeOrderResult tradeOrder(PayChannel payChannel, PaySubMerchant subMerchant, String userId, String notifyUrl, String returnUrl,
-                                       String payCode, Double amount, String goodsName, String ip) {
-        TradeOrderParams tradeOrderParams = new TradeOrderParams(subMerchant.getMerchantNo(), payCode, amount.toString(), goodsName, notifyUrl, "", returnUrl);
+    public PayCreateResponse tradeOrder(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder) {
+        PayCreateResponse response = new PayCreateResponse(payUser.getAppKey(), payUnifiedOrder.getPayMethod(), payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt().toString());
+
+        String goodsName = payUnifiedOrder.getOrderInfo().get(0).getGoodsName();
+        String channelNotifyUrl = payUnifiedOrder.getChannelNotifyUrl();
+        String channelReturnUrl = payUnifiedOrder.getChannelReturnUrl();
+        String method = payUnifiedOrder.getPayMethod();
+        String userId = payUser.getAppKey() + "_" + payUnifiedOrder.getUserNo();
+
+        TradeOrderParams tradeOrderParams = new TradeOrderParams(subMerchant.getMerchantNo(), payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt().toString(), goodsName, channelNotifyUrl, "", channelReturnUrl);
         tradeOrderParams.setParentMerchantNo(payChannel.getParentMerchantNo());
         TradeOrderResult tradeOrderResult = send("/rest/v1.0/trade/order", "POST", tradeOrderParams, TradeOrderResult.class);
-        // 易宝收银台地址
-        Map<String, String> params = new HashMap<>();
-        params.put("appKey", "app_10089066338");
-        params.put("merchantNo", tradeOrderResult.getParentMerchantNo());
-        params.put("token", tradeOrderResult.getToken());
-        params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
-        params.put("directPayType", "YJZF");
-        params.put("cardType", "");
-        params.put("userNo", userId);
-        params.put("userType", "USER_ID");
-        params.put("ext", "");
-        StringBuilder sb = new StringBuilder();
-        String[] CASHIER = {"appKey", "merchantNo", "token", "timestamp", "directPayType", "cardType", "userNo", "userType", "ext"};
-        for (int i = 0; i < CASHIER.length; i++) {
-            String name = CASHIER[i];
-            String value = params.get(name);
-            if (i != 0) {
-                sb.append("&");
+
+        if ("wechatPay".equals(method)) {
+            WechatAlipayPayParams wechat = new WechatAlipayPayParams(payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt(),
+                    channelNotifyUrl, "H5_PAY", "WECHAT", "", "", payUnifiedOrder.getIp(), "ONLINE", "REAL_TIME");
+            wechat.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
+            wechat.setToken(tradeOrderResult.getToken());
+            wechat.setMerchantNo(subMerchant.getMerchantNo());
+            wechat.setParentMerchantNo(tradeOrderResult.getParentMerchantNo());
+            WechatAliPayPayResult wechatPayResult = send("/rest/v1.0/aggpay/pre-pay", "POST", wechat, WechatAliPayPayResult.class);
+            response.setPayload(wechatPayResult.getPrePayTn());
+            response.setPlatformTxno(wechatPayResult.getUniqueOrderNo());
+
+        }
+        if ("aliPay".equals(method)) {
+            WechatAlipayPayParams alipayPay = new WechatAlipayPayParams(payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt(),
+                    channelNotifyUrl, "USER_SCAN", "ALIPAY", "", "", payUnifiedOrder.getIp(), "ONLINE", "REAL_TIME");
+
+            alipayPay.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
+            alipayPay.setToken(tradeOrderResult.getToken());
+            alipayPay.setMerchantNo(subMerchant.getMerchantNo());
+            alipayPay.setParentMerchantNo(tradeOrderResult.getParentMerchantNo());
+            WechatAliPayPayResult aliPayResult = send("/rest/v1.0/aggpay/pre-pay", "POST", alipayPay, WechatAliPayPayResult.class);
+            response.setPayload(aliPayResult.getPrePayTn());
+            response.setPlatformTxno(aliPayResult.getUniqueOrderNo());
+        }
+        if ("quickPay".equals(method)) {
+            // 易宝收银台地址
+            Map<String, String> params = new HashMap<>();
+            params.put("appKey", "app_10089066338");
+            params.put("merchantNo", tradeOrderResult.getParentMerchantNo());
+            params.put("token", tradeOrderResult.getToken());
+            params.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
+            params.put("directPayType", "YJZF");
+            params.put("cardType", "");
+            params.put("userNo", userId);
+            params.put("userType", "USER_ID");
+            params.put("ext", "");
+            StringBuilder sb = new StringBuilder();
+            String[] CASHIER = {"appKey", "merchantNo", "token", "timestamp", "directPayType", "cardType", "userNo", "userType", "ext"};
+            for (int i = 0; i < CASHIER.length; i++) {
+                String name = CASHIER[i];
+                String value = params.get(name);
+                if (i != 0) {
+                    sb.append("&");
+                }
+                sb.append(name).append("=").append(value);
             }
-            sb.append(name).append("=").append(value);
+            PrivateKey privateKey = RSAKeyUtils.string2PrivateKey(payChannel.getPriKey());
+            String sign = RSA.sign(sb.toString(), privateKey, DigestAlgEnum.SHA256) + "$SHA256";
+            String cashier = "https://cash.yeepay.com/cashier/std" + "?sign=" + sign + "&" + sb;
+            response.setPayload(cashier);
         }
-        PrivateKey privateKey = RSAKeyUtils.string2PrivateKey(payChannel.getPriKey());
-        String sign = RSA.sign(sb.toString(), privateKey, DigestAlgEnum.SHA256) + "$SHA256";
-        String cashier = "https://cash.yeepay.com/cashier/std" + "?sign=" + sign + "&" + sb;
-
-
-        // 易宝聚合支付下单
-        // WechatAlipayPayParams.PAYWAY.USER_SCAN.name()
-        WechatAlipayPayParams wechatAlipayPayParams = new WechatAlipayPayParams(payCode, new BigDecimal(amount),
-                notifyUrl, "支付方式", "H5_PAY", "ONLINE", "", ip, "ONLINE", "REAL_TIME");
-        wechatAlipayPayParams.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
-        wechatAlipayPayParams.setToken(tradeOrderResult.getToken());
-        wechatAlipayPayParams.setMerchantNo(subMerchant.getMerchantNo());
-        wechatAlipayPayParams.setParentMerchantNo(tradeOrderResult.getParentMerchantNo());
-        WechatAliPayPayResult wechatAliPayPayResult = send("/rest/v1.0/aggpay/pre-pay", "POST", wechatAlipayPayParams, WechatAliPayPayResult.class);
-
-        return null;
+        return response;
     }
 
 
-    public TradeOrderQueryResult queryPayResult(PayChannel payChannel, PaySubMerchant subMerchant, String orderNo) {
-        TradeOrderQueryParams params = new TradeOrderQueryParams(payChannel.getParentMerchantNo(), subMerchant.getMerchantNo(), orderNo);
-        return send("/rest/v1.0/trade/order/query", "GET", params, TradeOrderQueryResult.class);
+    public PayQueryResponse queryPayResult(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder) {
+        PayQueryResponse response = new PayQueryResponse(payUser.getAppKey(), payUnifiedOrder.getPayMethod(),
+                payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayChannelSeqno(), payUnifiedOrder.getPayAmt().toString(),
+                DateTimeUtils.format(payUnifiedOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+        TradeOrderQueryParams params = new TradeOrderQueryParams(payChannel.getParentMerchantNo(), subMerchant.getMerchantNo(),
+                payUnifiedOrder.getTxnSeqno());
+        TradeOrderQueryResult result = send("/rest/v1.0/trade/order/query", "GET", params, TradeOrderQueryResult.class);
+        response.setSuccessTime(result.getPaySuccessDate());
+        response.setPlatformTxno(result.getUniqueOrderNo());
+        if ("SUCCESS".equals(result.getStatus())) {
+            response.setStatus("SUCCESS");
+        }
+        if ("PROCESSING".equals(result.getStatus())) {
+            response.setStatus("PROCESSING");
+        }
+        if ("TIME_OUT".equals(result.getStatus()) || "FAIL".equals(result.getStatus()) || "CLOSE".equals(result.getStatus())) {
+            response.setStatus("FAIL");
+        }
+        return response;
     }
 
-    public TradeRefundResult refund(PayChannel payChannel, PaySubMerchant subMerchant, String userId, String payCode, String refundNo, BigDecimal refundAmt) {
+    public TradeRefundResult refund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder, String refundNo, BigDecimal refundAmt) {
         TradeRefundResult tradeRefundResult = new TradeRefundResult();
-        // 支付支付订单
-        TradeOrderQueryResult tradeOrderQueryResult = queryPayResult(payChannel, subMerchant, payCode);
-        if (tradeOrderQueryResult == null || !tradeOrderQueryResult.ifSuccess()) {
-            throw new RuntimeException("订单未支付成功不允许退款:" + payCode);
-        }
         // 是否已经退款
-        RefundQueryResult refundQueryResult = queryRefund(payChannel, subMerchant, payCode, refundNo);
+        RefundQueryResult refundQueryResult = queryRefund(payChannel, subMerchant, payUnifiedOrder.getTxnSeqno(), refundNo);
         if (refundQueryResult != null && !StringUtils.isEmpty(refundQueryResult.getCode())) {
             if (refundQueryResult.ifSuccess()) {
                 tradeRefundResult.setStatus("SUCCESS");
@@ -100,8 +140,8 @@ public class YopPaySvc {
                 return tradeRefundResult;
             }
         }
-        TradeRefundParams params = new TradeRefundParams(payCode, refundNo, refundAmt.toString());
-        params.setParentMerchantNo(tradeOrderQueryResult.getParentMerchantNo());
+        TradeRefundParams params = new TradeRefundParams(payUnifiedOrder.getTxnSeqno(), refundNo, refundAmt.toString());
+        params.setParentMerchantNo(payChannel.getParentMerchantNo());
         params.setMerchantNo(subMerchant.getMerchantNo());
         params.setRefundAccountType(YopEnums.AccountTypeEnum.待结算账户.getValue());
         tradeRefundResult = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);

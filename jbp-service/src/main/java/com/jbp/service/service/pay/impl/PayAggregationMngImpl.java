@@ -1,26 +1,22 @@
 package com.jbp.service.service.pay.impl;
 
 import com.jbp.common.model.pay.PayChannel;
+import com.jbp.common.model.pay.PaySubMerchant;
 import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.model.pay.PayUser;
-import com.jbp.common.model.pay.PayUserSubMerchant;
-import com.jbp.common.request.pay.PayQueryRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
 import com.jbp.common.response.pay.PayRefundQueryResponse;
 import com.jbp.common.response.pay.PayRefundResponse;
-import com.jbp.common.yop.result.WechatAliPayPayResult;
-import com.jbp.service.service.LianLianPayService;
-import com.jbp.service.service.YopService;
 import com.jbp.service.service.pay.PayAggregationMng;
-import com.jbp.service.service.pay.PayUserMng;
+import com.jbp.service.service.pay.channel.LianLianPaySvc;
+import com.jbp.service.service.pay.channel.YopPaySvc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -28,56 +24,31 @@ import java.math.BigDecimal;
 public class PayAggregationMngImpl implements PayAggregationMng {
 
     @Resource
-    private LianLianPayService lianLianPayService;
+    private LianLianPaySvc lianLianPaySvc;
     @Resource
-    private YopService yopService;
-    @Resource
-    private PayUserMng payUserMng;
+    private YopPaySvc yopPaySvc;
 
 
     @Override
-    public PayCreateResponse create(PayUser payUser, PayChannel payChannel, PayUserSubMerchant merchant, PayUnifiedOrder order) {
-        PayCreateResponse response = new PayCreateResponse(payUser.getAppKey(), order.getTxnSeqno(),  order.getPayAmt().toString());
-        String goodsName = order.getOrderInfo().get(0).getGoodsName();
-        if(payChannel.getName().equals("易宝")){
-            if ("wechatPay".equals(order.getPayMethod())) {
-
-            }
-
-            if ("aliPay".equals(order.getPayMethod())) {
-                WechatAliPayPayResult result = yopService.wechatAlipayPay(merchant.getMerchantNo(), order.getUserNo(), order.getTxnSeqno(), order.getPayAmt().toString(),
-                        goodsName,
-                        order.getNotifyUrl(), order.getExt(), order.getReturnUrl(), "USER_SCAN", "ALIPAY",
-                        "", "", order.getIp());
-                response.setPlatformTxno(result.getUniqueOrderNo());
-                response.setPayload(result.getPrePayTn());
-            }
-
-            if ("quickPay".equals(order.getPayMethod())) {
-
-            }
+    public PayCreateResponse create(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order) {
+        if (payChannel.getName().equals("易宝")) {
+            return yopPaySvc.tradeOrder(payChannel, payUser, paySubMerchant, order);
         }
-        if(payChannel.getName().equals("连连")){
-            if ("wechatPay".equals(order.getPayMethod())) {
-
-            }
-
-            if ("aliPay".equals(order.getPayMethod())) {
-
-            }
-
-            if ("quickPay".equals(order.getPayMethod())) {
-
-            }
+        if (payChannel.getName().equals("连连")) {
+            return lianLianPaySvc.tradeOrder(payChannel, payUser, paySubMerchant, order);
         }
-        return response;
+        return null;
     }
 
     @Override
-    public PayQueryResponse query(PayQueryRequest request) {
+    public PayQueryResponse query(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order) {
+        if (payChannel.getName().equals("易宝")) {
+            return yopPaySvc.queryPayResult(payChannel, payUser, paySubMerchant, order);
 
-
-
+        }
+        if (payChannel.getName().equals("连连")) {
+            return lianLianPaySvc.queryPayResult(payChannel, payUser, paySubMerchant, order);
+        }
         return null;
     }
 
@@ -90,4 +61,6 @@ public class PayAggregationMngImpl implements PayAggregationMng {
     public PayRefundQueryResponse refundQuery() {
         return null;
     }
+
+
 }

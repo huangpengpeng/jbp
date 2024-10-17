@@ -8,6 +8,7 @@ import com.jbp.common.dto.PayOrderInfoDto;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.pay.PayCashier;
+import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.request.pay.PayCashRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.result.CommonResult;
@@ -21,10 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -102,13 +100,17 @@ public class PayAct {
     @ApiOperation(value = "支付查询")
     @RequestMapping(value = "/query", method = RequestMethod.POST)
     public CommonResult<String> query(String token, String method) {
+
+        
+
         return CommonResult.success();
     }
 
     @ApiOperation(value = "支付回调")
-    @RequestMapping(value = "/call", method = RequestMethod.POST)
-    public CommonResult<String> callBack(String token, String method) {
-        return CommonResult.success();
+    @RequestMapping(value = "/call/{appKey}/{txnSeqno}", method = RequestMethod.POST)
+    public String callBack(@PathVariable("appKey") String appKey, @PathVariable("txnSeqno") String txnSeqno) {
+        payUnifiedOrderMng.callBack(appKey, txnSeqno);
+        return "SUCCESS";
     }
 
 

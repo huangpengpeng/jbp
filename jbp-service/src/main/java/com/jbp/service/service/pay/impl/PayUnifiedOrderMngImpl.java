@@ -6,8 +6,10 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.pay.*;
 import com.jbp.common.mybatis.UnifiedServiceImpl;
 import com.jbp.common.response.pay.PayCreateResponse;
+import com.jbp.common.response.pay.PayQueryResponse;
 import com.jbp.common.utils.ArithmeticUtils;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.common.utils.StringUtils;
 import com.jbp.service.dao.pay.PayUnifiedOrderDao;
 import com.jbp.service.service.pay.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     private PayUserMng payUserMng;
     @Resource
     private PayCashierMng payCashierMng;
+    @Resource
+    private PaySubMerchantMng paySubMerchantMng;
     @Resource
     private PayUserSubMerchantMng payUserSubMerchantMng;
     @Resource
@@ -59,6 +63,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         }
         // 随机支付渠道
         PayUserSubMerchant subMerchant = payUserSubMerchantMng.get(payUser.getId(), method);
+
         // 保存支付订单
         order = PayUnifiedOrder.builder().merId(payUser.getMerId()).payUserId(payUser.getId()).userNo(payCashier.getUserNo())
                 .channelName(subMerchant.getChannelName()).channelCode(subMerchant.getChannelCode())
@@ -70,10 +75,42 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 .build();
         save(order);
         PayChannel payChannel = payChannelMng.getByCode(subMerchant.getChannelCode());
-        PayCreateResponse payCreateResponse = payAggregationMng.create(payUser, payChannel, subMerchant, order);
+        PaySubMerchant paySubMerchant = paySubMerchantMng.getByMerchantNo(subMerchant.getMerchantNo());
+        PayCreateResponse payCreateResponse = payAggregationMng.create(payUser, payChannel, paySubMerchant, order);
         order.setPayChannelSeqno(payCreateResponse.getPlatformTxno());
         updateById(order);
         return payCreateResponse;
+    }
+
+
+    @Override
+    public PayUnifiedOrder callBack(String appKey, String txnSeqno) {
+        PayUser payUser = payUserMng.getByAppKey(appKey);
+        PayUnifiedOrder payUnifiedOrder = getByTxnSeqno(payUser.getId(), txnSeqno);
+        if (payUnifiedOrder == null) {
+            return null;
+        }
+        if ("SUCCESS".equals(payUnifiedOrder.getStatus())) {
+            return payUnifiedOrder;
+        }
+        if ("FAIL".equals(payUnifiedOrder.getStatus())) {
+            return payUnifiedOrder;
+        }
+        PayChannel payChannel = payChannelMng.getByCode(payUnifiedOrder.getChannelCode());
+        PaySubMerchant paySubMerchant = paySubMerchantMng.getByMerchantNo(payUnifiedOrder.getMerchantNo());
+        PayQueryResponse response = payAggregationMng.query(payUser, payChannel, paySubMerchant, payUnifiedOrder);
+        if (response == null) {
+            return payUnifiedOrder;
+        }
+        payUnifiedOrder.setStatus(response.getStatus());
+        if (StringUtils.isNotEmpty(response.getSuccessTime())) {
+            payUnifiedOrder.setPayTime(DateTimeUtils.parseDate(response.getSuccessTime()));
+        }
+        if (StringUtils.isNotEmpty(response.getPlatformTxno())) {
+            payUnifiedOrder.setPayChannelSeqno(response.getPlatformTxno());
+        }
+        updateById(payUnifiedOrder);
+        return payUnifiedOrder;
     }
 
     @Override

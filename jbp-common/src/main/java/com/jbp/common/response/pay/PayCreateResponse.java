@@ -15,13 +15,16 @@ import lombok.experimental.Accessors;
 @ApiModel(value="PayCreateResponse对象", description="支付订单创建结果")
 public class PayCreateResponse {
 
-    public PayCreateResponse(String appKey, String txnSeqno,  String orderAmt) {
+    public PayCreateResponse(String appKey, String method, String txnSeqno,  String orderAmt) {
         this.appKey = appKey;
+        this.method = method;
         this.txnSeqno = txnSeqno;
         this.orderAmt = orderAmt;
     }
 
     private String appKey; // 应用appKey
+
+    private String method; // 支付方法
 
     private String txnSeqno; // 商户系统唯一订单号
 
@@ -30,4 +33,6 @@ public class PayCreateResponse {
     private String orderAmt; // 支付金额
 
     private String payload; // 支付信息，js支付信息、二维码信息
+
+
 }

@@ -9,4 +9,6 @@ import com.jbp.common.request.PageParamRequest;
 public interface PaySubMerchantMng extends IService<PaySubMerchant> {
 
     PageInfo<PaySubMerchant> page(PageParamRequest pageParamRequest, String merchantName, String merchantNo);
+
+    PaySubMerchant getByMerchantNo(String merchantNo);
 }
