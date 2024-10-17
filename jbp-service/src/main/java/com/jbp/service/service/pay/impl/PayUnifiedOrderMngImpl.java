@@ -63,8 +63,9 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         }
         // 随机支付渠道
         PayUserSubMerchant subMerchant = payUserSubMerchantMng.get(payUser.getId(), method);
-
         // 保存支付订单
+        String channelNotifyUrl = "https://zs.jubaopeng.cc/api/front/publicly/pay/call/" + payUser.getAppKey() + "/" + payCashier.getTxnSeqno();
+        String channelReturnUrl = "https://zs.jubaopeng.cc/pages/users/payCode/success?" + "appKey=" + payUser.getAppKey() + "&txnSeqno=" + payCashier.getTxnSeqno();
         order = PayUnifiedOrder.builder().merId(payUser.getMerId()).payUserId(payUser.getId()).userNo(payCashier.getUserNo())
                 .channelName(subMerchant.getChannelName()).channelCode(subMerchant.getChannelCode())
                 .merchantName(subMerchant.getMerchantName()).merchantNo(subMerchant.getMerchantNo())
@@ -72,6 +73,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
                 .payMethod(method).txnSeqno(payCashier.getTxnSeqno()).orderInfo(payCashier.getOrderInfo()).ext(payCashier.getExt())
                 .payAmt(payCashier.getPayAmt()).refundAmt(BigDecimal.ZERO).status("PROCESSING").createTime(payCashier.getCreateTime())
                 .notifyUrl(payCashier.getNotifyUrl()).returnUrl(payCashier.getReturnUrl()).ip(payCashier.getIp())
+                .channelNotifyUrl(channelNotifyUrl).channelReturnUrl(channelReturnUrl)
                 .build();
         save(order);
         PayChannel payChannel = payChannelMng.getByCode(subMerchant.getChannelCode());
