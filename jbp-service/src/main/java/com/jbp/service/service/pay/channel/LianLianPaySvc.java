@@ -5,23 +5,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.jbp.common.lianlian.client.LLianPayClient;
 import com.jbp.common.lianlian.params.*;
-import com.jbp.common.lianlian.result.PaymentGwResult;
-import com.jbp.common.lianlian.result.QueryPaymentResult;
-import com.jbp.common.lianlian.result.RefundQueryResult;
-import com.jbp.common.lianlian.result.TradeCreateResult;
+import com.jbp.common.lianlian.result.*;
 import com.jbp.common.lianlian.utils.LLianPayDateUtils;
-import com.jbp.common.model.pay.PayChannel;
-import com.jbp.common.model.pay.PaySubMerchant;
-import com.jbp.common.model.pay.PayUnifiedOrder;
-import com.jbp.common.model.pay.PayUser;
+import com.jbp.common.model.pay.*;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
+import com.jbp.common.response.pay.PayRefundResponse;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.StringUtils;
+import com.jbp.service.service.LianLianPayService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,6 +28,9 @@ import java.util.Map;
 @Slf4j
 @Service
 public class LianLianPaySvc {
+
+    @Resource
+    private LianLianPayService lianLianPayService;
 
     /**
      * 支付下单
@@ -144,21 +144,32 @@ public class LianLianPaySvc {
     }
 
 
-
     /**
      * 退款申请
      */
-    public MorePayeeRefundResult refund(PayChannel payChannel, PaySubMerchant subMerchant, String userId, String payCode, String refundNo, BigDecimal refundAmt) {
+    public PayRefundResponse refund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payOrder, PayUnifiedRefundOrder refundOrder) {
 
-        QueryPaymentResult queryPaymentResult = queryPayResult(payChannel, subMerchant, payCode);
-        if (queryPaymentResult == null || !"TRADE_SUCCESS".equals(queryPaymentResult.getTxn_status())) {
-            throw new RuntimeException("订单未支付成功不允许退款:" + payCode);
+        PayQueryResponse payResult = queryPayResult(payChannel, payUser, subMerchant, payOrder);
+        if (payResult == null || !"SUCCESS".equals(payResult.getStatus())) {
+            throw new RuntimeException("订单未支付成功不允许退款:" + payOrder.getTxnSeqno());
         }
+        PayRefundResponse response = new PayRefundResponse(payUser.getAppKey(), payOrder.getTxnSeqno(), refundOrder.getPayRefundNo(),
+                refundOrder.getRefundAmt().toString(), DateTimeUtils.format(refundOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
+
+        QueryPaymentParams paymentParams = new QueryPaymentParams();
+        paymentParams.setTimestamp(LLianPayDateUtils.getTimestamp());
+        paymentParams.setOid_partner(payChannel.getParentMerchantNo());
+        paymentParams.setTxn_seqno(payOrder.getTxnSeqno());
+        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        String url = "https://accpapi.lianlianpay.com/v1/txn/query-payment";
+        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(paymentParams));
+        QueryPaymentResult queryPaymentResult = JSON.parseObject(resultJsonStr, QueryPaymentResult.class);
 
         QueryPaymentOrderInfo orderInfo = queryPaymentResult.getOrderInfo();
         List<QueryPaymentPayeeInfo> payeeInfo = queryPaymentResult.getPayeeInfo();
         List<QueryPaymentPayerInfo> payerInfo = queryPaymentResult.getPayerInfo();
-
+        String userId = payUser.getAppKey() + "_" + payOrder.getUserNo();
         MorePayeeRefundParams params = new MorePayeeRefundParams();
         String timestamp = LLianPayDateUtils.getTimestamp();
         params.setTimestamp(timestamp);
@@ -168,7 +179,7 @@ public class LianLianPaySvc {
         // 原商户订单信息
         OriginalOrderInfo originalOrderInfo = new OriginalOrderInfo();
         // 原支付交易商户系统唯一交易流水号
-        originalOrderInfo.setTxn_seqno(payCode);
+        originalOrderInfo.setTxn_seqno(payOrder.getTxnSeqno());
         // 订单总金额
         originalOrderInfo.setTotal_amount(orderInfo.getTotal_amount());
         params.setOriginalOrderInfo(originalOrderInfo);
@@ -176,10 +187,10 @@ public class LianLianPaySvc {
         // 退款订单信息
         RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
         // 退款订单号。标识一次退款请求，商户系统需要保证唯一
-        refundOrderInfo.setRefund_seqno(refundNo);
+        refundOrderInfo.setRefund_seqno(refundOrder.getPayRefundNo());
         refundOrderInfo.setRefund_time(timestamp);
         // 退款总金额。本次需要退款的金额，不允许超过对应原收款方的收款金额
-        refundOrderInfo.setRefund_amount(refundAmt.doubleValue());
+        refundOrderInfo.setRefund_amount(refundOrder.getRefundAmt().doubleValue());
         params.setRefundOrderInfo(refundOrderInfo);
 
         // 原收款方退款信息
@@ -189,7 +200,7 @@ public class LianLianPaySvc {
         pyeeRefundInfo.setPayee_type(payeeInfo.get(0).getPayee_type());
         pyeeRefundInfo.setPayee_accttype("MERCHANT".equals(pyeeRefundInfo.getPayee_type()) ? "MCHOWN" : "USEROWN");
         // 退款金额。本次需要退款的金额，不允许超过对应原收款方的收款金额。
-        pyeeRefundInfo.setPayee_refund_amount(refundAmt.doubleValue());
+        pyeeRefundInfo.setPayee_refund_amount(refundOrder.getRefundAmt().doubleValue());
         // 垫资标识。当原收款方金额不足时，是否由平台垫资的标识，默认:N
         pyeeRefundInfo.setIs_advance_pay("N");
         params.setPyeeRefundInfos(Arrays.asList(new PyeeRefundInfo[]{pyeeRefundInfo}));
@@ -198,29 +209,55 @@ public class LianLianPaySvc {
         // 付款方式
         refundMethod.setMethod(payerInfo.get(0).getMethod());
         // 退款金额
-        refundMethod.setAmount(refundAmt.doubleValue());
+        refundMethod.setAmount(refundOrder.getRefundAmt().doubleValue());
         params.setRefundMethods(Arrays.asList(new RefundMethod[]{refundMethod}));
 
-        String url = "https://accpapi.lianlianpay.com/v1/txn/more-payee-refund";
-        LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
-        String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
-        MorePayeeRefundResult morePayeeRefundResult = JSON.parseObject(resultJsonStr, MorePayeeRefundResult.class);
-        return morePayeeRefundResult;
+        url = "https://accpapi.lianlianpay.com/v1/txn/more-payee-refund";
+        lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
+        resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
+        MorePayeeRefundResult result = JSON.parseObject(resultJsonStr, MorePayeeRefundResult.class);
+        response.setStatus("PROCESSING");
+        response.setPlatformRefundTxno(result.getAccp_txno());
+        return response;
     }
 
     /**
      * 退款查询
      */
-    public RefundQueryResult queryRefund(PayChannel payChannel, PaySubMerchant subMerchant, String payCode, String refundNo) {
+    public PayRefundResponse queryRefund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payOrder,
+                                         PayUnifiedRefundOrder refundOrder) {
+
+        PayRefundResponse response = new PayRefundResponse(payUser.getAppKey(), payOrder.getTxnSeqno(), refundOrder.getPayRefundNo(),
+                refundOrder.getRefundAmt().toString(), DateTimeUtils.format(refundOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
         RefundQueryParams params = new RefundQueryParams();
         params.setTimestamp(LLianPayDateUtils.getTimestamp());
         params.setOid_partner(payChannel.getParentMerchantNo());
-        params.setRefund_seqno(refundNo);
+        params.setRefund_seqno(refundOrder.getPayRefundNo());
+
         String url = "https://accpapi.lianlianpay.com/v1/txn/query-refund";
         LLianPayClient lLianPayClient = new LLianPayClient(payChannel.getPriKey(), payChannel.getPubKey());
         String resultJsonStr = lLianPayClient.sendRequest(url, JSON.toJSONString(params));
         RefundQueryResult result = JSON.parseObject(resultJsonStr, RefundQueryResult.class);
-        return result;
+
+        response.setPlatformRefundTxno(result.getAccp_txno());
+        if ("TRADE_SUCCESS".equals(result.getTxn_status())) {
+            response.setStatus("SUCCESS");
+            if (StringUtils.isNotEmpty(result.getFinish_time())) {
+                try {
+                    response.setSuccessTime(DateTimeUtils.format(DateTimeUtils.parseDate(result.getFinish_time()), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+                } catch (Exception e) {
+                    response.setSuccessTime(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+                }
+            }
+        }
+        if ("TRADE_FAILURE".equals(result.getTxn_status())) {
+            response.setStatus("FAIL");
+        }
+        if ("TRADE_PROCESSING".equals(result.getTxn_status())) {
+            response.setStatus("PROCESSING");
+        }
+        return response;
     }
 
     private static RiskItemInfo getRiskItemInfo(String userId, String goodsName, String ip) {

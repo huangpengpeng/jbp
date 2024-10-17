@@ -1,10 +1,8 @@
 package com.jbp.service.service.pay;
 
 import com.jbp.common.model.pay.*;
-import com.jbp.common.request.pay.PayQueryRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
-import com.jbp.common.response.pay.PayRefundQueryResponse;
 import com.jbp.common.response.pay.PayRefundResponse;
 
 public interface PayAggregationMng {
@@ -13,7 +11,8 @@ public interface PayAggregationMng {
 
     PayQueryResponse query(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order);
 
-    PayRefundResponse refund();
+    PayRefundResponse refund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payOrder, PayUnifiedRefundOrder refundOrder);
 
-    PayRefundQueryResponse refundQuery();
+    PayRefundResponse refundQuery(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant,
+                                       PayUnifiedOrder payOrder, PayUnifiedRefundOrder refundOrder);
 }

@@ -4,14 +4,16 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.jbp.common.model.VersionModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "pay_unified_refund_order", autoResultMap = true)
@@ -20,6 +22,9 @@ public class PayUnifiedRefundOrder extends VersionModel {
 
     @ApiModelProperty(value = "后台商户ID")
     private Integer merId;
+
+    @ApiModelProperty(value = "支付用户ID")
+    private Long payUserId;
 
     @ApiModelProperty(value = "用户编号")
     private String userNo;

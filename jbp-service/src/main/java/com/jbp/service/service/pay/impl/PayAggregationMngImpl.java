@@ -1,12 +1,8 @@
 package com.jbp.service.service.pay.impl;
 
-import com.jbp.common.model.pay.PayChannel;
-import com.jbp.common.model.pay.PaySubMerchant;
-import com.jbp.common.model.pay.PayUnifiedOrder;
-import com.jbp.common.model.pay.PayUser;
+import com.jbp.common.model.pay.*;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
-import com.jbp.common.response.pay.PayRefundQueryResponse;
 import com.jbp.common.response.pay.PayRefundResponse;
 import com.jbp.service.service.pay.PayAggregationMng;
 import com.jbp.service.service.pay.channel.LianLianPaySvc;
@@ -53,12 +49,26 @@ public class PayAggregationMngImpl implements PayAggregationMng {
     }
 
     @Override
-    public PayRefundResponse refund() {
+    public PayRefundResponse refund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant,
+                                    PayUnifiedOrder payOrder, PayUnifiedRefundOrder refundOrder) {
+        if (payChannel.getName().equals("易宝")) {
+            return yopPaySvc.refund(payChannel, payUser, subMerchant, payOrder, refundOrder);
+        }
+        if (payChannel.getName().equals("连连")) {
+            return lianLianPaySvc.refund(payChannel, payUser, subMerchant, payOrder, refundOrder);
+        }
         return null;
     }
 
     @Override
-    public PayRefundQueryResponse refundQuery() {
+    public PayRefundResponse refundQuery(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant,
+                                         PayUnifiedOrder payOrder, PayUnifiedRefundOrder refundOrder) {
+        if (payChannel.getName().equals("易宝")) {
+            return yopPaySvc.queryRefund(payChannel, payUser, subMerchant, payOrder, refundOrder);
+        }
+        if (payChannel.getName().equals("连连")) {
+            return lianLianPaySvc.queryRefund(payChannel, payUser, subMerchant, payOrder, refundOrder);
+        }
         return null;
     }
 

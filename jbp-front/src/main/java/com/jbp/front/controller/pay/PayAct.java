@@ -9,13 +9,17 @@ import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.pay.PayCashier;
 import com.jbp.common.request.pay.PayCashRequest;
 import com.jbp.common.request.pay.PayQueryRequest;
+import com.jbp.common.request.pay.PayRefundQueryRequest;
+import com.jbp.common.request.pay.PayRefundRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
+import com.jbp.common.response.pay.PayRefundResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
 import com.jbp.service.service.pay.PayCashierMng;
 import com.jbp.service.service.pay.PayUnifiedOrderMng;
+import com.jbp.service.service.pay.PayUnifiedRefundOrderMng;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +44,8 @@ public class PayAct {
 
     @Resource
     private PayCashierMng payCashierMng;
+    @Resource
+    private PayUnifiedRefundOrderMng payUnifiedRefundOrderMng;
     @Resource
     private PayUnifiedOrderMng payUnifiedOrderMng;
 
@@ -115,14 +121,18 @@ public class PayAct {
 
     @ApiOperation(value = "支付退款")
     @RequestMapping(value = "/refund", method = RequestMethod.POST)
-    public CommonResult<String> refund(String token, String method) {
-        return CommonResult.success();
+    public CommonResult<PayRefundResponse> refund(@RequestBody @Validated PayRefundRequest request) {
+        validSign(request.getAppKey(), request.getTimeStr(), request.getMethod(), request.getSign());
+        PayRefundResponse refund = payUnifiedRefundOrderMng.refund(request);
+        return CommonResult.success(refund);
     }
 
     @ApiOperation(value = "支付退款查询")
     @RequestMapping(value = "/refundQuery", method = RequestMethod.POST)
-    public CommonResult<String> refundQuery(String token, String method) {
-        return CommonResult.success();
+    public CommonResult<PayRefundResponse> refundQuery(@RequestBody @Validated PayRefundQueryRequest request) {
+        validSign(request.getAppKey(), request.getTimeStr(), request.getMethod(), request.getSign());
+        PayRefundResponse refund = payUnifiedRefundOrderMng.refundQuery(request);
+        return CommonResult.success(refund);
     }
 
 

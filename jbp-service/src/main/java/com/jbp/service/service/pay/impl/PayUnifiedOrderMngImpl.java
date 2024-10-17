@@ -89,7 +89,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         PayUser payUser = payUserMng.getByAppKey(appKey);
         PayUnifiedOrder payUnifiedOrder = getByTxnSeqno(payUser.getId(), txnSeqno);
         if (payUnifiedOrder == null) {
-            return null;
+            throw new RuntimeException("订单不存在");
         }
         if ("SUCCESS".equals(payUnifiedOrder.getStatus())) {
             return payUnifiedOrder;
@@ -119,11 +119,12 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         PayUser payUser = payUserMng.getByAppKey(appKey);
         PayUnifiedOrder payUnifiedOrder = getByTxnSeqno(payUser.getId(), txnSeqno);
         if (payUnifiedOrder == null) {
-            return null;
+            throw new CrmebException("订单不存在");
         }
         PayQueryResponse response = new PayQueryResponse(payUser.getAppKey(), payUnifiedOrder.getPayMethod(),
                 payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayChannelSeqno(), payUnifiedOrder.getPayAmt().toString(),
                 DateTimeUtils.format(payUnifiedOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
         if ("SUCCESS".equals(payUnifiedOrder.getStatus())) {
             response.setStatus("SUCCESS");
             response.setSuccessTime(DateTimeUtils.format(payUnifiedOrder.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
@@ -147,8 +148,12 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     }
 
     @Override
-    public PayUnifiedOrder success(String txnSeqno) {
-        return null;
+    public PayUnifiedOrder refresh(PayUnifiedOrder payUnifiedOrder) {
+        if (payUnifiedOrder.getStatus().equals("SUCCESS") || payUnifiedOrder.getStatus().equals("FAIL")) {
+            return payUnifiedOrder;
+        }
+        PayUser payUser = payUserMng.getById(payUnifiedOrder.getPayUserId());
+        return callBack(payUser.getAppKey(), payUnifiedOrder.getTxnSeqno());
     }
 
     @Override

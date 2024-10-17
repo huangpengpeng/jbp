@@ -16,7 +16,7 @@ public interface PayUnifiedOrderMng extends IService<PayUnifiedOrder> {
 
      PayQueryResponse query(String appKey, String txnSeqno);
 
-     PayUnifiedOrder success(String txnSeqno);
+     PayUnifiedOrder refresh(PayUnifiedOrder payUnifiedOrder);
 
      PayUnifiedOrder getByTxnSeqno(Long payUserId, String txnSeqno);
 

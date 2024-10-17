@@ -1,12 +1,10 @@
 package com.jbp.service.service.pay.channel;
 
 import com.jbp.common.lianlian.result.TradeCreateResult;
-import com.jbp.common.model.pay.PayChannel;
-import com.jbp.common.model.pay.PaySubMerchant;
-import com.jbp.common.model.pay.PayUnifiedOrder;
-import com.jbp.common.model.pay.PayUser;
+import com.jbp.common.model.pay.*;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
+import com.jbp.common.response.pay.PayRefundResponse;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.JacksonTool;
 import com.jbp.common.yop.BaseYopRequest;
@@ -126,39 +124,61 @@ public class YopPaySvc {
         return response;
     }
 
-    public TradeRefundResult refund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder, String refundNo, BigDecimal refundAmt) {
-        TradeRefundResult tradeRefundResult = new TradeRefundResult();
-        // 是否已经退款
-        RefundQueryResult refundQueryResult = queryRefund(payChannel, subMerchant, payUnifiedOrder.getTxnSeqno(), refundNo);
-        if (refundQueryResult != null && !StringUtils.isEmpty(refundQueryResult.getCode())) {
-            if (refundQueryResult.ifSuccess()) {
-                tradeRefundResult.setStatus("SUCCESS");
-                return tradeRefundResult;
-            }
-            if (!refundQueryResult.ifCanRefund()) {
-                tradeRefundResult.setStatus("PROCESSING");
-                return tradeRefundResult;
-            }
-        }
-        TradeRefundParams params = new TradeRefundParams(payUnifiedOrder.getTxnSeqno(), refundNo, refundAmt.toString());
+    public PayRefundResponse refund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder, PayUnifiedRefundOrder refundOrder) {
+        PayRefundResponse response = new PayRefundResponse(payUser.getAppKey(), payUnifiedOrder.getTxnSeqno(), refundOrder.getPayRefundNo(),
+                refundOrder.getRefundAmt().toString(), DateTimeUtils.format(refundOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
+        TradeRefundParams params = new TradeRefundParams(payUnifiedOrder.getTxnSeqno(), refundOrder.getPayRefundNo(), refundOrder.getRefundAmt().toString());
         params.setParentMerchantNo(payChannel.getParentMerchantNo());
         params.setMerchantNo(subMerchant.getMerchantNo());
         params.setRefundAccountType(YopEnums.AccountTypeEnum.待结算账户.getValue());
-        tradeRefundResult = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);
-        if (!tradeRefundResult.validate()) {
+
+        TradeRefundResult result = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);
+        if (!result.validate()) {
             params.setRefundAccountType(YopEnums.AccountTypeEnum.商户资金账户.getValue());
-            tradeRefundResult = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);
+            result = send("/rest/v1.0/trade/refund", "POST", params, TradeRefundResult.class);
         }
-        if (!tradeRefundResult.validate()) {
-            throw new RuntimeException("调用退款异常:" + refundNo);
+        if (!result.validate()) {
+            throw new RuntimeException("调用退款异常:" + refundOrder.getPayRefundNo());
         }
-        return tradeRefundResult;
+        if ("PROCESSING".equals(result.getStatus())) {
+            response.setStatus("PROCESSING");
+            response.setPlatformRefundTxno(result.getUniqueRefundNo());
+        }
+        if ("SUCCESS".equals(result.getStatus())) {
+            response.setStatus("SUCCESS");
+            response.setPlatformRefundTxno(result.getUniqueRefundNo());
+            response.setSuccessTime(DateTimeUtils.format(DateTimeUtils.getNow(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+        }
+        if ("FAILED".equals(result.getStatus()) || "CANCEL".equals(result.getStatus())) {
+            response.setStatus("FAIL");
+            response.setPlatformRefundTxno(result.getUniqueRefundNo());
+        }
+        return response;
     }
 
-    public RefundQueryResult queryRefund(PayChannel payChannel, PaySubMerchant subMerchant, String payCode, String refundNo) {
-        com.jbp.common.yop.params.RefundQueryParams params = new RefundQueryParams(subMerchant.getMerchantNo(), payCode, refundNo);
+    public PayRefundResponse queryRefund(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payOrder,
+                                         PayUnifiedRefundOrder refundOrder) {
+
+        PayRefundResponse response = new PayRefundResponse(payUser.getAppKey(), payOrder.getTxnSeqno(), refundOrder.getPayRefundNo(),
+                refundOrder.getRefundAmt().toString(), DateTimeUtils.format(refundOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+
+        com.jbp.common.yop.params.RefundQueryParams params = new RefundQueryParams(subMerchant.getMerchantNo(), payOrder.getTxnSeqno(), refundOrder.getPayRefundNo());
         params.setParentMerchantNo(payChannel.getParentMerchantNo());
-        return send("/rest/v1.0/trade/refund/query", "GET", params, RefundQueryResult.class);
+        RefundQueryResult result = send("/rest/v1.0/trade/refund/query", "GET", params, RefundQueryResult.class);
+
+        response.setPlatformRefundTxno(result.getUniqueRefundNo());
+        if ("PROCESSING".equals(result.getStatus())) {
+            response.setStatus("PROCESSING");
+        }
+        if ("SUCCESS".equals(result.getStatus())) {
+            response.setStatus("SUCCESS");
+            response.setSuccessTime(result.getRefundSuccessDate());
+        }
+        if ("FAILED".equals(result.getStatus()) || "CANCEL".equals(result.getStatus())) {
+            response.setStatus("FAIL");
+        }
+        return response;
     }
 
 
