@@ -19,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,7 +69,8 @@ public class PayAct {
         request.setExpireTime("2024-10-19 14:54:55");
         request.setNotifyUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144910");
         request.setReturnUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144910");
-
+        request.setUserNo("123");
+        request.setIp("127.0.0.1");
         System.out.println(JSONObject.toJSONString(request));
 
 
@@ -90,7 +92,7 @@ public class PayAct {
 
     @ApiOperation(value = "获取支付方法")
     @RequestMapping(value = "/methodGet", method = RequestMethod.GET)
-    public CommonResult<List<String>> methodGet(String token) {
+    public CommonResult<JSONObject> methodGet(String token) {
         return CommonResult.success(payCashierMng.getPayMethod(token));
     }
 

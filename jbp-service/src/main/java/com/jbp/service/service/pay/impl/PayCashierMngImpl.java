@@ -1,5 +1,6 @@
 package com.jbp.service.service.pay.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.beust.jcommander.internal.Lists;
@@ -101,7 +102,7 @@ public class PayCashierMngImpl extends ServiceImpl<PayCashierDao, PayCashier> im
     }
 
     @Override
-    public List<String> getPayMethod(String token) {
+    public JSONObject getPayMethod(String token) {
         PayCashier payCashier = getByToken(token);
         PayUser payUser = payUserMng.getByAppKey(payCashier.getAppKey());
         List<PayUserSubMerchant> list = payUserSubMerchantMng.getByPayUser(payUser.getId());
@@ -119,6 +120,11 @@ public class PayCashierMngImpl extends ServiceImpl<PayCashierDao, PayCashier> im
         if (CollectionUtils.isNotEmpty(qucikPayList)) {
             methodList.add("quickPay");
         }
-        return methodList;
+
+        JSONObject jsonObject =new JSONObject();
+        jsonObject.put("methodList",methodList);
+        //金额
+        jsonObject.put("payAmt",payCashier.getPayAmt());
+        return jsonObject;
     }
 }

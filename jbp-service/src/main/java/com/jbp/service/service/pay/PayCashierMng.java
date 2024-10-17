@@ -1,5 +1,6 @@
 package com.jbp.service.service.pay;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.domain.OrderInfoDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jbp.common.dto.PayOrderInfoDto;
@@ -20,5 +21,5 @@ public interface PayCashierMng extends IService<PayCashier> {
 
     PayCashier getByToken(String token);
 
-    List<String> getPayMethod(String token);
+    JSONObject getPayMethod(String token);
 }
