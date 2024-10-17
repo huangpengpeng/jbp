@@ -149,6 +149,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
         WalletWithdraw walletWithdraw = new WalletWithdraw(uid, account, walletType, walletName, amt.subtract(commission), commission, postscript);
         if (ifOpenJdtx.equals("'true'")) {
             walletWithdraw.setChannel("JD");
+            walletWithdraw.setStatus(WalletWithdraw.StatusEnum.待审核.name());
         }
         save(walletWithdraw);
         walletService.reduce(uid, walletType, amt, WalletFlow.OperateEnum.提现.name(), walletWithdraw.getUniqueNo(), postscript);

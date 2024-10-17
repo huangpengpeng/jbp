@@ -1,14 +1,12 @@
 package com.jbp.front.controller.pay;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alipay.api.domain.OrderInfoDTO;
 import com.beust.jcommander.internal.Lists;
 import com.jbp.common.annotation.CustomResponseAnnotation;
 import com.jbp.common.dto.PayOrderInfoDto;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.pay.PayCashier;
-import com.jbp.common.model.pay.PayUnifiedOrder;
 import com.jbp.common.request.pay.PayCashRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.result.CommonResult;
@@ -20,7 +18,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +32,7 @@ import java.util.Map;
 @RestController
 @EncryptIgnore
 @CustomResponseAnnotation
-@RequestMapping("api/publicly/pay")
+@RequestMapping("api/front/publicly/pay")
 @Api(tags = "前台支付控制器")
 public class PayAct {
 
@@ -66,7 +63,8 @@ public class PayAct {
         request.setExpireTime("2024-10-19 14:54:55");
         request.setNotifyUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144910");
         request.setReturnUrl("http://127.0.0.1:8383/api/front/pay/call/PAY_20241016144910");
-
+        request.setUserNo("123");
+        request.setIp("127.0.0.1");
         System.out.println(JSONObject.toJSONString(request));
 
     }
@@ -86,7 +84,7 @@ public class PayAct {
 
     @ApiOperation(value = "获取支付方法")
     @RequestMapping(value = "/methodGet", method = RequestMethod.GET)
-    public CommonResult<List<String>> methodGet(String token) {
+    public CommonResult<JSONObject> methodGet(String token) {
         return CommonResult.success(payCashierMng.getPayMethod(token));
     }
 
