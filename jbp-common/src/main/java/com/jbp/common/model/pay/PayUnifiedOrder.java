@@ -93,6 +93,12 @@ public class PayUnifiedOrder extends VersionModel {
     @ApiModelProperty(value = "跳转地址")
     private String returnUrl;
 
+    @ApiModelProperty(value = "支付公司通知地址")
+    private String channelNotifyUrl;
+
+    @ApiModelProperty(value = "支付公司跳转地址")
+    private String channelReturnUrl;
+
     @ApiModelProperty(value = "客户端ip")
     private String ip;
 }

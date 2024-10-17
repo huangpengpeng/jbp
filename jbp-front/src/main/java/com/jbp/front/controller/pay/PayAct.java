@@ -71,8 +71,6 @@ public class PayAct {
 
         System.out.println(JSONObject.toJSONString(request));
 
-
-
     }
 
     @ApiOperation(value = "唤起收银台[不需要登录]")
