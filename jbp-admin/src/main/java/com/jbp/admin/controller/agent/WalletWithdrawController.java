@@ -58,7 +58,7 @@ public class WalletWithdrawController {
     @PostMapping("/jdSend")
     @ApiOperation("jd钱包提现批量出款")
     public CommonResult jdSend(@RequestBody List<WalletWithdrawRequest> requests) {
-        walletWithdrawService.send(requests);
+        walletWithdrawService.jdSend(requests);
         return CommonResult.success();
     }
 

@@ -37,7 +37,7 @@ import java.util.Map;
 @RestController
 @EncryptIgnore
 @CustomResponseAnnotation
-@RequestMapping("api/publicly/pay")
+@RequestMapping("api/front/publicly/pay")
 @Api(tags = "前台支付控制器")
 public class PayAct {
 
