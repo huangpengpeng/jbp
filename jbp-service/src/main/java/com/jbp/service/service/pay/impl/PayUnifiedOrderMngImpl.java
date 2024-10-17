@@ -114,6 +114,38 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     }
 
     @Override
+    public PayQueryResponse query(String appKey, String txnSeqno) {
+        PayUser payUser = payUserMng.getByAppKey(appKey);
+        PayUnifiedOrder payUnifiedOrder = getByTxnSeqno(payUser.getId(), txnSeqno);
+        if (payUnifiedOrder == null) {
+            return null;
+        }
+        PayQueryResponse response = new PayQueryResponse(payUser.getAppKey(), payUnifiedOrder.getPayMethod(),
+                payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayChannelSeqno(), payUnifiedOrder.getPayAmt().toString(),
+                DateTimeUtils.format(payUnifiedOrder.getCreateTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+        if ("SUCCESS".equals(payUnifiedOrder.getStatus())) {
+            response.setStatus("SUCCESS");
+            response.setSuccessTime(DateTimeUtils.format(payUnifiedOrder.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+            response.setPlatformTxno(payUnifiedOrder.getPayChannelSeqno());
+        }
+
+        payUnifiedOrder = callBack(appKey, txnSeqno);
+        if (payUnifiedOrder == null) {
+            response.setStatus("FAIL");
+            response.setPlatformTxno(payUnifiedOrder.getPayChannelSeqno());
+        } else {
+            response.setStatus(payUnifiedOrder.getStatus());
+            if (payUnifiedOrder.getPayAmt() != null) {
+                response.setSuccessTime(DateTimeUtils.format(payUnifiedOrder.getPayTime(), DateTimeUtils.DEFAULT_DATE_TIME_FORMAT_PATTERN));
+            }
+            if (StringUtils.isNotEmpty(payUnifiedOrder.getPayChannelSeqno())) {
+                response.setPlatformTxno(payUnifiedOrder.getPayChannelSeqno());
+            }
+        }
+        return response;
+    }
+
+    @Override
     public PayUnifiedOrder success(String txnSeqno) {
         return null;
     }

@@ -8,7 +8,9 @@ import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.pay.PayCashier;
 import com.jbp.common.request.pay.PayCashRequest;
+import com.jbp.common.request.pay.PayQueryRequest;
 import com.jbp.common.response.pay.PayCreateResponse;
+import com.jbp.common.response.pay.PayQueryResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
@@ -97,11 +99,9 @@ public class PayAct {
 
     @ApiOperation(value = "支付查询")
     @RequestMapping(value = "/query", method = RequestMethod.POST)
-    public CommonResult<String> query(String token, String method) {
-
-        
-
-        return CommonResult.success();
+    public CommonResult<PayQueryResponse> query(@RequestBody @Validated PayQueryRequest request) {
+        validSign(request.getAppKey(), request.getTimeStr(), request.getMethod(), request.getSign());
+        return CommonResult.success(payUnifiedOrderMng.query(request.getAppKey(), request.getTxnSeqno()));
     }
 
     @ApiOperation(value = "支付回调")
