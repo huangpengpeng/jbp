@@ -50,7 +50,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
             if (order.getTxnSeqno().equals("FAIL")) {
                 throw new CrmebException("订单已失败");
             }
-            if (ArithmeticUtils.equals(order.getPayAmt(), payCashier.getPayAmt())) {
+            if (!ArithmeticUtils.equals(order.getPayAmt(), payCashier.getPayAmt())) {
                 throw new CrmebException("单号重复");
             }
             // 订单关闭创建新的订单
@@ -71,6 +71,8 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         save(order);
         PayChannel payChannel = payChannelMng.getByCode(subMerchant.getChannelCode());
         PayCreateResponse payCreateResponse = payAggregationMng.create(payUser, payChannel, subMerchant, order);
+        order.setPayChannelSeqno(payCreateResponse.getPlatformTxno());
+        updateById(order);
         return payCreateResponse;
     }
 

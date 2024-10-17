@@ -307,7 +307,12 @@ public class ClearingUserServiceImpl extends UnifiedServiceImpl<ClearingUserDao,
                     userTeamScoreMap.put(uid, BigDecimal.valueOf(d).add(BigDecimal.valueOf(score)).doubleValue());
                 }
                 // 在加给上级
-                List<UserUpperDto> allUpper = invitationService.getAllUpper(uid);
+                List<UserUpperDto> allUpper = Lists.newArrayList();
+                if (sm || yk) {
+                    allUpper = invitationService.getNoMountAllUpper(uid);
+                }else{
+                    allUpper = invitationService.getAllUpper(uid);
+                }
                 if (CollectionUtils.isNotEmpty(allUpper)) {
                     for (UserUpperDto upperDto : allUpper) {
                         if (upperDto.getPId() != null && finalUidList.contains(upperDto.getPId())) {
