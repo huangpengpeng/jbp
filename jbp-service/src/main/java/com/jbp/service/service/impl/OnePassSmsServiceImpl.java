@@ -164,11 +164,11 @@ public class OnePassSmsServiceImpl implements OnePassSmsService, SmsService {
     @Override
     public Boolean sendCommonCode(String phone) {
         ValidateFormUtil.isPhone(phone, "手机号码错误");
-        beforeSendMessage();
-        DateTime dateTime = DateUtil.date();
+//        beforeSendMessage();
+//        DateTime dateTime = DateUtil.date();
 
 //        String clientIp = RequestUtil.getClientIp();
-        beforeSendCommonCodeCheck(phone, null, dateTime);
+//        beforeSendCommonCodeCheck(phone, null, dateTime);
 
         //获取短信验证码过期时间
         String codeExpireStr = systemConfigService.getValueByKey(SmsConstants.CONFIG_KEY_SMS_CODE_EXPIRE);
