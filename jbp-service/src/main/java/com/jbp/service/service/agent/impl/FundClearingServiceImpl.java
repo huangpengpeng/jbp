@@ -751,7 +751,7 @@ public class FundClearingServiceImpl extends ServiceImpl<FundClearingDao, FundCl
 
     public void setFundClearingWrapperByStatus(LambdaQueryWrapper<FundClearing> lqw, Integer uid, Integer headerStatus) {
         lqw.eq(FundClearing::getUid, uid);
-        lqw.ge(FundClearing::getSendAmt,0);
+        lqw.ge(FundClearing::getSendAmt,BigDecimal.ZERO);
         String openWaitStatus = environment.getProperty("platform.openWaitStatus");
 
         switch (headerStatus) {
