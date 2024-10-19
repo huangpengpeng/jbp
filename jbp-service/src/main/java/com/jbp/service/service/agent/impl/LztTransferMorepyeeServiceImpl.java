@@ -134,7 +134,7 @@ public class LztTransferMorepyeeServiceImpl extends ServiceImpl<LztTransferMorep
                 .select(LztTransferMorepyee.class, info -> !info.getColumn().equals("receipt_zip"))
                 .eq(merId!= null && merId > 0,  LztTransferMorepyee::getMerId, merId)
                 .eq(StringUtils.isNotEmpty(status), LztTransferMorepyee::getTxnStatus, status)
-                .eq(StringUtils.isNotEmpty(payerId), LztTransferMorepyee::getPayerId, payeeId)
+                .eq(StringUtils.isNotEmpty(payerId), LztTransferMorepyee::getPayerId, payerId)
                 .eq(StringUtils.isNotEmpty(payeeId), LztTransferMorepyee::getPayeeId, payeeId)
                 .eq(StringUtils.isNotEmpty(txnSeqno), LztTransferMorepyee::getTxnSeqno, txnSeqno)
                 .eq(StringUtils.isNotEmpty(accpTxno), LztTransferMorepyee::getAccpTxno, accpTxno)
