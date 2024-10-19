@@ -33,6 +33,12 @@ public class WechatAlipayPayParams extends BaseYopRequest {
 
     private String parentMerchantNo;
 
+
+
+
+    @NotBlank(message = "商品名称不能为空")
+    private String goodsName;
+
     @NotBlank(message = "商户编号不能为空")
     private String merchantNo;
 

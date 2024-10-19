@@ -45,12 +45,13 @@ public class YopPaySvc {
         String userId = payUser.getAppKey() + "_" + payUnifiedOrder.getUserNo();
 
         TradeOrderParams tradeOrderParams = new TradeOrderParams(subMerchant.getMerchantNo(), payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt().toString(), goodsName, channelNotifyUrl, "", channelReturnUrl);
-        tradeOrderParams.setParentMerchantNo(payChannel.getParentMerchantNo());
+        tradeOrderParams.setParentMerchantNo(subMerchant.getMerchantNo());
         TradeOrderResult tradeOrderResult = send("/rest/v1.0/trade/order", "POST", tradeOrderParams, TradeOrderResult.class);
 
         if ("wechatPay".equals(method)) {
             WechatAlipayPayParams wechat = new WechatAlipayPayParams(payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt(),
                     channelNotifyUrl, "H5_PAY", "WECHAT", "", "", payUnifiedOrder.getIp(), "ONLINE", "REAL_TIME");
+            wechat.setGoodsName(goodsName);
             wechat.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
             wechat.setToken(tradeOrderResult.getToken());
             wechat.setMerchantNo(subMerchant.getMerchantNo());
@@ -63,7 +64,7 @@ public class YopPaySvc {
         if ("aliPay".equals(method)) {
             WechatAlipayPayParams alipayPay = new WechatAlipayPayParams(payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt(),
                     channelNotifyUrl, "USER_SCAN", "ALIPAY", "", "", payUnifiedOrder.getIp(), "ONLINE", "REAL_TIME");
-
+            alipayPay.setGoodsName(goodsName);
             alipayPay.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
             alipayPay.setToken(tradeOrderResult.getToken());
             alipayPay.setMerchantNo(subMerchant.getMerchantNo());
