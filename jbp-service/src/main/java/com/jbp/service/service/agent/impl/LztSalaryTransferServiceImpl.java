@@ -231,7 +231,7 @@ public class LztSalaryTransferServiceImpl extends ServiceImpl<LztSalaryTransferD
     public static void main(String[] args) {
 
 
-        System.out.println(getBankName("6221321108344177"));
+        System.out.println(getBankName("622848099482026573"));
     }
 
     public static String getBankName(String bankCode) {
