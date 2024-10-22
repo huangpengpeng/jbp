@@ -42,8 +42,10 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-        PayUnifiedOrderMng payUnifiedOrderMng = run.getBean(PayUnifiedOrderMng.class);
+//        PayUnifiedOrderMng payUnifiedOrderMng = run.getBean(PayUnifiedOrderMng.class);
+//
+//        PayCreateResponse result = payUnifiedOrderMng.create("0100f61e1940465a9c88ed54d212fb97", "wechatPay");
+//
 
-        PayCreateResponse result = payUnifiedOrderMng.create("0100f61e1940465a9c88ed54d212fb97", "wechatPay");
     }
 }

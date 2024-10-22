@@ -34,6 +34,8 @@ public class JdPayAggregateCreateOrderRequest implements Serializable {
      * 交易描述
      */
     private String tradeRemark;
+
+    private String extendParam;
     /**
      * 币种
      */
@@ -365,5 +367,13 @@ public class JdPayAggregateCreateOrderRequest implements Serializable {
 
     public void setAccessType(String accessType) {
         this.accessType = accessType;
+    }
+
+    public String getExtendParam() {
+        return extendParam;
+    }
+
+    public void setExtendParam(String extendParam) {
+        this.extendParam = extendParam;
     }
 }
