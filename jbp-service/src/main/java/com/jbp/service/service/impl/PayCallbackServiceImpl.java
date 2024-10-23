@@ -617,11 +617,10 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             return "FAIL";
         }
         redisTemplate.expire("PaySuccessCall" + orderNo, 1, TimeUnit.MINUTES);
-        BigDecimal amt = BigDecimal.ZERO;
+
         if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
             Order order = orderService.getByOrderNo(orderNo);
             if (order != null) {
-                amt = order.getPayPrice();
                 if (BooleanUtils.isTrue(order.getPaid())) {
                     logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
                     return "SUCCESS";
@@ -658,7 +657,6 @@ public class PayCallbackServiceImpl implements PayCallbackService {
 
             // 充值
             if (rechargeOrder != null) {
-                amt = rechargeOrder.getPrice();
                 if (BooleanUtils.isTrue(rechargeOrder.getPaid())) {
                     logger.info("lianlian pay error : 充值订单已支付 ===》" + orderNo);
                     return "SUCCESS";
@@ -677,9 +675,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                 }
             }
         }
-        if(ArithmeticUtils.gt(amt, BigDecimal.ZERO)){
-            jdPayService.sendCommission(orderNo, amt.multiply(BigDecimal.valueOf(0.8)));
-        }
+
         redisTemplate.delete("PaySuccessCall" + orderNo);
         return "SUCCESS";
     }
@@ -699,9 +695,11 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             return "FAIL";
         }
         redisTemplate.expire("PaySuccessCall" + orderNo, 1, TimeUnit.MINUTES);
+        BigDecimal amt = BigDecimal.ZERO;
         if (!orderNo.startsWith(OrderConstants.RECHARGE_ORDER_PREFIX)) {
             Order order = orderService.getByOrderNo(orderNo);
             if (order != null) {
+                amt = order.getPayPrice();
                 if (BooleanUtils.isTrue(order.getPaid())) {
                     logger.info("lianlian pay error : 订单已支付 ===》" + orderNo);
                     return "SUCCESS";
@@ -737,6 +735,7 @@ public class PayCallbackServiceImpl implements PayCallbackService {
             RechargeOrder rechargeOrder = rechargeOrderService.getByOrderNo(orderNo);
             // 充值
             if (rechargeOrder != null) {
+                amt = rechargeOrder.getPrice();
                 if (BooleanUtils.isTrue(rechargeOrder.getPaid())) {
                     logger.info("lianlian pay error : 充值订单已支付 ===》" + orderNo);
                     return "SUCCESS";
@@ -754,6 +753,9 @@ public class PayCallbackServiceImpl implements PayCallbackService {
                     throw new CrmebException("充值订单回执失败" + orderNo);
                 }
             }
+        }
+        if(ArithmeticUtils.gt(amt, BigDecimal.ZERO)){
+            jdPayService.sendCommission(orderNo, amt.multiply(BigDecimal.valueOf(0.8)));
         }
         redisTemplate.delete("PaySuccessCall" + orderNo);
         return "SUCCESS";
