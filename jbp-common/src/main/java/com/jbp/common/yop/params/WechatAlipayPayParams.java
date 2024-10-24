@@ -90,7 +90,7 @@ public class WechatAlipayPayParams extends BaseYopRequest {
 
     private String uniqueOrderNo;
 
-    private String goodsName;
+
 
 
     public static enum PAYWAY {
