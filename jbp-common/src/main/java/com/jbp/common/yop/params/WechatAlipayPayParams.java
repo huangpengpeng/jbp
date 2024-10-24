@@ -84,6 +84,9 @@ public class WechatAlipayPayParams extends BaseYopRequest {
 
     private String uniqueOrderNo;
 
+    private String goodsName;
+
+
     public static enum PAYWAY {
         USER_SCAN, //用户扫码
         MINI_PROGRAM, //小程序支付

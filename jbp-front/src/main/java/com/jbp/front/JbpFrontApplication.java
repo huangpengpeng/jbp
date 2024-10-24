@@ -1,7 +1,13 @@
 package com.jbp.front;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+import com.jbp.common.model.agent.ClearingFinal;
+import com.jbp.common.model.agent.ClearingUser;
+import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.service.service.agent.ClearingFinalService;
+import com.jbp.service.service.agent.impl.ClearingUserServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +19,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * 程序主入口
@@ -39,5 +48,13 @@ public class JbpFrontApplication {
         Environment bean = run.getBean(Environment.class);
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
+
+//        ClearingUserServiceImpl clearingUserService =run.getBean(ClearingUserServiceImpl.class);
+//        ClearingFinalService clearingFinalService =run.getBean(ClearingFinalService.class);
+//        ClearingFinal clearingFinal =  clearingFinalService.getOne(new QueryWrapper<ClearingFinal>().lambda().eq(ClearingFinal::getId,28L));
+//        HashMap<Integer, ClearingUser> map =  new HashMap<>();
+//        Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
+//        Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
+//        clearingUserService.createMonthGuanLiUser(28L,clearingFinal,startTime,endTime,map);
     }
 }

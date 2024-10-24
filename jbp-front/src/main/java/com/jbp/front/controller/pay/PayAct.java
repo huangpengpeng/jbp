@@ -7,16 +7,18 @@ import com.jbp.common.dto.PayOrderInfoDto;
 import com.jbp.common.encryptapi.EncryptIgnore;
 import com.jbp.common.exception.CrmebException;
 import com.jbp.common.model.pay.PayCashier;
-import com.jbp.common.request.pay.PayCashRequest;
-import com.jbp.common.request.pay.PayQueryRequest;
-import com.jbp.common.request.pay.PayRefundQueryRequest;
-import com.jbp.common.request.pay.PayRefundRequest;
+import com.jbp.common.request.pay.*;
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.common.response.pay.PayQueryResponse;
 import com.jbp.common.response.pay.PayRefundResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
+import com.jbp.common.yop.YopApi;
+import com.jbp.common.yop.dto.WechatConfigAddResponse;
+import com.jbp.common.yop.dto.WechatConfigQueryResponse;
+import com.jbp.common.yop.params.WechatConfigAddRequest;
+import com.jbp.common.yop.params.WechatConfigQueryRequest;
 import com.jbp.service.service.pay.PayCashierMng;
 import com.jbp.service.service.pay.PayUnifiedOrderMng;
 import com.jbp.service.service.pay.PayUnifiedRefundOrderMng;
@@ -24,11 +26,18 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.springframework.http.MediaType;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UrlPathHelper;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +57,9 @@ public class PayAct {
     private PayUnifiedRefundOrderMng payUnifiedRefundOrderMng;
     @Resource
     private PayUnifiedOrderMng payUnifiedOrderMng;
+    @Resource
+    private YopApi yopApi;
+
 
     public static void main(String[] args) {
         PayCashRequest request = new PayCashRequest();
@@ -150,5 +162,27 @@ public class PayAct {
             throw new RuntimeException("签名错误");
         }
     }
+
+
+    @ApiOperation(value = "微信公众号appid报备")
+    @RequestMapping(value = "/wechatReport", method = RequestMethod.GET)
+        public CommonResult<WechatConfigAddResponse> create(String merchantNo) {
+        WechatConfigAddRequest request = new WechatConfigAddRequest(merchantNo);
+        WechatConfigAddResponse wechatConfigAddResponse = yopApi.wechatConfigAdd(request);
+        return CommonResult.success(wechatConfigAddResponse);
+    }
+
+
+
+
+    @ApiOperation(value = "微信公众号appid报备查询")
+    @RequestMapping(value = "/wechatReportQuery", method = RequestMethod.GET)
+        public CommonResult<WechatConfigQueryResponse> wechatReportQuery(String merchantNo) {
+
+        WechatConfigQueryRequest request2 = new WechatConfigQueryRequest(merchantNo, "OFFICIAL_ACCOUNT");
+        WechatConfigQueryResponse wechatConfigQueryResponse2 = yopApi.wechatConfigQuery(request2);
+        return CommonResult.success(wechatConfigQueryResponse2);
+    }
+
 
 }
