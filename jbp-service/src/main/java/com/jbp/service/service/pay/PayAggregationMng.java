@@ -7,7 +7,7 @@ import com.jbp.common.response.pay.PayRefundResponse;
 
 public interface PayAggregationMng {
 
-    PayCreateResponse create(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order);
+    PayCreateResponse create(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order,String openId);
 
     PayQueryResponse query(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order);
 

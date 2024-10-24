@@ -10,7 +10,7 @@ import java.util.List;
 public interface PayUnifiedOrderMng extends IService<PayUnifiedOrder> {
 
 
-     PayCreateResponse create(String token, String method);
+     PayCreateResponse create(String token, String method,String openId);
 
      PayUnifiedOrder callBack(String appKey, String txnSeqno);
 

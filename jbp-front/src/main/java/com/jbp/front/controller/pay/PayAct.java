@@ -14,11 +14,13 @@ import com.jbp.common.response.pay.PayRefundResponse;
 import com.jbp.common.result.CommonResult;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.common.utils.SignUtil;
+import com.jbp.common.vo.WeChatOauthToken;
 import com.jbp.common.yop.YopApi;
 import com.jbp.common.yop.dto.WechatConfigAddResponse;
 import com.jbp.common.yop.dto.WechatConfigQueryResponse;
 import com.jbp.common.yop.params.WechatConfigAddRequest;
 import com.jbp.common.yop.params.WechatConfigQueryRequest;
+import com.jbp.service.service.WechatService;
 import com.jbp.service.service.pay.PayCashierMng;
 import com.jbp.service.service.pay.PayUnifiedOrderMng;
 import com.jbp.service.service.pay.PayUnifiedRefundOrderMng;
@@ -27,6 +29,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
@@ -59,6 +62,9 @@ public class PayAct {
     private PayUnifiedOrderMng payUnifiedOrderMng;
     @Resource
     private YopApi yopApi;
+    @Autowired
+    private WechatService wechatService;
+
 
 
     public static void main(String[] args) {
@@ -111,8 +117,8 @@ public class PayAct {
 
     @ApiOperation(value = "支付下单")
     @RequestMapping(value = "/create", method = RequestMethod.GET)
-    public CommonResult<PayCreateResponse> create(String token, String method) {
-        PayCreateResponse result = payUnifiedOrderMng.create(token, method);
+    public CommonResult<PayCreateResponse> create(String token, String method,String openId) {
+        PayCreateResponse result = payUnifiedOrderMng.create(token, method,openId);
         return CommonResult.success(result);
     }
 
@@ -181,6 +187,14 @@ public class PayAct {
         WechatConfigQueryRequest request2 = new WechatConfigQueryRequest(merchantNo, "OFFICIAL_ACCOUNT");
         WechatConfigQueryResponse wechatConfigQueryResponse2 = yopApi.wechatConfigQuery(request2);
         return CommonResult.success(wechatConfigQueryResponse2);
+    }
+
+
+    @ApiOperation(value = "公众号获取用户openid")
+    @RequestMapping(value = "/get/openId", method = RequestMethod.GET)
+    public CommonResult<String> getOpenId(@RequestParam String code) {
+        WeChatOauthToken oauthToken = wechatService.getOauth2AccessToken(code);
+        return CommonResult.success(oauthToken.getOpenId());
     }
 
 

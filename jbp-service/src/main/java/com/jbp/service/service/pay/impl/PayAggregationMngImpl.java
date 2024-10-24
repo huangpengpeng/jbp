@@ -26,9 +26,9 @@ public class PayAggregationMngImpl implements PayAggregationMng {
 
 
     @Override
-    public PayCreateResponse create(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order) {
+    public PayCreateResponse create(PayUser payUser, PayChannel payChannel, PaySubMerchant paySubMerchant, PayUnifiedOrder order,String openId) {
         if (payChannel.getName().equals("易宝")) {
-            return yopPaySvc.tradeOrder(payChannel, payUser, paySubMerchant, order);
+            return yopPaySvc.tradeOrder(payChannel, payUser, paySubMerchant, order,openId);
         }
         if (payChannel.getName().equals("连连")) {
             return lianLianPaySvc.tradeOrder(payChannel, payUser, paySubMerchant, order);

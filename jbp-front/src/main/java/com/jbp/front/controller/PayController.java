@@ -5,8 +5,10 @@ import com.jbp.common.response.CashierInfoResponse;
 import com.jbp.common.response.OrderPayResultResponse;
 import com.jbp.common.response.PayConfigResponse;
 import com.jbp.common.result.CommonResult;
+import com.jbp.common.vo.WeChatOauthToken;
 import com.jbp.service.service.PayService;
 
+import com.jbp.service.service.WechatService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -64,4 +66,7 @@ public class PayController {
     public CommonResult<CashierInfoResponse> getCashierIno(@PathVariable(value = "orderNo") String orderNo) {
         return CommonResult.success(payService.getCashierIno(orderNo));
     }
+
+
+
 }

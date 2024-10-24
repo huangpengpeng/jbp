@@ -35,7 +35,7 @@ public class YopPaySvc {
     @Resource
     private YopClient yopClient;
 
-    public PayCreateResponse tradeOrder(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder) {
+    public PayCreateResponse tradeOrder(PayChannel payChannel, PayUser payUser, PaySubMerchant subMerchant, PayUnifiedOrder payUnifiedOrder,String openId) {
         PayCreateResponse response = new PayCreateResponse(payUser.getAppKey(), payUnifiedOrder.getPayMethod(), payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt().toString());
 
         String goodsName = payUnifiedOrder.getOrderInfo().get(0).getGoodsName();
@@ -50,7 +50,7 @@ public class YopPaySvc {
 
         if ("wechatPay".equals(method)) {
             WechatAlipayPayParams wechat = new WechatAlipayPayParams(payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt(),
-                    channelNotifyUrl, "WECHAT_OFFIACCOUNT", "WECHAT", "wx788c4a29e00f3f36", "oRYS_6boFN9FOuZ0wsOCK3FpckKc", payUnifiedOrder.getIp(), "ONLINE", "REAL_TIME");
+                    channelNotifyUrl, "WECHAT_OFFIACCOUNT", "WECHAT", "wx75cd25398f314fed", openId, payUnifiedOrder.getIp(), "ONLINE", "REAL_TIME");
             wechat.setGoodsName(goodsName);
             wechat.setUniqueOrderNo(tradeOrderResult.getUniqueOrderNo());
             wechat.setToken(tradeOrderResult.getToken());

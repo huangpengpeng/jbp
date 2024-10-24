@@ -39,7 +39,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
     private PayChannelMng payChannelMng;
 
     @Override
-    public PayCreateResponse create(String token, String method) {
+    public PayCreateResponse create(String token, String method,String openId) {
         PayCashier payCashier = payCashierMng.getByToken(token);
         if (payCashier == null || payCashier.getExpireTime().before(DateTimeUtils.getNow())) {
             throw new CrmebException("收银台已过期");
@@ -77,7 +77,7 @@ public class PayUnifiedOrderMngImpl extends UnifiedServiceImpl<PayUnifiedOrderDa
         save(order);
         PayChannel payChannel = payChannelMng.getByCode(subMerchant.getChannelCode());
         PaySubMerchant paySubMerchant = paySubMerchantMng.getByMerchantNo(subMerchant.getMerchantNo());
-        PayCreateResponse payCreateResponse = payAggregationMng.create(payUser, payChannel, paySubMerchant, order);
+        PayCreateResponse payCreateResponse = payAggregationMng.create(payUser, payChannel, paySubMerchant, order,openId);
         order.setPayChannelSeqno(payCreateResponse.getPlatformTxno());
         updateById(order);
         return payCreateResponse;
