@@ -9,10 +9,8 @@ import com.jbp.common.model.agent.ClearingUser;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.impl.ClearingUserServiceImpl;
-=======
 import com.jbp.common.response.pay.PayCreateResponse;
 import com.jbp.service.service.pay.PayUnifiedOrderMng;
->>>>>>> b10b430bb6ae18731fe12ea5bb010b4368fdd9be
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
