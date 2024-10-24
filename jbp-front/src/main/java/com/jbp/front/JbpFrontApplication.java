@@ -6,6 +6,7 @@ import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.ClearingUser;
 import com.jbp.common.utils.DateTimeUtils;
+import com.jbp.service.service.JdPayService;
 import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.impl.ClearingUserServiceImpl;
 import com.jbp.common.response.pay.PayCreateResponse;
@@ -22,6 +23,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -57,5 +59,8 @@ public class JbpFrontApplication {
 //        PayCreateResponse result = payUnifiedOrderMng.create("0100f61e1940465a9c88ed54d212fb97", "wechatPay");
 //
 
+
+//        JdPayService jdPayService = run.getBean(JdPayService.class);
+//        jdPayService.sendCommission("PT937172974162353355396", new BigDecimal(598).multiply(BigDecimal.valueOf(0.8)));
     }
 }

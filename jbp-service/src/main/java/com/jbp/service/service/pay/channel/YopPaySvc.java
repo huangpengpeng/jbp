@@ -45,7 +45,7 @@ public class YopPaySvc {
         String userId = payUser.getAppKey() + "_" + payUnifiedOrder.getUserNo();
 
         TradeOrderParams tradeOrderParams = new TradeOrderParams(subMerchant.getMerchantNo(), payUnifiedOrder.getTxnSeqno(), payUnifiedOrder.getPayAmt().toString(), goodsName, channelNotifyUrl, "", channelReturnUrl);
-        tradeOrderParams.setParentMerchantNo(subMerchant.getMerchantNo());
+        tradeOrderParams.setParentMerchantNo(payChannel.getParentMerchantNo());
         TradeOrderResult tradeOrderResult = send("/rest/v1.0/trade/order", "POST", tradeOrderParams, TradeOrderResult.class);
 
         if ("wechatPay".equals(method)) {
