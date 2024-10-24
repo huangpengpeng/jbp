@@ -130,7 +130,6 @@ public class PayAct {
         return "SUCCESS";
     }
 
-
     @ApiOperation(value = "支付退款")
     @RequestMapping(value = "/refund", method = RequestMethod.POST)
     public CommonResult<PayRefundResponse> refund(@RequestBody @Validated PayRefundRequest request) {

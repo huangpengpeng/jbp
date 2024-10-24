@@ -149,6 +149,9 @@ public class JdPay {
         request.setNotifyUrl(jdPayConfig.getNotifyUrl() + "/" + request.getOutTradeNo());
         request.setPageBackUrl(jdPayConfig.getReturnUrl());
         request.setDivisionAccount(GsonUtil.toJson(getJdPayDivisionAccount(request.getOutTradeNo(), new BigDecimal(request.getTradeAmount()))));
+        JSONObject json = new JSONObject();
+        json.put("teamName", request.getTradeRemark());
+        request.setExtendParam(json.toJSONString());
         return this.baseExecute(JdPayConstant.AGGREGATE_CREATE_ORDER_URL, request, JdPayAggregateCreateOrderResponse.class);
     }
 

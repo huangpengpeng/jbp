@@ -21,6 +21,7 @@ import com.jbp.service.service.UserService;
 import com.jbp.service.service.agent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,8 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
     private UserService userService;
     @Resource
     private ClearingInvitationFlowDao dao;
+    @Resource
+    private Environment environment;
 
     @Override
     public Boolean create(Long clearingId) {
@@ -98,11 +101,20 @@ public class ClearingInvitationFlowServiceImpl extends UnifiedServiceImpl<Cleari
             }
         }
         if (clearingFinal.getCommType().intValue() == ProductCommEnum.月度管理补贴.getType()) {
+            boolean sm = environment.getProperty("spring.profiles.active").contains("sm");
+            boolean yk = environment.getProperty("spring.profiles.active").contains("yk");
+
             List<ClearingUser> clearingUsers = clearingUserService.getByClearing(clearingFinal.getId());
             List<Integer> uidList = clearingUsers.stream().map(ClearingUser::getUid).collect(Collectors.toList());
             List<ClearingInvitationFlow> flowList = Lists.newArrayList();
             for (ClearingUser clearingUser : clearingUsers) {
-                List<UserUpperDto> allUpper = invitationService.getAllUpper(clearingUser.getUid());
+                // 在加给上级
+                List<UserUpperDto> allUpper = Lists.newArrayList();
+                if (sm || yk) {
+                    allUpper = invitationService.getNoMountAllUpper(clearingUser.getUid());
+                }else{
+                    allUpper = invitationService.getAllUpper(clearingUser.getUid());
+                }
                 if (CollectionUtils.isNotEmpty(allUpper)) {
                     int i = 1;
                     for (UserUpperDto upperDto : allUpper) {

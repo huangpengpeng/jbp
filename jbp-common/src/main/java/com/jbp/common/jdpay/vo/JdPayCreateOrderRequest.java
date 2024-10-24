@@ -38,6 +38,8 @@ public class JdPayCreateOrderRequest implements Serializable {
      * 交易描述
      */
     private String tradeRemark;
+
+    private String extendParam;
     /**
      * 请求的端
      */
@@ -297,5 +299,13 @@ public class JdPayCreateOrderRequest implements Serializable {
 
     public void setSceneType(String sceneType) {
         this.sceneType = sceneType;
+    }
+
+    public String getExtendParam() {
+        return extendParam;
+    }
+
+    public void setExtendParam(String extendParam) {
+        this.extendParam = extendParam;
     }
 }

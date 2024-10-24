@@ -3,11 +3,16 @@ package com.jbp.front;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
+<<<<<<< HEAD
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.ClearingUser;
 import com.jbp.common.utils.DateTimeUtils;
 import com.jbp.service.service.agent.ClearingFinalService;
 import com.jbp.service.service.agent.impl.ClearingUserServiceImpl;
+=======
+import com.jbp.common.response.pay.PayCreateResponse;
+import com.jbp.service.service.pay.PayUnifiedOrderMng;
+>>>>>>> b10b430bb6ae18731fe12ea5bb010b4368fdd9be
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,12 +54,11 @@ public class JbpFrontApplication {
         System.out.println("spring.datasource.url=" + bean.getProperty("spring.datasource.url"));
         System.out.println("启动完成");
 
-//        ClearingUserServiceImpl clearingUserService =run.getBean(ClearingUserServiceImpl.class);
-//        ClearingFinalService clearingFinalService =run.getBean(ClearingFinalService.class);
-//        ClearingFinal clearingFinal =  clearingFinalService.getOne(new QueryWrapper<ClearingFinal>().lambda().eq(ClearingFinal::getId,28L));
-//        HashMap<Integer, ClearingUser> map =  new HashMap<>();
-//        Date startTime = DateTimeUtils.parseDate(clearingFinal.getStartTime());
-//        Date endTime = DateTimeUtils.parseDate(clearingFinal.getEndTime());
-//        clearingUserService.createMonthGuanLiUser(28L,clearingFinal,startTime,endTime,map);
+
+//        PayUnifiedOrderMng payUnifiedOrderMng = run.getBean(PayUnifiedOrderMng.class);
+//
+//        PayCreateResponse result = payUnifiedOrderMng.create("0100f61e1940465a9c88ed54d212fb97", "wechatPay");
+//
+
     }
 }
