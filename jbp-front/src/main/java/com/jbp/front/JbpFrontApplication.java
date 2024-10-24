@@ -3,7 +3,6 @@ package com.jbp.front;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.binarywang.spring.starter.wxjava.miniapp.config.WxMaAutoConfiguration;
-<<<<<<< HEAD
 import com.jbp.common.model.agent.ClearingFinal;
 import com.jbp.common.model.agent.ClearingUser;
 import com.jbp.common.utils.DateTimeUtils;
