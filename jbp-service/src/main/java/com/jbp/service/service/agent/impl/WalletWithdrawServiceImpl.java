@@ -244,7 +244,7 @@ public class WalletWithdrawServiceImpl extends ServiceImpl<WalletWithdrawDao, Wa
             if (walletWithdraw == null) {
                 throw new CrmebException("提现信息不存在，行号:" + i);
             }
-            if (!walletWithdraw.getStatus().equals(WalletWithdraw.StatusEnum.待出款.toString())) {
+            if (!walletWithdraw.getStatus().equals(WalletWithdraw.StatusEnum.待出款.toString()) && !walletWithdraw.getStatus().equals(WalletWithdraw.StatusEnum.待审核.toString())) {
                 throw new CrmebException("提现状态不是待出款，行号:" + i);
             }
             walletWithdraw.setStatus(WalletWithdraw.StatusEnum.已取消.toString());
